@@ -6,20 +6,35 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.search.integrationtest.mapper.orm.bridge.CustomMarkerConsumingPropertyBridge;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerAnnotation;
-import org.hibernate.search.integrationtest.mapper.orm.bridge.annotation.CustomMarkerConsumingPropertyBridgeAnnotation;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -237,4 +252,55 @@ public class OrmAnnotationMappingDiscoveryIT {
 		}
 	}
 
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ ElementType.METHOD, ElementType.FIELD})
+	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = CustomMarker.Builder.class))
+	private @interface CustomMarkerAnnotation {
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD, ElementType.FIELD})
+	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(type = CustomMarkerConsumingPropertyBridge.class))
+	private @interface CustomMarkerConsumingPropertyBridgeAnnotation {
+	}
+
+	private static final class CustomMarker {
+		public static class Builder implements AnnotationMarkerBuilder<CustomMarkerAnnotation> {
+			@Override
+			public void initialize(CustomMarkerAnnotation annotation) {
+				// Nothing to do
+			}
+
+			@Override
+			public Object build() {
+				return new CustomMarker();
+			}
+		}
+
+		private CustomMarker() {
+		}
+	}
+
+	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
+		private List<IndexObjectFieldAccessor> objectFieldAccessors = new ArrayList<>();
+
+		@Override
+		public void bind(PropertyBridgeBindingContext context) {
+			List<PojoModelProperty> markedProperties = context.getBridgedElement().properties()
+					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
+					.collect( Collectors.toList() );
+			for ( PojoModelProperty property : markedProperties ) {
+				objectFieldAccessors.add(
+						context.getIndexSchemaElement().objectField( property.getName() ).createAccessor()
+				);
+			}
+		}
+
+		@Override
+		public void write(DocumentElement target, PojoElement source) {
+			for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
+				objectFieldAccessor.add( target );
+			}
+		}
+	}
 }
