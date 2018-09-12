@@ -7,6 +7,8 @@
 package org.hibernate.search.integrationtest.mapper.pojo.test.util.rule;
 
 import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -16,7 +18,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMappingBuilder;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
-public class JavaBeanMappingSetupHelper
+public final class JavaBeanMappingSetupHelper
 		extends MappingSetupHelper<JavaBeanMappingSetupHelper.SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping> {
 
 	private final MethodHandles.Lookup lookup;
@@ -35,8 +37,8 @@ public class JavaBeanMappingSetupHelper
 	}
 
 	@Override
-	protected SetupContext createSetupContext(ConfigurationPropertySource propertySource) {
-		return new SetupContext( propertySource );
+	protected SetupContext createSetupContext() {
+		return new SetupContext( ConfigurationPropertySource.empty() );
 	}
 
 	@Override
@@ -44,13 +46,23 @@ public class JavaBeanMappingSetupHelper
 		toClose.close();
 	}
 
-	public class SetupContext
-			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.SetupContext {
+	public final class SetupContext
+			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.AbstractSetupContext {
+
+		// Use a LinkedHashMap for deterministic iteration
+		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 
 		private final ConfigurationPropertySource propertySource;
 
 		SetupContext(ConfigurationPropertySource propertySource) {
 			this.propertySource = propertySource;
+			// Ensure overridden properties will be applied
+			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
+		}
+
+		public SetupContext withProperty(String key, String value) {
+			overriddenProperties.put( key, value );
+			return thisAsC();
 		}
 
 		public JavaBeanMapping setup(Class<?> ... annotatedEntityTypes) {
@@ -67,13 +79,14 @@ public class JavaBeanMappingSetupHelper
 		}
 
 		@Override
-		protected JavaBeanMappingBuilder createBuilder() {
-			return JavaBeanMapping.builder( propertySource, lookup );
+		protected SetupContext withPropertyRadical(String keyRadical, String value) {
+			// The JavaBean mapper doesn't use any particular prefix, so the key radical is the whole key.
+			return withProperty( keyRadical, value );
 		}
 
 		@Override
-		protected void setProperty(JavaBeanMappingBuilder builder, String key, String value) {
-			builder.setProperty( key, value );
+		protected JavaBeanMappingBuilder createBuilder() {
+			return JavaBeanMapping.builder( propertySource, lookup );
 		}
 
 		@Override
