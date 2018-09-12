@@ -7,12 +7,9 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
@@ -20,14 +17,14 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.SetupContext, B, R> implements TestRule {
+public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.AbstractSetupContext, B, R> implements TestRule {
 
 	private final List<R> toClose = new ArrayList<>();
 
 	public C withBackendMock(BackendMock backendMock) {
-		return createSetupContext( ConfigurationPropertySource.empty() )
-				.withProperty( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.withProperty( "index.default.backend", backendMock.getBackendName() );
+		return createSetupContext()
+				.withPropertyRadical( "backend.stubBackend.type", StubBackendFactory.class.getName() )
+				.withPropertyRadical( "index.default.backend", backendMock.getBackendName() );
 	}
 
 	@Override
@@ -35,7 +32,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.S
 		return statement( base );
 	}
 
-	protected abstract C createSetupContext(ConfigurationPropertySource propertySource);
+	protected abstract C createSetupContext();
 
 	protected abstract void close(R toClose) throws Exception;
 
@@ -57,19 +54,14 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.S
 		};
 	}
 
-	public abstract class SetupContext {
+	public abstract class AbstractSetupContext {
 
-		// Use a LinkedHashMap for deterministic iteration
-		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
 		private final List<Configuration<B, R>> configurations = new ArrayList<>();
 
-		protected SetupContext() {
+		protected AbstractSetupContext() {
 		}
 
-		public final C withProperty(String key, String value) {
-			overriddenProperties.put( key, value );
-			return thisAsC();
-		}
+		protected abstract C withPropertyRadical(String keyRadical, String value);
 
 		/**
 		 * Add configuration to be applied to the builder during setup.
@@ -98,10 +90,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.S
 		public final R setup() {
 			B builder = createBuilder();
 
-			for ( Map.Entry<String, String> entry : overriddenProperties.entrySet() ) {
-				setProperty( builder, entry.getKey(), entry.getValue() );
-			}
-
 			configurations.forEach( c -> c.beforeBuild( builder ) );
 
 			R result = build( builder );
@@ -113,8 +101,6 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.S
 		}
 
 		protected abstract B createBuilder();
-
-		protected abstract void setProperty(B builder, String key, String value);
 
 		protected abstract R build(B builder);
 
