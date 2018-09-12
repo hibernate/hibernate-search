@@ -20,9 +20,9 @@ import java.lang.annotation.Target;
 @Target({ ElementType.METHOD, ElementType.TYPE })
 public @interface TestForIssue {
 	/**
-	 * The key of a JIRA issue tested.
+	 * The keys of the JIRA issues tested.
 	 *
-	 * @return The jira issue key
+	 * @return The JIRA issue keys
 	 */
-	String jiraKey();
+	String[] jiraKey();
 }
