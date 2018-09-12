@@ -50,6 +50,23 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  *
+ * ### Integrations
+ *
+ * #### Coveralls (optional)
+ *
+ * You need to enable your repository in Coveralls first: see https://coveralls.io/repos/new.
+ *
+ * Then you will also need to add the Coveralls repository token as credentials in Jenkins
+ * (see "Credentials" section below).
+ *
+ * #### Sonarcloud (optional)
+ *
+ * You need to enable the SonarCloud GitHub app for your repository:
+ * see https://github.com/apps/sonarcloud.
+ *
+ * Then you will also need to add SonarCloud credentials in Jenkins (see below)
+ * and to configure the SonarCloud organization in the job configuration file (see below).
+ *
  * ### Job configuration
  *
  * This file gets its configuration from three sources: environment variables, a configuration file, and credentials.
