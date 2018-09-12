@@ -41,7 +41,7 @@ public class JavaBeanMappingSetupHelper
 
 	@Override
 	protected void close(CloseableJavaBeanMapping toClose) {
-		// TODO
+		toClose.close();
 	}
 
 	public class SetupContext
