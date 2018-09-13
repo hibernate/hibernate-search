@@ -89,8 +89,8 @@ public class DocumentIdDefaultBridgeIT {
 		VALUE2
 	}
 
-	private <E, T> void doTestBridge(Class<E> entityType,
-			Function<T, E> newEntityFunction, T identifierValue, String identifierAsString) {
+	private <E, I> void doTestBridge(Class<E> entityType,
+			Function<I, E> newEntityFunction, I identifierValue, String identifierAsString) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
