@@ -17,10 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 
+import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridgeAnnotation;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
@@ -37,13 +41,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyVa
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.OptionalIntAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridgeAnnotation;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridgeAnnotation;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.engine.search.ProjectionConstants;
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -82,10 +79,6 @@ public class AnnotationMappingSmokeIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
-				.field( "optionalText", String.class )
-				.field( "optionalInt", Integer.class )
-				.field( "optionalIntAsString", String.class )
-				.field( "numericArray", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myTextField", String.class )
@@ -183,9 +176,6 @@ public class AnnotationMappingSmokeIT {
 			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
-			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
-			entity5.setOptionalInt( OptionalInt.of( 42 ) );
-			entity5.setNumericArray( new Integer[] { 1, 2, 3 } );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -308,12 +298,6 @@ public class AnnotationMappingSmokeIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
-							.field( "optionalText", entity5.getOptionalText().get() )
-							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
-							.field( "optionalIntAsString", String.valueOf( entity5.getOptionalInt().getAsInt() ) )
-							.field( "numericArray", entity5.getNumericArray()[0] )
-							.field( "numericArray", entity5.getNumericArray()[1] )
-							.field( "numericArray", entity5.getNumericArray()[2] )
 							.objectField( "embeddedIterable", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myTextField", entity1.getEmbedded().getText() )
@@ -611,12 +595,6 @@ public class AnnotationMappingSmokeIT {
 
 		private Integer numeric;
 
-		private String optionalText;
-
-		private Integer optionalInt;
-
-		private Integer[] numericArray;
-
 		private Iterable<IndexedEntity> embeddedIterable;
 
 		private List<IndexedEntity> embeddedList;
@@ -641,38 +619,6 @@ public class AnnotationMappingSmokeIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
-		}
-
-		@Field
-		public Optional<String> getOptionalText() {
-			return Optional.ofNullable( optionalText );
-		}
-
-		public void setOptionalText(Optional<String> text) {
-			this.optionalText = text.orElse( null );
-		}
-
-		@Field
-		@Field(
-				name = "optionalIntAsString",
-				valueBridge = @ValueBridgeBeanReference(type = OptionalIntAsStringValueBridge.class),
-				extractors = {} // Explicitly skip the default extractors
-		)
-		public OptionalInt getOptionalInt() {
-			return optionalInt == null ? OptionalInt.empty() : OptionalInt.of( optionalInt );
-		}
-
-		public void setOptionalInt(OptionalInt value) {
-			this.optionalInt = value.isPresent() ? value.getAsInt() : null;
-		}
-
-		@Field
-		public Integer[] getNumericArray() {
-			return numericArray;
-		}
-
-		public void setNumericArray(Integer[] numericArray) {
-			this.numericArray = numericArray;
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myTextField")

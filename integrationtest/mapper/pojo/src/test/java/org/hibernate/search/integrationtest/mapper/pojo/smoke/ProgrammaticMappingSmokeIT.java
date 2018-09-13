@@ -16,9 +16,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
 
+import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
@@ -28,13 +32,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.OptionalIntAsStringValueBridge;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.engine.search.ProjectionConstants;
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -73,10 +70,6 @@ public class ProgrammaticMappingSmokeIT {
 				)
 				.field( "myLocalDateField", LocalDate.class )
 				.field( "numeric", Integer.class )
-				.field( "optionalText", String.class )
-				.field( "optionalInt", Integer.class )
-				.field( "optionalIntAsString", String.class )
-				.field( "numericArray", Integer.class )
 				.objectField( "embeddedIterable", b2 -> b2
 						.objectField( "embedded", b3 -> b3
 								.field( "prefix_myTextField", String.class )
@@ -184,15 +177,6 @@ public class ProgrammaticMappingSmokeIT {
 									.documentId()
 							.property( "numeric" )
 									.field()
-							.property( "optionalText" )
-									.field()
-							.property( "optionalInt" )
-									.field()
-									.field( "optionalIntAsString" )
-											.valueBridge( OptionalIntAsStringValueBridge.class )
-											.withoutExtractors()
-							.property( "numericArray" )
-									.field()
 							.property( "embeddedIterable" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsIterable" )
@@ -247,9 +231,6 @@ public class ProgrammaticMappingSmokeIT {
 			YetAnotherIndexedEntity entity5 = new YetAnotherIndexedEntity();
 			entity5.setId( 5 );
 			entity5.setNumeric( 405 );
-			entity5.setOptionalText( Optional.of( "some more text (5)" ) );
-			entity5.setOptionalInt( OptionalInt.of( 42 ) );
-			entity5.setNumericArray( new Integer[] { 1, 2, 3 } );
 			IndexedEntity entity6 = new IndexedEntity();
 			entity6.setId( 6 );
 			entity6.setText( "some more text (6)" );
@@ -373,12 +354,6 @@ public class ProgrammaticMappingSmokeIT {
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
-							.field( "optionalText", entity5.getOptionalText().get() )
-							.field( "optionalInt", entity5.getOptionalInt().getAsInt() )
-							.field( "optionalIntAsString", String.valueOf( entity5.getOptionalInt().getAsInt() ) )
-							.field( "numericArray", entity5.getNumericArray()[0] )
-							.field( "numericArray", entity5.getNumericArray()[1] )
-							.field( "numericArray", entity5.getNumericArray()[2] )
 							.objectField( "embeddedIterable", b2 -> b2
 									.objectField( "embedded", b3 -> b3
 											.field( "prefix_myTextField", entity1.getEmbedded().getText() )
@@ -654,12 +629,6 @@ public class ProgrammaticMappingSmokeIT {
 
 		private Integer numeric;
 
-		private String optionalText;
-
-		private Integer optionalInt;
-
-		private Integer[] numericArray;
-
 		private Iterable<IndexedEntity> embeddedIterable;
 
 		private List<IndexedEntity> embeddedList;
@@ -682,30 +651,6 @@ public class ProgrammaticMappingSmokeIT {
 
 		public void setNumeric(Integer numeric) {
 			this.numeric = numeric;
-		}
-
-		public Optional<String> getOptionalText() {
-			return Optional.ofNullable( optionalText );
-		}
-
-		public void setOptionalText(Optional<String> text) {
-			this.optionalText = text.orElse( null );
-		}
-
-		public OptionalInt getOptionalInt() {
-			return optionalInt == null ? OptionalInt.empty() : OptionalInt.of( optionalInt );
-		}
-
-		public void setOptionalInt(OptionalInt value) {
-			this.optionalInt = value.isPresent() ? value.getAsInt() : null;
-		}
-
-		public Integer[] getNumericArray() {
-			return numericArray;
-		}
-
-		public void setNumericArray(Integer[] numericArray) {
-			this.numericArray = numericArray;
 		}
 
 		public Iterable<IndexedEntity> getEmbeddedIterable() {
