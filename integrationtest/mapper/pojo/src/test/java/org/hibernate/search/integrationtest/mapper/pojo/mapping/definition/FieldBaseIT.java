@@ -7,14 +7,15 @@
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -25,8 +26,11 @@ import org.junit.Test;
 
 /**
  * Test common use cases of the {@code @Field} annotation.
- *
+ * <p>
  * Does not test default bridges, which are tested in {@link FieldDefaultBridgeIT}.
+ * <p>
+ * Does not test uses of container value extractors, which are tested in {@link FieldContainerValueExtractorBaseIT}
+ * (and others, see javadoc on that class).
  */
 public class FieldBaseIT {
 
@@ -182,6 +186,37 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
+						.failure(
+								"Value bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
+										+ Integer.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_invalidInputTypeForValueBridge_implicitContainerValueExtractor() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			List<Integer> numbers;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@Field(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			public List<Integer> getNumbers() {
+				return numbers;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".numbers" )
 						.failure(
 								"Value bridge '" + MyStringBridge.TOSTRING + "' cannot be applied to input type '"
 										+ Integer.class.getName() + "'"
