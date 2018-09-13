@@ -152,10 +152,10 @@ public class FieldDefaultBridgeIT {
 		VALUE2
 	}
 
-	private <E, T> void doTestPassThroughBridge(Class<E> entityType,
-			BiFunction<Integer, T, E> newEntityFunction,
-			Class<T> propertyAndIndexFieldType,
-			T propertyAndIndexedFieldValue) {
+	private <E, P> void doTestPassThroughBridge(Class<E> entityType,
+			BiFunction<Integer, P, E> newEntityFunction,
+			Class<P> propertyAndIndexFieldType,
+			P propertyAndIndexedFieldValue) {
 		doTestBridge(
 				entityType,
 				newEntityFunction,
@@ -164,10 +164,10 @@ public class FieldDefaultBridgeIT {
 		);
 	}
 
-	private <E, T, R> void doTestBridge(Class<E> entityType,
-			BiFunction<Integer, T, E> newEntityFunction,
-			Class<T> propertyType, Class<R> indexedFieldType,
-			T propertyValue, R indexedFieldValue) {
+	private <E, P, F> void doTestBridge(Class<E> entityType,
+			BiFunction<Integer, P, E> newEntityFunction,
+			Class<P> propertyType, Class<F> indexedFieldType,
+			P propertyValue, F indexedFieldValue) {
 		// Schema
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.field( "myProperty", indexedFieldType )
