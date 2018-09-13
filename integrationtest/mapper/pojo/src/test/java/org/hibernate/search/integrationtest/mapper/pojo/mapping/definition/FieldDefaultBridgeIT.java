@@ -190,7 +190,7 @@ public class FieldDefaultBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Searching
-		// TODO HSEARCH-3223 also test projections going through the bridge
+		// TODO HSEARCH-3361 also test projections going through the bridge
 	}
 
 }
