@@ -11,8 +11,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
-import java.util.stream.Stream;
 
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
@@ -21,13 +21,8 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReferen
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -215,69 +210,6 @@ public class BridgeIT {
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	@MarkerMapping(builder = @MarkerMappingBuilderReference)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
-	}
-
-	@Test
-	public void containerValueExtractor_error_cannotClassTypePattern() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			@Field(extractors = @ContainerValueExtractorBeanReference(type = RawContainerValueExtractor.class))
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
-						.failure(
-								"Cannot interpret the type arguments to the ContainerValueExtractor interface in "
-										+ " implementation '" + RawContainerValueExtractor.class.getName()
-										+ "'. Only the following implementations of ContainerValueExtractor are valid"
-						)
-						.build()
-				);
-	}
-
-	private static class RawContainerValueExtractor implements ContainerValueExtractor {
-		@Override
-		public Stream extract(Object container) {
-			throw new UnsupportedOperationException( "Should not be called" );
-		}
-	}
-
-	@Test
-	public void containerValueExtractor_error_invalidContainerValueExtractorForType() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			@Field(extractors = @ContainerValueExtractorBeanReference(type = CollectionElementExtractor.class))
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
-						.failure(
-								"Cannot apply the requested container value extractor '"
-										+ CollectionElementExtractor.class.getName()
-										+ "' to type '" + Integer.class.getName() + "'"
-						)
-						.build()
-				);
 	}
 
 }
