@@ -24,22 +24,20 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.ProjectionConstants;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
-
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,9 +82,10 @@ public class SearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( fieldPath )
+					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -105,9 +104,10 @@ public class SearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( fieldPath )
+					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -126,9 +126,10 @@ public class SearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( fieldPath )
+					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -151,7 +152,11 @@ public class SearchProjectionIT {
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY );
 
 		query = searchTarget.query( sessionContext )
-				.asProjections( ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT )
+				.asProjections(
+						searchTarget.projection().documentReference().toProjection(),
+						searchTarget.projection().reference().toProjection(),
+						searchTarget.projection().object().toProjection()
+				)
 				.predicate().matchAll().end()
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -174,9 +179,9 @@ public class SearchProjectionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asProjections(
-						indexMapping.string1Field.relativeFieldName,
-						ProjectionConstants.DOCUMENT_REFERENCE,
-						indexMapping.string2Field.relativeFieldName
+						searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection(),
+						searchTarget.projection().documentReference().toProjection(),
+						searchTarget.projection().field( indexMapping.string2Field.relativeFieldName, String.class ).toProjection()
 				)
 				.predicate().matchAll().end()
 				.build();
@@ -214,9 +219,10 @@ public class SearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( fieldPath )
+					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -238,9 +244,10 @@ public class SearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( fieldPath )
+					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -274,7 +281,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
-				.asProjections( "unknownField" )
+				.asProjections( searchTarget.projection().field( "unknownField", Object.class ).toProjection() )
 				.predicate().matchAll().end()
 				.build();
 	}
@@ -289,7 +296,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
-				.asProjections( "nestedObject" )
+				.asProjections( searchTarget.projection().field( "nestedObject", Object.class ).toProjection() )
 				.predicate().matchAll().end()
 				.build();
 	}
@@ -304,7 +311,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query( sessionContext )
-				.asProjections( "flattenedObject" )
+				.asProjections( searchTarget.projection().field( "flattenedObject", Object.class ).toProjection() )
 				.predicate().matchAll().end()
 				.build();
 	}

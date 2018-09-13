@@ -21,11 +21,13 @@ public class LuceneSearchTargetContext
 	private final SearchPredicateFactoryImpl searchPredicateFactory;
 	private final SearchSortFactoryImpl searchSortFactory;
 	private final SearchQueryFactoryImpl searchQueryFactory;
+	private final LuceneSearchProjectionFactoryImpl searchProjectionFactory;
 
 	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel );
+		this.searchProjectionFactory = new LuceneSearchProjectionFactoryImpl();
+		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
 
 	@Override
@@ -41,5 +43,10 @@ public class LuceneSearchTargetContext
 	@Override
 	public SearchQueryFactoryImpl getSearchQueryFactory() {
 		return searchQueryFactory;
+	}
+
+	@Override
+	public LuceneSearchProjectionFactoryImpl getSearchProjectionFactory() {
+		return searchProjectionFactory;
 	}
 }

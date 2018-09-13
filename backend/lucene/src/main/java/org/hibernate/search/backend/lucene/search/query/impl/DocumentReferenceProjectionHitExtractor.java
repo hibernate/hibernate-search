@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-class DocumentReferenceProjectionHitExtractor extends AbstractDocumentReferenceHitExtractor<ProjectionHitCollector> {
+public class DocumentReferenceProjectionHitExtractor extends AbstractDocumentReferenceHitExtractor<ProjectionHitCollector> {
 
 	private static final DocumentReferenceProjectionHitExtractor INSTANCE = new DocumentReferenceProjectionHitExtractor();
 

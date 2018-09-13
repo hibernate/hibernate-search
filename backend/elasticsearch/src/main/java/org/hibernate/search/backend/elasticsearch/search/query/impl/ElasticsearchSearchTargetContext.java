@@ -18,12 +18,14 @@ public class ElasticsearchSearchTargetContext
 	private final SearchPredicateFactoryImpl searchPredicateFactory;
 	private final SearchSortFactoryImpl searchSortFactory;
 	private final SearchQueryFactoryImpl searchQueryFactory;
+	private final ElasticsearchSearchProjectionFactoryImpl searchProjectionFactory;
 
 	public ElasticsearchSearchTargetContext(SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel );
+		this.searchProjectionFactory = new ElasticsearchSearchProjectionFactoryImpl();
+		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
 
 	@Override
@@ -39,5 +41,10 @@ public class ElasticsearchSearchTargetContext
 	@Override
 	public SearchQueryFactoryImpl getSearchQueryFactory() {
 		return searchQueryFactory;
+	}
+
+	@Override
+	public ElasticsearchSearchProjectionFactoryImpl getSearchProjectionFactory() {
+		return searchProjectionFactory;
 	}
 }

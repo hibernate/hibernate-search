@@ -17,7 +17,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridge;
@@ -28,6 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -36,7 +36,6 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -452,16 +451,18 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search_projection() {
 		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<List<?>> query = manager.search(
+			PojoSearchTarget<?> searchTarget = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			)
+			);
+
+			SearchQuery<List<?>> query = searchTarget
 					.query()
 					.asProjections(
-							"myTextField",
-							ProjectionConstants.REFERENCE,
-							"myLocalDateField",
-							ProjectionConstants.DOCUMENT_REFERENCE,
-							"customBridgeOnClass.text"
+							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
+							searchTarget.projection().reference().toProjection(),
+							searchTarget.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
+							searchTarget.projection().documentReference().toProjection(),
+							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
 					.predicate().matchAll().end()
 					.build();

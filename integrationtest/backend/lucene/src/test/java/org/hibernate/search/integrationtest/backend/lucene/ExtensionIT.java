@@ -285,7 +285,7 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
-				.asProjections( "nativeField" )
+				.asProjections( searchTarget.projection().field( "nativeField", Integer.class ).toProjection() )
 				.predicate().match().onField( "string" ).matching( "text 1" ).end()
 				.build();
 
@@ -313,7 +313,7 @@ public class ExtensionIT {
 				"projection on native field not supporting projections",
 				() -> {
 						SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
-								.asProjections( "nativeField_unsupportedProjection" )
+								.asProjections( searchTarget.projection().field( "nativeField_unsupportedProjection", Integer.class ).toProjection() )
 								.predicate().matchAll().end()
 								.build();
 						projectionQuery.execute();

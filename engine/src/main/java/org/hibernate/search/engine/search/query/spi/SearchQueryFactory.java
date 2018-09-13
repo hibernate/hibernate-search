@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.query.spi;
 import java.util.List;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.search.SearchProjection;
 
 /**
  * A factory for search queries.
@@ -27,6 +28,6 @@ public interface SearchQueryFactory<C> {
 			HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator);
 
 	<T> SearchQueryBuilder<T, C> asProjections(SessionContext sessionContext,
-			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, String... projections);
+			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projection);
 
 }

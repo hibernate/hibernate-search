@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.dsl.spi;
 
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
@@ -22,5 +23,7 @@ public interface SearchTargetContext<C> {
 	SearchSortFactory<? super C, ?> getSearchSortFactory();
 
 	SearchQueryFactory<C> getSearchQueryFactory();
+
+	SearchProjectionFactory getSearchProjectionFactory();
 
 }

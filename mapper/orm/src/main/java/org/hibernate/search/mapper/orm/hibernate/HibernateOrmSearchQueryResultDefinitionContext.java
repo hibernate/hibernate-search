@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.hibernate;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
 /**
@@ -23,7 +24,7 @@ public interface HibernateOrmSearchQueryResultDefinitionContext<O>
 	}
 
 	@Override
-	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(String... projections) {
+	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}
 
@@ -33,6 +34,6 @@ public interface HibernateOrmSearchQueryResultDefinitionContext<O>
 	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
 			Function<List<?>, T> hitTransformer,
-			String... projections);
+			SearchProjection<?>... projections);
 
 }

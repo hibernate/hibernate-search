@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.EventContext;
@@ -160,7 +161,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 7,
 			value = "Unknown projections %1$s.")
-	SearchException unknownProjectionForSearch(Collection<String> projections, @Param EventContext context);
+	SearchException unknownProjectionForSearch(Collection<SearchProjection<?>> projections, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 8,
 			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
@@ -285,4 +286,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 37,
 			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
 	SearchException analysisComponentParameterConflict(String name, JsonElement value1, JsonElement value2);
+
+	@Message(id = ID_OFFSET_3 + 38,
+			value = "An Elasticsearch query cannot include search projections built using a non-Elasticsearch search target."
+			+ " Given projection was: '%1$s'")
+	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 }

@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping;
 
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface PojoSearchTarget<T> {
 
@@ -20,5 +21,7 @@ public interface PojoSearchTarget<T> {
 	SearchPredicateContainerContext<SearchPredicate> predicate();
 
 	SearchSortContainerContext<SearchSort> sort();
+
+	SearchProjectionContainerContext projection();
 
 }

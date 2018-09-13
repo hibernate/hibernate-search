@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 
-class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<LoadingHitCollector> {
+public class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<LoadingHitCollector> {
 
 	private static final ObjectHitExtractor INSTANCE = new ObjectHitExtractor();
 

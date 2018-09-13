@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.dsl.query;
 import java.util.List;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 
 /**
@@ -22,13 +23,13 @@ public interface SearchQueryResultDefinitionContext<R, O> {
 		return asReferences( Function.identity() );
 	}
 
-	default SearchQueryWrappingDefinitionResultContext<SearchQuery<List<?>>> asProjections(String ... projections) {
+	<T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer);
+
+	default SearchQueryWrappingDefinitionResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}
 
-	<T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer);
-
 	<T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asProjections(Function<List<?>, T> hitTransformer,
-			String ... projections);
+			SearchProjection<?>... projections);
 
 }

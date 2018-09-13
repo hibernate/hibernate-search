@@ -12,16 +12,17 @@ import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
@@ -39,9 +40,14 @@ class SearchQueryFactoryImpl
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
+	private final LuceneSearchProjectionFactoryImpl searchProjectionFactory;
+
+	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext,
+			LuceneSearchTargetModel searchTargetModel,
+			LuceneSearchProjectionFactoryImpl searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
+		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
 	@Override
@@ -59,7 +65,7 @@ class SearchQueryFactoryImpl
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asProjections(
 			SessionContext sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
-			String... projections) {
+			SearchProjection<?>... projections) {
 		BitSet projectionFound = new BitSet( projections.length );
 
 		HitExtractor<? super ProjectionHitCollector> hitExtractor;
@@ -80,7 +86,7 @@ class SearchQueryFactoryImpl
 		}
 		if ( projectionFound.cardinality() < projections.length ) {
 			projectionFound.flip( 0, projections.length );
-			List<String> unknownProjections = projectionFound.stream()
+			List<SearchProjection<?>> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
 			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getIndexesEventContext() );
@@ -90,34 +96,19 @@ class SearchQueryFactoryImpl
 	}
 
 	private HitExtractor<? super ProjectionHitCollector> createProjectionHitExtractor(
-			LuceneIndexModel indexModel, String[] projections, BitSet projectionFound) {
+			LuceneIndexModel indexModel, SearchProjection<?>[] projections, BitSet projectionFound) {
 		List<HitExtractor<? super ProjectionHitCollector>> extractors = new ArrayList<>( projections.length );
 		for ( int i = 0; i < projections.length; ++i ) {
-			String projection = projections[i];
-			switch ( projection ) {
-				case ProjectionConstants.OBJECT:
-					projectionFound.set( i );
-					extractors.add( ObjectHitExtractor.get() );
-					break;
-				case ProjectionConstants.REFERENCE:
-					projectionFound.set( i );
-					extractors.add( DocumentReferenceHitExtractor.get() );
-					break;
-				case ProjectionConstants.DOCUMENT_REFERENCE:
-					projectionFound.set( i );
-					extractors.add( DocumentReferenceProjectionHitExtractor.get() );
-					break;
-				default:
-					LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( projection );
-					if ( schemaNode != null ) {
-						projectionFound.set( i );
-						extractors.add( new FieldProjectionHitExtractor<>( projection, schemaNode ) );
-					}
-					else {
-						// Make sure that the result list will have the correct indices and size
-						extractors.add( NullProjectionHitExtractor.get() );
-					}
-					break;
+			LuceneSearchProjection<?> projection = searchProjectionFactory.toImplementation( projections[i] );
+
+			Optional<HitExtractor<? super ProjectionHitCollector>> hitExtractorOptional =
+					projection.getHitExtractor( indexModel );
+			if ( hitExtractorOptional.isPresent() ) {
+				projectionFound.set( i );
+				extractors.add( hitExtractorOptional.get() );
+			}
+			else {
+				extractors.add( NullProjectionHitExtractor.get() );
 			}
 		}
 		return new CompositeHitExtractor<>( extractors );

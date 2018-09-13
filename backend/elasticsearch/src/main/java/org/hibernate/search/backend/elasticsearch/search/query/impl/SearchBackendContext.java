@@ -57,15 +57,15 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	DocumentReferenceHitExtractor getDocumentReferenceHitExtractor() {
+	public DocumentReferenceHitExtractor getDocumentReferenceHitExtractor() {
 		return documentReferenceHitExtractor;
 	}
 
-	ObjectHitExtractor getObjectHitExtractor() {
+	public ObjectHitExtractor getObjectHitExtractor() {
 		return objectHitExtractor;
 	}
 
-	DocumentReferenceProjectionHitExtractor getDocumentReferenceProjectionHitExtractor() {
+	public DocumentReferenceProjectionHitExtractor getDocumentReferenceProjectionHitExtractor() {
 		return documentReferenceProjectionHitExtractor;
 	}
 

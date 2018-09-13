@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
@@ -51,5 +52,10 @@ public class HibernateOrmSearchTargetImpl<T> implements HibernateOrmSearchTarget
 	@Override
 	public SearchSortContainerContext<SearchSort> sort() {
 		return searchTargetDelegate.sort();
+	}
+
+	@Override
+	public SearchProjectionContainerContext projection() {
+		return searchTargetDelegate.projection();
 	}
 }

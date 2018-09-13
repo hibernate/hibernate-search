@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -24,14 +25,15 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -44,12 +46,9 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-
-import org.assertj.core.api.Assertions;
 
 /**
  * @author Yoann Rodiere
@@ -336,17 +335,20 @@ public class ProgrammaticMappingSmokeIT {
 	public void search_projection() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<List<?>> query = ftSession.search(
-							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-					)
+
+			FullTextSearchTarget<?> searchTarget = ftSession.search(
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			);
+
+			FullTextQuery<List<?>> query = searchTarget
 					.query()
 					.asProjections(
-							"myTextField",
-							ProjectionConstants.REFERENCE,
-							"myLocalDateField",
-							ProjectionConstants.DOCUMENT_REFERENCE,
-							ProjectionConstants.OBJECT,
-							"customBridgeOnClass.text"
+							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
+							searchTarget.projection().reference().toProjection(),
+							searchTarget.projection().field( "myLocalDateField", String.class ).toProjection(),
+							searchTarget.projection().documentReference().toProjection(),
+							searchTarget.projection().object().toProjection(),
+							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
 					.predicate().matchAll().end()
 					.build();

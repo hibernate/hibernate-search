@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
@@ -30,5 +31,7 @@ public interface IndexSearchTarget {
 	SearchPredicateContainerContext<SearchPredicate> predicate();
 
 	SearchSortContainerContext<SearchSort> sort();
+
+	SearchProjectionContainerContext projection();
 
 }

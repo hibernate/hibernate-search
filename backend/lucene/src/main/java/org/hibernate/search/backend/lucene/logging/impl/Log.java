@@ -12,18 +12,20 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
+import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.MessageConstants;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 import org.hibernate.search.util.impl.common.logging.EventContextFormatter;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.util.impl.common.MessageConstants;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -34,9 +36,6 @@ import org.jboss.logging.annotations.MessageLogger;
 import org.jboss.logging.annotations.Param;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
-
-import org.apache.lucene.search.Query;
-import org.apache.lucene.util.Version;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -252,7 +251,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 26,
 			value = "Unknown projections %1$s.")
-	SearchException unknownProjectionForSearch(Collection<String> projections, @Param EventContext context);
+	SearchException unknownProjectionForSearch(Collection<SearchProjection<?>> projections, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "An IOException happened while executing the query '%1$s'.")
@@ -366,4 +365,8 @@ public interface Log extends BasicLogger {
 			value = "Unknown normalizer: '%1$s'. Make sure you defined this normalizer.")
 	SearchException unknownNormalizer(String normalizerName, @Param EventContext context);
 
+	@Message(id = ID_OFFSET_2 + 55,
+			value = "A Lucene query cannot include search projections built using a non-Lucene search target."
+			+ " Given projection was: '%1$s'")
+	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 }

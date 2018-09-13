@@ -175,7 +175,7 @@ public class SearchMultiIndexIT {
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
-				.asProjections( "sortField" )
+				.asProjections( searchTarget.projection().field( "sortField", String.class ).toProjection() )
 				.predicate().matchAll().end()
 				.build();
 
@@ -209,7 +209,7 @@ public class SearchMultiIndexIT {
 		// Projection
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
-				.asProjections( "additionalField" )
+				.asProjections( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
 				.predicate().matchAll().end()
 				.build();
 
@@ -261,11 +261,14 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on unknown field with multiple targeted indexes",
-				() -> searchTarget.query( sessionContext ).asProjections( "unknownField" )
+				() -> searchTarget.query( sessionContext ).asProjections(
+						searchTarget.projection().field( "unknownField", Object.class ).toProjection()
+				)
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown projections [unknownField]" )
+				.hasMessageContaining( "Unknown projections" )
+				.hasMessageContaining( "unknownField" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames(
 								INDEX_NAME_1_1,

@@ -12,16 +12,17 @@ import java.util.BitSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.ProjectionConstants;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
@@ -39,9 +40,13 @@ class SearchQueryFactoryImpl
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel) {
+	private final ElasticsearchSearchProjectionFactoryImpl searchProjectionFactory;
+
+	SearchQueryFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel,
+			ElasticsearchSearchProjectionFactoryImpl searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
+		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
 	@Override
@@ -63,7 +68,7 @@ class SearchQueryFactoryImpl
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjections(
 			SessionContext sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
-			String... projections) {
+			SearchProjection<?>... projections) {
 		BitSet projectionFound = new BitSet( projections.length );
 
 		HitExtractor<? super ProjectionHitCollector> hitExtractor;
@@ -84,7 +89,7 @@ class SearchQueryFactoryImpl
 		}
 		if ( projectionFound.cardinality() < projections.length ) {
 			projectionFound.flip( 0, projections.length );
-			List<String> unknownProjections = projectionFound.stream()
+			List<SearchProjection<?>> unknownProjections = projectionFound.stream()
 					.mapToObj( i -> projections[i] )
 					.collect( Collectors.toList() );
 			throw log.unknownProjectionForSearch( unknownProjections, searchTargetModel.getIndexesEventContext() );
@@ -94,34 +99,19 @@ class SearchQueryFactoryImpl
 	}
 
 	private HitExtractor<? super ProjectionHitCollector> createProjectionHitExtractor(
-			ElasticsearchIndexModel indexModel, String[] projections, BitSet projectionFound) {
+			ElasticsearchIndexModel indexModel, SearchProjection<?>[] projections, BitSet projectionFound) {
 		List<HitExtractor<? super ProjectionHitCollector>> extractors = new ArrayList<>( projections.length );
 		for ( int i = 0; i < projections.length; ++i ) {
-			String projection = projections[i];
-			switch ( projection ) {
-				case ProjectionConstants.OBJECT:
-					projectionFound.set( i );
-					extractors.add( searchBackendContext.getObjectHitExtractor() );
-					break;
-				case ProjectionConstants.REFERENCE:
-					projectionFound.set( i );
-					extractors.add( searchBackendContext.getDocumentReferenceHitExtractor() );
-					break;
-				case ProjectionConstants.DOCUMENT_REFERENCE:
-					projectionFound.set( i );
-					extractors.add( searchBackendContext.getDocumentReferenceProjectionHitExtractor() );
-					break;
-				default:
-					ElasticsearchIndexSchemaFieldNode<?> node = indexModel.getFieldNode( projection );
-					if ( node != null ) {
-						projectionFound.set( i );
-						extractors.add( new SourceHitExtractor<>( projection, node.getConverter() ) );
-					}
-					else {
-						// Make sure that the result list will have the correct indices and size
-						extractors.add( NullProjectionHitExtractor.get() );
-					}
-					break;
+			ElasticsearchSearchProjection<?> projection = searchProjectionFactory.toImplementation( projections[i] );
+
+			Optional<HitExtractor<? super ProjectionHitCollector>> hitExtractorOptional =
+					projection.getHitExtractor( searchBackendContext, indexModel );
+			if ( hitExtractorOptional.isPresent() ) {
+				projectionFound.set( i );
+				extractors.add( hitExtractorOptional.get() );
+			}
+			else {
+				extractors.add( NullProjectionHitExtractor.get() );
 			}
 		}
 		return new CompositeHitExtractor<>( extractors );

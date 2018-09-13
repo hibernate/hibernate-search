@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
@@ -35,5 +36,10 @@ class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
 	@Override
 	public SearchSortContainerContext<SearchSort> sort() {
 		return delegate.sort();
+	}
+
+	@Override
+	public SearchProjectionContainerContext projection() {
+		return delegate.projection();
 	}
 }

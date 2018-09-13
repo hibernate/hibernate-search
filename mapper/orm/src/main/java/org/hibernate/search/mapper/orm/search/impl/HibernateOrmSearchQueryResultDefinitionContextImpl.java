@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.impl.FullTextQueryImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 
 public class HibernateOrmSearchQueryResultDefinitionContextImpl<O>
 		implements HibernateOrmSearchQueryResultDefinitionContext<O> {
@@ -48,7 +49,7 @@ public class HibernateOrmSearchQueryResultDefinitionContextImpl<O>
 
 	@Override
 	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
-			Function<List<?>, T> hitTransformer, String... projections) {
+			Function<List<?>, T> hitTransformer, SearchProjection<?>... projections) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchTargetDelegate.query( objectLoaderBuilder.build( loadingOptions ) )
 				.asProjections( hitTransformer, projections )

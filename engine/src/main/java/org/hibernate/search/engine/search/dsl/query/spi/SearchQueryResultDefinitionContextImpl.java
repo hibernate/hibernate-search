@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
@@ -66,7 +67,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	@Override
 	public <T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asProjections(
-			Function<List<?>, T> hitTransformer, String... projections) {
+			Function<List<?>, T> hitTransformer, SearchProjection<?>... projections) {
 		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
 				new ProjectionHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
 						projections.length );

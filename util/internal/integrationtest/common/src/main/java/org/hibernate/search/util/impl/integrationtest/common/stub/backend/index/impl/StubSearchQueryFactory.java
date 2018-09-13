@@ -9,15 +9,16 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.List;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchQueryBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchQueryBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 class StubSearchQueryFactory implements SearchQueryFactory<StubQueryElementCollector> {
 	private final StubBackend backend;
@@ -42,7 +43,7 @@ class StubSearchQueryFactory implements SearchQueryFactory<StubQueryElementColle
 
 	@Override
 	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjections(SessionContext sessionContext,
-			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, String... projections) {
+			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.PROJECTIONS, hitAggregator );
 	}
 }

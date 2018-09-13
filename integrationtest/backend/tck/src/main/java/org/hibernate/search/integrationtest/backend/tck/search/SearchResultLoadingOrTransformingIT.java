@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
+import org.easymock.EasyMock;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
@@ -26,25 +27,21 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import org.easymock.EasyMock;
 
 public class SearchResultLoadingOrTransformingIT {
 
@@ -197,8 +194,10 @@ public class SearchResultLoadingOrTransformingIT {
 		SearchQuery<List<?>> projectionsQuery =
 				searchTarget.query( sessionContext, referenceTransformerMock, objectLoaderMock )
 						.asProjections(
-								"string", ProjectionConstants.DOCUMENT_REFERENCE,
-								ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT
+								searchTarget.projection().field( "string", String.class ).toProjection(),
+								searchTarget.projection().documentReference().toProjection(),
+								searchTarget.projection().reference().toProjection(),
+								searchTarget.projection().object().toProjection()
 						)
 						.predicate().matchAll().end()
 						.build();
@@ -238,9 +237,14 @@ public class SearchResultLoadingOrTransformingIT {
 		SearchQuery<StubTransformedHit> query = searchTarget.query( sessionContext )
 				.asProjections(
 						hitTransformerMock,
-						"string", "string_analyzed", "integer", "localDate", "geoPoint",
-						ProjectionConstants.DOCUMENT_REFERENCE, ProjectionConstants.DOCUMENT_REFERENCE,
-						ProjectionConstants.OBJECT
+						searchTarget.projection().field( "string", String.class ).toProjection(),
+						searchTarget.projection().field( "string_analyzed", String.class ).toProjection(),
+						searchTarget.projection().field( "integer", Integer.class ).toProjection(),
+						searchTarget.projection().field( "localDate", LocalDate.class ).toProjection(),
+						searchTarget.projection().field( "geoPoint", GeoPoint.class ).toProjection(),
+						searchTarget.projection().documentReference().toProjection(),
+						searchTarget.projection().reference().toProjection(),
+						searchTarget.projection().object().toProjection()
 				)
 				.predicate().matchAll().end()
 				.build();
@@ -283,8 +287,10 @@ public class SearchResultLoadingOrTransformingIT {
 				searchTarget.query( sessionContext, referenceTransformerMock, objectLoaderMock )
 						.asProjections(
 								hitTransformerMock,
-								"string", ProjectionConstants.DOCUMENT_REFERENCE,
-								ProjectionConstants.REFERENCE, ProjectionConstants.OBJECT
+								searchTarget.projection().field( "string", String.class ).toProjection(),
+								searchTarget.projection().documentReference().toProjection(),
+								searchTarget.projection().reference().toProjection(),
+								searchTarget.projection().object().toProjection()
 						)
 						.predicate().matchAll().end()
 						.build();

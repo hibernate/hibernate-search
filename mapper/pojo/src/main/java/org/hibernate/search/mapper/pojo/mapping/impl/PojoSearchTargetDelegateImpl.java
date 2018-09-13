@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.AssertionFailure;
@@ -65,6 +66,11 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	@Override
 	public SearchSortContainerContext<SearchSort> sort() {
 		return getIndexSearchTarget().sort();
+	}
+
+	@Override
+	public SearchProjectionContainerContext projection() {
+		return getIndexSearchTarget().projection();
 	}
 
 	private IndexSearchTarget getIndexSearchTarget() {

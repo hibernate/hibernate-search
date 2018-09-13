@@ -20,20 +20,24 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.StubSearchProjectionFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortFactory;
 
 class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTargetContext<StubQueryElementCollector> {
 	private final StubSearchPredicateFactory predicateFactory;
 	private final StubSearchSortFactory sortFactory;
 	private final StubSearchQueryFactory queryFactory;
+	private final StubSearchProjectionFactory projectionFactory;
 
 	private StubIndexSearchTarget(Builder builder) {
 		this.predicateFactory = new StubSearchPredicateFactory();
 		this.sortFactory = new StubSearchSortFactory();
 		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
 		this.queryFactory = new StubSearchQueryFactory( builder.backend, immutableIndexNames );
+		this.projectionFactory = new StubSearchProjectionFactory();
 	}
 
 	@Override
@@ -56,6 +60,11 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 	@Override
 	public StubSearchQueryFactory getSearchQueryFactory() {
 		return queryFactory;
+	}
+
+	@Override
+	public SearchProjectionFactory<?> getSearchProjectionFactory() {
+		return projectionFactory;
 	}
 
 	@Override

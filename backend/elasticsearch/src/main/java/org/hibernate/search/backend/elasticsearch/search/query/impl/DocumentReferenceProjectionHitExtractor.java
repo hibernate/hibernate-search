@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
 import com.google.gson.JsonObject;
 
 /**
- * A hit extractor used when projecting on the document reference,
- * when we don't want the reference to be transformed,
+ * A hit extractor used when projecting on the document reference, when we don't want the reference to be transformed,
  * but we just want the raw reference to be inserted into the projection.
  *
- * @see org.hibernate.search.engine.search.ProjectionConstants#DOCUMENT_REFERENCE
- * @see SearchQueryFactory#asProjections(SessionContext, HitAggregator, String...)
+ * @see SearchQueryFactory#asProjections(org.hibernate.search.engine.common.spi.SessionContext,
+ * org.hibernate.search.engine.search.query.spi.HitAggregator, org.hibernate.search.engine.search.SearchProjection...)
  */
 class DocumentReferenceProjectionHitExtractor implements HitExtractor<ProjectionHitCollector> {
 
