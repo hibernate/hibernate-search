@@ -356,39 +356,42 @@ stage('Default build') {
 					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''}
 			"""
 
-			try {
-				withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
-					sh """ \\
-							mvn coveralls:report \\
-							-DrepoToken=${COVERALLS_TOKEN} \\
-							${env.CHANGE_ID ? """ \\
-									-DpullRequest=${env.CHANGE_ID} \\
-							""" : """ \\
-									-Dbranch=${env.BRANCH_NAME} \\
-							"""} \\
-					"""
+			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
+			if ( enableDefaultEnvIT ) {
+				try {
+					withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
+						sh """ \\
+								mvn coveralls:report \\
+								-DrepoToken=${COVERALLS_TOKEN} \\
+								${env.CHANGE_ID ? """ \\
+										-DpullRequest=${env.CHANGE_ID} \\
+								""" : """ \\
+										-Dbranch=${env.BRANCH_NAME} \\
+								"""} \\
+						"""
+					}
 				}
-			}
-			catch (CredentialNotFoundException e) {
-				echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
-			}
+				catch (CredentialNotFoundException e) {
+					echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
+				}
 
-			if ( jobConfiguration?.sonar?.organization ) {
-				def sonarOrganization = jobConfiguration.sonar.organization
-				withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
-					sh """ \\
-							mvn sonar:sonar \\
-							-Dsonar.organization=${sonarOrganization} \\
-							-Dsonar.host.url=https://sonarcloud.io \\
-							-Dsonar.login=${SONARCLOUD_TOKEN} \\
-							${env.CHANGE_ID ? """ \\
-									-Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
-									-Dsonar.pullrequest.key=${env.CHANGE_ID} \\
-									-Dsonar.pullrequest.base=${env.CHANGE_TARGET} \\
-							""" : """ \\
-									-Dsonar.branch.name=${env.BRANCH_NAME} \\
-							"""} \\
-					"""
+				if ( jobConfiguration?.sonar?.organization ) {
+					def sonarOrganization = jobConfiguration.sonar.organization
+					withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
+						sh """ \\
+								mvn sonar:sonar \\
+								-Dsonar.organization=${sonarOrganization} \\
+								-Dsonar.host.url=https://sonarcloud.io \\
+								-Dsonar.login=${SONARCLOUD_TOKEN} \\
+								${env.CHANGE_ID ? """ \\
+										-Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
+										-Dsonar.pullrequest.key=${env.CHANGE_ID} \\
+										-Dsonar.pullrequest.base=${env.CHANGE_TARGET} \\
+								""" : """ \\
+										-Dsonar.branch.name=${env.BRANCH_NAME} \\
+								"""} \\
+						"""
+					}
 				}
 			}
 
