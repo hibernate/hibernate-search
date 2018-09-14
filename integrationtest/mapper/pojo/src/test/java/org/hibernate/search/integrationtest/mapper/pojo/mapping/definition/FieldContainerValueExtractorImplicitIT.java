@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -159,6 +161,31 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 		}
 
 		@Override
+		public TestModel<?, SortedSet<String>> sortedSet() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				private Integer id;
+				private SortedSet<String> myProperty;
+
+				private IndexedEntity(int id, SortedSet<String> myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+
+				@DocumentId
+				public Integer getId() {
+					return id;
+				}
+
+				@Field
+				public SortedSet<String> getMyProperty() {
+					return myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
 		public TestModel<?, Map<String, String>> mapValues() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
@@ -177,6 +204,31 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 
 				@Field
 				public Map<String, String> getMyProperty() {
+					return myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, SortedMap<String, String>> sortedMapValues() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				private Integer id;
+				private SortedMap<String, String> myProperty;
+
+				private IndexedEntity(int id, SortedMap<String, String> myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+
+				@DocumentId
+				public Integer getId() {
+					return id;
+				}
+
+				@Field
+				public SortedMap<String, String> getMyProperty() {
 					return myProperty;
 				}
 			}

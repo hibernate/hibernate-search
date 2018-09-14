@@ -8,12 +8,17 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
@@ -22,6 +27,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,12 +39,12 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 
 	static final String INDEX_NAME = "IndexName";
 
-	static final String STRING_VALUE_1 = "Some string";
-	static final String STRING_VALUE_2 = "Some other string";
-	static final String STRING_VALUE_3 = "Yet another string";
-	static final String STRING_VALUE_4 = "Still a different string";
-	static final String STRING_VALUE_5 = "Let's stop strings?";
-	static final String STRING_VALUE_6 = "The last string";
+	static final String STRING_VALUE_1 = "1 - Some string";
+	static final String STRING_VALUE_2 = "2 - Some other string";
+	static final String STRING_VALUE_3 = "3 - Yet another string";
+	static final String STRING_VALUE_4 = "4 - Still a different string";
+	static final String STRING_VALUE_5 = "5 - Let's stop strings?";
+	static final String STRING_VALUE_6 = "6 - The last string";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -103,6 +109,20 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2490")
+	public void sortedSet() {
+		SortedSet<String> set = new TreeSet<>();
+		// Do not add the strings in order, so as to really rely on the "sort" feature of the set
+		Collections.addAll( set, STRING_VALUE_2, STRING_VALUE_1, STRING_VALUE_3 );
+		doTest(
+				testModelProvider.sortedSet(),
+				String.class,
+				set,
+				STRING_VALUE_1, STRING_VALUE_2, STRING_VALUE_3
+		);
+	}
+
+	@Test
 	public void mapValues() {
 		Map<String, String> map = new LinkedHashMap<>();
 		map.put( STRING_VALUE_1, STRING_VALUE_4 );
@@ -110,6 +130,22 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 		map.put( STRING_VALUE_3, STRING_VALUE_6 );
 		doTest(
 				testModelProvider.mapValues(),
+				String.class,
+				map,
+				STRING_VALUE_4, STRING_VALUE_5, STRING_VALUE_6
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2490")
+	public void sortedMapValues() {
+		SortedMap<String, String> map = new TreeMap<>();
+		// Do not add the strings in order, so as to really rely on the "sort" feature of the map
+		map.put( STRING_VALUE_2, STRING_VALUE_5 );
+		map.put( STRING_VALUE_1, STRING_VALUE_4 );
+		map.put( STRING_VALUE_3, STRING_VALUE_6 );
+		doTest(
+				testModelProvider.sortedMapValues(),
 				String.class,
 				map,
 				STRING_VALUE_4, STRING_VALUE_5, STRING_VALUE_6
@@ -287,7 +323,9 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 		TestModel<?, Collection<String>> collection();
 		TestModel<?, List<String>> list();
 		TestModel<?, Set<String>> set();
+		TestModel<?, SortedSet<String>> sortedSet();
 		TestModel<?, Map<String, String>> mapValues();
+		TestModel<?, SortedMap<String, String>> sortedMapValues();
 		TestModel<?, Map<String, List<String>>> mapListValues();
 		TestModel<?, Optional<String>> optional();
 		TestModel<?, OptionalInt> optionalInt();
