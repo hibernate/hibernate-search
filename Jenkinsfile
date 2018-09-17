@@ -29,6 +29,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *
  * ### Jenkins configuration
  *
+ * #### Jenkins plugins
+ *
  * This file requires the following plugins in particular:
  *
  * - https://plugins.jenkins.io/pipeline-maven
@@ -38,6 +40,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - https://plugins.jenkins.io/email-ext
  * - https://plugins.jenkins.io/config-file-provider
  * - https://plugins.jenkins.io/pipeline-utility-steps
+ *
+ * #### Script approval
  *
  * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  *
@@ -51,6 +55,16 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * Just run the script a few times, it will fail and display a link to allow these calls.
  *
  * ### Integrations
+ *
+ * #### Nexus deployment
+ *
+ * This job includes two deployment modes:
+ *
+ * - A deployment of snapshot artifacts for every non-PR build on "primary" branches (master and maintenance branches).
+ * - A full release when starting the job with specific parameters.
+ *
+ * In the first case, the name of a Maven settings file must be provided in the job configuration file
+ * (see below).
  *
  * #### Coveralls (optional)
  *
@@ -82,9 +96,9 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * containing the URL of an AWS Elasticsearch service endpoint using that exact version,
  * to test Elasticsearch as a service on AWS.
  *
- * #### Configuration file
+ * #### Job configuration file
  *
- * The configuration file is optional. Its purpose is to host job-specific configuration, such as notification recipients.
+ * The job configuration file is optional. Its purpose is to host job-specific configuration, such as notification recipients.
  *
  * The file is named 'job-configuration.yaml', and it should be set up using the config file provider plugin
  * (https://plugins.jenkins.io/config-file-provider).
@@ -92,9 +106,17 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *
  *     notification:
  *       email:
- *         recipients: ... # string containing a space-separated list of email addresses to notify in case of failing non-PR builds>
+ *         # String containing a space-separated list of email addresses to notify in case of failing non-PR builds.
+ *         recipients: ...
  *     sonar:
- *       organization: ... # string containing the sonar organization. Mandatory in order to enable Sonar analysis.
+ *       # String containing the sonar organization. Mandatory in order to enable Sonar analysis.
+ *       organization: ...
+ *     deployment:
+ *       maven:
+ *         # String containing the ID of a Maven settings file registered using the config-file-provider Jenkins plugin.
+ *         # The settings must provide credentials to the servers with ID
+ *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
+ *         settingsId: ...
  *
  * #### Credentials
  *
@@ -159,6 +181,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 @Field boolean enableDefaultEnvLegacyIT = false
 @Field boolean enableNonDefaultSupportedEnvIT = false
 @Field boolean enableExperimentalEnvIT = false
+@Field boolean performRelease = false
+@Field boolean deploySnapshot = false
 
 @Field def jobConfiguration = null
 @Field ScmSource scmSource = null
@@ -224,6 +248,17 @@ ALL_ENV""",
 			])
 	])
 
+	performRelease = (params.RELEASE_VERSION ? true : false)
+
+	if (!performRelease && scmSource.branch.primary && !scmSource.pullRequest) {
+		if (jobConfiguration?.deployment?.maven?.settingsId) {
+			deploySnapshot = true
+		}
+		else {
+			echo "Missing deployment configuration in job configuration file - snapshot deployment will be skipped."
+		}
+	}
+
 	switch (params.INTEGRATION_TESTS) {
 		case 'DEFAULT_ENV_ONLY':
 			enableDefaultEnvIT = true
@@ -270,14 +305,17 @@ ALL_ENV""",
 		enableDefaultEnvLegacyIT = true
 	}
 
-	enableDefaultBuild = enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT
+	enableDefaultBuild =
+			enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT || deploySnapshot
 
-	echo """Integration test setting: $params.INTEGRATION_TESTS, result:
+	echo """Branch: ${scmSource.branch.name}, PR: ${scmSource.pullRequest?.id}, integration test setting: $params.INTEGRATION_TESTS, resulting execution plan:
 enableDefaultBuild=$enableDefaultBuild
 enableDefaultEnvIT=$enableDefaultEnvIT
 enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
 enableExperimentalEnvIT=$enableExperimentalEnvIT
-enableDefaultEnvLegacyIT=$enableDefaultEnvLegacyIT"""
+enableDefaultEnvLegacyIT=$enableDefaultEnvLegacyIT
+performRelease=$performRelease
+deploySnapshot=$deploySnapshot"""
 
 	allEnvironmentLists.each { envList ->
 		// No need to re-test these environments, they are already tested as part of the default build
@@ -330,7 +368,7 @@ enableDefaultEnvLegacyIT=$enableDefaultEnvLegacyIT"""
 
 	// Compute the version truncated to the minor component, a.k.a. the version family
 	// To be used for the documentation upload in particular
-	if (params.RELEASE_VERSION) {
+	if (performRelease) {
 		def matcher = (params.RELEASE_VERSION =~ versionPattern)
 		if (!matcher.matches()) {
 			throw new IllegalArgumentException(
@@ -371,9 +409,15 @@ stage('Default build') {
 	node(NODE_PATTERN_BASE) {
 		cleanWs()
 		checkout scm
-		withDefaultedMaven {
+		withDefaultedMaven(mavenSettingsConfig: deploySnapshot ? jobConfiguration.deployment.maven.settingsId : null) {
 			sh """ \\
-					mvn clean install -Pdist -Pcoverage -Pjqassistant \\
+					mvn clean \\
+					${deploySnapshot ? """ \\
+							deploy \\
+					""" : """ \\
+							install \\
+					"""} \\
+					-Pdist -Pcoverage -Pjqassistant \\
 					${enableDefaultEnvIT ? '' : '-DskipITs'} \\
 					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''}
 			"""
@@ -520,38 +564,44 @@ stage('Non-default environment ITs') {
 	}
 }
 
-stage('Release') {
-	if (!params.RELEASE_VERSION) {
-		echo "Skipping the release"
+stage('Deploy') {
+	if (deploySnapshot) {
+		// TODO delay the release to this stage? This would require to use staging repositories for snapshots, not sure it's possible.
+		echo "Already deployed snapshot as part of the 'Default build' stage."
+	}
+	else if (performRelease) {
+		echo "Performing full release for version ${params.RELEASE_VERSION}"
+		node(NODE_PATTERN_BASE) {
+			cleanWs()
+			withDefaultedMaven {
+				checkout scm
+
+				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
+				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${params.RELEASE_VERSION}"
+
+				if (!params.RELEASE_DRY_RUN) {
+					sh "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
+				} else {
+					echo "WARNING: Not deploying"
+				}
+
+				if (!params.RELEASE_DRY_RUN) {
+					sh "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${params.RELEASE_VERSION}"
+					sh "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${params.RELEASE_VERSION} ${releaseVersionFamily}"
+				}
+				else {
+					echo "WARNING: Not uploading anything"
+				}
+
+				sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${params.RELEASE_DEVELOPMENT_VERSION}"
+				sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${params.RELEASE_VERSION} ${scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
+			}
+		}
+	}
+	else {
+		echo "Skipping deployment"
 		Utils.markStageSkippedForConditional(STAGE_NAME)
 		return
-	}
-	node(NODE_PATTERN_BASE) {
-		cleanWs()
-
-		withDefaultedMaven {
-			checkout scm
-
-			sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-			sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${params.RELEASE_VERSION}"
-
-			if (!params.RELEASE_DRY_RUN) {
-				sh "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
-			} else {
-				echo "WARNING: Not deploying"
-			}
-
-			if (!params.RELEASE_DRY_RUN) {
-				sh "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${params.RELEASE_VERSION}"
-				sh "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${params.RELEASE_VERSION} ${releaseVersionFamily}"
-			}
-			else {
-				echo "WARNING: Not uploading anything"
-			}
-
-			sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${params.RELEASE_DEVELOPMENT_VERSION}"
-			sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${params.RELEASE_VERSION} ${scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
-		}
 	}
 }
 
