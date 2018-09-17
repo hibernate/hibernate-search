@@ -13,7 +13,7 @@
     <description>Hibernate Search common test utilities</description>
 
     <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!--
