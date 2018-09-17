@@ -31,7 +31,7 @@
         <html.google-analytics.tag-manager.channel>Hibernate</html.google-analytics.tag-manager.channel>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
 
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
