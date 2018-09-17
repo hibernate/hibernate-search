@@ -59,6 +59,9 @@
         <sonar.skip>true</sonar.skip>
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <jacoco.skip>true</jacoco.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        <!-- The above plus the parent configuration should be enough, but just in case... -->
+        <maven.deploy.skip>true</maven.deploy.skip>
 
         <!-- Dependencies versions -->
 
