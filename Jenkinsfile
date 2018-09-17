@@ -366,7 +366,7 @@ stage('Default build') {
 		return
 	}
 	node(NODE_PATTERN_BASE) {
-		checkout scm
+		initWorkspace()
 		withDefaultedMaven {
 			sh """ \\
 					mvn clean install -Pdist -Pcoverage -Pjqassistant \\
@@ -431,8 +431,8 @@ stage('Non-default environment ITs') {
 	jdkEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
+				initWorkspace()
 				withDefaultedMaven(jdk: itEnv.tool) {
-					checkout scm
 					mavenNonDefaultIT itEnv,
 							"clean install --fail-at-end"
 				}
@@ -444,6 +444,7 @@ stage('Non-default environment ITs') {
 	databaseEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
+				initWorkspace()
 				withDefaultedMaven {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
@@ -458,6 +459,7 @@ stage('Non-default environment ITs') {
 	esLocalEnvs.each { itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
+				initWorkspace()
 				withDefaultedMaven {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
@@ -480,6 +482,7 @@ stage('Non-default environment ITs') {
 		executions.put(itEnv.tag, {
 			lock(label: itEnv.lockedResourcesLabel) {
 				node(NODE_PATTERN_BASE + '&&AWS') {
+					initWorkspace()
 					withDefaultedMaven {
 						resumeFromDefaultBuild()
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
@@ -519,7 +522,7 @@ stage('Release') {
 		return
 	}
 	node(NODE_PATTERN_BASE) {
-		cleanWs()
+		initWorkspace()
 
 		withDefaultedMaven {
 			checkout scm
@@ -694,6 +697,33 @@ static <T extends ITEnvironment> T getDefaultEnv(List<T> envs) {
 	return envs.find { it.status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
 }
 
+void initWorkspace() {
+	/*
+	 * Remove our own artifacts from the local Maven repository,
+	 * because they might have been created by another build executed on the same node,
+	 * and thus might result from a different revision of the source code.
+	 * We copy the built artifacts from one stage to another explicitly when necessary; see resumeFromDefaultBuild().
+	 */
+	cleanWs(deleteDirs: true, patterns: [
+			[type: 'INCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/org/hibernate/search/**"],
+			[type: 'INCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/org/hibernate/hibernate-search*/**"]
+	])
+
+	/*
+	 * Remove everything unless we know it's safe, to prevent previous builds from interfering with the current build.
+	 * Keep the local Maven repository and Git metadata, since they may be reused safely.
+	 */
+	cleanWs(deleteDirs: true, patterns: [
+			// The Maven repository is safe, we cleaned it up just above
+			[type: 'EXCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/**"],
+			// The Git metadata is safe, we check out the correct branch just below
+			[type: 'EXCLUDE', pattern: ".git/**"]
+	])
+
+	// Check out the code
+	checkout scm
+}
+
 void withDefaultedMaven(Closure body) {
 	withDefaultedMaven([:], body)
 }
@@ -707,7 +737,6 @@ void withDefaultedMaven(Map args, Closure body) {
 }
 
 void resumeFromDefaultBuild() {
-	checkout scm
 	dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
 		unstash name:'main-build'
 	}
