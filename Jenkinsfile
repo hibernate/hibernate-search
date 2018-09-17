@@ -161,7 +161,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 @Field boolean enableExperimentalEnvIT = false
 
 @Field def jobConfiguration = null
-@Field String gitHubRepoId = null
+@Field ScmSource scmSource = null
 
 @Field String releaseVersionFamily
 
@@ -179,17 +179,8 @@ stage('Configure') {
 		echo "Job configuration: $jobConfiguration"
 	}
 
-	// See https://stackoverflow.com/a/38255364/6692043
-	def scmUrl = scm.getUserRemoteConfigs()[0].getUrl()
-	def gitHubUrlMatcher = (scmUrl =~ /^(?:git@github.com:|https:\/\/github\.com\/)([^\/]+)\/([^.]+)\.git$/)
-	if (gitHubUrlMatcher.matches()) {
-		String owner = gitHubUrlMatcher.group(1)
-		String name = gitHubUrlMatcher.group(2)
-		gitHubRepoId = owner + '/' + name
-		echo "Detected GitHub repository ID: $gitHubRepoId"
-	} else {
-		echo "Could not detect GitHub repository ID for URL: $scmUrl"
-	}
+	scmSource = new ScmSource(env, scm)
+	echo "SCM source: $scmSource"
 
 	properties([
 			pipelineTriggers([
@@ -252,18 +243,18 @@ ALL_ENV""",
 		case 'AUTOMATIC':
 			if (params.RELEASE_VERSION) {
 				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
-			} else if (env.CHANGE_ID) {
-				echo "Enabling only the default build and integration tests in the default environment for pull request $env.CHANGE_ID"
+			} else if (scmSource.pullRequest) {
+				echo "Enabling only the default build and integration tests in the default environment for pull request $scmSource.pullRequest.id"
 				enableDefaultEnvIT = true
-			} else if (env.BRANCH_NAME ==~ /master|\d+\.\d+/) {
-				echo "Enabling integration tests on all supported environments for master or maintenance branch '$env.BRANCH_NAME'"
+			} else if (scmSource.branch.primary) {
+				echo "Enabling integration tests on all supported environments for primary branch '$scmSource.branch.name'"
 				enableDefaultBuild = true
 				enableDefaultEnvIT = true
 				enableNonDefaultSupportedEnvIT = true
-				echo "Enabling legacy integration tests for master or maintenance branch '$env.BRANCH_NAME'"
+				echo "Enabling legacy integration tests for primary branch '$scmSource.branch.name'"
 				enableDefaultEnvLegacyIT = true
 			} else {
-				echo "Enabling only the default build and integration tests in the default environment for feature branch $env.BRANCH_NAME"
+				echo "Enabling only the default build and integration tests in the default environment for feature branch $scmSource.branch.name"
 				enableDefaultBuild = true
 				enableDefaultEnvIT = true
 			}
@@ -393,10 +384,10 @@ stage('Default build') {
 						sh """ \\
 								mvn coveralls:report \\
 								-DrepoToken=${COVERALLS_TOKEN} \\
-								${env.CHANGE_ID ? """ \\
-										-DpullRequest=${env.CHANGE_ID} \\
+								${scmSource.pullRequest ? """ \\
+										-DpullRequest=${scmSource.pullRequest.id} \\
 								""" : """ \\
-										-Dbranch=${env.BRANCH_NAME} \\
+										-Dbranch=${scmSource.branch.name} \\
 								"""} \\
 						"""
 					}
@@ -413,16 +404,16 @@ stage('Default build') {
 								-Dsonar.organization=${sonarOrganization} \\
 								-Dsonar.host.url=https://sonarcloud.io \\
 								-Dsonar.login=${SONARCLOUD_TOKEN} \\
-								${env.CHANGE_ID ? """ \\
-										-Dsonar.pullrequest.branch=${env.BRANCH_NAME} \\
-										-Dsonar.pullrequest.key=${env.CHANGE_ID} \\
-										-Dsonar.pullrequest.base=${env.CHANGE_TARGET} \\
-										${gitHubRepoId ? """ \\
+								${scmSource.pullRequest ? """ \\
+										-Dsonar.pullrequest.branch=${scmSource.branch.name} \\
+										-Dsonar.pullrequest.key=${scmSource.pullRequest.id} \\
+										-Dsonar.pullrequest.base=${scmSource.pullRequest.target.name} \\
+										${scmSource.gitHubRepoId ? """ \\
 												-Dsonar.pullrequest.provider=GitHub \\
-												-Dsonar.pullrequest.github.repository=${gitHubRepoId} \\
+												-Dsonar.pullrequest.github.repository=${scmSource.gitHubRepoId} \\
 										""" : ''} \\
 								""" : """ \\
-										-Dsonar.branch.name=${env.BRANCH_NAME} \\
+										-Dsonar.branch.name=${scmSource.branch.name} \\
 								"""} \\
 						"""
 					}
@@ -554,7 +545,7 @@ stage('Release') {
 			}
 
 			sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${params.RELEASE_DEVELOPMENT_VERSION}"
-			sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${params.RELEASE_VERSION} ${env.BRANCH_NAME} ${!params.RELEASE_DRY_RUN}"
+			sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${params.RELEASE_VERSION} ${scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
 		}
 	}
 }
@@ -592,6 +583,64 @@ finally {
 }
 
 // Helpers
+
+class ScmSource {
+	final String remoteUrl
+	final String gitHubRepoId
+	final ScmBranch branch
+	final ScmPullRequest pullRequest
+
+	ScmSource(env, scm) {
+		// See https://stackoverflow.com/a/38255364/6692043
+		remoteUrl = scm.getUserRemoteConfigs()[0].getUrl()
+		def gitHubUrlMatcher = (remoteUrl =~ /^(?:git@github.com:|https:\/\/github\.com\/)([^\/]+)\/([^.]+)\.git$/)
+		if (gitHubUrlMatcher.matches()) {
+			String owner = gitHubUrlMatcher.group(1)
+			String name = gitHubUrlMatcher.group(2)
+			gitHubRepoId = owner + '/' + name
+		}
+		else {
+			gitHubRepoId = null
+		}
+		if (env.CHANGE_ID) {
+			def source = new ScmBranch(name: env.CHANGE_BRANCH)
+			def target = new ScmBranch(name: env.CHANGE_TARGET)
+			pullRequest = new ScmPullRequest(id: env.CHANGE_ID, source: source, target: target)
+			branch = source
+		}
+		else {
+			branch = new ScmBranch(name: env.BRANCH_NAME)
+			pullRequest = null
+		}
+	}
+
+	String toString() {
+		"ScmSource(remoteUrl: $remoteUrl, gitHubRepoId: $gitHubRepoId, branch: $branch, pullRequest: $pullRequest)"
+	}
+}
+
+class ScmBranch {
+	String name
+
+	String toString() { "ScmBranch(name:$name)" }
+
+	/**
+	 * @return Whether this branch is "primary", i.e. it's either "master" or a maintenance branch.
+	 * The purpose of primary branches is to hold the history of a major version of the code,
+	 * whereas the only purpose  of "feature" branches is to eventually be merged into a primary branch.
+	 */
+	boolean isPrimary() {
+		(name ==~ /master|\d+\.\d+/)
+	}
+}
+
+class ScmPullRequest {
+	String id
+	ScmBranch source
+	ScmBranch target
+
+	String toString() { "ScmPullRequest(id: $id, source: $source, target: $target)" }
+}
 
 enum ITEnvironmentStatus {
 	// For environments used as part of the integration tests in the default build (tested on all branches)
@@ -721,7 +770,7 @@ def notifyBuildEnd() {
 
 	// Notify the notification recipients configured on the job,
 	// except in the case of a PR build or of a "success after a success"
-	if (!env.CHANGE_ID && !successAfterSuccess) {
+	if (!scmSource.pullRequest && !successAfterSuccess) {
 		explicitRecipients = jobConfiguration?.notification?.email?.recipients
 	}
 
