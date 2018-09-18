@@ -8,12 +8,11 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -45,10 +44,10 @@ public class IndexedIT {
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.withBackendMock( backendMock ).setup(
-						CollectionHelper.asLinkedHashSet(), // Do not mention the type here, on purpose, to trigger the failure
-						CollectionHelper.asLinkedHashSet( IndexedWithoutEntityMetadata.class )
-				)
+				() -> setupHelper.withBackendMock( backendMock )
+						// Do not mention the type is an entity type here, on purpose, to trigger the failure
+						.withAnnotatedTypes( IndexedWithoutEntityMetadata.class )
+						.setup()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

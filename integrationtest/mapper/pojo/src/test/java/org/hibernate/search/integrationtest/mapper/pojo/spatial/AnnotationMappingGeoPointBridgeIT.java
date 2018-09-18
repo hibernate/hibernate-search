@@ -7,6 +7,9 @@
 package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
@@ -14,10 +17,6 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longit
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
 import org.junit.Before;
@@ -53,19 +52,15 @@ public class AnnotationMappingGeoPointBridgeIT {
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
-				.setup(
-						CollectionHelper.asSet(
-								GeoPointOnTypeEntity.class,
-								GeoPointOnCoordinatesPropertyEntity.class,
-								GeoPointOnCustomCoordinatesPropertyEntity.class
-						),
-						CollectionHelper.asSet(
-								GeoPointOnTypeEntity.class,
-								GeoPointOnCoordinatesPropertyEntity.class,
-								GeoPointOnCustomCoordinatesPropertyEntity.class,
-								CustomCoordinates.class
-						)
-				);
+				.withAnnotatedEntityTypes(
+						GeoPointOnTypeEntity.class,
+						GeoPointOnCoordinatesPropertyEntity.class,
+						GeoPointOnCustomCoordinatesPropertyEntity.class
+				)
+				.withAnnotatedTypes(
+						CustomCoordinates.class
+				)
+				.setup();
 
 		backendMock.verifyExpectationsMet();
 	}
