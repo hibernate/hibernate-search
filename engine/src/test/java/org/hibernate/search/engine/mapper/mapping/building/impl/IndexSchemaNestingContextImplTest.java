@@ -20,6 +20,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -258,6 +260,27 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		// Excluded due to additional filters
 		checkLeafExcluded( "level3", level2Context, "level3" );
 		checkCompositeExcluded( "level3", level2Context, "level3" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2194")
+	public void indexedEmbedded_noFilterThenIncludePaths() {
+		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+
+		// First level of @IndexedEmbedded: no filter
+		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"professionnelGC", rootContext, typeModel1Mock, "professionnelGC.",
+				null, null
+		);
+
+		// Second level of @IndexedEmbedded: includePaths filter
+		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+				"groupe", level1Context, typeModel1Mock, "groupe.",
+				null, CollectionHelper.asSet( "raisonSociale" )
+		);
+
+		checkLeafIncluded( "raisonSociale", level2Context, "raisonSociale" );
+		checkLeafExcluded( "notRaisonSociale", level2Context, "notRaisonSociale" );
 	}
 
 	@Test
