@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.junit.Assert.assertEquals;
+
 import java.lang.invoke.MethodHandles;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -13,8 +15,10 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.AnnotationMappingSmokeIT;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.ProgrammaticMappingSmokeIT;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.StartupStubBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
@@ -22,6 +26,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +51,9 @@ public class IndexedEmbeddedBaseIT {
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+
+	@Rule
+	public StaticCounters counters = new StaticCounters();
 
 	@Test
 	public void noParameter() {
@@ -341,6 +350,84 @@ public class IndexedEmbeddedBaseIT {
 						.field( "level1Property", "level1Value" )
 				)
 		);
+	}
+
+	/**
+	 * Check that bridges whose contributed fields are all filtered out are never applied.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3212")
+	public void includePaths_excludesBridges() {
+		class IndexedEmbeddedLevel1 {
+			String level1Property;
+			public String getLevel1Property() {
+				return level1Property;
+			}
+		}
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String level1Property) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.level1Property = level1Property;
+			}
+			public Integer getId() {
+				return id;
+			}
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		StartupStubBridge.CounterKeys filteredOutBridgeCounterKeys = StartupStubBridge.createKeys();
+
+		BridgeBuilder<StartupStubBridge> filteredOutBridgeBuilder =
+				c -> new StartupStubBridge( filteredOutBridgeCounterKeys );
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.objectField( "level1", b2 -> b2
+						.field( "level1IncludedField", String.class )
+				)
+		);
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock )
+				.withConfiguration( b -> {
+					b.addEntityType( IndexedEntity.class );
+					b.programmaticMapping().type( IndexedEntity.class )
+							.indexed( INDEX_NAME )
+							.property( "id" )
+									.documentId()
+							.property( "level1" )
+									.indexedEmbedded()
+											.includePaths( "level1IncludedField" );
+					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
+							.bridge( filteredOutBridgeBuilder )
+							.property( "level1Property" )
+									.bridge( filteredOutBridgeBuilder )
+									.field( "level1IncludedField" )
+									.field( "filteredOut" )
+											.valueBridge( filteredOutBridgeBuilder );
+				} )
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		/*
+		 * All the bridges that were filtered out should have been instantiated,
+		 * but then immediately closed.
+		 */
+		assertEquals( 3, counters.get( filteredOutBridgeCounterKeys.instance ) );
+		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance ) - counters.get( filteredOutBridgeCounterKeys.close ) );
+
+		doTestEmbeddedRuntime(
+				mapping,
+				id -> new IndexedEntity( id, "level1Value" ),
+				document -> document.objectField( "level1", b2 -> b2
+						.field( "level1IncludedField", "level1Value" )
+				)
+		);
+
+		// The bridges that were filtered out should not have been used.
+		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.runtimeUse ) );
 	}
 
 	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,

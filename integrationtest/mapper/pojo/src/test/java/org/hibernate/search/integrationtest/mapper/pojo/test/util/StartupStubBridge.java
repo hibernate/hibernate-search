@@ -20,7 +20,13 @@ import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 /**
- * A stub bridge for use in startup tests. Any runtime use of this bridge will fail.
+ * A stub bridge for use in tests where the bridge is only used on startup.
+ * <p>
+ * This is useful if we know the bridge will be filtered out, or simply if we don't test runtime at all.
+ * <p>
+ * This bridge contributes fields to the index schema where possible.
+ * <p>
+ * Any runtime use of this bridge will simply increment a counter and throw an exception.
  * <p>
  * For our own convenience, all bridge types are implemented in the same class.
  */
@@ -29,6 +35,7 @@ public class StartupStubBridge
 		RoutingKeyBridge, IdentifierBridge<Object> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
+		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
 		public final StaticCounters.Key close = StaticCounters.createKey();
 
 		private CounterKeys() {
@@ -64,13 +71,15 @@ public class StartupStubBridge
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field( "fieldFromPropertyBridge" ).asString().createAccessor();
+		context.getIndexSchemaElement().field( "startupStubBridgeFieldFromPropertyBridge" )
+				.asString().createAccessor();
 	}
 
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field( "fieldFromTypeBridge" ).asString().createAccessor();
+		context.getIndexSchemaElement().field( "startupStubBridgeFieldFromTypeBridge" )
+				.asString().createAccessor();
 	}
 
 	@Override
@@ -80,35 +89,36 @@ public class StartupStubBridge
 
 	@Override
 	public void write(DocumentElement target, PojoElement source) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
 	@Override
 	public Object cast(Object value) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
 	@Override
 	public String toIndexedValue(Object value) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
 	@Override
 	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
 	@Override
 	public String toDocumentIdentifier(Object propertyValue) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
 	@Override
 	public Object fromDocumentIdentifier(String documentIdentifier) {
-		throw shouldNotBeUsed();
+		throw unexpectedRuntimeUse();
 	}
 
-	private AssertionFailure shouldNotBeUsed() {
+	private AssertionFailure unexpectedRuntimeUse() {
+		StaticCounters.get().increment( counterKeys.runtimeUse );
 		return new AssertionFailure(
 				"Instances of " + getClass().getSimpleName() + " are not supposed to be used at runtime,"
 				+ " they should only be used to test the startup process."
