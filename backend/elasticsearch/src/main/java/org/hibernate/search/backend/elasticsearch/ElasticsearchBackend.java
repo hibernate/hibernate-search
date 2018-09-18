@@ -16,6 +16,7 @@ public interface ElasticsearchBackend extends Backend {
 	 * <strong>WARNING - Unsupported API:</strong> the underlying client class may change without notice.
 	 *
 	 * @param clientClass The {@link Class} representing the expected client type
+	 * @param <T> The expected client type
 	 * @return The client.
 	 * @throws org.hibernate.search.util.SearchException if the underlying client does not implement the given class.
 	 */

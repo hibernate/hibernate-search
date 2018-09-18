@@ -23,6 +23,8 @@ public interface FieldSortMissingValueContext<N> {
 	 *
 	 * <p>This instruction is independent of whether the sort is being ascending
 	 * or descending.
+	 *
+	 * @return The original context, for method chaining.
 	 */
 	N sortLast();
 
@@ -31,6 +33,8 @@ public interface FieldSortMissingValueContext<N> {
 	 *
 	 * <p>This instruction is independent of whether the sort is being ascending
 	 * or descending.
+	 *
+	 * @return The original context, for method chaining.
 	 */
 	N sortFirst();
 
@@ -42,6 +46,8 @@ public interface FieldSortMissingValueContext<N> {
 	 * services, Elasticsearch included.
 	 * <p>Field bridges, if any, will be ignored. Thus the actual numeric value must be provided.
 	 *
+	 * @param value The value to use as a default when a document is missing a value on the sort field.
+	 * @return The original context, for method chaining.
 	 * @throws SearchException If the field is not numeric.
 	 */
 	N use(Object value);

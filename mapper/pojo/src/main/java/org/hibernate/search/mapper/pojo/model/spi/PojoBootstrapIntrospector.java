@@ -20,6 +20,7 @@ public interface PojoBootstrapIntrospector {
 
 	/**
 	 * @param clazz The Java class representing the raw version of the type
+	 * @param <T> The type
 	 * @return A type model for the given type.
 	 */
 	<T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz);

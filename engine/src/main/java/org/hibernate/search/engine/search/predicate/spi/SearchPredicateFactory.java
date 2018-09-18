@@ -28,6 +28,7 @@ public interface SearchPredicateFactory<C, B> {
 	 * or to convert it to another representation if it is not reusable.
 	 *
 	 * @param builder The predicate builder implementation.
+	 * @return The corresponding reusable {@link SearchPredicate} object.
 	 */
 	SearchPredicate toSearchPredicate(B builder);
 
@@ -37,6 +38,7 @@ public interface SearchPredicateFactory<C, B> {
 	 * May be called multiple times for a given {@link SearchPredicate} object.
 	 *
 	 * @param predicate The {@link SearchPredicate} object to convert.
+	 * @return The corresponding predicate builder implementation.
 	 * @throws SearchException If the {@link SearchPredicate} object was created
 	 * by a different, incompatible factory.
 	 */
