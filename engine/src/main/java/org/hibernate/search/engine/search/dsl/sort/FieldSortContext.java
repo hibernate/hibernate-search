@@ -18,7 +18,7 @@ public interface FieldSortContext<N>
 		extends NonEmptySortContext<N>, SortOrderContext<FieldSortContext<N>> {
 
 	/**
-	 * Describe how to treat missing values when doing the sorting.
+	 * @return A context allowing to describe how to treat missing values when doing the sorting.
 	 */
 	FieldSortMissingValueContext<FieldSortContext<N>> onMissingValue();
 

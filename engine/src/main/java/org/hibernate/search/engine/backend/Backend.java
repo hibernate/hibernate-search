@@ -22,6 +22,7 @@ public interface Backend {
 	 * Unwrap the backend to some implementation-specific type.
 	 *
 	 * @param clazz The {@link Class} representing the expected type
+	 * @param <T> The expected type
 	 * @return The unwrapped backend.
 	 * @throws org.hibernate.search.util.SearchException if the backend implementation does not support
 	 * unwrapping to the given class.

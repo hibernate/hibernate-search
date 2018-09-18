@@ -20,6 +20,8 @@ public interface HitAggregator<C, T> {
 
 	/**
 	 * Initialize the aggregator for a new aggregation.
+	 *
+	 * @param expectedHitCount An estimate of how many hits will be aggregated. Used for optimization purposes only.
 	 */
 	void init(int expectedHitCount);
 

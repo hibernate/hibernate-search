@@ -50,6 +50,7 @@ public interface ConfigurationPropertySource {
 	}
 
 	/**
+	 * @param properties The {@link Properties} object to extract properties from.
 	 * @return An source containing the properties from the given {@link Properties} object.
 	 */
 	static ConfigurationPropertySource fromProperties(Properties properties) {

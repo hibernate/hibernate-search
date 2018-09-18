@@ -14,6 +14,8 @@ package org.hibernate.search.engine.search.dsl.sort;
 public interface SortOrderContext<T> {
 	/**
 	 * Sort in ascending order.
+	 *
+	 * @return The original context, to chain calls.
 	 */
 	default T asc() {
 		return order( SortOrder.ASC );
@@ -21,6 +23,8 @@ public interface SortOrderContext<T> {
 
 	/**
 	 * Sort in descending order.
+	 *
+	 * @return The original context, to chain calls.
 	 */
 	default T desc() {
 		return order( SortOrder.DESC );

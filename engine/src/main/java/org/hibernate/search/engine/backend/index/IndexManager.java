@@ -21,6 +21,7 @@ public interface IndexManager {
 	 * Unwrap the index manager to some implementation-specific type.
 	 *
 	 * @param clazz The {@link Class} representing the expected type
+	 * @param <T> The expected type
 	 * @return The unwrapped index manager.
 	 * @throws org.hibernate.search.util.SearchException if the index manager implementation does not support
 	 * unwrapping to the given class.

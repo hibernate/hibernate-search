@@ -32,6 +32,7 @@ public interface SearchSortFactory<C, B> {
 	 * or to convert them to another representation if they are not reusable.
 	 *
 	 * @param builders The sort builder implementations.
+	 * @return The corresponding reusable {@link SearchSort} object.
 	 */
 	SearchSort toSearchSort(List<B> builders);
 
@@ -41,7 +42,7 @@ public interface SearchSortFactory<C, B> {
 	 * May be called multiple times for a given {@link SearchSort} object.
 	 *
 	 * @param sort The {@link SearchSort} object to convert.
-	 * @param implementationConsumer A collector for the result.
+	 * @param implementationConsumer A collector for the corresponding sort builder implementations.
 	 * @throws SearchException If the {@link SearchSort} object was created
 	 * by a different, incompatible factory.
 	 */

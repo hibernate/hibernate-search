@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 /**
  * The context used when defining "minimum should match" constraints.
- * <p>
+ *
  * <h3 id="minimumshouldmatch">"minimumShouldMatch" constraints</h3>
  * <p>
  * "minimumShouldMatch" constraints define a minimum number of "should" clauses that have to match

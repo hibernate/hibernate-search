@@ -24,7 +24,7 @@ public interface EnvironmentSynchronizer extends Service {
 	 * If the environment is already "ready", run the
 	 * work now, synchronously.
 	 *
-	 * @param runnable
+	 * @param runnable The work to run.
 	 */
 	void whenEnvironmentReady(Runnable runnable);
 
@@ -36,7 +36,7 @@ public interface EnvironmentSynchronizer extends Service {
 	 * If the environment is already "destroyed", run the
 	 * work now, synchronously.
 	 *
-	 * @param runnable
+	 * @param runnable The work to run.
 	 */
 	void whenEnvironmentDestroying(Runnable runnable);
 }

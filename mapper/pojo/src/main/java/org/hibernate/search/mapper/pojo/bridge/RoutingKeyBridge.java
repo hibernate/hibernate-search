@@ -46,6 +46,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * @param entityIdentifier The value of the POJO property used to generate the document identifier,
 	 * i.e. the same value that was passed to {@link IdentifierBridge#toDocumentIdentifier(Object)}.
 	 * @param source The {@link PojoElement} to read from.
+	 * @return The resulting routing key. Never null.
 	 */
 	String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source);
 

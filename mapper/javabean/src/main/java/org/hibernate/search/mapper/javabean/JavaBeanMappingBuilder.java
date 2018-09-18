@@ -47,6 +47,7 @@ public final class JavaBeanMappingBuilder {
 	/**
 	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
 	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan}.
+	 * @return {@code this}, for call chaining.
 	 */
 	public JavaBeanMappingBuilder addEntityType(Class<?> type) {
 		mappingInitiator.addEntityType( type );
@@ -56,6 +57,7 @@ public final class JavaBeanMappingBuilder {
 	/**
 	 * @param types The types to be considered as entity types, i.e. types that may be indexed
 	 * and whose instances be added/updated/deleted through the {@link org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan}.
+	 * @return {@code this}, for call chaining.
 	 */
 	public JavaBeanMappingBuilder addEntityTypes(Set<Class<?>> types) {
 		for ( Class<?> type : types ) {
