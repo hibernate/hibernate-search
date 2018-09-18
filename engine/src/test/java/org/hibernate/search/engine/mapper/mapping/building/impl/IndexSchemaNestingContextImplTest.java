@@ -179,6 +179,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2552")
 	public void indexedEmbedded_includePaths() {
 		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
@@ -257,7 +258,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkCompositeIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
 		checkLeafExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
 		checkCompositeExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
-		// Excluded due to additional filters
+		// Excluded due to additional filters: this right here checks HSEARCH-2552 is fixed
 		checkLeafExcluded( "level3", level2Context, "level3" );
 		checkCompositeExcluded( "level3", level2Context, "level3" );
 	}
