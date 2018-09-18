@@ -29,7 +29,7 @@ public final class JavaBeanMappingSetupHelper
 
 	/**
 	 * @param lookup A {@link MethodHandles.Lookup} with private access to the test method,
-	 * to be passed to initiators created by {@link SetupContext#setup(Class[])} or {@link SetupContext#setup(Set, Set)}
+	 * to be passed to mapping builders created by {@link SetupContext#setup(Class[])} or {@link SetupContext#setup()}
 	 * so that the javabean mapper will be able to inspect classes defined in the test methods.
 	 */
 	public JavaBeanMappingSetupHelper(MethodHandles.Lookup lookup) {
@@ -65,17 +65,27 @@ public final class JavaBeanMappingSetupHelper
 			return thisAsC();
 		}
 
-		public JavaBeanMapping setup(Class<?> ... annotatedEntityTypes) {
-			Set<Class<?>> classesSet = CollectionHelper.asLinkedHashSet( annotatedEntityTypes );
-			return setup( classesSet, classesSet );
+		public SetupContext withAnnotatedEntityTypes(Class<?> ... annotatedEntityTypes) {
+			return withAnnotatedEntityTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
 		}
 
-		public JavaBeanMapping setup(Set<Class<?>> entityTypes, Set<Class<?>> annotatedTypes) {
+		public SetupContext withAnnotatedEntityTypes(Set<Class<?>> annotatedEntityTypes) {
 			return withConfiguration( builder -> {
-				builder.addEntityTypes( entityTypes );
-				builder.annotationMapping().add( annotatedTypes );
-			} )
-					.setup();
+				builder.addEntityTypes( annotatedEntityTypes );
+				builder.annotationMapping().add( annotatedEntityTypes );
+			} );
+		}
+
+		public SetupContext withAnnotatedTypes(Class<?> ... annotatedTypes) {
+			return withAnnotatedTypes( CollectionHelper.asLinkedHashSet( annotatedTypes ) );
+		}
+
+		public SetupContext withAnnotatedTypes(Set<Class<?>> annotatedTypes) {
+			return withConfiguration( builder -> builder.annotationMapping().add( annotatedTypes ) );
+		}
+
+		public JavaBeanMapping setup(Class<?> ... annotatedEntityTypes) {
+			return withAnnotatedEntityTypes( annotatedEntityTypes ).setup();
 		}
 
 		@Override
