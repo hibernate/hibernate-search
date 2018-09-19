@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  *
  * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
  */
-public interface MatchAllPredicateContext<N> extends SearchPredicateContext<MatchAllPredicateContext<N>>, ExplicitEndContext<N> {
+public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldContext<MatchAllPredicateContext<N>>, ExplicitEndContext<N> {
 
 	MatchAllPredicateContext<N> except(SearchPredicate searchPredicate);
 

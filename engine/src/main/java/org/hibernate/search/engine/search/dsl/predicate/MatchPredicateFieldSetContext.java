@@ -15,6 +15,12 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  */
 public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<MatchPredicateFieldSetContext<N>> {
 
+	default MatchPredicateFieldSetContext<N> orField(String field) {
+		return orFields( field );
+	}
+
+	MatchPredicateFieldSetContext<N> orFields(String ... field);
+
 	ExplicitEndContext<N> matching(Object value);
 
 }

@@ -21,6 +21,12 @@ import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
  */
 public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<SpatialWithinPredicateFieldSetContext<N>> {
 
+	default SpatialWithinPredicateFieldSetContext<N> orField(String field) {
+		return orFields( field );
+	}
+
+	SpatialWithinPredicateFieldSetContext<N> orFields(String ... field);
+
 	ExplicitEndContext<N> circle(GeoPoint center, double radiusInMeters, DistanceUnit unit);
 
 	default ExplicitEndContext<N> circle(GeoPoint center, double radius) {
