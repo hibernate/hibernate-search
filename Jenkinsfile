@@ -133,20 +133,12 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 ]
 @Field DatabaseITEnvironment defaultDatabaseEnv
 @Field final List<EsLocalITEnvironment> esLocalEnvs = [
-		// TODO add support for Elasticsearch 2? 5.0? 5.1?
-		new EsLocalITEnvironment(versionRange: '[2.0,2.2)', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsLocalITEnvironment(versionRange: '[2.2,5.0)', mavenProfile: 'elasticsearch-2.2', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsLocalITEnvironment(versionRange: '[5.0,5.2)', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsLocalITEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 		new EsLocalITEnvironment(versionRange: '[6.0,6.x)', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
 ]
 @Field EsLocalITEnvironment defaultEsLocalEnv
 @Field final List<EsAwsITEnvironment> esAwsEnvs = [
-		// TODO add support for AWS (needs the plugin currently only available in Search 5)
-		new EsAwsITEnvironment(version: '2.3', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsAwsITEnvironment(version: '5.1', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsAwsITEnvironment(version: '5.3', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsAwsITEnvironment(version: '5.5', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.EXPERIMENTAL),
+		new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
 ]
