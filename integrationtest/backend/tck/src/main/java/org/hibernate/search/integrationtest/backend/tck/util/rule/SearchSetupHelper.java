@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
-import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
@@ -29,7 +29,7 @@ import org.junit.runners.model.Statement;
 
 public class SearchSetupHelper implements TestRule {
 
-	private final List<SearchMappingRepository> mappingRepositories = new ArrayList<>();
+	private final List<SearchIntegration> mappingRepositories = new ArrayList<>();
 
 	private String testId;
 
@@ -49,7 +49,7 @@ public class SearchSetupHelper implements TestRule {
 						base.evaluate();
 					}
 					finally {
-						closer.pushAll( SearchMappingRepository::close, mappingRepositories );
+						closer.pushAll( SearchIntegration::close, mappingRepositories );
 						mappingRepositories.clear();
 					}
 				}
@@ -107,25 +107,25 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
-		public SearchMappingRepository setup() {
-			SearchMappingRepositoryBuilder mappingRepositoryBuilder = SearchMappingRepository.builder( propertySource );
+		public SearchIntegration setup() {
+			SearchIntegrationBuilder integrationBuilder = SearchIntegration.builder( propertySource );
 
 			for ( Map.Entry<String, String> entry : overriddenProperties.entrySet() ) {
-				mappingRepositoryBuilder = mappingRepositoryBuilder.setProperty( entry.getKey(), entry.getValue() );
+				integrationBuilder = integrationBuilder.setProperty( entry.getKey(), entry.getValue() );
 			}
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
 			StubMappingKey mappingKey = new StubMappingKey();
-			mappingRepositoryBuilder.addMappingInitiator( mappingKey, initiator );
+			integrationBuilder.addMappingInitiator( mappingKey, initiator );
 			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
-			SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();
-			mappingRepositories.add( mappingRepository );
+			SearchIntegration integration = integrationBuilder.build();
+			mappingRepositories.add( integration );
 
-			StubMapping mapping = mappingRepository.getMapping( mappingKey );
+			StubMapping mapping = integration.getMapping( mappingKey );
 			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
 
-			return mappingRepository;
+			return integration;
 		}
 
 	}

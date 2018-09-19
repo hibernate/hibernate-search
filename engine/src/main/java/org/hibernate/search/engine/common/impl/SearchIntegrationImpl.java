@@ -12,14 +12,14 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 
-public class SearchMappingRepositoryImpl implements SearchMappingRepository {
+public class SearchIntegrationImpl implements SearchIntegration {
 
 	private final BeanResolver beanResolver;
 
@@ -27,7 +27,7 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
-	SearchMappingRepositoryImpl(BeanResolver beanResolver,
+	SearchIntegrationImpl(BeanResolver beanResolver,
 			Map<MappingKey<?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
@@ -39,7 +39,7 @@ public class SearchMappingRepositoryImpl implements SearchMappingRepository {
 
 	@Override
 	public <M> M getMapping(MappingKey<M> mappingKey) {
-		// See SearchMappingRepositoryBuilderImpl: we are sure that, if there is a mapping, it implements MappingImplementor<M>
+		// See SearchIntegrationBuilderImpl: we are sure that, if there is a mapping, it implements MappingImplementor<M>
 		@SuppressWarnings("unchecked")
 		MappingImplementor<M> mappingImplementor = (MappingImplementor<M>) mappings.get( mappingKey );
 		if ( mappingImplementor == null ) {

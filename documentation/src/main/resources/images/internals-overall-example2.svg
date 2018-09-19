@@ -24,20 +24,20 @@
     </text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="544" y="207.75" width="177.95" height="70"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="544" y="207.75" width="177.95" height="70"/>
-    <rect style="fill: #ffffff" x="524" y="221.75" width="40" height="14"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="524" y="221.75" width="40" height="14"/>
-    <rect style="fill: #ffffff" x="524" y="249.75" width="40" height="14"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="524" y="249.75" width="40" height="14"/>
-    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="572" y="233.3">
-      <tspan x="572" y="233.3">SearchMappingRepository</tspan>
+    <rect style="fill: #ffffff" x="567" y="205.75" width="133.25" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="567" y="205.75" width="133.25" height="70"/>
+    <rect style="fill: #ffffff" x="547" y="219.75" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="547" y="219.75" width="40" height="14"/>
+    <rect style="fill: #ffffff" x="547" y="247.75" width="40" height="14"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="547" y="247.75" width="40" height="14"/>
+    <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="595" y="231.3">
+      <tspan x="595" y="231.3">SearchIntegration</tspan>
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="544,242.75 429.684,242.75 429.684,275 374.033,275 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="567,240.75 429.684,240.75 429.684,275 374.033,275 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="386.681,270 370.681,275 386.681,280 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="431.684" y="254.875">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="431.684" y="253.875">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
     <ellipse style="fill: #ffffff" cx="633.798" cy="49.92" rx="6" ry="6"/>
@@ -56,9 +56,9 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="437.673" y="81.438">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="633.798,140.904 633.798,182.953 632.975,182.953 632.975,201.045 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="627.975,188.397 632.975,204.397 637.975,188.397 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="633.387" y="178.953">&lt;&lt;closes&gt;&gt;</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="633.798,140.904 633.798,182.953 633.625,182.953 633.625,199.045 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="628.625,186.397 633.625,202.397 638.625,186.397 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="633.712" y="178.953">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="658.798,85.92 658.798,86.6272 1006.9,86.6272 1006.9,177.437 "/>
@@ -66,9 +66,9 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="832.851" y="82.6272">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="721.95,242.75 770.25,242.75 770.25,273.75 939.935,273.75 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="700.25,240.75 770.25,240.75 770.25,273.75 939.935,273.75 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="927.287,278.75 943.287,273.75 927.287,268.75 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="772.25" y="254.25">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:start;font-family:monospace;font-style:normal;font-weight:normal" x="772.25" y="253.25">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="289.678,239.015 289.678,215.06 266.548,215.06 266.548,203.52 "/>
@@ -157,7 +157,7 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="830.797,438.068 830.797,426.904 805.028,426.904 805.028,400.068 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="830.796,438.068 830.796,426.904 805.028,426.904 805.028,400.068 "/>
     <path style="fill: #ffffff" d="M 805.028 384.068 C 809.028,384.068 813.028,388.068 813.028,392.068 C 813.028,396.068 809.028,400.068 805.028,400.068 C 801.028,400.068 797.028,396.068 797.028,392.068 C 797.028,388.068 801.028,384.068 805.028,384.068z"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 805.028 384.068 C 809.028,384.068 813.028,388.068 813.028,392.068 C 813.028,396.068 809.028,400.068 805.028,400.068 C 801.028,400.068 797.028,396.068 797.028,392.068 C 797.028,388.068 801.028,384.068 805.028,384.068"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="760.936" y="413.936">
@@ -165,7 +165,7 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="830.797,438.068 830.797,427.068 849.622,427.068 849.622,400.068 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="830.796,438.068 830.796,427.068 849.622,427.068 849.622,400.068 "/>
     <path style="fill: #ffffff" d="M 849.622 384.068 C 853.622,384.068 857.622,388.068 857.622,392.068 C 857.622,396.068 853.622,400.068 849.622,400.068 C 845.622,400.068 841.622,396.068 841.622,392.068 C 841.622,388.068 845.622,384.068 849.622,384.068z"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 849.622 384.068 C 853.622,384.068 857.622,388.068 857.622,392.068 C 857.622,396.068 853.622,400.068 849.622,400.068 C 845.622,400.068 841.622,396.068 841.622,392.068 C 841.622,388.068 845.622,384.068 849.622,384.068"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="901.622" y="412.068">
@@ -211,7 +211,7 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="448.383,437.061 448.383,426.904 419.714,426.904 419.714,400.068 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="448.382,437.061 448.382,426.904 419.714,426.904 419.714,400.068 "/>
     <path style="fill: #ffffff" d="M 419.714 384.068 C 423.714,384.068 427.714,388.068 427.714,392.068 C 427.714,396.068 423.714,400.068 419.714,400.068 C 415.714,400.068 411.714,396.068 411.714,392.068 C 411.714,388.068 415.714,384.068 419.714,384.068z"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 419.714 384.068 C 423.714,384.068 427.714,388.068 427.714,392.068 C 427.714,396.068 423.714,400.068 419.714,400.068 C 415.714,400.068 411.714,396.068 411.714,392.068 C 411.714,388.068 415.714,384.068 419.714,384.068"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="375.622" y="413.936">
@@ -219,7 +219,7 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="448.383,437.073 448.383,427.068 464.308,427.068 464.308,400.068 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="448.382,437.073 448.382,427.068 464.308,427.068 464.308,400.068 "/>
     <path style="fill: #ffffff" d="M 464.308 384.068 C 468.308,384.068 472.308,388.068 472.308,392.068 C 472.308,396.068 468.308,400.068 464.308,400.068 C 460.308,400.068 456.308,396.068 456.308,392.068 C 456.308,388.068 460.308,384.068 464.308,384.068z"/>
     <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 464.308 384.068 C 468.308,384.068 472.308,388.068 472.308,392.068 C 472.308,396.068 468.308,400.068 464.308,400.068 C 460.308,400.068 456.308,396.068 456.308,392.068 C 456.308,388.068 460.308,384.068 464.308,384.068"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="516.308" y="412.068">
@@ -333,12 +333,12 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="115.701" y="556.816">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="468.383,508.068 468.383,545.214 622.148,545.214 622.148,614.857 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="468.382,508.068 468.382,545.214 622.148,545.214 622.148,614.857 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="617.148,602.209 622.148,618.209 627.148,602.209 "/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="545.265" y="541.214">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="830.797,508.068 830.797,543.918 622.148,543.918 622.148,614.857 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="830.796,508.068 830.796,543.918 622.148,543.918 622.148,614.857 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="617.148,602.209 622.148,618.209 627.148,602.209 "/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="726.472" y="539.918">&lt;&lt;uses&gt;&gt;</text>
   </g>
@@ -348,9 +348,9 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1167.81" y="556.816">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="632.975,277.75 632.975,305.75 543.946,305.75 543.946,328.509 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="633.625,275.75 633.625,305.75 543.946,305.75 543.946,328.509 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="538.946,315.861 543.946,331.861 548.946,315.861 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="588.461" y="301.75">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="588.785" y="301.75">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
     <polygon style="fill: #ffffff" points="488.746,335.214 587.146,335.214 599.146,347.214 599.146,369.214 488.746,369.214 "/>
@@ -361,7 +361,7 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1167.81,689.184 1167.81,729.882 1021.58,729.882 1021.58,773.062 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="1167.81,689.184 1167.81,729.882 1021.58,729.882 1021.58,773.063 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="1016.58,760.415 1021.58,776.415 1026.58,760.415 "/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="1094.69" y="725.882">&lt;&lt;reads/writes&gt;&gt;</text>
   </g>
@@ -375,8 +375,8 @@
     </text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="632.975,277.75 632.975,305.75 725.75,305.75 725.75,327.527 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="633.625,275.75 633.625,305.75 725.75,305.75 725.75,327.527 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="720.75,314.879 725.75,330.879 730.75,314.879 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="679.362" y="301.75">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="679.688" y="301.75">&lt;&lt;closes&gt;&gt;</text>
   </g>
 </svg>

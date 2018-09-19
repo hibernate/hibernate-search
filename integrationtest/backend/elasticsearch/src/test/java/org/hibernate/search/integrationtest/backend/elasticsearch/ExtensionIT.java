@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -59,14 +59,14 @@ public class ExtensionIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private SearchMappingRepository mappingRepository;
+	private SearchIntegration integration;
 	private IndexAccessors indexAccessors;
 	private MappedIndexManager<?> indexManager;
 	private SessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {
-		this.mappingRepository = setupHelper.withDefaultConfiguration( BACKEND_NAME )
+		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
@@ -280,14 +280,14 @@ public class ExtensionIT {
 
 	@Test
 	public void backend_unwrap() {
-		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Backend backend = integration.getBackend( BACKEND_NAME );
 		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void backend_unwrap_error_unknownType() {
-		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Backend backend = integration.getBackend( BACKEND_NAME );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Attempt to unwrap an Elasticsearch backend to '" + String.class.getName() + "'" );
@@ -298,7 +298,7 @@ public class ExtensionIT {
 
 	@Test
 	public void backend_getClient() throws Exception {
-		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Backend backend = integration.getBackend( BACKEND_NAME );
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 		RestClient restClient = elasticsearchBackend.getClient( RestClient.class );
 
@@ -309,7 +309,7 @@ public class ExtensionIT {
 
 	@Test
 	public void backend_getClient_error_invalidClass() {
-		Backend backend = mappingRepository.getBackend( BACKEND_NAME );
+		Backend backend = integration.getBackend( BACKEND_NAME );
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
 		thrown.expect( SearchException.class );
@@ -322,14 +322,14 @@ public class ExtensionIT {
 
 	@Test
 	public void indexManager_unwrap() {
-		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
 		Assertions.assertThat( indexManager.unwrap( ElasticsearchIndexManager.class ) )
 				.isNotNull();
 	}
 
 	@Test
 	public void indexManager_unwrap_error_unknownType() {
-		IndexManager indexManager = mappingRepository.getIndexManager( INDEX_NAME );
+		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'" );

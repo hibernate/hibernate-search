@@ -20,8 +20,8 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
-import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
@@ -135,7 +135,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		}
 		BeanResolver beanResolver = null;
 		try {
-			SearchMappingRepositoryBuilder builder = SearchMappingRepository.builder( propertySource );
+			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
@@ -159,8 +159,8 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			// TODO namingService (JMX)
 			// TODO ClassLoaderService
 
-			SearchMappingRepository mappingRepository = builder.build();
-			HibernateOrmMapping mapping = mappingRepository.getMapping( mappingKey );
+			SearchIntegration integration = builder.build();
+			HibernateOrmMapping mapping = integration.getMapping( mappingKey );
 
 			// TODO JMX
 //			this.jmx = new JMXHook( propertySource );
@@ -169,7 +169,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
 			HibernateSearchContextService contextService =
 					sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextService.class );
-			contextService.initialize( mappingRepository, mapping );
+			contextService.initialize( integration, mapping );
 			contextFuture.complete( contextService );
 
 			if ( unusedPropertyTrackingPropertySource != null ) {
@@ -217,7 +217,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	private synchronized void cleanup(HibernateSearchContextService context) {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( c -> c.getMappingRepository().close(), context );
+			closer.push( c -> c.getIntegration().close(), context );
 			// TODO JMX
 			// closer.push( JMXHook::unRegisterIfRegistered, jmx );
 		}

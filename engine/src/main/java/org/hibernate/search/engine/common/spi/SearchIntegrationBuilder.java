@@ -14,16 +14,16 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 /**
  * @author Yoann Rodiere
  */
-public interface SearchMappingRepositoryBuilder {
+public interface SearchIntegrationBuilder {
 
-	SearchMappingRepositoryBuilder setBeanResolver(BeanResolver beanResolver);
+	SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver);
 
-	SearchMappingRepositoryBuilder setProperty(String name, String value);
+	SearchIntegrationBuilder setProperty(String name, String value);
 
-	SearchMappingRepositoryBuilder setProperties(Properties properties);
+	SearchIntegrationBuilder setProperties(Properties properties);
 
-	<M> SearchMappingRepositoryBuilder addMappingInitiator(MappingKey<M> mappingKey, MappingInitiator<?, M> initiator);
+	<M> SearchIntegrationBuilder addMappingInitiator(MappingKey<M> mappingKey, MappingInitiator<?, M> initiator);
 
-	SearchMappingRepository build();
+	SearchIntegration build();
 
 }

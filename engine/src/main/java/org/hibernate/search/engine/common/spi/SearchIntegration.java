@@ -9,10 +9,10 @@ package org.hibernate.search.engine.common.spi;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.impl.SearchMappingRepositoryBuilderImpl;
+import org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
-public interface SearchMappingRepository extends AutoCloseable {
+public interface SearchIntegration extends AutoCloseable {
 
 	<M> M getMapping(MappingKey<M> mappingKey);
 
@@ -23,11 +23,11 @@ public interface SearchMappingRepository extends AutoCloseable {
 	@Override
 	void close();
 
-	static SearchMappingRepositoryBuilder builder() {
-		return new SearchMappingRepositoryBuilderImpl( ConfigurationPropertySource.empty() );
+	static SearchIntegrationBuilder builder() {
+		return new SearchIntegrationBuilderImpl( ConfigurationPropertySource.empty() );
 	}
 
-	static SearchMappingRepositoryBuilder builder(ConfigurationPropertySource propertySource) {
-		return new SearchMappingRepositoryBuilderImpl( propertySource );
+	static SearchIntegrationBuilder builder(ConfigurationPropertySource propertySource) {
+		return new SearchIntegrationBuilderImpl( propertySource );
 	}
 }

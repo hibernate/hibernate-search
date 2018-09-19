@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
-<svg width="40cm" height="49cm" viewBox="3 10 785 980" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="38cm" height="49cm" viewBox="3 10 741 980" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g>
     <rect style="fill: #ffffff" x="276.028" y="239" width="115.3" height="70"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="276.028" y="239" width="115.3" height="70"/>
@@ -13,14 +13,14 @@
     </text>
   </g>
   <g>
-    <rect style="fill: #ffffff" x="609" y="239" width="177.95" height="70"/>
-    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="609" y="239" width="177.95" height="70"/>
+    <rect style="fill: #ffffff" x="609" y="239" width="133.25" height="70"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="609" y="239" width="133.25" height="70"/>
     <rect style="fill: #ffffff" x="589" y="253" width="40" height="14"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="589" y="253" width="40" height="14"/>
     <rect style="fill: #ffffff" x="589" y="281" width="40" height="14"/>
     <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="589" y="281" width="40" height="14"/>
     <text font-size="12.8" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:normal" x="637" y="264.55">
-      <tspan x="637" y="264.55">SearchMappingRepository</tspan>
+      <tspan x="637" y="264.55">SearchIntegration</tspan>
     </text>
   </g>
   <g>
@@ -45,9 +45,9 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="376.5" y="62.75">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="513,66 513,66.75 697.975,66.75 697.975,232.295 "/>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="692.975,219.647 697.975,235.647 702.975,219.647 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="605.488" y="62.75">&lt;&lt;closes&gt;&gt;</text>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="513,66 513,66.75 675.625,66.75 675.625,232.295 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="670.625,219.647 675.625,235.647 680.625,219.647 "/>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="594.312" y="62.75">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="313.678,238.021 313.678,210.75 290,210.75 290,193.75 "/>
@@ -173,23 +173,23 @@
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="225.256" y="556.816">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="526.273,508.068 526.273,561 316.182,561 316.182,635.857 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="526.272,508.068 526.272,561 316.182,561 316.182,635.857 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="311.182,623.209 316.182,639.209 321.182,623.209 "/>
     <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="421.227" y="557">&lt;&lt;uses&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="697.975,309 697.975,677.562 400.913,677.562 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="675.625,309 675.625,677.562 400.913,677.562 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="413.561,672.562 397.561,677.562 413.561,682.562 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="546.092" y="673.562">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="534.917" y="673.562">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="697.975,309 697.975,473.068 596.803,473.068 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="675.625,309 675.625,473.068 596.803,473.068 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="609.451,468.068 593.451,473.068 609.451,478.068 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="644.037" y="469.068">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="632.861" y="469.068">&lt;&lt;closes&gt;&gt;</text>
   </g>
   <g>
-    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="697.975,309 697.975,974.862 114.33,974.862 114.33,515.76 "/>
+    <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke-dasharray: 8; stroke: #000000" points="675.625,309 675.625,974.862 114.33,974.862 114.33,515.76 "/>
     <polyline style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="119.33,528.408 114.33,512.408 109.33,528.408 "/>
-    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="406.152" y="970.862">&lt;&lt;closes&gt;&gt;</text>
+    <text font-size="12.7998" style="fill: #000000;text-anchor:middle;font-family:monospace;font-style:normal;font-weight:normal" x="394.977" y="970.862">&lt;&lt;closes&gt;&gt;</text>
   </g>
 </svg>
