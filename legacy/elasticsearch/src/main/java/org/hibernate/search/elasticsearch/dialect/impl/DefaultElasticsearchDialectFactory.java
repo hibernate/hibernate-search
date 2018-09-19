@@ -11,9 +11,7 @@ import java.util.Properties;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
-import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
@@ -39,23 +37,22 @@ public class DefaultElasticsearchDialectFactory implements ElasticsearchDialectF
 			throw log.failedToDetectElasticsearchVersion( e );
 		}
 
-		if ( version.startsWith( "0." ) || version.startsWith( "1." ) ) {
+		if ( version.startsWith( "0." ) || version.startsWith( "1." ) || version.startsWith( "2." ) ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
-		else if ( version.startsWith( "2." ) ) {
-			return new Elasticsearch2Dialect( properties );
-		}
 		else if ( version.startsWith( "5." ) ) {
-			if ( version.startsWith( "5.0." ) || version.startsWith( "5.1." ) ) {
-				return new Elasticsearch50Dialect( properties );
+			if ( version.startsWith( "5.0." ) || version.startsWith( "5.1." )
+					|| version.startsWith( "5.2." ) || version.startsWith( "5.3." )
+					|| version.startsWith( "5.4." ) || version.startsWith( "5.5." ) ) {
+				throw log.unsupportedElasticsearchVersion( version );
 			}
 			else {
-				return new Elasticsearch52Dialect( properties );
+				return new Elasticsearch56Dialect( properties );
 			}
 		}
 		else {
 			log.unexpectedElasticsearchVersion( version );
-			return new Elasticsearch52Dialect( properties );
+			return new Elasticsearch56Dialect( properties );
 		}
 	}
 

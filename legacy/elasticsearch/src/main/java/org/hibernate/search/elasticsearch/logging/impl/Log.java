@@ -403,13 +403,6 @@ public interface Log extends BaseHibernateSearchLogger {
 	)
 	void failedToOpenIndex(Object indexName);
 
-	@Message(id = ES_BACKEND_MESSAGES_START_ID + 72,
-			value = "DeleteByQuery request to Elasticsearch failed with 404 result code."
-					+ "\nPlease check that 1. you installed the delete-by-query plugin on your Elasticsearch nodes"
-					+ " and 2. the targeted index exists"
-			)
-	SearchException elasticsearch2RequestDeleteByQueryNotFound();
-
 	@LogMessage(level = Level.WARN)
 	@Message(id = ES_BACKEND_MESSAGES_START_ID + 73,
 			value = "Hibernate Search will connect to Elasticsearch server '%1$s' with authentication over plain HTTP (not HTTPS)."

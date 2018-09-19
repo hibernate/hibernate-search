@@ -9,9 +9,6 @@ package org.hibernate.search.elasticsearch.schema.impl.model;
 /**
  * An enum for Elasticsearch "fielddata" attribute values.
  * <p>
- * Values of this type are ignored in ES2, because field data isn't used
- * (and configuration is more complex)
- * <p>
  * See https://www.elastic.co/guide/en/elasticsearch/reference/current/fielddata.html
  *
  * @author Yoann Rodiere

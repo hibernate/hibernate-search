@@ -17,21 +17,6 @@ package org.hibernate.search.elasticsearch.schema.impl.model;
  */
 public enum IndexType {
 
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	NOT_ANALYZED,
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	ANALYZED,
-	/**
-	 * @deprecated ES2 only.
-	 */
-	@Deprecated
-	NO,
 	TRUE,
 	FALSE
 	;

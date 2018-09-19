@@ -6,13 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
+import com.google.gson.JsonPrimitive;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
@@ -26,13 +20,14 @@ import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.nulls.codec.impl.ElasticsearchAsNullNullMarkerCodec;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
+import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.elasticsearch.util.impl.FieldHelper;
-import org.hibernate.search.elasticsearch.util.impl.FieldHelper.ExtendedFieldType;
 import org.hibernate.search.engine.BoostStrategy;
 import org.hibernate.search.engine.impl.DefaultBoostStrategy;
 import org.hibernate.search.engine.metadata.impl.BridgeDefinedField;
@@ -50,19 +45,21 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-
-import com.google.gson.JsonPrimitive;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 /**
- * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 2.
+ * An {@link ElasticsearchSchemaTranslator} implementation for Elasticsearch 5.6.
  *
- * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-@SuppressWarnings( "deprecation" )
-public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTranslator {
+public class Elasticsearch56SchemaTranslator implements ElasticsearchSchemaTranslator {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
 	public IndexMetadata translate(URLEncodedString indexName, Collection<EntityIndexBinding> descriptors, ExecutionOptions executionOptions) {
@@ -86,7 +83,17 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	@Override
 	public boolean isTextDataType(PartialDocumentFieldMetadata fieldMetadata) {
-		// This datatype does not exist on Elasticsearch 2.x
+		DataType stringDataType = getStringType( fieldMetadata.getPath().getAbsoluteName(),
+				fieldMetadata.getIndex(), fieldMetadata.getAnalyzerReference() );
+		if ( DataType.TEXT.equals( stringDataType ) ) {
+			// Also check that this is actually a string field
+			FieldHelper.ExtendedFieldType fieldType = FieldHelper.getType( fieldMetadata );
+			if ( FieldHelper.ExtendedFieldType.STRING.equals( fieldType )
+					// We also use strings when the type is unknown
+					|| FieldHelper.ExtendedFieldType.UNKNOWN.equals( fieldType ) ) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -109,8 +116,8 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	protected PropertyMapping generateTenantIdProperty() {
 		PropertyMapping tenantId = new PropertyMapping();
-		tenantId.setType( DataType.STRING );
-		tenantId.setIndex( IndexType.NOT_ANALYZED );
+		tenantId.setType( DataType.KEYWORD );
+		tenantId.setIndex( IndexType.TRUE );
 		return tenantId;
 	}
 
@@ -180,7 +187,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	private void logDynamicBoostWarning(ElasticsearchMappingBuilder mappingBuilder, BoostStrategy dynamicBoostStrategy, String fieldPath) {
 		if ( dynamicBoostStrategy != null && !DefaultBoostStrategy.INSTANCE.equals( dynamicBoostStrategy ) ) {
-			LOG.unsupportedDynamicBoost( dynamicBoostStrategy.getClass(), mappingBuilder.getTypeIdentifier(), fieldPath );
+			log.unsupportedDynamicBoost( dynamicBoostStrategy.getClass(), mappingBuilder.getTypeIdentifier(), fieldPath );
 		}
 	}
 
@@ -257,54 +264,35 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	 * Adds the main indexing-related options to the given facet sub-field: "index", "doc_values", "analyzer", ...
 	 */
 	protected void addSubfieldIndexOptions(PropertyMapping fieldMapping, FacetMetadata facetMetadata) {
-		fieldMapping.setIndex( IndexType.NOT_ANALYZED );
+		fieldMapping.setIndex( IndexType.TRUE );
 	}
 
-	/*
-	 * Adds the main indexing-related options to the given property: "index", "doc_values", "analyzer", ...
-	 */
+	@SuppressWarnings("deprecation")
 	protected void addIndexOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder, PropertyMetadata sourceProperty,
 			String propertyPath, Field.Index index, AnalyzerReference analyzerReference) {
-		IndexType elasticsearchIndex = elasticsearchIndexType( propertyMapping, index );
-		propertyMapping.setIndex( elasticsearchIndex );
+		propertyMapping.setIndex( index.isIndexed() ? IndexType.TRUE : IndexType.FALSE );
 
-		if ( IndexType.NO.equals( elasticsearchIndex ) && FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
-			// We must use doc values in order to enable sorting on non-indexed fields
-			propertyMapping.setDocValues( true );
-		}
+		DataType type = propertyMapping.getType();
 
-		if ( IndexType.ANALYZED.equals( elasticsearchIndex ) && analyzerReference != null ) {
-			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
-				LOG.analyzerIsNotElasticsearch( mappingBuilder.getTypeIdentifier(), propertyPath, analyzerReference );
+		if ( FieldHelper.isSortableField( mappingBuilder.getMetadata(), sourceProperty, propertyPath ) ) {
+			if ( DataType.TEXT.equals( type ) ) {
+				// Text fields do not support sort by default, and do not support doc values
+				propertyMapping.setFieldData( FieldDataType.TRUE );
 			}
-			else {
-				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
-				String analyzerName = settingsBuilder.register( elasticsearchReference, propertyPath );
-				propertyMapping.setAnalyzer( analyzerName );
+			else if ( !index.isIndexed() ) {
+				// We must use doc values in order to enable sorting on non-indexed fields
+				propertyMapping.setDocValues( true );
 			}
 		}
-	}
 
-	private IndexType elasticsearchIndexType(PropertyMapping propertyMapping, Field.Index index) {
-		switch ( index ) {
-			case ANALYZED:
-			case ANALYZED_NO_NORMS:
-				return canTypeBeAnalyzed( propertyMapping.getType() )
-						? IndexType.ANALYZED
-						: IndexType.NOT_ANALYZED;
-			case NOT_ANALYZED:
-			case NOT_ANALYZED_NO_NORMS:
-				return IndexType.NOT_ANALYZED;
-			case NO:
-				return IndexType.NO;
-			default:
-				throw new AssertionFailure( "Unexpected index type: " + index );
+		addAnalyzerOptions( propertyMapping, mappingBuilder, settingsBuilder,
+				propertyPath, index, analyzerReference );
+
+		// Only text and keyword fields can have norms
+		if ( DataType.TEXT.equals( type ) || DataType.KEYWORD.equals( type ) ) {
+			propertyMapping.setNorms( index.omitNorms() ? NormsType.FALSE : NormsType.TRUE );
 		}
-	}
-
-	private boolean canTypeBeAnalyzed(DataType fieldType) {
-		return DataType.STRING.equals( fieldType );
 	}
 
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
@@ -315,10 +303,10 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
 			PropertyMapping propertyMapping, BridgeDefinedField bridgeDefinedField) {
-		ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
+		FieldHelper.ExtendedFieldType type = FieldHelper.getType( bridgeDefinedField );
 
-		if ( ExtendedFieldType.UNKNOWN.equals( type ) ) {
-			throw LOG.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
+		if ( FieldHelper.ExtendedFieldType.UNKNOWN.equals( type ) ) {
+			throw log.unexpectedFieldType( bridgeDefinedField.getType().name(), bridgeDefinedField.getAbsoluteName() );
 		}
 
 		addTypeOptions( mappingBuilder, bridgeDefinedField.getAbsoluteName(), propertyMapping, type,
@@ -328,7 +316,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	private void addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
 			PropertyMapping fieldMapping, FacetMetadata facetMetadata,
 			Field.Index index, AnalyzerReference analyzerReference) {
-		ExtendedFieldType type;
+		FieldHelper.ExtendedFieldType type;
 
 		if ( facetMetadata.isEncodingAuto() ) {
 			/*
@@ -341,13 +329,13 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 
 		switch ( facetMetadata.getEncoding() ) {
 			case DOUBLE:
-				type = ExtendedFieldType.DOUBLE;
+				type = FieldHelper.ExtendedFieldType.DOUBLE;
 				break;
 			case LONG:
-				type = ExtendedFieldType.LONG;
+				type = FieldHelper.ExtendedFieldType.LONG;
 				break;
 			case STRING:
-				type = ExtendedFieldType.STRING;
+				type = FieldHelper.ExtendedFieldType.STRING;
 				break;
 			case AUTO:
 				throw new AssertionFailure( "The facet type should have been resolved during bootstrapping" );
@@ -365,7 +353,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 	}
 
 	private DataType addTypeOptions(ElasticsearchMappingBuilder mappingBuilder,
-			String fieldName, PropertyMapping propertyMapping, ExtendedFieldType extendedType,
+			String fieldName, PropertyMapping propertyMapping, FieldHelper.ExtendedFieldType extendedType,
 			Field.Index index, AnalyzerReference analyzerReference) {
 		DataType elasticsearchType;
 		List<String> formats = new ArrayList<>();
@@ -446,7 +434,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 				elasticsearchType = DataType.OBJECT;
 				break;
 			case UNKNOWN_NUMERIC:
-				throw LOG.unexpectedNumericEncodingType( mappingBuilder.getTypeIdentifier(), fieldName );
+				throw log.unexpectedNumericEncodingType( mappingBuilder.getTypeIdentifier(), fieldName );
 			case STRING:
 			case UNKNOWN:
 			default:
@@ -463,8 +451,18 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 		return elasticsearchType;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected DataType getStringType(String propertyPath, Index index, AnalyzerReference analyzerReference) {
-		return DataType.STRING;
+		if ( ! index.isAnalyzed() ) {
+			return DataType.KEYWORD;
+		}
+		if ( analyzerReference != null && analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
+			ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
+			if ( elasticsearchReference.isNormalizer( propertyPath ) ) {
+				return DataType.KEYWORD;
+			}
+		}
+		return DataType.TEXT;
 	}
 
 	private void addNullValue(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder, DocumentFieldMetadata fieldMetadata) {
@@ -498,7 +496,7 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			return new JsonPrimitive( (Boolean) indexedNullToken );
 		}
 		else {
-			throw LOG.unsupportedNullTokenType( mappingBuilder.getTypeIdentifier(), fieldPath.getAbsoluteName(),
+			throw log.unsupportedNullTokenType( mappingBuilder.getTypeIdentifier(), fieldPath.getAbsoluteName(),
 					indexedNullToken.getClass() );
 		}
 	}
@@ -512,6 +510,38 @@ public class Elasticsearch2SchemaTranslator implements ElasticsearchSchemaTransl
 			bridgeDefinedFields.addAll( documentFieldMetadata.getBridgeDefinedFields().values() );
 		}
 		return bridgeDefinedFields;
+	}
+
+	protected void addAnalyzerOptions(PropertyMapping propertyMapping, ElasticsearchMappingBuilder mappingBuilder,
+			ElasticsearchIndexSettingsBuilder settingsBuilder, String propertyPath,
+			Field.Index index, AnalyzerReference analyzerReference) {
+		DataType type = propertyMapping.getType();
+
+		// Only text fields can be analyzed
+		if ( DataType.TEXT.equals( type ) && analyzerReference != null ) {
+			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
+				log.analyzerIsNotElasticsearch( mappingBuilder.getTypeIdentifier(), propertyPath, analyzerReference );
+			}
+			else {
+				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
+				String analyzerName = settingsBuilder.register( elasticsearchReference, propertyPath );
+				propertyMapping.setAnalyzer( analyzerName );
+			}
+		}
+
+		// Keyword fields cannot be analyzed, but they can still be normalized
+		if ( DataType.KEYWORD.equals( type ) && analyzerReference != null ) {
+			if ( !analyzerReference.is( ElasticsearchAnalyzerReference.class ) ) {
+				log.analyzerIsNotElasticsearch( mappingBuilder.getTypeIdentifier(), propertyPath, analyzerReference );
+			}
+			else {
+				ElasticsearchAnalyzerReference elasticsearchReference = analyzerReference.unwrap( ElasticsearchAnalyzerReference.class );
+				if ( elasticsearchReference.isNormalizer( propertyPath ) ) {
+					String normalizerName = settingsBuilder.register( elasticsearchReference, propertyPath );
+					propertyMapping.setNormalizer( normalizerName );
+				}
+			}
+		}
 	}
 
 }
