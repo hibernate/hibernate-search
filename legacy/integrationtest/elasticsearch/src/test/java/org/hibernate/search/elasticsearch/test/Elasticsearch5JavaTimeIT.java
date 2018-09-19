@@ -31,12 +31,10 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -45,7 +43,6 @@ import com.google.gson.JsonObject;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-@Category(SkipBelowElasticsearch50.class)
 public class Elasticsearch5JavaTimeIT {
 
 	@Rule
