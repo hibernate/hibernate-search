@@ -130,7 +130,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  */
 
 @Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
-@Field final String MAVEN_TOOL = 'Apache Maven 3.5.2'
+@Field final String MAVEN_TOOL = 'Apache Maven 3.5.4'
 
 // Default node pattern, to be used for resource-intensive stages.
 // Should not include the master node.
