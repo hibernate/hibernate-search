@@ -20,9 +20,7 @@ import org.hibernate.search.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
 import org.hibernate.search.elasticsearch.dialect.impl.DefaultElasticsearchDialectFactory;
 import org.hibernate.search.elasticsearch.dialect.impl.ElasticsearchDialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es2.Elasticsearch2Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es50.Elasticsearch50Dialect;
-import org.hibernate.search.elasticsearch.dialect.impl.es52.Elasticsearch52Dialect;
+import org.hibernate.search.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.elasticsearch.impl.JsonBuilder;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.test.util.impl.ExpectedLog4jLog;
@@ -71,22 +69,43 @@ public class DefaultElasticsearchDialectFactoryTest {
 
 	@Test
 	public void es20() throws Exception {
-		testSuccess( "2.0.0", Elasticsearch2Dialect.class );
+		doMock( "2.0.0" );
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400081" );
+		thrown.expectMessage( "'2.0.0'" );
+		dialectFactory.createDialect( clientMock, new Properties() );
 	}
 
 	@Test
 	public void es24() throws Exception {
-		testSuccess( "2.4.4", Elasticsearch2Dialect.class );
+		doMock( "2.4.4" );
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400081" );
+		thrown.expectMessage( "'2.4.4'" );
+		dialectFactory.createDialect( clientMock, new Properties() );
 	}
 
 	@Test
 	public void es50() throws Exception {
-		testSuccess( "5.0.0", Elasticsearch50Dialect.class );
+		doMock( "5.0.0" );
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400081" );
+		thrown.expectMessage( "'5.0.0'" );
+		dialectFactory.createDialect( clientMock, new Properties() );
 	}
 
 	@Test
 	public void es52() throws Exception {
-		testSuccess( "5.2.0", Elasticsearch52Dialect.class );
+		doMock( "5.2.0" );
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "HSEARCH400081" );
+		thrown.expectMessage( "'5.2.0'" );
+		dialectFactory.createDialect( clientMock, new Properties() );
+	}
+
+	@Test
+	public void es56() throws Exception {
+		testSuccess( "5.6.12", Elasticsearch56Dialect.class );
 	}
 
 	@Test
@@ -95,7 +114,7 @@ public class DefaultElasticsearchDialectFactoryTest {
 		doMock( "6.0.0" );
 		logged.expectMessage( "HSEARCH400085", "'6.0.0'" );
 		ElasticsearchDialect dialect = dialectFactory.createDialect( clientMock, new Properties() );
-		assertThat( dialect ).isInstanceOf( Elasticsearch52Dialect.class );
+		assertThat( dialect ).isInstanceOf( Elasticsearch56Dialect.class );
 	}
 
 	private void testSuccess(String versionString, Class<?> expectedDialectClass) throws Exception {

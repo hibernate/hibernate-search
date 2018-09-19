@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.elasticsearch.schema.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,28 +21,30 @@ import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisJsonElementEq
 import org.hibernate.search.elasticsearch.schema.impl.json.AnalysisParameterEquivalenceRegistry;
 import org.hibernate.search.elasticsearch.schema.impl.model.DataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.DynamicType;
+import org.hibernate.search.elasticsearch.schema.impl.model.FieldDataType;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexMetadata;
 import org.hibernate.search.elasticsearch.schema.impl.model.IndexType;
+import org.hibernate.search.elasticsearch.schema.impl.model.NormsType;
 import org.hibernate.search.elasticsearch.schema.impl.model.PropertyMapping;
 import org.hibernate.search.elasticsearch.schema.impl.model.TypeMapping;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalysisDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings;
-import org.hibernate.search.elasticsearch.settings.impl.model.IndexSettings.Analysis;
+import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
-import java.lang.invoke.MethodHandles;
+
 import org.jboss.logging.Messages;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
 /**
- * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 2.
+ * An {@link ElasticsearchSchemaValidator} implementation for Elasticsearch 5.6.
  * <p>
  * <strong>Important implementation note:</strong> unexpected attributes (i.e. those not mapped to a field in TypeMapping)
  * are totally ignored. This allows users to leverage Elasticsearch features that are not supported in
@@ -49,11 +52,17 @@ import com.google.gson.JsonPrimitive;
  *
  * @author Yoann Rodiere
  */
-public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidator {
+public class Elasticsearch56SchemaValidator implements ElasticsearchSchemaValidator {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
+	private static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
+
+	private static final AnalysisParameterEquivalenceRegistry NORMALIZER_EQUIVALENCES =
+			new AnalysisParameterEquivalenceRegistry.Builder()
+					.build();
+
+	private final Validator<NormalizerDefinition> normalizerDefinitionValidator = new NormalizerDefinitionValidator( NORMALIZER_EQUIVALENCES );
 
 	private static final double DEFAULT_DOUBLE_DELTA = 0.001;
 	private static final float DEFAULT_FLOAT_DELTA = 0.001f;
@@ -69,7 +78,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	private static final AnalysisParameterEquivalenceRegistry ANALYZER_EQUIVALENCES =
 			new AnalysisParameterEquivalenceRegistry.Builder()
 					.type( "keep_types" )
-							.param( "types" ).unorderedArray()
+					.param( "types" ).unorderedArray()
 					.end()
 					.build();
 
@@ -79,35 +88,35 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	private static final AnalysisParameterEquivalenceRegistry TOKENIZER_EQUIVALENCES =
 			new AnalysisParameterEquivalenceRegistry.Builder()
 					.type( "edgeNGram" )
-							.param( "token_chars" ).unorderedArray()
+					.param( "token_chars" ).unorderedArray()
 					.end()
 					.type( "nGram" )
-							.param( "token_chars" ).unorderedArray()
+					.param( "token_chars" ).unorderedArray()
 					.end()
 					.type( "stop" )
-							.param( "stopwords" ).unorderedArray()
+					.param( "stopwords" ).unorderedArray()
 					.end()
 					.type( "word_delimiter" )
-							.param( "protected_words" ).unorderedArray()
+					.param( "protected_words" ).unorderedArray()
 					.end()
 					.type( "keyword_marker" )
-							.param( "keywords" ).unorderedArray()
+					.param( "keywords" ).unorderedArray()
 					.end()
 					.type( "pattern_capture" )
-							.param( "patterns" ).unorderedArray()
+					.param( "patterns" ).unorderedArray()
 					.end()
 					.type( "common_grams" )
-							.param( "common_words" ).unorderedArray()
+					.param( "common_words" ).unorderedArray()
 					.end()
 					.type( "cjk_bigram" )
-							.param( "ignored_scripts" ).unorderedArray()
+					.param( "ignored_scripts" ).unorderedArray()
 					.end()
 					.build();
 
 	private static final AnalysisParameterEquivalenceRegistry TOKEN_FILTER_EQUIVALENCES =
 			new AnalysisParameterEquivalenceRegistry.Builder()
 					.type( "keep_types" )
-							.param( "types" ).unorderedArray()
+					.param( "types" ).unorderedArray()
 					.end()
 					.build();
 
@@ -119,7 +128,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	private final Validator<TokenizerDefinition> tokenizerDefinitionValidator = new AnalysisDefinitionValidator<>( TOKENIZER_EQUIVALENCES );
 	private final Validator<TokenFilterDefinition> tokenFilterDefinitionValidator = new AnalysisDefinitionValidator<>( TOKEN_FILTER_EQUIVALENCES );
 
-	public Elasticsearch2SchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
+	public Elasticsearch56SchemaValidator(ElasticsearchSchemaAccessor schemaAccessor) {
 		super();
 		this.schemaAccessor = schemaAccessor;
 	}
@@ -152,7 +161,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				builder.append( "\n\t" ).append( message );
 			}
 		}
-		throw LOG.schemaValidationFailed( builder.toString() );
+		throw log.schemaValidationFailed( builder.toString() );
 	}
 
 	@Override
@@ -228,7 +237,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		builder.append( formatted );
 	}
 
-	protected String formatContextElement(ValidationContextType type, String name) {
+	private String formatContextElement(ValidationContextType type, String name) {
 		switch ( type ) {
 			case INDEX:
 				return MESSAGES.indexContext( name );
@@ -246,6 +255,8 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				return MESSAGES.tokenizerContext( name );
 			case TOKEN_FILTER:
 				return MESSAGES.tokenFilterContext( name );
+			case NORMALIZER:
+				return MESSAGES.normalizerContext( name );
 			default:
 				throw new AssertionFailure( "Unexpected validation context element type: " + type );
 		}
@@ -269,7 +280,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		validateAnalysisSettings( errorCollector, expectedAnalysis, actualAnalysis );
 	}
 
-	protected void validateAnalysisSettings(ValidationErrorCollector errorCollector, Analysis expectedAnalysis, Analysis actualAnalysis) {
+	private void validateAnalysisSettings(ValidationErrorCollector errorCollector, IndexSettings.Analysis expectedAnalysis, IndexSettings.Analysis actualAnalysis) {
 		validateAll(
 				errorCollector, ValidationContextType.ANALYZER, MESSAGES.analyzerMissing(), analyzerDefinitionValidator,
 				expectedAnalysis.getAnalyzers(), actualAnalysis == null ? null : actualAnalysis.getAnalyzers() );
@@ -285,13 +296,17 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		validateAll(
 				errorCollector, ValidationContextType.TOKEN_FILTER, MESSAGES.tokenFilterMissing(), tokenFilterDefinitionValidator,
 				expectedAnalysis.getTokenFilters(), actualAnalysis == null ? null : actualAnalysis.getTokenFilters() );
+
+		validateAll(
+				errorCollector, ValidationContextType.NORMALIZER, MESSAGES.normalizerMissing(), normalizerDefinitionValidator,
+				expectedAnalysis.getNormalizers(), actualAnalysis == null ? null : actualAnalysis.getNormalizers() );
 	}
 
 	/*
 	 * Validate that two values are equal, using a given default value when null is encountered on either value.
 	 * Useful to take into account the fact that Elasticsearch has default values for attributes.
 	 */
-	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	private <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			T expectedValue, T actualValue, T defaultValueForNulls) {
 		Object defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Object defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -299,14 +314,14 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			// Don't show the defaulted actual value, this might confuse users
 			errorCollector.addError( MESSAGES.invalidAttributeValue(
 					attributeName, defaultedExpectedValue, actualValue
-					) );
+			) );
 		}
 	}
 
 	/*
 	 * Variation of validateEqualWithDefault() for floats.
 	 */
-	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	private <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
 		Float defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Float defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -320,7 +335,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				// Don't show the defaulted actual value, this might confuse users
 				errorCollector.addError( MESSAGES.invalidAttributeValue(
 						attributeName, defaultedExpectedValue, actualValue
-						) );
+				) );
 			}
 		}
 		else {
@@ -331,7 +346,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				// Don't show the defaulted actual value, this might confuse users
 				errorCollector.addError( MESSAGES.invalidAttributeValue(
 						attributeName, defaultedExpectedValue, actualValue
-						) );
+				) );
 			}
 		}
 	}
@@ -339,7 +354,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	/*
 	 * Variation of validateEqualWithDefault() for doubles.
 	 */
-	protected <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	private <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
 		Double defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Double defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -353,7 +368,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				// Don't show the defaulted actual value, this might confuse users
 				errorCollector.addError( MESSAGES.invalidAttributeValue(
 						attributeName, defaultedExpectedValue, actualValue
-						) );
+				) );
 			}
 		}
 		if ( Double.compare( defaultedExpectedValue, defaultedActualValue ) == 0 ) {
@@ -363,7 +378,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			// Don't show the defaulted actual value, this might confuse users
 			errorCollector.addError( MESSAGES.invalidAttributeValue(
 					attributeName, defaultedExpectedValue, actualValue
-					) );
+			) );
 		}
 	}
 
@@ -372,7 +387,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	 * - Checks that the first element (the format used for output format in ES) is equal
 	 * - Checks all expected formats are present in the actual value
 	 */
-	protected <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
+	private <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
 			String attributeName, List<String> expectedValue, List<String> actualValue, List<String> defaultValueForNulls) {
 		List<String> defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		List<String> defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -386,7 +401,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			// Don't show the defaulted actual value, this might confuse users
 			errorCollector.addError( MESSAGES.invalidOutputFormat(
 					attributeName, expectedOutputFormat, actualOutputFormat
-					) );
+			) );
 		}
 
 		List<String> missingFormats = new ArrayList<>();
@@ -400,22 +415,25 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		if ( !missingFormats.isEmpty() || !unexpectedFormats.isEmpty() ) {
 			errorCollector.addError( MESSAGES.invalidInputFormat(
 					attributeName, defaultedExpectedValue, defaultedActualValue, missingFormats, unexpectedFormats
-					) );
+			) );
 		}
 	}
 
-	protected final void validateJsonPrimitive(ValidationErrorCollector errorCollector,
+	private void validateJsonPrimitive(ValidationErrorCollector errorCollector,
 			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
 		DataType defaultedType = type == null ? DataType.OBJECT : type;
 		doValidateJsonPrimitive( errorCollector, defaultedType, attributeName, expectedValue, actualValue );
 	}
 
-	@SuppressWarnings("deprecation")
-	protected void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
+	private void doValidateJsonPrimitive(ValidationErrorCollector errorCollector,
 			DataType type, String attributeName, JsonPrimitive expectedValue, JsonPrimitive actualValue) {
 		// We can't just use equal, mainly because of floating-point numbers
 
 		switch ( type ) {
+			case TEXT:
+			case KEYWORD:
+				validateEqualWithDefault( errorCollector, attributeName, expectedValue, actualValue, null );
+				break;
 			case DOUBLE:
 				if ( expectedValue.isNumber() && actualValue.isNumber() ) {
 					validateEqualWithDefault( errorCollector, attributeName, expectedValue.getAsDouble(), actualValue.getAsDouble(),
@@ -424,7 +442,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				else {
 					errorCollector.addError( MESSAGES.invalidAttributeValue(
 							attributeName, expectedValue, actualValue
-							) );
+					) );
 				}
 				break;
 			case FLOAT:
@@ -435,14 +453,13 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 				else {
 					errorCollector.addError( MESSAGES.invalidAttributeValue(
 							attributeName, expectedValue, actualValue
-							) );
+					) );
 				}
 				break;
 			case INTEGER:
 			case LONG:
 			case DATE:
 			case BOOLEAN:
-			case STRING:
 			case OBJECT:
 			case GEO_POINT:
 			default:
@@ -460,7 +477,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	 *
 	 * Unexpected elements are ignored, we only validate expected elements.
 	 */
-	protected <T> void validateAll(
+	private <T> void validateAll(
 			ValidationErrorCollector errorCollector, ValidationContextType type, String messageIfMissing,
 			Validator<T> validator,
 			Map<String, T> expectedMap, Map<String, T> actualMap) {
@@ -493,7 +510,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	class AnalysisDefinitionValidator<T extends AnalysisDefinition> implements Validator<T> {
 		private final AnalysisParameterEquivalenceRegistry equivalences;
 
-		public AnalysisDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
+		AnalysisDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
 			super();
 			this.equivalences = equivalences;
 		}
@@ -503,7 +520,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 			if ( ! Objects.equals( expectedDefinition.getType(), actualDefinition.getType() ) ) {
 				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionType(
 						expectedDefinition.getType(), actualDefinition.getType()
-						) );
+				) );
 			}
 
 			Map<String, JsonElement> expectedParameters = expectedDefinition.getParameters();
@@ -534,7 +551,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	}
 
 	private class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDefinition> {
-		public AnalyzerDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
+		AnalyzerDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
 			super( equivalences );
 		}
 
@@ -577,7 +594,7 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 	private class TypeMappingValidator extends AbstractTypeMappingValidator<TypeMapping> {
 		private final Validator<PropertyMapping> propertyMappingValidator;
 
-		public TypeMappingValidator(Validator<PropertyMapping> propertyMappingValidator) {
+		TypeMappingValidator(Validator<PropertyMapping> propertyMappingValidator) {
 			super();
 			this.propertyMappingValidator = propertyMappingValidator;
 		}
@@ -626,15 +643,25 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	protected void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+	private void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
 		IndexType expectedIndex = expectedMapping.getIndex();
-		if ( !IndexType.NO.equals( expectedIndex ) ) { // If we don't need an index, we don't care
-			// See Elasticsearch doc: this attribute's default value depends on the data type.
-			IndexType indexDefault = DataType.STRING.equals( expectedMapping.getType() ) ? IndexType.ANALYZED : IndexType.NOT_ANALYZED;
+		if ( IndexType.TRUE.equals( expectedIndex ) ) { // If we don't need an index, we don't care
+			// From ES 5.0 on, all indexable fields are indexed by default
+			IndexType indexDefault = IndexType.TRUE;
 			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
 		}
 
+		NormsType expectedNorms = expectedMapping.getNorms();
+		if ( NormsType.TRUE.equals( expectedNorms ) ) { // If we don't need norms, we don't care
+			// From ES 5.0 on, norms are enabled by default on text fields only
+			NormsType normsDefault = DataType.TEXT.equals( expectedMapping.getType() ) ? NormsType.TRUE : NormsType.FALSE;
+			validateEqualWithDefault( errorCollector, "norms", expectedNorms, actualMapping.getNorms(), normsDefault );
+		}
+
+		FieldDataType expectedFieldData = expectedMapping.getFieldData();
+		if ( FieldDataType.TRUE.equals( expectedFieldData ) ) { // If we don't need an index, we don't care
+			validateEqualWithDefault( errorCollector, "fielddata", expectedFieldData, actualMapping.getFieldData(), FieldDataType.FALSE );
+		}
 
 		Boolean expectedDocValues = expectedMapping.getDocValues();
 		if ( Boolean.TRUE.equals( expectedDocValues ) ) { // If we don't need doc_values, we don't care
@@ -646,8 +673,29 @@ public class Elasticsearch2SchemaValidator implements ElasticsearchSchemaValidat
 		}
 	}
 
-	protected void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
+	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
 		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
+		validateEqualWithDefault( errorCollector, "normalizer", expectedMapping.getNormalizer(), actualMapping.getNormalizer(), null );
 	}
 
+	private class NormalizerDefinitionValidator extends AnalysisDefinitionValidator<NormalizerDefinition> {
+		NormalizerDefinitionValidator(AnalysisParameterEquivalenceRegistry equivalences) {
+			super( equivalences );
+		}
+
+		@Override
+		public void validate(ValidationErrorCollector errorCollector, NormalizerDefinition expectedDefinition, NormalizerDefinition actualDefinition) {
+			super.validate( errorCollector, expectedDefinition, actualDefinition );
+
+			if ( ! Objects.equals( expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) ) {
+				errorCollector.addError( MESSAGES.invalidAnalyzerCharFilters(
+						expectedDefinition.getCharFilters(), actualDefinition.getCharFilters() ) );
+			}
+
+			if ( ! Objects.equals( expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) ) {
+				errorCollector.addError( MESSAGES.invalidAnalyzerTokenFilters(
+						expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) );
+			}
+		}
+	}
 }

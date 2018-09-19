@@ -10,18 +10,16 @@ import java.util.Map;
 
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistryPopulator;
-import org.hibernate.search.elasticsearch.settings.impl.model.AnalyzerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
-import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 
 /**
  * @author Yoann Rodiere
  */
-public class NamedElasticsearch2NormalizerReference extends NamedElasticsearchAnalyzerReference {
+public class NamedElasticsearchNormalizerReference extends NamedElasticsearchAnalyzerReference {
 
-	public NamedElasticsearch2NormalizerReference(String name) {
+	public NamedElasticsearchNormalizerReference(String name) {
 		super( name );
 	}
 
@@ -37,28 +35,15 @@ public class NamedElasticsearch2NormalizerReference extends NamedElasticsearchAn
 			return (r) -> { }; // No-op
 		}
 
-		AnalyzerDefinition analyzerDefinition = normalizerToAnalyzer( normalizerDefinition );
-
-		String tokenizerName = analyzerDefinition.getTokenizer();
-		TokenizerDefinition tokenizerDefinition = definitionRegistry.getTokenizerDefinition( tokenizerName );
-
 		Map<String, TokenFilterDefinition> tokenFilters =
-				collectDefinitions( definitionRegistry::getTokenFilterDefinition, analyzerDefinition.getTokenFilters() );
+				collectDefinitions( definitionRegistry::getTokenFilterDefinition, normalizerDefinition.getTokenFilters() );
 
 		Map<String, CharFilterDefinition> charFilters =
-				collectDefinitions( definitionRegistry::getCharFilterDefinition, analyzerDefinition.getCharFilters() );
+				collectDefinitions( definitionRegistry::getCharFilterDefinition, normalizerDefinition.getCharFilters() );
 
 		return new SimpleElasticsearchAnalysisDefinitionRegistryPopulator(
-				name, analyzerDefinition, tokenizerName, tokenizerDefinition,
+				name, normalizerDefinition,
 				charFilters, tokenFilters );
-	}
-
-	private AnalyzerDefinition normalizerToAnalyzer(NormalizerDefinition definition) {
-		AnalyzerDefinition analyzerDefinition = new AnalyzerDefinition();
-		analyzerDefinition.setTokenizer( "keyword" );
-		analyzerDefinition.setCharFilters( definition.getCharFilters() );
-		analyzerDefinition.setTokenFilters( definition.getTokenFilters() );
-		return analyzerDefinition;
 	}
 
 }
