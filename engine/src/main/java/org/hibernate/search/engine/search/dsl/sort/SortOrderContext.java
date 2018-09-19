@@ -15,7 +15,7 @@ public interface SortOrderContext<T> {
 	/**
 	 * Sort in ascending order.
 	 *
-	 * @return The original context, to chain calls.
+	 * @return The original context, for method chaining.
 	 */
 	default T asc() {
 		return order( SortOrder.ASC );
@@ -24,7 +24,7 @@ public interface SortOrderContext<T> {
 	/**
 	 * Sort in descending order.
 	 *
-	 * @return The original context, to chain calls.
+	 * @return The original context, for method chaining.
 	 */
 	default T desc() {
 		return order( SortOrder.DESC );
