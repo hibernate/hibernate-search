@@ -38,10 +38,7 @@ env:
     # Ensure Maven doesn't eat up too much memory
     - MAVEN_OPTS=-Xmx756m
   matrix:
-    #- DB=h2 ELASTICSEARCH=2.0
-    #- DB=h2 ELASTICSEARCH=2.2
-    - DB=h2 ELASTICSEARCH=5.0
-    - DB=h2 ELASTICSEARCH=5.2
+    - DB=h2
     # for now, let's test only with H2
     #- DB=pgsql
     #- DB=mariadb
@@ -54,12 +51,6 @@ before_install:
     "h2") ;;
     "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
     "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
-    esac
-  - case $ELASTICSEARCH in
-    2.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.0' ;;
-    2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.2' ;;
-    5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
-    5.2) ;;
     esac
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
