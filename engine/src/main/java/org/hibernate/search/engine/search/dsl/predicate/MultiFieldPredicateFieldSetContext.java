@@ -14,6 +14,13 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface MultiFieldPredicateFieldSetContext<S> {
 
+	/**
+	 * Boost the weight of the last added set of fields in score computation.
+	 *
+	 * @param boost The boost factor. Higher than 1 increases the weight in score computation,
+	 * between 0 and 1 lowers the weight. Lower than 0 is for experts only.
+	 * @return {@code this}, for method chaining.
+	 */
 	S boostedTo(float boost);
 
 	// TODO other methods from QueryCustomization/FieldCustomization

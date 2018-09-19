@@ -79,16 +79,16 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	@Override
 	public <T> N withExtensionOptional(
 			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor) {
-		return delegate.withExtensionOptional( extension, clauseContributor );
+			Consumer<T> predicateContributor) {
+		return delegate.withExtensionOptional( extension, predicateContributor );
 	}
 
 	@Override
 	public <T> N withExtensionOptional(
 			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor,
-			Consumer<SearchPredicateContainerContext<N>> fallbackClauseContributor) {
-		return delegate.withExtensionOptional( extension, clauseContributor, fallbackClauseContributor );
+			Consumer<T> predicateContributor,
+			Consumer<SearchPredicateContainerContext<N>> fallbackPredicateContributor) {
+		return delegate.withExtensionOptional( extension, predicateContributor, fallbackPredicateContributor );
 	}
 
 	protected SearchPredicateContainerContext<N> getDelegate() {

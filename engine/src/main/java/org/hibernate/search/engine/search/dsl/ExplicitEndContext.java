@@ -14,6 +14,11 @@ package org.hibernate.search.engine.search.dsl;
  */
 public interface ExplicitEndContext<N> {
 
+	/**
+	 * End the current context and continue to the next one.
+	 *
+	 * @return The next context.
+	 */
 	N end();
 
 }

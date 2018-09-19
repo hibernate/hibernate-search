@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.dsl.predicate;
 
 
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
+
 /**
  * The context used when starting to define a spatial predicate.
  *
@@ -14,6 +16,13 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface SpatialPredicateContext<N> {
 
+	/**
+	 * Match documents where targeted fields point to a location within given bounds:
+	 * a circle (maximum distance matching), a polygon, a bounding box, ...
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 */
 	SpatialWithinPredicateContext<N> within();
 
 }
