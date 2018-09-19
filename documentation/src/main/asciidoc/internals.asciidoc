@@ -66,9 +66,7 @@ created at bootstrap, and allow to close it all from a single call.
 Finally, the purpose of the backend and its index managers
 is to execute the actual work and return results when relevant.
 
-Some elements in the architecture may seem redundant in this example.
-For example, why expose the `SearchIntegration`?
-The main reason is to support more complex user configurations.
+The architecture is able to support more complex user configurations.
 The example below shows a Hibernate Search instance with two mappings: a POJO mapping and a JSON mapping.
 
 image::internals-overall-example2.svg[High-level view of a more complex Hibernate Search instance at runtime,align="center"]
@@ -76,12 +74,12 @@ image::internals-overall-example2.svg[High-level view of a more complex Hibernat
 The example is deliberately a bit contrived, in order to demonstrate some subtleties:
 
 * There are two mappings in this example.
-Most users will only ever use one in a single Hibernate Search instance,
+Most setups will only configure one mapping,
 but it is important to keep in mind there may be more.
 In particular, we anticipate that Infinispan may need multiple different mappings in a single Hibernate Search instance,
 in order to handle the multiple input types it accepts from its users.
 * There are multiple backends in this example.
-Again, most users will only ever use one in a single Hibernate Search instance,
+Again, most setups will only ever configure one,
 but there may be good reasons to use more.
 For instance if someone wants to index part of the entities in one Elasticsearch cluster,
 and the other part in another cluster.
