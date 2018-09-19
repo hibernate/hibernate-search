@@ -32,5 +32,4 @@ org.hibernate.SharedSessionContract#getTransaction() @ Using this method is ofte
 ################################################################################################################
 # Use our Contracts class instead
 com.google.common.base.Preconditions @ Use our Contracts class instead
-java.util.Objects#requireNonNull(java.lang.Object) @ Use our Contracts class instead
 java.util.Objects#requireNonNull(java.lang.Object, java.lang.String) @ Use our Contracts class instead
