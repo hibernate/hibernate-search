@@ -12,12 +12,12 @@ package org.hibernate.search.engine.search.dsl.predicate;
  *
  * @param <S> The "self" type (the actual type of this context)
  */
-public interface MultiFieldPredicateFieldSetContext<S> extends SearchPredicateContext<S> {
+public interface MultiFieldPredicateFieldSetContext<S> {
 
-	default S orField(String field) {
-		return orFields( field );
-	}
+	S boostedTo(float boost);
 
-	S orFields(String ... field);
+	// TODO other methods from QueryCustomization/FieldCustomization
+//	S withConstantScore();
+//	S withFilter();
 
 }

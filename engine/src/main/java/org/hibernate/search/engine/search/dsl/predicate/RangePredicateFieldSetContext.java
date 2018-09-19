@@ -16,6 +16,12 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  */
 public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<RangePredicateFieldSetContext<N>> {
 
+	default RangePredicateFieldSetContext<N> orField(String field) {
+		return orFields( field );
+	}
+
+	RangePredicateFieldSetContext<N> orFields(String ... field);
+
 	RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion);
 
 	default RangePredicateFromContext<N> from(Object value) {

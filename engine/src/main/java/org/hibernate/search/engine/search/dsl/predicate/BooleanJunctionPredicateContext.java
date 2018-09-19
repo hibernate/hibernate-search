@@ -64,7 +64,8 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  *
  * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
  */
-public interface BooleanJunctionPredicateContext<N> extends SearchPredicateContext<BooleanJunctionPredicateContext<N>>, ExplicitEndContext<N> {
+public interface BooleanJunctionPredicateContext<N> extends
+		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext<N>>, ExplicitEndContext<N> {
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.
