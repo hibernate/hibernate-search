@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.util.EventContextElement;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in
- * {@link SearchMappingRepository#getMapping(MappingKey)}.
+ * {@link SearchIntegration#getMapping(MappingKey)}.
  *
  * @param <M> The Java type of the mapping
  */

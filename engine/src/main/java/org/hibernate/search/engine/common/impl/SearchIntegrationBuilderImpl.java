@@ -23,8 +23,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
-import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.BeanProvider;
 import org.hibernate.search.engine.common.spi.BeanResolver;
 import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
@@ -49,7 +49,7 @@ import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
-public class SearchMappingRepositoryBuilderImpl implements SearchMappingRepositoryBuilder {
+public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -62,30 +62,30 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	private BeanResolver beanResolver;
 	private boolean frozen = false;
 
-	public SearchMappingRepositoryBuilderImpl(ConfigurationPropertySource mainPropertySource) {
+	public SearchIntegrationBuilderImpl(ConfigurationPropertySource mainPropertySource) {
 		this.mainPropertySource = mainPropertySource;
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder setBeanResolver(BeanResolver beanResolver) {
+	public SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver) {
 		this.beanResolver = beanResolver;
 		return this;
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder setProperty(String name, String value) {
+	public SearchIntegrationBuilder setProperty(String name, String value) {
 		this.overriddenProperties.setProperty( name, value );
 		return this;
 	}
 
 	@Override
-	public SearchMappingRepositoryBuilder setProperties(Properties properties) {
+	public SearchIntegrationBuilder setProperties(Properties properties) {
 		this.overriddenProperties.putAll( properties );
 		return this;
 	}
 
 	@Override
-	public <M> SearchMappingRepositoryBuilder addMappingInitiator(MappingKey<M> mappingKey,
+	public <M> SearchIntegrationBuilder addMappingInitiator(MappingKey<M> mappingKey,
 			MappingInitiator<?, M> initiator) {
 		if ( frozen ) {
 			throw new AssertionFailure(
@@ -108,7 +108,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 	}
 
 	@Override
-	public SearchMappingRepository build() {
+	public SearchIntegration build() {
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
@@ -169,7 +169,7 @@ public class SearchMappingRepositoryBuilderImpl implements SearchMappingReposito
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			return new SearchMappingRepositoryImpl(
+			return new SearchIntegrationImpl(
 					beanResolver,
 					mappings,
 					indexManagerBuildingStateHolder.getBackendsByName(),

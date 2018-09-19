@@ -60,14 +60,14 @@ instead target `index manager 1` and `index manager 2`.
 may return "document 1 in index 1 matched the query",
 but the user wants to see "entity 1 of type MyEntity matched the query".
 
-The purpose of the `SearchMappingRepository` is mainly to keep track of every resource (mapping or backend)
+The purpose of the `SearchIntegration` is mainly to keep track of every resource (mapping or backend)
 created at bootstrap, and allow to close it all from a single call.
 
 Finally, the purpose of the backend and its index managers
 is to execute the actual work and return results when relevant.
 
 Some elements in the architecture may seem redundant in this example.
-For example, why expose the `SearchMappingRepository`?
+For example, why expose the `SearchIntegration`?
 The main reason is to support more complex user configurations.
 The example below shows a Hibernate Search instance with two mappings: a POJO mapping and a JSON mapping.
 
@@ -94,13 +94,13 @@ mainly based on the Infinispan needs.
 
 Bootstrap starts by creating at least two components:
 
-* The `SearchMappingRepositoryBuilder`, which allows to setup all the mapper-independent configuration:
+* The `SearchIntegrationBuilder`, which allows to setup all the mapper-independent configuration:
 bean resolver, configuration property sources for the backends, ...
 * At least one `MappingInitiator` instance, of a type provided by the mapper module,
-which will register itself to the `SearchMappingRepositoryBuilder`.
+which will register itself to the `SearchIntegrationBuilder`.
 From the point of view of the engine, it is a callback that will come into play later.
 
-The idea is that the `SearchMappingRepositoryBuilder` will allow one or more initiators
+The idea is that the `SearchIntegrationBuilder` will allow one or more initiators
 to provide configuration about their mapping, in particular metadata
 about various "mappable" types (in short, the types manipulated by the user).
 Then the builder will organize this metadata, check the consistency to some extent,
@@ -108,7 +108,7 @@ create backends and index manager builders as necessary,
 and then provide the (organized) metadata back to the mapper module along with handles to index manager builders
 so that it can start its own bootstrapping.
 
-To sum up: the `SearchMappingRepositoryBuilder` is a facilitator,
+To sum up: the `SearchIntegrationBuilder` is a facilitator,
 allowing to start mapper bootstrapping with everything that is necessary:
 
 * engine services and components (`BuildContext`);

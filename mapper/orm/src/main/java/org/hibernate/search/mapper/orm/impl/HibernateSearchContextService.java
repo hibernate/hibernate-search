@@ -22,7 +22,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.SearchManager;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
@@ -33,7 +33,7 @@ import org.hibernate.service.Service;
 
 public class HibernateSearchContextService implements Service {
 
-	private volatile SearchMappingRepository mappingRepository;
+	private volatile SearchIntegration integration;
 	private volatile HibernateOrmMapping mapping;
 
 	/*
@@ -48,14 +48,14 @@ public class HibernateSearchContextService implements Service {
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
 
-	public void initialize(SearchMappingRepository mappingRepository, HibernateOrmMapping mapping) {
-		this.mappingRepository = mappingRepository;
+	public void initialize(SearchIntegration integration, HibernateOrmMapping mapping) {
+		this.integration = integration;
 		this.mapping = mapping;
 	}
 
-	public SearchMappingRepository getMappingRepository() {
-		if ( mappingRepository != null ) {
-			return mappingRepository;
+	public SearchIntegration getIntegration() {
+		if ( integration != null ) {
+			return integration;
 		}
 		else {
 			throw LoggerFactory.make( Log.class, MethodHandles.lookup() ).hibernateSearchNotInitialized();

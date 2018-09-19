@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchMappingRepository;
-import org.hibernate.search.engine.common.spi.SearchMappingRepositoryBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiatorImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
@@ -22,16 +22,16 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
 
-	private final SearchMappingRepositoryBuilder mappingRepositoryBuilder;
+	private final SearchIntegrationBuilder integrationBuilder;
 	private final JavaBeanMappingKey mappingKey;
 	private final JavaBeanMappingInitiatorImpl mappingInitiator;
 
 	JavaBeanMappingBuilder(ConfigurationPropertySource propertySource, MethodHandles.Lookup lookup) {
-		mappingRepositoryBuilder = SearchMappingRepository.builder( propertySource );
+		integrationBuilder = SearchIntegration.builder( propertySource );
 		JavaBeanBootstrapIntrospector introspector = new JavaBeanBootstrapIntrospector( lookup );
 		mappingKey = new JavaBeanMappingKey();
 		mappingInitiator = new JavaBeanMappingInitiatorImpl( introspector );
-		mappingRepositoryBuilder.addMappingInitiator( mappingKey, mappingInitiator );
+		integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
 		// Enable annotated type discovery by default
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( true );
 	}
@@ -75,25 +75,25 @@ public final class JavaBeanMappingBuilder {
 	}
 
 	public JavaBeanMappingBuilder setProperty(String name, String value) {
-		mappingRepositoryBuilder.setProperty( name, value );
+		integrationBuilder.setProperty( name, value );
 		return this;
 	}
 
 	public CloseableJavaBeanMapping build() {
-		SearchMappingRepository mappingRepository = mappingRepositoryBuilder.build();
+		SearchIntegration integration = integrationBuilder.build();
 		try {
-			JavaBeanMapping mapping = mappingRepository.getMapping( mappingKey );
+			JavaBeanMapping mapping = integration.getMapping( mappingKey );
 
 			/*
-			 * Since the user doesn't have access to the mapping repository, but only to the (closeable) mapping,
-			 * make sure to close the mapping repository whenever the mapping is closed by the user.
+			 * Since the user doesn't have access to the integration, but only to the (closeable) mapping,
+			 * make sure to close the integration whenever the mapping is closed by the user.
 			 */
 			JavaBeanMappingImpl mappingImpl = (JavaBeanMappingImpl) mapping;
-			mappingImpl.onClose( mappingRepository::close );
+			mappingImpl.onClose( integration::close );
 			return mappingImpl;
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( mappingRepository );
+			new SuppressingCloser( e ).push( integration );
 			throw e;
 		}
 	}
