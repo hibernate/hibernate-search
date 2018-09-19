@@ -133,12 +133,12 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 ]
 @Field DatabaseITEnvironment defaultDatabaseEnv
 @Field final List<EsLocalITEnvironment> esLocalEnvs = [
-		new EsLocalITEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+		new EsLocalITEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 		new EsLocalITEnvironment(versionRange: '[6.0,6.x)', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
 ]
 @Field EsLocalITEnvironment defaultEsLocalEnv
 @Field final List<EsAwsITEnvironment> esAwsEnvs = [
-		new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.EXPERIMENTAL),
+		new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
 		new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
 ]
