@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.dsl.predicate;
 
 
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+
 /**
  * The context used when starting to define a nested predicate.
  *
@@ -14,6 +16,15 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface NestedPredicateContext<N> {
 
+	/**
+	 * Set the object field to "nest" on.
+	 * <p>
+	 * The selected field must be stored as {@link ObjectFieldStorage#NESTED} in the targeted indexes.
+	 *
+	 * @param absoluteFieldPath The path to the object.
+	 * @return A {@link NestedPredicateFieldContext} allowing to define the predicate
+	 * that should match on a single object.
+	 */
 	NestedPredicateFieldContext<N> onObjectField(String absoluteFieldPath);
 
 }

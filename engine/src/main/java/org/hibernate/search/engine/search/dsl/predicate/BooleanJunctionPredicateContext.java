@@ -104,28 +104,28 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 */
 
 	/**
-	 * Create a context allowing to define a <a href="#must">"must" clause</a>.
+	 * Add a <a href="#must">"must" clause</a>.
 	 *
 	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "must" clause.
 	 */
 	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> must();
 
 	/**
-	 * Create a context allowing to define a <a href="#mustnot">"must not" clause</a>.
+	 * Add a <a href="#mustnot">"must not" clause</a>.
 	 *
 	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "must not" clause.
 	 */
 	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> mustNot();
 
 	/**
-	 * Create a context allowing to define a <a href="#should">"should" clause</a>.
+	 * Add a <a href="#should">"should" clause</a>.
 	 *
 	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "should" clause.
 	 */
 	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> should();
 
 	/**
-	 * Create a context allowing to define a <a href="#filter">"filter" clause</a>.
+	 * Add a <a href="#filter">"filter" clause</a>.
 	 *
 	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "filter" clause.
 	 */
@@ -137,8 +137,8 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 */
 
 	/**
-	 * Create a context allowing to define a <a href="#must">"must" clause</a>,
-	 * and apply a consumer to it.
+	 * Add a <a href="#must">"must" clause</a>,
+	 * which will be defined by the given consumer.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
@@ -149,8 +149,8 @@ public interface BooleanJunctionPredicateContext<N> extends
 	BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
 	/**
-	 * Create a context allowing to define a <a href="#mustnot">"must not" clause</a>,
-	 * and apply a consumer to it.
+	 * Add a <a href="#mustnot">"must not" clause</a>,
+	 * which will be defined by the given consumer.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
@@ -161,8 +161,8 @@ public interface BooleanJunctionPredicateContext<N> extends
 	BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
 	/**
-	 * Create a context allowing to define a <a href="#should">"should" clause</a>,
-	 * and apply a consumer to it.
+	 * Add a <a href="#should">"should" clause</a>,
+	 * which will be defined by the given consumer.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
@@ -173,8 +173,8 @@ public interface BooleanJunctionPredicateContext<N> extends
 	BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
 
 	/**
-	 * Create a context allowing to define a <a href="#filter">"filter" clause</a>,
-	 * and apply a consumer to it.
+	 * Add a <a href="#filter">"filter" clause</a>,
+	 * which will be defined by the given consumer.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *

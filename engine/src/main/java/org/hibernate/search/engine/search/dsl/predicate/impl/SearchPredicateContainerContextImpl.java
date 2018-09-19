@@ -96,22 +96,22 @@ public class SearchPredicateContainerContextImpl<N, B> implements SearchPredicat
 
 	@Override
 	public <T> N withExtensionOptional(
-			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> clauseContributor) {
-		extension.extendOptional( this, factory, dslContext ).ifPresent( clauseContributor );
+			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor) {
+		extension.extendOptional( this, factory, dslContext ).ifPresent( predicateContributor );
 		return dslContext.getNextContext();
 	}
 
 	@Override
 	public <T> N withExtensionOptional(
 			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor,
-			Consumer<SearchPredicateContainerContext<N>> fallbackClauseContributor) {
+			Consumer<T> predicateContributor,
+			Consumer<SearchPredicateContainerContext<N>> fallbackPredicateContributor) {
 		Optional<T> optional = extension.extendOptional( this, factory, dslContext );
 		if ( optional.isPresent() ) {
-			clauseContributor.accept( optional.get() );
+			predicateContributor.accept( optional.get() );
 		}
 		else {
-			fallbackClauseContributor.accept( this );
+			fallbackPredicateContributor.accept( this );
 		}
 		return dslContext.getNextContext();
 	}

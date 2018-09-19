@@ -15,10 +15,39 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface RangePredicateContext<N> {
 
+	/**
+	 * Target the given field in the range predicate.
+	 * <p>
+	 * Multiple fields may be targeted by the same predicate:
+	 * the predicate will match if <em>any</em> targeted field matches.
+	 * <p>
+	 * When targeting multiple fields, those fields must have compatible types.
+	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 *
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return A {@link RangePredicateFieldSetContext} allowing to define field-specific settings
+	 * (such as the {@link RangePredicateFieldSetContext#boostedTo(float) boost}),
+	 * or simply to continue the definition of the range predicate
+	 * ({@link RangePredicateFieldSetContext#from(Object) bounds}, ...).
+	 */
 	default RangePredicateFieldSetContext<N> onField(String absoluteFieldPath) {
 		return onFields( absoluteFieldPath );
 	}
 
+	/**
+	 * Target the given fields in the range predicate.
+	 * <p>
+	 * Equivalent to {@link #onField(String)} followed by multiple calls to
+	 * {@link RangePredicateFieldSetContext#orField(String)},
+	 * the only difference being that calls to {@link RangePredicateFieldSetContext#boostedTo(float)}
+	 * and other field-specific settings on the returned context will only need to be done once
+	 * and will apply to all the fields passed to this method.
+	 *
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return A {@link RangePredicateFieldSetContext} (see {@link #onField(String)} for details).
+	 *
+	 * @see #onField(String)
+	 */
 	RangePredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
 
 }
