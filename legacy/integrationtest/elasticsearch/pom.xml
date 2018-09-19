@@ -294,40 +294,7 @@
 
     <profiles>
         <profile>
-            <id>elasticsearch-2.0</id>
-            <properties>
-                <test.elasticsearch.failsafe.excludedGroups.version>
-                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                </test.elasticsearch.failsafe.excludedGroups.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>elasticsearch-2.2</id>
-            <properties>
-                <test.elasticsearch.failsafe.excludedGroups.version>
-                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                </test.elasticsearch.failsafe.excludedGroups.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>elasticsearch-5.0</id>
-            <properties>
-                <test.elasticsearch.failsafe.excludedGroups.version>
-                    org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
-                </test.elasticsearch.failsafe.excludedGroups.version>
-            </properties>
-        </profile>
-        <profile>
-            <id>elasticsearch-5.2</id>
+            <id>elasticsearch-5.6</id>
             <!-- Activation rules are not inherited from the profile definition in the parent, so we must copy them here -->
             <activation>
                 <property>
@@ -337,9 +304,7 @@
             <properties>
                 <test.elasticsearch.failsafe.excludedGroups.version>
                     org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
-                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch50,
-                    org.hibernate.search.elasticsearch.testutil.junit.SkipFromElasticsearch52
+                    org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress
                 </test.elasticsearch.failsafe.excludedGroups.version>
             </properties>
         </profile>
