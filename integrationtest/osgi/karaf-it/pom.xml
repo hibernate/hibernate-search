@@ -151,12 +151,6 @@
     </dependencies>
 
     <build>
-        <testResources>
-            <testResource>
-                <filtering>true</filtering>
-                <directory>src/test/resources</directory>
-            </testResource>
-        </testResources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -176,6 +170,12 @@
 
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <maven.settings.localRepository>${settings.localRepository}</maven.settings.localRepository>
+                        <pax-exam.jvm.args>${pax-exam.jvm.args}</pax-exam.jvm.args>
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <id>verify</id>
