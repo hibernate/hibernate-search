@@ -190,9 +190,6 @@
 
         <version.org.infinispan>9.2.2.Final</version.org.infinispan>
 
-        <!-- Necessary for integration tests; must be aligned with ORM dependencies -->
-        <version.net.bytebuddy>1.8.17</version.net.bytebuddy>
-
         <version.wildfly>12.0.0.Final</version.wildfly>
 
         <version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>1.0.2.Final</version.org.jboss.spec.javax.jms.jboss-jms-api_2.0_spec>
@@ -467,11 +464,6 @@
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
                 <version>${version.javax.persistence}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${version.net.bytebuddy}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
@@ -1453,8 +1445,6 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
-                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${surefire.jvm.args}</argLine>
                         <additionalClasspathElements>
@@ -1576,8 +1566,6 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
-                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <additionalClasspathElements>
