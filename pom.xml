@@ -1433,8 +1433,6 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
-                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
@@ -1459,8 +1457,6 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
-                            <!-- Javassist still not working when using stricter checks with Jigsaw: use ByteBuddy -->
-                            <hibernate.bytecode.provider>bytebuddy</hibernate.bytecode.provider>
                         </systemPropertyVariables>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>

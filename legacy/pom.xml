@@ -89,8 +89,6 @@
          -->
         <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
         <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
-        <!-- Necessary for integration tests; must be aligned with ORM dependencies -->
-        <version.net.bytebuddy>1.8.17</version.net.bytebuddy>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
@@ -229,11 +227,6 @@
                 <groupId>javax.persistence</groupId>
                 <artifactId>javax.persistence-api</artifactId>
                 <version>${version.javax.persistence}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.bytebuddy</groupId>
-                <artifactId>byte-buddy</artifactId>
-                <version>${version.net.bytebuddy}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.lucene</groupId>
