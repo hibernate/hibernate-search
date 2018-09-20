@@ -119,6 +119,13 @@ public class HibernateSearchWithKarafIT {
 				.type( "xml" )
 				.versionAsInProject();
 
+		MavenUrlReference hibernateOrmFeature = maven()
+				.groupId( "org.hibernate" )
+				.artifactId( "hibernate-osgi" )
+				.classifier( "karaf" )
+				.type( "xml" )
+				.versionAsInProject();
+
 		MavenUrlReference hibernateSearchFeature = maven()
 				.groupId( "org.hibernate" )
 				.artifactId( "hibernate-search-integrationtest-osgi-features" )
@@ -149,6 +156,7 @@ public class HibernateSearchWithKarafIT {
 					.ignoreRemoteShell()
 					.ignoreLocalConsole() ,
 				features( karafStandardRepo, "scr" ),
+				features( hibernateOrmFeature, "hibernate-orm" ),
 				features( hibernateSearchFeature, "hibernate-search" ),
 
 				// configure Aries transaction manager
