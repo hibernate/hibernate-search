@@ -9,8 +9,6 @@ package org.hibernate.search.test.integration.osgi;
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -24,6 +22,7 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.testsupport.TestForIssue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,10 +117,7 @@ public class HibernateSearchWithKarafIT {
 				.type( "xml" )
 				.versionAsInProject();
 
-		Properties mavenProperties = new Properties();
-		try ( final InputStream inputStream = getClass().getResourceAsStream( "/maven.properties" ) ) {
-			mavenProperties.load( inputStream );
-		}
+		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
@@ -166,12 +162,12 @@ public class HibernateSearchWithKarafIT {
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.defaultRepositories",
-						"file://" + mavenProperties.getProperty( "maven.settings.localRepository" )
+						"file://" + mavenLocalRepository
 				),
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.localRepository",
-						mavenProperties.getProperty( "maven.settings.localRepository" )
+						mavenLocalRepository
 				)
 		};
 	}
