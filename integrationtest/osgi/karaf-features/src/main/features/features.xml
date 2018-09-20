@@ -14,6 +14,8 @@
 
         <!-- JTA -->
         <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
+        <bundle start-level="30">mvn:org.apache.aries.proxy/org.apache.aries.proxy/1.0.0</bundle>
+        <bundle start-level="30">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint/1.0.0</bundle>
         <bundle start-level="30">mvn:org.apache.aries.transaction/org.apache.aries.transaction.blueprint/1.0.0</bundle>
         <bundle start-level="30">mvn:org.apache.aries.transaction/org.apache.aries.transaction.manager/1.0.1</bundle>
 
