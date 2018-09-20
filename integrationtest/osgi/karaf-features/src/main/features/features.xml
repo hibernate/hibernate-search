@@ -56,17 +56,7 @@
 
         <bundle>mvn:com.h2database/h2/${version.com.h2database}</bundle>
 
-        <!-- ORM dependencies -->
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/2.7.7_5</bundle>
-        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.dom4j/1.6.1_5</bundle>
-
-        <bundle>mvn:org.jboss/jandex/${version.org.jboss.jandex}</bundle>
-        <bundle>mvn:com.fasterxml/classmate/${version.com.fasterxml.classmate}</bundle>
-        <bundle>mvn:org.javassist/javassist/${version.org.javassist}</bundle>
-        <bundle>mvn:net.bytebuddy/byte-buddy/${version.net.bytebuddy}</bundle>
-
         <!-- Hibernate ORM -->
-        <bundle>mvn:org.hibernate/hibernate-core/${version.org.hibernate}</bundle>
-        <bundle>mvn:org.hibernate/hibernate-osgi/${version.org.hibernate}</bundle>
+        <feature version="${version.org.hibernate}">hibernate-orm</feature>
     </feature>
 </features>
