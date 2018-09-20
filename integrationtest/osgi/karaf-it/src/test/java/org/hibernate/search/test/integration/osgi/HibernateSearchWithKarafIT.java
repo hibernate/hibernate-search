@@ -172,10 +172,15 @@ public class HibernateSearchWithKarafIT {
 						"rmiRegistryHost", "127.0.0.1"
 				),
 				// set the log level for the in container logging to INFO
-				// also just logging to file (out), check data/log/karaf.log w/i the Karaf installation for the test execution log
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.logging.cfg",
-						"log4j.rootLogger", "INFO, out"
+						"log4j2.rootLogger.level", "INFO"
+				),
+				// also log to the console, so that failsafe can capture the logs in the test output file
+				editConfigurationFilePut(
+						"etc/org.ops4j.pax.logging.cfg",
+						"log4j2.rootLogger.appenderRef.Console.filter.threshold.level",
+						"TRACE" // Means "whatever the root logger level is"
 				),
 				/*
 				 * Use the same local Maven repository as the build job.
