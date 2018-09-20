@@ -7,10 +7,13 @@
   -->
 <blueprint default-activation="eager" xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-    <bean id="service-contributor" class="org.hibernate.search.hcore.impl.SearchFactoryServiceContributor" />
-    <service ref="service-contributor" interface="org.hibernate.service.spi.ServiceContributor" />
+    <bean id="search-factory-service-contributor" class="org.hibernate.search.hcore.impl.SearchFactoryServiceContributor" />
+    <service ref="search-factory-service-contributor" interface="org.hibernate.service.spi.ServiceContributor" />
 
-    <bean id="integrator" class="org.hibernate.search.hcore.impl.HibernateSearchIntegrator"/>
-    <service ref="integrator" interface="org.hibernate.integrator.spi.Integrator"/>
+    <bean id="search-integrator" class="org.hibernate.search.hcore.impl.HibernateSearchIntegrator"/>
+    <service ref="search-integrator" interface="org.hibernate.integrator.spi.Integrator"/>
+
+    <bean id="extended-bean-managed-synchronizer-service-contributor" class="org.hibernate.search.hcore.impl.SearchFactoryServiceContributor" />
+    <service ref="extended-bean-managed-synchronizer-service-contributor" interface="org.hibernate.service.spi.ServiceContributor" />
 
 </blueprint>
