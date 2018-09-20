@@ -19,9 +19,8 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Properties;
 import java.util.concurrent.atomic.LongAdder;
 
 import javax.inject.Inject;
@@ -37,6 +36,8 @@ import org.hibernate.search.SearchFactory;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.StringHelper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -125,19 +126,19 @@ public class HibernateSearchWithKarafIT {
 				.type( "xml" )
 				.versionAsInProject();
 
-		Properties mavenProperties = new Properties();
-		try ( final InputStream inputStream = getClass().getResourceAsStream( "/maven.properties" ) ) {
-			mavenProperties.load( inputStream );
-		}
-
-		String vmArgsFromProperties = mavenProperties.getProperty( "pax-exam.jvm.args" );
+		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
+		String[] vmArgsFromProperties =
+				Arrays.stream(
+						System.getProperty( "pax-exam.jvm.args", "" ).split( "\\s" )
+				)
+						.filter( StringHelper::isNotEmpty )
+						.toArray( String[]::new );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
 				DEBUG ? debugConfiguration( "5005", true ) : null,
-				vmArgsFromProperties != null && !vmArgsFromProperties.isEmpty()
-						? CoreOptions.vmOptions( vmArgsFromProperties.split( " " ) ) : null,
+				vmArgsFromProperties.length > 0 ? CoreOptions.vmOptions( vmArgsFromProperties ) : null,
 				logLevel( LogLevelOption.LogLevel.WARN ),
 				karafDistributionConfiguration()
 						.frameworkUrl( karafUrl )
@@ -190,12 +191,12 @@ public class HibernateSearchWithKarafIT {
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.defaultRepositories",
-						"file://" + mavenProperties.getProperty( "maven.settings.localRepository" )
+						"file://" + mavenLocalRepository
 				),
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.localRepository",
-						mavenProperties.getProperty( "maven.settings.localRepository" )
+						mavenLocalRepository
 				)
 		};
 	}
