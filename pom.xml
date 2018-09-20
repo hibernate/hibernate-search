@@ -418,8 +418,9 @@
         </arquillian.wildfly.jvm.args.jbossmodules>
         <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.java-version} ${arquillian.wildfly.jvm.args.jacoco} ${arquillian.wildfly.jvm.args.jbossmodules}</arquillian.wildfly.jvm.args>
 
+        <pax-exam.jvm.args.java-version></pax-exam.jvm.args.java-version>
         <pax-exam.jvm.args.jacoco></pax-exam.jvm.args.jacoco>
-        <pax-exam.jvm.args>${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
+        <pax-exam.jvm.args>${pax-exam.jvm.args.java-version} ${pax-exam.jvm.args.jacoco}</pax-exam.jvm.args>
 
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
@@ -2000,6 +2001,9 @@
                 <arquillian.wildfly.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
                 </arquillian.wildfly.jvm.args.java-version>
+                <pax-exam.jvm.args.java-version>
+                    --add-modules=java.xml.bind
+                </pax-exam.jvm.args.java-version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
@@ -2022,6 +2026,9 @@
                 <arquillian.wildfly.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
                 </arquillian.wildfly.jvm.args.java-version>
+                <pax-exam.jvm.args.java-version>
+                    --add-modules=java.xml.bind
+                </pax-exam.jvm.args.java-version>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>
