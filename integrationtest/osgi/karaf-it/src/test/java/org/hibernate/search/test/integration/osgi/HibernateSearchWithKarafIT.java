@@ -18,8 +18,11 @@ import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRunti
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.inject.Inject;
 
@@ -33,12 +36,14 @@ import org.hibernate.search.Search;
 import org.hibernate.search.SearchFactory;
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.util.StringHelper;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
+import org.ops4j.pax.exam.CoreOptions;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption;
@@ -120,11 +125,19 @@ public class HibernateSearchWithKarafIT {
 		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
 		String jbossPublicRepository = System.getProperty( "maven.jboss.public.repo.url" );
 		String mavenCentralRepository = System.getProperty( "maven.mavencentral.repo.url" );
+		List<String> vmArgsFromPropertiesList = new ArrayList<>();
+		for ( String arg : System.getProperty( "pax-exam.jvm.args", "" ).split( "\\s+" ) ) {
+			if ( StringHelper.isNotEmpty( arg ) ) {
+				vmArgsFromPropertiesList.add( arg );
+			}
+		}
+		String[] vmArgsFromProperties = vmArgsFromPropertiesList.toArray( new String[0] );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
 		return new Option[] {
 				DEBUG ? debugConfiguration( "5005", true ) : null,
+				vmArgsFromProperties.length > 0 ? CoreOptions.vmOptions( vmArgsFromProperties ) : null,
 				logLevel( LogLevelOption.LogLevel.WARN ),
 				karafDistributionConfiguration()
 						.frameworkUrl( karafUrl )
