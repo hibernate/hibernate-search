@@ -47,6 +47,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
  * - method hudson.plugins.git.UserRemoteConfig getUrl
  * - method java.lang.Throwable addSuppressed java.lang.Throwable
+ * - method java.util.regex.MatchResult groupCount
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  *
@@ -163,6 +164,8 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 @Field def jobConfiguration = null
 @Field String gitHubRepoId = null
 
+@Field boolean trackingPR = false
+
 @Field String releaseVersionFamily
 
 Throwable mainScriptException = null
@@ -191,10 +194,45 @@ stage('Configure') {
 		echo "Could not detect GitHub repository ID for URL: $scmUrl"
 	}
 
+	def trackedJobs = ''
+	if (env.CHANGE_BRANCH) {
+		def trackingPatchBranchNameMatcher = (env.CHANGE_BRANCH =~ /^tracking-patch-([^_]+)(?:_([^_]+))+$/)
+		if (trackingPatchBranchNameMatcher.matches()) {
+			trackingPR = true
+			if (!env.CHANGE_TARGET) {
+				error "This is a tracking patch branch. These branches can only be built as part of a pull request."
+			}
+			patchName = trackingPatchBranchNameMatcher.group(1)
+			def trackingPatchBaseBranch = env.CHANGE_TARGET
+
+			// Configure jobs that are tracked (should trigger a build of this branch on successful builds)
+			// The base branch should have a job with the same name
+			trackedJobs = trackingPatchBaseBranch
+			// If additional jobs are mentioned in the branch name, take them into account
+			// (and prepend "/" to reference jobs outside of the multibranch job)
+			for (int i = 2; i <= trackingPatchBranchNameMatcher.groupCount(); ++i) {
+				trackedJobs += ", /" + trackingPatchBranchNameMatcher.group(i)
+			}
+
+			echo "This is a tracking-patch branch. Patch name: $patchName." +
+					" Base branch: $trackingPatchBaseBranch." +
+					" Tracked Jenkins jobs: $trackedJobs"
+		}
+	}
+
 	properties([
-			pipelineTriggers([
-					issueCommentTrigger('.*test this please.*')
-			]),
+			pipelineTriggers(
+					[
+							issueCommentTrigger('.*test this please.*'),
+							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
+							snapshotDependencies()
+					]
+							+ trackedJobs ? [
+									// Rebuild when tracked jobs are rebuilt
+									upstream(trackedJobs)
+							]
+							: []
+			),
 			parameters([
 					choice(
 							name: 'INTEGRATION_TESTS',
@@ -720,8 +758,9 @@ def notifyBuildEnd() {
 	}
 
 	// Notify the notification recipients configured on the job,
-	// except in the case of a PR build or of a "success after a success"
-	if (!env.CHANGE_ID && !successAfterSuccess) {
+	// except in the case of a non-tracking PR build or of a "success after a success"
+	def pullRequest = env.CHANGE_ID ? true : false
+	if ((!pullRequest || trackingPR) && !successAfterSuccess) {
 		explicitRecipients = jobConfiguration?.notification?.email?.recipients
 	}
 
