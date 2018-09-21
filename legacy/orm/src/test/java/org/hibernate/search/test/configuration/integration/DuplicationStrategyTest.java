@@ -49,7 +49,7 @@ public class DuplicationStrategyTest {
 		final SessionFactoryOptionsBuilder sfOptions = new SessionFactoryOptionsBuilder( serviceRegistry, ctx );
 		SessionFactoryServiceRegistryImpl sessionFactoryServiceRegistry = new SessionFactoryServiceRegistryImpl(
 				(ServiceRegistryImplementor)serviceRegistry, Collections.emptyList(), Collections.emptyList(),
-				sessionFactoryImplementor, ctx, sfOptions
+				sessionFactoryImplementor, sfOptions
 		);
 
 		EventListenerRegistry eventListenerRegistry = EventListenerServiceInitiator.INSTANCE.initiateService( sessionFactoryServiceRegistry );
