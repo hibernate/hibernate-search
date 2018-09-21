@@ -178,8 +178,8 @@
 
         <!-- Dependencies versions -->
 
-        <version.org.hibernate>5.3.7.Final</version.org.hibernate>
-        <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
+        <version.org.hibernate>5.4.0.CR2</version.org.hibernate>
+        <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
@@ -237,12 +237,9 @@
         <!-- Derby driver used by JBatch -->
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
-        <!--
-            Using JAXB 2.3.0 as 2.2.11 seems to be broken in more than a few ways.
-            In particular version 2.2.11 of the impl depends on version 2.2.12-b140109.1041 of the API.
-         -->
-        <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
-        <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+        <!-- This should be aligned with the version used in ORM -->
+        <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
@@ -281,7 +278,7 @@
             exact versions in this pom are being tested.
             Essentially we allow older versions when we know no changes were necessary when we upgraded the dependency. -->
         <osgi.version-range.org.apache.lucene>[5.3.0,5.6.0)</osgi.version-range.org.apache.lucene>
-        <osgi.version-range.org.hibernate>[5.3.0,5.4.0)</osgi.version-range.org.hibernate>
+        <osgi.version-range.org.hibernate>[5.4.0,5.5.0)</osgi.version-range.org.hibernate>
         <osgi.version-range.org.hibernate.commons.annotations>[5,6)</osgi.version-range.org.hibernate.commons.annotations>
         <osgi.version-range.org.jgroups>[3.6.0,4)</osgi.version-range.org.jgroups>
         <osgi.version-range.org.jboss.logging.jboss-logging>[3.3,4.0.0)</osgi.version-range.org.jboss.logging.jboss-logging>
