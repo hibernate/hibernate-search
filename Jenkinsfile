@@ -9,6 +9,8 @@ import groovy.transform.Field
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
+import java.util.regex.Pattern
+
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
  *
@@ -51,6 +53,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
  * - method hudson.plugins.git.UserRemoteConfig getUrl
  * - method java.lang.Throwable addSuppressed java.lang.Throwable
+ * - method java.util.regex.MatchResult groupCount
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  *
@@ -92,6 +95,16 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * Branches named "master" or matching the regex /[0-9]+.[0-9]+/ will be considered as "primary" branches,
  * and will undergo additional testing.
  *
+ * Branches named "tracking-<some-name>"
+ * will be considered as "tracking branches", i.e. branches containing a patch to be applied regularly
+ * on top of a base branch, whenever that base branch changes, or another job succeeds.
+ * The corresponding job will be configured to run:
+ * - when the PR is updated (as usual)
+ * - when a snapshot dependency is updated in the same Jenkins instance (as usual)
+ * - when the base branch is built successfully
+ * - when the Jenkins jobs mentioned in the branch name are built successfully
+ * Also, when such branches are built, they are automatically merged with the base branch.
+ *
  * #### Environment variables
  *
  * The following environment variables are necessary for some features:
@@ -122,6 +135,25 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *         # The settings must provide credentials to the servers with ID
  *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
  *         settingsId: ...
+ *     # Remotes to be added to git when checking out. Useful for tracking (see below) in particular.
+ *     scm:
+ *       remotes:
+ *         <remote-name>:
+ *           # The URL of a remote
+ *           url: ...
+ *     tracking:
+ *       # The tracking ID, used as a suffix for tracking branch names:
+ *       # if the branch is named "tracking-foo", the tracking ID will be "foo".
+ *       <tracking-name>:
+ *         # The Git refspec to the base of this tracking branch.
+ *         # For example this can be "origin/master" or "upstream/master" (if a remote named "upstream" is defined).
+ *         base: ...
+ *         # The Jenkins jobs to track.
+ *         # Use "branchname" to reference jobs corresponding to other branches in the same multibranch job.
+ *         # Use a "/" prefix ("/somename") to reference jobs outside of the multibranch job.
+ *         tracked:
+ *           - <job name>
+ *           - <other job name>
  *
  * #### Credentials
  *
@@ -183,6 +215,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
 @Field def jobConfiguration = null
 @Field ScmSource scmSource = null
+@Field def trackingConfiguration = null
 
 @Field String releaseVersionFamily
 
@@ -203,10 +236,44 @@ stage('Configure') {
 	scmSource = new ScmSource(env, scm)
 	echo "SCM source: $scmSource"
 
+	String trackedJobs = ''
+	if (scmSource.branch.tracking) {
+		def trackingName = scmSource.branch.tracking
+		trackingConfiguration = jobConfiguration?.tracking?.get(trackingName)
+		if (!trackingConfiguration) {
+			error "Missing tracking configuration for tracking ID '$trackingName'." +
+					" Add tracking configuration to job-configuration.yaml." +
+					" See the documentation in the Jenkinsfile for more information."
+		}
+
+		// Configure jobs that are tracked (should trigger a build of this branch on successful builds)
+		// If additional jobs are mentioned in the branch name, take them into account
+		// (and prepend "/" to reference jobs outside of the multibranch job)
+		trackingConfiguration.tracked.each { jobName ->
+			if (!trackedJobs.isEmpty()) {
+				trackedJobs += ","
+			}
+			trackedJobs += jobName
+		}
+
+		echo "This is a tracking-patch branch. Tracking name: $trackingName." +
+				" Base branch: ${trackingConfiguration.base}." +
+				" Tracked Jenkins jobs: $trackedJobs"
+	}
+
 	properties([
-			pipelineTriggers([
-					issueCommentTrigger('.*test this please.*')
-			]),
+			pipelineTriggers(
+					[
+							issueCommentTrigger('.*test this please.*'),
+							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
+							snapshotDependencies()
+					]
+							+ trackedJobs ? [
+									// Rebuild when tracked jobs are rebuilt
+									upstream(trackedJobs)
+							]
+							: []
+			),
 			parameters([
 					choice(
 							name: 'INTEGRATION_TESTS',
@@ -668,6 +735,9 @@ class ScmSource {
 }
 
 class ScmBranch {
+	private static final Pattern PRIMARY_PATTERN = ~/master|\d+\.\d+/
+	private static final Pattern TRACKING_PATTERN = ~/^tracking-(.+)$/
+
 	String name
 
 	String toString() { "ScmBranch(name:$name)" }
@@ -678,7 +748,15 @@ class ScmBranch {
 	 * whereas the only purpose  of "feature" branches is to eventually be merged into a primary branch.
 	 */
 	boolean isPrimary() {
-		(name ==~ /master|\d+\.\d+/)
+		(name ==~ PRIMARY_PATTERN)
+	}
+
+	/**
+	 * @return The name of the "tracking" for this branch, to allow for configuration retrieval.
+	 */
+	String getTracking() {
+		def matcher = (name =~ TRACKING_PATTERN)
+		return matcher.matches() ? matcher.group(1) : null
 	}
 }
 
@@ -770,6 +848,23 @@ void initWorkspace() {
 
 	// Check out the code
 	checkout scm
+
+	// Take tracking configuration into account
+	if (trackingConfiguration?.base) {
+		// Add the configured remotes, just in case the "base" references one of these
+		if (jobConfiguration?.scm?.remotes) {
+			remotesConfiguration = jobConfiguration.scm.remotes
+			echo "Adding configured remotes"
+			remotesConfiguration.each { name, config ->
+				// Remove the remote if it was added in a previous build
+				sh "git remote remove '$name' 1>&2 2>/dev/null || true"
+				sh "git remote add -f '$name' '$config.url'"
+			}
+		}
+		String base = trackingConfiguration?.base
+		echo "Merging with tracking base: $base"
+		sh "git merge $base"
+	}
 }
 
 void withDefaultedMaven(Closure body) {
@@ -843,8 +938,8 @@ def notifyBuildEnd() {
 	}
 
 	// Notify the notification recipients configured on the job,
-	// except in the case of a PR build or of a "success after a success"
-	if (!scmSource.pullRequest && !successAfterSuccess) {
+	// except in the case of a non-tracking PR build or of a "success after a success"
+	if ((!scmSource.pullRequest || scmSource.branch.tracking) && !successAfterSuccess) {
 		explicitRecipients = jobConfiguration?.notification?.email?.recipients
 	}
 
