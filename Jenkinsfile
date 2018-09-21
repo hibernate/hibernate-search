@@ -9,6 +9,8 @@ import groovy.transform.Field
 import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
+import java.util.regex.Pattern
+
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
  *
@@ -51,6 +53,7 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
  * - method hudson.plugins.git.UserRemoteConfig getUrl
  * - method java.lang.Throwable addSuppressed java.lang.Throwable
+ * - method java.util.regex.MatchResult groupCount
  *
  * Just run the script a few times, it will fail and display a link to allow these calls.
  *
@@ -83,9 +86,23 @@ import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
  *
  * ### Job configuration
  *
- * This file gets its configuration from three sources: environment variables, a configuration file, and credentials.
+ * This file gets its configuration from four sources: the branch name, environment variables, a configuration file, and credentials.
  * All configuration is optional for the default build (and it should stay that way),
  * but some features require some configuration.
+ *
+ * #### Branch name
+ *
+ * Branches named "master" or matching the regex /[0-9]+.[0-9]+/ will be considered as "primary" branches,
+ * and will undergo additional testing.
+ *
+ * Branches named "tracking-<some-name>_<some-jenkins-job>_<some-other-jenkins-job>_<etc>"
+ * will be considered as "tracking branches", i.e. branches containing a patch to be applied regularly
+ * on top of the tracked branch.
+ * As soon as a pull request is submitted for such a branch, the corresponding job will be configured to run:
+ * - when the PR is updated (as usual)
+ * - when a snapshot dependency is updated in the same Jenkins instance (as usual)
+ * - when the tracked branch (the target of the PR) is built successfully
+ * - when the Jenkins jobs mentioned in the branch name are built successfully
  *
  * #### Environment variables
  *
@@ -206,10 +223,41 @@ stage('Configure') {
 	scmSource = new ScmSource(env, scm)
 	echo "SCM source: $scmSource"
 
+	def trackedJobs = ''
+	if (scmSource.branch.tracking) {
+		if (!scmSource.pullRequest) {
+			error "This is a tracking patch branch. These branches can only be built as part of a pull request."
+		}
+		def patchName = scmSource.branch.trackingName
+		def targetBranchName = scmSource.pullRequest.target.name
+
+		// Configure jobs that are tracked (should trigger a build of this branch on successful builds)
+		// The target branch should have a job with the same name
+		trackedJobs = targetBranchName
+		// If additional jobs are mentioned in the branch name, take them into account
+		// (and prepend "/" to reference jobs outside of the multibranch job)
+		scmSource.branch.trackingParameters.each({
+			param -> trackedJobs += ", /" + param
+		})
+
+		echo "This is a tracking-patch branch. Patch name: $patchName." +
+				" Base branch: $targetBranchName." +
+				" Tracked Jenkins jobs: $trackedJobs"
+	}
+
 	properties([
-			pipelineTriggers([
-					issueCommentTrigger('.*test this please.*')
-			]),
+			pipelineTriggers(
+					[
+							issueCommentTrigger('.*test this please.*'),
+							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
+							snapshotDependencies()
+					]
+							+ trackedJobs ? [
+									// Rebuild when tracked jobs are rebuilt
+									upstream(trackedJobs)
+							]
+							: []
+			),
 			parameters([
 					choice(
 							name: 'INTEGRATION_TESTS',
@@ -675,6 +723,9 @@ class ScmSource {
 }
 
 class ScmBranch {
+	private static final Pattern PRIMARY_PATTERN = ~/master|\d+\.\d+/
+	private static final Pattern TRACKING_PATTERN = ~/^tracking-([^_]+)(?:_([^_]+))+$/
+
 	String name
 
 	String toString() { "ScmBranch(name:$name)" }
@@ -685,7 +736,29 @@ class ScmBranch {
 	 * whereas the only purpose  of "feature" branches is to eventually be merged into a primary branch.
 	 */
 	boolean isPrimary() {
-		(name ==~ /master|\d+\.\d+/)
+		(name ==~ PRIMARY_PATTERN)
+	}
+
+	/**
+	 * @return Whether this branch is a "tracking" branch, i.e. it contains a patch that should be applied
+	 * on another branch regularly.
+	 */
+	boolean isTracking() {
+		(name ==~ TRACKING_PATTERN)
+	}
+
+	String getTrackingName() {
+		def matcher = (name =~ TRACKING_PATTERN)
+		return matcher.group(1)
+	}
+
+	List<String> getTrackingParameters() {
+		def matcher = (name =~ TRACKING_PATTERN)
+		List<String> parameters = []
+		for (int i = 2; i <= matcher.groupCount(); ++i) {
+			parameters.add(matcher.group(i))
+		}
+		return parameters
 	}
 }
 
@@ -824,8 +897,8 @@ def notifyBuildEnd() {
 	}
 
 	// Notify the notification recipients configured on the job,
-	// except in the case of a PR build or of a "success after a success"
-	if (!scmSource.pullRequest && !successAfterSuccess) {
+	// except in the case of a non-tracking PR build or of a "success after a success"
+	if ((!scmSource.pullRequest || scmSource.branch.tracking) && !successAfterSuccess) {
 		explicitRecipients = jobConfiguration?.notification?.email?.recipients
 	}
 
