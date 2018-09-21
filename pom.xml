@@ -178,7 +178,7 @@
 
         <!-- Dependencies versions -->
 
-        <version.org.hibernate>5.3.11.Final</version.org.hibernate>
+        <version.org.hibernate>5.3.12.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
@@ -237,12 +237,9 @@
         <!-- Derby driver used by JBatch -->
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
-        <!--
-            Using JAXB 2.3.0 as 2.2.11 seems to be broken in more than a few ways.
-            In particular version 2.2.11 of the impl depends on version 2.2.12-b140109.1041 of the API.
-         -->
-        <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
-        <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+        <!-- This should be aligned with the version used in ORM -->
+        <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
