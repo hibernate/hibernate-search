@@ -202,6 +202,7 @@
         <version.org.apache.commons.lang>2.6</version.org.apache.commons.lang>
         <version.org.apache.commons.lang3>3.5</version.org.apache.commons.lang3>
         <version.org.apache.commons.logging>1.1.3</version.org.apache.commons.logging>
+        <version.org.apache.commons.collections>3.2.1</version.org.apache.commons.collections>
         <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
         <version.org.apache.avro>1.7.6</version.org.apache.avro>
@@ -677,6 +678,15 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${version.org.apache.commons.lang3}</version>
+            </dependency>
+            <dependency>
+                <!--
+                     Dependency management is necessary to avoid divergence between the version required by unitils
+                     and the one required by commons-beanutils used in jaxb
+                 -->
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${version.org.apache.commons.collections}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
