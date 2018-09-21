@@ -8,28 +8,13 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
-git:
-  # Required in order for Sonar to retrieve blame information
-  depth: false
 addons:
   # for now, let's test only with H2
   #postgresql: '9.4'
   #mariadb: '10.0'
-# might be useful to push reports to an S3 bucket
-#  artifacts:
-#    paths:
-#      - $(find $HOME -name surefire-reports | tr "\n" ":")
-#      - $(find $HOME -name failsafe-reports | tr "\n" ":")
-#  s3_region: 'us-west-2'
-  sonarcloud:
-    organization: "hibernate"
-    token:
-      # SONAR_TOKEN should be defined in the Travis project; do not define it to skip Sonar.
-      secure: $SONAR_TOKEN
 cache:
   directories:
     - $HOME/.m2
-    - $HOME/.sonar/cache
 env:
   global:
     # Unset _JAVA_OPTIONS to avoid raising the memory used by Elasticsearch
@@ -45,8 +30,6 @@ env:
 before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
-  # Skip Sonar if no token is defined
-  - if [[ -z "$SONAR_TOKEN" ]]; then BUILD_OPTIONS+=' -Dsonar.skip=true'; fi
   - case $DB in
     "h2") ;;
     "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
@@ -60,9 +43,8 @@ install:
   # We want to start as many plugins as possible (so that their dependencies are downloaded),
   # but we want the plugins to be skipped if they are not essential,
   # because they will be re-executed later and we don't want to waste time.
-  - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc coveralls:report sonar:sonar
+  - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc
     -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
-    -Dcoveralls.skip=true -Dsonar.skip=true
 before_script:
   - case $DB in
     "h2") ;;
@@ -73,9 +55,7 @@ script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
   # Note sonar must be ran in the "script:" section in order to benefit from Travis caching.
   - ./mvnw $BUILD_OPTIONS checkstyle:check
-    && ./mvnw $BUILD_OPTIONS install javadoc:javadoc sonar:sonar -Dcheckstyle.skip
-after_success:
-  - ./mvnw $BUILD_OPTIONS coveralls:report
+    && ./mvnw $BUILD_OPTIONS install javadoc:javadoc -Dcheckstyle.skip
 before_cache:
   # Do not put the artifacts we just built into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/search/
