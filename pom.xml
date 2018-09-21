@@ -183,17 +183,16 @@
         <version.com.google.code.gson>2.8.5</version.com.google.code.gson>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.3.7.Final</version.org.hibernate>
+        <version.org.hibernate>5.4.0.CR2</version.org.hibernate>
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
-        <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
+        <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
         <!--
             Explicit JAXB/javax.xml.bind dependencies: to be removed in HSEARCH-3376
-            Using JAXB 2.3.0 as 2.2.11 seems to be broken in more than a few ways.
-            In particular version 2.2.11 of the impl depends on version 2.2.12-b140109.1041 of the API.
          -->
-        <version.javax.xml.bind.jaxb-api>2.3.0</version.javax.xml.bind.jaxb-api>
-        <version.org.glassfish.jaxb>2.3.0.1</version.org.glassfish.jaxb>
+        <!-- This should be aligned with the version used in ORM -->
+        <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
+        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
