@@ -8,10 +8,6 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
-addons:
-  # for now, let's test only with H2
-  #postgresql: '9.4'
-  #mariadb: '10.0'
 cache:
   directories:
     - $HOME/.m2
@@ -22,19 +18,9 @@ env:
     - _JAVA_OPTIONS=
     # Ensure Maven doesn't eat up too much memory
     - MAVEN_OPTS=-Xmx756m
-  matrix:
-    - DB=h2
-    # for now, let's test only with H2
-    #- DB=pgsql
-    #- DB=mariadb
 before_install:
   # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
   - BUILD_OPTIONS='-Pdist -Pcoverage -Pjqassistant'
-  - case $DB in
-    "h2") ;;
-    "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
-    "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
-    esac
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
@@ -45,12 +31,6 @@ install:
   # because they will be re-executed later and we don't want to waste time.
   - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc
     -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
-before_script:
-  - case $DB in
-    "h2") ;;
-    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
-    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
-    esac
 script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
   # Note sonar must be ran in the "script:" section in order to benefit from Travis caching.
