@@ -200,19 +200,19 @@ stage('Configure') {
 				error "This is a tracking patch branch. These branches can only be built as part of a pull request."
 			}
 			patchName = trackingPatchBranchNameMatcher.group(1)
-			trackingPatchBranchBase = env.CHANGE_TARGET
+			def trackingPatchBaseBranch = env.CHANGE_TARGET
 
 			// Configure jobs that are tracked (should trigger a build of this branch on successful builds)
 			// The base branch should have a job with the same name
-			trackedJobs = trackingPatchBranchBase
+			trackedJobs = trackingPatchBaseBranch
 			// If additional jobs are mentioned in the branch name, take them into account
 			for (int i = 2; i <= trackingPatchBranchNameMatcher.groupCount(); ++i) {
 				trackedJobs += "/" + trackingPatchBranchNameMatcher.group(i) + ","
 			}
 
 			echo "This is a tracking-patch branch. Patch name: $patchName." +
-					" Base branch: $trackingPatchBranchBase." +
-					" Upstream Jenkins jobs: $upstreamProjects"
+					" Base branch: $trackingPatchBaseBranch." +
+					" Tracked Jenkins jobs: $trackedJobs"
 		}
 	}
 
