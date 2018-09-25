@@ -596,7 +596,6 @@ abstract class ITEnvironment {
 }
 
 class JdkITEnvironment extends ITEnvironment {
-	ITEnvironmentStatus status
 	String version
 	String tool
 	String getTag() { "jdk-$version" }
