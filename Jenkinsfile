@@ -585,7 +585,11 @@ enum ITEnvironmentStatus {
 	// For environments that are expected to work correctly (tested on master and maintenance branches)
 	SUPPORTED,
 	// For environments that may not work correctly (only tested when explicitly requested through job parameters)
-	EXPERIMENTAL
+	EXPERIMENTAL;
+
+	// Work around JENKINS-33023
+	// See https://issues.jenkins-ci.org/browse/JENKINS-33023?focusedCommentId=325738&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-325738
+	public ITEnvironmentStatus() {}
 }
 
 abstract class ITEnvironment {
