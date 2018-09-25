@@ -6,10 +6,15 @@
  */
 
 import groovy.transform.Field
-import org.jenkinsci.plugins.pipeline.modeldefinition.Utils
 import org.jenkinsci.plugins.credentialsbinding.impl.CredentialNotFoundException
 
-import java.util.regex.Pattern
+/*
+ * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
+ */
+@Library('hibernate-jenkins-pipeline-helpers@1.0')
+import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
+import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
+import org.hibernate.jenkins.pipeline.helpers.version.Version
 
 /*
  * WARNING: DO NOT IMPORT LOCAL LIBRARIES HERE.
@@ -27,7 +32,9 @@ import java.util.regex.Pattern
  */
 
 /*
- * See http://ci.hibernate.org/pipeline-syntax/ for help writing Jenkins pipeline steps.
+ * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers for the documentation
+ * of the helpers library used in this Jenkinsfile,
+ * and for help writing Jenkinsfiles.
  *
  * ### Jenkins configuration
  *
@@ -35,27 +42,16 @@ import java.util.regex.Pattern
  *
  * This file requires the following plugins in particular:
  *
- * - https://plugins.jenkins.io/pipeline-maven
- * - https://plugins.jenkins.io/ec2
- * - https://plugins.jenkins.io/lockable-resources
- * - https://plugins.jenkins.io/pipeline-github
- * - https://plugins.jenkins.io/email-ext
- * - https://plugins.jenkins.io/config-file-provider
- * - https://plugins.jenkins.io/pipeline-utility-steps
+ * - everything required by the helpers library (see the org.hibernate.(...) imports for a link to its documentation)
+ * - https://plugins.jenkins.io/ec2 for AWS credentials
+ * - https://plugins.jenkins.io/lockable-resources for the lock on the AWS Elasticsearch server
+ * - https://plugins.jenkins.io/pipeline-github for the trigger on pull request comments
  *
  * #### Script approval
  *
- * Also you might need to allow the following calls in <jenkinsUrl>/scriptApproval/:
+ * If not already done, you will need to allow the following calls in <jenkinsUrl>/scriptApproval/:
  *
- * - method java.util.Map putIfAbsent java.lang.Object java.lang.Object
- * - staticMethod org.jenkinsci.plugins.pipeline.modeldefinition.Utils markStageSkippedForConditional java.lang.String
- * - new java.lang.IllegalArgumentException java.lang.String
- * - method hudson.plugins.git.GitSCM getUserRemoteConfigs
- * - method hudson.plugins.git.UserRemoteConfig getUrl
- * - method java.lang.Throwable addSuppressed java.lang.Throwable
- * - method java.util.regex.MatchResult groupCount
- *
- * Just run the script a few times, it will fail and display a link to allow these calls.
+ * - everything required by the helpers library (see the org.hibernate.(...) imports for a link to its documentation)
  *
  * ### Integrations
  *
@@ -86,24 +82,15 @@ import java.util.regex.Pattern
  *
  * ### Job configuration
  *
- * This file gets its configuration from four sources: branch name, environment variables, a configuration file, and credentials.
+ * This Jenkinsfile gets its configuration from four sources:
+ * branch name, environment variables, a configuration file, and credentials.
  * All configuration is optional for the default build (and it should stay that way),
  * but some features require some configuration.
  *
  * #### Branch name
  *
- * Branches named "master" or matching the regex /[0-9]+.[0-9]+/ will be considered as "primary" branches,
- * and will undergo additional testing.
- *
- * Branches named "tracking-<some-name>"
- * will be considered as "tracking branches", i.e. branches containing a patch to be applied regularly
- * on top of a base branch, whenever that base branch changes, or another job succeeds.
- * The corresponding job will be configured to run:
- * - when the PR is updated (as usual)
- * - when a snapshot dependency is updated in the same Jenkins instance (as usual)
- * - when the base branch is built successfully
- * - when the Jenkins jobs mentioned in the branch name are built successfully
- * Also, when such branches are built, they are automatically merged with the base branch.
+ * See the org.hibernate.(...) imports for a link to the helpers library documentation,
+ * which explains the basics.
  *
  * #### Environment variables
  *
@@ -116,16 +103,11 @@ import java.util.regex.Pattern
  *
  * #### Job configuration file
  *
- * The job configuration file is optional. Its purpose is to host job-specific configuration, such as notification recipients.
+ * See the org.hibernate.(...) imports for a link to the helpers library documentation,
+ * which explains the basic structure of this file and how to set it up.
  *
- * The file is named 'job-configuration.yaml', and it should be set up using the config file provider plugin
- * (https://plugins.jenkins.io/config-file-provider).
- * Expected structure of this file:
+ * Below is the additional structure specific to this Jenkinsfile:
  *
- *     notification:
- *       email:
- *         # String containing a space-separated list of email addresses to notify in case of failing non-PR builds.
- *         recipients: ...
  *     sonar:
  *       # String containing the sonar organization. Mandatory in order to enable Sonar analysis.
  *       organization: ...
@@ -135,25 +117,6 @@ import java.util.regex.Pattern
  *         # The settings must provide credentials to the servers with ID
  *         # 'jboss-releases-repository' and 'jboss-snapshots-repository'.
  *         settingsId: ...
- *     # Remotes to be added to git when checking out. Useful for tracking (see below) in particular.
- *     scm:
- *       remotes:
- *         <remote-name>:
- *           # The URL of a remote
- *           url: ...
- *     tracking:
- *       # The tracking ID, used as a suffix for tracking branch names:
- *       # if the branch is named "tracking-foo", the tracking ID will be "foo".
- *       <tracking-name>:
- *         # The Git refspec to the base of this tracking branch.
- *         # For example this can be "origin/master" or "upstream/master" (if a remote named "upstream" is defined).
- *         base: ...
- *         # The Jenkins jobs to track.
- *         # Use "branchname" to reference jobs corresponding to other branches in the same multibranch job.
- *         # Use a "/" prefix ("/somename") to reference jobs outside of the multibranch job.
- *         tracked:
- *           - <job name>
- *           - <other job name>
  *
  * #### Credentials
  *
@@ -166,7 +129,6 @@ import java.util.regex.Pattern
  * (see "Configuration file" above) to send Sonar analysis input to sonarcloud.io.
  */
 
-@Field final String MAVEN_LOCAL_REPOSITORY_RELATIVE = '.repository'
 @Field final String MAVEN_TOOL = 'Apache Maven 3.5.4'
 
 // Default node pattern, to be used for resource-intensive stages.
@@ -176,34 +138,8 @@ import java.util.regex.Pattern
 // such as sending a notification. May include the master node in particular.
 @Field final String QUICK_USE_NODE_PATTERN = 'Master||Slave'
 
-@Field final List<JdkITEnvironment> jdkEnvs = [
-		// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
-		// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
-		new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-		new JdkITEnvironment(version: '10', tool: 'Oracle JDK 10.0.1', status: ITEnvironmentStatus.SUPPORTED),
-		// TODO HSEARCH-3238 (and maybe more) to support JDK11 builds
-		new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.EXPERIMENTAL)
-]
-@Field JdkITEnvironment defaultJdkEnv
-@Field final List<DatabaseITEnvironment> databaseEnvs = [
-		new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-		new DatabaseITEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: ITEnvironmentStatus.SUPPORTED),
-		new DatabaseITEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: ITEnvironmentStatus.SUPPORTED)
-]
-@Field DatabaseITEnvironment defaultDatabaseEnv
-@Field final List<EsLocalITEnvironment> esLocalEnvs = [
-		new EsLocalITEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-		new EsLocalITEnvironment(versionRange: '[6.0,6.x)', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
-]
-@Field EsLocalITEnvironment defaultEsLocalEnv
-@Field final List<EsAwsITEnvironment> esAwsEnvs = [
-		new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
-		new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
-]
-@Field final List<List<? extends ITEnvironment>> allEnvironmentLists = [
-		jdkEnvs, databaseEnvs, esLocalEnvs, esAwsEnvs
-]
+@Field AlternativeMultiMap<ITEnvironment> environments
+@Field JobHelper helper
 
 @Field boolean enableDefaultBuild = false
 @Field boolean enableDefaultEnvIT = false
@@ -213,52 +149,56 @@ import java.util.regex.Pattern
 @Field boolean performRelease = false
 @Field boolean deploySnapshot = false
 
-@Field def jobConfiguration = null
-@Field ScmSource scmSource = null
-@Field def trackingConfiguration = null
+@Field Version releaseVersion
+@Field Version afterReleaseDevelopmentVersion
 
-@Field String releaseVersionFamily
+this.helper = new JobHelper(this)
 
-Throwable mainScriptException = null
-try { // Start of the code triggering notifications, see below. Not indenting for readability.
+helper.runWithNotification {
 
 stage('Configure') {
-	defaultJdkEnv = getDefaultEnv( jdkEnvs )
-	defaultDatabaseEnv = getDefaultEnv( databaseEnvs )
-	defaultEsLocalEnv = getDefaultEnv( esLocalEnvs )
+	this.environments = AlternativeMultiMap.create([
+			jdk: [
+					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
+					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
+					new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new JdkITEnvironment(version: '10', tool: 'Oracle JDK 10.0.1', status: ITEnvironmentStatus.SUPPORTED),
+					// TODO HSEARCH-3238 (and maybe more) to support JDK11 builds
+					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.EXPERIMENTAL)
+			],
+			database: [
+					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new DatabaseITEnvironment(dbName: 'mariadb', mavenProfile: 'ci-mariadb', status: ITEnvironmentStatus.SUPPORTED),
+					new DatabaseITEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: ITEnvironmentStatus.SUPPORTED)
+			],
+			esLocal: [
+					new EsLocalITEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
+					new EsLocalITEnvironment(versionRange: '[6.0,6.x)', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.SUPPORTED)
+			],
+			esAws: [
+					new EsAwsITEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: ITEnvironmentStatus.EXPERIMENTAL),
+					new EsAwsITEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL),
+					new EsAwsITEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: ITEnvironmentStatus.EXPERIMENTAL)
+			]
+	])
 
 	// Load the configuration specific to each job set up in Jenkins
+	def jobConfigurationFromNode
 	node(QUICK_USE_NODE_PATTERN) {
-		jobConfiguration = loadYamlConfiguration('job-configuration.yaml')
-		echo "Job configuration: $jobConfiguration"
+		jobConfigurationFromNode = helper.loadYamlConfiguration('job-configuration.yaml')
+		echo "Job configuration: $jobConfigurationFromNode"
 	}
 
-	scmSource = new ScmSource(env, scm)
-	echo "SCM source: $scmSource"
-
-	String trackedJobs = ''
-	if (scmSource.branch.tracking) {
-		def trackingName = scmSource.branch.tracking
-		trackingConfiguration = jobConfiguration?.tracking?.get(trackingName)
-		if (!trackingConfiguration) {
-			error "Missing tracking configuration for tracking ID '$trackingName'." +
-					" Add tracking configuration to job-configuration.yaml." +
-					" See the documentation in the Jenkinsfile for more information."
+	helper.configure {
+		file jobConfigurationFromNode
+		jdk {
+			defaultTool environments.content.jdk.default.tool
 		}
-
-		// Configure jobs that are tracked (should trigger a build of this branch on successful builds)
-		// If additional jobs are mentioned in the branch name, take them into account
-		// (and prepend "/" to reference jobs outside of the multibranch job)
-		trackingConfiguration.tracked.each { jobName ->
-			if (!trackedJobs.isEmpty()) {
-				trackedJobs += ","
-			}
-			trackedJobs += jobName
+		maven {
+			defaultTool MAVEN_TOOL
+			producedArtifactPattern "org/hibernate/search/*"
+			producedArtifactPattern "org/hibernate/hibernate-search*"
 		}
-
-		echo "This is a tracking-patch branch. Tracking name: $trackingName." +
-				" Base branch: ${trackingConfiguration.base}." +
-				" Tracked Jenkins jobs: $trackedJobs"
 	}
 
 	properties([
@@ -268,9 +208,9 @@ stage('Configure') {
 							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
 							snapshotDependencies()
 					]
-							+ trackedJobs ? [
+							+ helper.configuration.tracking.trackedAsString ? [
 									// Rebuild when tracked jobs are rebuilt
-									upstream(trackedJobs)
+									upstream(helper.configuration.tracking.trackedAsString)
 							]
 							: []
 			),
@@ -314,8 +254,8 @@ ALL_ENV""",
 
 	performRelease = (params.RELEASE_VERSION ? true : false)
 
-	if (!performRelease && scmSource.branch.primary && !scmSource.pullRequest) {
-		if (jobConfiguration?.deployment?.maven?.settingsId) {
+	if (!performRelease && helper.scmSource.branch.primary && !helper.scmSource.pullRequest) {
+		if (helper.configuration.file?.deployment?.maven?.settingsId) {
 			deploySnapshot = true
 		}
 		else {
@@ -342,18 +282,18 @@ ALL_ENV""",
 		case 'AUTOMATIC':
 			if (params.RELEASE_VERSION) {
 				echo "Skipping default build and integration tests to speed up the release of version $params.RELEASE_VERSION"
-			} else if (scmSource.pullRequest) {
-				echo "Enabling only the default build and integration tests in the default environment for pull request $scmSource.pullRequest.id"
+			} else if (helper.scmSource.pullRequest) {
+				echo "Enabling only the default build and integration tests in the default environment for pull request $helper.scmSource.pullRequest.id"
 				enableDefaultEnvIT = true
-			} else if (scmSource.branch.primary) {
-				echo "Enabling integration tests on all supported environments for primary branch '$scmSource.branch.name'"
+			} else if (helper.scmSource.branch.primary) {
+				echo "Enabling integration tests on all supported environments for primary branch '$helper.scmSource.branch.name'"
 				enableDefaultBuild = true
 				enableDefaultEnvIT = true
 				enableNonDefaultSupportedEnvIT = true
-				echo "Enabling legacy integration tests for primary branch '$scmSource.branch.name'"
+				echo "Enabling legacy integration tests for primary branch '$helper.scmSource.branch.name'"
 				enableDefaultEnvLegacyIT = true
 			} else {
-				echo "Enabling only the default build and integration tests in the default environment for feature branch $scmSource.branch.name"
+				echo "Enabling only the default build and integration tests in the default environment for feature branch $helper.scmSource.branch.name"
 				enableDefaultBuild = true
 				enableDefaultEnvIT = true
 			}
@@ -372,7 +312,7 @@ ALL_ENV""",
 	enableDefaultBuild =
 			enableDefaultEnvIT || enableNonDefaultSupportedEnvIT || enableExperimentalEnvIT || deploySnapshot
 
-	echo """Branch: ${scmSource.branch.name}, PR: ${scmSource.pullRequest?.id}, integration test setting: $params.INTEGRATION_TESTS, resulting execution plan:
+	echo """Branch: ${helper.scmSource.branch.name}, PR: ${helper.scmSource.pullRequest?.id}, integration test setting: $params.INTEGRATION_TESTS, resulting execution plan:
 enableDefaultBuild=$enableDefaultBuild
 enableDefaultEnvIT=$enableDefaultEnvIT
 enableNonDefaultSupportedEnvIT=$enableNonDefaultSupportedEnvIT
@@ -381,19 +321,21 @@ enableDefaultEnvLegacyIT=$enableDefaultEnvLegacyIT
 performRelease=$performRelease
 deploySnapshot=$deploySnapshot"""
 
-	allEnvironmentLists.each { envList ->
-		// No need to re-test these environments, they are already tested as part of the default build
-		envList.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
+	// Filter environments
+
+	environments.content.each { key, envSet ->
+		// No need to re-test default environments, they are already tested as part of the default build
+		envSet.enabled.remove(envSet.default)
 
 		if (!enableNonDefaultSupportedEnvIT) {
-			envList.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.SUPPORTED }
+			envSet.enabled.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.SUPPORTED }
 		}
 		if (!enableExperimentalEnvIT) {
-			envList.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.EXPERIMENTAL }
+			envSet.enabled.removeAll { itEnv -> itEnv.status == ITEnvironmentStatus.EXPERIMENTAL }
 		}
 	}
 
-	esAwsEnvs.removeAll { itEnv ->
+	environments.content.esAws.enabled.removeAll { itEnv ->
 		itEnv.endpointUrl = env.getProperty(itEnv.endpointVariableName)
 		if (!itEnv.endpointUrl) {
 			echo "Skipping test ${itEnv.tag} because environment variable '${itEnv.endpointVariableName}' is not defined."
@@ -407,43 +349,16 @@ deploySnapshot=$deploySnapshot"""
 		return false // Environment is fully defined, do not remove
 	}
 
-	/*
-	 * There is something deeply wrong with collections in pipelines:
-	 * - referencing a collection directly with interpolation ("$foo") sometimes results
-	 *   in the echo statement not being executed at all, without even an exception
-	 * - calling collection.toString() only prints the first element in the collection
-	 * - calling flatten().join(', ') only prints the first element
-	 * Thus the workaround below...
-	 */
-	String stringToPrint = ''
-	allEnvironmentLists.each { envList ->
-		envList.each {
-			stringToPrint += ' ' + it.toString()
-		}
-	}
-	if (stringToPrint) {
-		echo "Enabled non-default environment ITs:$stringToPrint"
+	if (environments.isAnyEnabled()) {
+		echo "Enabled non-default environment ITs: ${environments.enabledAsString}"
 	}
 	else {
 		echo "Non-default environment ITs are completely disabled."
 	}
 
-	def versionPattern = ~/^(\d+)\.(\d+)(\.0\.Alpha\d+|\.0\.Beta\d+|\.0\.CR\d+|\.\d+\.Final)$/
-
-	// Compute the version truncated to the minor component, a.k.a. the version family
-	// To be used for the documentation upload in particular
 	if (performRelease) {
-		def matcher = (params.RELEASE_VERSION =~ versionPattern)
-		if (!matcher.matches()) {
-			throw new IllegalArgumentException(
-					"Invalid version number: '$params.RELEASE_VERSION'. Version numbers must match /$versionPattern/"
-			)
-		}
-
-		String major = matcher.group(1)
-		String minor = matcher.group(2)
-		releaseVersionFamily = "$major.$minor"
-		echo "Inferred version family for the release to '$releaseVersionFamily'"
+		releaseVersion = Version.parseReleaseVersion(params.RELEASE_VERSION)
+		echo "Inferred version family for the release to '$releaseVersion.family'"
 
 		// Check that all the necessary parameters are set
 		if (!params.RELEASE_DEVELOPMENT_VERSION) {
@@ -454,25 +369,19 @@ deploySnapshot=$deploySnapshot"""
 		}
 	}
 
-	def developmentVersionPattern = ~/^\d+\.\d+\.\d+-SNAPSHOT$/
-
-	if (params.RELEASE_DEVELOPMENT_VERSION && !(params.RELEASE_DEVELOPMENT_VERSION ==~ developmentVersionPattern)) {
-		throw new IllegalArgumentException(
-				"Invalid development version number: '$params.RELEASE_DEVELOPMENT_VERSION'." +
-						" Development version numbers must match /$developmentVersionPattern/"
-		)
+	if (params.RELEASE_DEVELOPMENT_VERSION) {
+		afterReleaseDevelopmentVersion = Version.parseDevelopmentVersion(params.RELEASE_DEVELOPMENT_VERSION)
 	}
 }
 
 stage('Default build') {
 	if (!enableDefaultBuild) {
 		echo 'Skipping default build and integration tests in the default environment'
-		Utils.markStageSkippedForConditional(STAGE_NAME)
+		helper.markStageSkipped()
 		return
 	}
 	node(NODE_PATTERN_BASE) {
-		initWorkspace()
-		withDefaultedMaven(mavenSettingsConfig: deploySnapshot ? jobConfiguration.deployment.maven.settingsId : null) {
+		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
 			sh """ \\
 					mvn clean \\
 					${deploySnapshot ? """ \\
@@ -486,16 +395,16 @@ stage('Default build') {
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
-			if ( enableDefaultEnvIT ) {
+			if (enableDefaultEnvIT) {
 				try {
 					withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
 						sh """ \\
 								mvn coveralls:report \\
 								-DrepoToken=${COVERALLS_TOKEN} \\
-								${scmSource.pullRequest ? """ \\
-										-DpullRequest=${scmSource.pullRequest.id} \\
+								${helper.scmSource.pullRequest ? """ \\
+										-DpullRequest=${helper.scmSource.pullRequest.id} \\
 								""" : """ \\
-										-Dbranch=${scmSource.branch.name} \\
+										-Dbranch=${helper.scmSource.branch.name} \\
 								"""} \\
 						"""
 					}
@@ -504,31 +413,31 @@ stage('Default build') {
 					echo "No Coveralls token configured - skipping Coveralls report. Error was: ${e}"
 				}
 
-				if ( jobConfiguration?.sonar?.organization ) {
-					def sonarOrganization = jobConfiguration.sonar.organization
+				if (helper.configuration.file?.sonar?.organization) {
+					def sonarOrganization = helper.configuration.file.sonar.organization
 					withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
 						sh """ \\
 								mvn sonar:sonar \\
 								-Dsonar.organization=${sonarOrganization} \\
 								-Dsonar.host.url=https://sonarcloud.io \\
 								-Dsonar.login=${SONARCLOUD_TOKEN} \\
-								${scmSource.pullRequest ? """ \\
-										-Dsonar.pullrequest.branch=${scmSource.branch.name} \\
-										-Dsonar.pullrequest.key=${scmSource.pullRequest.id} \\
-										-Dsonar.pullrequest.base=${scmSource.pullRequest.target.name} \\
-										${scmSource.gitHubRepoId ? """ \\
+								${helper.scmSource.pullRequest ? """ \\
+										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \\
+										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \\
+										-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \\
+										${helper.scmSource.gitHubRepoId ? """ \\
 												-Dsonar.pullrequest.provider=GitHub \\
-												-Dsonar.pullrequest.github.repository=${scmSource.gitHubRepoId} \\
+												-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \\
 										""" : ''} \\
 								""" : """ \\
-										-Dsonar.branch.name=${scmSource.branch.name} \\
+										-Dsonar.branch.name=${helper.scmSource.branch.name} \\
 								"""} \\
 						"""
 					}
 				}
 			}
 
-			dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
+			dir(helper.configuration.maven.localRepositoryPath) {
 				stash name:'main-build', includes:"org/hibernate/search/**"
 			}
 		}
@@ -539,11 +448,10 @@ stage('Non-default environment ITs') {
 	Map<String, Closure> executions = [:]
 
 	// Test with multiple JDKs
-	jdkEnvs.each { itEnv ->
+	environments.content.jdk.enabled.each { JdkITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
-				initWorkspace()
-				withDefaultedMaven(jdk: itEnv.tool) {
+				helper.withMavenWorkspace(jdk: itEnv.tool) {
 					mavenNonDefaultIT itEnv,
 							"clean install --fail-at-end"
 				}
@@ -552,11 +460,10 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test ORM integration with multiple databases
-	databaseEnvs.each { itEnv ->
+	environments.content.database.enabled.each { DatabaseITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
-				initWorkspace()
-				withDefaultedMaven {
+				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
 							clean install -pl org.hibernate.search:hibernate-search-integrationtest-orm -P$itEnv.mavenProfile
@@ -567,11 +474,10 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in a local instance
-	esLocalEnvs.each { itEnv ->
+	environments.content.esLocal.enabled.each { EsLocalITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
-				initWorkspace()
-				withDefaultedMaven {
+				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \\
 							clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
@@ -583,7 +489,7 @@ stage('Non-default environment ITs') {
 	}
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
-	esAwsEnvs.each { itEnv ->
+	environments.content.esAws.enabled.each { EsAwsITEnvironment itEnv ->
 		if (!itEnv.endpointUrl) {
 			throw new IllegalStateException("Unexpected empty endpoint URL")
 		}
@@ -593,8 +499,7 @@ stage('Non-default environment ITs') {
 		executions.put(itEnv.tag, {
 			lock(label: itEnv.lockedResourcesLabel) {
 				node(NODE_PATTERN_BASE + '&&AWS') {
-					initWorkspace()
-					withDefaultedMaven {
+					helper.withMavenWorkspace {
 						resumeFromDefaultBuild()
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
 										 credentialsId   : 'aws-elasticsearch',
@@ -619,7 +524,7 @@ stage('Non-default environment ITs') {
 
 	if (executions.isEmpty()) {
 		echo 'Skipping integration tests in non-default environments'
-		Utils.markStageSkippedForConditional(STAGE_NAME)
+		helper.markStageSkipped()
 	}
 	else {
 		parallel(executions)
@@ -632,141 +537,47 @@ stage('Deploy') {
 		echo "Already deployed snapshot as part of the 'Default build' stage."
 	}
 	else if (performRelease) {
-		echo "Performing full release for version ${params.RELEASE_VERSION}"
+		echo "Performing full release for version ${releaseVersion.toString()}"
 		node(NODE_PATTERN_BASE) {
-			initWorkspace()
-			withDefaultedMaven {
+			helper.withMavenWorkspace {
 				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
-				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${params.RELEASE_VERSION}"
+				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
 
+				String deployCommand = "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
 				if (!params.RELEASE_DRY_RUN) {
-					sh "bash -xe hibernate-noorm-release-scripts/deploy.sh search"
+					sh deployCommand
 				} else {
-					echo "WARNING: Not deploying"
+					echo "WARNING: Not deploying. Would have executed:"
+					echo deployCommand
 				}
 
+				String uploadDistributionCommand = "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${releaseVersion.toString()}"
+				String uploadDocumentationCommand = "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${releaseVersion.toString()} ${releaseVersion.family}"
 				if (!params.RELEASE_DRY_RUN) {
-					sh "bash -xe hibernate-noorm-release-scripts/upload-distribution.sh search ${params.RELEASE_VERSION}"
-					sh "bash -xe hibernate-noorm-release-scripts/upload-documentation.sh search ${params.RELEASE_VERSION} ${releaseVersionFamily}"
+					sh uploadDistributionCommand
+					sh uploadDocumentationCommand
 				}
 				else {
-					echo "WARNING: Not uploading anything"
+					echo "WARNING: Not uploading anything. Would have executed:"
+					echo uploadDistributionCommand
+					echo uploadDocumentationCommand
 				}
 
-				sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${params.RELEASE_DEVELOPMENT_VERSION}"
-				sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${params.RELEASE_VERSION} ${scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
+				sh "bash -xe hibernate-noorm-release-scripts/update-version.sh search ${afterReleaseDevelopmentVersion.toString()}"
+				sh "bash -xe hibernate-noorm-release-scripts/push-upstream.sh search ${releaseVersion.toString()} ${helper.scmSource.branch.name} ${!params.RELEASE_DRY_RUN}"
 			}
 		}
 	}
 	else {
 		echo "Skipping deployment"
-		Utils.markStageSkippedForConditional(STAGE_NAME)
+		helper.markStageSkipped()
 		return
 	}
 }
 
-} // End of the code triggering notifications
-catch (any) {
-	mainScriptException = any
-	throw any
-}
-finally {
-	/*
-	 * Set the build result so that the email notifications correctly report it.
-	 * We have to do it manually because Jenkins only does that automatically *after* the build.
-	 */
-	if (mainScriptException) {
-		currentBuild.result = 'FAILURE'
-	}
-	else {
-		currentBuild.result = 'SUCCESS'
-	}
-	
-	try {
-		notifyBuildEnd()
-	}
-	catch (notifyException) {
-		if (mainScriptException != null) {
-			// We are already throwing an exception, just register the new one as suppressed
-			mainScriptException.addSuppressed(notifyException)
-		}
-		else {
-			// We are not already throwing an exception, we can rethrow the new one
-			throw notifyException
-		}
-	}
-}
+} // End of helper.runWithNotification
 
-// Helpers
-
-class ScmSource {
-	final String remoteUrl
-	final String gitHubRepoId
-	final ScmBranch branch
-	final ScmPullRequest pullRequest
-
-	ScmSource(env, scm) {
-		// See https://stackoverflow.com/a/38255364/6692043
-		remoteUrl = scm.getUserRemoteConfigs()[0].getUrl()
-		def gitHubUrlMatcher = (remoteUrl =~ /^(?:git@github.com:|https:\/\/github\.com\/)([^\/]+)\/([^.]+)\.git$/)
-		if (gitHubUrlMatcher.matches()) {
-			String owner = gitHubUrlMatcher.group(1)
-			String name = gitHubUrlMatcher.group(2)
-			gitHubRepoId = owner + '/' + name
-		}
-		else {
-			gitHubRepoId = null
-		}
-		if (env.CHANGE_ID) {
-			def source = new ScmBranch(name: env.CHANGE_BRANCH)
-			def target = new ScmBranch(name: env.CHANGE_TARGET)
-			pullRequest = new ScmPullRequest(id: env.CHANGE_ID, source: source, target: target)
-			branch = source
-		}
-		else {
-			branch = new ScmBranch(name: env.BRANCH_NAME)
-			pullRequest = null
-		}
-	}
-
-	String toString() {
-		"ScmSource(remoteUrl: $remoteUrl, gitHubRepoId: $gitHubRepoId, branch: $branch, pullRequest: $pullRequest)"
-	}
-}
-
-class ScmBranch {
-	private static final Pattern PRIMARY_PATTERN = ~/master|\d+\.\d+/
-	private static final Pattern TRACKING_PATTERN = ~/^tracking-(.+)$/
-
-	String name
-
-	String toString() { "ScmBranch(name:$name)" }
-
-	/**
-	 * @return Whether this branch is "primary", i.e. it's either "master" or a maintenance branch.
-	 * The purpose of primary branches is to hold the history of a major version of the code,
-	 * whereas the only purpose  of "feature" branches is to eventually be merged into a primary branch.
-	 */
-	boolean isPrimary() {
-		(name ==~ PRIMARY_PATTERN)
-	}
-
-	/**
-	 * @return The name of the "tracking" for this branch, to allow for configuration retrieval.
-	 */
-	String getTracking() {
-		def matcher = (name =~ TRACKING_PATTERN)
-		return matcher.matches() ? matcher.group(1) : null
-	}
-}
-
-class ScmPullRequest {
-	String id
-	ScmBranch source
-	ScmBranch target
-
-	String toString() { "ScmPullRequest(id: $id, source: $source, target: $target)" }
-}
+// Job-specific helpers
 
 enum ITEnvironmentStatus {
 	// For environments used as part of the integration tests in the default build (tested on all branches)
@@ -781,6 +592,7 @@ abstract class ITEnvironment {
 	ITEnvironmentStatus status
 	String toString() { getTag() }
 	abstract String getTag()
+	boolean isDefault() { status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
 }
 
 class JdkITEnvironment extends ITEnvironment {
@@ -819,68 +631,8 @@ class EsAwsITEnvironment extends ITEnvironment {
 	}
 }
 
-static <T extends ITEnvironment> T getDefaultEnv(List<T> envs) {
-	return envs.find { it.status == ITEnvironmentStatus.USED_IN_DEFAULT_BUILD }
-}
-
-void initWorkspace() {
-	/*
-	 * Remove our own artifacts from the local Maven repository,
-	 * because they might have been created by another build executed on the same node,
-	 * and thus might result from a different revision of the source code.
-	 * We copy the built artifacts from one stage to another explicitly when necessary; see resumeFromDefaultBuild().
-	 */
-	cleanWs(deleteDirs: true, patterns: [
-			[type: 'INCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/org/hibernate/search/**"],
-			[type: 'INCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/org/hibernate/hibernate-search*/**"]
-	])
-
-	/*
-	 * Remove everything unless we know it's safe, to prevent previous builds from interfering with the current build.
-	 * Keep the local Maven repository and Git metadata, since they may be reused safely.
-	 */
-	cleanWs(deleteDirs: true, patterns: [
-			// The Maven repository is safe, we cleaned it up just above
-			[type: 'EXCLUDE', pattern: "$MAVEN_LOCAL_REPOSITORY_RELATIVE/**"],
-			// The Git metadata is safe, we check out the correct branch just below
-			[type: 'EXCLUDE', pattern: ".git/**"]
-	])
-
-	// Check out the code
-	checkout scm
-
-	// Take tracking configuration into account
-	if (trackingConfiguration?.base) {
-		// Add the configured remotes, just in case the "base" references one of these
-		if (jobConfiguration?.scm?.remotes) {
-			remotesConfiguration = jobConfiguration.scm.remotes
-			echo "Adding configured remotes"
-			remotesConfiguration.each { name, config ->
-				// Remove the remote if it was added in a previous build
-				sh "git remote remove '$name' 1>&2 2>/dev/null || true"
-				sh "git remote add -f '$name' '$config.url'"
-			}
-		}
-		String base = trackingConfiguration?.base
-		echo "Merging with tracking base: $base"
-		sh "git merge $base"
-	}
-}
-
-void withDefaultedMaven(Closure body) {
-	withDefaultedMaven([:], body)
-}
-
-void withDefaultedMaven(Map args, Closure body) {
-	args.putIfAbsent('jdk', defaultJdkEnv.tool)
-	args.putIfAbsent('maven', MAVEN_TOOL)
-	args.putIfAbsent('options', [artifactsPublisher(disabled: true)])
-	args.putIfAbsent('mavenLocalRepo', "$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE")
-	withMaven(args, body)
-}
-
 void resumeFromDefaultBuild() {
-	dir("$env.WORKSPACE/$MAVEN_LOCAL_REPOSITORY_RELATIVE") {
+	dir(helper.configuration.maven.localRepositoryPath) {
 		unstash name:'main-build'
 	}
 }
@@ -893,61 +645,14 @@ void mavenNonDefaultIT(ITEnvironment itEnv, String args) {
 }
 
 String toMavenElasticsearchProfileArg(String mavenEsProfile) {
-	if (mavenEsProfile != defaultEsLocalEnv.mavenProfile) {
+	String defaultEsProfile = environments.content.esLocal.default.mavenProfile
+	if (mavenEsProfile != defaultEsProfile) {
 		// Disable the default profile to avoid conflicting configurations
-		"-P!$defaultEsLocalEnv.mavenProfile,$mavenEsProfile"
+		"-P!$defaultEsProfile,$mavenEsProfile"
 	}
 	else {
 		// Do not do as above, as we would tell Maven "disable the default profile, but enable it"
 		// and Maven would end up disabling it.
 		''
 	}
-}
-
-def loadYamlConfiguration(String yamlConfigFileId) {
-	try {
-		configFileProvider([configFile(fileId: yamlConfigFileId, variable: "FILE_PATH")]) {
-			return readYaml(file: FILE_PATH)
-		}
-	}
-	catch (Exception e) {
-		echo "Failed to load configuration file '$yamlConfigFileId'; assuming empty file. Exception was: $e"
-		return [:]
-	}
-}
-
-def notifyBuildEnd() {
-	boolean success = currentBuild.result == 'SUCCESS'
-	boolean successAfterSuccess = success &&
-			currentBuild.previousBuild != null && currentBuild.previousBuild.result == 'SUCCESS'
-
-	String explicitRecipients = null
-
-	// Always notify people who explicitly requested a build
-	def recipientProviders = [requestor()]
-
-	// In case of failure, notify all the people who committed a change since the last non-broken build
-	if (!success) {
-		echo "Notification recipients: adding culprits()"
-		recipientProviders.add(culprits())
-	}
-	// Always notify the author of the changeset, except in the case of a "success after a success"
-	if (!successAfterSuccess) {
-		echo "Notification recipients: adding developers()"
-		recipientProviders.add(developers())
-	}
-
-	// Notify the notification recipients configured on the job,
-	// except in the case of a non-tracking PR build or of a "success after a success"
-	if ((!scmSource.pullRequest || scmSource.branch.tracking) && !successAfterSuccess) {
-		explicitRecipients = jobConfiguration?.notification?.email?.recipients
-	}
-
-	// See https://plugins.jenkins.io/email-ext#Email-extplugin-PipelineExamples
-	emailext(
-			subject: '${DEFAULT_SUBJECT}',
-			body: '${DEFAULT_CONTENT}',
-			recipientProviders: recipientProviders,
-			to: explicitRecipients
-	)
 }
