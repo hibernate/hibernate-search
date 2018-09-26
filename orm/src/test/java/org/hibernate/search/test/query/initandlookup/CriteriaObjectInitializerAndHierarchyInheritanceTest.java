@@ -165,7 +165,6 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 	}
 
 	@MappedSuperclass
-	@Inheritance(strategy = InheritanceType.JOINED)
 	@Table(name = "BaseEntity")
 	public abstract static class BaseEntity {
 		@Id
@@ -185,6 +184,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 	@Entity
 	@Indexed
 	@Table(name = "A")
+	@Inheritance(strategy = InheritanceType.JOINED)
 	public static class A extends BaseEntity {
 	}
 
@@ -227,6 +227,7 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 	@Entity
 	@Indexed
 	@Table(name = "B")
+	@Inheritance(strategy = InheritanceType.JOINED)
 	public static class B extends BaseEntity {
 	}
 
