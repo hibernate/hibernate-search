@@ -33,7 +33,6 @@ install:
     -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
 script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
-  # Note sonar must be ran in the "script:" section in order to benefit from Travis caching.
   - ./mvnw $BUILD_OPTIONS checkstyle:check
     && ./mvnw $BUILD_OPTIONS install javadoc:javadoc -Dcheckstyle.skip
 before_cache:
