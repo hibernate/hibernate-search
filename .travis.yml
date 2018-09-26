@@ -1,4 +1,4 @@
-# The main CI of Hibernate Search is http://ci.hibernate.org/. Travis CI can be
+# The main CI of Hibernate Search is http://ci.hibernate.org/job/hibernate-search/. Travis CI can be
 # used in github forks. https://travis-ci.org/hibernate/hibernate-search is
 # therefore deactivated. Activating Travis for your own fork is as easy as
 # activating it in the travis site of your fork.
@@ -8,16 +8,6 @@ dist: trusty
 language: java
 jdk:
   - oraclejdk8
-addons:
-  # for now, let's test only with H2
-  #postgresql: '9.4'
-  #mariadb: '10.0'
-# might be useful to push reports to an S3 bucket
-#  artifacts:
-#    paths:
-#      - $(find $HOME -name surefire-reports | tr "\n" ":")
-#      - $(find $HOME -name failsafe-reports | tr "\n" ":")
-#  s3_region: 'us-west-2'
 cache:
   directories:
     - $HOME/.m2
@@ -28,49 +18,23 @@ env:
     - _JAVA_OPTIONS=
     # Ensure Maven doesn't eat up too much memory
     - MAVEN_OPTS=-Xmx756m
-  matrix:
-    #- DB=h2 ELASTICSEARCH=2.0
-    - DB=h2 ELASTICSEARCH=2.2
-    - DB=h2 ELASTICSEARCH=5.0
-    - DB=h2 ELASTICSEARCH=5.2
-    # for now, let's test only with H2
-    #- DB=pgsql
-    #- DB=mariadb
 before_install:
-  # Build options must be set before install, so that
-  # we properly retrieve *all* the necessary dependencies
-  - BUILD_OPTIONS='-Pdist -Pcoverage'
-  - case $DB in
-    "h2") ;;
-    "pgsql") BUILD_OPTIONS+=' -Pci-postgresql' ;;
-    "mariadb") BUILD_OPTIONS+=' -Pci-mariadb' ;;
-    esac
-  - case $ELASTICSEARCH in
-    2.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.0' ;;
-    2.2) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-2.2' ;;
-    5.0) BUILD_OPTIONS+=' -P!elasticsearch-5.2,elasticsearch-5.0' ;;
-    5.2) ;;
-    esac
+  # Build options must be set before install, so that we properly retrieve *all* the necessary dependencies
+  - BUILD_OPTIONS='-Pdist'
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
   - ./mvnw -v
-  # first run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
-  - ./mvnw $BUILD_OPTIONS -B -q clean install -DskipTests -Dcheckstyle.skip
-before_script: 
-  - case $DB in
-    "h2") ;;
-    "pgsql") psql -U postgres -f 'travis/pgsql.sql' ;;
-    "mariadb") mysql -u root < 'travis/mariadb.sql' ;;
-    esac
+  # First run to download most Maven dependencies without logging and to install our artifacts for the early checkstyle execution
+  # We want to start as many plugins as possible (so that their dependencies are downloaded),
+  # but we want the plugins to be skipped if they are not essential,
+  # because they will be re-executed later and we don't want to waste time.
+  - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc
+    -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
 script:
-  # we run checks first to fail fast if there is a styling error
-  # then we run the actual build
+  # We run checks first to fail fast if there is a styling error, then we run the actual build.
   - ./mvnw $BUILD_OPTIONS checkstyle:check
-    && ./mvnw $BUILD_OPTIONS clean install -Dcheckstyle.skip
-after_success:
-  - ./mvnw coveralls:report
+    && ./mvnw $BUILD_OPTIONS install javadoc:javadoc -Dcheckstyle.skip
 before_cache:
-  # Do not put Hibernate Search artifacts into the cache
+  # Do not put the artifacts we just built into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/hibernate-search*
-
