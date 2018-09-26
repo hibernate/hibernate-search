@@ -31,6 +31,8 @@
             ,
             org.hibernate.search.elasticsearch.testutil.junit.SkipWithoutAWS
         </test.elasticsearch.failsafe.excludedGroups.aws>
+
+        <surefire.executing-module>it-elasticsearch</surefire.executing-module>
     </properties>
 
     <dependencies>
