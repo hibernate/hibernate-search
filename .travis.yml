@@ -1,29 +1,16 @@
+# The main CI of Hibernate Search is http://ci.hibernate.org/job/hibernate-search/. Travis CI can be
+# used in github forks. https://travis-ci.org/hibernate/hibernate-search is
+# therefore deactivated. Activating Travis for your own fork is as easy as
+# activating it in the travis site of your fork.
+
 sudo: required
 dist: trusty
 language: java
 jdk:
   - oraclejdk8
-addons:
-  # for now, let's test only with H2
-  #postgresql: '9.4'
-  #mariadb: '10.0'
-  apt:
-    packages:
-      - oracle-java8-installer
-# might be useful to push reports to an S3 bucket
-#  artifacts:
-#    paths:
-#      - $(find $HOME -name surefire-reports | tr "\n" ":")
-#      - $(find $HOME -name failsafe-reports | tr "\n" ":")
-#  s3_region: 'us-west-2'
 cache:
   directories:
     - $HOME/.m2
-env:
-  - DB=h2
-  # for now, let's test only with H2
-  #- DB=pgsql
-  #- DB=mariadb
 install:
   # The Maven install provided by Travis is outdated, use Maven wrapper to get the latest version
   - mvn -N io.takari:maven:wrapper
@@ -32,10 +19,8 @@ install:
   - ./mvnw -B -q clean install -DskipTests=true
   # we run checkstyle first to fail fast if there is a styling error
   - ./mvnw checkstyle:check
-before_script: 
-  - if [[ "$DB" == "pgsql" ]]; then psql -U postgres -f 'travis/pgsql.sql';fi 
-  - if [[ "$DB" == "mariadb" ]]; then mysql -u root < 'travis/mariadb.sql'; fi
 script:
-  - if [[ "$DB" == "h2" ]]; then ./mvnw -Pdocs,docbook,dist clean install;fi
-  - if [[ "$DB" == "pgsql" ]]; then ./mvnw -Pci-postgresql,docs,docbook,dist clean install;fi
-  - if [[ "$DB" == "mariadb" ]]; then ./mvnw -Pci-mariadb,docs,docbook,dist clean install; fi
+  - ./mvnw -Pdocs,docbook,dist clean install
+before_cache:
+  # Do not put the artifacts we just built into the cache
+  - rm -r $HOME/.m2/repository/org/hibernate/hibernate-search*
