@@ -382,30 +382,30 @@ stage('Default build') {
 	}
 	node(NODE_PATTERN_BASE) {
 		helper.withMavenWorkspace(mavenSettingsConfig: deploySnapshot ? helper.configuration.file.deployment.maven.settingsId : null) {
-			sh """ \\
-					mvn clean \\
-					${deploySnapshot ? """ \\
-							deploy \\
-					""" : """ \\
-							install \\
-					"""} \\
-					-Pdist -Pcoverage -Pjqassistant \\
-					${enableDefaultEnvIT ? '' : '-DskipITs'} \\
-					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''}
+			sh """ \
+					mvn clean \
+					${deploySnapshot ? "\
+							deploy \
+					" : "\
+							install \
+					"} \
+					-Pdist -Pcoverage -Pjqassistant \
+					${enableDefaultEnvIT ? '' : '-DskipITs'} \
+					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
 			if (enableDefaultEnvIT) {
 				try {
 					withCredentials([string(credentialsId: 'coveralls-repository-token', variable: 'COVERALLS_TOKEN')]) {
-						sh """ \\
-								mvn coveralls:report \\
-								-DrepoToken=${COVERALLS_TOKEN} \\
-								${helper.scmSource.pullRequest ? """ \\
-										-DpullRequest=${helper.scmSource.pullRequest.id} \\
-								""" : """ \\
-										-Dbranch=${helper.scmSource.branch.name} \\
-								"""} \\
+						sh """ \
+								mvn coveralls:report \
+								-DrepoToken=${COVERALLS_TOKEN} \
+								${helper.scmSource.pullRequest ? """ \
+										-DpullRequest=${helper.scmSource.pullRequest.id} \
+								""" : """ \
+										-Dbranch=${helper.scmSource.branch.name} \
+								"""} \
 						"""
 					}
 				}
@@ -416,22 +416,22 @@ stage('Default build') {
 				if (helper.configuration.file?.sonar?.organization) {
 					def sonarOrganization = helper.configuration.file.sonar.organization
 					withCredentials([string(credentialsId: 'sonarcloud-hibernate-token', variable: 'SONARCLOUD_TOKEN')]) {
-						sh """ \\
-								mvn sonar:sonar \\
-								-Dsonar.organization=${sonarOrganization} \\
-								-Dsonar.host.url=https://sonarcloud.io \\
-								-Dsonar.login=${SONARCLOUD_TOKEN} \\
-								${helper.scmSource.pullRequest ? """ \\
-										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \\
-										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \\
-										-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \\
-										${helper.scmSource.gitHubRepoId ? """ \\
-												-Dsonar.pullrequest.provider=GitHub \\
-												-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \\
-										""" : ''} \\
-								""" : """ \\
-										-Dsonar.branch.name=${helper.scmSource.branch.name} \\
-								"""} \\
+						sh """ \
+								mvn sonar:sonar \
+								-Dsonar.organization=${sonarOrganization} \
+								-Dsonar.host.url=https://sonarcloud.io \
+								-Dsonar.login=${SONARCLOUD_TOKEN} \
+								${helper.scmSource.pullRequest ? """ \
+										-Dsonar.pullrequest.branch=${helper.scmSource.branch.name} \
+										-Dsonar.pullrequest.key=${helper.scmSource.pullRequest.id} \
+										-Dsonar.pullrequest.base=${helper.scmSource.pullRequest.target.name} \
+										${helper.scmSource.gitHubRepoId ? """ \
+												-Dsonar.pullrequest.provider=GitHub \
+												-Dsonar.pullrequest.github.repository=${helper.scmSource.gitHubRepoId} \
+										""" : ''} \
+								""" : """ \
+										-Dsonar.branch.name=${helper.scmSource.branch.name} \
+								"""} \
 						"""
 					}
 				}
@@ -452,8 +452,9 @@ stage('Non-default environment ITs') {
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace(jdk: itEnv.tool) {
-					mavenNonDefaultIT itEnv,
-							"clean install --fail-at-end"
+					mavenNonDefaultIT itEnv, """ \
+							clean install --fail-at-end \
+					"""
 				}
 			}
 		})
@@ -465,8 +466,8 @@ stage('Non-default environment ITs') {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
-					mavenNonDefaultIT itEnv, """ \\
-							clean install -pl org.hibernate.search:hibernate-search-integrationtest-orm -P$itEnv.mavenProfile
+					mavenNonDefaultIT itEnv, """ \
+							clean install -pl org.hibernate.search:hibernate-search-integrationtest-orm -P$itEnv.mavenProfile \
 					"""
 				}
 			}
@@ -479,9 +480,9 @@ stage('Non-default environment ITs') {
 			node(NODE_PATTERN_BASE) {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
-					mavenNonDefaultIT itEnv, """ \\
-							clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
-							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
+					mavenNonDefaultIT itEnv, """ \
+							clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
+							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
 					"""
 				}
 			}
@@ -506,15 +507,15 @@ stage('Non-default environment ITs') {
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
 										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 						]]) {
-							mavenNonDefaultIT itEnv, """ \\
-								clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \\
-								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \\
-								-Dtest.elasticsearch.host.provided=true \\
-								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \\
-								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \\
-								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \\
-								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion
-"""
+							mavenNonDefaultIT itEnv, """ \
+								clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
+								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
+								-Dtest.elasticsearch.host.provided=true \
+								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
+								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
+								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
+								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
+							"""
 						}
 					}
 				}
