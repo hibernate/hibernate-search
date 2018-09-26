@@ -20,6 +20,10 @@
     <name>Hibernate Search Elasticsearch</name>
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
 
+    <properties>
+        <surefire.executing-module>it-elasticsearch</surefire.executing-module>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate</groupId>

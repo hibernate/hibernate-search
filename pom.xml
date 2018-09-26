@@ -206,6 +206,19 @@
 
         <puppycrawl.checkstyle.version>6.16</puppycrawl.checkstyle.version>
 
+        <!--
+            Should be set by submodules.
+            Used by integration tests modules that execute tests from another module.
+            Allows to distinguish between multiple executions of the same test in test reports.
+         -->
+        <surefire.executing-module>default</surefire.executing-module>
+        <!--
+            Should be set from the command line.
+            Used by CI jobs that execute tests in multiple environments.
+            Allows to distinguish between multiple executions of the same test in test reports.
+         -->
+        <surefire.environment>default</surefire.environment>
+
         <!-- Version to be used as baseline for API/SPI change reports -->
         <previous.stable>5.5.2.Final</previous.stable>
     </properties>
@@ -934,6 +947,7 @@
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
                         </additionalClasspathElements>
+                        <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1016,6 +1030,9 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>2.17</version>
+                    <configuration>
+                        <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
