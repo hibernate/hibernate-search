@@ -232,6 +232,19 @@
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
 
         <!--
+            Should be set by submodules.
+            Used by integration tests modules that execute tests from another module.
+            Allows to distinguish between multiple executions of the same test in test reports.
+         -->
+        <surefire.executing-module>default</surefire.executing-module>
+        <!--
+            Should be set from the command line.
+            Used by CI jobs that execute tests in multiple environments.
+            Allows to distinguish between multiple executions of the same test in test reports.
+         -->
+        <surefire.environment>default</surefire.environment>
+
+        <!--
             Please don't change the name of this property, it may be used and
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
@@ -974,6 +987,7 @@
                             <!-- Needed by Byteman to load the agent on demand -->
                             <additionalClasspathElement>${jdk-toolsjar}</additionalClasspathElement>
                         </additionalClasspathElements>
+                        <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -1060,6 +1074,9 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <!-- 2.19.1 seems buggy, see https://hibernate.atlassian.net/browse/HV-1117 -->
                     <version>2.18.1</version>
+                    <configuration>
+                        <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
