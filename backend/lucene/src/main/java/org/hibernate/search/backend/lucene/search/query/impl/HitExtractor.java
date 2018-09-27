@@ -32,6 +32,7 @@ public interface HitExtractor<C> {
 	 *
 	 * @param collector The hit collector, which will receive the result of the extraction.
 	 * @param document The Lucene document extracted from the index.
+	 * @param score The score of the hit.
 	 */
-	void extract(C collector, Document document);
+	void extract(C collector, Document document, Float score);
 }

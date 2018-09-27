@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
@@ -30,6 +31,7 @@ import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
@@ -165,6 +167,28 @@ public class SearchProjectionIT {
 			b.projection( document3Reference, document3Reference, document3Reference );
 			b.projection( emptyReference, emptyReference, emptyReference );
 		} );
+	}
+
+	@Test
+	public void score() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections( searchTarget.projection().score().toProjection() )
+				.predicate().match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ).end()
+				.sort().byScore().desc().end()
+				.build();
+
+		SearchResult<List<?>> result = query.execute();
+		Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+
+		Float score1 = (Float) result.getHits().get( 0 ).get( 0 );
+		Float score2 = (Float) result.getHits().get( 1 ).get( 0 );
+
+		Assertions.assertThat( score1 ).isNotNull();
+		Assertions.assertThat( score2 ).isNotNull();
+
+		Assertions.assertThat( score1 ).isGreaterThan( score2 );
 	}
 
 	/**
@@ -331,6 +355,8 @@ public class SearchProjectionIT {
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
 
+			indexMapping.scoreField.document1Value.write( document );
+
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
@@ -346,6 +372,8 @@ public class SearchProjectionIT {
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
 
+			indexMapping.scoreField.document2Value.write( document );
+
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
@@ -360,6 +388,8 @@ public class SearchProjectionIT {
 
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
+
+			indexMapping.scoreField.document3Value.write( document );
 
 			// Note: this object must be single-valued for these tests
 			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
@@ -389,6 +419,7 @@ public class SearchProjectionIT {
 
 		final FieldModel<String> string1Field;
 		final FieldModel<String> string2Field;
+		final FieldModel<String> scoreField;
 
 		final ObjectMapping flattenedObject;
 		final ObjectMapping nestedObject;
@@ -399,10 +430,14 @@ public class SearchProjectionIT {
 					root, "converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
 			);
 
-			string1Field = FieldModel.mapper( String.class,"ccc", "mmm", "xxx" )
+			string1Field = FieldModel.mapper( String.class, "ccc", "mmm", "xxx" )
 					.map( root, "string1" );
-			string2Field = FieldModel.mapper( String.class,"ddd", "nnn", "yyy" )
+			string2Field = FieldModel.mapper( String.class, "ddd", "nnn", "yyy" )
 					.map( root, "string2" );
+
+			scoreField = FieldModel.mapper( String.class, "scorepattern scorepattern", "scorepattern", "xxx" )
+					.map( root, "score", c -> ( (StringIndexSchemaFieldTypedContext<?>) c )
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ) );
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );

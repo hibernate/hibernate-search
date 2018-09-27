@@ -37,9 +37,9 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void extract(C collector, Document document) {
+	public void extract(C collector, Document document, Float score) {
 		String indexName = document.get( LuceneFields.indexFieldName() );
 		HitExtractor<? super C> delegate = extractorByIndex.get( indexName );
-		delegate.extract( collector, document );
+		delegate.extract( collector, document, score );
 	}
 }

@@ -64,4 +64,10 @@ public interface SearchProjectionContainerContext {
 	 */
 	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type);
 
+	/**
+	 * Project on the score of the hit.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	ScoreProjectionContext score();
 }

@@ -25,6 +25,8 @@ public interface SearchProjectionFactory<P extends SearchProjection<?>> {
 
 	ReferenceSearchProjectionBuilder reference();
 
+	ScoreSearchProjectionBuilder score();
+
 	/**
 	 * Convert a {@link SearchProjection} object to the backend-specific implementation.
 	 *

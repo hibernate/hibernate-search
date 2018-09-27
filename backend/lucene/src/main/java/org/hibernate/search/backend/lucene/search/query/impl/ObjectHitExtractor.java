@@ -21,7 +21,7 @@ public class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<Lo
 	}
 
 	@Override
-	public void extract(LoadingHitCollector collector, Document document) {
+	public void extract(LoadingHitCollector collector, Document document, Float score) {
 		collector.collectForLoading( extractDocumentReference( document ) );
 	}
 }

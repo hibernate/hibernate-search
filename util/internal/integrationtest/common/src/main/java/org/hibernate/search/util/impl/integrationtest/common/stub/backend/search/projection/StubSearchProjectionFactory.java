@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearch
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 
 public class StubSearchProjectionFactory implements SearchProjectionFactory<StubSearchProjection<?>> {
@@ -63,6 +64,18 @@ public class StubSearchProjectionFactory implements SearchProjectionFactory<Stub
 			@Override
 			public SearchProjection<Object> build() {
 				return (SearchProjection<Object>) PROJECTION;
+			}
+		};
+	}
+
+	@Override
+	public ScoreSearchProjectionBuilder score() {
+		return new ScoreSearchProjectionBuilder() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public SearchProjection<Float> build() {
+				return (SearchProjection<Float>) PROJECTION;
 			}
 		};
 	}

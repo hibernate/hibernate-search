@@ -29,6 +29,7 @@ public class SearchBackendContext {
 	private final DocumentReferenceHitExtractor documentReferenceHitExtractor;
 	private final ObjectHitExtractor objectHitExtractor;
 	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
+	private final ScoreHitExtractor scoreHitExtractor;
 
 	public SearchBackendContext(EventContext eventContext,
 			ElasticsearchWorkFactory workFactory,
@@ -46,6 +47,7 @@ public class SearchBackendContext {
 		this.objectHitExtractor = new ObjectHitExtractor( documentReferenceExtractorHelper );
 		this.documentReferenceProjectionHitExtractor =
 				new DocumentReferenceProjectionHitExtractor( documentReferenceExtractorHelper );
+		this.scoreHitExtractor = new ScoreHitExtractor( documentReferenceExtractorHelper );
 	}
 
 	@Override
@@ -69,6 +71,10 @@ public class SearchBackendContext {
 		return documentReferenceProjectionHitExtractor;
 	}
 
+	public ScoreHitExtractor getScoreHitExtractor() {
+		return scoreHitExtractor;
+	}
+
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			Set<URLEncodedString> indexNames,
 			SessionContext sessionContext,
@@ -80,4 +86,5 @@ public class SearchBackendContext {
 				indexNames, sessionContext, hitExtractor, hitAggregator
 		);
 	}
+
 }

@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjec
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 
@@ -42,4 +43,8 @@ public class SearchProjectionContainerContextImpl implements SearchProjectionCon
 		return new ObjectProjectionContextImpl( factory );
 	}
 
+	@Override
+	public ScoreProjectionContext score() {
+		return new ScoreProjectionContextImpl( factory );
+	}
 }

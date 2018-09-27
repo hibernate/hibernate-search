@@ -14,11 +14,13 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ScoreSearchProjectionBuilderImpl;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -47,6 +49,11 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
 		return ReferenceSearchProjectionBuilderImpl.get();
+	}
+
+	@Override
+	public ScoreSearchProjectionBuilder score() {
+		return ScoreSearchProjectionBuilderImpl.get();
 	}
 
 	@Override

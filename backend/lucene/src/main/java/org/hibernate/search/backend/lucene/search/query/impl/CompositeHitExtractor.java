@@ -39,9 +39,9 @@ class CompositeHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void extract(C collector, Document document) {
+	public void extract(C collector, Document document, Float score) {
 		for ( HitExtractor<? super C> extractor : extractors ) {
-			extractor.extract( collector, document );
+			extractor.extract( collector, document, score );
 		}
 	}
 }

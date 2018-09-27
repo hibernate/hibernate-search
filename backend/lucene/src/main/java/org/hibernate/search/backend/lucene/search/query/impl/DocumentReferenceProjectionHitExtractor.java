@@ -21,7 +21,7 @@ public class DocumentReferenceProjectionHitExtractor extends AbstractDocumentRef
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document) {
+	public void extract(ProjectionHitCollector collector, Document document, Float score) {
 		collector.collectProjection( extractDocumentReference( document ) );
 	}
 }

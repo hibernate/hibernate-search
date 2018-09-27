@@ -14,11 +14,13 @@ import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchPro
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.ObjectSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.ScoreSearchProjectionBuilderImpl;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -47,6 +49,11 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<Lucen
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
 		return ReferenceSearchProjectionBuilderImpl.get();
+	}
+
+	@Override
+	public ScoreSearchProjectionBuilder score() {
+		return ScoreSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
