@@ -148,7 +148,9 @@ stage('Configure') {
 			esLocal: [
 					new EsLocalITEnvironment(versionRange: '[2.0,2.2)', mavenProfile: 'elasticsearch-2.0', status: ITEnvironmentStatus.SUPPORTED),
 					new EsLocalITEnvironment(versionRange: '[2.2,5.0)', mavenProfile: 'elasticsearch-2.2', status: ITEnvironmentStatus.SUPPORTED),
-					new EsLocalITEnvironment(versionRange: '[5.0,5.2)', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.SUPPORTED),
+					// Use Elasticsearch 5.0.2 instead of the default 5.1.2, because a bug crashes ES on startup in our environment
+					// See https://github.com/elastic/elasticsearch/issues/23218
+					new EsLocalITEnvironment(versionRange: '[5.0,5.2)', version: '5.0.2', mavenProfile: 'elasticsearch-5.0', status: ITEnvironmentStatus.SUPPORTED),
 					new EsLocalITEnvironment(versionRange: '[5.2,6.0)', mavenProfile: 'elasticsearch-5.2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD)
 			],
 			esAws: [
@@ -398,6 +400,7 @@ stage('Non-default environment ITs') {
 					mavenNonDefaultIT itEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
 							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
+							${itEnv.version ? "-Dtest.elasticsearch.host.version=$itEnv.version" : ''} \
 					"""
 				}
 			}
@@ -534,8 +537,9 @@ class DatabaseITEnvironment extends ITEnvironment {
 
 class EsLocalITEnvironment extends ITEnvironment {
 	String versionRange
+	String version
 	String mavenProfile
-	String getTag() { "elasticsearch-local-$versionRange" }
+	String getTag() { "elasticsearch-local-$versionRange${version ? "-as-$version" : ''}" }
 }
 
 class EsAwsITEnvironment extends ITEnvironment {
