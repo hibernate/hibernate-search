@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -85,6 +86,11 @@ public class Book {
 
 	@Lob
 	@Basic(fetch = FetchType.LAZY)
+	/*
+	 * The actual size of the data will depend on the execution environment (absolute path to the workspace)
+	 * so we should allow a lot of characters.
+	 */
+	@Column(length = 1024)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public byte[] getContentAsBytes() {
@@ -96,6 +102,11 @@ public class Book {
 	}
 
 	@Basic(fetch = FetchType.LAZY)
+	/*
+	 * The actual size of the data will depend on the execution environment (absolute path to the workspace)
+	 * so we should allow a lot of characters.
+	 */
+	@Column(length = 1024)
 	@Field(indexNullAs = "<NULL>")
 	@TikaBridge
 	public URI getContentAsURI() {
@@ -110,6 +121,11 @@ public class Book {
 	@Field
 	@TikaBridge
 	@ElementCollection
+	/*
+	 * The actual size of the data will depend on the execution environment (absolute path to the workspace)
+	 * so we should allow a lot of characters.
+	 */
+	@Column(length = 1024)
 	public Set<String> getContentAsListOfString() {
 		return contentAsListOfString;
 	}
