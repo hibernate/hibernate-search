@@ -21,6 +21,7 @@
     <description>Hibernate Search backend which has indexing operations forwarded to Elasticsearch</description>
 
     <properties>
+        <test.elasticsearch.failsafe.excludedGroups.version></test.elasticsearch.failsafe.excludedGroups.version>
         <surefire.executing-module>it-elasticsearch</surefire.executing-module>
     </properties>
 
@@ -269,7 +270,11 @@
                                 <!-- HSEARCH-2404 Enable CollectionUpdateEventTest for Elasticsearch -->
                                 <exclude>**/CollectionUpdateEventTest.java</exclude><!-- Only fails on CI (Travis) -->
                             </excludes>
-                            <excludedGroups>org.hibernate.search.testsupport.junit.SkipOnElasticsearch,org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress</excludedGroups>
+                            <excludedGroups>
+                                org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
+                                org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress
+                                ${test.elasticsearch.failsafe.excludedGroups.version}
+                            </excludedGroups>
                         </configuration>
                     </execution>
                 </executions>
@@ -314,6 +319,12 @@
     <profiles>
         <profile>
             <id>elasticsearch-2.0</id>
+            <properties>
+                <test.elasticsearch.failsafe.excludedGroups.version>
+                    ,
+                    org.hibernate.search.testsupport.junit.SkipBelowElasticsearch22
+                </test.elasticsearch.failsafe.excludedGroups.version>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
