@@ -287,6 +287,7 @@
                 <test.elasticsearch.failsafe.excludedGroups.version>
                     org.hibernate.search.testsupport.junit.SkipOnElasticsearch,
                     org.hibernate.search.testsupport.junit.ElasticsearchSupportInProgress,
+                    org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch22,
                     org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch50,
                     org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch52
                 </test.elasticsearch.failsafe.excludedGroups.version>

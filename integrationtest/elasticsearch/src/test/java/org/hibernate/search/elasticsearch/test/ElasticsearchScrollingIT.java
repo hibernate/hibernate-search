@@ -18,6 +18,7 @@ import org.hibernate.search.annotations.DocumentId;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.SortableField;
+import org.hibernate.search.elasticsearch.testutil.junit.SkipBelowElasticsearch22;
 import org.hibernate.search.engine.integration.impl.ExtendedSearchIntegrator;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
@@ -30,6 +31,7 @@ import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SearchITHelper.EntityInstanceWorkContext;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 /**
  * @author Yoann Rodiere
@@ -60,7 +62,16 @@ public class ElasticsearchScrollingIT {
 		assertEquals( DEFAULT_MAX_RESULT_WINDOW - 5, results.get( 0 ).getId() );
 	}
 
+	/*
+	 * Only expect an exception in ES 2.2 and higher,
+	 * since this limitation was introduced in 2.1:
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/2.1/breaking_21_search_changes.html#_from_size_limits
+	 *
+	 * We could also expect an exception in ES 2.1, but that would require additional profiles
+	 * that complicate everything, and we don't care that much to be honest.
+	 */
 	@Test(expected = SearchException.class)
+	@Category(SkipBelowElasticsearch22.class)
 	public void searchBeyondMaxResultWindow() throws Exception {
 		generateData( 0, DEFAULT_MAX_RESULT_WINDOW + 10 );
 
