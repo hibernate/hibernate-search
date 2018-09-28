@@ -31,13 +31,27 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
-	private final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();
-	private final Map<String, TokenizerDefinition> tokenizerDefinitions = new TreeMap<>();
-	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions = new TreeMap<>();
-	private final Map<String, CharFilterDefinition> charFilterDefinitions = new TreeMap<>();
+	private final Map<String, AnalyzerDefinition> analyzerDefinitions;
+	private final Map<String, NormalizerDefinition> normalizerDefinitions;
+	private final Map<String, TokenizerDefinition> tokenizerDefinitions;
+	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions;
+	private final Map<String, CharFilterDefinition> charFilterDefinitions;
 
-	private ElasticsearchAnalysisDefinitionRegistry(ElasticsearchAnalysisDefinitionContributor contributor) {
+	public ElasticsearchAnalysisDefinitionRegistry() {
+		// Nothing to do: we're creating an empty registry
+		analyzerDefinitions = Collections.emptyMap();
+		normalizerDefinitions = Collections.emptyMap();
+		tokenizerDefinitions = Collections.emptyMap();
+		tokenFilterDefinitions = Collections.emptyMap();
+		charFilterDefinitions = Collections.emptyMap();
+	}
+
+	public ElasticsearchAnalysisDefinitionRegistry(ElasticsearchAnalysisDefinitionContributor contributor) {
+		analyzerDefinitions = new TreeMap<>();
+		normalizerDefinitions = new TreeMap<>();
+		tokenizerDefinitions = new TreeMap<>();
+		tokenFilterDefinitions = new TreeMap<>();
+		charFilterDefinitions = new TreeMap<>();
 		contributor.contribute( new ElasticsearchAnalysisDefinitionCollector() {
 			@Override
 			public void collect(String name, AnalyzerDefinition definition) {

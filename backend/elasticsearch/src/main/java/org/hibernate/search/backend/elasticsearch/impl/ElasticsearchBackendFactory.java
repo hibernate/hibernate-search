@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Locale;
+import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
@@ -21,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.ES5FieldDataTypeJson
 import org.hibernate.search.backend.elasticsearch.gson.impl.ES5IndexTypeJsonAdapter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.ES5NormsTypeJsonAdapter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategyImpl;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategyImpl;
@@ -31,7 +37,11 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 import com.google.gson.GsonBuilder;
@@ -41,6 +51,8 @@ import com.google.gson.GsonBuilder;
  * @author Yoann Rodiere
  */
 public class ElasticsearchBackendFactory implements BackendFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.MULTI_TENANCY_STRATEGY )
@@ -55,7 +67,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
+	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+		EventContext backendContext = EventContexts.fromBackendName( name );
+
 		ElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
 
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
@@ -71,8 +85,14 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory( dialectSpecificGsonProvider );
 
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
+					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
+
 			return new ElasticsearchBackendImpl(
-					client, name, workFactory, getMultiTenancyStrategy( name, propertySource ) );
+					client, name, workFactory,
+					analysisDefinitionRegistry,
+					getMultiTenancyStrategy( name, propertySource )
+			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e ).push( ElasticsearchClientImplementor::close, client );
@@ -100,6 +120,34 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",
 						backendName, multiTenancyStrategyConfiguration
 				) );
+		}
+	}
+
+	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(EventContext backendContext,
+			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+		try {
+			// Apply the user-provided analysis configurer if necessary
+			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+			ConfigurationProperty<Optional<ElasticsearchAnalysisConfigurer>> analysisConfigurerProperty =
+					ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
+							.as(
+									ElasticsearchAnalysisConfigurer.class,
+									reference -> beanProvider
+											.getBean( reference, ElasticsearchAnalysisConfigurer.class )
+							)
+							.build();
+			return analysisConfigurerProperty.get( propertySource )
+					.map( configurer -> {
+						ElasticsearchAnalysisDefinitionContainerContextImpl collector
+								= new ElasticsearchAnalysisDefinitionContainerContextImpl();
+						configurer.configure( collector );
+						return new ElasticsearchAnalysisDefinitionRegistry( collector );
+					} )
+					// Otherwise just use an empty registry
+					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );
+		}
+		catch (Exception e) {
+			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), backendContext, e );
 		}
 	}
 }

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
@@ -40,12 +41,17 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 
 	@Override
 	public ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName,
-			RootTypeMapping mapping) {
+			RootTypeMapping mapping,
+			IndexSettings settings) {
 		Gson gson = gsonProvider.getGsonNoSerializeNulls();
+
 		JsonObject mappingMap = new JsonObject();
 		mappingMap.add( typeName.original, gson.toJsonTree( mapping ) );
+
 		JsonObject payload = new JsonObject();
 		payload.add( "mappings", mappingMap );
+		payload.add( "settings", gson.toJsonTree( settings ) );
+
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( indexName )
 				.body( payload );

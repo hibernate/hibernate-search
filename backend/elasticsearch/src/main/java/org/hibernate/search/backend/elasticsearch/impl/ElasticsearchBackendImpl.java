@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
@@ -48,6 +50,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final String name;
 
+	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
@@ -60,9 +64,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final SearchBackendContext searchContext;
 
 	ElasticsearchBackendImpl(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
 		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
@@ -124,12 +130,18 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		}
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
-				new ElasticsearchIndexSchemaRootNodeBuilder( hibernateSearchIndexName, multiTenancyStrategy );
+				new ElasticsearchIndexSchemaRootNodeBuilder(
+						hibernateSearchIndexName,
+						multiTenancyStrategy
+				);
+
+		ElasticsearchIndexSettingsBuilder settingsBuilder =
+				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
-				indexSchemaRootNodeBuilder, buildContext, propertySource
+				indexSchemaRootNodeBuilder, settingsBuilder, buildContext, propertySource
 		);
 	}
 

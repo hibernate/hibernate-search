@@ -78,6 +78,10 @@ public interface Log extends BasicLogger {
 			value = "The same analyzer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique.")
 	SearchException analyzerNamingConflict(String remoteName);
 
+	@Message(id = ID_OFFSET_2 + 75,
+			value = "Error while applying analysis configuration: %1$s")
+	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Param EventContext context, @Cause Exception e);
+
 	@Message(id = ID_OFFSET_2 + 76,
 			value = "Invalid analyzer definition for name '%1$s'. Analyzer definitions must at least define the tokenizer.")
 	SearchException invalidElasticsearchAnalyzerDefinition(String name);
@@ -276,4 +280,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 34,
 			value = "Invalid typed analyzer definition for name '%1$s'. Typed analyzer definitions must at least define the analyzer type.")
 	SearchException invalidElasticsearchTypedAnalyzerDefinition(String name);
+
+	@Message(id = ID_OFFSET_3 + 35,
+			value = "Cannot apply both an analyzer and a normalizer." )
+	SearchException cannotApplyAnalyzerAndNormalizer(@Param EventContext context);
+
 }

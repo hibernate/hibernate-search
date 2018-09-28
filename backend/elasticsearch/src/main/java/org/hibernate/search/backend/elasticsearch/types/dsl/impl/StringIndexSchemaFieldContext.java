@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
@@ -22,6 +25,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
 
@@ -30,6 +34,8 @@ import com.google.gson.JsonElement;
  * @author Guillaume Smet
  */
 public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String relativeFieldName;
 	private String analyzerName;
@@ -87,6 +93,10 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
 			mapping.setAnalyzer( analyzerName );
+
+			if ( normalizerName != null ) {
+				throw log.cannotApplyAnalyzerAndNormalizer( getSchemaContext().getEventContext() );
+			}
 
 			switch ( sortable ) {
 				case DEFAULT:

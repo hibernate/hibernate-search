@@ -55,7 +55,10 @@ public class IndexingBackendContext {
 	CompletableFuture<?> initializeIndex(URLEncodedString indexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		ElasticsearchWork<?> dropWork = workFactory.dropIndexIfExists( indexName );
-		ElasticsearchWork<?> createWork = workFactory.createIndex( indexName, typeName, model.getMapping() );
+		ElasticsearchWork<?> createWork = workFactory.createIndex(
+				indexName, typeName,
+				model.getMapping(), model.getSettings()
+		);
 		return streamOrchestrator.submit( Arrays.asList( dropWork, createWork ) );
 	}
 

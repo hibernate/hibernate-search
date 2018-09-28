@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
@@ -27,6 +28,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String hibernateSearchIndexName;
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
+	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
 
 	private final BackendBuildContext buildContext;
 	private final ConfigurationPropertySource propertySource;
@@ -35,6 +37,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
+			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
@@ -42,6 +45,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
+		this.settingsBuilder = settingsBuilder;
 
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
@@ -65,7 +69,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 		ElasticsearchIndexModel model = new ElasticsearchIndexModel(
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				schemaRootNodeBuilder
+				schemaRootNodeBuilder,
+				settingsBuilder
 		);
 
 		// TODO make sure index initialization is performed in parallel for all indexes?

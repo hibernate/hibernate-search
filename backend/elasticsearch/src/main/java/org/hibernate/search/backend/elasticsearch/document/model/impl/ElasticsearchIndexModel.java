@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.util.EventContext;
@@ -24,9 +26,11 @@ public class ElasticsearchIndexModel {
 	private final RootTypeMapping mapping;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+	private final IndexSettings settings;
 
 	public ElasticsearchIndexModel(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
-			ElasticsearchRootIndexSchemaContributor contributor) {
+			ElasticsearchRootIndexSchemaContributor contributor,
+			ElasticsearchIndexSettingsBuilder settingsBuilder) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.mapping = contributor.contribute( new ElasticsearchIndexSchemaNodeCollector() {
@@ -40,6 +44,7 @@ public class ElasticsearchIndexModel {
 				fieldNodes.put( absoluteFieldPath, node );
 			}
 		} );
+		this.settings = settingsBuilder.build();
 	}
 
 	public String getHibernateSearchIndexName() {
@@ -56,6 +61,10 @@ public class ElasticsearchIndexModel {
 
 	public RootTypeMapping getMapping() {
 		return mapping;
+	}
+
+	public IndexSettings getSettings() {
+		return settings;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath) {
