@@ -51,7 +51,9 @@ public interface LuceneFieldCodec<F> {
 
 	// equals()/hashCode() needs to be implemented if the codec is not a singleton
 
+	@Override
 	boolean equals(Object obj);
 
+	@Override
 	int hashCode();
 }
