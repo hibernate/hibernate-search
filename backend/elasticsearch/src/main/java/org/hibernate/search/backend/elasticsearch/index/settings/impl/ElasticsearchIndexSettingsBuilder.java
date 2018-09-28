@@ -4,9 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.analysis.model.impl;
+package org.hibernate.search.backend.elasticsearch.index.settings.impl;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.Analysis;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 
 /**
@@ -45,10 +46,10 @@ public class ElasticsearchIndexSettingsBuilder {
 	/*
 	 * Allows lazy initialization of analysis settings
 	 */
-	private IndexSettings.Analysis getAnalysis(IndexSettings settings) {
-		IndexSettings.Analysis analysis = settings.getAnalysis();
+	private Analysis getAnalysis(IndexSettings settings) {
+		Analysis analysis = settings.getAnalysis();
 		if ( analysis == null ) {
-			analysis = new IndexSettings.Analysis();
+			analysis = new Analysis();
 			settings.setAnalysis( analysis );
 		}
 		return analysis;
