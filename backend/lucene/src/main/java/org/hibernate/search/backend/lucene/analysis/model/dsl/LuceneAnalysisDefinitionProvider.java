@@ -17,10 +17,6 @@ import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
  * {@link SearchBackendLuceneSettings#ANALYSIS_DEFINITION_PROVIDER configuration properties}.
  *
  * @author Yoann Rodiere
- *
- * @hsearch.experimental This interface is a prototype.
- * Please let us know what you like and what you don't like, and bear in mind
- * that this will likely change in any future version.
  */
 public interface LuceneAnalysisDefinitionProvider {
 
