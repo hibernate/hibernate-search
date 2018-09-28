@@ -30,6 +30,8 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	private final DeferredInitializationIndexFieldAccessor<F> deferredInitializationAccessor =
 			new DeferredInitializationIndexFieldAccessor<>();
 
+	private final Class<F> indexFieldType;
+
 	private ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
 
@@ -37,12 +39,14 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext,
 			Class<F> indexFieldType) {
-		this( schemaContext, new PassThroughToIndexFieldValueConverter<>( indexFieldType ) );
+		this( schemaContext, indexFieldType, new PassThroughToIndexFieldValueConverter<>( indexFieldType ) );
 	}
 
 	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext,
+			Class<F> indexFieldType,
 			ToIndexFieldValueConverter<F, ? extends F> identityToIndexConverter) {
 		this.schemaContext = schemaContext;
+		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = identityToIndexConverter;
 		this.projectionFromIndexConverter = null;
 	}
@@ -79,6 +83,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	public UserIndexFieldConverter<F> createUserIndexFieldConverter() {
 		checkAccessorCreated();
 		return new UserIndexFieldConverter<>(
+				indexFieldType,
 				dslToIndexConverter,
 				projectionFromIndexConverter
 		);

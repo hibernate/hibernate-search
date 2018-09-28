@@ -8,24 +8,24 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Contracts;
 
@@ -98,10 +98,11 @@ class LuceneIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public <F> IndexSchemaFieldTerminalContext<F> asLuceneField(LuceneFieldContributor<F> fieldContributor,
+	public <F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> indexFieldType,
+			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		return setDelegate( new LuceneFieldIndexSchemaFieldContextImpl<>(
-				this, relativeFieldName, fieldContributor, fieldValueExtractor
+				this, relativeFieldName, indexFieldType, fieldContributor, fieldValueExtractor
 		) );
 	}
 

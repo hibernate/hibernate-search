@@ -22,11 +22,13 @@ import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueC
  */
 public final class UserIndexFieldConverter<F> {
 
+	private final Class<F> indexFieldType;
 	private final ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private final FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
 
-	UserIndexFieldConverter(ToIndexFieldValueConverter<?,? extends F> dslToIndexConverter,
+	UserIndexFieldConverter(Class<F> indexFieldType, ToIndexFieldValueConverter<?,? extends F> dslToIndexConverter,
 			FromIndexFieldValueConverter<? super F,?> projectionFromIndexConverter) {
+		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = dslToIndexConverter;
 		this.projectionFromIndexConverter = projectionFromIndexConverter;
 	}
@@ -70,4 +72,18 @@ public final class UserIndexFieldConverter<F> {
 		return dslToIndexConverter.isCompatibleWith( other.dslToIndexConverter );
 	}
 
+
+	/**
+	 * Determine whether the given projection type is compatible with this converter.
+	 *
+	 * @param projectionType The projection type.
+	 * @return {@code true} if the given projection type is compatible. {@code false} otherwise
+	 */
+	public boolean isProjectionCompatibleWith(Class<?> projectionType) {
+		if ( projectionFromIndexConverter == null ) {
+			return projectionType.isAssignableFrom( indexFieldType );
+		}
+
+		return projectionType.isAssignableFrom( projectionFromIndexConverter.getConvertedType() );
+	}
 }

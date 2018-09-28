@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -24,7 +25,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString()
-				.projectionConverter( this::fromIndexedValue );
+				.projectionConverter( new DefaultEnumFromIndexFieldValueConverter() );
 	}
 
 	@Override
@@ -46,8 +47,17 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		return enumType.equals( castedOther.enumType );
 	}
 
-	private V fromIndexedValue(String indexedValue) {
-		return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
+	private class DefaultEnumFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, V> {
+
+		@Override
+		public Class<?> getConvertedType() {
+			return enumType;
+		}
+
+		@Override
+		public V convert(String indexedValue) {
+			return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
+		}
 	}
 
 }

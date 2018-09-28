@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
+import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -14,11 +15,14 @@ import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
+	private static final ISBNFromIndexFieldValueConverter FROM_INDEX_FIELD_VALUE_CONVERTER =
+			new ISBNFromIndexFieldValueConverter();
+
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
 		return context.getIndexSchemaFieldContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
-				.projectionConverter( this::fromIndexedValue );
+				.projectionConverter( FROM_INDEX_FIELD_VALUE_CONVERTER );
 	}
 
 	@Override
@@ -36,7 +40,16 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 		return getClass().equals( other.getClass() );
 	}
 
-	private Object fromIndexedValue(String indexedValue) {
-		return indexedValue == null ? null : new ISBN( indexedValue );
+	private static class ISBNFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, ISBN> {
+
+		@Override
+		public Class<ISBN> getConvertedType() {
+			return ISBN.class;
+		}
+
+		@Override
+		public ISBN convert(String indexedValue) {
+			return indexedValue == null ? null : new ISBN( indexedValue );
+		}
 	}
 }

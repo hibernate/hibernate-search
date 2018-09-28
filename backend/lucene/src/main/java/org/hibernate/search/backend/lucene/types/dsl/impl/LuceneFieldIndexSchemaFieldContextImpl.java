@@ -56,8 +56,10 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
 	public LuceneFieldIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName,
+			Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, getToIndexFieldValueConverter() );
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType,
+				getToIndexFieldValueConverter() );
 		this.relativeFieldName = relativeFieldName;
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;

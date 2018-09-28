@@ -482,15 +482,15 @@ public class ExtensionIT {
 					.createAccessor();
 			nativeField = root.field( "nativeField" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
+					.asLuceneField( Integer.class, ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
 					.createAccessor();
 			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( ExtensionIT::contributeNativeField )
+					.asLuceneField( Integer.class, ExtensionIT::contributeNativeField )
 					.createAccessor();
 			nativeField_invalidFieldPath = root.field( "nativeField_invalidFieldPath" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( ExtensionIT::contributeNativeFieldInvalidFieldPath )
+					.asLuceneField( Integer.class, ExtensionIT::contributeNativeFieldInvalidFieldPath )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )

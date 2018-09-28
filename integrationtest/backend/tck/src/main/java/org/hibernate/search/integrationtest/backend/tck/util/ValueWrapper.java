@@ -25,6 +25,7 @@ public final class ValueWrapper<T> {
 				return value.getValue();
 			}
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public T convertUnknown(Object value) {
 				return convert( (ValueWrapper<T>) value );
@@ -33,7 +34,18 @@ public final class ValueWrapper<T> {
 	}
 
 	public static <T> FromIndexFieldValueConverter<T, ValueWrapper<T>> fromIndexFieldConverter() {
-		return ValueWrapper::new;
+		return new FromIndexFieldValueConverter<T, ValueWrapper<T>>() {
+
+			@Override
+			public Class<?> getConvertedType() {
+				return ValueWrapper.class;
+			}
+
+			@Override
+			public ValueWrapper<T> convert(T indexedValue) {
+				return new ValueWrapper<T>( indexedValue );
+			}
+		};
 	}
 
 	private final T value;

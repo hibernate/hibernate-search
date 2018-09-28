@@ -20,23 +20,27 @@ public interface LuceneIndexSchemaFieldContext extends IndexSchemaFieldContext {
 	/**
 	 * Declares a native field, on which projection is allowed.
 	 *
+	 * @param valueType The type of the value.
 	 * @param fieldContributor The field contributor.
 	 * @param fieldValueExtractor The field value extractor used when projecting on this field.
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	<F> IndexSchemaFieldTerminalContext<F> asLuceneField(LuceneFieldContributor<F> fieldContributor,
+	<F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> valueType,
+			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor);
 
 	/**
 	 * Declares a native field on which projection is not allowed.
 	 *
+	 * @param valueType The type of the value.
 	 * @param fieldContributor The field contributor.
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	default <F> IndexSchemaFieldTerminalContext<F> asLuceneField(LuceneFieldContributor<F> fieldContributor) {
-		return asLuceneField( fieldContributor, null );
+	default <F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> valueType,
+			LuceneFieldContributor<F> fieldContributor) {
+		return asLuceneField( valueType, fieldContributor, null );
 	}
 
 }

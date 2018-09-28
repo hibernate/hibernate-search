@@ -26,7 +26,6 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 		return getClass().getSimpleName() + "[" + userConverter + "]";
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public JsonElement convertFromDsl(Object value) {
 		F rawValue = userConverter.convertFromDsl( value );
@@ -49,4 +48,8 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 				&& codec.equals( castedOther.codec );
 	}
 
+	@Override
+	public boolean isProjectionCompatibleWith(Class<?> projectionType) {
+		return userConverter.isProjectionCompatibleWith( projectionType );
+	}
 }

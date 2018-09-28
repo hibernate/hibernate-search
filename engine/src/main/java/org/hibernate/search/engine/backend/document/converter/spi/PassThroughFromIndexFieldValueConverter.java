@@ -10,20 +10,20 @@ import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValu
 
 public final class PassThroughFromIndexFieldValueConverter<F> implements FromIndexFieldValueConverter<F, F> {
 
-	private static final PassThroughFromIndexFieldValueConverter<Object> INSTANCE = new PassThroughFromIndexFieldValueConverter<>();
+	private final Class<F> fieldType;
 
-	@SuppressWarnings("unchecked") // INSTANCE works for any F
-	public static <F> PassThroughFromIndexFieldValueConverter<F> get() {
-		return (PassThroughFromIndexFieldValueConverter<F>) INSTANCE;
-	}
-
-	private PassThroughFromIndexFieldValueConverter() {
-		// private, use get() instead
+	public PassThroughFromIndexFieldValueConverter(Class<F> fieldType) {
+		this.fieldType = fieldType;
 	}
 
 	@Override
 	public F convert(F value) {
 		return value;
+	}
+
+	@Override
+	public Class<?> getConvertedType() {
+		return fieldType;
 	}
 
 }

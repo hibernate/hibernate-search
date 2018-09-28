@@ -15,6 +15,11 @@ package org.hibernate.search.engine.backend.document.converter;
 public interface FromIndexFieldValueConverter<F, V> {
 
 	/**
+	 * @return The type of the converted value.
+	 */
+	Class<?> getConvertedType();
+
+	/**
 	 * @param value The index field value to convert.
 	 * @return The converted value.
 	 */

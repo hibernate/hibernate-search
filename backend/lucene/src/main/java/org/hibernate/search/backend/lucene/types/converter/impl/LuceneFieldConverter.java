@@ -43,4 +43,12 @@ public interface LuceneFieldConverter<F, T> {
 	 */
 	boolean isDslCompatibleWith(LuceneFieldConverter<?, ?> other);
 
+	/**
+	 * Determine whether the given projection type is compatible with this converter.
+	 *
+	 * @param projectionType The projection type.
+	 * @return {@code true} if the given projection type is compatible. {@code false} otherwise
+	 */
+	boolean isProjectionCompatibleWith(Class<?> projectionType);
+
 }

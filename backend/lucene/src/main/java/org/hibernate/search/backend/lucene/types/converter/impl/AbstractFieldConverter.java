@@ -35,4 +35,8 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 		return userConverter.isDslCompatibleWith( castedOther.userConverter );
 	}
 
+	@Override
+	public boolean isProjectionCompatibleWith(Class<?> projectionType) {
+		return userConverter.isProjectionCompatibleWith( projectionType );
+	}
 }
