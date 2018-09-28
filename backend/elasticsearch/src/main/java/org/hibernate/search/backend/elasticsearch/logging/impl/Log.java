@@ -14,11 +14,11 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
@@ -55,12 +55,44 @@ public interface Log extends BasicLogger {
 	// -----------------------------------
 	int ID_OFFSET_2 = MessageConstants.BACKEND_ES_ID_RANGE_MIN;
 
+	@Message(id = ID_OFFSET_2 + 55,
+			value = "The same tokenizer name '%1$s' is assigned to multiple definitions. The tokenizer names must be unique.")
+	SearchException tokenizerNamingConflict(String remoteName);
+
+	@Message(id = ID_OFFSET_2 + 56,
+			value = "The same char filter name '%1$s' is assigned to multiple definitions. The char filter names must be unique.")
+	SearchException charFilterNamingConflict(String remoteName);
+
+	@Message(id = ID_OFFSET_2 + 57,
+			value = "The same token filter name '%1$s' is assigned to multiple definitions. The token filter names must be unique.")
+	SearchException tokenFilterNamingConflict(String remoteName);
+
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_2 + 73,
 			value = "Hibernate Search will connect to Elasticsearch server '%1$s' with authentication over plain HTTP (not HTTPS)."
 					+ " The password will be sent in clear text over the network."
 	)
 	void usingPasswordOverHttp(String serverUris);
+
+	@Message(id = ID_OFFSET_2 + 74,
+			value = "The same analyzer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique.")
+	SearchException analyzerNamingConflict(String remoteName);
+
+	@Message(id = ID_OFFSET_2 + 76,
+			value = "Invalid analyzer definition for name '%1$s'. Analyzer definitions must at least define the tokenizer.")
+	SearchException invalidElasticsearchAnalyzerDefinition(String name);
+
+	@Message(id = ID_OFFSET_2 + 77,
+			value = "Invalid tokenizer definition for name '%1$s'. Tokenizer definitions must at least define the tokenizer type.")
+	SearchException invalidElasticsearchTokenizerDefinition(String name);
+
+	@Message(id = ID_OFFSET_2 + 78,
+			value = "Invalid char filter definition for name '%1$s'. Char filter definitions must at least define the char filter type.")
+	SearchException invalidElasticsearchCharFilterDefinition(String name);
+
+	@Message(id = ID_OFFSET_2 + 79,
+			value = "Invalid token filter definition for name '%1$s'. Token filter definitions must at least define the token filter type.")
+	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 82,
@@ -69,6 +101,10 @@ public interface Log extends BasicLogger {
 	)
 	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
 			int responseStatusCode, String responseStatusMessage);
+
+	@Message(id = ID_OFFSET_2 + 86,
+			value = "The same normalizer name '%1$s' is assigned to multiple definitions. The normalizer names must be unique.")
+	SearchException normalizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 89,
 			value = "Failed to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'.")
