@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;

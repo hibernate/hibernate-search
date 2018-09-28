@@ -4,25 +4,25 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.query.impl;
+package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
 import com.google.gson.JsonObject;
 
 /**
- * A hit extractor used when search results are expected to contain document references, potentially transformed.
+ * A hit extractor used when search results are expected to contain loaded objects.
  *
- * @see SearchQueryFactory#asReferences(SessionContext, HitAggregator)
+ * @see SearchQueryFactory#asObjects(SessionContext, HitAggregator)
  */
-class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHitCollector> {
+public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	DocumentReferenceHitExtractor(DocumentReferenceExtractorHelper helper) {
+	public ObjectHitExtractor(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 
@@ -32,8 +32,8 @@ class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHit
 	}
 
 	@Override
-	public void extract(DocumentReferenceHitCollector collector, JsonObject responseBody, JsonObject hit) {
-		collector.collectReference( helper.extractDocumentReference( hit ) );
+	public void extract(LoadingHitCollector collector, JsonObject responseBody, JsonObject hit) {
+		collector.collectForLoading( helper.extractDocumentReference( hit ) );
 	}
 
 }

@@ -12,6 +12,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.search.SearchQuery;

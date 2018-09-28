@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.CompositeHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.IndexSensitiveHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.NullProjectionHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;

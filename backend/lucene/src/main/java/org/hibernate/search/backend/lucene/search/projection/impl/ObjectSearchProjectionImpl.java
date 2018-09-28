@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.search.query.impl.HitExtractor;
-import org.hibernate.search.backend.lucene.search.query.impl.ObjectHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 public class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {

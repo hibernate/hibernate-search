@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.query.impl;
+package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
@@ -18,7 +18,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-class DocumentReferenceExtractorHelper {
+public class DocumentReferenceExtractorHelper {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
@@ -26,7 +26,8 @@ class DocumentReferenceExtractorHelper {
 	private final Function<String, String> indexNameConverter;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	DocumentReferenceExtractorHelper(Function<String, String> indexNameConverter, MultiTenancyStrategy multiTenancyStrategy) {
+	public DocumentReferenceExtractorHelper(Function<String, String> indexNameConverter,
+			MultiTenancyStrategy multiTenancyStrategy) {
 		this.indexNameConverter = indexNameConverter;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}

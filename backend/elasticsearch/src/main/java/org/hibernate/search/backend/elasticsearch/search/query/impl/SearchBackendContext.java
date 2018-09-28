@@ -10,13 +10,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceProjectionHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ObjectHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ScoreHitExtractor;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.util.EventContext;
 
 public class SearchBackendContext {
 	private final EventContext eventContext;

@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;

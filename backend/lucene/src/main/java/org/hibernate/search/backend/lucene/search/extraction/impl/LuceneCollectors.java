@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.search.query.impl;
+package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 
-class LuceneCollectors {
+public class LuceneCollectors {
 
 	private final TopDocsCollector<?> topDocsCollector;
 
@@ -26,7 +26,7 @@ class LuceneCollectors {
 		this.compositeCollector = compositeCollector;
 	}
 
-	long getTotalHits() {
+	public long getTotalHits() {
 		if ( topDocsCollector != null ) {
 			return topDocsCollector.getTotalHits();
 		}
@@ -35,7 +35,7 @@ class LuceneCollectors {
 		}
 	}
 
-	TopDocs getTopDocs(long firstResultIndex, Long maxResultsCount) {
+	public TopDocs getTopDocs(long firstResultIndex, Long maxResultsCount) {
 		if ( topDocsCollector == null ) {
 			return null;
 		}
@@ -48,7 +48,7 @@ class LuceneCollectors {
 		}
 	}
 
-	Collector getCompositeCollector() {
+	public Collector getCompositeCollector() {
 		return compositeCollector;
 	}
 }

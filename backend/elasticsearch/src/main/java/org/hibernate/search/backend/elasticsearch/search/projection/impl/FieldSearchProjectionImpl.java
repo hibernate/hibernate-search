@@ -10,9 +10,9 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.SourceHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SourceHitExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 public class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {

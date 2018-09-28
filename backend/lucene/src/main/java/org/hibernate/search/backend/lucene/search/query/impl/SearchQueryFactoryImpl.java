@@ -18,6 +18,12 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.extraction.impl.CompositeHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.IndexSensitiveHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.NullProjectionHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;

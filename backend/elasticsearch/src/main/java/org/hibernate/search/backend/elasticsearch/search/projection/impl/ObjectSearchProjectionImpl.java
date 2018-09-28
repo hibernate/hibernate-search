@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.query.impl;
+package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -22,7 +22,7 @@ import com.google.gson.JsonObject;
  * Used in projections, where a given projection can have a different meaning
  * depending on the index.
  */
-class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
+public class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root()
@@ -31,7 +31,7 @@ class IndexSensitiveHitExtractor<C> implements HitExtractor<C> {
 
 	private final Map<String, HitExtractor<? super C>> extractorByElasticsearchIndexName;
 
-	IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByElasticsearchIndexName) {
+	public IndexSensitiveHitExtractor(Map<String, HitExtractor<? super C>> extractorByElasticsearchIndexName) {
 		this.extractorByElasticsearchIndexName = extractorByElasticsearchIndexName;
 	}
 
