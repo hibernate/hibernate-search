@@ -22,6 +22,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearch
  */
 public interface ElasticsearchAnalysisDefinitionProvider {
 
-	void register(ElasticsearchAnalysisDefinitionRegistryBuilder builder);
+	void provide(ElasticsearchAnalysisDefinitionContainerContext builder);
 
 }

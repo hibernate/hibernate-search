@@ -7,10 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 /**
- * A builder for Elasticsearch analysis-related definitions: analyzers, tokenizers, char filters, ...
- * <p>
- * This contract only expects users to provide the definitions;
- * the registry building is handled by Hibernate Search.
+ * A context allowing to define named analysis-related elements in an Elasticsearch backend:
+ * analyzers, tokenizers, char filters, ...
  *
  * @author Yoann Rodiere
  *
@@ -18,7 +16,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
  * Please let us know what you like and what you don't like, and bear in mind
  * that this will likely change in any future version.
  */
-public interface ElasticsearchAnalysisDefinitionRegistryBuilder {
+public interface ElasticsearchAnalysisDefinitionContainerContext {
 
 	/**
 	 * Start an analyzer definition.

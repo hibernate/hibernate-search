@@ -13,6 +13,8 @@ import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -32,29 +34,24 @@ public class SimpleLuceneAnalysisDefinitionRegistry implements LuceneAnalysisDef
 
 	private final Map<String, NormalizerDef> normalizerDefinitions = new TreeMap<>();
 
-	SimpleLuceneAnalysisDefinitionRegistry() {
-	}
+	public SimpleLuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
+		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
+			@Override
+			public void collect(String name, AnalyzerDef definition) {
+				AnalyzerDef previous = analyzerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw log.analyzerDefinitionNamingConflict( name );
+				}
+			}
 
-	public SimpleLuceneAnalysisDefinitionRegistry(Map<String, AnalyzerDef> analyzerDefinitions,
-			Map<String, NormalizerDef> normalizerDefinitions) {
-		this.analyzerDefinitions.putAll( analyzerDefinitions );
-		this.normalizerDefinitions.putAll( normalizerDefinitions );
-	}
-
-	@Override
-	public void register(String name, AnalyzerDef definition) {
-		AnalyzerDef previous = analyzerDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw log.analyzerDefinitionNamingConflict( name );
-		}
-	}
-
-	@Override
-	public void register(String name, NormalizerDef definition) {
-		NormalizerDef previous = normalizerDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw log.normalizerDefinitionNamingConflict( name );
-		}
+			@Override
+			public void collect(String name, NormalizerDef definition) {
+				NormalizerDef previous = normalizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw log.normalizerDefinitionNamingConflict( name );
+				}
+			}
+		} );
 	}
 
 	@Override

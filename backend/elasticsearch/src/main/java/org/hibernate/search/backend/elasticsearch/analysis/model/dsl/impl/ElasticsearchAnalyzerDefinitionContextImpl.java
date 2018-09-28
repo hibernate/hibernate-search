@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -22,7 +24,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class ElasticsearchAnalyzerDefinitionContextImpl
 		implements ElasticsearchAnalyzerDefinitionContext,
 		ElasticsearchAnalyzerDefinitionWithTokenizerContext,
-		ElasticsearchAnalysisDefinitionRegistryPopulator {
+		ElasticsearchAnalysisDefinitionContributor {
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -60,11 +62,11 @@ public class ElasticsearchAnalyzerDefinitionContextImpl
 	}
 
 	@Override
-	public void populate(ElasticsearchAnalysisDefinitionRegistry registry) {
+	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getTokenizer() ) ) {
 			throw LOG.invalidElasticsearchAnalyzerDefinition( name );
 		}
-		registry.register( name, definition );
+		collector.collect( name, definition );
 	}
 
 }

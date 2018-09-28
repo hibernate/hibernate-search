@@ -22,7 +22,7 @@ public interface ElasticsearchAnalyzerDefinitionContext {
 	 * @param name The name of the tokenizer.
 	 * There must be a corresponding tokenizer definition on the Elasticsearch server.
 	 * This can be achieved by defining the tokenizer
-	 * {@link ElasticsearchAnalysisDefinitionRegistryBuilder#tokenizer(String) from Hibernate Search},
+	 * {@link ElasticsearchAnalysisDefinitionContainerContext#tokenizer(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
 	 * @return A definition context allowing to define the analyzer's filters.
 	 */

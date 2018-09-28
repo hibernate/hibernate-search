@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
-import org.hibernate.search.util.SearchException;
 
 /**
  * A registry of analysis-related definitions for Lucene.
@@ -16,22 +15,6 @@ import org.hibernate.search.util.SearchException;
  * @author Yoann Rodiere
  */
 public interface LuceneAnalysisDefinitionRegistry {
-
-	/**
-	 * Register an analyzer definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, AnalyzerDef definition);
-
-	/**
-	 * Register a normalizer definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, NormalizerDef definition);
 
 	/**
 	 * @param name An analyzer name

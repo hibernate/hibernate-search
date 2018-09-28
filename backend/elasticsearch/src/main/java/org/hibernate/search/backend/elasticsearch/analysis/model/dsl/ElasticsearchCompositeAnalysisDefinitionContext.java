@@ -22,7 +22,7 @@ public interface ElasticsearchCompositeAnalysisDefinitionContext {
 	 * @param names The name of each char filters to use, in order.
 	 * There must be a corresponding char filter definition on the Elasticsearch server.
 	 * This can be achieved by defining the char filter
-	 * {@link ElasticsearchAnalysisDefinitionRegistryBuilder#charFilter(String) from Hibernate Search},
+	 * {@link ElasticsearchAnalysisDefinitionContainerContext#charFilter(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
 	 * @return This context, allowing to chain calls.
 	 */
@@ -34,7 +34,7 @@ public interface ElasticsearchCompositeAnalysisDefinitionContext {
 	 * @param names The name of the token filters to use, in order.
 	 * There must be a corresponding token filter definition on the Elasticsearch server.
 	 * This can be achieved by defining the token filter
-	 * {@link ElasticsearchAnalysisDefinitionRegistryBuilder#tokenFilter(String) from Hibernate Search},
+	 * {@link ElasticsearchAnalysisDefinitionContainerContext#tokenFilter(String) from Hibernate Search},
 	 * by configuring the Elasticsearch server, or by using built-in tokenizers.
 	 * @return This context, allowing to chain calls.
 	 */

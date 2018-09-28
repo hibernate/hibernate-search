@@ -11,7 +11,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.C
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
-import org.hibernate.search.util.SearchException;
 
 /**
  * A registry of analysis-related definitions for Elasticsearch.
@@ -19,46 +18,6 @@ import org.hibernate.search.util.SearchException;
  * @author Yoann Rodiere
  */
 public interface ElasticsearchAnalysisDefinitionRegistry {
-
-	/**
-	 * Register an analyzer definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, AnalyzerDefinition definition);
-
-	/**
-	 * Register a normalizer definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, NormalizerDefinition definition);
-
-	/**
-	 * Register a tokenizer definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, TokenizerDefinition definition);
-
-	/**
-	 * Register a token filter definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, TokenFilterDefinition definition);
-
-	/**
-	 * Register a char filter definition.
-	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
-	 * @throws SearchException if the name is already associated with a different definition.
-	 */
-	void register(String name, CharFilterDefinition definition);
 
 	/**
 	 * @param name An analyzer name

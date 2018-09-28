@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -27,11 +28,11 @@ public class ElasticsearchTokenizerDefinitionContextImpl
 	}
 
 	@Override
-	public void populate(ElasticsearchAnalysisDefinitionRegistry registry) {
+	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
 			throw LOG.invalidElasticsearchTokenizerDefinition( name );
 		}
-		registry.register( name, definition );
+		collector.collect( name, definition );
 	}
 
 }

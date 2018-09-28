@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerDefinitionContext;
 
@@ -15,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
  */
 public class ElasticsearchNormalizerDefinitionContextImpl
 		implements ElasticsearchNormalizerDefinitionContext,
-		ElasticsearchAnalysisDefinitionRegistryPopulator {
+		ElasticsearchAnalysisDefinitionContributor {
 
 	private final String name;
 
@@ -45,8 +47,8 @@ public class ElasticsearchNormalizerDefinitionContextImpl
 	}
 
 	@Override
-	public void populate(ElasticsearchAnalysisDefinitionRegistry registry) {
-		registry.register( name, definition );
+	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
+		collector.collect( name, definition );
 	}
 
 }

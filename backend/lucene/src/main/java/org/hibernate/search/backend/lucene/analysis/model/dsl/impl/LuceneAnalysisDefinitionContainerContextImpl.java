@@ -10,9 +10,11 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionRegistryBuilder;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -20,7 +22,8 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-public class LuceneAnalysisDefinitionRegistryBuilderImpl implements LuceneAnalysisDefinitionRegistryBuilder {
+public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnalysisDefinitionContainerContext,
+		LuceneAnalysisDefinitionContributor {
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,15 +51,14 @@ public class LuceneAnalysisDefinitionRegistryBuilderImpl implements LuceneAnalys
 		return definition;
 	}
 
-	public SimpleLuceneAnalysisDefinitionRegistry build() {
-		SimpleLuceneAnalysisDefinitionRegistry registry = new SimpleLuceneAnalysisDefinitionRegistry();
+	@Override
+	public void contribute(LuceneAnalysisDefinitionCollector collector) {
 		for ( Map.Entry<String, LuceneAnalyzerDefinitionContextImpl> entry : analyzerDefinitions.entrySet() ) {
-			registry.register( entry.getKey(), entry.getValue().build() );
+			collector.collect( entry.getKey(), entry.getValue().build() );
 		}
 		for ( Map.Entry<String, LuceneNormalizerDefinitionContextImpl> entry : normalizerDefinitions.entrySet() ) {
-			registry.register( entry.getKey(), entry.getValue().build() );
+			collector.collect( entry.getKey(), entry.getValue().build() );
 		}
-		return registry;
 	}
 
 }

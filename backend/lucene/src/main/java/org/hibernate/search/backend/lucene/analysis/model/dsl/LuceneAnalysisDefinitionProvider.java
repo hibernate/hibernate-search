@@ -24,6 +24,6 @@ import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
  */
 public interface LuceneAnalysisDefinitionProvider {
 
-	void register(LuceneAnalysisDefinitionRegistryBuilder builder);
+	void register(LuceneAnalysisDefinitionContainerContext builder);
 
 }

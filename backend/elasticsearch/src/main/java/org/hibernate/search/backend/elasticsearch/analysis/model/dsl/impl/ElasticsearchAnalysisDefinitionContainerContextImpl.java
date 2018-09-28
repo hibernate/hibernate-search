@@ -11,55 +11,59 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionContext;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionRegistryBuilder;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchAnalysisDefinitionRegistryBuilderImpl implements ElasticsearchAnalysisDefinitionRegistryBuilder {
+public class ElasticsearchAnalysisDefinitionContainerContextImpl
+		implements ElasticsearchAnalysisDefinitionContainerContext, ElasticsearchAnalysisDefinitionContributor {
 
-	private final List<ElasticsearchAnalysisDefinitionRegistryPopulator> populators = new ArrayList<>();
+	private final List<ElasticsearchAnalysisDefinitionContributor> children = new ArrayList<>();
 
 	@Override
 	public ElasticsearchAnalyzerDefinitionContext analyzer(String name) {
 		ElasticsearchAnalyzerDefinitionContextImpl context = new ElasticsearchAnalyzerDefinitionContextImpl( name );
-		populators.add( context );
+		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchNormalizerDefinitionContext normalizer(String name) {
 		ElasticsearchNormalizerDefinitionContextImpl context = new ElasticsearchNormalizerDefinitionContextImpl( name );
-		populators.add( context );
+		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext tokenizer(String name) {
 		ElasticsearchTokenizerDefinitionContextImpl context = new ElasticsearchTokenizerDefinitionContextImpl( name );
-		populators.add( context );
+		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext charFilter(String name) {
 		ElasticsearchCharFilterDefinitionContextImpl context = new ElasticsearchCharFilterDefinitionContextImpl( name );
-		populators.add( context );
+		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext tokenFilter(String name) {
 		ElasticsearchTokenFilterDefinitionContextImpl context = new ElasticsearchTokenFilterDefinitionContextImpl( name );
-		populators.add( context );
+		children.add( context );
 		return context;
 	}
 
-	public void build(ElasticsearchAnalysisDefinitionRegistry registry) {
-		for ( ElasticsearchAnalysisDefinitionRegistryPopulator populator : populators ) {
-			populator.populate( registry );
+	@Override
+	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
+		for ( ElasticsearchAnalysisDefinitionContributor child : children ) {
+			child.contribute( collector );
 		}
 	}
 

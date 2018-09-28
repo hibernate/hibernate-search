@@ -31,7 +31,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 public class LuceneAnalyzerDefinitionContextImpl
 		implements LuceneAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext {
 
-	private final LuceneAnalysisDefinitionRegistryBuilderImpl registry;
+	private final LuceneAnalysisDefinitionContainerContextImpl parentContext;
 
 	private final String name;
 
@@ -41,19 +41,19 @@ public class LuceneAnalyzerDefinitionContextImpl
 
 	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
 
-	LuceneAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionRegistryBuilderImpl registry, String name) {
-		this.registry = registry;
+	LuceneAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
+		this.parentContext = parentContext;
 		this.name = name;
 	}
 
 	@Override
 	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		return registry.analyzer( name );
+		return parentContext.analyzer( name );
 	}
 
 	@Override
 	public LuceneNormalizerDefinitionContext normalizer(String name) {
-		return registry.normalizer( name );
+		return parentContext.normalizer( name );
 	}
 
 	@Override

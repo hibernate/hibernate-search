@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -26,11 +27,11 @@ public class ElasticsearchCharFilterDefinitionContextImpl
 	}
 
 	@Override
-	public void populate(ElasticsearchAnalysisDefinitionRegistry registry) {
+	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
 			throw LOG.invalidElasticsearchCharFilterDefinition( name );
 		}
-		registry.register( name, definition );
+		collector.collect( name, definition );
 	}
 
 }

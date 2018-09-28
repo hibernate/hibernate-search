@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalysisDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchTypedAnalysisComponentDefinitionContext;
@@ -23,7 +24,7 @@ import com.google.gson.JsonPrimitive;
 public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D extends AnalysisDefinition>
 		implements ElasticsearchTypedAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisComponentDefinitionContext,
-		ElasticsearchAnalysisDefinitionRegistryPopulator {
+		ElasticsearchAnalysisDefinitionContributor {
 
 	protected final String name;
 

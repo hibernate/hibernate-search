@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
@@ -37,44 +39,48 @@ public class SimpleElasticsearchAnalysisDefinitionRegistry implements Elasticsea
 	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions = new TreeMap<>();
 	private final Map<String, CharFilterDefinition> charFilterDefinitions = new TreeMap<>();
 
-	@Override
-	public void register(String name, AnalyzerDefinition definition) {
-		AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw LOG.analyzerNamingConflict( name );
-		}
-	}
+	private SimpleElasticsearchAnalysisDefinitionRegistry(ElasticsearchAnalysisDefinitionContributor contributor) {
+		contributor.contribute( new ElasticsearchAnalysisDefinitionCollector() {
+			@Override
+			public void collect(String name, AnalyzerDefinition definition) {
+				AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.analyzerNamingConflict( name );
+				}
+			}
 
-	@Override
-	public void register(String name, NormalizerDefinition definition) {
-		NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw LOG.normalizerNamingConflict( name );
-		}
-	}
+			@Override
+			public void collect(String name, NormalizerDefinition definition) {
+				NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.normalizerNamingConflict( name );
+				}
+			}
 
-	@Override
-	public void register(String name, TokenizerDefinition definition) {
-		TokenizerDefinition previous = tokenizerDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw LOG.tokenizerNamingConflict( name );
-		}
-	}
+			@Override
+			public void collect(String name, TokenizerDefinition definition) {
+				TokenizerDefinition previous = tokenizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.tokenizerNamingConflict( name );
+				}
+			}
 
-	@Override
-	public void register(String name, TokenFilterDefinition definition) {
-		TokenFilterDefinition previous = tokenFilterDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw LOG.tokenFilterNamingConflict( name );
-		}
-	}
+			@Override
+			public void collect(String name, TokenFilterDefinition definition) {
+				TokenFilterDefinition previous = tokenFilterDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.tokenFilterNamingConflict( name );
+				}
+			}
 
-	@Override
-	public void register(String name, CharFilterDefinition definition) {
-		CharFilterDefinition previous = charFilterDefinitions.putIfAbsent( name, definition );
-		if ( previous != null && previous != definition ) {
-			throw LOG.charFilterNamingConflict( name );
-		}
+			@Override
+			public void collect(String name, CharFilterDefinition definition) {
+				CharFilterDefinition previous = charFilterDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.charFilterNamingConflict( name );
+				}
+			}
+		} );
 	}
 
 	@Override

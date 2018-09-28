@@ -17,7 +17,7 @@ public class ElasticsearchIndexSettingsBuilder {
 	private final SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	public ElasticsearchIndexSettingsBuilder(SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
-		this.analysisDefinitionRegistry = new SimpleElasticsearchAnalysisDefinitionRegistry();
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
 	public IndexSettings build() {
