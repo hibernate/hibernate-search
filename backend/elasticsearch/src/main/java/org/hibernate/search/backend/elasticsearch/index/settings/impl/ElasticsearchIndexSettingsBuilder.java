@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.settings.impl;
 
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.Analysis;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
 
 /**
  * @author Yoann Rodiere

@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.N
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.Parameter;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenFilterDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenizerDef;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;

@@ -4,15 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
+package org.hibernate.search.backend.elasticsearch.analysis.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
