@@ -21,8 +21,8 @@ import javax.persistence.Id;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
@@ -78,11 +78,11 @@ public class AnnotationMappingDiscoveryIT {
 
 		ormSetupHelper.withBackendMock( backendMock )
 				.withProperty(
-						SearchOrmSettings.MAPPING_CONTRIBUTOR,
-						new HibernateOrmSearchMappingContributor() {
+						SearchOrmSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void contribute(HibernateOrmMappingDefinition definition) {
-								definition.programmaticMapping()
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping()
 										.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )
 										.indexedEmbedded();
@@ -118,11 +118,11 @@ public class AnnotationMappingDiscoveryIT {
 		ormSetupHelper.withBackendMock( backendMock )
 				.withProperty( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
 				.withProperty(
-						SearchOrmSettings.MAPPING_CONTRIBUTOR,
-						new HibernateOrmSearchMappingContributor() {
+						SearchOrmSettings.MAPPING_CONFIGURER,
+						new HibernateOrmSearchMappingConfigurer() {
 							@Override
-							public void contribute(HibernateOrmMappingDefinition definition) {
-								definition.programmaticMapping()
+							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+								context.programmaticMapping()
 										.type( IndexedEntity.class )
 										.property( "nonAnnotationMappedEmbedded" )
 										.indexedEmbedded();
@@ -132,7 +132,7 @@ public class AnnotationMappingDiscoveryIT {
 								 * We add some of the annotation mapping programmatically,
 								 * just to check that discovery is disabled for nested types.
 								 */
-								definition.programmaticMapping()
+								context.programmaticMapping()
 										.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
 										.property( "id" ).documentId()
 										.property( "annotationMappedEmbedded" )

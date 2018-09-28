@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.cfg;
 
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -45,17 +47,18 @@ public final class SearchOrmSettings {
 	/**
 	 * When enabled, annotations will be automatically processed for entity types,
 	 * as well as nested types in those entity types, for instance embedded types.
-	 * Enabled by default. Disable to only consider {@link #MAPPING_CONTRIBUTOR}.
+	 * Enabled by default. Disable to only consider {@link #MAPPING_CONFIGURER}.
 	 */
 	public static final String ENABLE_ANNOTATION_MAPPING = PREFIX + Radicals.ENABLE_ANNOTATION_MAPPING;
 
 	/**
-	 * Provide a programmatic mapping model to Hibernate Search configuration
-	 * Accepts a {@link org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor}
-	 * instance or the fully qualified class name of a HibernateOrmSearchMappingContributor subclass.
+	 * Configure a programmatic mapping in Hibernate Search.
+	 * <p>
+	 * Accepts a {@link HibernateOrmSearchMappingConfigurer}
+	 * instance or the fully qualified class name of a {@link HibernateOrmSearchMappingConfigurer} subclass.
 	 * Such a subclass must have a no-arg constructor.
 	 */
-	public static final String MAPPING_CONTRIBUTOR = PREFIX + Radicals.MAPPING_CONTRIBUTOR;
+	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 
 	public static class Radicals {
 		public static final String ENABLE_CONFIGURATION_PROPERTY_TRACKING = "enable_configuration_property_tracking";
@@ -63,7 +66,7 @@ public final class SearchOrmSettings {
 		public static final String INDEXING_STRATEGY = "indexing_strategy";
 		public static final String ENABLE_DIRTY_CHECK = "enable_dirty_check";
 		public static final String ENABLE_ANNOTATION_MAPPING = "enable_annotation_mapping";
-		public static final String MAPPING_CONTRIBUTOR = "mapping_contributor";
+		public static final String MAPPING_CONFIGURER = "mapping_configurer";
 
 		private Radicals() {
 		}

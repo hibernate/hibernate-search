@@ -8,26 +8,26 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge;
 
 /**
- * A programmatic mapping contributor that reproduces the exact same mapping as the annotations on model types.
+ * A programmatic mapping configurer that reproduces the exact same mapping as the annotations on model types.
  * <p>
  * While such a programmatic mapping would normally make no sense (we could just use the annotation mapping),
  * it is useful for demonstration purposes.
  */
-public class ProgrammaticMappingContributor implements HibernateOrmSearchMappingContributor {
+public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 	@Override
-	public void contribute(HibernateOrmMappingDefinition definition) {
-		ProgrammaticMappingDefinition mapping = definition.programmaticMapping();
+	public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+		ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
 
 		mapping.type( Library.class ).indexed( Library.INDEX )
 				.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )

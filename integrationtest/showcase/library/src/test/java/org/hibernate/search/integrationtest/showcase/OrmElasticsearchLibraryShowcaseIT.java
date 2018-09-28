@@ -47,7 +47,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
-import org.hibernate.search.integrationtest.showcase.library.model.ProgrammaticMappingContributor;
+import org.hibernate.search.integrationtest.showcase.library.model.ProgrammaticMappingConfigurer;
 import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
@@ -144,8 +144,8 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
 			registryBuilder.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" );
-			registryBuilder.applySetting( SearchOrmSettings.MAPPING_CONTRIBUTOR,
-					new ProgrammaticMappingContributor() );
+			registryBuilder.applySetting( SearchOrmSettings.MAPPING_CONFIGURER,
+					new ProgrammaticMappingConfigurer() );
 		}
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();

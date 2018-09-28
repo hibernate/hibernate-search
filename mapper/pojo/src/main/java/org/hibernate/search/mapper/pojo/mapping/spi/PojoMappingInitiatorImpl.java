@@ -16,17 +16,17 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionImpl;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl.AnnotationMappingDefinitionContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
-		implements PojoMappingDefinition, MappingInitiator<PojoTypeMetadataContributor, M> {
+		implements PojoMappingDefinitionContainerContext, MappingInitiator<PojoTypeMetadataContributor, M> {
 
 	private final PojoMappingFactory<M> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
@@ -34,7 +34,7 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 	private boolean implicitProvidedId;
 	private boolean multiTenancyEnabled;
 
-	private final AnnotationMappingDefinitionImpl annotationMappingDefinition;
+	private final AnnotationMappingDefinitionContextImpl annotationMappingDefinition;
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
@@ -50,19 +50,19 @@ public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
 		 * Also, make sure to re-use the same mapping, so as not to parse annotations on a given type twice,
 		 * which would lead to duplicate field definitions.
 		 */
-		annotationMappingDefinition = new AnnotationMappingDefinitionImpl( introspector );
+		annotationMappingDefinition = new AnnotationMappingDefinitionContextImpl( introspector );
 		addConfigurationContributor( annotationMappingDefinition );
 	}
 
 	@Override
-	public ProgrammaticMappingDefinition programmaticMapping() {
-		ProgrammaticMappingDefinitionImpl definition = new ProgrammaticMappingDefinitionImpl( introspector );
+	public ProgrammaticMappingDefinitionContext programmaticMapping() {
+		ProgrammaticMappingDefinitionContextImpl definition = new ProgrammaticMappingDefinitionContextImpl( introspector );
 		addConfigurationContributor( definition );
 		return definition;
 	}
 
 	@Override
-	public AnnotationMappingDefinition annotationMapping() {
+	public AnnotationMappingDefinitionContext annotationMapping() {
 		return annotationMappingDefinition;
 	}
 

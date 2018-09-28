@@ -45,7 +45,7 @@ public final class SearchBackendElasticsearchSettings {
 
 	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy_strategy";
 
-	public static final String ANALYSIS_DEFINITION_PROVIDER = "analysis_definition_provider";
+	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
 
 	/**
 	 * Default values for the different settings if no values are given.

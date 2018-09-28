@@ -14,12 +14,12 @@ import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
  * or {@literal @Normalizer(definition = "some-other-name")}.
  * <p>
  * Users can select a definition provider through the
- * {@link SearchBackendLuceneSettings#ANALYSIS_DEFINITION_PROVIDER configuration properties}.
+ * {@link SearchBackendLuceneSettings#ANALYSIS_CONFIGURER configuration properties}.
  *
  * @author Yoann Rodiere
  */
-public interface LuceneAnalysisDefinitionProvider {
+public interface LuceneAnalysisConfigurer {
 
-	void register(LuceneAnalysisDefinitionContainerContext builder);
+	void configure(LuceneAnalysisDefinitionContainerContext context);
 
 }

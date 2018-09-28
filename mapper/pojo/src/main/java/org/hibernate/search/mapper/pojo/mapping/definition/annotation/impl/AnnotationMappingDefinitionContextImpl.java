@@ -19,14 +19,14 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDisco
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 
-public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinition,
+public class AnnotationMappingDefinitionContextImpl implements AnnotationMappingDefinitionContext,
 		PojoMappingConfigurationContributor {
 
 	private final PojoBootstrapIntrospector introspector;
@@ -35,7 +35,7 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 
 	private boolean annotatedTypeDiscoveryEnabled = false;
 
-	public AnnotationMappingDefinitionImpl(PojoBootstrapIntrospector introspector) {
+	public AnnotationMappingDefinitionContextImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 
@@ -44,13 +44,13 @@ public class AnnotationMappingDefinitionImpl implements AnnotationMappingDefinit
 	}
 
 	@Override
-	public AnnotationMappingDefinition add(Class<?> annotatedType) {
+	public AnnotationMappingDefinitionContext add(Class<?> annotatedType) {
 		this.annotatedTypes.add( annotatedType );
 		return this;
 	}
 
 	@Override
-	public AnnotationMappingDefinition add(Set<Class<?>> annotatedTypes) {
+	public AnnotationMappingDefinitionContext add(Set<Class<?>> annotatedTypes) {
 		this.annotatedTypes.addAll( annotatedTypes );
 		return this;
 	}

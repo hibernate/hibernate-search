@@ -13,20 +13,20 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-public class ProgrammaticMappingDefinitionImpl
-		implements ProgrammaticMappingDefinition, PojoMappingConfigurationContributor {
+public class ProgrammaticMappingDefinitionContextImpl
+		implements ProgrammaticMappingDefinitionContext, PojoMappingConfigurationContributor {
 
 	private final PojoBootstrapIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Class<?>, TypeMappingContextImpl> entities = new LinkedHashMap<>();
 
-	public ProgrammaticMappingDefinitionImpl(PojoBootstrapIntrospector introspector) {
+	public ProgrammaticMappingDefinitionContextImpl(PojoBootstrapIntrospector introspector) {
 		this.introspector = introspector;
 	}
 

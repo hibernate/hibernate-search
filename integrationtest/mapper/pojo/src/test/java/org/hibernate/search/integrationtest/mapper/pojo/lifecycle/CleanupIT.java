@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.StartupStubBridge;
@@ -322,7 +322,7 @@ public class CleanupIT {
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
 
-	private void failingStartup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
+	private void failingStartup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
 		SubTest.expectException(
 				() -> startup( additionalMappingContributor )
 		)
@@ -331,14 +331,14 @@ public class CleanupIT {
 				.hasMessageContaining( SimulatedFailure.MESSAGE );
 	}
 
-	private void startup(Consumer<ProgrammaticMappingDefinition> additionalMappingContributor) {
+	private void startup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
 		this.mapping = setupHelper.withBackendMock( backendMock )
 				.withConfiguration(
 						builder -> {
 							builder.addEntityType( IndexedEntity.class );
 							builder.addEntityType( OtherIndexedEntity.class );
 
-							ProgrammaticMappingDefinition mappingDefinition = builder.programmaticMapping();
+							ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
 							mappingDefinition.type( IndexedEntity.class )
 									.indexed( IndexedEntity.INDEX )
 									.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )

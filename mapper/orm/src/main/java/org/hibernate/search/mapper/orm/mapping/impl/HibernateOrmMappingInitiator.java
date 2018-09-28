@@ -22,11 +22,11 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
 import org.hibernate.search.util.impl.common.StreamHelper;
 
@@ -37,7 +37,7 @@ import org.hibernate.search.util.impl.common.StreamHelper;
  *  2. And more?
  */
 public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping>
-		implements HibernateOrmMappingDefinition {
+		implements HibernateOrmMappingDefinitionContainerContext {
 
 	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
@@ -100,23 +100,23 @@ public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<Hiber
 		if ( enableAnnotationMapping ) {
 			setAnnotatedTypeDiscoveryEnabled( true );
 
-			AnnotationMappingDefinition annotationMapping = annotationMapping();
+			AnnotationMappingDefinitionContext annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : persistentClasses.values() ) {
 				annotationMapping.add( persistentClass.getMappedClass() );
 			}
 		}
 
-		// Apply the user-provided metadata contributor if necessary
+		// Apply the user-provided mapping configurer if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-		ConfigurationProperty<Optional<HibernateOrmSearchMappingContributor>> userMappingContributorProperty =
-				ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONTRIBUTOR )
+		ConfigurationProperty<Optional<HibernateOrmSearchMappingConfigurer>> mappingConfigurerProperty =
+				ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
 						.as(
-								HibernateOrmSearchMappingContributor.class,
-								reference -> beanProvider.getBean( reference, HibernateOrmSearchMappingContributor.class )
+								HibernateOrmSearchMappingConfigurer.class,
+								reference -> beanProvider.getBean( reference, HibernateOrmSearchMappingConfigurer.class )
 						)
 						.build();
-		userMappingContributorProperty.get( propertySource )
-				.ifPresent( userContributor -> userContributor.contribute( this ) );
+		mappingConfigurerProperty.get( propertySource )
+				.ifPresent( configurer -> configurer.configure( this ) );
 
 		super.configure( buildContext, propertySource, configurationCollector );
 	}

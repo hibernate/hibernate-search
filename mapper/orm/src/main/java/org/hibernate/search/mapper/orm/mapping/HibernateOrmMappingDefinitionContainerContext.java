@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
-import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinitionContainerContext;
 
-public interface HibernateOrmMappingDefinition extends PojoMappingDefinition {
+public interface HibernateOrmMappingDefinitionContainerContext extends PojoMappingDefinitionContainerContext {
 }

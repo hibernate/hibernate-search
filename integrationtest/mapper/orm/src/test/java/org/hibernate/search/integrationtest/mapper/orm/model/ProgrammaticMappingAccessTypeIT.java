@@ -20,9 +20,9 @@ import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinition;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
+import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -67,7 +67,7 @@ public class ProgrammaticMappingAccessTypeIT {
 		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withProperty( SearchOrmSettings.MAPPING_CONTRIBUTOR, new MyMappingContributor() )
+				.withProperty( SearchOrmSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
 				.setup(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,
@@ -131,10 +131,10 @@ public class ProgrammaticMappingAccessTypeIT {
 		return null;
 	}
 
-	private class MyMappingContributor implements HibernateOrmSearchMappingContributor {
+	private class MyMappingConfigurer implements HibernateOrmSearchMappingConfigurer {
 		@Override
-		public void contribute(HibernateOrmMappingDefinition definition) {
-			ProgrammaticMappingDefinition mapping = definition.programmaticMapping();
+		public void configure(HibernateOrmMappingDefinitionContainerContext context) {
+			ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.property( "id" ).documentId()

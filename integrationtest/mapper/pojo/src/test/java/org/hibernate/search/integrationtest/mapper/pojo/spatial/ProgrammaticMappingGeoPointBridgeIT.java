@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
@@ -59,7 +59,7 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 							GeoPointOnCustomCoordinatesPropertyEntity.class
 					) );
 
-					ProgrammaticMappingDefinition mappingDefinition = builder.programmaticMapping();
+					ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( GeoPointOnTypeEntity.class )
 							.indexed( GeoPointOnTypeEntity.INDEX )
 							.bridge( new GeoPointBridge.Builder()

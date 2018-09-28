@@ -9,15 +9,16 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
 
 /**
- * A provider of analysis-related definitions that can be referenced from the mapping.
+ * An object responsible for configuring analysis in an Elasticsearch backend,
+ * providing analysis-related definitions that can be referenced from the mapping.
  * <p>
- * Users can select a definition provider through the
- * {@link SearchBackendElasticsearchSettings#ANALYSIS_DEFINITION_PROVIDER configuration properties}.
+ * Users can select an analysis configurer through the
+ * {@link SearchBackendElasticsearchSettings#ANALYSIS_CONFIGURER configuration properties}.
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchAnalysisDefinitionProvider {
+public interface ElasticsearchAnalysisConfigurer {
 
-	void provide(ElasticsearchAnalysisDefinitionContainerContext builder);
+	void configure(ElasticsearchAnalysisDefinitionContainerContext context);
 
 }

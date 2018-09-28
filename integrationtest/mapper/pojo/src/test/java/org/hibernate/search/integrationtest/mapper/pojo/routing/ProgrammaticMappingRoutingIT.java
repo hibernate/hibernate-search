@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinition;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -50,7 +50,7 @@ public class ProgrammaticMappingRoutingIT {
 				.withConfiguration( builder -> {
 					builder.addEntityType( IndexedEntity.class );
 
-					ProgrammaticMappingDefinition mappingDefinition = builder.programmaticMapping();
+					ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( IndexedEntity.class )
 							.indexed( IndexedEntity.INDEX )
 							.routingKeyBridge( MyRoutingKeyBridge.class )

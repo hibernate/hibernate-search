@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 
 import java.util.Set;
 
-public interface AnnotationMappingDefinition {
+public interface AnnotationMappingDefinitionContext {
 
-	AnnotationMappingDefinition add(Class<?> annotatedType);
+	AnnotationMappingDefinitionContext add(Class<?> annotatedType);
 
-	AnnotationMappingDefinition add(Set<Class<?>> annotatedTypes);
+	AnnotationMappingDefinitionContext add(Set<Class<?>> annotatedTypes);
 
 }
