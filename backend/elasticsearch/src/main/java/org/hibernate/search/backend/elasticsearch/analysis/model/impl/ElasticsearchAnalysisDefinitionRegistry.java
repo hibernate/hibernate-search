@@ -6,52 +6,99 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.CharFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.NormalizerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenFilterDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A registry of analysis-related definitions for Elasticsearch.
+ * <p>
+ * This class provides access to the full mapping from names to definitions
+ * (see {@link #getAnalyzerDefinitions} for instance).
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchAnalysisDefinitionRegistry {
+public final class ElasticsearchAnalysisDefinitionRegistry {
 
-	/**
-	 * @param name An analyzer name
-	 * @return The analyzer definition associated with the given name,
-	 * or {@code null} if there isn't any.
-	 */
-	AnalyzerDefinition getAnalyzerDefinition(String name);
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	/**
-	 * @param name A normalizer name
-	 * @return The normalizer definition associated with the given name,
-	 * or {@code null} if there isn't any.
-	 */
-	NormalizerDefinition getNormalizerDefinition(String name);
+	private final Map<String, AnalyzerDefinition> analyzerDefinitions = new TreeMap<>();
+	private final Map<String, NormalizerDefinition> normalizerDefinitions = new TreeMap<>();
+	private final Map<String, TokenizerDefinition> tokenizerDefinitions = new TreeMap<>();
+	private final Map<String, TokenFilterDefinition> tokenFilterDefinitions = new TreeMap<>();
+	private final Map<String, CharFilterDefinition> charFilterDefinitions = new TreeMap<>();
 
-	/**
-	 * @param name A tokenizer name
-	 * @return The tokenizer definition associated with the given name,
-	 * or {@code null} if there isn't any.
-	 */
-	TokenizerDefinition getTokenizerDefinition(String name);
+	private ElasticsearchAnalysisDefinitionRegistry(ElasticsearchAnalysisDefinitionContributor contributor) {
+		contributor.contribute( new ElasticsearchAnalysisDefinitionCollector() {
+			@Override
+			public void collect(String name, AnalyzerDefinition definition) {
+				AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.analyzerNamingConflict( name );
+				}
+			}
 
-	/**
-	 * @param name A token filter name
-	 * @return The token filter definition associated with the given name,
-	 * or {@code null} if there isn't any.
-	 */
-	TokenFilterDefinition getTokenFilterDefinition(String name);
+			@Override
+			public void collect(String name, NormalizerDefinition definition) {
+				NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.normalizerNamingConflict( name );
+				}
+			}
 
-	/**
-	 * @param name A char filter name
-	 * @return The char filter definition associated with the given name,
-	 * or {@code null} if there isn't any.
-	 */
-	CharFilterDefinition getCharFilterDefinition(String name);
+			@Override
+			public void collect(String name, TokenizerDefinition definition) {
+				TokenizerDefinition previous = tokenizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.tokenizerNamingConflict( name );
+				}
+			}
+
+			@Override
+			public void collect(String name, TokenFilterDefinition definition) {
+				TokenFilterDefinition previous = tokenFilterDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.tokenFilterNamingConflict( name );
+				}
+			}
+
+			@Override
+			public void collect(String name, CharFilterDefinition definition) {
+				CharFilterDefinition previous = charFilterDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw LOG.charFilterNamingConflict( name );
+				}
+			}
+		} );
+	}
+
+	public Map<String, AnalyzerDefinition> getAnalyzerDefinitions() {
+		return Collections.unmodifiableMap( analyzerDefinitions );
+	}
+
+	public Map<String, NormalizerDefinition> getNormalizerDefinitions() {
+		return Collections.unmodifiableMap( normalizerDefinitions );
+	}
+
+	public Map<String, TokenizerDefinition> getTokenizerDefinitions() {
+		return Collections.unmodifiableMap( tokenizerDefinitions );
+	}
+
+	public Map<String, TokenFilterDefinition> getTokenFilterDefinitions() {
+		return Collections.unmodifiableMap( tokenFilterDefinitions );
+	}
+
+	public Map<String, CharFilterDefinition> getCharFilterDefinitions() {
+		return Collections.unmodifiableMap( charFilterDefinitions );
+	}
 
 }

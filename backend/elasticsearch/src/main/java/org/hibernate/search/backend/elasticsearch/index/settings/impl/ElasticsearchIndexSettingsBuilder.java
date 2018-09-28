@@ -8,16 +8,16 @@ package org.hibernate.search.backend.elasticsearch.index.settings.impl;
 
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.Analysis;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.SimpleElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 
 /**
  * @author Yoann Rodiere
  */
 public class ElasticsearchIndexSettingsBuilder {
 
-	private final SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	public ElasticsearchIndexSettingsBuilder(SimpleElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+	public ElasticsearchIndexSettingsBuilder(ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 

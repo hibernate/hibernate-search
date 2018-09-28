@@ -6,28 +6,64 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A registry of analysis-related definitions for Lucene.
  *
  * @author Yoann Rodiere
  */
-public interface LuceneAnalysisDefinitionRegistry {
+public final class LuceneAnalysisDefinitionRegistry {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final Map<String, AnalyzerDef> analyzerDefinitions = new TreeMap<>();
+
+	private final Map<String, NormalizerDef> normalizerDefinitions = new TreeMap<>();
+
+	public LuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
+		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
+			@Override
+			public void collect(String name, AnalyzerDef definition) {
+				AnalyzerDef previous = analyzerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw log.analyzerDefinitionNamingConflict( name );
+				}
+			}
+
+			@Override
+			public void collect(String name, NormalizerDef definition) {
+				NormalizerDef previous = normalizerDefinitions.putIfAbsent( name, definition );
+				if ( previous != null && previous != definition ) {
+					throw log.normalizerDefinitionNamingConflict( name );
+				}
+			}
+		} );
+	}
 
 	/**
 	 * @param name An analyzer name
 	 * @return The analyzer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
-	AnalyzerDef getAnalyzerDefinition(String name);
+	public AnalyzerDef getAnalyzerDefinition(String name) {
+		return analyzerDefinitions.get( name );
+	}
 
 	/**
 	 * @param name A normalizer name
 	 * @return The normalizer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
-	NormalizerDef getNormalizerDefinition(String name);
+	public NormalizerDef getNormalizerDefinition(String name) {
+		return normalizerDefinitions.get( name );
+	}
 
 }
