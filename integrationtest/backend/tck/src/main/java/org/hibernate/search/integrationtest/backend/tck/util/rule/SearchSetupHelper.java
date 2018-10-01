@@ -62,21 +62,23 @@ public class SearchSetupHelper implements TestRule {
 	}
 
 	public SetupContext withDefaultConfiguration() {
-		return withDefaultConfiguration( "testedBackend" );
+		return withConfiguration( null );
 	}
 
 	public SetupContext withDefaultConfiguration(String backendName) {
-		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId ).withPrefix( "backend." + backendName );
-		return new SetupContext( propertySource )
-				.withProperty( "index.default.backend", backendName );
+		return withConfiguration( null, backendName );
 	}
 
-	public SetupContext withMultiTenancyConfiguration() {
+	public SetupContext withConfiguration(String configurationId) {
+		return withConfiguration( configurationId, "testedBackend" );
+	}
+
+	public SetupContext withConfiguration(String configurationId, String backendName) {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getMultiTenancyBackendProperties( testId ).withPrefix( "backend.testedBackend" );
+		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId, configurationId )
+				.withPrefix( "backend." + backendName );
 		return new SetupContext( propertySource )
-				.withProperty( "index.default.backend", "testedBackend" );
+				.withProperty( "index.default.backend", backendName );
 	}
 
 	public class SetupContext {

@@ -35,6 +35,8 @@ import org.junit.rules.ExpectedException;
 
 public class MultiTenancyIT {
 
+	public static final String CONFIGURATION_ID = "multi-tenancy";
+
 	private static final String INDEX_NAME = "IndexName";
 
 	private static final String TENANT_1 = "tenant_1";
@@ -70,7 +72,7 @@ public class MultiTenancyIT {
 
 	@Before
 	public void setup() {
-		setupHelper.withMultiTenancyConfiguration()
+		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						"MappedType", INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),

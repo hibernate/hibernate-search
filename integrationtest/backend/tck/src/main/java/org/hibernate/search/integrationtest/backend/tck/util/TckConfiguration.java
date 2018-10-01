@@ -14,18 +14,20 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.ServiceLoader;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 /**
  * Allows to run the tests with different backends depending on the content of the property file at
- * {@value PROPERTIES_PATH} in the classpath.
+ * {@value DEFAULT_PROPERTIES_PATH} in the classpath.
  */
 public final class TckConfiguration {
 
-	private static final String PROPERTIES_PATH = "/backend-tck.properties";
+	private static final String DEFAULT_PROPERTIES_PATH = "/backend-tck.properties";
 
-	private static final String MULTI_TENANCY_PROPERTIES_PATH = "/backend-tck-multi-tenancy.properties";
+	private static final Function<String, String> SPECIFIC_PROPERTIES_PATH_FUNCTION =
+			configurationId -> "/backend-tck-" + configurationId + ".properties";
 
 	private static TckConfiguration instance;
 
@@ -60,12 +62,12 @@ public final class TckConfiguration {
 		return backendFeatures;
 	}
 
-	public ConfigurationPropertySource getBackendProperties(String testId) {
-		return getPropertySourceFromFile( PROPERTIES_PATH, testId );
-	}
-
-	public ConfigurationPropertySource getMultiTenancyBackendProperties(String testId) {
-		return getPropertySourceFromFile( MULTI_TENANCY_PROPERTIES_PATH, testId );
+	public ConfigurationPropertySource getBackendProperties(String testId, String configurationId) {
+		String propertiesPath =
+				configurationId == null
+						? DEFAULT_PROPERTIES_PATH
+						: SPECIFIC_PROPERTIES_PATH_FUNCTION.apply( configurationId );
+		return getPropertySourceFromFile( propertiesPath, testId );
 	}
 
 	private ConfigurationPropertySource getPropertySourceFromFile(String propertyFilePath, String testId) {
