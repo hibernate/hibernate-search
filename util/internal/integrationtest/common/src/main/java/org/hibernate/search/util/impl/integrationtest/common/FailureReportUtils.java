@@ -43,7 +43,9 @@ public final class FailureReportUtils {
 		return throwable -> {
 			Assertions.assertThat( throwable )
 					.isInstanceOf( SearchException.class );
-			Assertions.assertThat( ( (SearchException) throwable ).getContext().getElements() )
+			EventContext actualContext = ( (SearchException) throwable ).getContext();
+			Assertions.assertThat( actualContext ).as( "throwable.getContext()" ).isNotNull();
+			Assertions.assertThat( actualContext.getElements() )
 					.containsExactly( contextElements );
 			String renderedContextElements = Arrays.stream( contextElements ).map( EventContextElement::render )
 					.collect( Collectors.joining( ", " ) );

@@ -477,6 +477,27 @@ public class DocumentModelDslIT {
 	}
 
 	@Test
+	public void analyzerAndNormalizer() {
+		SubTest.expectException(
+				"Setting an analyzer and a normalizer on the same field",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field( "myField" ).asString()
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
+							.createAccessor();
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Cannot apply both an analyzer and a normalizer" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+				) );
+	}
+
+	@Test
 	public void missingCreateAccessorCall() {
 		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
