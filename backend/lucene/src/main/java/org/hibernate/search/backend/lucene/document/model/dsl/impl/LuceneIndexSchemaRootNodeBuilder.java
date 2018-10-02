@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -14,12 +15,15 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder, LuceneRootIndexSchemaContributor {
+		implements IndexSchemaRootNodeBuilder, LuceneRootIndexSchemaContributor, LuceneIndexSchemaRootContext {
 
 	private final String indexName;
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	public LuceneIndexSchemaRootNodeBuilder(String indexName) {
+	public LuceneIndexSchemaRootNodeBuilder(String indexName,
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.indexName = indexName;
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
 	@Override
@@ -41,7 +45,12 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
+		return analysisDefinitionRegistry;
+	}
+
+	@Override
+	public LuceneIndexSchemaRootNodeBuilder getRoot() {
 		return this;
 	}
 

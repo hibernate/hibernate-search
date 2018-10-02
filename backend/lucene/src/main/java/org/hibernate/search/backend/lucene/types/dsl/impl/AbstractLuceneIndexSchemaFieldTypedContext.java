@@ -8,11 +8,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.analysis.Analyzer;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -31,14 +30,17 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final LuceneIndexSchemaContext schemaContext;
+
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
 	private final String relativeFieldName;
 
 	private Store store;
 
-	protected AbstractLuceneIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, String relativeFieldName,
+	protected AbstractLuceneIndexSchemaFieldTypedContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> fieldType) {
+		this.schemaContext = schemaContext;
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
 		this.relativeFieldName = relativeFieldName;
 	}
@@ -94,15 +96,7 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 		return store;
 	}
 
-	protected Analyzer getAnalyzer() {
-		return null;
-	}
-
-	protected Analyzer getNormalizer() {
-		return null;
-	}
-
-	protected final IndexSchemaContext getSchemaContext() {
-		return helper.getSchemaContext();
+	protected final LuceneIndexSchemaContext getSchemaContext() {
+		return schemaContext;
 	}
 }

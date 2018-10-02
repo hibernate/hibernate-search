@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -40,6 +42,8 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final DirectoryProvider directoryProvider;
 
+	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -48,9 +52,12 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	private final SearchBackendContext searchContext;
 
 	LuceneBackendImpl(String name, DirectoryProvider directoryProvider, LuceneWorkFactory workFactory,
+			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.name = name;
 		this.directoryProvider = directoryProvider;
+
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
 		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -87,6 +94,12 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 			throw log.multiTenancyRequiredButNotSupportedByBackend( indexName, eventContext );
 		}
 
+		LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
+				new LuceneIndexSchemaRootNodeBuilder(
+						indexName,
+						analysisDefinitionRegistry
+				);
+
 		/*
 		 * We do not normalize index names: directory providers are expected to use the exact given index name,
 		 * or a reversible conversion of that name, as an internal key (file names, ...),
@@ -94,7 +107,8 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		 */
 		return new LuceneIndexManagerBuilder(
 				indexingContext, searchContext,
-				indexName, context, propertySource
+				indexName, indexSchemaRootNodeBuilder,
+				context, propertySource
 		);
 	}
 

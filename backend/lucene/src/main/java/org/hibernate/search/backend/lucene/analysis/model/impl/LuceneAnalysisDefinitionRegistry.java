@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -24,11 +25,19 @@ public final class LuceneAnalysisDefinitionRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<String, Analyzer> analyzerDefinitions = new TreeMap<>();
+	private final Map<String, Analyzer> analyzerDefinitions;
 
-	private final Map<String, Analyzer> normalizerDefinitions = new TreeMap<>();
+	private final Map<String, Analyzer> normalizerDefinitions;
+
+	public LuceneAnalysisDefinitionRegistry() {
+		// Nothing to do: we're creating an empty registry
+		analyzerDefinitions = Collections.emptyMap();
+		normalizerDefinitions = Collections.emptyMap();
+	}
 
 	public LuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
+		analyzerDefinitions = new TreeMap<>();
+		normalizerDefinitions = new TreeMap<>();
 		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
 			@Override
 			public void collectAnalyzer(String name, Analyzer analyzer) {

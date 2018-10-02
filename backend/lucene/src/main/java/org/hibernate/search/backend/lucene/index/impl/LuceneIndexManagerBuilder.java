@@ -46,11 +46,12 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 	public LuceneIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName,
+			LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.indexName = indexName;
-		this.schemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder( indexName );
+		this.schemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 		this.buildContext = buildContext;
 		this.propertySource = propertySource;
 	}

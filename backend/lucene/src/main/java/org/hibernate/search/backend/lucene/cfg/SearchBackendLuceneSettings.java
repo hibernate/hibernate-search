@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import org.apache.lucene.util.Version;
+
 /**
  * Configuration properties for Lucene,
  */
@@ -13,6 +15,11 @@ public final class SearchBackendLuceneSettings {
 
 	private SearchBackendLuceneSettings() {
 	}
+
+	/**
+	 * The Lucene match version parameter. Highly recommended since Lucene 3.
+	 */
+	public static final String LUCENE_VERSION = "lucene_version";
 
 	public static final String LUCENE_DIRECTORY_PROVIDER = "lucene.directory_provider";
 
@@ -29,6 +36,14 @@ public final class SearchBackendLuceneSettings {
 
 		private Defaults() {
 		}
+
+		/**
+		 * If nothing else is specified we use {@code Version.LATEST} as the default Lucene version. This version
+		 * parameter was introduced by Lucene to attempt providing backwards compatibility when upgrading Lucene versions
+		 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you
+		 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
+		 */
+		public static final Version LUCENE_VERSION = Version.LATEST;
 
 		public static final MultiTenancyStrategyConfiguration MULTI_TENANCY_STRATEGY = MultiTenancyStrategyConfiguration.NONE;
 	}

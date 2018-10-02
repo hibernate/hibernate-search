@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
@@ -34,7 +33,7 @@ import org.hibernate.search.util.impl.common.Contracts;
  * @author Guillaume Smet
  */
 class LuceneIndexSchemaFieldContextImpl
-		implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor, IndexSchemaContext {
+		implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor, LuceneIndexSchemaContext {
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
@@ -107,8 +106,13 @@ class LuceneIndexSchemaFieldContextImpl
 
 	@Override
 	public EventContext getEventContext() {
-		return parent.getRootNodeBuilder().getIndexEventContext()
+		return getRoot().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	}
+
+	@Override
+	public LuceneIndexSchemaRootNodeBuilder getRoot() {
+		return parent.getRoot();
 	}
 
 	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {
@@ -118,5 +122,4 @@ class LuceneIndexSchemaFieldContextImpl
 		delegate = context;
 		return context;
 	}
-
 }

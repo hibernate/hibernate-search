@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
@@ -25,7 +25,7 @@ public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFie
 
 	private Sortable sortable;
 
-	public IntegerIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public IntegerIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, Integer.class );
 	}
 

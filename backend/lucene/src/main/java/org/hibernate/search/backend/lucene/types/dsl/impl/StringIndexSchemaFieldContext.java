@@ -6,13 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.QueryBuilder;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
@@ -25,22 +28,40 @@ import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortContributor;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
 public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<String> {
 
-	private static final Analyzer STANDARD_ANALYZER = new StandardAnalyzer();
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private Analyzer analyzer;
+	private Analyzer normalizer;
 
 	private Sortable sortable;
 
-	private Analyzer analyzer;
-
-	private Analyzer normalizer;
-
-	public StringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public StringIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, String.class );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
+		if ( analyzer == null ) {
+			throw log.unknownAnalyzer( analyzerName, getSchemaContext().getEventContext() );
+		}
+		return this;
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
+		if ( normalizer == null ) {
+			throw log.unknownNormalizer( normalizerName, getSchemaContext().getEventContext() );
+		}
+		return this;
 	}
 
 	@Override
@@ -53,9 +74,13 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		// TODO For now, we allow the sortable - analyzed combination, it will be disallowed later
-//		if ( Sortable.YES.equals( getSortable() ) && getAnalyzer() != null ) {
+//		if ( Sortable.YES.equals( getSortable() ) && analyzer != null ) {
 //			throw log.cannotUseAnalyzerOnSortableField( getRelativeFieldName() );
 //		}
+
+		if ( analyzer != null && normalizer != null ) {
+			throw log.cannotApplyAnalyzerAndNormalizer( getSchemaContext().getEventContext() );
+		}
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
@@ -88,28 +113,8 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 		}
 	}
 
-	@Override
-	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
-		if ( !"default".equals( analyzerName ) ) {
-			throw new UnsupportedOperationException( "For now, only the default analyzer is supported by the Lucene backend." );
-		}
-		this.analyzer = STANDARD_ANALYZER;
-		return this;
-	}
-
-	@Override
-	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
-		throw new UnsupportedOperationException( "For now, normalizers are not supported by the Lucene backend." );
-	}
-
-	@Override
-	protected Analyzer getAnalyzer() {
-		return analyzer;
-	}
-
-	@Override
-	protected Analyzer getNormalizer() {
-		return normalizer;
+	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
+		return getSchemaContext().getRoot().getAnalysisDefinitionRegistry();
 	}
 
 	private static FieldType getFieldType(Store store, boolean analyzed) {
@@ -126,7 +131,12 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 		else {
 			fieldType.setOmitNorms( true );
 			fieldType.setIndexOptions( IndexOptions.DOCS );
-			fieldType.setTokenized( false );
+			/*
+			 * Note that the name "tokenized" is misleading: it actually means "should the analyzer (or normalizer) be applied".
+			 * When it's false, the analyzer/normalizer is completely ignored, not just tokenization.
+			 * Thus it should be true even when just using a normalizer.
+			 */
+			fieldType.setTokenized( true );
 		}
 		fieldType.setStored( Store.YES.equals( store ) );
 		fieldType.freeze();
