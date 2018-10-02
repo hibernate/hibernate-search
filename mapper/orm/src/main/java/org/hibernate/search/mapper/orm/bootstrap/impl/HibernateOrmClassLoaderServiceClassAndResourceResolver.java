@@ -13,7 +13,8 @@ import java.util.Map;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
 /**
  * An implementation of {@link ClassResolver} which delegates to the ORM-provided {@code ClassResolver}.
@@ -21,7 +22,7 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolve
  *
  * @author Hardy Ferentschik
  */
-final class HibernateOrmClassLoaderServiceClassResolver implements ClassResolver {
+final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements ClassResolver, ResourceResolver {
 	/**
 	 * {@code ClassResolver] as provided by Hibernate ORM. This is the class loader which we attempt to use first.
 	 */
@@ -31,12 +32,12 @@ final class HibernateOrmClassLoaderServiceClassResolver implements ClassResolver
 	 * A Search internal class loader service which in particular tries to use the current class loader. This can be
 	 * necessary in case the ORM class loader can due to modularity not access the required resources
 	 */
-	private final ClassResolver internalClassResolver;
+	private final DefaultClassAndResourceResolver internalClassResolver;
 
 
-	HibernateOrmClassLoaderServiceClassResolver(org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+	HibernateOrmClassLoaderServiceClassAndResourceResolver(org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
-		this.internalClassResolver = new DefaultClassResolver();
+		this.internalClassResolver = new DefaultClassAndResourceResolver();
 	}
 
 	@Override

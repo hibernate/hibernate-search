@@ -145,11 +145,12 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
-			HibernateOrmClassLoaderServiceClassResolver classResolver =
-					new HibernateOrmClassLoaderServiceClassResolver( hibernateOrmClassLoaderService );
-			builder.setClassResolver( classResolver );
+			HibernateOrmClassLoaderServiceClassAndResourceResolver classAndResourceResolver =
+					new HibernateOrmClassLoaderServiceClassAndResourceResolver( hibernateOrmClassLoaderService );
+			builder.setClassResolver( classAndResourceResolver );
+			builder.setResourceResolver( classAndResourceResolver );
 
-			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classResolver );
+			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classAndResourceResolver );
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
 				if ( beanContainer != null ) {

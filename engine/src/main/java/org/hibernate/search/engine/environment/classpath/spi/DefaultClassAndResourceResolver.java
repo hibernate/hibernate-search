@@ -19,18 +19,18 @@ import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoa
  *
  * @author Hardy Ferentschik
  */
-public final class DefaultClassResolver implements ClassResolver {
+public final class DefaultClassAndResourceResolver implements ClassResolver, ResourceResolver {
 
 	private AggregatedClassLoader aggregatedClassLoader;
 
 	/**
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
 	 */
-	public DefaultClassResolver() {
+	public DefaultClassAndResourceResolver() {
 		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
 
 		//  adding known class-loaders...
-		orderedClassLoaderSet.add( DefaultClassResolver.class.getClassLoader() );
+		orderedClassLoaderSet.add( DefaultClassAndResourceResolver.class.getClassLoader() );
 
 		// then the TCCL, if one...
 		final ClassLoader tccl = locateTCCL();

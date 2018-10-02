@@ -9,6 +9,7 @@ package org.hibernate.search.engine.environment.service.spi;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 
 /**
  * @author Yoann Rodiere
@@ -16,6 +17,8 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 public interface ServiceManager {
 
 	ClassResolver getClassResolver();
+
+	ResourceResolver getResourceResolver();
 
 	BeanProvider getBeanProvider();
 
