@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.engine.environment.classpath.spi;
 
-import java.io.InputStream;
-import java.net.URL;
-
 import org.hibernate.search.engine.environment.service.spi.Service;
 
 /**
@@ -29,24 +26,6 @@ public interface ClassResolver {
 	 * @throws ClassLoadingException Indicates the class could not be found
 	 */
 	<T> Class<T> classForName(String className);
-
-	/**
-	 * Locate a resource by name (classpath lookup).
-	 *
-	 * @param name The resource name.
-	 *
-	 * @return The located URL; may return {@code null} to indicate the resource was not found
-	 */
-	URL locateResource(String name);
-
-	/**
-	 * Locate a resource by name (classpath lookup) and gets its stream.
-	 *
-	 * @param name The resource name.
-	 *
-	 * @return The stream of the located resource; may return {@code null} to indicate the resource was not found
-	 */
-	InputStream locateResourceStream(String name);
 
 	/**
 	 * Discovers and instantiates implementations of the named service contract.

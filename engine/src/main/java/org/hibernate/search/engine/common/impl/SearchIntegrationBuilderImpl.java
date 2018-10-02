@@ -29,8 +29,9 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.impl.BeanProviderImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassAndResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.environment.service.impl.ServiceManagerImpl;
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -64,6 +65,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private ClassResolver classResolver;
+	private ResourceResolver resourceResolver;
 	private BeanResolver beanResolver;
 	private boolean frozen = false;
 
@@ -74,6 +76,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	@Override
 	public SearchIntegrationBuilder setClassResolver(ClassResolver classResolver) {
 		this.classResolver = classResolver;
+		return this;
+	}
+
+	@Override
+	public SearchIntegrationBuilder setResourceResolver(ResourceResolver resourceResolver) {
+		this.resourceResolver = resourceResolver;
 		return this;
 	}
 
@@ -130,8 +138,18 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		try {
 			frozen = true;
 
+			DefaultClassAndResourceResolver defaultClassAndResourceResolver = null;
+
 			if ( classResolver == null ) {
-				classResolver = new DefaultClassResolver();
+				defaultClassAndResourceResolver = new DefaultClassAndResourceResolver();
+				classResolver = defaultClassAndResourceResolver;
+			}
+
+			if ( resourceResolver == null ) {
+				if ( defaultClassAndResourceResolver == null ) {
+					defaultClassAndResourceResolver = new DefaultClassAndResourceResolver();
+				}
+				resourceResolver = defaultClassAndResourceResolver;
 			}
 
 			if ( beanResolver == null ) {
@@ -139,7 +157,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
-			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, beanProvider );
+			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
 			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
 			ConfigurationPropertySource propertySource;
