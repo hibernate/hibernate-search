@@ -54,21 +54,26 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 35, value = "Could not close resource.")
+	@Message(id = ID_OFFSET_1 + 35,
+			value = "Could not close resource.")
 	void couldNotCloseResource(@Cause Exception e);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 55, value = "Unable to close the index reader. %1$s")
+	@Message(id = ID_OFFSET_1 + 55,
+			value = "Unable to close the index reader. %1$s")
 	void unableToCloseIndexReader(@FormatWith(EventContextFormatter.class) EventContext context, @Cause Exception e);
 
-	@Message(id = 284, value = "An IOException happened while opening multiple indexes." )
+	@Message(id = ID_OFFSET_1 + 284,
+			value = "An IOException happened while opening multiple indexes." )
 	SearchException ioExceptionOnMultiReaderRefresh(@Param EventContext context, @Cause IOException e);
 
-	@Message(id = 320, value = "Could not normalize value for field '%1$s'.")
+	@Message(id = ID_OFFSET_1 + 320,
+			value = "Could not normalize value for field '%1$s'.")
 	SearchException couldNotNormalizeField(String absoluteFieldPath, @Cause Exception cause);
 
 	@LogMessage(level = Level.WARN)
-	@Message(id = 321, value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
+	@Message(id = ID_OFFSET_1 + 321,
+			value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
 			+ " (synonyms) should not be used on sortable fields or range queries. Only the first token will be considered.")
 	void multipleTermsDetectedDuringNormalization(String absoluteFieldPath);
 
