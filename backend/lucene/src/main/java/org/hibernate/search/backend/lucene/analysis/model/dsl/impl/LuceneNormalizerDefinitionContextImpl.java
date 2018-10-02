@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
 import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalyzerFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCharFilterDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
@@ -19,6 +20,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.C
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenFilterDef;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
@@ -65,13 +67,15 @@ public class LuceneNormalizerDefinitionContextImpl implements LuceneNormalizerDe
 		return filter;
 	}
 
-	public NormalizerDef build() {
+	public Analyzer build(LuceneAnalyzerFactory factory) {
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( NormalizerDef.class );
 		descriptor.setValue( "name", name );
 
 		descriptor.setValue( "charFilters", LuceneAnalysisDefinitionUtils.buildAll( charFilters, CharFilterDef[]::new ) );
 		descriptor.setValue( "filters", LuceneAnalysisDefinitionUtils.buildAll( tokenFilters, TokenFilterDef[]::new ) );
-		return AnnotationFactory.create( descriptor );
+
+		NormalizerDef definition = AnnotationFactory.create( descriptor );
+		return factory.createNormalizer( definition );
 	}
 
 }

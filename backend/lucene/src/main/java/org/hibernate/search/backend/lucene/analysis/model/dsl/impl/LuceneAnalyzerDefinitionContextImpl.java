@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
 import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalyzerFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCharFilterDefinitionContext;
@@ -20,6 +21,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.A
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.CharFilterDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenFilterDef;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
@@ -82,14 +84,16 @@ public class LuceneAnalyzerDefinitionContextImpl
 		return filter;
 	}
 
-	public AnalyzerDef build() {
+	public Analyzer build(LuceneAnalyzerFactory factory) {
 		AnnotationDescriptor descriptor = new AnnotationDescriptor( AnalyzerDef.class );
 		descriptor.setValue( "name", name );
 		descriptor.setValue( "tokenizer", tokenizer.build() );
 
 		descriptor.setValue( "charFilters", LuceneAnalysisDefinitionUtils.buildAll( charFilters, CharFilterDef[]::new ) );
 		descriptor.setValue( "filters", LuceneAnalysisDefinitionUtils.buildAll( tokenFilters, TokenFilterDef[]::new ) );
-		return AnnotationFactory.create( descriptor );
+
+		AnalyzerDef definition = AnnotationFactory.create( descriptor );
+		return factory.createAnalyzer( definition );
 	}
 
 }

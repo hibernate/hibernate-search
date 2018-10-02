@@ -6,26 +6,26 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
 import org.hibernate.search.util.SearchException;
+
+import org.apache.lucene.analysis.Analyzer;
 
 public interface LuceneAnalysisDefinitionCollector {
 
 	/**
 	 * Collect an analyzer definition.
 	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
+	 * @param analyzer The analyzer to be registered.
 	 * @throws SearchException if the name is already associated with a different definition.
 	 */
-	void collect(String name, AnalyzerDef definition);
+	void collectAnalyzer(String name, Analyzer analyzer);
 
 	/**
 	 * Collect a normalizer definition.
 	 * @param name The name of the definition to be registered.
-	 * @param definition The definition to be registered.
+	 * @param normalizer The normalizer to be registered.
 	 * @throws SearchException if the name is already associated with a different definition.
 	 */
-	void collect(String name, NormalizerDef definition);
+	void collectNormalizer(String name, Analyzer normalizer);
 
 }

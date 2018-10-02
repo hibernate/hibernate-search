@@ -10,10 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.NormalizerDef;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.analysis.Analyzer;
 
 /**
  * A registry of analysis-related definitions for Lucene.
@@ -24,24 +24,24 @@ public final class LuceneAnalysisDefinitionRegistry {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<String, AnalyzerDef> analyzerDefinitions = new TreeMap<>();
+	private final Map<String, Analyzer> analyzerDefinitions = new TreeMap<>();
 
-	private final Map<String, NormalizerDef> normalizerDefinitions = new TreeMap<>();
+	private final Map<String, Analyzer> normalizerDefinitions = new TreeMap<>();
 
 	public LuceneAnalysisDefinitionRegistry(LuceneAnalysisDefinitionContributor contributor) {
 		contributor.contribute( new LuceneAnalysisDefinitionCollector() {
 			@Override
-			public void collect(String name, AnalyzerDef definition) {
-				AnalyzerDef previous = analyzerDefinitions.putIfAbsent( name, definition );
-				if ( previous != null && previous != definition ) {
+			public void collectAnalyzer(String name, Analyzer analyzer) {
+				Analyzer previous = analyzerDefinitions.putIfAbsent( name, analyzer );
+				if ( previous != null && previous != analyzer ) {
 					throw log.analyzerDefinitionNamingConflict( name );
 				}
 			}
 
 			@Override
-			public void collect(String name, NormalizerDef definition) {
-				NormalizerDef previous = normalizerDefinitions.putIfAbsent( name, definition );
-				if ( previous != null && previous != definition ) {
+			public void collectNormalizer(String name, Analyzer normalizer) {
+				Analyzer previous = normalizerDefinitions.putIfAbsent( name, normalizer );
+				if ( previous != null && previous != normalizer ) {
 					throw log.normalizerDefinitionNamingConflict( name );
 				}
 			}
@@ -53,7 +53,7 @@ public final class LuceneAnalysisDefinitionRegistry {
 	 * @return The analyzer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
-	public AnalyzerDef getAnalyzerDefinition(String name) {
+	public Analyzer getAnalyzerDefinition(String name) {
 		return analyzerDefinitions.get( name );
 	}
 
@@ -62,7 +62,7 @@ public final class LuceneAnalysisDefinitionRegistry {
 	 * @return The normalizer definition associated with the given name,
 	 * or {@code null} if there isn't any.
 	 */
-	public NormalizerDef getNormalizerDefinition(String name) {
+	public Analyzer getNormalizerDefinition(String name) {
 		return normalizerDefinitions.get( name );
 	}
 

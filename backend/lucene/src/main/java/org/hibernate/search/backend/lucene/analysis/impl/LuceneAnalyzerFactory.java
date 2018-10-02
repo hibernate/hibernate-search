@@ -15,14 +15,12 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.N
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.Parameter;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenFilterDef;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenizerDef;
-import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.util.SearchException;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordTokenizer;
 import org.apache.lucene.analysis.core.KeywordTokenizerFactory;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.ResourceLoader;
@@ -37,7 +35,7 @@ import org.apache.lucene.util.Version;
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-final class LuceneAnalyzerFactory {
+public final class LuceneAnalyzerFactory {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
@@ -47,73 +45,39 @@ final class LuceneAnalyzerFactory {
 
 	private final ResourceLoader resourceLoader;
 
-	private final LuceneAnalysisDefinitionRegistry definitionRegistry;
-
 	public LuceneAnalyzerFactory(Version luceneMatchVersion,
-			ClassResolver classResolver, ResourceResolver resourceResolver,
-			LuceneAnalysisDefinitionRegistry definitionRegistry) {
+			ClassResolver classResolver, ResourceResolver resourceResolver) {
 		super();
 		this.luceneMatchVersion = luceneMatchVersion;
 		this.resourceLoader = new HibernateSearchResourceLoader( classResolver, resourceResolver );
-		this.definitionRegistry = definitionRegistry;
 	}
 
-	/**
-	 * Create a Lucene {@link Analyzer} for the given analyzer name.
-	 *
-	 * @param name The name of the definition, which should match the name defined in an {@code AnalyzerDef} annotation
-	 * as found in the annotated domain class.
-	 * @return a Lucene {@code Analyzer}
-	 */
-	public Analyzer createAnalyzer(String name) {
-		AnalyzerDef analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
-		if ( analyzerDefinition == null ) {
-			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
-		}
+	public Analyzer createAnalyzer(AnalyzerDef analyzerDef) {
 		try {
-			return createAnalyzer( analyzerDefinition );
+			TokenizerDef tokenizer = analyzerDef.tokenizer();
+			TokenizerFactory tokenizerFactory = createAnalysisComponent(
+					TokenizerFactory.class, tokenizer.factory(), tokenizer.params() );
+
+			return createAnalyzer( tokenizerFactory, analyzerDef.charFilters(), analyzerDef.filters() );
 		}
 		catch (IOException e) {
-			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDefinition, e );
+			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDef, e );
 		}
 	}
 
-	/**
-	 * Create a Lucene {@link Analyzer} for the given normalizer name.
-	 *
-	 * @param name The name of the definition, which should match the name defined in a {@code NormalizerDef} annotation
-	 * as found in the annotated domain class.
-	 * @return a Lucene {@code Analyzer} with a {@link KeywordTokenizer}, but otherwise matching the the matching {@link NormalizerDef}.
-	 */
-	public Analyzer createNormalizer(String name) {
-		NormalizerDef definition = definitionRegistry.getNormalizerDefinition( name );
-		if ( definition == null ) {
-			throw new SearchException( "Lucene normalizer found with an unknown definition: " + name );
-		}
+	public Analyzer createNormalizer(NormalizerDef normalizerDef) {
 		try {
-			return createNormalizer( definition );
+			TokenizerFactory tokenizerFactory = createAnalysisComponent( TokenizerFactory.class,
+					KeywordTokenizerFactory.class, EMPTY_PARAMETERS );
+
+			Analyzer normalizer = createAnalyzer(
+					tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
+
+			return new HibernateSearchNormalizerWrapper( normalizer, normalizerDef.name() );
 		}
 		catch (IOException e) {
-			throw new SearchException( "Could not initialize normalizer definition " + definition, e );
+			throw new SearchException( "Could not initialize Normalizer definition " + normalizerDef, e );
 		}
-	}
-
-	private Analyzer createAnalyzer(AnalyzerDef analyzerDef) throws IOException {
-		TokenizerDef tokenizer = analyzerDef.tokenizer();
-		TokenizerFactory tokenizerFactory = createAnalysisComponent(
-				TokenizerFactory.class, tokenizer.factory(), tokenizer.params() );
-
-		return createAnalyzer( tokenizerFactory, analyzerDef.charFilters(), analyzerDef.filters() );
-	}
-
-	private Analyzer createNormalizer(NormalizerDef normalizerDef) throws IOException {
-		TokenizerFactory tokenizerFactory = createAnalysisComponent( TokenizerFactory.class,
-				KeywordTokenizerFactory.class, EMPTY_PARAMETERS );
-
-		Analyzer normalizer = createAnalyzer(
-				tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
-
-		return new HibernateSearchNormalizerWrapper( normalizer, normalizerDef.name() );
 	}
 
 	private Analyzer createAnalyzer(TokenizerFactory tokenizerFactory,

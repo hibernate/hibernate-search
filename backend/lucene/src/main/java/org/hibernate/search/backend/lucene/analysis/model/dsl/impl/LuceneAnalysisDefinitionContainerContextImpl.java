@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalyzerFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
@@ -27,9 +28,15 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final LuceneAnalyzerFactory factory;
+
 	private Map<String, LuceneAnalyzerDefinitionContextImpl> analyzerDefinitions = new LinkedHashMap<>();
 
 	private Map<String, LuceneNormalizerDefinitionContextImpl> normalizerDefinitions = new LinkedHashMap<>();
+
+	public LuceneAnalysisDefinitionContainerContextImpl(LuceneAnalyzerFactory factory) {
+		this.factory = factory;
+	}
 
 	@Override
 	public LuceneAnalyzerDefinitionContext analyzer(String name) {
@@ -54,10 +61,10 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 	@Override
 	public void contribute(LuceneAnalysisDefinitionCollector collector) {
 		for ( Map.Entry<String, LuceneAnalyzerDefinitionContextImpl> entry : analyzerDefinitions.entrySet() ) {
-			collector.collect( entry.getKey(), entry.getValue().build() );
+			collector.collectAnalyzer( entry.getKey(), entry.getValue().build( factory ) );
 		}
 		for ( Map.Entry<String, LuceneNormalizerDefinitionContextImpl> entry : normalizerDefinitions.entrySet() ) {
-			collector.collect( entry.getKey(), entry.getValue().build() );
+			collector.collectNormalizer( entry.getKey(), entry.getValue().build( factory ) );
 		}
 	}
 
