@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
@@ -49,7 +50,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final ConfigurationPropertySource propertySource;
 	private final UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource;
 	private final JndiService namingService;
-	private final ClassLoaderService classLoaderService;
+	private final ClassLoaderService hibernateOrmClassLoaderService;
 	private final EnvironmentSynchronizer environmentSynchronizer;
 	private final ManagedBeanRegistry managedBeanRegistry;
 	private final FullTextIndexEventListener listener;
@@ -68,7 +69,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			ConfigurationPropertySource propertySource,
 			UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource,
 			FullTextIndexEventListener listener,
-			ClassLoaderService classLoaderService,
+			ClassLoaderService hibernateOrmClassLoaderService,
 			EnvironmentSynchronizer environmentSynchronizer,
 			ManagedBeanRegistry managedBeanRegistry,
 			JndiService namingService) {
@@ -76,7 +77,8 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		this.propertySource = propertySource;
 		this.unusedPropertyTrackingPropertySource = unusedPropertyTrackingPropertySource;
 		this.listener = listener;
-		this.classLoaderService = classLoaderService;
+		Contracts.assertNotNull( hibernateOrmClassLoaderService, "Hibernate ORM ClassLoaderService" );
+		this.hibernateOrmClassLoaderService = hibernateOrmClassLoaderService;
 		this.environmentSynchronizer = environmentSynchronizer;
 		this.managedBeanRegistry = managedBeanRegistry;
 		this.namingService = namingService;
@@ -143,6 +145,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
+			DelegatingClassLoaderService classLoaderService =
+					new DelegatingClassLoaderService( hibernateOrmClassLoaderService );
+			builder.setClassLoaderService( classLoaderService );
+
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
 				if ( beanContainer != null ) {
@@ -157,7 +163,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			builder.setBeanResolver( beanResolver );
 
 			// TODO namingService (JMX)
-			// TODO ClassLoaderService
 
 			SearchIntegration integration = builder.build();
 			HibernateOrmMapping mapping = integration.getMapping( mappingKey );
