@@ -29,8 +29,14 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.impl.BeanProviderImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.classloading.impl.DefaultClassLoaderService;
+import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.environment.service.impl.ServiceManagerImpl;
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.logging.impl.RootFailureCollector;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
@@ -42,10 +48,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.logging.impl.RootFailureCollector;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -61,11 +63,18 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private final Properties overriddenProperties = new Properties();
 	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
+	private ClassLoaderService classLoaderService;
 	private BeanResolver beanResolver;
 	private boolean frozen = false;
 
 	public SearchIntegrationBuilderImpl(ConfigurationPropertySource mainPropertySource) {
 		this.mainPropertySource = mainPropertySource;
+	}
+
+	@Override
+	public SearchIntegrationBuilder setClassLoaderService(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
+		return this;
 	}
 
 	@Override
@@ -121,12 +130,16 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		try {
 			frozen = true;
 
+			if ( classLoaderService == null ) {
+				classLoaderService = new DefaultClassLoaderService();
+			}
+
 			if ( beanResolver == null ) {
 				beanResolver = new ReflectionBeanResolver();
 			}
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
-			ServiceManager serviceManager = new ServiceManagerImpl( beanProvider );
+			ServiceManager serviceManager = new ServiceManagerImpl( classLoaderService, beanProvider );
 			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
 			ConfigurationPropertySource propertySource;
