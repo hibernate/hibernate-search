@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
-import org.hibernate.search.engine.common.BeanReference;
-import org.hibernate.search.engine.common.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 

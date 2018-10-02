@@ -4,19 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.common.impl;
+package org.hibernate.search.engine.environment.bean.impl;
 
-import org.hibernate.search.engine.common.BeanProvider;
-import org.hibernate.search.engine.common.BeanReference;
-import org.hibernate.search.engine.common.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.StringHelper;
 
-class BeanProviderImpl implements BeanProvider {
+public class BeanProviderImpl implements BeanProvider {
 
 	private final BeanResolver beanResolver;
 
-	BeanProviderImpl(BeanResolver beanResolver) {
+	public BeanProviderImpl(BeanResolver beanResolver) {
 		this.beanResolver = beanResolver;
 	}
 
