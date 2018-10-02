@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import org.hibernate.search.engine.common.spi.ServiceManager;
+import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 class DelegatingBuildContext {
 	private final RootBuildContext delegate;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
-import org.hibernate.search.engine.common.spi.ServiceManager;
+import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 /**
  * A build context for backends.

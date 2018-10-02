@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.logging.spi.FailureCollector;
-import org.hibernate.search.engine.common.spi.ServiceManager;
+import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 class RootBuildContext {
 

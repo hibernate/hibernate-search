@@ -12,8 +12,8 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ContainedBean;
 import org.hibernate.resource.beans.container.spi.ContainedBeanImplementor;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
-import org.hibernate.search.engine.common.spi.BeanResolver;
-import org.hibernate.search.engine.common.spi.ReflectionBeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.Contracts;
 

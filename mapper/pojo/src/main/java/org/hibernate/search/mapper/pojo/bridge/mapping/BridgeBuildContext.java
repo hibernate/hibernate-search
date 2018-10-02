@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
-import org.hibernate.search.engine.common.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanProvider;
 
 public interface BridgeBuildContext {
 
