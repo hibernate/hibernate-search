@@ -8,11 +8,14 @@ package org.hibernate.search.engine.environment.service.spi;
 
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
 
 /**
  * @author Yoann Rodiere
  */
 public interface ServiceManager {
+
+	ClassLoaderService getClassLoaderService();
 
 	BeanProvider getBeanProvider();
 
