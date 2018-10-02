@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.environment.service.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 
@@ -19,6 +20,12 @@ public class ServiceManagerImpl implements ServiceManager {
 
 	public ServiceManagerImpl(BeanProvider beanProvider) {
 		this.beanProvider = beanProvider;
+	}
+
+	@Override
+	public ClassLoaderService getClassLoaderService() {
+		// FIXME to be implemented in a later commit
+		return null;
 	}
 
 	@Override
