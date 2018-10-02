@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.environment.classloading.spi;
+package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -12,12 +12,12 @@ import java.net.URL;
 import org.hibernate.search.engine.environment.service.spi.Service;
 
 /**
- * A service for interacting with class loaders.
+ * A resolver of Java classes.
  *
  * @author Steve Ebersole
  * @author Hardy Ferentschik
  */
-public interface ClassLoaderService extends Service {
+public interface ClassResolver {
 	/**
 	 * Locate a class by name.
 	 *

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.common.spi;
 import java.util.Properties;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
@@ -18,7 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
  */
 public interface SearchIntegrationBuilder {
 
-	SearchIntegrationBuilder setClassLoaderService(ClassLoaderService classLoaderService);
+	SearchIntegrationBuilder setClassResolver(ClassResolver classResolver);
 
 	SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver);
 

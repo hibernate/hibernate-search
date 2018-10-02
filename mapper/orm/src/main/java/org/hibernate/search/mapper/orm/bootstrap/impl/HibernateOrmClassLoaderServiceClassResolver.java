@@ -12,18 +12,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.boot.registry.classloading.spi.ClassLoadingException;
-import org.hibernate.search.engine.environment.classloading.spi.DefaultClassLoaderService;
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
 
 /**
- * An implementation of class loader service which delegates to the ORM provided {@code ClassLoaderService}. If class,
- * resource or service loading fails in ORM class loader, the current class loader is checked.
+ * An implementation of {@link ClassResolver} which delegates to the ORM-provided {@code ClassResolver}.
+ * If class, resource or service loading fails in ORM class loader, the current class loader is checked.
  *
  * @author Hardy Ferentschik
  */
-final class DelegatingClassLoaderService implements ClassLoaderService {
+final class HibernateOrmClassLoaderServiceClassResolver implements ClassResolver {
 	/**
-	 * {@code ClassLoaderService] as provided by Hibernate ORM. This is the class loader which we attempt to use first.
+	 * {@code ClassResolver] as provided by Hibernate ORM. This is the class loader which we attempt to use first.
 	 */
 	private final org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService;
 
@@ -31,12 +31,12 @@ final class DelegatingClassLoaderService implements ClassLoaderService {
 	 * A Search internal class loader service which in particular tries to use the current class loader. This can be
 	 * necessary in case the ORM class loader can due to modularity not access the required resources
 	 */
-	private final ClassLoaderService internalClassLoaderService;
+	private final ClassResolver internalClassResolver;
 
 
-	DelegatingClassLoaderService(org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+	HibernateOrmClassLoaderServiceClassResolver(org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
-		this.internalClassLoaderService = new DefaultClassLoaderService();
+		this.internalClassResolver = new DefaultClassResolver();
 	}
 
 	@Override
@@ -45,7 +45,7 @@ final class DelegatingClassLoaderService implements ClassLoaderService {
 			return hibernateClassLoaderService.classForName( className );
 		}
 		catch (ClassLoadingException | LinkageError e) {
-			return internalClassLoaderService.classForName( className );
+			return internalClassResolver.classForName( className );
 		}
 	}
 
@@ -53,7 +53,7 @@ final class DelegatingClassLoaderService implements ClassLoaderService {
 	public URL locateResource(String name) {
 		URL url = hibernateClassLoaderService.locateResource( name );
 		if ( url == null ) {
-			url = internalClassLoaderService.locateResource( name );
+			url = internalClassResolver.locateResource( name );
 		}
 		return url;
 	}
@@ -62,7 +62,7 @@ final class DelegatingClassLoaderService implements ClassLoaderService {
 	public InputStream locateResourceStream(String name) {
 		InputStream in = hibernateClassLoaderService.locateResourceStream( name );
 		if ( in == null ) {
-			in = internalClassLoaderService.locateResourceStream( name );
+			in = internalClassResolver.locateResourceStream( name );
 		}
 		return in;
 	}
@@ -72,7 +72,7 @@ final class DelegatingClassLoaderService implements ClassLoaderService {
 		// when it comes to services, we need to search in both services and the de-duplicate
 		// however, we cannot rely on 'equals' for comparison. Instead compare class names
 		Iterable<T> servicesFromORMCLassLoader = hibernateClassLoaderService.loadJavaServices( serviceContract );
-		Iterable<T> servicesFromLocalClassLoader = internalClassLoaderService.loadJavaServices( serviceContract );
+		Iterable<T> servicesFromLocalClassLoader = internalClassResolver.loadJavaServices( serviceContract );
 
 		//LinkedHashMap to maintain order; elements from Hibernate ORM first.
 		Map<String,T> combined = new LinkedHashMap<String,T>();

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderHelper;
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.util.SearchException;
 
 
@@ -16,10 +16,10 @@ import org.hibernate.search.util.SearchException;
  */
 public final class ReflectionBeanResolver implements BeanResolver {
 
-	private final ClassLoaderService classLoaderService;
+	private final ClassResolver classResolver;
 
-	public ReflectionBeanResolver(ClassLoaderService classLoaderService) {
-		this.classLoaderService = classLoaderService;
+	public ReflectionBeanResolver(ClassResolver classResolver) {
+		this.classResolver = classResolver;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	@Override
 	public <T> T resolve(String classOrFactoryClassName, Class<T> expectedClass) {
 		Class<?> classOrFactoryClass = ClassLoaderHelper.classForName(
-				expectedClass, classOrFactoryClassName, expectedClass.getName(), classLoaderService
+				expectedClass, classOrFactoryClassName, expectedClass.getName(), classResolver
 		);
 
 		return resolve( classOrFactoryClass, expectedClass );
