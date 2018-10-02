@@ -45,7 +45,7 @@ public class ClassLoaderHelper {
 	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
 	 * @param componentDescription a meaningful description of the role the instance will have,
 	 * used to enrich error messages to describe the context of the error
-	 * @param serviceManager Service manager allowing access to the class loading service
+	 * @param classLoaderService the {@link ClassLoaderService} to use to load classes
 	 *
 	 * @return a new instance of the type given by {@code classNameToLoad}
 	 *
@@ -55,8 +55,8 @@ public class ClassLoaderHelper {
 	public static <T> T instanceFromName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ServiceManager serviceManager) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
+			ClassLoaderService classLoaderService) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -225,9 +225,8 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, String componentDescription, ServiceManager serviceManager) {
+	public static Class<?> classForName(String classNameToLoad, String componentDescription, ClassLoaderService classLoaderService) {
 		Class<?> clazz;
-		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
 		try {
 			clazz = classLoaderService.classForName( classNameToLoad );
 		}
@@ -243,8 +242,8 @@ public class ClassLoaderHelper {
 	public static <T> Class<? extends T> classForName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ServiceManager serviceManager) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, serviceManager );
+			ClassLoaderService classLoaderService) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
 		try {
 			return clazzDef.asSubclass( targetSuperType );
 		}
@@ -263,14 +262,13 @@ public class ClassLoaderHelper {
 	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
 	 *
 	 * @param classNameToLoad The class name
-	 * @param serviceManager The service manager from which to retrieve the class loader service
+	 * @param classLoaderService The {@link ClassLoaderService} to use to load classes
 	 *
 	 * @return The class reference.
 	 *
 	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
-	public static Class classForName(String classNameToLoad, ServiceManager serviceManager) {
-		ClassLoaderService classLoaderService = serviceManager.getClassLoaderService();
+	public static Class classForName(String classNameToLoad, ClassLoaderService classLoaderService) {
 		return classLoaderService.classForName( classNameToLoad );
 	}
 }
