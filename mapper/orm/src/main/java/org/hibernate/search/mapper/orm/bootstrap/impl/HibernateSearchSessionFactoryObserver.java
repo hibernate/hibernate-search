@@ -149,16 +149,17 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 					new DelegatingClassLoaderService( hibernateOrmClassLoaderService );
 			builder.setClassLoaderService( classLoaderService );
 
+			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classLoaderService );
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
 				if ( beanContainer != null ) {
 					// Only use the primary registry, so that we can implement our own fallback when beans are not found
-					beanResolver = new HibernateOrmBeanContainerBeanResolver( beanContainer );
+					beanResolver = new HibernateOrmBeanContainerBeanResolver( beanContainer, reflectionBeanResolver );
 				}
 				// else: The given ManagedBeanRegistry only implements fallback: let's ignore it
 			}
 			if ( beanResolver == null ) {
-				beanResolver = new ReflectionBeanResolver();
+				beanResolver = reflectionBeanResolver;
 			}
 			builder.setBeanResolver( beanResolver );
 

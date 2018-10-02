@@ -135,7 +135,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			if ( beanResolver == null ) {
-				beanResolver = new ReflectionBeanResolver();
+				beanResolver = new ReflectionBeanResolver( classLoaderService );
 			}
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );

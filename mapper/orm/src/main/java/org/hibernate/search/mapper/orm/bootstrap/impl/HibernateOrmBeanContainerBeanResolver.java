@@ -13,7 +13,6 @@ import org.hibernate.resource.beans.container.spi.ContainedBean;
 import org.hibernate.resource.beans.container.spi.ContainedBeanImplementor;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.Contracts;
 
@@ -38,23 +37,24 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 	private final ConcurrentHashMap<ContainedBeanImplementor, Object> beansToCleanup = new ConcurrentHashMap<>();
 
-	private final BeanInstanceProducer fallbackInstanceProducer = new BeanInstanceProducer() {
-		private final BeanResolver delegate = new ReflectionBeanResolver();
+	private final BeanInstanceProducer fallbackInstanceProducer;
 
-		@Override
-		public <B> B produceBeanInstance(Class<B> aClass) {
-			return delegate.resolve( aClass, aClass );
-		}
-
-		@Override
-		public <B> B produceBeanInstance(String s, Class<B> aClass) {
-			return delegate.resolve( s, aClass );
-		}
-	};
-
-	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer) {
+	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer, BeanResolver fallback) {
 		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
+		this.fallbackInstanceProducer = new BeanInstanceProducer() {
+			private final BeanResolver delegate = fallback;
+
+			@Override
+			public <B> B produceBeanInstance(Class<B> aClass) {
+				return delegate.resolve( aClass, aClass );
+			}
+
+			@Override
+			public <B> B produceBeanInstance(String s, Class<B> aClass) {
+				return delegate.resolve( s, aClass );
+			}
+		};
 	}
 
 	@Override
