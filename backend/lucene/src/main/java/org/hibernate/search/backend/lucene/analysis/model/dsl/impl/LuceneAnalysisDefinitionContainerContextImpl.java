@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalyzerFactory;
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
@@ -28,13 +28,13 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneAnalyzerFactory factory;
+	private final LuceneAnalysisComponentFactory factory;
 
 	private Map<String, LuceneAnalyzerDefinitionContextImpl> analyzerDefinitions = new LinkedHashMap<>();
 
 	private Map<String, LuceneNormalizerDefinitionContextImpl> normalizerDefinitions = new LinkedHashMap<>();
 
-	public LuceneAnalysisDefinitionContainerContextImpl(LuceneAnalyzerFactory factory) {
+	public LuceneAnalysisDefinitionContainerContextImpl(LuceneAnalysisComponentFactory factory) {
 		this.factory = factory;
 	}
 

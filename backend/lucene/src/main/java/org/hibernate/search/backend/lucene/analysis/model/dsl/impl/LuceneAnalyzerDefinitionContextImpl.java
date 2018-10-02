@@ -6,20 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.common.annotationfactory.AnnotationDescriptor;
-import org.hibernate.annotations.common.annotationfactory.AnnotationFactory;
-import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalyzerFactory;
+import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionWithTokenizerContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCharFilterDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneTokenFilterDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.AnalyzerDef;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.CharFilterDef;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.annotations.TokenFilterDef;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
@@ -33,11 +31,13 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 public class LuceneAnalyzerDefinitionContextImpl
 		implements LuceneAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final LuceneAnalysisDefinitionContainerContextImpl parentContext;
 
 	private final String name;
 
-	private final LuceneTokenizerDefinitionContextImpl tokenizer = new LuceneTokenizerDefinitionContextImpl();
+	private final LuceneTokenizerDefinitionContextImpl tokenizer;
 
 	private final List<LuceneCharFilterDefinitionContextImpl> charFilters = new ArrayList<>();
 
@@ -45,6 +45,7 @@ public class LuceneAnalyzerDefinitionContextImpl
 
 	LuceneAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
 		this.parentContext = parentContext;
+		this.tokenizer = new LuceneTokenizerDefinitionContextImpl( this );
 		this.name = name;
 	}
 
@@ -71,29 +72,31 @@ public class LuceneAnalyzerDefinitionContextImpl
 	}
 
 	@Override
-	public LuceneCharFilterDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
+	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
 		LuceneCharFilterDefinitionContextImpl filter = new LuceneCharFilterDefinitionContextImpl( this, factory );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
-	public LuceneTokenFilterDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
+	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
 		LuceneTokenFilterDefinitionContextImpl filter = new LuceneTokenFilterDefinitionContextImpl( this, factory );
 		tokenFilters.add( filter );
 		return filter;
 	}
 
-	public Analyzer build(LuceneAnalyzerFactory factory) {
-		AnnotationDescriptor descriptor = new AnnotationDescriptor( AnalyzerDef.class );
-		descriptor.setValue( "name", name );
-		descriptor.setValue( "tokenizer", tokenizer.build() );
-
-		descriptor.setValue( "charFilters", LuceneAnalysisDefinitionUtils.buildAll( charFilters, CharFilterDef[]::new ) );
-		descriptor.setValue( "filters", LuceneAnalysisDefinitionUtils.buildAll( tokenFilters, TokenFilterDef[]::new ) );
-
-		AnalyzerDef definition = AnnotationFactory.create( descriptor );
-		return factory.createAnalyzer( definition );
+	public Analyzer build(LuceneAnalysisComponentFactory factory) {
+		try {
+			return factory.createAnalyzer(
+					name,
+					tokenizer.build( factory ),
+					LuceneAnalysisComponentBuilder.buildAll( charFilters, CharFilterFactory[]::new, factory ),
+					LuceneAnalysisComponentBuilder.buildAll( tokenFilters, TokenFilterFactory[]::new, factory )
+			);
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.unableToCreateAnalyzer( name, e );
+		}
 	}
 
 }

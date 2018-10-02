@@ -91,7 +91,7 @@ public interface Log extends BasicLogger {
 	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
 
 	@Message(id = ID_OFFSET_1 + 337,
-			value = "Conflicting usage of @Parameter annotation for parameter name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
 	SearchException conflictingParameterDefined(String name, String value1, String value2);
 
 	@Message(id = ID_OFFSET_1 + 341,
@@ -322,5 +322,13 @@ public interface Log extends BasicLogger {
 	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
 			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 52,
+			value = "Unable to create analyzer for name '%1$s'.")
+	SearchException unableToCreateAnalyzer(String name, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 53,
+			value = "Unable to create normalizer for name '%1$s'.")
+	SearchException unableToCreateNormalizer(String name, @Cause Exception e);
 
 }

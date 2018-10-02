@@ -12,7 +12,7 @@ import org.apache.lucene.analysis.AnalyzerWrapper;
 /**
  * @author Yoann Rodiere
  */
-final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
+public final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 
 	private final Analyzer delegate;
 

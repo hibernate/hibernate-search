@@ -9,15 +9,15 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 /**
  * @author Yoann Rodiere
  */
-public interface LuceneCharFilterDefinitionContext extends LuceneCompositeAnalysisDefinitionContext {
+public interface LuceneAnalysisComponentDefinitionContext extends LuceneCompositeAnalysisDefinitionContext {
 
 	/**
-	 * Set a char filter parameter.
+	 * Set a parameter.
 	 *
 	 * @param name The name of the parameter.
 	 * @param value The value of the parameter.
 	 * @return This context, allowing to chain calls.
 	 */
-	LuceneCharFilterDefinitionContext param(String name, String value);
+	LuceneAnalysisComponentDefinitionContext param(String name, String value);
 
 }

@@ -20,7 +20,7 @@ public interface LuceneCompositeAnalysisDefinitionContext extends LuceneAnalysis
 	 * @param factory The factory that will create the char filter.
 	 * @return A context allowing to further define this analyzer or the char filter.
 	 */
-	LuceneCharFilterDefinitionContext charFilter(Class<? extends CharFilterFactory> factory);
+	LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory);
 
 	/**
 	 * Add a token filter that the analyzer will use.
@@ -28,6 +28,6 @@ public interface LuceneCompositeAnalysisDefinitionContext extends LuceneAnalysis
 	 * @param factory The factory that will create the token filter.
 	 * @return A context allowing to further define this analyzer or the token filter.
 	 */
-	LuceneTokenFilterDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory);
+	LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory);
 
 }
