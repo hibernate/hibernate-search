@@ -4,33 +4,33 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.environment.classloading.spi;
+package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
 
-import org.hibernate.search.engine.environment.classloading.impl.AggregatedClassLoader;
+import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoader;
 
 /**
- * Default implementation of {@code ClassLoaderService} using the old pre class loader service apporach of
+ * Default implementation of {@code ClassResolver} using the old pre class loader service approach of
  * attempting to load from the current and thread context class loaders.
  *
  * @author Hardy Ferentschik
  */
-public final class DefaultClassLoaderService implements ClassLoaderService {
+public final class DefaultClassResolver implements ClassResolver {
 
 	private AggregatedClassLoader aggregatedClassLoader;
 
 	/**
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
 	 */
-	public DefaultClassLoaderService() {
+	public DefaultClassResolver() {
 		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
 
 		//  adding known class-loaders...
-		orderedClassLoaderSet.add( DefaultClassLoaderService.class.getClassLoader() );
+		orderedClassLoaderSet.add( DefaultClassResolver.class.getClassLoader() );
 
 		// then the TCCL, if one...
 		final ClassLoader tccl = locateTCCL();

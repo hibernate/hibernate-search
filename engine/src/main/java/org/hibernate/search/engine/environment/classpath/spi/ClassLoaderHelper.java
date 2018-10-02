@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.environment.classloading.spi;
+package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -12,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -45,7 +44,7 @@ public class ClassLoaderHelper {
 	 * @param classNameToLoad a fully qualified class name, whose type is assignable to targetSuperType
 	 * @param componentDescription a meaningful description of the role the instance will have,
 	 * used to enrich error messages to describe the context of the error
-	 * @param classLoaderService the {@link ClassLoaderService} to use to load classes
+	 * @param classResolver the {@link ClassResolver} to use to load classes
 	 *
 	 * @return a new instance of the type given by {@code classNameToLoad}
 	 *
@@ -55,8 +54,8 @@ public class ClassLoaderHelper {
 	public static <T> T instanceFromName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ClassLoaderService classLoaderService) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
+			ClassResolver classResolver) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classResolver );
 		return instanceFromClass( targetSuperType, clazzDef, componentDescription );
 	}
 
@@ -225,10 +224,10 @@ public class ClassLoaderHelper {
 		}
 	}
 
-	public static Class<?> classForName(String classNameToLoad, String componentDescription, ClassLoaderService classLoaderService) {
+	public static Class<?> classForName(String classNameToLoad, String componentDescription, ClassResolver classResolver) {
 		Class<?> clazz;
 		try {
-			clazz = classLoaderService.classForName( classNameToLoad );
+			clazz = classResolver.classForName( classNameToLoad );
 		}
 		catch (ClassLoadingException e) {
 			throw new SearchException(
@@ -242,8 +241,8 @@ public class ClassLoaderHelper {
 	public static <T> Class<? extends T> classForName(Class<T> targetSuperType,
 			String classNameToLoad,
 			String componentDescription,
-			ClassLoaderService classLoaderService) {
-		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classLoaderService );
+			ClassResolver classResolver) {
+		final Class<?> clazzDef = classForName( classNameToLoad, componentDescription, classResolver );
 		try {
 			return clazzDef.asSubclass( targetSuperType );
 		}
@@ -262,13 +261,13 @@ public class ClassLoaderHelper {
 	 * {@link Class#forName(String, boolean, ClassLoader)} using the caller's classloader
 	 *
 	 * @param classNameToLoad The class name
-	 * @param classLoaderService The {@link ClassLoaderService} to use to load classes
+	 * @param classResolver The {@link ClassResolver} to use to load classes
 	 *
 	 * @return The class reference.
 	 *
 	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
-	public static Class classForName(String classNameToLoad, ClassLoaderService classLoaderService) {
-		return classLoaderService.classForName( classNameToLoad );
+	public static Class classForName(String classNameToLoad, ClassResolver classResolver) {
+		return classResolver.classForName( classNameToLoad );
 	}
 }

@@ -77,7 +77,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		this.propertySource = propertySource;
 		this.unusedPropertyTrackingPropertySource = unusedPropertyTrackingPropertySource;
 		this.listener = listener;
-		Contracts.assertNotNull( hibernateOrmClassLoaderService, "Hibernate ORM ClassLoaderService" );
+		Contracts.assertNotNull( hibernateOrmClassLoaderService, "Hibernate ORM ClassResolver" );
 		this.hibernateOrmClassLoaderService = hibernateOrmClassLoaderService;
 		this.environmentSynchronizer = environmentSynchronizer;
 		this.managedBeanRegistry = managedBeanRegistry;
@@ -145,11 +145,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
-			DelegatingClassLoaderService classLoaderService =
-					new DelegatingClassLoaderService( hibernateOrmClassLoaderService );
-			builder.setClassLoaderService( classLoaderService );
+			HibernateOrmClassLoaderServiceClassResolver classResolver =
+					new HibernateOrmClassLoaderServiceClassResolver( hibernateOrmClassLoaderService );
+			builder.setClassResolver( classResolver );
 
-			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classLoaderService );
+			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classResolver );
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
 				if ( beanContainer != null ) {

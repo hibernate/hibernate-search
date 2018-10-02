@@ -195,7 +195,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 
 		/* TODO ElasticsearchHttpClientConfigurer
 		Iterable<ElasticsearchHttpClientConfigurer> configurers =
-				serviceManager.getClassLoaderService().loadJavaServices( ElasticsearchHttpClientConfigurer.class );
+				serviceManager.getClassResolver().loadJavaServices( ElasticsearchHttpClientConfigurer.class );
 		for ( ElasticsearchHttpClientConfigurer configurer : configurers ) {
 			configurer.configure( builder, properties );
 		}

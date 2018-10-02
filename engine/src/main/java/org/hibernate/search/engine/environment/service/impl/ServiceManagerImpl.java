@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.environment.service.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 
 
@@ -16,17 +16,17 @@ import org.hibernate.search.engine.environment.service.spi.ServiceManager;
  */
 public class ServiceManagerImpl implements ServiceManager {
 
-	private final ClassLoaderService classLoaderService;
+	private final ClassResolver classResolver;
 	private final BeanProvider beanProvider;
 
-	public ServiceManagerImpl(ClassLoaderService classLoaderService, BeanProvider beanProvider) {
-		this.classLoaderService = classLoaderService;
+	public ServiceManagerImpl(ClassResolver classResolver, BeanProvider beanProvider) {
+		this.classResolver = classResolver;
 		this.beanProvider = beanProvider;
 	}
 
 	@Override
-	public ClassLoaderService getClassLoaderService() {
-		return classLoaderService;
+	public ClassResolver getClassResolver() {
+		return classResolver;
 	}
 
 	@Override

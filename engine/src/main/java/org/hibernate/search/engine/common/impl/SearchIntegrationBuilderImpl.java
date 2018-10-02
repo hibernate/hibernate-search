@@ -29,8 +29,8 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.impl.BeanProviderImpl;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
-import org.hibernate.search.engine.environment.classloading.impl.DefaultClassLoaderService;
-import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
+import org.hibernate.search.engine.environment.classpath.spi.DefaultClassResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.service.impl.ServiceManagerImpl;
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -63,7 +63,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private final Properties overriddenProperties = new Properties();
 	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
-	private ClassLoaderService classLoaderService;
+	private ClassResolver classResolver;
 	private BeanResolver beanResolver;
 	private boolean frozen = false;
 
@@ -72,8 +72,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public SearchIntegrationBuilder setClassLoaderService(ClassLoaderService classLoaderService) {
-		this.classLoaderService = classLoaderService;
+	public SearchIntegrationBuilder setClassResolver(ClassResolver classResolver) {
+		this.classResolver = classResolver;
 		return this;
 	}
 
@@ -130,16 +130,16 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		try {
 			frozen = true;
 
-			if ( classLoaderService == null ) {
-				classLoaderService = new DefaultClassLoaderService();
+			if ( classResolver == null ) {
+				classResolver = new DefaultClassResolver();
 			}
 
 			if ( beanResolver == null ) {
-				beanResolver = new ReflectionBeanResolver( classLoaderService );
+				beanResolver = new ReflectionBeanResolver( classResolver );
 			}
 
 			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
-			ServiceManager serviceManager = new ServiceManagerImpl( classLoaderService, beanProvider );
+			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, beanProvider );
 			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
 			ConfigurationPropertySource propertySource;
