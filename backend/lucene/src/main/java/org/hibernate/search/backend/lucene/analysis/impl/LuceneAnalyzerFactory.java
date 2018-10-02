@@ -32,12 +32,12 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 import org.apache.lucene.util.Version;
 
 /**
- * Instances of this class are used to build Lucene analyzers.
+ * Instances of this class are used to create Lucene analyzers.
  *
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-final class LuceneAnalyzerBuilder {
+final class LuceneAnalyzerFactory {
 
 	private static final String LUCENE_VERSION_PARAM = "luceneMatchVersion";
 
@@ -49,7 +49,7 @@ final class LuceneAnalyzerBuilder {
 
 	private final LuceneAnalysisDefinitionRegistry definitionRegistry;
 
-	public LuceneAnalyzerBuilder(Version luceneMatchVersion,
+	public LuceneAnalyzerFactory(Version luceneMatchVersion,
 			ClassResolver classResolver, ResourceResolver resourceResolver,
 			LuceneAnalysisDefinitionRegistry definitionRegistry) {
 		super();
@@ -59,19 +59,19 @@ final class LuceneAnalyzerBuilder {
 	}
 
 	/**
-	 * Build a Lucene {@link Analyzer} for the given analyzer name.
+	 * Create a Lucene {@link Analyzer} for the given analyzer name.
 	 *
 	 * @param name The name of the definition, which should match the name defined in an {@code AnalyzerDef} annotation
 	 * as found in the annotated domain class.
 	 * @return a Lucene {@code Analyzer}
 	 */
-	public Analyzer buildAnalyzer(String name) {
+	public Analyzer createAnalyzer(String name) {
 		AnalyzerDef analyzerDefinition = definitionRegistry.getAnalyzerDefinition( name );
 		if ( analyzerDefinition == null ) {
 			throw new SearchException( "Lucene analyzer found with an unknown definition: " + name );
 		}
 		try {
-			return buildAnalyzer( analyzerDefinition );
+			return createAnalyzer( analyzerDefinition );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize Analyzer definition " + analyzerDefinition, e );
@@ -79,50 +79,50 @@ final class LuceneAnalyzerBuilder {
 	}
 
 	/**
-	 * Build a Lucene {@link Analyzer} for the given normalizer name.
+	 * Create a Lucene {@link Analyzer} for the given normalizer name.
 	 *
 	 * @param name The name of the definition, which should match the name defined in a {@code NormalizerDef} annotation
 	 * as found in the annotated domain class.
 	 * @return a Lucene {@code Analyzer} with a {@link KeywordTokenizer}, but otherwise matching the the matching {@link NormalizerDef}.
 	 */
-	public Analyzer buildNormalizer(String name) {
+	public Analyzer createNormalizer(String name) {
 		NormalizerDef definition = definitionRegistry.getNormalizerDefinition( name );
 		if ( definition == null ) {
 			throw new SearchException( "Lucene normalizer found with an unknown definition: " + name );
 		}
 		try {
-			return buildNormalizer( definition );
+			return createNormalizer( definition );
 		}
 		catch (IOException e) {
 			throw new SearchException( "Could not initialize normalizer definition " + definition, e );
 		}
 	}
 
-	private Analyzer buildAnalyzer(AnalyzerDef analyzerDef) throws IOException {
+	private Analyzer createAnalyzer(AnalyzerDef analyzerDef) throws IOException {
 		TokenizerDef tokenizer = analyzerDef.tokenizer();
-		TokenizerFactory tokenizerFactory = buildAnalysisComponent(
+		TokenizerFactory tokenizerFactory = createAnalysisComponent(
 				TokenizerFactory.class, tokenizer.factory(), tokenizer.params() );
 
-		return buildAnalyzer( tokenizerFactory, analyzerDef.charFilters(), analyzerDef.filters() );
+		return createAnalyzer( tokenizerFactory, analyzerDef.charFilters(), analyzerDef.filters() );
 	}
 
-	private Analyzer buildNormalizer(NormalizerDef normalizerDef) throws IOException {
-		TokenizerFactory tokenizerFactory = buildAnalysisComponent( TokenizerFactory.class,
+	private Analyzer createNormalizer(NormalizerDef normalizerDef) throws IOException {
+		TokenizerFactory tokenizerFactory = createAnalysisComponent( TokenizerFactory.class,
 				KeywordTokenizerFactory.class, EMPTY_PARAMETERS );
 
-		Analyzer normalizer = buildAnalyzer(
+		Analyzer normalizer = createAnalyzer(
 				tokenizerFactory, normalizerDef.charFilters(), normalizerDef.filters() );
 
 		return new HibernateSearchNormalizerWrapper( normalizer, normalizerDef.name() );
 	}
 
-	private Analyzer buildAnalyzer(TokenizerFactory tokenizerFactory,
+	private Analyzer createAnalyzer(TokenizerFactory tokenizerFactory,
 			CharFilterDef[] charFilterDefs, TokenFilterDef[] filterDefs) throws IOException {
 		final int tokenFiltersLength = filterDefs.length;
 		TokenFilterFactory[] filters = new TokenFilterFactory[tokenFiltersLength];
 		for ( int index = 0; index < tokenFiltersLength; index++ ) {
 			TokenFilterDef filterDef = filterDefs[index];
-			filters[index] = buildAnalysisComponent( TokenFilterFactory.class,
+			filters[index] = createAnalysisComponent( TokenFilterFactory.class,
 					filterDef.factory(),
 					filterDef.params() );
 		}
@@ -131,14 +131,14 @@ final class LuceneAnalyzerBuilder {
 		CharFilterFactory[] charFilters = new CharFilterFactory[charFiltersLength];
 		for ( int index = 0; index < charFiltersLength; index++ ) {
 			CharFilterDef charFilterDef = charFilterDefs[index];
-			charFilters[index] = buildAnalysisComponent( CharFilterFactory.class,
+			charFilters[index] = createAnalysisComponent( CharFilterFactory.class,
 					charFilterDef.factory(), charFilterDef.params() );
 		}
 
 		return new TokenizerChain( charFilters, tokenizerFactory, filters );
 	}
 
-	private <T> T buildAnalysisComponent(Class<T> expectedFactoryClass,
+	private <T> T createAnalysisComponent(Class<T> expectedFactoryClass,
 			Class<? extends T> factoryClass,
 			Parameter[] parameters) throws IOException {
 		final Map<String, String> tokenMapsOfParameters = getMapOfParameters( parameters, luceneMatchVersion );
