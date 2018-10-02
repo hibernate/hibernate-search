@@ -40,9 +40,14 @@ import org.apache.lucene.search.Query;
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 35, max = 35),
 		@ValidIdRange(min = 55, max = 55),
+		@ValidIdRange(min = 114, max = 114),
 		@ValidIdRange(min = 284, max = 284),
 		@ValidIdRange(min = 320, max = 320),
-		@ValidIdRange(min = 321, max = 321)
+		@ValidIdRange(min = 321, max = 321),
+		@ValidIdRange(min = 330, max = 330),
+		@ValidIdRange(min = 337, max = 337),
+		@ValidIdRange(min = 341, max = 341),
+		@ValidIdRange(min = 344, max = 344)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5.
 })
 public interface Log extends BasicLogger {
@@ -63,6 +68,10 @@ public interface Log extends BasicLogger {
 			value = "Unable to close the index reader. %1$s")
 	void unableToCloseIndexReader(@FormatWith(EventContextFormatter.class) EventContext context, @Cause Exception e);
 
+	@Message(id = ID_OFFSET_1 + 114,
+			value = "Could not load resource: '%1$s'")
+	SearchException unableToLoadResource(String fileName);
+
 	@Message(id = ID_OFFSET_1 + 284,
 			value = "An IOException happened while opening multiple indexes." )
 	SearchException ioExceptionOnMultiReaderRefresh(@Param EventContext context, @Cause IOException e);
@@ -76,6 +85,26 @@ public interface Log extends BasicLogger {
 			value = "The analysis of field '%1$s' produced multiple tokens. Tokenization or term generation"
 			+ " (synonyms) should not be used on sortable fields or range queries. Only the first token will be considered.")
 	void multipleTermsDetectedDuringNormalization(String absoluteFieldPath);
+
+	@Message(id = ID_OFFSET_1 + 330,
+			value = "Multiple analyzer definitions with the same name: '%1$s'." )
+	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
+
+	@Message(id = ID_OFFSET_1 + 337,
+			value = "Conflicting usage of @Parameter annotation for parameter name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+	SearchException conflictingParameterDefined(String name, String value1, String value2);
+
+	@Message(id = ID_OFFSET_1 + 341,
+			value = "Multiple normalizer definitions with the same name: '%1$s'." )
+	SearchException normalizerDefinitionNamingConflict(String normalizerDefinitionName);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET_1 + 344,
+			value = "The normalizer for definition '%s' produced %d tokens."
+			+ " Normalizers should never produce more than one token."
+			+ " The tokens have been concatenated by Hibernate Search,"
+			+ " but you should fix your normalizer definition." )
+	void normalizerProducedMultipleTokens(String normalizerName, int token);
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
