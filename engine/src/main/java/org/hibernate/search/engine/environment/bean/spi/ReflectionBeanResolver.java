@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
+import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderHelper;
+import org.hibernate.search.engine.environment.classloading.spi.ClassLoaderService;
 import org.hibernate.search.util.SearchException;
 
 
@@ -17,6 +16,12 @@ import org.hibernate.search.util.SearchException;
  */
 public final class ReflectionBeanResolver implements BeanResolver {
 
+	private final ClassLoaderService classLoaderService;
+
+	public ReflectionBeanResolver(ClassLoaderService classLoaderService) {
+		this.classLoaderService = classLoaderService;
+	}
+
 	@Override
 	public void close() {
 		// Nothing to do
@@ -24,15 +29,7 @@ public final class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {
-		Object instance;
-		try {
-			// TODO use ClassLoaderHelper from Search 5
-			Constructor<?> constructor = classOrFactoryClass.getConstructor();
-			instance = constructor.newInstance();
-		}
-		catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
-			throw new SearchException( "Error while resolving bean", e );
-		}
+		Object instance = ClassLoaderHelper.untypedInstanceFromClass( classOrFactoryClass, expectedClass.getName() );
 
 		// TODO support @Factory annotation
 
@@ -41,13 +38,11 @@ public final class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(String classOrFactoryClassName, Class<T> expectedClass) {
-		try {
-			Class<?> classOrFactoryClass = getClass().getClassLoader().loadClass( classOrFactoryClassName );
-			return resolve( classOrFactoryClass, expectedClass );
-		}
-		catch (ClassNotFoundException e) {
-			throw new SearchException( "Error while resolving bean", e );
-		}
+		Class<?> classOrFactoryClass = ClassLoaderHelper.classForName(
+				expectedClass, classOrFactoryClassName, expectedClass.getName(), classLoaderService
+		);
+
+		return resolve( classOrFactoryClass, expectedClass );
 	}
 
 	@Override
