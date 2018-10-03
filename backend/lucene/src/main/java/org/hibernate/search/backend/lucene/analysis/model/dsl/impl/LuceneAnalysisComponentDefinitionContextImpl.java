@@ -10,10 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCompositeAnalysisDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -22,6 +20,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
 abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
+		extends DelegatingAnalysisDefinitionContainerContextImpl
 		implements LuceneAnalysisComponentDefinitionContext, LuceneAnalysisComponentBuilder<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -31,6 +30,7 @@ abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
 	final Map<String, String> params = new LinkedHashMap<>();
 
 	LuceneAnalysisComponentDefinitionContextImpl(LuceneCompositeAnalysisDefinitionContext parentContext) {
+		super( parentContext );
 		this.parentContext = parentContext;
 	}
 
@@ -41,16 +41,6 @@ abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
 			throw log.conflictingParameterDefined( name, value, previous );
 		}
 		return this;
-	}
-
-	@Override
-	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		return parentContext.analyzer( name );
-	}
-
-	@Override
-	public LuceneNormalizerDefinitionContext normalizer(String name) {
-		return parentContext.normalizer( name );
 	}
 
 	@Override

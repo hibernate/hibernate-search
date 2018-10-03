@@ -29,11 +29,10 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  * @author Yoann Rodiere
  */
 public class LuceneAnalyzerDefinitionContextImpl
+		extends DelegatingAnalysisDefinitionContainerContextImpl
 		implements LuceneAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final LuceneAnalysisDefinitionContainerContextImpl parentContext;
 
 	private final String name;
 
@@ -44,19 +43,9 @@ public class LuceneAnalyzerDefinitionContextImpl
 	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
 
 	LuceneAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
-		this.parentContext = parentContext;
+		super( parentContext );
 		this.tokenizer = new LuceneTokenizerDefinitionContextImpl( this );
 		this.name = name;
-	}
-
-	@Override
-	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		return parentContext.analyzer( name );
-	}
-
-	@Override
-	public LuceneNormalizerDefinitionContext normalizer(String name) {
-		return parentContext.normalizer( name );
 	}
 
 	@Override
