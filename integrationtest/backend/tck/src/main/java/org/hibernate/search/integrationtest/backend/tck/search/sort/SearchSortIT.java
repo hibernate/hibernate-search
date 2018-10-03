@@ -24,6 +24,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -338,7 +339,7 @@ public class SearchSortIT {
 			string = root.field( "string" ).asString().sortable( Sortable.YES ).createAccessor();
 			geoPoint = root.field( "geoPoint" ).asGeoPoint().sortable( Sortable.YES ).createAccessor();
 			string_analyzed_forScore = root.field( "string_analyzed_forScore" ).asString()
-					.analyzer( "default" ).createAccessor();
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).createAccessor();
 			unsortable = root.field( "unsortable" ).asString().sortable( Sortable.NO ).createAccessor();
 
 			IndexSchemaObjectField flattenedObjectField =

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.SearchException;
@@ -377,7 +378,7 @@ public class DocumentModelDslIT {
 						typedContextFunction.apply(
 								root.field( "myField" )
 						)
-								.analyzer( "someAnalyzer" );
+								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
 					} )
 			)
 					.assertThrown()
@@ -395,7 +396,7 @@ public class DocumentModelDslIT {
 						typedContextFunction.apply(
 								root.objectField( "nonRoot" ).field( "myField" )
 						)
-								.analyzer( "someAnalyzer" );
+								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
 					} )
 			)
 					.assertThrown()

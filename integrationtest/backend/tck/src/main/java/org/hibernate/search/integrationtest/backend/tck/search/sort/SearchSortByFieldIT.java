@@ -27,6 +27,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
@@ -463,7 +464,7 @@ public class SearchSortByFieldIT {
 								// TODO use a normalizer instead of an analyzer (needs support for normalizer definitions)
 								root, prefix + "analyzedString",
 								c -> {
-									c.analyzer( "default" );
+									c.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
 									additionalConfiguration.accept( c );
 								}
 						),

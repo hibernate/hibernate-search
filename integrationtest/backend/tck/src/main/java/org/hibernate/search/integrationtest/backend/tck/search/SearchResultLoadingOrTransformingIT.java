@@ -30,6 +30,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
@@ -362,7 +363,7 @@ public class SearchResultLoadingOrTransformingIT {
 			string = root.field( "string" ).asString().store( Store.YES ).createAccessor();
 			string_analyzed = root.field( "string_analyzed" ).asString()
 					.store( Store.YES )
-					.analyzer( "default" )
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 					.createAccessor();
 			integer = root.field( "integer" ).asInteger().store( Store.YES ).createAccessor();
 			localDate = root.field( "localDate" ).asLocalDate().store( Store.YES ).createAccessor();

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -346,7 +347,7 @@ public class ObjectFieldStorageIT {
 			self = objectField.createAccessor();
 			string = objectField.field( "string" ).asString().createAccessor();
 			string_analyzed = objectField.field( "string_analyzed" ).asString()
-					.analyzer( "default" ).createAccessor();
+					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).createAccessor();
 			integer = objectField.field( "integer" ).asInteger().createAccessor();
 			localDate = objectField.field( "localDate" ).asLocalDate().createAccessor();
 		}
