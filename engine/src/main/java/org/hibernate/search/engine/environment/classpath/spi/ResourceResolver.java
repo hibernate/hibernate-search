@@ -27,7 +27,7 @@ public interface ResourceResolver {
 	URL locateResource(String name);
 
 	/**
-	 * Locate a resource by name (classpath lookup) and gets its stream.
+	 * Locate a resource by name (classpath lookup) and get its stream.
 	 *
 	 * @param name The resource name.
 	 *

@@ -23,13 +23,14 @@ import org.hibernate.search.engine.service.classloading.spi.ClassLoaderService;
  */
 public class DelegatingClassLoaderService implements ClassLoaderService {
 	/**
-	 * {@code ClassLoaderService] as provided by Hibernate ORM. This is the class loader which we attempt to use first.
+	 * {@code ClassLoaderService} as provided by Hibernate ORM. This is the class loader which we attempt to use first.
 	 */
 	private final org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService;
 
 	/**
-	 * A Search internal class loader service which in particular tries to use the current class loader. This can be
-	 * necessary in case the ORM class loader can due to modularity not access the required resources
+	 * A Search internal class loader service which in particular tries to use the current class loader.
+	 * This can be necessary in modular environments (WildFly, ...)
+	 * when the ORM class loader can not access the required resources, but the Search class loader can.
 	 */
 	private final ClassLoaderService internalClassLoaderService;
 
@@ -69,7 +70,7 @@ public class DelegatingClassLoaderService implements ClassLoaderService {
 
 	@Override
 	public <T> Iterable<T> loadJavaServices(Class<T> serviceContract) {
-		// when it comes to services, we need to search in both services and the de-duplicate
+		// when it comes to services, we need to search in both services and de-duplicate
 		// however, we cannot rely on 'equals' for comparison. Instead compare class names
 		Iterable<T> servicesFromORMCLassLoader = hibernateClassLoaderService.loadJavaServices( serviceContract );
 		Iterable<T> servicesFromLocalClassLoader = internalClassLoaderService.loadJavaServices( serviceContract );

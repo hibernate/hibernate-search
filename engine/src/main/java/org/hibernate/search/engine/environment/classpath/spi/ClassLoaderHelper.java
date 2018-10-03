@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
  * Utility class to load instances of other classes by using a fully qualified name,
  * or from a class type.
  * Uses reflection and throws SearchException(s) with proper descriptions of the error,
- * like the target class is missing a proper constructor, is an interface, is not found...
+ * such as the target class is missing a proper constructor, is an interface, is not found...
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik

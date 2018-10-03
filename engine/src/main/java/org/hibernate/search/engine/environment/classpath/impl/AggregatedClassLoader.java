@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 /**
- * A classloader which keeps a ordered list of aggregated classloaders.
+ * A classloader which keeps an ordered list of aggregated classloaders.
  *
  * @author Steve Ebersole
  * @author Hardy Ferentschik
