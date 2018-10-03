@@ -135,6 +135,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( contextFuture.isDone() ) {
 			return;
 		}
+		BeanResolver reflectionBeanResolver = null;
 		BeanResolver beanResolver = null;
 		try {
 			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
@@ -150,7 +151,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			builder.setClassResolver( classAndResourceResolver );
 			builder.setResourceResolver( classAndResourceResolver );
 
-			BeanResolver reflectionBeanResolver = new ReflectionBeanResolver( classAndResourceResolver );
+			reflectionBeanResolver = new ReflectionBeanResolver( classAndResourceResolver );
 			if ( managedBeanRegistry != null ) {
 				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
 				if ( beanContainer != null ) {
@@ -187,7 +188,9 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			}
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( BeanResolver::close, beanResolver );
+			new SuppressingCloser( e )
+					.push( BeanResolver::close, reflectionBeanResolver )
+					.push( BeanResolver::close, beanResolver );
 
 			contextFuture.completeExceptionally( e );
 			// This will make the SessionFactory abort and close itself

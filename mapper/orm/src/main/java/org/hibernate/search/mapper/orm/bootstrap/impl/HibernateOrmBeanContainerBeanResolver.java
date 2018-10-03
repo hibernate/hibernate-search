@@ -37,11 +37,13 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 	private final ConcurrentHashMap<ContainedBeanImplementor, Object> beansToCleanup = new ConcurrentHashMap<>();
 
+	private final BeanResolver fallback;
 	private final BeanInstanceProducer fallbackInstanceProducer;
 
 	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer, BeanResolver fallback) {
 		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
+		this.fallback = fallback;
 		this.fallbackInstanceProducer = new BeanInstanceProducer() {
 			private final BeanResolver delegate = fallback;
 
@@ -61,6 +63,7 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( ContainedBeanImplementor::release, beansToCleanup.keySet() );
+			closer.push( BeanResolver::close, fallback );
 		}
 	}
 
