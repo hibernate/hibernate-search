@@ -11,8 +11,11 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomAnalyzerDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomNormalizerDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchTypedAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 
@@ -27,16 +30,36 @@ public class ElasticsearchAnalysisDefinitionContainerContextImpl
 
 	@Override
 	public ElasticsearchAnalyzerDefinitionContext analyzer(String name) {
-		ElasticsearchAnalyzerDefinitionContextImpl context = new ElasticsearchAnalyzerDefinitionContextImpl( name );
-		children.add( context );
-		return context;
+		return new ElasticsearchAnalyzerDefinitionContext() {
+			@Override
+			public ElasticsearchCustomAnalyzerDefinitionContext custom() {
+				ElasticsearchCustomAnalyzerDefinitionContextImpl context =
+						new ElasticsearchCustomAnalyzerDefinitionContextImpl( name );
+				children.add( context );
+				return context;
+			}
+
+			@Override
+			public ElasticsearchTypedAnalysisComponentDefinitionContext type(String type) {
+				ElasticsearchTypedAnalyzerDefinitionContextImpl context =
+						new ElasticsearchTypedAnalyzerDefinitionContextImpl( name, type );
+				children.add( context );
+				return context;
+			}
+		};
 	}
 
 	@Override
 	public ElasticsearchNormalizerDefinitionContext normalizer(String name) {
-		ElasticsearchNormalizerDefinitionContextImpl context = new ElasticsearchNormalizerDefinitionContextImpl( name );
-		children.add( context );
-		return context;
+		return new ElasticsearchNormalizerDefinitionContext() {
+			@Override
+			public ElasticsearchCustomNormalizerDefinitionContext custom() {
+				ElasticsearchCustomNormalizerDefinitionContextImpl context =
+						new ElasticsearchCustomNormalizerDefinitionContextImpl( name );
+				children.add( context );
+				return context;
+			}
+		};
 	}
 
 	@Override

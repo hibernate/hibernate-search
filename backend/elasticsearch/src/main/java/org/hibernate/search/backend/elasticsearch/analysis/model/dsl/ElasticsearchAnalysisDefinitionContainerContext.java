@@ -17,21 +17,21 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start an analyzer definition.
 	 * @param name The name used to reference this analyzer (both in Elasticsearch and in Hibernate Search).
-	 * @return The analyzer definition context, allowing to define the analyzer's components (tokenizer, ...).
+	 * @return A context allowing to further define the analyzer.
 	 */
 	ElasticsearchAnalyzerDefinitionContext analyzer(String name);
 
 	/**
 	 * Start a normalizer definition.
 	 * @param name The name used to reference this normalizer (both in Elasticsearch and in Hibernate Search).
-	 * @return The normalizer definition context, allowing to define the normalizer's components (token filters, ...).
+	 * @return A context allowing to further define the normalizer.
 	 */
 	ElasticsearchNormalizerDefinitionContext normalizer(String name);
 
 	/**
 	 * Start a tokenizer definition.
 	 * @param name The name used to reference this tokenizer
-	 * {@link ElasticsearchAnalyzerDefinitionContext#withTokenizer(String) in analyzer definitions}.
+	 * {@link ElasticsearchCustomAnalyzerDefinitionContext#withTokenizer(String) in analyzer definitions}.
 	 * @return The tokenizer definition context, allowing to define the tokenizer's type and parameters.
 	 */
 	ElasticsearchAnalysisComponentDefinitionContext tokenizer(String name);
@@ -39,7 +39,7 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start a char filter definition.
 	 * @param name The name used to reference this char filter
-	 * {@link ElasticsearchCompositeAnalysisDefinitionContext#withCharFilters(String...) in analyzer or normalizer definitions}.
+	 * {@link ElasticsearchCustomAnalysisDefinitionContext#withCharFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The char filter definition context, allowing to define the char filter's type and parameters.
 	 */
 	ElasticsearchAnalysisComponentDefinitionContext charFilter(String name);
@@ -47,7 +47,7 @@ public interface ElasticsearchAnalysisDefinitionContainerContext {
 	/**
 	 * Start a token filter definition.
 	 * @param name The name used to reference this token filter
-	 * {@link ElasticsearchCompositeAnalysisDefinitionContext#withTokenFilters(String...) in analyzer or normalizer definitions}.
+	 * {@link ElasticsearchCustomAnalysisDefinitionContext#withTokenFilters(String...) in analyzer or normalizer definitions}.
 	 * @return The token filter definition context, allowing to define the token filter's type and parameters.
 	 */
 	ElasticsearchAnalysisComponentDefinitionContext tokenFilter(String name);

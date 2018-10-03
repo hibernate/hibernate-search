@@ -10,6 +10,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchAnalyzerDefinitionWithTokenizerContext extends ElasticsearchCompositeAnalysisDefinitionContext {
+public interface ElasticsearchAnalyzerDefinitionWithTokenizerContext extends
+		ElasticsearchCustomAnalysisDefinitionContext {
 
 }

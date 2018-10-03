@@ -7,14 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 
-public interface ElasticsearchNormalizerDefinitionContext {
-
-	/**
-	 * Start a custom normalizer definition,
-	 * assigning char filters and token filters to the definition.
-	 *
-	 * @return A context allowing to further define the normalizer.
-	 */
-	ElasticsearchCustomNormalizerDefinitionContext custom();
+/**
+ * @author Yoann Rodiere
+ */
+public interface ElasticsearchCustomNormalizerDefinitionContext extends ElasticsearchCustomAnalysisDefinitionContext {
 
 }

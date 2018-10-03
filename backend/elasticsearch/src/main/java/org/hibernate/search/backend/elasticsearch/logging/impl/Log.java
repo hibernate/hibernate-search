@@ -272,4 +272,8 @@ public interface Log extends BasicLogger {
 	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
 			@FormatWith(ClassFormatter.class) Class<?> actualClass,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 34,
+			value = "Invalid typed analyzer definition for name '%1$s'. Typed analyzer definitions must at least define the analyzer type.")
+	SearchException invalidElasticsearchTypedAnalyzerDefinition(String name);
 }

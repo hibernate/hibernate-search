@@ -7,21 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 
 
-/**
- * @author Yoann Rodiere
- */
 public interface ElasticsearchAnalyzerDefinitionContext {
 
 	/**
-	 * Set the tokenizer that the analyzer will use.
+	 * Start a custom analyzer definition,
+	 * assigning a tokenizer, and optionally char filters and token filters to the definition.
 	 *
-	 * @param name The name of the tokenizer.
-	 * There must be a corresponding tokenizer definition on the Elasticsearch server.
-	 * This can be achieved by defining the tokenizer
-	 * {@link ElasticsearchAnalysisDefinitionContainerContext#tokenizer(String) from Hibernate Search},
-	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
-	 * @return A definition context allowing to define the analyzer's filters.
+	 * @return A context allowing to further define the analyzer.
 	 */
-	ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenizer(String name);
+	ElasticsearchCustomAnalyzerDefinitionContext custom();
+
+	/**
+	 * Start a typed analyzer definition,
+	 * assigning a type, and optionally parameters to the definition.
+	 *
+	 * @param type The name of the analyzer type to configure.
+	 * @return The parent context, for method chaining.
+	 */
+	ElasticsearchTypedAnalysisComponentDefinitionContext type(String type);
 
 }

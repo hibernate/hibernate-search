@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalyzerDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchCustomAnalyzerDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
@@ -21,8 +21,8 @@ import org.hibernate.search.util.impl.common.StringHelper;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchAnalyzerDefinitionContextImpl
-		implements ElasticsearchAnalyzerDefinitionContext,
+public class ElasticsearchCustomAnalyzerDefinitionContextImpl
+		implements ElasticsearchCustomAnalyzerDefinitionContext,
 		ElasticsearchAnalyzerDefinitionWithTokenizerContext,
 		ElasticsearchAnalysisDefinitionContributor {
 
@@ -32,7 +32,7 @@ public class ElasticsearchAnalyzerDefinitionContextImpl
 
 	private final AnalyzerDefinition definition = new AnalyzerDefinition();
 
-	ElasticsearchAnalyzerDefinitionContextImpl(String name) {
+	ElasticsearchCustomAnalyzerDefinitionContextImpl(String name) {
 		this.name = name;
 		this.definition.setType( "custom" );
 	}

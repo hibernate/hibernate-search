@@ -10,7 +10,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl;
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchCompositeAnalysisDefinitionContext {
+public interface ElasticsearchCustomAnalysisDefinitionContext {
 
 	/**
 	 * Set the char filters that the normalizer will use.
@@ -22,7 +22,7 @@ public interface ElasticsearchCompositeAnalysisDefinitionContext {
 	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
 	 * @return This context, allowing to chain calls.
 	 */
-	ElasticsearchCompositeAnalysisDefinitionContext withCharFilters(String... names);
+	ElasticsearchCustomAnalysisDefinitionContext withCharFilters(String... names);
 
 	/**
 	 * Set the token filters that the normalizer will use.
@@ -34,6 +34,6 @@ public interface ElasticsearchCompositeAnalysisDefinitionContext {
 	 * by configuring the Elasticsearch server, or by using built-in tokenizers.
 	 * @return This context, allowing to chain calls.
 	 */
-	ElasticsearchCompositeAnalysisDefinitionContext withTokenFilters(String... names);
+	ElasticsearchCustomAnalysisDefinitionContext withTokenFilters(String... names);
 
 }
