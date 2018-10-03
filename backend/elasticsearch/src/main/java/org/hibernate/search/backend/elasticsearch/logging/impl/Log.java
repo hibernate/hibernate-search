@@ -230,7 +230,7 @@ public interface Log extends BasicLogger {
 			value = "Unable to convert DSL parameter: %1$s")
 	SearchException cannotConvertDslParameter(String errorMessage, @Cause Exception cause, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 33,
+	@Message(id = ID_OFFSET_3 + 33,
 			value = "Attempt to unwrap an Elasticsearch index manager to '%1$s',"
 					+ " but this index manager can only be unwrapped to '%2$s'.")
 	SearchException indexManagerUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
