@@ -422,10 +422,9 @@ public class SearchProjectionIT {
 						// Mix capitalized and non-capitalized text on purpose
 						.mapper( String.class, "Aaron", "george", "Zach" )
 						.map(
-								// TODO use a normalizer instead of an analyzer (needs support for normalizer definitions)
-								root, prefix + "analyzedString",
+								root, prefix + "normalizedString",
 								c -> {
-									c.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
+									c.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
 									additionalConfiguration.accept( c );
 								}
 						),

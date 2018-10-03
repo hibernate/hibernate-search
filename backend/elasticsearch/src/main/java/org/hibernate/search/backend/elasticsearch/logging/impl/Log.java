@@ -285,4 +285,9 @@ public interface Log extends BasicLogger {
 			value = "Cannot apply both an analyzer and a normalizer." )
 	SearchException cannotApplyAnalyzerAndNormalizer(@Param EventContext context);
 
+	@Message(id = ID_OFFSET_3 + 36,
+			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead."
+					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+					+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
+	SearchException cannotUseAnalyzerOnSortableField(@Param EventContext context);
 }

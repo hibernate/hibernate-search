@@ -14,5 +14,7 @@ public class DefaultITAnalysisConfigurer implements ElasticsearchAnalysisConfigu
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
 		context.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).type( "standard" );
+		context.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ).custom()
+				.withTokenFilters( "lowercase" );
 	}
 }

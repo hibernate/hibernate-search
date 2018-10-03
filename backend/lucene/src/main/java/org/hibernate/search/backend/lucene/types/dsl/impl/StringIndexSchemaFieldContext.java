@@ -73,10 +73,9 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
-		// TODO For now, we allow the sortable - analyzed combination, it will be disallowed later
-//		if ( Sortable.YES.equals( getSortable() ) && analyzer != null ) {
-//			throw log.cannotUseAnalyzerOnSortableField( getRelativeFieldName() );
-//		}
+		if ( Sortable.YES.equals( sortable ) && analyzer != null ) {
+			throw log.cannotUseAnalyzerOnSortableField( getSchemaContext().getEventContext() );
+		}
 
 		if ( analyzer != null && normalizer != null ) {
 			throw log.cannotApplyAnalyzerAndNormalizer( getSchemaContext().getEventContext() );

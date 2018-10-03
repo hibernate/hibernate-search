@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
@@ -100,13 +99,10 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 
 			switch ( sortable ) {
 				case DEFAULT:
-					break;
 				case NO:
-					mapping.setFieldData( FieldDataType.FALSE );
 					break;
 				case YES:
-					mapping.setFieldData( FieldDataType.TRUE );
-					break;
+					throw log.cannotUseAnalyzerOnSortableField( getSchemaContext().getEventContext() );
 			}
 		}
 		else {

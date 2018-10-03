@@ -55,6 +55,7 @@ import org.apache.lucene.search.Query;
 		@ValidIdRange(min = 341, max = 341),
 		@ValidIdRange(min = 342, max = 342),
 		@ValidIdRange(min = 344, max = 344),
+		@ValidIdRange(min = 345, max = 345),
 		@ValidIdRange(min = 353, max = 353)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5.
 })
@@ -132,6 +133,12 @@ public interface Log extends BasicLogger {
 			+ " The tokens have been concatenated by Hibernate Search,"
 			+ " but you should fix your normalizer definition." )
 	void normalizerProducedMultipleTokens(String normalizerName, int token);
+
+	@Message(id = ID_OFFSET_1 + 345,
+			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead."
+			+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
+			+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
+	SearchException cannotUseAnalyzerOnSortableField(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_1 + 353,
 			value = "Unknown analyzer: '%1$s'. Make sure you defined this analyzer.")

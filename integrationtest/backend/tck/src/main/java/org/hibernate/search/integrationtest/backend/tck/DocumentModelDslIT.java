@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -451,6 +452,28 @@ public class DocumentModelDslIT {
 							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
 					) );
 		}
+	}
+
+	@Test
+	public void analyzerOnSortableField() {
+		SubTest.expectException(
+				"Setting an analyzer on sortable field",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field( "myField" ).asString()
+							.sortable( Sortable.YES )
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.createAccessor();
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Cannot apply an analyzer on a sortable field" )
+				.hasMessageContaining( "Use a normalizer instead" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexName( INDEX_NAME ),
+						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+				) );
 	}
 
 	@Test

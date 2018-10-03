@@ -16,7 +16,11 @@ public enum DefaultAnalysisDefinitions {
 	/**
 	 * The standard analyzer, as defined by Lucene.
 	 */
-	ANALYZER_STANDARD("standard")
+	ANALYZER_STANDARD("standard"),
+	/**
+	 * A normalizer that lowercases the input.
+	 */
+	NORMALIZER_LOWERCASE("lowercase")
 	;
 
 	public final String name;
