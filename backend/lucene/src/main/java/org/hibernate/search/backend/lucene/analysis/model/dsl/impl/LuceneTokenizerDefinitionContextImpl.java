@@ -9,9 +9,8 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCompositeAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
 
-import org.apache.lucene.analysis.util.TokenFilterFactory;
 import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
@@ -23,7 +22,7 @@ public class LuceneTokenizerDefinitionContextImpl
 
 	private Class<? extends TokenizerFactory> factoryClass;
 
-	LuceneTokenizerDefinitionContextImpl(LuceneCompositeAnalysisDefinitionContext parentContext) {
+	LuceneTokenizerDefinitionContextImpl(LuceneCustomAnalysisDefinitionContext parentContext) {
 		super( parentContext );
 	}
 

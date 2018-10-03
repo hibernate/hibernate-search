@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCompositeAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -25,11 +25,11 @@ abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneCompositeAnalysisDefinitionContext parentContext;
+	private final LuceneCustomAnalysisDefinitionContext parentContext;
 
 	final Map<String, String> params = new LinkedHashMap<>();
 
-	LuceneAnalysisComponentDefinitionContextImpl(LuceneCompositeAnalysisDefinitionContext parentContext) {
+	LuceneAnalysisComponentDefinitionContextImpl(LuceneCustomAnalysisDefinitionContext parentContext) {
 		super( parentContext );
 		this.parentContext = parentContext;
 	}

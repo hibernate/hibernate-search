@@ -6,19 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-import org.apache.lucene.analysis.util.TokenizerFactory;
+import org.apache.lucene.analysis.Analyzer;
 
-/**
- * @author Yoann Rodiere
- */
 public interface LuceneAnalyzerDefinitionContext {
 
 	/**
-	 * Set the tokenizer to use.
+	 * Start a custom analyzer definition,
+	 * assigning a tokenizer, and optionally char filters and token filters to the definition.
 	 *
-	 * @param factory The factory that will create the tokenizer.
 	 * @return A context allowing to further define the analyzer.
 	 */
-	LuceneAnalyzerDefinitionWithTokenizerContext tokenizer(Class<? extends TokenizerFactory> factory);
+	LuceneCustomAnalyzerDefinitionContext custom();
+
+	/**
+	 * Assign the given analyzer instance to this analyzer definition.
+	 *
+	 * @param instance The analyzer instance.
+	 * @return The parent context, for method chaining.
+	 */
+	LuceneAnalysisDefinitionContainerContext instance(Analyzer instance);
 
 }

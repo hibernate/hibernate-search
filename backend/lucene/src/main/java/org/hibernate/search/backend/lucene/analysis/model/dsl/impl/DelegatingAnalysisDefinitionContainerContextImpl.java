@@ -25,18 +25,8 @@ class DelegatingAnalysisDefinitionContainerContextImpl implements LuceneAnalysis
 	}
 
 	@Override
-	public LuceneAnalysisDefinitionContainerContext analyzerInstance(String name, Analyzer instance) {
-		return parentContext.analyzerInstance( name, instance );
-	}
-
-	@Override
 	public LuceneNormalizerDefinitionContext normalizer(String name) {
 		return parentContext.normalizer( name );
-	}
-
-	@Override
-	public LuceneAnalysisDefinitionContainerContext normalizerInstance(String name, Analyzer instance) {
-		return parentContext.normalizerInstance( name, instance );
 	}
 
 }

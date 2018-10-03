@@ -13,11 +13,15 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalyzerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomNormalizerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+
+import org.apache.lucene.analysis.Analyzer;
 
 
 /**
@@ -30,9 +34,9 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 	private final LuceneAnalysisComponentFactory factory;
 
-	private Map<String, LuceneAnalyzerDefinitionContextImpl> analyzerDefinitions = new LinkedHashMap<>();
+	private Map<String, LuceneAnalyzerBuilder> analyzers = new LinkedHashMap<>();
 
-	private Map<String, LuceneNormalizerDefinitionContextImpl> normalizerDefinitions = new LinkedHashMap<>();
+	private Map<String, LuceneAnalyzerBuilder> normalizers = new LinkedHashMap<>();
 
 	public LuceneAnalysisDefinitionContainerContextImpl(LuceneAnalysisComponentFactory factory) {
 		this.factory = factory;
@@ -40,31 +44,67 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 	@Override
 	public LuceneAnalyzerDefinitionContext analyzer(String name) {
-		LuceneAnalyzerDefinitionContextImpl definition = new LuceneAnalyzerDefinitionContextImpl( this, name );
-		LuceneAnalyzerDefinitionContextImpl existing = analyzerDefinitions.putIfAbsent( name, definition );
-		if ( existing != null ) {
-			throw LOG.analyzerDefinitionNamingConflict( name );
-		}
-		return definition;
+		return new LuceneAnalyzerDefinitionContext() {
+			@Override
+			public LuceneCustomAnalyzerDefinitionContext custom() {
+				LuceneCustomAnalyzerDefinitionContextImpl definition = new LuceneCustomAnalyzerDefinitionContextImpl(
+						LuceneAnalysisDefinitionContainerContextImpl.this, name
+				);
+				addAnalyzer( name, definition );
+				return definition;
+			}
+
+			@Override
+			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
+				LuceneAnalyzerInstanceContextImpl definition = new LuceneAnalyzerInstanceContextImpl( instance );
+				addAnalyzer( name, definition );
+				return LuceneAnalysisDefinitionContainerContextImpl.this;
+			}
+		};
 	}
 
 	@Override
 	public LuceneNormalizerDefinitionContext normalizer(String name) {
-		LuceneNormalizerDefinitionContextImpl definition = new LuceneNormalizerDefinitionContextImpl( this, name );
-		LuceneNormalizerDefinitionContextImpl existing = normalizerDefinitions.putIfAbsent( name, definition );
-		if ( existing != null ) {
-			throw LOG.normalizerDefinitionNamingConflict( name );
-		}
-		return definition;
+		return new LuceneNormalizerDefinitionContext() {
+			@Override
+			public LuceneCustomNormalizerDefinitionContext custom() {
+				LuceneCustomNormalizerDefinitionContextImpl definition = new LuceneCustomNormalizerDefinitionContextImpl(
+						LuceneAnalysisDefinitionContainerContextImpl.this, name
+				);
+				addNormalizer( name, definition );
+				return definition;
+			}
+
+			@Override
+			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
+				LuceneNormalizerInstanceContextImpl definition = new LuceneNormalizerInstanceContextImpl( name, instance );
+				addNormalizer( name, definition );
+				return LuceneAnalysisDefinitionContainerContextImpl.this;
+			}
+		};
 	}
 
 	@Override
 	public void contribute(LuceneAnalysisDefinitionCollector collector) {
-		for ( Map.Entry<String, LuceneAnalyzerDefinitionContextImpl> entry : analyzerDefinitions.entrySet() ) {
+		for ( Map.Entry<String, LuceneAnalyzerBuilder> entry : analyzers.entrySet() ) {
 			collector.collectAnalyzer( entry.getKey(), entry.getValue().build( factory ) );
 		}
-		for ( Map.Entry<String, LuceneNormalizerDefinitionContextImpl> entry : normalizerDefinitions.entrySet() ) {
+		for ( Map.Entry<String, LuceneAnalyzerBuilder> entry : normalizers.entrySet() ) {
 			collector.collectNormalizer( entry.getKey(), entry.getValue().build( factory ) );
+		}
+	}
+
+	private void addAnalyzer(String name, LuceneAnalyzerBuilder definition) {
+		LuceneAnalysisComponentBuilder<Analyzer> existing = analyzers.putIfAbsent( name, definition );
+		if ( existing != null ) {
+			throw LOG.analyzerDefinitionNamingConflict( name );
+		}
+	}
+
+	private void addNormalizer(String name, LuceneAnalyzerBuilder definition) {
+		LuceneAnalysisComponentBuilder<Analyzer> existing = normalizers.putIfAbsent( name, definition );
+		if ( existing != null ) {
+			throw LOG.normalizerDefinitionNamingConflict( name );
 		}
 	}
 

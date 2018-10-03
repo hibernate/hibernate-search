@@ -12,35 +12,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalyzerDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.analysis.util.TokenizerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class LuceneNormalizerDefinitionContextImpl
+public class LuceneCustomAnalyzerDefinitionContextImpl
 		extends DelegatingAnalysisDefinitionContainerContextImpl
-		implements LuceneNormalizerDefinitionContext {
+		implements LuceneCustomAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext,
+		LuceneAnalyzerBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
+	private final LuceneTokenizerDefinitionContextImpl tokenizer;
+
 	private final List<LuceneCharFilterDefinitionContextImpl> charFilters = new ArrayList<>();
 
 	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
 
-	LuceneNormalizerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
+	LuceneCustomAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
 		super( parentContext );
+		this.tokenizer = new LuceneTokenizerDefinitionContextImpl( this );
 		this.name = name;
+	}
+
+	@Override
+	public LuceneAnalyzerDefinitionWithTokenizerContext tokenizer(Class<? extends TokenizerFactory> factory) {
+		tokenizer.factory( factory );
+		return this;
+	}
+
+	@Override
+	public LuceneAnalyzerDefinitionWithTokenizerContext param(String name, String value) {
+		tokenizer.param( name, value );
+		return this;
 	}
 
 	@Override
@@ -57,16 +74,18 @@ public class LuceneNormalizerDefinitionContextImpl
 		return filter;
 	}
 
+	@Override
 	public Analyzer build(LuceneAnalysisComponentFactory factory) {
 		try {
-			return factory.createNormalizer(
+			return factory.createAnalyzer(
 					name,
+					tokenizer.build( factory ),
 					LuceneAnalysisComponentBuilder.buildAll( charFilters, CharFilterFactory[]::new, factory ),
 					LuceneAnalysisComponentBuilder.buildAll( tokenFilters, TokenFilterFactory[]::new, factory )
 			);
 		}
 		catch (IOException | RuntimeException e) {
-			throw log.unableToCreateNormalizer( name, e );
+			throw log.unableToCreateAnalyzer( name, e );
 		}
 	}
 

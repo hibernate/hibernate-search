@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCompositeAnalysisDefinitionContext;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
 
 import org.apache.lucene.analysis.util.CharFilterFactory;
 
@@ -22,7 +22,7 @@ public class LuceneCharFilterDefinitionContextImpl
 
 	private final Class<? extends CharFilterFactory> factoryClass;
 
-	LuceneCharFilterDefinitionContextImpl(LuceneCompositeAnalysisDefinitionContext parentContext,
+	LuceneCharFilterDefinitionContextImpl(LuceneCustomAnalysisDefinitionContext parentContext,
 			Class<? extends CharFilterFactory> factoryClass) {
 		super( parentContext );
 		this.factoryClass = factoryClass;

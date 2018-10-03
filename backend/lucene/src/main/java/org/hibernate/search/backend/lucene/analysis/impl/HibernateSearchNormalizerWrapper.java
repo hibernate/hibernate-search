@@ -12,16 +12,16 @@ import org.apache.lucene.analysis.AnalyzerWrapper;
 /**
  * @author Yoann Rodiere
  */
-public final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
-
-	private final Analyzer delegate;
+final class HibernateSearchNormalizerWrapper extends AnalyzerWrapper {
 
 	private final String normalizerName;
 
-	public HibernateSearchNormalizerWrapper(Analyzer delegate, String normalizerName) {
+	private final Analyzer delegate;
+
+	HibernateSearchNormalizerWrapper(String normalizerName, Analyzer delegate) {
 		super( delegate.getReuseStrategy() );
-		this.delegate = delegate;
 		this.normalizerName = normalizerName;
+		this.delegate = delegate;
 	}
 
 	@Override

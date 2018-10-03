@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.analysis.model.dsl;
 /**
  * @author Yoann Rodiere
  */
-public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneCompositeAnalysisDefinitionContext {
+public interface LuceneAnalyzerDefinitionWithTokenizerContext extends LuceneCustomAnalysisDefinitionContext {
 
 	/**
 	 * Set a tokenizer parameter.

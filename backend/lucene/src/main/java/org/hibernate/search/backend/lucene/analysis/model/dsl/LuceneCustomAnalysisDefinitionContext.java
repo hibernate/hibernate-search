@@ -12,7 +12,7 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
 /**
  * @author Yoann Rodiere
  */
-public interface LuceneCompositeAnalysisDefinitionContext extends LuceneAnalysisDefinitionContainerContext {
+public interface LuceneCustomAnalysisDefinitionContext extends LuceneAnalysisDefinitionContainerContext {
 
 	/**
 	 * Add a char filter that the analyzer will use.

@@ -6,9 +6,25 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.dsl;
 
-/**
- * @author Yoann Rodiere
- */
-public interface LuceneNormalizerDefinitionContext extends LuceneCompositeAnalysisDefinitionContext {
+import org.apache.lucene.analysis.Analyzer;
+
+public interface LuceneNormalizerDefinitionContext {
+
+	/**
+	 * Start a custom normalizer definition,
+	 * assigning char filters and token filters to the definition.
+	 *
+	 * @return A context allowing to further define the analyzer.
+	 */
+	LuceneCustomNormalizerDefinitionContext custom();
+
+	/**
+	 * Assign the given normalizer instance to this normalizer definition.
+	 *
+	 * @param instance The normalizer instance.
+	 * This instance is expected to never produce more than one token per stream.
+	 * @return The parent context, for method chaining.
+	 */
+	LuceneAnalysisDefinitionContainerContext instance(Analyzer instance);
 
 }

@@ -56,7 +56,11 @@ public final class LuceneAnalysisComponentFactory {
 	public Analyzer createNormalizer(String name,
 			CharFilterFactory[] charFilterFactories, TokenFilterFactory[] filterFactories) {
 		Analyzer normalizer = new TokenizerChain( charFilterFactories, KEYWORD_TOKENIZER_FACTORY, filterFactories );
-		return new HibernateSearchNormalizerWrapper( normalizer, name );
+		return wrapNormalizer( name, normalizer );
+	}
+
+	public Analyzer wrapNormalizer(String name, Analyzer normalizer) {
+		return new HibernateSearchNormalizerWrapper( name, normalizer );
 	}
 
 	public TokenizerFactory createTokenizerFactory(Class<? extends TokenizerFactory> factoryClass,
@@ -98,5 +102,4 @@ public final class LuceneAnalysisComponentFactory {
 		params.put( LUCENE_VERSION_PARAM, luceneMatchVersion.toString() );
 		return mapOfParams;
 	}
-
 }
