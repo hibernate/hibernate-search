@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -29,11 +30,15 @@ public final class CollectionHelper {
 	}
 
 	public static <K, V> HashMap<K, V> newHashMap(int size) {
-		return new HashMap<K, V>( getInitialCapacityFromExpectedSize( size ) );
+		return new HashMap<>( getInitialCapacityFromExpectedSize( size ) );
+	}
+
+	public static <K, V> LinkedHashMap<K, V> newLinkedHashMap(int size) {
+		return new LinkedHashMap<>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	public static <T> HashSet<T> newHashSet(int size) {
-		return new HashSet<T>( getInitialCapacityFromExpectedSize( size ) );
+		return new HashSet<>( getInitialCapacityFromExpectedSize( size ) );
 	}
 
 	public static <T> LinkedHashSet<T> newLinkedHashSet(int size) {
