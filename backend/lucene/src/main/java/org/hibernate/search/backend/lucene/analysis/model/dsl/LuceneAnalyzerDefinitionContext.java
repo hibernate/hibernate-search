@@ -11,7 +11,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
 /**
  * @author Yoann Rodiere
  */
-public interface LuceneAnalyzerDefinitionContext extends LuceneAnalysisDefinitionContainerContext {
+public interface LuceneAnalyzerDefinitionContext {
 
 	/**
 	 * Set the tokenizer to use.
