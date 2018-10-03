@@ -109,6 +109,37 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void match_emptyStringBeforeAnalysis() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		MainFieldModel fieldModel = indexMapping.analyzedStringField;
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().match().onField( fieldModel.relativeFieldName ).matching( "" ).end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasNoHits();
+	}
+
+	@Test
+	public void match_noTokenAfterAnalysis() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		MainFieldModel fieldModel = indexMapping.analyzedStringField;
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				// Use a stopword, which should be removed by the analysis
+				.predicate().match().onField( fieldModel.relativeFieldName ).matching( "a" ).end()
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasNoHits();
+	}
+
+	@Test
 	public void unsupported_field_types() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
@@ -373,11 +404,12 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel string1Field;
 		final MainFieldModel string2Field;
 		final MainFieldModel string3Field;
+		final MainFieldModel analyzedStringField;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
+			supportedFieldModels = mapSupportedFields( root, "supported_", ignored -> { } );
 			supportedFieldWithDslConverterModels = mapSupportedFields(
-					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
+					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			);
 			unsupportedFieldModels = Arrays.asList(
 					ByTypeFieldModel.mapper(
@@ -399,6 +431,10 @@ public class MatchSearchPredicateIT {
 					"Avenue of mysteries", "Oracle Night", "4 3 2 1"
 			)
 					.map( root, "string3" );
+			analyzedStringField = MainFieldModel.mapper(
+					"a word", "another word", "a"
+			)
+					.map( root, "analyzedString", c -> c.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ) );
 		}
 
 		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.MatchNoDocsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
@@ -30,7 +31,14 @@ class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String, 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		if ( queryBuilder != null ) {
-			return queryBuilder.createBooleanQuery( absoluteFieldPath, value );
+			Query analyzed = queryBuilder.createBooleanQuery( absoluteFieldPath, value );
+			if ( analyzed == null ) {
+				// Either the value was an empty string
+				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
+				// In any case, use the same behavior as Elasticsearch: don't match anything
+				analyzed = new MatchNoDocsQuery( "No tokens after analysis of the value to match" );
+			}
+			return analyzed;
 		}
 		else {
 			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
