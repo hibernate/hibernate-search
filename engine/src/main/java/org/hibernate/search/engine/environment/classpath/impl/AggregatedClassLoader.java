@@ -29,7 +29,7 @@ public final class AggregatedClassLoader extends ClassLoader {
 
 	@Override
 	public Enumeration<URL> getResources(String name) throws IOException {
-		final HashSet<URL> resourceUrls = new HashSet<URL>();
+		final HashSet<URL> resourceUrls = new HashSet<>();
 
 		for ( ClassLoader classLoader : individualClassLoaders ) {
 			final Enumeration<URL> urls = classLoader.getResources( name );
@@ -71,6 +71,7 @@ public final class AggregatedClassLoader extends ClassLoader {
 				return classLoader.loadClass( name );
 			}
 			catch (Exception | LinkageError ignore) {
+				// Ignore
 			}
 		}
 		throw new ClassNotFoundException( "Could not load requested class : " + name );

@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoader;
 
@@ -21,13 +22,13 @@ import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoa
  */
 public final class DefaultClassAndResourceResolver implements ClassResolver, ResourceResolver {
 
-	private AggregatedClassLoader aggregatedClassLoader;
+	private final AggregatedClassLoader aggregatedClassLoader;
 
 	/**
 	 * Constructs a ClassLoaderServiceImpl with standard set-up
 	 */
 	public DefaultClassAndResourceResolver() {
-		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<ClassLoader>();
+		final LinkedHashSet<ClassLoader> orderedClassLoaderSet = new LinkedHashSet<>();
 
 		//  adding known class-loaders...
 		orderedClassLoaderSet.add( DefaultClassAndResourceResolver.class.getClassLoader() );
@@ -69,6 +70,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 			return aggregatedClassLoader.getResource( name );
 		}
 		catch (Exception ignore) {
+			// Ignore
 		}
 
 		return null;
@@ -83,6 +85,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 			}
 		}
 		catch (Exception ignore) {
+			// Ignore
 		}
 
 		final String stripped = name.startsWith( "/" ) ? name.substring( 1 ) : null;
@@ -92,6 +95,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 				return new URL( stripped ).openStream();
 			}
 			catch (Exception ignore) {
+				// Ignore
 			}
 
 			try {
@@ -101,6 +105,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 				}
 			}
 			catch (Exception ignore) {
+				// Ignore
 			}
 		}
 
@@ -109,9 +114,9 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 
 
 	@Override
-	public <S> LinkedHashSet<S> loadJavaServices(Class<S> serviceContract) {
+	public <S> Set<S> loadJavaServices(Class<S> serviceContract) {
 		ServiceLoader<S> serviceLoader = ServiceLoader.load( serviceContract, aggregatedClassLoader );
-		final LinkedHashSet<S> services = new LinkedHashSet<S>();
+		final LinkedHashSet<S> services = new LinkedHashSet<>();
 		for ( S service : serviceLoader ) {
 			services.add( service );
 		}
