@@ -76,7 +76,7 @@ final class HibernateOrmClassLoaderServiceClassAndResourceResolver implements Cl
 		Iterable<T> servicesFromLocalClassLoader = internalClassResolver.loadJavaServices( serviceContract );
 
 		//LinkedHashMap to maintain order; elements from Hibernate ORM first.
-		Map<String,T> combined = new LinkedHashMap<String,T>();
+		Map<String,T> combined = new LinkedHashMap<>();
 
 		addAllServices( servicesFromORMCLassLoader, combined );
 		addAllServices( servicesFromLocalClassLoader, combined );

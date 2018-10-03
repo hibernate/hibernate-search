@@ -160,7 +160,7 @@ public class ClassLoaderHelper {
 		checkClassType( classToLoad, componentDescription );
 		Constructor<?> singleMapConstructor = getSingleMapConstructor( classToLoad, componentDescription );
 		if ( constructorParameter == null ) {
-			constructorParameter = new HashMap<String, String>( 0 );//can't use the emptyMap singleton as it needs to be mutable
+			constructorParameter = new HashMap<>( 0 );//can't use the emptyMap singleton as it needs to be mutable
 		}
 		final Object instance;
 		try {
