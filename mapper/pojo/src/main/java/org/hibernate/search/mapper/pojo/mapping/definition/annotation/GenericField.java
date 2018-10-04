@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.Store;
  * @author Yoann Rodiere
  */
 @Documented
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+@Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable( GenericField.List.class )
 public @interface GenericField {
@@ -67,7 +67,7 @@ public @interface GenericField {
 			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
 
 	@Documented
-	@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
+	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface List {
 		GenericField[] value();
