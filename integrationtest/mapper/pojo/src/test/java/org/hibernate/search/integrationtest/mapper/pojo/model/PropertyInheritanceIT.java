@@ -10,7 +10,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -91,7 +91,7 @@ public class PropertyInheritanceIT {
 
 		private String parentDeclaredProperty;
 
-		@Field
+		@GenericField
 		public String getParentDeclaredProperty() {
 			return parentDeclaredProperty;
 		}
@@ -127,7 +127,7 @@ public class PropertyInheritanceIT {
 			this.id = id;
 		}
 
-		@Field
+		@GenericField
 		public String getChildDeclaredProperty() {
 			return childDeclaredProperty;
 		}

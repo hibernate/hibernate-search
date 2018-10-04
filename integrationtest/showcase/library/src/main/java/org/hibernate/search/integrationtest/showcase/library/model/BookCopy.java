@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import javax.persistence.Entity;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
  * A concrete copy of a book document.
@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 @Entity
 public class BookCopy extends DocumentCopy<Book> {
 
-	@Field
+	@GenericField
 	// TODO facet
 	private BookMedium medium;
 

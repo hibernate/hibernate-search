@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -59,7 +59,7 @@ public class IndexedEmbeddedBaseIT {
 	public void noParameter() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
-			@Field
+			@GenericField
 			public String getLevel2Property() {
 				return level2Property;
 			}
@@ -67,7 +67,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
 			IndexedEmbeddedLevel2 level2;
-			@Field
+			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
@@ -132,7 +132,7 @@ public class IndexedEmbeddedBaseIT {
 	public void prefix() {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
-			@Field
+			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
@@ -183,11 +183,11 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String ignoredProperty;
 			String includedProperty;
-			@Field
+			@GenericField
 			public String getIgnoredProperty() {
 				return ignoredProperty;
 			}
-			@Field
+			@GenericField
 			public String getIncludedProperty() {
 				return includedProperty;
 			}
@@ -241,7 +241,7 @@ public class IndexedEmbeddedBaseIT {
 	public void maxDepth() {
 		class IndexedEmbeddedLevel2 {
 			String level2Property;
-			@Field
+			@GenericField
 			public String getLevel2Property() {
 				return level2Property;
 			}
@@ -249,7 +249,7 @@ public class IndexedEmbeddedBaseIT {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
 			IndexedEmbeddedLevel2 level2;
-			@Field
+			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
@@ -308,7 +308,7 @@ public class IndexedEmbeddedBaseIT {
 	public void storage() {
 		class IndexedEmbeddedLevel1 {
 			String level1Property;
-			@Field
+			@GenericField
 			public String getLevel1Property() {
 				return level1Property;
 			}
@@ -404,8 +404,8 @@ public class IndexedEmbeddedBaseIT {
 							.bridge( filteredOutBridgeBuilder )
 							.property( "level1Property" )
 									.bridge( filteredOutBridgeBuilder )
-									.field( "level1IncludedField" )
-									.field( "filteredOut" )
+									.genericField( "level1IncludedField" )
+									.genericField( "filteredOut" )
 											.valueBridge( filteredOutBridgeBuilder );
 				} )
 				.setup();

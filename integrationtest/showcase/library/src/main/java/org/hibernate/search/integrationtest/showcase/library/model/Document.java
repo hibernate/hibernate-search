@@ -18,7 +18,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge;
 
@@ -35,8 +35,8 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private Integer id;
 
 	@Basic
-	@Field(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@Field(
+	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@GenericField(
 			name = "title_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES
@@ -44,7 +44,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String title;
 
 	@Basic
-	@Field(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
 	private String summary;
 
 	/**

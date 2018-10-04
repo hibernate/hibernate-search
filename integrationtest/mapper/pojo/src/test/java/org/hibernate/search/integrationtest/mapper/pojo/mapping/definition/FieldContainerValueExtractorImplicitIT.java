@@ -16,13 +16,13 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 /**
- * Test implicit container value extractors for the {@code @Field} annotation.
+ * Test implicit container value extractors for the {@code @GenericField} annotation.
  * <p>
  * Error cases are not tested here but in {@link FieldContainerValueExtractorBaseIT}.
  */
@@ -52,7 +52,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public String[] getMyProperty() {
 					return myProperty;
 				}
@@ -77,7 +77,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Iterable<String> getMyProperty() {
 					return myProperty;
 				}
@@ -102,7 +102,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Collection<String> getMyProperty() {
 					return myProperty;
 				}
@@ -127,7 +127,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public List<String> getMyProperty() {
 					return myProperty;
 				}
@@ -152,7 +152,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Set<String> getMyProperty() {
 					return myProperty;
 				}
@@ -177,7 +177,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public SortedSet<String> getMyProperty() {
 					return myProperty;
 				}
@@ -202,7 +202,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Map<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -227,7 +227,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public SortedMap<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -252,7 +252,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Map<String, List<String>> getMyProperty() {
 					return myProperty;
 				}
@@ -277,7 +277,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public Optional<String> getMyProperty() {
 					return myProperty;
 				}
@@ -302,7 +302,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public OptionalInt getMyProperty() {
 					return myProperty;
 				}
@@ -327,7 +327,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field(valueBridge = @ValueBridgeBeanReference(type = PrefixedStringBridge.class))
+				@GenericField(valueBridge = @ValueBridgeBeanReference(type = PrefixedStringBridge.class))
 				public List<String> getMyProperty() {
 					return myProperty;
 				}
@@ -352,7 +352,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@Field
+				@GenericField
 				public List<MyEnum> getMyProperty() {
 					return myProperty;
 				}

@@ -34,12 +34,12 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -70,7 +70,7 @@ class AnnotationProcessorProvider {
 				new IndexingDependencyProcessor( helper ),
 				new DocumentIdProcessor( helper ),
 				new PropertyBridgeProcessor( helper ),
-				new FieldProcessor( helper ),
+				new GenericFieldProcessor( helper ),
 				new IndexedEmbeddedProcessor( helper )
 		) );
 	}
@@ -242,20 +242,20 @@ class AnnotationProcessorProvider {
 		}
 	}
 
-	private static class FieldProcessor extends PropertyAnnotationProcessor<Field> {
-		FieldProcessor(AnnotationProcessorHelper helper) {
+	private static class GenericFieldProcessor extends PropertyAnnotationProcessor<GenericField> {
+		GenericFieldProcessor(AnnotationProcessorHelper helper) {
 			super( helper );
 		}
 
 		@Override
-		Stream<? extends Field> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-			return propertyModel.getAnnotationsByType( Field.class );
+		Stream<? extends GenericField> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+			return propertyModel.getAnnotationsByType( GenericField.class );
 		}
 
 		@Override
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-				Field annotation) {
+				GenericField annotation) {
 			String cleanedUpRelativeFieldName = annotation.name();
 			if ( cleanedUpRelativeFieldName.isEmpty() ) {
 				cleanedUpRelativeFieldName = null;
@@ -265,9 +265,9 @@ class AnnotationProcessorProvider {
 					helper.createValueBridgeBuilder( annotation, propertyModel );
 
 			ContainerValueExtractorPath extractorPath =
-					helper.getExtractorPath( annotation.extractors(), Field.DefaultExtractors.class );
+					helper.getExtractorPath( annotation.extractors(), GenericField.DefaultExtractors.class );
 
-			PropertyFieldMappingContext fieldContext = mappingContext.field( cleanedUpRelativeFieldName )
+			PropertyGenericFieldMappingContext fieldContext = mappingContext.genericField( cleanedUpRelativeFieldName )
 					.withExtractors( extractorPath )
 					.valueBridge( builder );
 

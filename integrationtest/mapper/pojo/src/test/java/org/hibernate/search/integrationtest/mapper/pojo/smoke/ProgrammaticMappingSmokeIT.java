@@ -144,7 +144,7 @@ public class ProgrammaticMappingSmokeIT {
 							.property( "id" )
 									.documentId()
 							.property( "text" )
-									.field( "myTextField" )
+									.genericField( "myTextField" )
 							.property( "embedded" )
 									.indexedEmbedded()
 											.prefix( "embedded.prefix_" )
@@ -154,7 +154,7 @@ public class ProgrammaticMappingSmokeIT {
 					ProgrammaticMappingDefinitionContext secondMappingDefinition = builder.programmaticMapping();
 					secondMappingDefinition.type( ParentIndexedEntity.class )
 							.property( "localDate" )
-									.field( "myLocalDateField" )
+									.genericField( "myLocalDateField" )
 							.property( "embedded" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsSingle" )
@@ -169,14 +169,14 @@ public class ProgrammaticMappingSmokeIT {
 							.property( "id" )
 									.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 							.property( "numeric" )
-									.field()
-									.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
+									.genericField()
+									.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 					secondMappingDefinition.type( YetAnotherIndexedEntity.class )
 							.indexed( YetAnotherIndexedEntity.INDEX )
 							.property( "id" )
 									.documentId()
 							.property( "numeric" )
-									.field()
+									.genericField()
 							.property( "embeddedIterable" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsIterable" )
@@ -202,7 +202,7 @@ public class ProgrammaticMappingSmokeIT {
 											PojoModelPath.fromRoot( "embeddingAsMap" )
 													.value( ContainerValueExtractorPath.defaultExtractors() )
 									)
-									.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
+									.genericField( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 				} )
 				.setup();

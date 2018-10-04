@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -27,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test error cases when applying container value extractors in the {@code @Field} annotation.
+ * Test error cases when applying container value extractors in the {@code @GenericField} annotation.
  * <p>
  * Does not test all container value extractor types, which are tested in {@link FieldContainerValueExtractorImplicitIT}
  * and {@link FieldContainerValueExtractorExplicitIT}.
@@ -47,7 +47,7 @@ public class FieldContainerValueExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@Field(extractors = @ContainerValueExtractorBeanReference(type = RawContainerValueExtractor.class))
+			@GenericField(extractors = @ContainerValueExtractorBeanReference(type = RawContainerValueExtractor.class))
 			public Integer getId() {
 				return id;
 			}
@@ -86,7 +86,7 @@ public class FieldContainerValueExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))
+			@GenericField(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}

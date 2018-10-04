@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test default value bridges for the {@code @Field} annotation.
+ * Test default value bridges for the {@code @GenericField} annotation.
  */
 public abstract class AbstractFieldContainerValueExtractorIT {
 

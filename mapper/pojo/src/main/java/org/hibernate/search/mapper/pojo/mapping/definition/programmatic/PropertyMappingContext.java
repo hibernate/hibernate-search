@@ -35,9 +35,9 @@ public interface PropertyMappingContext {
 
 	PropertyMappingContext marker(MarkerBuilder builder);
 
-	PropertyFieldMappingContext field();
+	PropertyGenericFieldMappingContext genericField();
 
-	PropertyFieldMappingContext field(String relativeFieldName);
+	PropertyGenericFieldMappingContext genericField(String relativeFieldName);
 
 	PropertyIndexedEmbeddedMappingContext indexedEmbedded();
 

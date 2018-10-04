@@ -16,33 +16,33 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 /**
  * @author Yoann Rodiere
  */
-public interface PropertyFieldMappingContext extends PropertyMappingContext {
+public interface PropertyGenericFieldMappingContext extends PropertyMappingContext {
 
-	PropertyFieldMappingContext valueBridge(String bridgeName);
+	PropertyGenericFieldMappingContext valueBridge(String bridgeName);
 
-	PropertyFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
+	PropertyGenericFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	PropertyFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass);
+	PropertyGenericFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	PropertyFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
+	PropertyGenericFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
-	PropertyFieldMappingContext analyzer(String analyzerName);
+	PropertyGenericFieldMappingContext analyzer(String analyzerName);
 
-	PropertyFieldMappingContext normalizer(String normalizerName);
+	PropertyGenericFieldMappingContext normalizer(String normalizerName);
 
-	PropertyFieldMappingContext store(Store store);
+	PropertyGenericFieldMappingContext store(Store store);
 
-	PropertyFieldMappingContext sortable(Sortable sortable);
+	PropertyGenericFieldMappingContext sortable(Sortable sortable);
 
-	default PropertyFieldMappingContext withExtractor(
+	default PropertyGenericFieldMappingContext withExtractor(
 			Class<? extends ContainerValueExtractor> extractorClass) {
 		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
-	default PropertyFieldMappingContext withoutExtractors() {
+	default PropertyGenericFieldMappingContext withoutExtractors() {
 		return withExtractors( ContainerValueExtractorPath.noExtractors() );
 	}
 
-	PropertyFieldMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
+	PropertyGenericFieldMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
 
 }

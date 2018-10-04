@@ -42,7 +42,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
  *     public class EntityB {
  *         private List&lt;EntityA&gt; a; // This is a very big list
  *
- *         &#064;Field
+ *         &#064;GenericField
  *         private String field;
  *     }
  * </code></pre>

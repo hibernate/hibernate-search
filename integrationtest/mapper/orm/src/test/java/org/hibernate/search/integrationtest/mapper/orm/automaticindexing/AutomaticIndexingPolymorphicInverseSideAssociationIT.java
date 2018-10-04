@@ -18,7 +18,7 @@ import javax.persistence.OrderBy;
 import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -337,7 +337,7 @@ public class AutomaticIndexingPolymorphicInverseSideAssociationIT {
 		private List<ContainingEntity> containingAsSingle = new ArrayList<>();
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInSingle;
 
 		public Integer getId() {

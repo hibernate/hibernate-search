@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
@@ -77,7 +77,7 @@ public class DependencyIT {
 				return id;
 			}
 			@Transient
-			@Field
+			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath({}))
 			public String getDerived() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -112,7 +112,7 @@ public class DependencyIT {
 				return id;
 			}
 			@Transient
-			@Field
+			@GenericField
 			@IndexingDependency(derivedFrom = @ObjectPath(@PropertyValue(propertyName = "invalidPath")))
 			public String getDerived() {
 				throw new UnsupportedOperationException( "Should not be called" );
@@ -149,7 +149,7 @@ public class DependencyIT {
 					return b;
 				}
 				@Transient
-				@Field
+				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "b"),
 						@PropertyValue(propertyName = "derivedB")
@@ -164,7 +164,7 @@ public class DependencyIT {
 					return c;
 				}
 				@Transient
-				@Field
+				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "c"),
 						@PropertyValue(propertyName = "derivedC")
@@ -179,7 +179,7 @@ public class DependencyIT {
 					return a;
 				}
 				@Transient
-				@Field
+				@GenericField
 				@IndexingDependency(derivedFrom = @ObjectPath({
 						@PropertyValue(propertyName = "a"),
 						@PropertyValue(propertyName = "derivedA")
@@ -239,7 +239,7 @@ public class DependencyIT {
 				public A getA() {
 					return a;
 				}
-				@Field
+				@GenericField
 				public String getText() {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
@@ -288,7 +288,7 @@ public class DependencyIT {
 				public A getA() {
 					return a;
 				}
-				@Field
+				@GenericField
 				public String getText() {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}
@@ -338,7 +338,7 @@ public class DependencyIT {
 				public String getA() {
 					return a;
 				}
-				@Field
+				@GenericField
 				public String getText() {
 					throw new UnsupportedOperationException( "Should not be called" );
 				}

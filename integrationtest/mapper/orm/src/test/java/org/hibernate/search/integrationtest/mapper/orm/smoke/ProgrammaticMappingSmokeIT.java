@@ -416,7 +416,7 @@ public class ProgrammaticMappingSmokeIT {
 					.property( "id" )
 							.documentId()
 					.property( "text" )
-							.field( "myTextField" )
+							.genericField( "myTextField" )
 					.property( "embedded" )
 							.indexedEmbedded()
 									.prefix( "embedded.prefix_" )
@@ -426,7 +426,7 @@ public class ProgrammaticMappingSmokeIT {
 			ProgrammaticMappingDefinitionContext secondMapping = context.programmaticMapping();
 			secondMapping.type( ParentIndexedEntity.class )
 					.property( "localDate" )
-							.field( "myLocalDateField" )
+							.genericField( "myLocalDateField" )
 					.property( "embedded" )
 							.bridge(
 									new CustomPropertyBridge.Builder()
@@ -437,20 +437,20 @@ public class ProgrammaticMappingSmokeIT {
 					.property( "id" )
 							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
 					.property( "numeric" )
-							.field()
-							.field( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
+							.genericField()
+							.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
 			secondMapping.type( YetAnotherIndexedEntity.class )
 					.indexed( YetAnotherIndexedEntity.INDEX )
 					.property( "id" )
 							.documentId()
 					.property( "numeric" )
-							.field()
+							.genericField()
 					.property( "embeddedList" )
 							.indexedEmbedded()
 									.prefix( "embeddedList.otherPrefix_" )
 									.includePaths( "embedded.prefix_customBridgeOnClass.text" )
 					.property( "embeddedMap" )
-							.field( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
+							.genericField( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 		}
 	}

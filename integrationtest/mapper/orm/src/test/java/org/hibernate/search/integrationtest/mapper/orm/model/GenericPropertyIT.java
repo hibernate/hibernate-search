@@ -16,7 +16,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.annotations.Type;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -132,12 +132,12 @@ public class GenericPropertyIT {
 
 		@Basic
 		@Type(type = "serializable") // Necessary for Hibernate ORM...
-		@Field
+		@GenericField
 		private T content;
 
 		@Basic
 		@Type(type = "serializable") // Necessary for Hibernate ORM...
-		@Field
+		@GenericField
 		private T[] arrayContent;
 
 		@OneToMany(mappedBy = "genericProperty")

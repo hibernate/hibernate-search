@@ -12,7 +12,7 @@ import java.util.List;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
@@ -25,7 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test common use cases of the {@code @Field} annotation.
+ * Test common use cases of the {@code @GenericField} annotation.
  * <p>
  * Does not test default bridges, which are tested in {@link FieldDefaultBridgeIT}.
  * <p>
@@ -50,7 +50,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public Object getMyProperty() {
 				return myProperty;
 			}
@@ -81,7 +81,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public Enum getMyProperty() {
 				return myProperty;
 			}
@@ -111,7 +111,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public Enum<?> getMyProperty() {
 				return myProperty;
 			}
@@ -141,7 +141,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public Enum<EnumForEnumSuperClassTest> getMyProperty() {
 				return myProperty;
 			}
@@ -173,7 +173,7 @@ public class FieldBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@Field(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			@GenericField(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
 			public Integer getId() {
 				return id;
 			}
@@ -204,7 +204,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			@GenericField(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -247,7 +247,7 @@ public class FieldBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@Field(
+			@GenericField(
 					valueBridge = @ValueBridgeBeanReference(name = "foo"),
 					valueBridgeBuilder = @ValueBridgeBuilderBeanReference(name = "bar")
 			)
@@ -263,9 +263,9 @@ public class FieldBaseIT {
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
-						.annotationContextAnyParameters( Field.class )
+						.annotationContextAnyParameters( GenericField.class )
 						.failure(
-								"Annotation @Field on property 'id' defines both valueBridge and valueBridgeBuilder."
+								"Annotation @GenericField on property 'id' defines both valueBridge and valueBridgeBuilder."
 										+ " Only one of those can be defined, not both."
 						)
 						.build()

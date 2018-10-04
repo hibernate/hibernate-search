@@ -40,7 +40,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -222,7 +222,7 @@ class AnnotationProcessorHelper {
 	}
 
 	BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
-			Field annotation, PojoPropertyModel<?> annotationHolder) {
+			GenericField annotation, PojoPropertyModel<?> annotationHolder) {
 		ValueBridgeBeanReference bridgeReferenceAnnotation = annotation.valueBridge();
 		Optional<BeanReference> bridgeReference = toBeanReference(
 				bridgeReferenceAnnotation.name(),

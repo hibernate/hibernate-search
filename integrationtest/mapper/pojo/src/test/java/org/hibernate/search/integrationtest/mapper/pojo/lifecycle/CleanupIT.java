@@ -66,7 +66,7 @@ public class CleanupIT {
 									.identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-							.field( "otherText" )
+							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
 		} );
 
@@ -122,7 +122,7 @@ public class CleanupIT {
 									.identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-							.field( "otherText" )
+							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
 			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
 		} );
@@ -165,7 +165,7 @@ public class CleanupIT {
 									.identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-							.field( "otherText" )
+							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
 			typeContext.bridge( new FailingBridgeBuilder() );
 		} );
@@ -205,7 +205,7 @@ public class CleanupIT {
 				.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-						.field( "otherText" )
+						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
 				.property( "id" )
 						.documentId()
@@ -249,7 +249,7 @@ public class CleanupIT {
 						.documentId()
 								.identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
-						.field( "otherText" )
+						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
 						.bridge( new FailingBridgeBuilder() )
 		);
@@ -291,7 +291,7 @@ public class CleanupIT {
 						.documentId().identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-						.field( "otherText" ).valueBridge( new FailingBridgeBuilder() )
+						.genericField( "otherText" ).valueBridge( new FailingBridgeBuilder() )
 		);
 
 
@@ -348,7 +348,7 @@ public class CleanupIT {
 													new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS )
 											)
 									.property( "text" )
-											.field().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+											.genericField().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
 									.property( "embedded" )
 											.associationInverseSide(
 													PojoModelPath.fromRoot( "embedding" )

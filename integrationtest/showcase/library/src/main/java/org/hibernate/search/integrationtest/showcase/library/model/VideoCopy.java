@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import javax.persistence.Entity;
 
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 
 /**
  * A concrete copy of a video document.
@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
 @Entity
 public class VideoCopy extends DocumentCopy<Video> {
 
-	@Field
+	@GenericField
 	// TODO facet
 	private VideoMedium medium;
 

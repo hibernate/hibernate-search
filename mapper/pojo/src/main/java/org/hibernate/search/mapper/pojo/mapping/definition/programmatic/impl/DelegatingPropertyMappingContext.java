@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -65,13 +65,13 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	}
 
 	@Override
-	public PropertyFieldMappingContext field() {
-		return delegate.field();
+	public PropertyGenericFieldMappingContext genericField() {
+		return delegate.genericField();
 	}
 
 	@Override
-	public PropertyFieldMappingContext field(String relativeFieldName) {
-		return delegate.field( relativeFieldName );
+	public PropertyGenericFieldMappingContext genericField(String relativeFieldName) {
+		return delegate.genericField( relativeFieldName );
 	}
 
 	@Override
