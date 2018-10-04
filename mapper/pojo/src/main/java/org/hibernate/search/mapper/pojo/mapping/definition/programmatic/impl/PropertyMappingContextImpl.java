@@ -19,8 +19,10 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -106,6 +108,30 @@ public class PropertyMappingContextImpl
 	@Override
 	public PropertyGenericFieldMappingContext genericField(String relativeFieldName) {
 		PropertyGenericFieldMappingContextImpl child = new PropertyGenericFieldMappingContextImpl( this, relativeFieldName );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public PropertyFullTextFieldMappingContext fullTextField() {
+		return fullTextField( null );
+	}
+
+	@Override
+	public PropertyFullTextFieldMappingContext fullTextField(String relativeFieldName) {
+		PropertyFullTextFieldMappingContextImpl child = new PropertyFullTextFieldMappingContextImpl( this, relativeFieldName );
+		children.add( child );
+		return child;
+	}
+
+	@Override
+	public PropertyKeywordFieldMappingContext keywordField() {
+		return keywordField( null );
+	}
+
+	@Override
+	public PropertyKeywordFieldMappingContext keywordField(String relativeFieldName) {
+		PropertyKeywordFieldMappingContextImpl child = new PropertyKeywordFieldMappingContextImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}

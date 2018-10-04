@@ -9,6 +9,9 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 /**
  * @author Yoann Rodiere
  */
-public interface PropertyGenericFieldMappingContext extends PropertySortableFieldMappingContext<PropertyGenericFieldMappingContext> {
+public interface PropertyKeywordFieldMappingContext
+		extends PropertySortableFieldMappingContext<PropertyKeywordFieldMappingContext> {
+
+	PropertyKeywordFieldMappingContext normalizer(String analyzerName);
 
 }

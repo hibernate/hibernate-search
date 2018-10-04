@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -40,7 +41,6 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -50,7 +50,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridg
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class AnnotationProcessorHelper {
@@ -221,14 +220,14 @@ class AnnotationProcessorHelper {
 	}
 
 	BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
-			GenericField annotation, PojoPropertyModel<?> annotationHolder) {
-		ValueBridgeBeanReference bridgeReferenceAnnotation = annotation.valueBridge();
+			ValueBridgeBeanReference bridgeReferenceAnnotation,
+			ValueBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation,
+			PojoPropertyModel<?> annotationHolder) {
 		Optional<BeanReference> bridgeReference = toBeanReference(
 				bridgeReferenceAnnotation.name(),
 				bridgeReferenceAnnotation.type(),
 				ValueBridgeBeanReference.UndefinedImplementationType.class
 		);
-		ValueBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation = annotation.valueBridgeBuilder();
 		Optional<BeanReference> bridgeBuilderReference = toBeanReference(
 				bridgeBuilderReferenceAnnotation.name(),
 				bridgeBuilderReferenceAnnotation.type(),
