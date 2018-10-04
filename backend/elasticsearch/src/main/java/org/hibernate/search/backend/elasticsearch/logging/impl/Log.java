@@ -33,6 +33,8 @@ import org.jboss.logging.annotations.Param;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
+import com.google.gson.JsonElement;
+
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.BACKEND_ES_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_ID_RANGE_MAX),
@@ -56,15 +58,15 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_2 = MessageConstants.BACKEND_ES_ID_RANGE_MIN;
 
 	@Message(id = ID_OFFSET_2 + 55,
-			value = "The same tokenizer name '%1$s' is assigned to multiple definitions. The tokenizer names must be unique.")
+			value = "Multiple tokenizer definitions with the same name: '%1$s'. The tokenizer names must be unique.")
 	SearchException tokenizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 56,
-			value = "The same char filter name '%1$s' is assigned to multiple definitions. The char filter names must be unique.")
+			value = "Multiple char filter definitions with the same name: '%1$s'. The char filter names must be unique.")
 	SearchException charFilterNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 57,
-			value = "The same token filter name '%1$s' is assigned to multiple definitions. The token filter names must be unique.")
+			value = "Multiple token filter definitions with the same name: '%1$s'. The token filter names must be unique.")
 	SearchException tokenFilterNamingConflict(String remoteName);
 
 	@LogMessage(level = Level.WARN)
@@ -75,7 +77,7 @@ public interface Log extends BasicLogger {
 	void usingPasswordOverHttp(String serverUris);
 
 	@Message(id = ID_OFFSET_2 + 74,
-			value = "The same analyzer name '%1$s' is assigned to multiple definitions. The analyzer names must be unique.")
+			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique.")
 	SearchException analyzerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 75,
@@ -107,7 +109,7 @@ public interface Log extends BasicLogger {
 			int responseStatusCode, String responseStatusMessage);
 
 	@Message(id = ID_OFFSET_2 + 86,
-			value = "The same normalizer name '%1$s' is assigned to multiple definitions. The normalizer names must be unique.")
+			value = "Multiple normalizer definitions with the same name: '%1$s'. The normalizer names must be unique.")
 	SearchException normalizerNamingConflict(String remoteName);
 
 	@Message(id = ID_OFFSET_2 + 89,
@@ -290,4 +292,8 @@ public interface Log extends BasicLogger {
 					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
 					+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
 	SearchException cannotUseAnalyzerOnSortableField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 37,
+			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
+	SearchException analysisComponentParameterConflict(String name, JsonElement value1, JsonElement value2);
 }

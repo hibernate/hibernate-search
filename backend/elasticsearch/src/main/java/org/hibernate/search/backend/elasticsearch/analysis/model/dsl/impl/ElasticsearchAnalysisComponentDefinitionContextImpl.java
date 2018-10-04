@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalysisDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchTypedAnalysisComponentDefinitionContext;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,6 +28,8 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 		implements ElasticsearchTypedAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisDefinitionContributor {
+
+	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String name;
 
@@ -47,7 +52,10 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 			parameters = new LinkedHashMap<>();
 			definition.setParameters( parameters );
 		}
-		parameters.put( name, value );
+		JsonElement previous = parameters.putIfAbsent( name, value );
+		if ( previous != null ) {
+			throw LOG.analysisComponentParameterConflict( name, previous, value );
+		}
 		return this;
 	}
 

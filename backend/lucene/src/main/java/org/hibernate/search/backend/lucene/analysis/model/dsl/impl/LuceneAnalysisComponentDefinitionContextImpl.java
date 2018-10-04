@@ -38,7 +38,7 @@ abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
 	public LuceneAnalysisComponentDefinitionContext param(String name, String value) {
 		String previous = params.putIfAbsent( name, value );
 		if ( previous != null ) {
-			throw log.conflictingParameterDefined( name, value, previous );
+			throw log.analysisComponentParameterConflict( name, previous, value );
 		}
 		return this;
 	}

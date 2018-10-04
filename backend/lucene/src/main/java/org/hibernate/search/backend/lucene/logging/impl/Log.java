@@ -111,15 +111,15 @@ public interface Log extends BasicLogger {
 	SearchException unableToApplyAnalysisConfiguration(String errorMessage, @Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 330,
-			value = "Multiple analyzer definitions with the same name: '%1$s'." )
+			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique." )
 	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
 
 	@Message(id = ID_OFFSET_1 + 337,
 			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )
-	SearchException conflictingParameterDefined(String name, String value1, String value2);
+	SearchException analysisComponentParameterConflict(String name, String value1, String value2);
 
 	@Message(id = ID_OFFSET_1 + 341,
-			value = "Multiple normalizer definitions with the same name: '%1$s'." )
+			value = "Multiple normalizer definitions with the same name: '%1$s'. The normalizer names must be unique." )
 	SearchException normalizerDefinitionNamingConflict(String normalizerDefinitionName);
 
 	@Message(id = ID_OFFSET_1 + 342,
