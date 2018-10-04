@@ -115,9 +115,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				AssociationInverseSide annotation) {
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath(
-					annotation.extractors(), AssociationInverseSide.DefaultExtractors.class
-			);
+			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			Optional<PojoModelPathValueNode> inversePathOptional =
 					helper.getPojoModelPathValueNode( annotation.inversePath() );
@@ -144,9 +142,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				IndexingDependency annotation) {
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath(
-					annotation.extractors(), IndexingDependency.DefaultExtractors.class
-			);
+			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
@@ -264,8 +260,7 @@ class AnnotationProcessorProvider {
 			BridgeBuilder<? extends ValueBridge<?, ?>> builder =
 					helper.createValueBridgeBuilder( annotation, propertyModel );
 
-			ContainerValueExtractorPath extractorPath =
-					helper.getExtractorPath( annotation.extractors(), GenericField.DefaultExtractors.class );
+			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			PropertyGenericFieldMappingContext fieldContext = mappingContext.genericField( cleanedUpRelativeFieldName )
 					.withExtractors( extractorPath )
@@ -320,8 +315,7 @@ class AnnotationProcessorProvider {
 				cleanedUpIncludePaths = Collections.emptySet();
 			}
 
-			ContainerValueExtractorPath extractorPath =
-					helper.getExtractorPath( annotation.extractors(), IndexedEmbedded.DefaultExtractors.class );
+			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			mappingContext.indexedEmbedded()
 					.withExtractors( extractorPath )

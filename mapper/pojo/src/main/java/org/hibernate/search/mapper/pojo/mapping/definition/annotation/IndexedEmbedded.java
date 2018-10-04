@@ -13,7 +13,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 
 /**
  * @author Yoann Rodiere
@@ -39,15 +38,7 @@ public @interface IndexedEmbedded {
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
 	ContainerValueExtractorBeanReference[] extractors()
-			default @ContainerValueExtractorBeanReference( type = DefaultExtractors.class );
-
-	/**
-	 * Class used as a marker for the default value of the {@link #extractors()} attribute.
-	 */
-	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
-		private DefaultExtractors() {
-		}
-	}
+			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
 
 	// TODO includeEmbeddedObjectId?
 	// TODO targetElement?

@@ -12,8 +12,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-
 /**
  * Given an association on a entity type A to entity type B, defines the inverse side of an association,
  * i.e. the path from B to A.
@@ -41,19 +39,11 @@ public @interface AssociationInverseSide {
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
 	ContainerValueExtractorBeanReference[] extractors()
-			default @ContainerValueExtractorBeanReference( type = DefaultExtractors.class );
+			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
 
 	/**
 	 * @return The path to the targeted entity on the inverse side of the association.
 	 */
 	ObjectPath inversePath();
-
-	/**
-	 * Class used as a marker for the default value of the {@link #extractors()} attribute.
-	 */
-	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
-		private DefaultExtractors() {
-		}
-	}
 
 }

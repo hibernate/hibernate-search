@@ -75,7 +75,7 @@ class AnnotationProcessorHelper {
 		for ( PropertyValue element : inversePathElements ) {
 			String inversePropertyName = element.propertyName();
 			ContainerValueExtractorPath inverseExtractorPath = getExtractorPath(
-					element.extractors(), PropertyValue.DefaultExtractors.class
+					element.extractors()
 			);
 			if ( inversePath == null ) {
 				inversePath = PojoModelPath.fromRoot( inversePropertyName ).value( inverseExtractorPath );
@@ -87,12 +87,11 @@ class AnnotationProcessorHelper {
 		return Optional.ofNullable( inversePath );
 	}
 
-	ContainerValueExtractorPath getExtractorPath(
-			ContainerValueExtractorBeanReference[] extractors, Class<?> defaultExtractorsClass) {
+	ContainerValueExtractorPath getExtractorPath(ContainerValueExtractorBeanReference[] extractors) {
 		if ( extractors.length == 0 ) {
 			return ContainerValueExtractorPath.noExtractors();
 		}
-		else if ( extractors.length == 1 && defaultExtractorsClass.equals( extractors[0].type() ) ) {
+		else if ( extractors.length == 1 && ContainerValueExtractorBeanReference.DefaultExtractors.class.equals( extractors[0].type() ) ) {
 			return ContainerValueExtractorPath.defaultExtractors();
 		}
 		else {

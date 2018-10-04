@@ -23,4 +23,12 @@ public @interface ContainerValueExtractorBeanReference {
 
 	Class<? extends ContainerValueExtractor> type();
 
+	/**
+	 * Class used as a marker for the default value of attributes of type {@link ContainerValueExtractorBeanReference}
+	 * in other annotations.
+	 */
+	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
+		private DefaultExtractors() {
+		}
+	}
 }
