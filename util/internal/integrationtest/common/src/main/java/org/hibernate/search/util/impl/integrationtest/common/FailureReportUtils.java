@@ -83,6 +83,14 @@ public final class FailureReportUtils {
 			return contextLiteral( "type '" + exactTypeName + "'" );
 		}
 
+		public SingleContextFailureReportPatternBuilder indexContext(String exactIndexName) {
+			return contextLiteral( "index '" + exactIndexName + "'" );
+		}
+
+		public SingleContextFailureReportPatternBuilder backendContext(String exactBackendName) {
+			return contextLiteral( "backend '" + exactBackendName + "'" );
+		}
+
 		public SingleContextFailureReportPatternBuilder pathContext(String pathPattern) {
 			return contextLiteral( "path '" + pathPattern + "'" );
 		}
