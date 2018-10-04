@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMappi
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeReference;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -163,7 +163,7 @@ public class AnnotationMappingRoutingIT {
 			this.category = category;
 		}
 
-		@Field
+		@GenericField
 		public String getValue() {
 			return value;
 		}

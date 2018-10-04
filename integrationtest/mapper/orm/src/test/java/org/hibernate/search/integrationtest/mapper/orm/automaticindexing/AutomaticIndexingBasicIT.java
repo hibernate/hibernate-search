@@ -16,7 +16,7 @@ import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -487,11 +487,11 @@ public class AutomaticIndexingBasicIT {
 		private Integer id;
 
 		@Basic
-		@Field
+		@GenericField
 		private String indexedField;
 
 		@ElementCollection
-		@Field
+		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
 		@Basic
@@ -501,12 +501,12 @@ public class AutomaticIndexingBasicIT {
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
 		@Basic
-		@Field
+		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private String noReindexOnUpdateField;
 
 		@ElementCollection
-		@Field
+		@GenericField
 		@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)
 		private List<String> noReindexOnUpdateElementCollectionField = new ArrayList<>();
 

@@ -98,7 +98,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *                private Contained contained;
  *             }
  *             public class Contained {
- *                &#064;Field
+ *                &#064;GenericField
  *                private String field;
  *             }
  *         </code></pre>
@@ -134,7 +134,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *             }
  *             &#064;Embeddable
  *             public class Contained {
- *                &#064;Field
+ *                &#064;GenericField
  *                private String field;
  *             }
  *         </code></pre>

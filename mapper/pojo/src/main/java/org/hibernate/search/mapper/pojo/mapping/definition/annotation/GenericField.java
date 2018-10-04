@@ -23,8 +23,8 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 @Documented
 @Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable( Field.List.class )
-public @interface Field {
+@Repeatable( GenericField.List.class )
+public @interface GenericField {
 
 	/**
 	 * @return The name of the index field.
@@ -33,14 +33,14 @@ public @interface Field {
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #valueBridgeBuilder()}:
+	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridgeBuilder()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
 	ValueBridgeBeanReference valueBridge() default @ValueBridgeBeanReference;
 
 	/**
 	 * @return A reference to the builder to use to build a value bridge for this field.
-	 * Cannot be used in the same {@code @Field} annotation as {@link #valueBridge()}:
+	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridge()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
 	ValueBridgeBuilderBeanReference valueBridgeBuilder() default @ValueBridgeBuilderBeanReference;
@@ -79,7 +79,7 @@ public @interface Field {
 	@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface List {
-		Field[] value();
+		GenericField[] value();
 	}
 
 }

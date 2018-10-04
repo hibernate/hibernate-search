@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -23,7 +23,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test default value bridges for the {@code @Field} annotation.
+ * Test default value bridges for the {@code @GenericField} annotation.
  */
 public class FieldDefaultBridgeIT {
 
@@ -45,7 +45,7 @@ public class FieldDefaultBridgeIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public String getMyProperty() {
 				return myProperty;
 			}
@@ -73,7 +73,7 @@ public class FieldDefaultBridgeIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public Integer getMyProperty() {
 				return myProperty;
 			}
@@ -101,7 +101,7 @@ public class FieldDefaultBridgeIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public LocalDate getMyProperty() {
 				return myProperty;
 			}
@@ -129,7 +129,7 @@ public class FieldDefaultBridgeIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field
+			@GenericField
 			public MyEnum getMyProperty() {
 				return myProperty;
 			}

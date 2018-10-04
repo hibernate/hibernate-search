@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -464,7 +464,7 @@ public class AnnotationMappingSmokeIT {
 
 		private IndexedEntity embedded;
 
-		@Field(name = "myLocalDateField")
+		@GenericField(name = "myLocalDateField")
 		public LocalDate getLocalDate() {
 			return localDate;
 		}
@@ -518,7 +518,7 @@ public class AnnotationMappingSmokeIT {
 			this.id = id;
 		}
 
-		@Field(name = "myTextField")
+		@GenericField(name = "myTextField")
 		public String getText() {
 			return text;
 		}
@@ -574,8 +574,8 @@ public class AnnotationMappingSmokeIT {
 			this.id = id;
 		}
 
-		@Field
-		@Field(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
+		@GenericField
+		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -612,7 +612,7 @@ public class AnnotationMappingSmokeIT {
 			this.id = id;
 		}
 
-		@Field
+		@GenericField
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -669,7 +669,7 @@ public class AnnotationMappingSmokeIT {
 						@PropertyValue( propertyName = "embeddingAsMap")
 				)
 		)
-		@Field(
+		@GenericField(
 				name = "embeddedMapKeys",
 				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
 		)

@@ -84,7 +84,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 
 	@Message(id = ID_OFFSET_2 + 5,
-			value = "Annotation @Field on property '%1$s' defines both valueBridge and valueBridgeBuilder."
+			value = "Annotation @GenericField on property '%1$s' defines both valueBridge and valueBridgeBuilder."
 					+ " Only one of those can be defined, not both."
 	)
 	SearchException invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference(String property);

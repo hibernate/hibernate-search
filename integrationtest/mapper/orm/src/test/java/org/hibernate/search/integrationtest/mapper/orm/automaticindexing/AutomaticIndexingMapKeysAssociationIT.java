@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
@@ -356,7 +356,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		}
 
 		@Transient
-		@Field
+		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath({
 						@PropertyValue(
@@ -440,31 +440,33 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		private List<ContainingEntity> containingAsIndexedEmbeddedNoReindexOnUpdate = new ArrayList<>();
 
 		@Basic
-		@Field
+		@GenericField
 		private String indexedField;
 
 		@ElementCollection
-		@Field
+		@GenericField
 		private List<String> indexedElementCollectionField = new ArrayList<>();
 
 		@Basic
-		@Field // Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
+		@GenericField
+		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private String nonIndexedField;
 
 		@ElementCollection
-		@Field // Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
+		@GenericField
+		// Keep this annotation, it should be ignored because the field is not included in the @IndexedEmbedded
 		private List<String> nonIndexedElementCollectionField = new ArrayList<>();
 
-		@Basic // Do not annotate with @Field, this would make the test pointless
+		@Basic // Do not annotate with @GenericField, this would make the test pointless
 		private String fieldUsedInContainedDerivedField1;
 
-		@Basic // Do not annotate with @Field, this would make the test pointless
+		@Basic // Do not annotate with @GenericField, this would make the test pointless
 		private String fieldUsedInContainedDerivedField2;
 
-		@Basic // Do not annotate with @Field, this would make the test pointless
+		@Basic // Do not annotate with @GenericField, this would make the test pointless
 		private String fieldUsedInCrossEntityDerivedField1;
 
-		@Basic // Do not annotate with @Field, this would make the test pointless
+		@Basic // Do not annotate with @GenericField, this would make the test pointless
 		private String fieldUsedInCrossEntityDerivedField2;
 
 		public Integer getId() {
@@ -552,7 +554,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		}
 
 		@Transient
-		@Field
+		@GenericField
 		@IndexingDependency(derivedFrom = {
 				@ObjectPath(@PropertyValue(propertyName = "fieldUsedInContainedDerivedField1")),
 				@ObjectPath(@PropertyValue(propertyName = "fieldUsedInContainedDerivedField2"))

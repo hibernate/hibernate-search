@@ -34,26 +34,26 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 				.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
 				.property( "id" ).documentId()
 				.property( "name" )
-						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
-						.field( "name_sort" )
+						.genericField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.genericField( "name_sort" )
 								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
 								.sortable( Sortable.YES )
 				.property( "collectionSize" )
-						.field().sortable( Sortable.YES )
+						.genericField().sortable( Sortable.YES )
 				.property( "latitude" ).marker( new LatitudeMarker.Builder() )
 				.property( "longitude" ).marker( new LongitudeMarker.Builder() )
 				.property( "services" )
-						.field();
+						.genericField();
 
 		mapping.type( Document.class )
 				.property( "id" ).documentId()
 				.property( "title" )
-						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
-						.field( "title_sort" )
+						.genericField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.genericField( "title_sort" )
 								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
 								.sortable( Sortable.YES )
 				.property( "summary" )
-						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.genericField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
 				.property( "tags" )
 						.bridge(
 								new MultiKeywordStringBridge.Builder()
@@ -65,7 +65,7 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 								.storage( ObjectFieldStorage.NESTED );
 		mapping.type( Book.class ).indexed( Book.INDEX )
 				.property( "isbn" )
-						.field().valueBridge( ISBNBridge.class );
+						.genericField().valueBridge( ISBNBridge.class );
 		mapping.type( Video.class ).indexed( Video.INDEX );
 
 		mapping.type( DocumentCopy.class )
@@ -75,20 +75,20 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 						.indexedEmbedded().maxDepth( 1 );
 		mapping.type( BookCopy.class )
 				.property( "medium" )
-						.field();
+						.genericField();
 		mapping.type( VideoCopy.class )
 				.property( "medium" )
-						.field();
+						.genericField();
 
 		mapping.type( Person.class ).indexed( Person.INDEX )
 				.property( "firstName" )
-						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
-						.field( "firstName_sort" )
+						.genericField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.genericField( "firstName_sort" )
 								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
 								.sortable( Sortable.YES )
 				.property( "lastName" )
-						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
-						.field( "lastName_sort" )
+						.genericField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.genericField( "lastName_sort" )
 								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
 								.sortable( Sortable.YES )
 				.property( "account" )

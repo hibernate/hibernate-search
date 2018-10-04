@@ -14,7 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -114,7 +114,7 @@ public class PropertyInheritanceIT {
 			this.id = id;
 		}
 
-		@Field
+		@GenericField
 		public String getParentDeclaredProperty() {
 			return parentDeclaredProperty;
 		}
@@ -150,7 +150,7 @@ public class PropertyInheritanceIT {
 
 		private IndexedEntity embedded;
 
-		@Field
+		@GenericField
 		public String getChildDeclaredProperty() {
 			return childDeclaredProperty;
 		}

@@ -19,7 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -139,7 +139,7 @@ public class AnnotationMappingAccessTypeIT {
 		@Transient
 		private String internalFieldWithDifferentName;
 
-		@Field
+		@GenericField
 		public String getFieldWithDefaultFieldAccess() {
 			return methodShouldNotBeCalled();
 		}
@@ -150,7 +150,7 @@ public class AnnotationMappingAccessTypeIT {
 
 		@Access( AccessType.PROPERTY )
 		@Basic
-		@Field
+		@GenericField
 		public String getFieldWithNonDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -197,7 +197,7 @@ public class AnnotationMappingAccessTypeIT {
 			this.id = id;
 		}
 
-		@Field
+		@GenericField
 		public String getFieldWithNonDefaultFieldAccess() {
 			return methodShouldNotBeCalled();
 		}
@@ -206,7 +206,7 @@ public class AnnotationMappingAccessTypeIT {
 			methodShouldNotBeCalled();
 		}
 
-		@Field
+		@GenericField
 		public String getFieldWithDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -263,7 +263,7 @@ public class AnnotationMappingAccessTypeIT {
 		@Transient
 		private String internalFieldWithDifferentName;
 
-		@Field
+		@GenericField
 		public String getFieldWithDefaultFieldAccess() {
 			return methodShouldNotBeCalled();
 		}
@@ -274,7 +274,7 @@ public class AnnotationMappingAccessTypeIT {
 
 		@Access( AccessType.PROPERTY )
 		@Basic
-		@Field
+		@GenericField
 		public String getFieldWithNonDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -294,7 +294,7 @@ public class AnnotationMappingAccessTypeIT {
 		@Transient
 		private String internalFieldWithDifferentName;
 
-		@Field
+		@GenericField
 		public String getFieldWithNonDefaultFieldAccess() {
 			return methodShouldNotBeCalled();
 		}
@@ -304,7 +304,7 @@ public class AnnotationMappingAccessTypeIT {
 		}
 
 		@Basic
-		@Field
+		@GenericField
 		public String getFieldWithDefaultMethodAccess() {
 			return internalFieldWithDifferentName;
 		}
@@ -326,7 +326,7 @@ public class AnnotationMappingAccessTypeIT {
 			this.internalFieldWithDifferentName = internalFieldWithDifferentName;
 		}
 
-		@Field
+		@GenericField
 		public String getField() {
 			return internalFieldWithDifferentName;
 		}

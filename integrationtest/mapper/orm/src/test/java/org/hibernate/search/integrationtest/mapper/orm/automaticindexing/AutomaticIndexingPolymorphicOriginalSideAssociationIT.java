@@ -19,7 +19,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -270,7 +270,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 		private List<SecondMiddleContainingEntity> containingAsSingleFromSecond = new ArrayList<>();
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInSingle;
 
 		public Integer getId() {

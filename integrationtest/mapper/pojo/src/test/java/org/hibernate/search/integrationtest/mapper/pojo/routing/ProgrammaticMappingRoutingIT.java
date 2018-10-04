@@ -56,7 +56,7 @@ public class ProgrammaticMappingRoutingIT {
 							.routingKeyBridge( MyRoutingKeyBridge.class )
 							.property( "id" )
 									.documentId()
-							.property( "value" ).field();
+							.property( "value" ).genericField();
 				} )
 				.setup();
 

@@ -138,10 +138,10 @@ public class ProgrammaticMappingAccessTypeIT {
 			mapping.type( IndexedEntity.class )
 					.indexed( IndexedEntity.INDEX )
 					.property( "id" ).documentId()
-					.property( "fieldWithNonDefaultFieldAccess" ).field()
-					.property( "fieldWithDefaultFieldAccess" ).field()
-					.property( "fieldWithNonDefaultMethodAccess" ).field()
-					.property( "fieldWithDefaultMethodAccess" ).field()
+					.property( "fieldWithNonDefaultFieldAccess" ).genericField()
+					.property( "fieldWithDefaultFieldAccess" ).genericField()
+					.property( "fieldWithNonDefaultMethodAccess" ).genericField()
+					.property( "fieldWithDefaultMethodAccess" ).genericField()
 					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded()
 					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded()
 					.property( "nonManaged" ).indexedEmbedded();
@@ -149,13 +149,13 @@ public class ProgrammaticMappingAccessTypeIT {
 					.indexed( IndexedEntityWithoutIdSetter.INDEX )
 					.property( "id" ).documentId();
 			mapping.type( EmbeddableWithDefaultFieldAccess.class )
-					.property( "fieldWithDefaultFieldAccess" ).field()
-					.property( "fieldWithNonDefaultMethodAccess" ).field();
+					.property( "fieldWithDefaultFieldAccess" ).genericField()
+					.property( "fieldWithNonDefaultMethodAccess" ).genericField();
 			mapping.type( EmbeddableWithDefaultMethodAccess.class )
-					.property( "fieldWithNonDefaultFieldAccess" ).field()
-					.property( "fieldWithDefaultMethodAccess" ).field();
+					.property( "fieldWithNonDefaultFieldAccess" ).genericField()
+					.property( "fieldWithDefaultMethodAccess" ).genericField();
 			mapping.type( NonManaged.class )
-					.property( "field" ).field();
+					.property( "field" ).genericField();
 		}
 	}
 

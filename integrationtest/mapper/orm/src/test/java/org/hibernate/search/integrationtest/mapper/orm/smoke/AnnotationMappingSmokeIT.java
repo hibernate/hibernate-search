@@ -36,7 +36,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -408,7 +408,7 @@ public class AnnotationMappingSmokeIT {
 	@MappedSuperclass
 	public static class ParentIndexedEntity {
 
-		@Field(name = "myLocalDateField")
+		@GenericField(name = "myLocalDateField")
 		private LocalDate localDate;
 
 		@ManyToOne
@@ -443,7 +443,7 @@ public class AnnotationMappingSmokeIT {
 		@Id
 		private Integer id;
 
-		@Field(name = "myTextField")
+		@GenericField(name = "myTextField")
 		private String text;
 
 		@OneToMany(mappedBy = "embedded")
@@ -509,7 +509,7 @@ public class AnnotationMappingSmokeIT {
 		private Integer id;
 
 		@Column(name = "numeric_column")
-		@Field(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
+		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
 		private Integer numeric;
 
 		@DocumentId(identifierBridge = @IdentifierBridgeBeanReference(type = DefaultIntegerIdentifierBridge.class))
@@ -521,7 +521,7 @@ public class AnnotationMappingSmokeIT {
 			this.id = id;
 		}
 
-		@Field
+		@GenericField
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -543,7 +543,7 @@ public class AnnotationMappingSmokeIT {
 		private Integer id;
 
 		@Column(name = "numeric_column")
-		@Field
+		@GenericField
 		private Integer numeric;
 
 		@ManyToMany
@@ -580,7 +580,7 @@ public class AnnotationMappingSmokeIT {
 		}
 
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
-		@Field(
+		@GenericField(
 				name = "embeddedMapKeys",
 				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
 		)

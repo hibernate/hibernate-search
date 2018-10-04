@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
@@ -207,7 +207,7 @@ public class AnnotationMappingDiscoveryIT {
 	public static class NonExplicitlyRegisteredNonAnnotationMappedType {
 		private String text;
 
-		@Field
+		@GenericField
 		public String getText() {
 			return text;
 		}

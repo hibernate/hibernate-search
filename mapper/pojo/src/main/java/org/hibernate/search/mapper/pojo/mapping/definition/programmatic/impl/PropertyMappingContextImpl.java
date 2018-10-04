@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataCon
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -99,13 +99,13 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public PropertyFieldMappingContext field() {
-		return field( null );
+	public PropertyGenericFieldMappingContext genericField() {
+		return genericField( null );
 	}
 
 	@Override
-	public PropertyFieldMappingContext field(String relativeFieldName) {
-		PropertyFieldMappingContextImpl child = new PropertyFieldMappingContextImpl( this, relativeFieldName );
+	public PropertyGenericFieldMappingContext genericField(String relativeFieldName) {
+		PropertyGenericFieldMappingContextImpl child = new PropertyGenericFieldMappingContextImpl( this, relativeFieldName );
 		children.add( child );
 		return child;
 	}

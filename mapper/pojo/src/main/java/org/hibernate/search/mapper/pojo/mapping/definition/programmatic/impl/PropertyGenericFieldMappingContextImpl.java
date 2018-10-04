@@ -21,13 +21,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingContext
-		implements PropertyFieldMappingContext, PojoPropertyMetadataContributor {
+public class PropertyGenericFieldMappingContextImpl extends DelegatingPropertyMappingContext
+		implements PropertyGenericFieldMappingContext, PojoPropertyMetadataContributor {
 
 	private final String relativeFieldName;
 
@@ -37,7 +37,7 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 
-	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
+	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
 		super( parent );
 		this.relativeFieldName = relativeFieldName;
 	}
@@ -54,23 +54,23 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	}
 
 	@Override
-	public PropertyFieldMappingContext valueBridge(String bridgeName) {
+	public PropertyGenericFieldMappingContext valueBridge(String bridgeName) {
 		return valueBridge( new ImmutableBeanReference( bridgeName ) );
 	}
 
 	@Override
-	public PropertyFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
+	public PropertyGenericFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
 		return valueBridge( new ImmutableBeanReference( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass) {
+	public PropertyGenericFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass) {
 		return valueBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
 	}
 
 	// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
 	@SuppressWarnings( "unchecked" )
-	private PropertyFieldMappingContext valueBridge(BeanReference bridgeReference) {
+	private PropertyGenericFieldMappingContext valueBridge(BeanReference bridgeReference) {
 		return valueBridge(
 				(BeanResolverBridgeBuilder<? extends ValueBridge<?, ?>>)
 						new BeanResolverBridgeBuilder( ValueBridge.class, bridgeReference )
@@ -78,37 +78,37 @@ public class PropertyFieldMappingContextImpl extends DelegatingPropertyMappingCo
 	}
 
 	@Override
-	public PropertyFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder) {
+	public PropertyGenericFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder) {
 		this.bridgeBuilder = builder;
 		return this;
 	}
 
 	@Override
-	public PropertyFieldMappingContext analyzer(String analyzerName) {
+	public PropertyGenericFieldMappingContext analyzer(String analyzerName) {
 		fieldModelContributor.add( c -> c.analyzer( analyzerName ) );
 		return this;
 	}
 
 	@Override
-	public PropertyFieldMappingContext normalizer(String normalizerName) {
+	public PropertyGenericFieldMappingContext normalizer(String normalizerName) {
 		fieldModelContributor.add( c -> c.normalizer( normalizerName ) );
 		return this;
 	}
 
 	@Override
-	public PropertyFieldMappingContext store(Store store) {
+	public PropertyGenericFieldMappingContext store(Store store) {
 		fieldModelContributor.add( c -> c.store( store ) );
 		return this;
 	}
 
 	@Override
-	public PropertyFieldMappingContext sortable(Sortable sortable) {
+	public PropertyGenericFieldMappingContext sortable(Sortable sortable) {
 		fieldModelContributor.add( c -> c.sortable( sortable ) );
 		return this;
 	}
 
 	@Override
-	public PropertyFieldMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+	public PropertyGenericFieldMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

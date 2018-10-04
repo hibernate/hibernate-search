@@ -26,7 +26,7 @@ import javax.persistence.OrderBy;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
@@ -1503,27 +1503,27 @@ public class AutomaticIndexingEmbeddableIT {
 		private InverseSideBidirectionalEmbeddable containingAsBidirectionalEmbedded = new InverseSideBidirectionalEmbeddable();
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInEmbeddedSingle;
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInEmbeddedList;
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInElementCollection;
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInContainedSingleWithInverseSideEmbedded;
 
 		@Basic
-		@Field
+		@GenericField
 		private String includedInBidirectionalEmbedded;
 
 		@Basic
-		@Field
+		@GenericField
 		private String excludedFromAll;
 
 		public Integer getId() {

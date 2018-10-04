@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.bootstrap;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -59,8 +59,8 @@ public class FailureReportIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(name = "failingField1")
-			@Field(name = "failingField2")
+			@GenericField(name = "failingField1")
+			@GenericField(name = "failingField2")
 			public Integer getMyProperty() {
 				return myProperty;
 			}
@@ -123,11 +123,11 @@ public class FailureReportIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(name = "failingField1")
+			@GenericField(name = "failingField1")
 			public Integer getMyProperty1() {
 				return myProperty1;
 			}
-			@Field(name = "failingField2")
+			@GenericField(name = "failingField2")
 			public Integer getMyProperty2() {
 				return myProperty2;
 			}
@@ -191,7 +191,7 @@ public class FailureReportIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(name = "failingField1")
+			@GenericField(name = "failingField1")
 			public Integer getMyProperty1() {
 				return myProperty1;
 			}
@@ -205,7 +205,7 @@ public class FailureReportIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(name = "failingField2")
+			@GenericField(name = "failingField2")
 			public Integer getMyProperty2() {
 				return myProperty2;
 			}
@@ -266,8 +266,8 @@ public class FailureReportIT {
 			public Integer getId() {
 				return id;
 			}
-			@Field(name = "failingField1")
-			@Field(name = "failingField2")
+			@GenericField(name = "failingField1")
+			@GenericField(name = "failingField2")
 			public Integer getMyProperty() {
 				return myProperty;
 			}

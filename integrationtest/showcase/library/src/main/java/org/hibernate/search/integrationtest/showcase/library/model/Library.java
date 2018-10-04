@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAna
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Field;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 /**
@@ -38,8 +38,8 @@ public class Library extends AbstractEntity<Integer> {
 	@Basic
 	// TODO use multi-fields here
 	// TODO use a different analyzer/normalizer for these fields
-	@Field(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@Field(
+	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@GenericField(
 			name = "name_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES
@@ -47,7 +47,7 @@ public class Library extends AbstractEntity<Integer> {
 	private String name;
 
 	@Basic
-	@Field(sortable = Sortable.YES)
+	@GenericField(sortable = Sortable.YES)
 	private Integer collectionSize;
 
 	@Basic
@@ -59,7 +59,7 @@ public class Library extends AbstractEntity<Integer> {
 	private Double longitude;
 
 	@ElementCollection
-	@Field
+	@GenericField
 	private List<LibraryService> services;
 
 	@OneToMany(mappedBy = "library")
