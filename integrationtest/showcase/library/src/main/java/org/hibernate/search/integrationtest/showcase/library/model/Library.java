@@ -19,8 +19,10 @@ import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAna
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 /**
  * A place where documents are available.
@@ -38,8 +40,8 @@ public class Library extends AbstractEntity<Integer> {
 	@Basic
 	// TODO use multi-fields here
 	// TODO use a different analyzer/normalizer for these fields
-	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@GenericField(
+	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@KeywordField(
 			name = "name_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES

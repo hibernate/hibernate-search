@@ -12,8 +12,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyDocumentIdMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
@@ -21,11 +23,11 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 /**
  * @author Yoann Rodiere
  */
-public class DelegatingPropertyMappingContext implements PropertyMappingContext {
+class DelegatingPropertyMappingContext implements PropertyMappingContext {
 
 	private final PropertyMappingContext delegate;
 
-	protected DelegatingPropertyMappingContext(PropertyMappingContext delegate) {
+	DelegatingPropertyMappingContext(PropertyMappingContext delegate) {
 		this.delegate = delegate;
 	}
 
@@ -72,6 +74,26 @@ public class DelegatingPropertyMappingContext implements PropertyMappingContext 
 	@Override
 	public PropertyGenericFieldMappingContext genericField(String relativeFieldName) {
 		return delegate.genericField( relativeFieldName );
+	}
+
+	@Override
+	public PropertyFullTextFieldMappingContext fullTextField() {
+		return delegate.fullTextField();
+	}
+
+	@Override
+	public PropertyFullTextFieldMappingContext fullTextField(String relativeFieldName) {
+		return delegate.fullTextField( relativeFieldName );
+	}
+
+	@Override
+	public PropertyKeywordFieldMappingContext keywordField() {
+		return delegate.keywordField();
+	}
+
+	@Override
+	public PropertyKeywordFieldMappingContext keywordField(String relativeFieldName) {
+		return delegate.keywordField( relativeFieldName );
 	}
 
 	@Override

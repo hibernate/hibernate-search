@@ -18,9 +18,10 @@ import javax.persistence.OneToMany;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 /**
  * Information about a document (book, video, ...) that can be available in a library catalog.
@@ -35,8 +36,8 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private Integer id;
 
 	@Basic
-	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@GenericField(
+	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@KeywordField(
 			name = "title_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES
@@ -44,7 +45,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String title;
 
 	@Basic
-	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
 	private String summary;
 
 	/**

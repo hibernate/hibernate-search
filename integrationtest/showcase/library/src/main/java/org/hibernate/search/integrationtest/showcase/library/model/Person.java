@@ -14,9 +14,10 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
 @Indexed(index = Person.INDEX)
@@ -29,8 +30,8 @@ public class Person extends AbstractEntity<Integer> {
 
 	@Basic(optional = false)
 	// TODO use a different analyzer/normalizer for these fields
-	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@GenericField(
+	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@KeywordField(
 			name = "firstName_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES
@@ -39,8 +40,8 @@ public class Person extends AbstractEntity<Integer> {
 
 	@Basic(optional = false)
 	// TODO use a different analyzer/normalizer for these fields
-	@GenericField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	@GenericField(
+	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@KeywordField(
 			name = "lastName_sort",
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES

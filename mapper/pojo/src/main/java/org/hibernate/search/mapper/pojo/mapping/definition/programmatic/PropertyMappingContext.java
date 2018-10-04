@@ -39,6 +39,14 @@ public interface PropertyMappingContext {
 
 	PropertyGenericFieldMappingContext genericField(String relativeFieldName);
 
+	PropertyFullTextFieldMappingContext fullTextField();
+
+	PropertyFullTextFieldMappingContext fullTextField(String relativeFieldName);
+
+	PropertyKeywordFieldMappingContext keywordField();
+
+	PropertyKeywordFieldMappingContext keywordField(String relativeFieldName);
+
 	PropertyIndexedEmbeddedMappingContext indexedEmbedded();
 
 	AssociationInverseSideMappingContext associationInverseSide(PojoModelPathValueNode inversePath);

@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+
 /**
  * @author Yoann Rodiere
  */
-public interface PropertyGenericFieldMappingContext extends PropertySortableFieldMappingContext<PropertyGenericFieldMappingContext> {
+public interface PropertySortableFieldMappingContext<S extends PropertySortableFieldMappingContext<?>>
+		extends PropertyFieldMappingContext<S> {
+
+	S sortable(Sortable sortable);
 
 }

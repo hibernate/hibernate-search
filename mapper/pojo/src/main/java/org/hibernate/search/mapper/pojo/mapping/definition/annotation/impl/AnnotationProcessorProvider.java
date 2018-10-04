@@ -18,11 +18,11 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
@@ -33,19 +33,25 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -71,6 +77,8 @@ class AnnotationProcessorProvider {
 				new DocumentIdProcessor( helper ),
 				new PropertyBridgeProcessor( helper ),
 				new GenericFieldProcessor( helper ),
+				new FullTextFieldProcessor( helper ),
+				new KeywordFieldProcessor( helper ),
 				new IndexedEmbeddedProcessor( helper )
 		) );
 	}
@@ -238,48 +246,133 @@ class AnnotationProcessorProvider {
 		}
 	}
 
-	private static class GenericFieldProcessor extends PropertyAnnotationProcessor<GenericField> {
+	private static class GenericFieldProcessor extends PropertySortableFieldAnnotationProcessor<GenericField> {
 		GenericFieldProcessor(AnnotationProcessorHelper helper) {
-			super( helper );
+			super( helper, GenericField.class );
 		}
 
 		@Override
-		Stream<? extends GenericField> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-			return propertyModel.getAnnotationsByType( GenericField.class );
+		PropertySortableFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+				PojoPropertyModel<?> propertyModel, GenericField annotation, String fieldName) {
+			return mappingContext.genericField( fieldName );
 		}
 
 		@Override
-		void doProcess(PropertyMappingContext mappingContext,
-				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-				GenericField annotation) {
-			String cleanedUpRelativeFieldName = annotation.name();
-			if ( cleanedUpRelativeFieldName.isEmpty() ) {
-				cleanedUpRelativeFieldName = null;
-			}
+		String getName(GenericField annotation) {
+			return annotation.name();
+		}
 
-			BridgeBuilder<? extends ValueBridge<?, ?>> builder =
-					helper.createValueBridgeBuilder( annotation, propertyModel );
+		@Override
+		Store getStore(GenericField annotation) {
+			return annotation.store();
+		}
 
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+		@Override
+		Sortable getSortable(GenericField annotation) {
+			return annotation.sortable();
+		}
 
-			PropertyGenericFieldMappingContext fieldContext = mappingContext.genericField( cleanedUpRelativeFieldName )
-					.withExtractors( extractorPath )
-					.valueBridge( builder );
+		@Override
+		ValueBridgeBeanReference getValueBridge(GenericField annotation) {
+			return annotation.valueBridge();
+		}
 
-			if ( !Store.DEFAULT.equals( annotation.store() ) ) {
-				fieldContext.store( annotation.store() );
-			}
-			if ( !Sortable.DEFAULT.equals( annotation.sortable() ) ) {
-				fieldContext.sortable( annotation.sortable() );
-			}
-			if ( !annotation.analyzer().isEmpty() ) {
-				fieldContext.analyzer( annotation.analyzer() );
-			}
-			if ( !annotation.normalizer().isEmpty() ) {
-				fieldContext.normalizer( annotation.normalizer() );
-			}
+		@Override
+		ValueBridgeBuilderBeanReference getValueBridgeBuilder(GenericField annotation) {
+			return annotation.valueBridgeBuilder();
+		}
+
+		@Override
+		ContainerValueExtractorBeanReference[] getExtractors(GenericField annotation) {
+			return annotation.extractors();
 		}
 	}
+
+	private static class FullTextFieldProcessor extends PropertyFieldAnnotationProcessor<FullTextField> {
+		FullTextFieldProcessor(AnnotationProcessorHelper helper) {
+			super( helper, FullTextField.class );
+		}
+
+		@Override
+		PropertyFieldMappingContext<?> initFieldMappingContext(PropertyMappingContext mappingContext,
+				PojoPropertyModel<?> propertyModel, FullTextField annotation, String fieldName) {
+			return mappingContext.fullTextField( fieldName )
+					.analyzer( annotation.analyzer() );
+		}
+
+		@Override
+		String getName(FullTextField annotation) {
+			return annotation.name();
+		}
+
+		@Override
+		Store getStore(FullTextField annotation) {
+			return annotation.store();
+		}
+
+		@Override
+		ValueBridgeBeanReference getValueBridge(FullTextField annotation) {
+			return annotation.valueBridge();
+		}
+
+		@Override
+		ValueBridgeBuilderBeanReference getValueBridgeBuilder(FullTextField annotation) {
+			return annotation.valueBridgeBuilder();
+		}
+
+		@Override
+		ContainerValueExtractorBeanReference[] getExtractors(FullTextField annotation) {
+			return annotation.extractors();
+		}
+	}
+
+	private static class KeywordFieldProcessor extends PropertySortableFieldAnnotationProcessor<KeywordField> {
+		KeywordFieldProcessor(AnnotationProcessorHelper helper) {
+			super( helper, KeywordField.class );
+		}
+
+		@Override
+		PropertySortableFieldMappingContext<?> initSortableFieldMappingContext(PropertyMappingContext mappingContext,
+				PojoPropertyModel<?> propertyModel, KeywordField annotation, String fieldName) {
+			PropertyKeywordFieldMappingContext fieldContext = mappingContext.keywordField( fieldName );
+			String normalizer = annotation.normalizer();
+			if ( !normalizer.isEmpty() ) {
+				fieldContext.normalizer( annotation.normalizer() );
+			}
+			return fieldContext;
+		}
+
+		@Override
+		String getName(KeywordField annotation) {
+			return annotation.name();
+		}
+
+		@Override
+		Store getStore(KeywordField annotation) {
+			return annotation.store();
+		}
+
+		@Override
+		Sortable getSortable(KeywordField annotation) {
+			return annotation.sortable();
+		}
+
+		@Override
+		ValueBridgeBeanReference getValueBridge(KeywordField annotation) {
+			return annotation.valueBridge();
+		}
+
+		@Override
+		ValueBridgeBuilderBeanReference getValueBridgeBuilder(KeywordField annotation) {
+			return annotation.valueBridgeBuilder();
+		}
+
+		@Override
+		ContainerValueExtractorBeanReference[] getExtractors(KeywordField annotation) {
+			return annotation.extractors();
+		}
+	}
+
 
 	private static class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedded> {
 		IndexedEmbeddedProcessor(AnnotationProcessorHelper helper) {

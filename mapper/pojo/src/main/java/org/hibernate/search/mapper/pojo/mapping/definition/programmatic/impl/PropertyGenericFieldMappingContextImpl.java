@@ -6,124 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
-import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
-import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-public class PropertyGenericFieldMappingContextImpl extends DelegatingPropertyMappingContext
-		implements PropertyGenericFieldMappingContext, PojoPropertyMetadataContributor {
-
-	private final String relativeFieldName;
-
-	private BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder;
-
-	private final CompositeFieldModelContributor fieldModelContributor = new CompositeFieldModelContributor();
-
-	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
+class PropertyGenericFieldMappingContextImpl
+		extends PropertySortableFieldMappingContextImpl<PropertyGenericFieldMappingContext>
+		implements PropertyGenericFieldMappingContext {
 
 	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent );
-		this.relativeFieldName = relativeFieldName;
+		super( parent, relativeFieldName );
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
-		// Nothing to do
-	}
-
-	@Override
-	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
-		collector.value( extractorPath )
-				.valueBridge( bridgeBuilder, relativeFieldName, fieldModelContributor );
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext valueBridge(String bridgeName) {
-		return valueBridge( new ImmutableBeanReference( bridgeName ) );
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
-		return valueBridge( new ImmutableBeanReference( bridgeClass ) );
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass) {
-		return valueBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
-	}
-
-	// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
-	@SuppressWarnings( "unchecked" )
-	private PropertyGenericFieldMappingContext valueBridge(BeanReference bridgeReference) {
-		return valueBridge(
-				(BeanResolverBridgeBuilder<? extends ValueBridge<?, ?>>)
-						new BeanResolverBridgeBuilder( ValueBridge.class, bridgeReference )
-		);
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder) {
-		this.bridgeBuilder = builder;
+	PropertyGenericFieldMappingContext thisAsS() {
 		return this;
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext analyzer(String analyzerName) {
-		fieldModelContributor.add( c -> c.analyzer( analyzerName ) );
-		return this;
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext normalizer(String normalizerName) {
-		fieldModelContributor.add( c -> c.normalizer( normalizerName ) );
-		return this;
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext store(Store store) {
-		fieldModelContributor.add( c -> c.store( store ) );
-		return this;
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext sortable(Sortable sortable) {
-		fieldModelContributor.add( c -> c.sortable( sortable ) );
-		return this;
-	}
-
-	@Override
-	public PropertyGenericFieldMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
-		this.extractorPath = extractorPath;
-		return this;
-	}
-
-	private static class CompositeFieldModelContributor implements FieldModelContributor {
-		private final List<FieldModelContributor> delegates = new ArrayList<>();
-
-		public void add(FieldModelContributor delegate) {
-			delegates.add( delegate );
-		}
-
-		@Override
-		public void contribute(StandardIndexSchemaFieldTypedContext<?> context) {
-			delegates.forEach( c -> c.contribute( context ) );
-		}
 	}
 
 }

@@ -17,20 +17,27 @@ import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 
 /**
- * A generic annotation that will work for any supported type of field in the full text index:
- * full-text, keyword (non-analyzed) text, integer, date, ...
+ * A keyword field in the full text index, holding a single token (word) of text.
  * <p>
- * Note that this annotation, being generic, does not offer configuration options
- * that are specific to only some types of fields.
- * Use more specific annotations if you want that kind of configuration.
- * For example, to define a tokenized (multi-word) text field, use {@link FullTextField}.
- * To define a non-tokenized (single-word) text field, use {@link KeywordField}.
+ * On contrary to {@link FullTextField}, this annotation only creates non-tokenized (single-word) text fields.
+ * As a result:
+ * <ul>
+ *     <li>The field value (the value of your annotated property, or at least the value produced by your custom
+ *     {@link #valueBridge() value bridge} must be of type String</li>
+ *     <li>You cannot assign an analyzer when using this annotation</li>
+ *     <li>You can, however, assign a normalizer (which is an analyzer that doesn't perform tokenization)
+ *     when using this annotation</li>
+ *     <li>This annotation allows to make the field sortable</li>
+ * </ul>
+ * <p>
+ * If you want to index a non-String value, use the {@link GenericField} annotation instead.
+ * If you want to index a String value, but want the field to be tokenized, use {@link FullTextField} instead.
  */
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(GenericField.List.class)
-public @interface GenericField {
+@Repeatable(KeywordField.List.class)
+public @interface KeywordField {
 
 	/**
 	 * @return The name of the index field.
@@ -38,35 +45,39 @@ public @interface GenericField {
 	String name() default "";
 
 	/**
+	 * @return A reference to the normalizer to use for this field.
+	 * Defaults to an empty string, meaning no normalization at all.
+	 * See the documentation of your backend to know how to define normalization.
+	 */
+	String normalizer() default "";
+
+	/**
 	 * @return Whether values for this field should be stored (enables projections).
+	 * @see GenericField#store()
 	 */
 	Store store() default Store.DEFAULT;
 
 	/**
 	 * @return Whether this field should be sortable.
+	 * @see GenericField#sortable()
 	 */
 	Sortable sortable() default Sortable.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
-	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridgeBuilder()}:
-	 * either a bridge or a bridge builder can be provided, but never both.
+	 * @see GenericField#valueBridge()
 	 */
 	ValueBridgeBeanReference valueBridge() default @ValueBridgeBeanReference;
 
 	/**
 	 * @return A reference to the builder to use to build a value bridge for this field.
-	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridge()}:
-	 * either a bridge or a bridge builder can be provided, but never both.
+	 * @see GenericField#valueBridgeBuilder()
 	 */
 	ValueBridgeBuilderBeanReference valueBridgeBuilder() default @ValueBridgeBuilderBeanReference;
 
 	/**
-	 * @return An array of reference to container value extractor implementation classes,
-	 * which will be applied to the source value before applying this bridge.
-	 * By default, Hibernate Search will try to apply a set of extractors for common types
-	 * ({@link java.lang.Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
-	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
+	 * @return An array of reference to container value extractor implementation classes.
+	 * @see GenericField#extractors()
 	 */
 	ContainerValueExtractorBeanReference[] extractors()
 			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
@@ -75,7 +86,7 @@ public @interface GenericField {
 	@Target({ ElementType.METHOD, ElementType.FIELD })
 	@Retention(RetentionPolicy.RUNTIME)
 	@interface List {
-		GenericField[] value();
+		KeywordField[] value();
 	}
 
 }
