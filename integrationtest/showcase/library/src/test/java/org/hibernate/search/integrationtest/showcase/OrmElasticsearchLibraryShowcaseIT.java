@@ -24,7 +24,9 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
@@ -140,6 +142,10 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backend.elasticsearchBackend_1.log.json_pretty_printing", true )
+				.applySetting(
+						PREFIX + "backend.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						new LibraryAnalysisConfigurer()
+				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
 
 		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
@@ -538,7 +544,8 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		Book javaForDummies = documentDao.createBook(
 				JAVA_FOR_DUMMIES_ID,
 				new ISBN( "978-0-00-000004-4" ),
-				"Java for Dummies",
+				// Use varying case on purpose
+				"java for Dummies",
 				"Learning the Java programming language in ten lessons",
 				"programming,language,java"
 		);
@@ -587,7 +594,8 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		// Suburban library 1
 		Library suburbanLibrary1 = libraryDao.create(
 				SUBURBAN_1_ID,
-				"Suburban Library 1",
+				// Use varying case on purpose
+				"suburban Library 1",
 				800,
 				42.0, 0.25,
 				LibraryService.DISABLED_ACCESS,
@@ -649,17 +657,20 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		createBorrowal( personDao, janeFonda, universityLibrary, thesaurusOfLanguages, BorrowalType.SHORT_TERM );
 		createBorrowal( personDao, janeFonda, universityLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
 
-		Person janePorter = personDao.create( JANE_PORTER_ID, "Jane", "Porter" );
+		// Use varying case on purpose
+		Person janePorter = personDao.create( JANE_PORTER_ID, "Jane", "porter" );
 		personDao.createAccount( janePorter );
 		createBorrowal( personDao, janePorter, suburbanLibrary1, indonesianEconomy, BorrowalType.LONG_TERM );
 		createBorrowal( personDao, janePorter, suburbanLibrary2, livingOnIsland, 1, BorrowalType.LONG_TERM );
 		createBorrowal( personDao, janePorter, universityLibrary, thesaurusOfLanguages, BorrowalType.LONG_TERM );
 
-		Person johnLennon = personDao.create( JOHN_LENNON_ID, "John", "Lennon" );
+		// Use varying case on purpose
+		Person johnLennon = personDao.create( JOHN_LENNON_ID, "john", "Lennon" );
 		personDao.createAccount( johnLennon );
 		createBorrowal( personDao, johnLennon, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person eltonJohn = personDao.create( ELTON_JOHN_ID, "Elton", "John" );
+		// Use varying case on purpose
+		Person eltonJohn = personDao.create( ELTON_JOHN_ID, "elton", "john" );
 		personDao.createAccount( eltonJohn );
 		createBorrowal( personDao, eltonJohn, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 

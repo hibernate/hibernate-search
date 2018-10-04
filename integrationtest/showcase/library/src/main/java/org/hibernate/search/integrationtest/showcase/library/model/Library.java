@@ -15,6 +15,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
@@ -37,8 +38,12 @@ public class Library extends AbstractEntity<Integer> {
 	@Basic
 	// TODO use multi-fields here
 	// TODO use a different analyzer/normalizer for these fields
-	@Field(analyzer = "default")
-	@Field(name = "name_sort", sortable = Sortable.YES)
+	@Field(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@Field(
+			name = "name_sort",
+			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
+			sortable = Sortable.YES
+	)
 	private String name;
 
 	@Basic

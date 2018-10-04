@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.model;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
@@ -33,8 +34,10 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 				.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
 				.property( "id" ).documentId()
 				.property( "name" )
-						.field().analyzer( "default" )
-						.field( "name_sort" ).sortable( Sortable.YES )
+						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.field( "name_sort" )
+								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
+								.sortable( Sortable.YES )
 				.property( "collectionSize" )
 						.field().sortable( Sortable.YES )
 				.property( "latitude" ).marker( new LatitudeMarker.Builder() )
@@ -45,10 +48,12 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 		mapping.type( Document.class )
 				.property( "id" ).documentId()
 				.property( "title" )
-						.field().analyzer( "default" )
-						.field( "title_sort" ).sortable( Sortable.YES )
+						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.field( "title_sort" )
+								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
+								.sortable( Sortable.YES )
 				.property( "summary" )
-						.field().analyzer( "default" )
+						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
 				.property( "tags" )
 						.bridge(
 								new MultiKeywordStringBridge.Builder()
@@ -77,11 +82,15 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 
 		mapping.type( Person.class ).indexed( Person.INDEX )
 				.property( "firstName" )
-						.field().analyzer( "default" )
-						.field( "firstName_sort" ).sortable( Sortable.YES )
+						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.field( "firstName_sort" )
+								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
+								.sortable( Sortable.YES )
 				.property( "lastName" )
-						.field().analyzer( "default" )
-						.field( "lastName_sort" ).sortable( Sortable.YES )
+						.field().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
+						.field( "lastName_sort" )
+								.normalizer( LibraryAnalysisConfigurer.NORMALIZER_SORT )
+								.sortable( Sortable.YES )
 				.property( "account" )
 						.indexedEmbedded();
 
