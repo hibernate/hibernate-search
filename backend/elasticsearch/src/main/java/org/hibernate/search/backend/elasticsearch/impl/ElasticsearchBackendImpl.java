@@ -141,7 +141,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
-				indexSchemaRootNodeBuilder, settingsBuilder, buildContext, propertySource
+				indexSchemaRootNodeBuilder, settingsBuilder
 		);
 	}
 

@@ -31,8 +31,8 @@ public class ElasticsearchCustomNormalizerDefinitionContextImpl
 	@Override
 	public ElasticsearchCustomNormalizerDefinitionContext withCharFilters(String... names) {
 		definition.setCharFilters( null );
-		for ( String name : names ) {
-			definition.addCharFilter( name );
+		for ( String charFilterName : names ) {
+			definition.addCharFilter( charFilterName );
 		}
 		return this;
 	}
@@ -40,8 +40,8 @@ public class ElasticsearchCustomNormalizerDefinitionContextImpl
 	@Override
 	public ElasticsearchCustomNormalizerDefinitionContext withTokenFilters(String... names) {
 		definition.setTokenFilters( null );
-		for ( String name : names ) {
-			definition.addTokenFilter( name );
+		for ( String tokenFilterName : names ) {
+			definition.addTokenFilter( tokenFilterName );
 		}
 		return this;
 	}

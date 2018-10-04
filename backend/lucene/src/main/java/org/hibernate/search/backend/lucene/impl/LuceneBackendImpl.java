@@ -107,8 +107,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		 */
 		return new LuceneIndexManagerBuilder(
 				indexingContext, searchContext,
-				indexName, indexSchemaRootNodeBuilder,
-				context, propertySource
+				indexName, indexSchemaRootNodeBuilder
 		);
 	}
 

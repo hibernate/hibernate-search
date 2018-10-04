@@ -38,16 +38,16 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 	}
 
 	@Override
-	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenizer(String name) {
-		definition.setTokenizer( name );
+	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenizer(String tokenizerName) {
+		definition.setTokenizer( tokenizerName );
 		return this;
 	}
 
 	@Override
 	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withCharFilters(String... names) {
 		definition.setCharFilters( null );
-		for ( String name : names ) {
-			definition.addCharFilter( name );
+		for ( String charFilterName : names ) {
+			definition.addCharFilter( charFilterName );
 		}
 		return this;
 	}
@@ -55,8 +55,8 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 	@Override
 	public ElasticsearchAnalyzerDefinitionWithTokenizerContext withTokenFilters(String... names) {
 		definition.setTokenFilters( null );
-		for ( String name : names ) {
-			definition.addTokenFilter( name );
+		for ( String tokenFilterName : names ) {
+			definition.addTokenFilter( tokenFilterName );
 		}
 		return this;
 	}

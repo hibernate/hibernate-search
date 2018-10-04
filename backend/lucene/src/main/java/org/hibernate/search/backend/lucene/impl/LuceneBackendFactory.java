@@ -201,10 +201,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		try {
 			return Version.parseLeniently( versionString );
 		}
-		catch (IllegalArgumentException e) {
-			throw log.illegalLuceneVersionFormat( versionString, e.getMessage(), e );
-		}
-		catch (ParseException e) {
+		catch (IllegalArgumentException | ParseException e) {
 			throw log.illegalLuceneVersionFormat( versionString, e.getMessage(), e );
 		}
 	}

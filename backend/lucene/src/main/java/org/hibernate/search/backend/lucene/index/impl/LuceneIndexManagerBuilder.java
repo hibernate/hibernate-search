@@ -16,8 +16,6 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -40,20 +38,14 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 	private final String indexName;
 	private final LuceneIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
-	private final BackendBuildContext buildContext;
-	private final ConfigurationPropertySource propertySource;
-
 	public LuceneIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String indexName,
-			LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
-			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+			LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.indexName = indexName;
 		this.schemaRootNodeBuilder = indexSchemaRootNodeBuilder;
-		this.buildContext = buildContext;
-		this.propertySource = propertySource;
 	}
 
 	@Override

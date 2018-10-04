@@ -78,7 +78,6 @@ public class LuceneCustomAnalyzerDefinitionContextImpl
 	public Analyzer build(LuceneAnalysisComponentFactory factory) {
 		try {
 			return factory.createAnalyzer(
-					name,
 					tokenizer.build( factory ),
 					LuceneAnalysisComponentBuilder.buildAll( charFilters, CharFilterFactory[]::new, factory ),
 					LuceneAnalysisComponentBuilder.buildAll( tokenFilters, TokenFilterFactory[]::new, factory )

@@ -32,9 +32,21 @@ final class HibernateSearchNormalizerCheckingFilter extends TokenFilter {
 
 	private final StringBuilder concatenatedTokenBuilder = new StringBuilder();
 
-	protected HibernateSearchNormalizerCheckingFilter(TokenStream input, String normalizerName) {
+	HibernateSearchNormalizerCheckingFilter(TokenStream input, String normalizerName) {
 		super( input );
 		this.normalizerName = normalizerName;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null && getClass().equals( obj.getClass() )
+				&& normalizerName.equals( ( (HibernateSearchNormalizerCheckingFilter) obj ).normalizerName )
+				&& super.equals( obj );
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode() * 31 + normalizerName.hashCode();
 	}
 
 	@Override

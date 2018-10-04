@@ -48,7 +48,7 @@ public final class LuceneAnalysisComponentFactory {
 		this.resourceLoader = new HibernateSearchResourceLoader( classResolver, resourceResolver );
 	}
 
-	public Analyzer createAnalyzer(String name, TokenizerFactory tokenizerFactory,
+	public Analyzer createAnalyzer(TokenizerFactory tokenizerFactory,
 			CharFilterFactory[] charFilterFactories, TokenFilterFactory[] filterFactories) {
 		return new TokenizerChain( charFilterFactories, tokenizerFactory, filterFactories );
 	}
