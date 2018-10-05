@@ -103,8 +103,9 @@ public class LuceneBackendFactory implements BackendFactory {
 			}
 		}
 		else {
-			log.recommendConfiguringLuceneVersion( backendContext );
-			luceneVersion = SearchBackendLuceneSettings.Defaults.LUCENE_VERSION;
+			Version latestVersion = SearchBackendLuceneSettings.Defaults.LUCENE_VERSION;
+			log.recommendConfiguringLuceneVersion( latestVersion, backendContext );
+			luceneVersion = latestVersion;
 		}
 		return luceneVersion;
 	}

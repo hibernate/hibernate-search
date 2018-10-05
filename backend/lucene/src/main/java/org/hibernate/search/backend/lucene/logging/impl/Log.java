@@ -36,6 +36,7 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Version;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -80,8 +81,8 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 75,
 			value = "Configuration setting " + SearchBackendLuceneSettings.LUCENE_VERSION
-			+ " was not specified: using LATEST. %1$s")
-	void recommendConfiguringLuceneVersion(@FormatWith(EventContextFormatter.class) EventContext context);
+			+ " was not specified: using LATEST (currently '%1$s'). %2$s")
+	void recommendConfiguringLuceneVersion(Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
 
 	@Message(id = ID_OFFSET_1 + 114,
 			value = "Could not load resource: '%1$s'")
