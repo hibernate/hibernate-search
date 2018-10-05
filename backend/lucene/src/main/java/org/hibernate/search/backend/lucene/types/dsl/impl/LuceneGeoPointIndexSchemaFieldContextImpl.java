@@ -13,39 +13,40 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccesso
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.IntegerFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.lucene.types.predicate.impl.IntegerFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.GeoPointFieldSortContributor;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * @author Guillaume Smet
  */
-public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
+public class LuceneGeoPointIndexSchemaFieldContextImpl extends
+		AbstractLuceneStandardIndexSchemaFieldTypedContext<GeoPoint> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public IntegerIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Integer.class );
+	public LuceneGeoPointIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, GeoPoint.class );
 	}
 
 	@Override
-	public IntegerIndexSchemaFieldContext sortable(Sortable sortable) {
+	public LuceneGeoPointIndexSchemaFieldContextImpl sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
-		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
-		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
+		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
-				new IntegerFieldCodec( getStore(), sortable ),
-				new IntegerFieldPredicateBuilderFactory( converter ),
-				IntegerFieldSortContributor.INSTANCE
+				new StandardFieldConverter<>( helper.createUserIndexFieldConverter() ),
+				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore(), sortable ),
+				GeoPointFieldPredicateBuilderFactory.INSTANCE,
+				GeoPointFieldSortContributor.INSTANCE
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -25,7 +25,7 @@ import org.hibernate.search.util.AssertionFailure;
 /**
  * @author Guillaume Smet
  */
-public class LuceneFieldIndexSchemaFieldContext<F>
+public class LuceneFieldIndexSchemaFieldContextImpl<F>
 		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
 
 	private static final ToIndexFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
@@ -55,7 +55,7 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
+	public LuceneFieldIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, getToIndexFieldValueConverter() );
 		this.relativeFieldName = relativeFieldName;

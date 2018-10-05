@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueC
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.LuceneStandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -25,8 +25,8 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
-		implements LuceneIndexSchemaFieldTypedContext<F>, LuceneIndexSchemaNodeContributor {
+public abstract class AbstractLuceneStandardIndexSchemaFieldTypedContext<F>
+		implements LuceneStandardIndexSchemaFieldTypedContext<F>, LuceneIndexSchemaNodeContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,7 +38,7 @@ public abstract class AbstractLuceneIndexSchemaFieldTypedContext<F>
 
 	private Store store = Store.DEFAULT;
 
-	protected AbstractLuceneIndexSchemaFieldTypedContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
+	protected AbstractLuceneStandardIndexSchemaFieldTypedContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> fieldType) {
 		this.schemaContext = schemaContext;
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );

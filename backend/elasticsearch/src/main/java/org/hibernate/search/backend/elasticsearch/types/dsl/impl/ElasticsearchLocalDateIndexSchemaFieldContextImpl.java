@@ -36,7 +36,8 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<LocalDate> {
+public class ElasticsearchLocalDateIndexSchemaFieldContextImpl extends
+		AbstractElasticsearchScalarFieldTypedContext<LocalDate> {
 
 	private static final LocalDateFieldCodec DEFAULT_CODEC = new LocalDateFieldCodec(
 					new DateTimeFormatterBuilder()
@@ -52,7 +53,7 @@ public class LocalDateIndexSchemaFieldContext extends AbstractScalarFieldTypedCo
 	private final String relativeFieldName;
 	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	public LocalDateIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchLocalDateIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, LocalDate.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}

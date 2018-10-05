@@ -15,9 +15,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.IntegerFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
 
@@ -25,29 +26,28 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedContext<Integer> {
+public class ElasticsearchGeoPointIndexSchemaFieldContextImpl extends
+		AbstractElasticsearchScalarFieldTypedContext<GeoPoint> {
 
 	private final String relativeFieldName;
 
-	public IntegerIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Integer.class, DataType.INTEGER );
+	public ElasticsearchGeoPointIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, GeoPoint.class, DataType.GEO_POINT );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Integer> helper,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>(
+		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				IntegerFieldCodec.INSTANCE
+				GeoPointFieldCodec.INSTANCE
 		);
-		StandardFieldPredicateBuilderFactory predicateBuilderFactory =
-				new StandardFieldPredicateBuilderFactory( converter );
-		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, IntegerFieldCodec.INSTANCE, predicateBuilderFactory
+		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, converter, GeoPointFieldCodec.INSTANCE, GeoPointFieldPredicateBuilderFactory.INSTANCE
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
@@ -58,4 +58,5 @@ public class IntegerIndexSchemaFieldContext extends AbstractScalarFieldTypedCont
 
 		return mapping;
 	}
+
 }

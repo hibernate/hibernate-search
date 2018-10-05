@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTypedContext<String>,
+public class JsonStringIndexSchemaFieldContextImpl implements IndexSchemaFieldTypedContext<String>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
@@ -45,7 +45,7 @@ public class JsonStringIndexSchemaFieldContext implements IndexSchemaFieldTypedC
 
 	private final String mappingJsonString;
 
-	public JsonStringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
+	public JsonStringIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;

@@ -33,7 +33,8 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<String> {
+public class LuceneStringIndexSchemaFieldContextImpl extends
+		AbstractLuceneStandardIndexSchemaFieldTypedContext<String> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,7 +45,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public StringIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneStringIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, String.class );
 	}
 
@@ -69,7 +70,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	}
 
 	@Override
-	public StringIndexSchemaFieldContext sortable(Sortable sortable) {
+	public LuceneStringIndexSchemaFieldContextImpl sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
