@@ -6,21 +6,30 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyGenericFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 
 
 class PropertyGenericFieldMappingContextImpl
-		extends PropertySortableFieldMappingContextImpl<PropertyGenericFieldMappingContext>
+		extends PropertySortableFieldMappingContextImpl<PropertyGenericFieldMappingContext, StandardIndexSchemaFieldTypedContext<?, ?>>
 		implements PropertyGenericFieldMappingContext {
 
 	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName );
+		super(
+				parent, relativeFieldName,
+				PropertyGenericFieldMappingContextImpl::convertFieldTypedContext
+		);
 	}
 
 	@Override
 	PropertyGenericFieldMappingContext thisAsS() {
 		return this;
+	}
+
+	private static StandardIndexSchemaFieldTypedContext<?,?> convertFieldTypedContext(StandardIndexSchemaFieldTypedContext<?,?> context) {
+		// Nothing to do: we don't need anything more than the standard context
+		return context;
 	}
 
 }

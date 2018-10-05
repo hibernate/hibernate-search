@@ -22,6 +22,7 @@ import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSc
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -50,18 +51,18 @@ class LuceneIndexSchemaFieldContextImpl
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <F> StandardIndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
+	public <F> StandardIndexSchemaFieldTypedContext<?, F> as(Class<F> inputType) {
 		if ( String.class.equals( inputType ) ) {
-			return (StandardIndexSchemaFieldTypedContext<F>) asString();
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asString();
 		}
 		else if ( Integer.class.equals( inputType ) ) {
-			return (StandardIndexSchemaFieldTypedContext<F>) asInteger();
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asInteger();
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
-			return (StandardIndexSchemaFieldTypedContext<F>) asLocalDate();
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
-			return (StandardIndexSchemaFieldTypedContext<F>) asGeoPoint();
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asGeoPoint();
 		}
 		else {
 			// TODO implement other types
@@ -70,22 +71,22 @@ class LuceneIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> asString() {
+	public StringIndexSchemaFieldTypedContext<?> asString() {
 		return setDelegate( new LuceneStringIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<Integer> asInteger() {
+	public StandardIndexSchemaFieldTypedContext<?, Integer> asInteger() {
 		return setDelegate( new LuceneIntegerIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
+	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return setDelegate( new LuceneLocalDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
+	public StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint() {
 		return setDelegate( new LuceneGeoPointIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 

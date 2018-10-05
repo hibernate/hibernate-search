@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
@@ -24,28 +25,32 @@ class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 	}
 
 	@Override
-	public <F> StandardIndexSchemaFieldTypedContext<F> as(Class<F> inputType) {
-		builder.inputType( inputType );
-		return new StubIndexSchemaFieldTypedContext<>( builder, inputType, included );
+	public <F> StandardIndexSchemaFieldTypedContext<?, F> as(Class<F> inputType) {
+		if ( String.class.isAssignableFrom( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asString();
+		}
+		else {
+			return new StubGenericIndexSchemaFieldTypedContext<>( builder, inputType, included );
+		}
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> asString() {
-		return as( String.class );
+	public StringIndexSchemaFieldTypedContext<?> asString() {
+		return new StubStringIndexSchemaFieldTypedContext( builder, included );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<Integer> asInteger() {
+	public StandardIndexSchemaFieldTypedContext<?, Integer> asInteger() {
 		return as( Integer.class );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
+	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
+	public StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint() {
 		return as( GeoPoint.class );
 	}
 

@@ -41,16 +41,9 @@ public class DocumentModelDslIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static List<Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>>> MAIN_TYPES =
+	private static List<Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>>> MAIN_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexSchemaFieldContext::asString,
-					IndexSchemaFieldContext::asInteger,
-					IndexSchemaFieldContext::asLocalDate,
-					IndexSchemaFieldContext::asGeoPoint
-			) );
-
-	private static List<Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>>> NON_ANALYZABLE_TYPES =
-			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexSchemaFieldContext::asInteger,
 					IndexSchemaFieldContext::asLocalDate,
 					IndexSchemaFieldContext::asGeoPoint
@@ -369,92 +362,6 @@ public class DocumentModelDslIT {
 	}
 
 	@Test
-	public void analyzerOnNonAnalyzableType() {
-		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction
-				: NON_ANALYZABLE_TYPES ) {
-			SubTest.expectException(
-					"Setting an analyzer after " + typedContextFunction + " on schema root",
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						typedContextFunction.apply(
-								root.field( "myField" )
-						)
-								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
-					} )
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "An analyzer was set on field 'myField'" )
-					.hasMessageContaining( "fields of this type cannot be analyzed" )
-					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexName( INDEX_NAME ),
-							EventContexts.fromIndexFieldAbsolutePath( "myField" )
-					) );
-			SubTest.expectException(
-					"Setting an analyzer after " + typedContextFunction + " on non-root",
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						typedContextFunction.apply(
-								root.objectField( "nonRoot" ).field( "myField" )
-						)
-								.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
-					} )
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "An analyzer was set on field 'myField'" )
-					.hasMessageContaining( "fields of this type cannot be analyzed" )
-					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexName( INDEX_NAME ),
-							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
-					) );
-		}
-	}
-
-	@Test
-	public void normalizerOnNonAnalyzableType() {
-		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction
-				: NON_ANALYZABLE_TYPES ) {
-			SubTest.expectException(
-					"Setting a normalizer after " + typedContextFunction + " on schema root",
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						typedContextFunction.apply(
-								root.field( "myField" )
-						)
-								.normalizer( "someNormalizer" );
-					} )
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "A normalizer was set on field 'myField'" )
-					.hasMessageContaining( "fields of this type cannot be analyzed" )
-					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexName( INDEX_NAME ),
-							EventContexts.fromIndexFieldAbsolutePath( "myField" )
-					) );
-			SubTest.expectException(
-					"Setting a normalizer after " + typedContextFunction + " on non-root",
-					() -> setup( ctx -> {
-						IndexSchemaElement root = ctx.getSchemaElement();
-						typedContextFunction.apply(
-								root.objectField( "nonRoot" ).field( "myField" )
-						)
-								.normalizer( "someNormalizer" );
-					} )
-			)
-					.assertThrown()
-					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "A normalizer was set on field 'myField'" )
-					.hasMessageContaining( "fields of this type cannot be analyzed" )
-					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexName( INDEX_NAME ),
-							EventContexts.fromIndexFieldAbsolutePath( "nonRoot.myField" )
-					) );
-		}
-	}
-
-	@Test
 	public void analyzerOnSortableField() {
 		SubTest.expectException(
 				"Setting an analyzer on sortable field",
@@ -502,7 +409,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void missingCreateAccessorCall() {
-		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Missing createAccessor() call after " + typedContextFunction,
 					() -> setup( ctx -> {
@@ -538,12 +445,12 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void multipleCreateAccessorCall() {
-		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?>> typedContextFunction : MAIN_TYPES ) {
+		for ( Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
 					"Multiple createAccessor() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						StandardIndexSchemaFieldTypedContext<?> context = typedContextFunction.apply(
+						StandardIndexSchemaFieldTypedContext<?, ?> context = typedContextFunction.apply(
 								root.field( "myField" )
 						);
 						context.createAccessor();

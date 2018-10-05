@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-public interface StandardIndexSchemaFieldTypedContext<S extends StandardIndexSchemaFieldTypedContext<? extends S, F>, F>
-		extends IndexSchemaFieldTypedContext<S, F> {
+/**
+ * @param <S> The type of this context.
+ */
+public interface StringIndexSchemaFieldTypedContext<S extends StringIndexSchemaFieldTypedContext<? extends S>>
+		extends StandardIndexSchemaFieldTypedContext<S, String> {
 
-	S store(Store store);
+	S analyzer(String analyzerName);
 
-	S sortable(Sortable sortable);
+	S normalizer(String normalizerName);
 
 }

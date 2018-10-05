@@ -19,20 +19,20 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
-import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
+import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -692,7 +692,7 @@ public class RangeSearchPredicateIT {
 		}
 
 		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-				Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
 			return Arrays.asList(
 					// TODO also test analyzed strings
 					ByTypeFieldModel.mapper( String.class, "ccc", "mmm", "xxx",
@@ -733,7 +733,7 @@ public class RangeSearchPredicateIT {
 		public static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
 			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<String> context = parent.field( name ).asString();
+				StandardIndexSchemaFieldTypedContext<?, String> context = parent.field( name ).asString();
 				configuration.accept( context );
 				IndexFieldAccessor<String> accessor = context.createAccessor();
 				return new MainFieldModel( accessor, name, document1Value, document2Value, document3Value );
@@ -759,7 +759,7 @@ public class RangeSearchPredicateIT {
 				F document1Value, F document2Value, F document3Value,
 				F predicateLowerBound, F predicateUpperBound) {
 			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
+				StandardIndexSchemaFieldTypedContext<?, F> context = parent.field( name ).as( type );
 				configuration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new ByTypeFieldModel<>(

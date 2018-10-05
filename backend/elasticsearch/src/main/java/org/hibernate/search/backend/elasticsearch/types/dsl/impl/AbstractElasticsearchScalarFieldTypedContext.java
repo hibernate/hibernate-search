@@ -6,63 +6,41 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractElasticsearchScalarFieldTypedContext<F> extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<F> {
+abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractElasticsearchScalarFieldTypedContext<? extends S, F>, F>
+		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<S, F> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final String relativeFieldName;
 	private final DataType dataType;
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
 	AbstractElasticsearchScalarFieldTypedContext(IndexSchemaContext schemaContext,
-			String relativeFieldName, Class<F> fieldType, DataType dataType) {
+			Class<F> fieldType, DataType dataType) {
 		super( schemaContext, fieldType );
-		this.relativeFieldName = relativeFieldName;
 		this.dataType = dataType;
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
-		throw log.cannotUseAnalyzerOnFieldType(
-				relativeFieldName, dataType, getSchemaContext().getEventContext()
-		);
-	}
-
-	@Override
-	public StandardIndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
-		throw log.cannotUseNormalizerOnFieldType(
-				relativeFieldName, dataType, getSchemaContext().getEventContext()
-		);
-	}
-
-	@Override
-	public StandardIndexSchemaFieldTypedContext<F> store(Store store) {
+	public S store(Store store) {
 		this.store = store;
-		return this;
+		return thisAsS();
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
+	public S sortable(Sortable sortable) {
 		this.sortable = sortable;
-		return this;
+		return thisAsS();
 	}
 
 	@Override

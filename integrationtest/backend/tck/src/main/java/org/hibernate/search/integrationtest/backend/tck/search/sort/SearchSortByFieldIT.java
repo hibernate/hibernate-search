@@ -14,11 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
@@ -452,21 +454,18 @@ public class SearchSortByFieldIT {
 	}
 
 	private static List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
 		return Arrays.asList(
 				ByTypeFieldModel
 						// Mix capitalized and non-capitalized text on purpose
-						.mapper( String.class, "Aaron", "george", "Zach",
+						.mapper(
+								String.class,
+								c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ),
+								"Aaron", "george", "Zach",
 								// TODO Fix HSEARCH-3387, then mix capitalization here
 								"aaaaa", "bastian", "marco", "zzzz"
 						)
-						.map(
-								root, prefix + "normalizedString",
-								c -> {
-									c.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
-									additionalConfiguration.accept( c );
-								}
-						),
+						.map( root, prefix + "normalizedString", additionalConfiguration ),
 				ByTypeFieldModel.mapper( String.class, "aaron", "george", "zach",
 						"aaaa", "bastian", "marc", "zzzz"
 				)
@@ -523,7 +522,7 @@ public class SearchSortByFieldIT {
 		static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
 			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<String> context = parent.field( name ).asString();
+				StandardIndexSchemaFieldTypedContext<?, String> context = parent.field( name ).asString();
 				configuration.accept( context );
 				IndexFieldAccessor<String> accessor = context.createAccessor();
 				return new MainFieldModel( accessor, name, document1Value, document2Value, document3Value );
@@ -548,10 +547,24 @@ public class SearchSortByFieldIT {
 		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value,
 				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
-			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
+			return mapper(
+					type,
+					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
+					document1Value, document2Value, document3Value,
+					before1Value, between1And2Value, between2And3Value, after3Value
+			);
+		}
+
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(
+				Class<F> type,
+				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
+				F document1Value, F document2Value, F document3Value,
+				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
+			return (parent, name, additionalConfiguration) -> {
+				IndexSchemaFieldContext untypedContext = parent.field( name );
+				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
 				context.sortable( Sortable.YES );
-				configuration.accept( context );
+				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new ByTypeFieldModel<>(
 						accessor, name, type,

@@ -6,15 +6,29 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class PropertyFullTextFieldMappingContextImpl extends PropertyFieldMappingContextImpl<PropertyFullTextFieldMappingContext>
+class PropertyFullTextFieldMappingContextImpl
+		extends PropertyFieldMappingContextImpl<PropertyFullTextFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
 		implements PropertyFullTextFieldMappingContext {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	// We can't use type parameters when calling SomeClass.class, but we expect wildcards anyway, so this is safe.
+	@SuppressWarnings({"rawtypes", "unchecked"})
 	PropertyFullTextFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName );
+		super(
+				parent, relativeFieldName,
+				PropertyFullTextFieldMappingContextImpl::convertFieldTypedContext
+		);
 	}
 
 	@Override
@@ -26,6 +40,17 @@ class PropertyFullTextFieldMappingContextImpl extends PropertyFieldMappingContex
 	public PropertyFullTextFieldMappingContext analyzer(String normalizerName) {
 		fieldModelContributor.add( c -> c.analyzer( normalizerName ) );
 		return thisAsS();
+	}
+
+	private static StringIndexSchemaFieldTypedContext<?> convertFieldTypedContext(StandardIndexSchemaFieldTypedContext<?,?> context) {
+		if ( context instanceof StringIndexSchemaFieldTypedContext ) {
+			return (StringIndexSchemaFieldTypedContext<?>) context;
+		}
+		else {
+			throw log.invalidFieldEncodingForFullTextFieldMapping(
+					context, StringIndexSchemaFieldTypedContext.class
+			);
+		}
 	}
 
 }

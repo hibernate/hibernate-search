@@ -14,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -432,21 +434,21 @@ public class MatchSearchPredicateIT {
 			)
 					.map( root, "string3" );
 			analyzedStringField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
 					"a word", "another word", "a"
 			)
-					.map( root, "analyzedString", c -> c.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ) );
+					.map( root, "analyzedString" );
 		}
 
 		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-				Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
 			return Arrays.asList(
-					ByTypeFieldModel.mapper( String.class, "irving and company", "Auster", "Irving" )
+					ByTypeFieldModel.mapper(
+							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+							"irving and company", "Auster", "Irving"
+					)
 							.map(
-									root, prefix + "analyzedString",
-									c -> {
-										c.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name );
-										additionalConfiguration.accept( c );
-									}
+									root, prefix + "analyzedString", additionalConfiguration
 							),
 					ByTypeFieldModel.mapper( String.class, "Irving", "Auster" )
 							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
@@ -479,9 +481,15 @@ public class MatchSearchPredicateIT {
 	private static class MainFieldModel {
 		static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
-			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<String> context = parent.field( name ).asString();
-				configuration.accept( context );
+			return mapper( c -> c.asString(), document1Value, document2Value, document3Value );
+		}
+
+		static StandardFieldMapper<String, MainFieldModel> mapper(
+				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, String>> configuration,
+				String document1Value, String document2Value, String document3Value) {
+			return (parent, name, additionalConfiguration) -> {
+				StandardIndexSchemaFieldTypedContext<?, String> context = configuration.apply( parent.field( name ) );
+				additionalConfiguration.accept( context );
 				IndexFieldAccessor<String> accessor = context.createAccessor();
 				return new MainFieldModel( accessor, name, document1Value, document3Value, document2Value );
 			};
@@ -504,14 +512,19 @@ public class MatchSearchPredicateIT {
 	private static class ByTypeFieldModel<F> {
 		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value) {
-			return mapper( type, document1Value, document2Value, document1Value );
+			return mapper(
+					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
+					document1Value, document2Value, document1Value
+			);
 		}
 
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(
+				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
 				F document1Value, F document2Value, F predicateParameterValue) {
-			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
-				configuration.accept( context );
+			return (parent, name, additionalConfiguration) -> {
+				IndexSchemaFieldContext untypedContext = parent.field( name );
+				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
+				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new ByTypeFieldModel<>(
 						accessor, name, document1Value, document2Value, predicateParameterValue

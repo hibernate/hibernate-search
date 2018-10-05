@@ -16,15 +16,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public interface IndexSchemaFieldContext {
 
-	<F> StandardIndexSchemaFieldTypedContext<F> as(Class<F> inputType);
+	<F> StandardIndexSchemaFieldTypedContext<?, F> as(Class<F> inputType);
 
-	StandardIndexSchemaFieldTypedContext<String> asString();
+	StringIndexSchemaFieldTypedContext<?> asString();
 
-	StandardIndexSchemaFieldTypedContext<Integer> asInteger();
+	StandardIndexSchemaFieldTypedContext<?, Integer> asInteger();
 
-	StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate();
+	StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate();
 
-	StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint();
+	StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint();
 
 	// TODO NumericBridgeProvider
 	// TODO JavaTimeBridgeProvider

@@ -25,13 +25,13 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchIntegerIndexSchemaFieldContextImpl extends
-		AbstractElasticsearchScalarFieldTypedContext<Integer> {
+public class ElasticsearchIntegerIndexSchemaFieldContextImpl
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchIntegerIndexSchemaFieldContextImpl, Integer> {
 
 	private final String relativeFieldName;
 
 	public ElasticsearchIntegerIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Integer.class, DataType.INTEGER );
+		super( schemaContext, Integer.class, DataType.INTEGER );
 		this.relativeFieldName = relativeFieldName;
 	}
 
@@ -58,5 +58,10 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl extends
 		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
+	}
+
+	@Override
+	protected ElasticsearchIntegerIndexSchemaFieldContextImpl thisAsS() {
+		return this;
 	}
 }
