@@ -37,7 +37,9 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private String analyzerName;
 	private Analyzer analyzer;
+	private String normalizerName;
 	private Analyzer normalizer;
 
 	private Sortable sortable;
@@ -48,6 +50,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, getSchemaContext().getEventContext() );
@@ -57,6 +60,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
 			throw log.unknownNormalizer( normalizerName, getSchemaContext().getEventContext() );
@@ -74,11 +78,11 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		if ( Sortable.YES.equals( sortable ) && analyzer != null ) {
-			throw log.cannotUseAnalyzerOnSortableField( getSchemaContext().getEventContext() );
+			throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
 		}
 
 		if ( analyzer != null && normalizer != null ) {
-			throw log.cannotApplyAnalyzerAndNormalizer( getSchemaContext().getEventContext() );
+			throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
 		}
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer

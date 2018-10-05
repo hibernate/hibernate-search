@@ -123,8 +123,8 @@ public interface Log extends BasicLogger {
 	SearchException normalizerDefinitionNamingConflict(String normalizerDefinitionName);
 
 	@Message(id = ID_OFFSET_1 + 342,
-			value = "Cannot apply both an analyzer and a normalizer." )
-	SearchException cannotApplyAnalyzerAndNormalizer(@Param EventContext context);
+			value = "Cannot apply both an analyzer and a normalizer. Analyzer: '%1$s', normalizer: '%2$s'.")
+	SearchException cannotApplyAnalyzerAndNormalizer(String analyzerName, String normalizerName, @Param EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 344,
@@ -135,10 +135,10 @@ public interface Log extends BasicLogger {
 	void normalizerProducedMultipleTokens(String normalizerName, int token);
 
 	@Message(id = ID_OFFSET_1 + 345,
-			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead."
+			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead. Analyzer: '%1$s'."
 			+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
 			+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
-	SearchException cannotUseAnalyzerOnSortableField(@Param EventContext context);
+	SearchException cannotUseAnalyzerOnSortableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_1 + 353,
 			value = "Unknown analyzer: '%1$s'. Make sure you defined this analyzer.")

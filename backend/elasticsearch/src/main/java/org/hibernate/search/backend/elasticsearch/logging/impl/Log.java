@@ -284,14 +284,14 @@ public interface Log extends BasicLogger {
 	SearchException invalidElasticsearchTypedAnalyzerDefinition(String name);
 
 	@Message(id = ID_OFFSET_3 + 35,
-			value = "Cannot apply both an analyzer and a normalizer." )
-	SearchException cannotApplyAnalyzerAndNormalizer(@Param EventContext context);
+			value = "Cannot apply both an analyzer and a normalizer. Analyzer: '%1$s', normalizer: '%2$s'.")
+	SearchException cannotApplyAnalyzerAndNormalizer(String analyzerName, String normalizerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 36,
-			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead."
+			value = "Cannot apply an analyzer on a sortable field. Use a normalizer instead. Analyzer: '%1$s'."
 					+ " If an actual analyzer (with tokenization) is necessary, define two separate fields:"
 					+ " one with an analyzer that is not sortable, and one with a normalizer that is sortable.")
-	SearchException cannotUseAnalyzerOnSortableField(@Param EventContext context);
+	SearchException cannotUseAnalyzerOnSortableField(String analyzerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 37,
 			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )

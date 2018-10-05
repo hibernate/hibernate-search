@@ -470,6 +470,7 @@ public class DocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Cannot apply an analyzer on a sortable field" )
 				.hasMessageContaining( "Use a normalizer instead" )
+				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexName( INDEX_NAME ),
 						EventContexts.fromIndexFieldAbsolutePath( "myField" )
@@ -491,6 +492,8 @@ public class DocumentModelDslIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Cannot apply both an analyzer and a normalizer" )
+				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
+				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexName( INDEX_NAME ),
 						EventContexts.fromIndexFieldAbsolutePath( "myField" )

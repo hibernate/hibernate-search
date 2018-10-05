@@ -94,7 +94,7 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 			mapping.setAnalyzer( analyzerName );
 
 			if ( normalizerName != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( getSchemaContext().getEventContext() );
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
 			}
 
 			switch ( sortable ) {
@@ -102,7 +102,7 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 				case NO:
 					break;
 				case YES:
-					throw log.cannotUseAnalyzerOnSortableField( getSchemaContext().getEventContext() );
+					throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
 			}
 		}
 		else {
