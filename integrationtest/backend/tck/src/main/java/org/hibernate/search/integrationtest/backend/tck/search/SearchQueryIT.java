@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -154,6 +155,23 @@ public class SearchQueryIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasHitCount( 3 )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3389")
+	public void maxResults_zero() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll().end()
+				.sort().byField( "string" ).asc().end()
+				.build();
+		query.setMaxResults( 0L );
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasHitCount( 3 )
+				.hasNoHits();
 	}
 
 	@Test
