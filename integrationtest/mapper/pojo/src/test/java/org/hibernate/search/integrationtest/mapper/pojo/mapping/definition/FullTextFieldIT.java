@@ -1,0 +1,273 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
+
+import java.lang.invoke.MethodHandles;
+import java.util.function.BiFunction;
+
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.test.SubTest;
+
+import org.junit.Rule;
+import org.junit.Test;
+
+/**
+ * Test common use cases of the {@link FullTextField} annotation.
+ * <p>
+ * Does not test error cases common to all kinds of {@code @XXField} annotations, which are tested in {@link FieldBaseIT}.
+ * <p>
+ * Does not test default bridges, which are tested in {@link FieldDefaultBridgeIT}.
+ * <p>
+ * Does not test uses of container value extractors, which are tested in {@link FieldContainerValueExtractorBaseIT}
+ * (and others, see javadoc on that class).
+ */
+public class FullTextFieldIT {
+
+	private static final String INDEX_NAME = "IndexName";
+	private static final String ANALYZER_NAME = "myAnalyzer";
+
+	@Rule
+	public BackendMock backendMock = new BackendMock( "stubBackend" );
+
+	@Rule
+	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+
+	@Test
+	public void defaultBridge() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String myProperty;
+			IndexedEntity(int id, String myProperty) {
+				this.id = id;
+				this.myProperty = myProperty;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public String getMyProperty() {
+				return myProperty;
+			}
+		}
+
+		String value = "some value";
+		doTestValidMapping(
+				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
+				String.class, String.class,
+				value, value
+		);
+	}
+
+	@Test
+	public void customBridge_implicitBinding() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue myProperty;
+			IndexedEntity(int id, WrappedValue myProperty) {
+				this.id = id;
+				this.myProperty = myProperty;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = ValidImplicitBindingBridge.class))
+			public WrappedValue getMyProperty() {
+				return myProperty;
+			}
+		}
+
+		WrappedValue value = new WrappedValue();
+		value.wrapped = "some value";
+		doTestValidMapping(
+				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
+				WrappedValue.class, String.class,
+				value, value.wrapped
+		);
+	}
+
+	@Test
+	public void customBridge_explicitBinding() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue myProperty;
+			IndexedEntity(int id, WrappedValue myProperty) {
+				this.id = id;
+				this.myProperty = myProperty;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = ValidExplicitBindingBridge.class))
+			public WrappedValue getMyProperty() {
+				return myProperty;
+			}
+		}
+
+		WrappedValue value = new WrappedValue();
+		value.wrapped = "some value";
+		doTestValidMapping(
+				IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ),
+				WrappedValue.class, String.class,
+				value, value.wrapped
+		);
+	}
+
+	@Test
+	public void error_invalidFieldType_defaultBridge() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			Integer myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME)
+			public Integer getMyProperty() {
+				return myProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"This property is mapped to a full-text field, but with a value bridge that creates a non-String or otherwise incompatible field",
+								"bind() method returned context '",
+								"expected '" + StringIndexSchemaFieldTypedContext.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Test
+	public void error_invalidFieldType_customBridge_explicitBinding() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			String myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = InvalidExplicitBindingBridge.class))
+			public String getMyProperty() {
+				return myProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".myProperty" )
+						.failure(
+								"This property is mapped to a full-text field, but with a value bridge that creates a non-String or otherwise incompatible field",
+								"bind() method returned context '",
+								"expected '" + StringIndexSchemaFieldTypedContext.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	private <E, P, F> void doTestValidMapping(Class<E> entityType,
+			BiFunction<Integer, P, E> newEntityFunction,
+			Class<P> propertyType, Class<F> indexedFieldType,
+			P propertyValue, F indexedFieldValue) {
+		// Schema
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "myProperty", indexedFieldType, b2 -> b2.analyzerName( ANALYZER_NAME ) )
+		);
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
+		backendMock.verifyExpectationsMet();
+
+		// Indexing
+		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+			E entity1 = newEntityFunction.apply( 1, propertyValue );
+
+			manager.getMainWorkPlan().add( entity1 );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b
+							.field( "myProperty", indexedFieldValue )
+					)
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	public static class ValidImplicitBindingBridge implements ValueBridge<WrappedValue, String> {
+		@Override
+		public String toIndexedValue(WrappedValue value) {
+			return value == null ? null : value.wrapped;
+		}
+		@Override
+		public WrappedValue cast(Object value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, String> {
+		@Override
+		public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
+			return context.getIndexSchemaFieldContext().asString();
+		}
+		@Override
+		public String toIndexedValue(WrappedValue value) {
+			return value == null ? null : value.wrapped;
+		}
+		@Override
+		public WrappedValue cast(Object value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+	private static class WrappedValue {
+		private String wrapped;
+	}
+
+	public static class InvalidExplicitBindingBridge implements ValueBridge<String, Integer> {
+		@Override
+		public StandardIndexSchemaFieldTypedContext<?, Integer> bind(ValueBridgeBindingContext context) {
+			return context.getIndexSchemaFieldContext().asInteger();
+		}
+		@Override
+		public Integer toIndexedValue(String value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+		@Override
+		public String cast(Object value) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+	}
+
+}
