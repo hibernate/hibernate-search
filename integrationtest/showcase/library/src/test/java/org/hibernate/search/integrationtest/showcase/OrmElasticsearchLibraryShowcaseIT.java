@@ -281,6 +281,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 
 			book = dao.getByIsbn( "978-0-00-000005-1" );
 			assertFalse( book.isPresent() );
+
+			// Test the normalizer
+			book = dao.getByIsbn( "9780000000055" );
+			assertTrue( book.isPresent() );
+			assertThat( book.get() ).isEqualTo( session.get( Book.class, ART_OF_COMPUTER_PROG_ID ) );
 		} );
 	}
 

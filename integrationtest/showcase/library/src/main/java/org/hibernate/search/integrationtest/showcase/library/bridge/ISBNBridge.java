@@ -7,16 +7,17 @@
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
-	// TODO use a default normalizer that removes hyphens
 	@Override
 	public StandardIndexSchemaFieldTypedContext<String> bind(ValueBridgeBindingContext context) {
 		return context.getIndexSchemaFieldContext().asString()
+				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
 				.projectionConverter( this::fromIndexedValue );
 	}
 

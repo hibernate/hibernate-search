@@ -12,10 +12,16 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 public class LibraryAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	public static final String ANALYZER_DEFAULT = "default"; // No definition, just use the default from Elasticsearch
 	public static final String NORMALIZER_SORT = "asciifolding_lowercase";
+	public static final String NORMALIZER_ISBN = "isbn";
 
 	@Override
 	public void configure(ElasticsearchAnalysisDefinitionContainerContext context) {
 		context.normalizer( NORMALIZER_SORT ).custom()
 				.withTokenFilters( "asciifolding", "lowercase" );
+		context.normalizer( NORMALIZER_ISBN ).custom()
+				.withCharFilters( "removeHyphens" );
+		context.charFilter( "removeHyphens" ).type( "pattern_replace" )
+				.param( "pattern", "-+" )
+				.param( "replacement", "" );
 	}
 }
