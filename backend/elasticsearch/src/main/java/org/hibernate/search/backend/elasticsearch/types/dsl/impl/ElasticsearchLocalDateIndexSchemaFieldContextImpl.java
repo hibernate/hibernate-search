@@ -36,8 +36,8 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchLocalDateIndexSchemaFieldContextImpl extends
-		AbstractElasticsearchScalarFieldTypedContext<LocalDate> {
+public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchLocalDateIndexSchemaFieldContextImpl, LocalDate> {
 
 	private static final LocalDateFieldCodec DEFAULT_CODEC = new LocalDateFieldCodec(
 					new DateTimeFormatterBuilder()
@@ -54,7 +54,7 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl extends
 	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
 	public ElasticsearchLocalDateIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, LocalDate.class, DataType.DATE );
+		super( schemaContext, LocalDate.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}
 
@@ -81,5 +81,10 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl extends
 		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
+	}
+
+	@Override
+	protected ElasticsearchLocalDateIndexSchemaFieldContextImpl thisAsS() {
+		return this;
 	}
 }

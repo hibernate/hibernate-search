@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
@@ -25,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingContext<?>>
+abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingContext<?>, C extends StandardIndexSchemaFieldTypedContext<?, ?>>
 		extends DelegatingPropertyMappingContext
 		implements PojoPropertyMetadataContributor, PropertyFieldMappingContext<S> {
 
@@ -33,13 +35,15 @@ abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingCon
 
 	private BridgeBuilder<? extends ValueBridge<?, ?>> bridgeBuilder;
 
-	final CompositeFieldModelContributor fieldModelContributor = new CompositeFieldModelContributor();
+	final CompositeFieldModelContributor<C> fieldModelContributor;
 
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 
-	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
+	PropertyFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName,
+			Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
 		super( parent );
 		this.relativeFieldName = relativeFieldName;
+		this.fieldModelContributor = new CompositeFieldModelContributor<>( contextConverter );
 	}
 
 	@Override
@@ -97,16 +101,23 @@ abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingCon
 		return thisAsS();
 	}
 
-	static class CompositeFieldModelContributor implements FieldModelContributor {
-		private final List<FieldModelContributor> delegates = new ArrayList<>();
+	static class CompositeFieldModelContributor<C extends StandardIndexSchemaFieldTypedContext<?, ?>>
+			implements FieldModelContributor {
+		private final Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter;
+		private final List<Consumer<C>> delegates = new ArrayList<>();
 
-		public void add(FieldModelContributor delegate) {
+		private CompositeFieldModelContributor(Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
+			this.contextConverter = contextConverter;
+		}
+
+		public void add(Consumer<C> delegate) {
 			delegates.add( delegate );
 		}
 
 		@Override
-		public void contribute(StandardIndexSchemaFieldTypedContext<?> context) {
-			delegates.forEach( c -> c.contribute( context ) );
+		public void contribute(StandardIndexSchemaFieldTypedContext<?, ?> context) {
+			C convertedContext = contextConverter.apply( context );
+			delegates.forEach( c -> c.accept( convertedContext ) );
 		}
 	}
 

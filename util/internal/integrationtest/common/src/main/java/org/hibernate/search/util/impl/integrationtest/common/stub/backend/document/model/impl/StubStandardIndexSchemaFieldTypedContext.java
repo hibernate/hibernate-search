@@ -15,52 +15,44 @@ import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaFieldTypedContext<F> implements StandardIndexSchemaFieldTypedContext<F> {
+abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIndexSchemaFieldTypedContext<? extends S, F>, F>
+		implements StandardIndexSchemaFieldTypedContext<S, F> {
 
 	private IndexSchemaFieldDefinitionHelper<F> helper;
-	private final StubIndexSchemaNode.Builder builder;
+	protected final StubIndexSchemaNode.Builder builder;
 	private final boolean included;
 
-	StubIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
+	StubStandardIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( builder, inputType );
 		this.builder = builder;
 		this.included = included;
+		builder.inputType( inputType );
 	}
 
+	abstract S thisAsS();
+
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> dslConverter(
+	public S dslConverter(
 			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
-		return this;
+		return thisAsS();
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> projectionConverter(
+	public S projectionConverter(
 			FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
-		return this;
+		return thisAsS();
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> analyzer(String analyzerName) {
-		builder.analyzerName( analyzerName );
-		return this;
-	}
-
-	@Override
-	public StandardIndexSchemaFieldTypedContext<F> normalizer(String normalizerName) {
-		builder.normalizerName( normalizerName );
-		return this;
-	}
-
-	@Override
-	public StandardIndexSchemaFieldTypedContext<F> store(Store store) {
+	public S store(Store store) {
 		builder.store( store );
-		return this;
+		return thisAsS();
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> sortable(Sortable sortable) {
+	public S sortable(Sortable sortable) {
 		builder.sortable( sortable );
-		return this;
+		return thisAsS();
 	}
 
 	@Override

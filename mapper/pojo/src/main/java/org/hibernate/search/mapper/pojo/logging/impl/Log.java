@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Set;
 
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
@@ -259,4 +260,24 @@ public interface Log extends BasicLogger {
 	SearchException infiniteRecursionForDerivedFrom(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
+
+	@Message(id = ID_OFFSET_2 + 31,
+			value = "This property is mapped to a full-text field,"
+					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
+					+ " Make sure to use a compatible bridge."
+					+ " Details: the value bridge's bind() method returned context '%1$s',"
+					+ " which does not extend the expected '%2$s' interface."
+	)
+	SearchException invalidFieldEncodingForFullTextFieldMapping(IndexSchemaFieldTypedContext<?, ?> context,
+			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
+
+	@Message(id = ID_OFFSET_2 + 32,
+			value = "This property is mapped to a keyword field,"
+					+ " but with a value bridge that creates a non-String or otherwise incompatible field."
+					+ " Make sure to use a compatible bridge."
+					+ " Details: the value bridge's bind() method returned context '%1$s',"
+					+ " which does not extend the expected '%2$s' interface."
+	)
+	SearchException invalidFieldEncodingForKeywordFieldMapping(IndexSchemaFieldTypedContext<?, ?> context,
+			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 }

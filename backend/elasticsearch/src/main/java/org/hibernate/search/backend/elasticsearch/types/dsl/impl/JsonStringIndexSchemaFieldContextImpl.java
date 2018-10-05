@@ -31,7 +31,7 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class JsonStringIndexSchemaFieldContextImpl implements IndexSchemaFieldTypedContext<String>,
+public class JsonStringIndexSchemaFieldContextImpl implements IndexSchemaFieldTypedContext<JsonStringIndexSchemaFieldContextImpl, String>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
@@ -52,14 +52,14 @@ public class JsonStringIndexSchemaFieldContextImpl implements IndexSchemaFieldTy
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> dslConverter(
+	public JsonStringIndexSchemaFieldContextImpl dslConverter(
 			ToIndexFieldValueConverter<?, ? extends String> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return this;
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<String> projectionConverter(
+	public JsonStringIndexSchemaFieldContextImpl projectionConverter(
 			FromIndexFieldValueConverter<? super String, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return this;

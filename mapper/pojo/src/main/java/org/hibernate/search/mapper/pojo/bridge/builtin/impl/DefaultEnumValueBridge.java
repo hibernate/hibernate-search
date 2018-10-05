@@ -21,7 +21,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexSchemaFieldTypedContext<String> bind(ValueBridgeBindingContext context) {
+	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString()
 				.projectionConverter( this::fromIndexedValue );

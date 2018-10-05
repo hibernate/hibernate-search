@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchem
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchStandardIndexSchemaFieldTypedContext<F> extends StandardIndexSchemaFieldTypedContext<F> {
+public interface ElasticsearchStandardIndexSchemaFieldTypedContext<S extends ElasticsearchStandardIndexSchemaFieldTypedContext<? extends S, F>, F>
+		extends StandardIndexSchemaFieldTypedContext<S, F> {
 
 }

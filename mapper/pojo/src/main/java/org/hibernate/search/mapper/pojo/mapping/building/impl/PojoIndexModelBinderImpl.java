@@ -218,7 +218,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				new PojoModelValueElement<>( valueTypeModel ),
 				fieldContext
 		);
-		StandardIndexSchemaFieldTypedContext<? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
+		StandardIndexSchemaFieldTypedContext<?, ? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
 
 		if ( typedFieldContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection

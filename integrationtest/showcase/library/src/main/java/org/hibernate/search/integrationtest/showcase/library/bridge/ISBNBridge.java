@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> bind(ValueBridgeBindingContext context) {
+	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
 		return context.getIndexSchemaFieldContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
 				.projectionConverter( this::fromIndexedValue );

@@ -8,33 +8,34 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
+import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortContributor;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.QueryBuilder;
 
-import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
-import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortContributor;
-import org.hibernate.search.util.impl.common.LoggerFactory;
-
 /**
  * @author Guillaume Smet
  */
-public class LuceneStringIndexSchemaFieldContextImpl extends
-		AbstractLuceneStandardIndexSchemaFieldTypedContext<String> {
+public class LuceneStringIndexSchemaFieldContextImpl
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContextImpl, String>
+		implements StringIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContextImpl> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -50,7 +51,7 @@ public class LuceneStringIndexSchemaFieldContextImpl extends
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+	public LuceneStringIndexSchemaFieldContextImpl analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
@@ -60,7 +61,7 @@ public class LuceneStringIndexSchemaFieldContextImpl extends
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+	public LuceneStringIndexSchemaFieldContextImpl normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
@@ -121,6 +122,11 @@ public class LuceneStringIndexSchemaFieldContextImpl extends
 		if ( analyzerOrNormalizer != null ) {
 			collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
 		}
+	}
+
+	@Override
+	protected LuceneStringIndexSchemaFieldContextImpl thisAsS() {
+		return this;
 	}
 
 	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {

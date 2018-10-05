@@ -10,12 +10,14 @@ import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValu
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 
 /**
+ * @param <S> The concrete type of this context.
  * @param <F> The type of field values.
  */
-public interface IndexSchemaFieldTypedContext<F> extends IndexSchemaFieldTerminalContext<F> {
+public interface IndexSchemaFieldTypedContext<S extends IndexSchemaFieldTypedContext<? extends S, F>, F>
+		extends IndexSchemaFieldTerminalContext<F> {
 
-	IndexSchemaFieldTypedContext<F> dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
+	S dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
 
-	IndexSchemaFieldTypedContext<F> projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter);
+	S projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter);
 
 }

@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -232,7 +232,7 @@ public class AnalysisCustomIT {
 		setup( "fieldWithNormalizer", c -> c.normalizer( analysisDefinition.name ).createAccessor() );
 	}
 
-	private void setup(String fieldName, Function<StandardIndexSchemaFieldTypedContext<String>, IndexFieldAccessor<String>> fieldMapping) {
+	private void setup(String fieldName, Function<StringIndexSchemaFieldTypedContext<?>, IndexFieldAccessor<String>> fieldMapping) {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						"MappedType", INDEX_NAME,

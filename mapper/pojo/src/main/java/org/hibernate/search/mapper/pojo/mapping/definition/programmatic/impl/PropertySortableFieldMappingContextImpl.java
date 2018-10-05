@@ -6,17 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
 
 
-abstract class PropertySortableFieldMappingContextImpl<S extends PropertySortableFieldMappingContext<?>>
-		extends PropertyFieldMappingContextImpl<S>
+abstract class PropertySortableFieldMappingContextImpl<S extends PropertySortableFieldMappingContext<?>, C extends StandardIndexSchemaFieldTypedContext<?, ?>>
+		extends PropertyFieldMappingContextImpl<S, C>
 		implements PropertySortableFieldMappingContext<S> {
 
-	PropertySortableFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
-		super( parent, relativeFieldName );
+	PropertySortableFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName,
+			Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
+		super( parent, relativeFieldName, contextConverter );
 	}
 
 	@Override

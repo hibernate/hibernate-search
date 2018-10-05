@@ -179,14 +179,6 @@ public interface Log extends BasicLogger {
 			+ " derived from the Lucene backend. Was applied to '%1$s' instead.")
 	SearchException luceneExtensionOnUnknownType(Object context);
 
-	@Message(id = ID_OFFSET_2 + 6,
-			value = "An analyzer was set on field '%1$s', but fields of this type cannot be analyzed.")
-	SearchException cannotUseAnalyzerOnFieldType(String relativeFieldName, @Param EventContext context);
-
-	@Message(id = ID_OFFSET_2 + 7,
-			value = "A normalizer was set on field '%1$s', but fields of this type cannot be analyzed.")
-	SearchException cannotUseNormalizerOnFieldType(String relativeFieldName, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 10,
 			value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
 			+ " Given predicate was: '%1$s'")

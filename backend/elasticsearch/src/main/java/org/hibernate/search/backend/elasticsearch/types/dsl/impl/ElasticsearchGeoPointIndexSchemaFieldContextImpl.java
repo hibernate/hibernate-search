@@ -26,13 +26,13 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchGeoPointIndexSchemaFieldContextImpl extends
-		AbstractElasticsearchScalarFieldTypedContext<GeoPoint> {
+public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchGeoPointIndexSchemaFieldContextImpl, GeoPoint> {
 
 	private final String relativeFieldName;
 
 	public ElasticsearchGeoPointIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, GeoPoint.class, DataType.GEO_POINT );
+		super( schemaContext, GeoPoint.class, DataType.GEO_POINT );
 		this.relativeFieldName = relativeFieldName;
 	}
 
@@ -59,4 +59,8 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl extends
 		return mapping;
 	}
 
+	@Override
+	protected ElasticsearchGeoPointIndexSchemaFieldContextImpl thisAsS() {
+		return this;
+	}
 }

@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
@@ -416,7 +417,7 @@ public class SearchProjectionIT {
 	}
 
 	private static List<FieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?>> additionalConfiguration) {
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
 		return Arrays.asList(
 				FieldModel
 						// Mix capitalized and non-capitalized text on purpose
@@ -424,7 +425,7 @@ public class SearchProjectionIT {
 						.map(
 								root, prefix + "normalizedString",
 								c -> {
-									c.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
+									( (StringIndexSchemaFieldTypedContext<?>) c ).normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
 									additionalConfiguration.accept( c );
 								}
 						),
@@ -467,7 +468,7 @@ public class SearchProjectionIT {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<F> context = parent.field( name ).as( type );
+				StandardIndexSchemaFieldTypedContext<?, F> context = parent.field( name ).as( type );
 				context.store( Store.YES );
 				configuration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();

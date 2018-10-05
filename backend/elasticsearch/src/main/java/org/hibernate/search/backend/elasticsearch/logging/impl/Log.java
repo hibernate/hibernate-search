@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -180,16 +179,6 @@ public interface Log extends BasicLogger {
 			value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
 					+ " Given sort was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
-
-	@Message(id = ID_OFFSET_3 + 12,
-			value = "An analyzer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed.")
-	SearchException cannotUseAnalyzerOnFieldType(String relativeName, DataType fieldType,
-			@Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 13,
-			value = "A normalizer was set on field '%1$s' with type '%2$s', but fields of this type cannot be analyzed.")
-	SearchException cannotUseNormalizerOnFieldType(String relativeName, DataType fieldType,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 14,
 			value = "Index '%1$s' requires multi-tenancy but the backend does not support it in its current configuration.")

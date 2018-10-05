@@ -8,12 +8,6 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -21,9 +15,15 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -32,7 +32,9 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchStringIndexSchemaFieldContextImpl extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<String> {
+public class ElasticsearchStringIndexSchemaFieldContextImpl
+		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContextImpl, String>
+		implements StringIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContextImpl> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,25 +50,25 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl extends AbstractElas
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> analyzer(String analyzerName) {
+	public ElasticsearchStringIndexSchemaFieldContextImpl analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		return this;
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> normalizer(String normalizerName) {
+	public ElasticsearchStringIndexSchemaFieldContextImpl normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		return this;
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> store(Store store) {
+	public ElasticsearchStringIndexSchemaFieldContextImpl store(Store store) {
 		this.store = store;
 		return this;
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<String> sortable(Sortable sortable) {
+	public ElasticsearchStringIndexSchemaFieldContextImpl sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -138,5 +140,10 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl extends AbstractElas
 		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
+	}
+
+	@Override
+	protected ElasticsearchStringIndexSchemaFieldContextImpl thisAsS() {
+		return this;
 	}
 }

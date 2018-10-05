@@ -36,7 +36,7 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<F> bind(ValueBridgeBindingContext context) {
+	public StandardIndexSchemaFieldTypedContext<?, F> bind(ValueBridgeBindingContext context) {
 		return context.getIndexSchemaFieldContext().as( fieldType )
 				.projectionConverter( PassThroughFromIndexFieldValueConverter.get() );
 	}

@@ -22,8 +22,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 /**
  * @author Guillaume Smet
  */
-public class LuceneGeoPointIndexSchemaFieldContextImpl extends
-		AbstractLuceneStandardIndexSchemaFieldTypedContext<GeoPoint> {
+public class LuceneGeoPointIndexSchemaFieldContextImpl
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneGeoPointIndexSchemaFieldContextImpl, GeoPoint> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
@@ -52,5 +52,10 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl extends
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
 
 		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
+	}
+
+	@Override
+	protected LuceneGeoPointIndexSchemaFieldContextImpl thisAsS() {
+		return this;
 	}
 }
