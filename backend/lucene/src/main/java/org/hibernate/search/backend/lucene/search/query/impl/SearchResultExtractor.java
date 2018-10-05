@@ -14,6 +14,6 @@ import org.hibernate.search.engine.search.SearchResult;
 
 public interface SearchResultExtractor<T> {
 
-	SearchResult<T> extract(IndexSearcher indexSearcher, TopDocs topDocs) throws IOException;
+	SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs) throws IOException;
 
 }

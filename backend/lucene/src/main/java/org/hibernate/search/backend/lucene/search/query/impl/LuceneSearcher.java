@@ -12,12 +12,11 @@ import java.util.Set;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.util.EventContext;
 
 /**
  * @author Guillaume Smet
@@ -63,7 +62,8 @@ public class LuceneSearcher<T> implements AutoCloseable {
 
 		indexSearcher.search( luceneQuery, luceneCollectors.getCompositeCollector() );
 
-		return searchResultExtractor.extract( indexSearcher, getTopDocs( luceneCollectors ) );
+		return searchResultExtractor.extract( indexSearcher, luceneCollectors.getTotalHits(),
+				luceneCollectors.getTopDocs( firstResultIndex, maxResultsCount ) );
 	}
 
 	public Query getLuceneQuery() {
@@ -95,15 +95,6 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		}
 		else {
 			return Math.min( (int) ( firstResultIndex + maxResultsCount ), indexSearcher.getIndexReader().maxDoc() );
-		}
-	}
-
-	private TopDocs getTopDocs(LuceneCollectors luceneCollectors) {
-		if ( maxResultsCount == null ) {
-			return luceneCollectors.getTopDocsCollector().topDocs( (int) firstResultIndex );
-		}
-		else {
-			return luceneCollectors.getTopDocsCollector().topDocs( (int) firstResultIndex, maxResultsCount.intValue() );
 		}
 	}
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 
@@ -18,13 +19,14 @@ class LuceneCollectors {
 
 	private final Collector compositeCollector;
 
-	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector, Collector compositeCollector) {
+	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
+			Collector compositeCollector) {
 		this.topDocsCollector = topDocsCollector;
-		this.totalHitCountCollector = null;
-		this.compositeCollector = topDocsCollector;
+		this.totalHitCountCollector = totalHitCountCollector;
+		this.compositeCollector = compositeCollector;
 	}
 
-	int getTotalHits() {
+	long getTotalHits() {
 		if ( topDocsCollector != null ) {
 			return topDocsCollector.getTotalHits();
 		}
@@ -33,11 +35,20 @@ class LuceneCollectors {
 		}
 	}
 
-	Collector getCompositeCollector() {
-		return compositeCollector;
+	TopDocs getTopDocs(long firstResultIndex, Long maxResultsCount) {
+		if ( topDocsCollector == null ) {
+			return null;
+		}
+
+		if ( maxResultsCount == null ) {
+			return topDocsCollector.topDocs( (int) firstResultIndex );
+		}
+		else {
+			return topDocsCollector.topDocs( (int) firstResultIndex, maxResultsCount.intValue() );
+		}
 	}
 
-	TopDocsCollector<?> getTopDocsCollector() {
-		return topDocsCollector;
+	Collector getCompositeCollector() {
+		return compositeCollector;
 	}
 }
