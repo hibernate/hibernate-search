@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -48,7 +48,7 @@ class SearchQueryFactoryImpl
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
-			SessionContext sessionContext, HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator) {
+			SessionContext sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return createSearchQueryBuilder(
 				sessionContext, searchBackendContext.getReferenceHitExtractor(), hitAggregator
 		);

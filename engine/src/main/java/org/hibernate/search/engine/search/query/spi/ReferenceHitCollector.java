@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.DocumentReference;
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()}.
  */
-public interface DocumentReferenceHitCollector {
+public interface ReferenceHitCollector {
 
 	void collectReference(DocumentReference reference);
 

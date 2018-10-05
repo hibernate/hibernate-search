@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.query.spi;
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()}.
  */
-public interface ProjectionHitCollector extends DocumentReferenceHitCollector, LoadingHitCollector {
+public interface ProjectionHitCollector extends ReferenceHitCollector, LoadingHitCollector {
 
 	void collectProjection(Object projection);
 

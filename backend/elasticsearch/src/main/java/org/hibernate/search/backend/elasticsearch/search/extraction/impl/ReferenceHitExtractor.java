@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
 
@@ -18,11 +18,11 @@ import com.google.gson.JsonObject;
  *
  * @see SearchQueryFactory#asReferences(SessionContext, HitAggregator)
  */
-public class DocumentReferenceHitExtractor implements HitExtractor<DocumentReferenceHitCollector> {
+public class ReferenceHitExtractor implements HitExtractor<ReferenceHitCollector> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	public DocumentReferenceHitExtractor(DocumentReferenceExtractorHelper helper) {
+	public ReferenceHitExtractor(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 
@@ -32,7 +32,7 @@ public class DocumentReferenceHitExtractor implements HitExtractor<DocumentRefer
 	}
 
 	@Override
-	public void extract(DocumentReferenceHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ReferenceHitCollector collector, JsonObject responseBody, JsonObject hit) {
 		collector.collectReference( helper.extractDocumentReference( hit ) );
 	}
 

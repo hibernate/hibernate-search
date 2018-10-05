@@ -12,10 +12,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.util.AssertionFailure;
 
-public final class ReferenceHitAggregator<T> implements HitAggregator<DocumentReferenceHitCollector, List<T>> {
+public final class ReferenceHitAggregator<T> implements HitAggregator<ReferenceHitCollector, List<T>> {
 
 	private final Function<DocumentReference, T> documentReferenceTransformer;
 	private final HitCollectorImpl hitCollector = new HitCollectorImpl();
@@ -32,7 +32,7 @@ public final class ReferenceHitAggregator<T> implements HitAggregator<DocumentRe
 	}
 
 	@Override
-	public DocumentReferenceHitCollector nextCollector() {
+	public ReferenceHitCollector nextCollector() {
 		hitCollector.reset();
 		return hitCollector;
 	}
@@ -44,7 +44,7 @@ public final class ReferenceHitAggregator<T> implements HitAggregator<DocumentRe
 		return result;
 	}
 
-	private class HitCollectorImpl implements DocumentReferenceHitCollector {
+	private class HitCollectorImpl implements ReferenceHitCollector {
 
 		private boolean currentHitCollected = false;
 

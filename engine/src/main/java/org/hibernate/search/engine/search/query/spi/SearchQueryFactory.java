@@ -25,7 +25,7 @@ public interface SearchQueryFactory<C> {
 			HitAggregator<LoadingHitCollector, List<O>> hitAggregator);
 
 	<T> SearchQueryBuilder<T, C> asReferences(SessionContext sessionContext,
-			HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator);
+			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator);
 
 	<T> SearchQueryBuilder<T, C> asProjections(SessionContext sessionContext,
 			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projection);

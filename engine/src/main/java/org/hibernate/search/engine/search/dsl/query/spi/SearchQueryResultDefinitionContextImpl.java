@@ -21,7 +21,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ProjectionHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ReferenceHitAggregator;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -58,7 +58,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	@Override
 	public <T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer) {
-		HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator =
+		HitAggregator<ReferenceHitCollector, List<T>> hitAggregator =
 				new ReferenceHitAggregator<>( hitTransformer.compose( documentReferenceTransformer ) );
 		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryFactory()
 				.asReferences( sessionContext, hitAggregator );

@@ -10,14 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.CompositeHitExtractor;
-import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceHitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ReferenceHitExtractor;
 import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -49,8 +49,8 @@ class SearchQueryFactoryImpl
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReferences(
-			SessionContext sessionContext, HitAggregator<DocumentReferenceHitCollector, List<T>> hitAggregator) {
-		return createSearchQueryBuilder( sessionContext, DocumentReferenceHitExtractor.get(), hitAggregator );
+			SessionContext sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
+		return createSearchQueryBuilder( sessionContext, ReferenceHitExtractor.get(), hitAggregator );
 	}
 
 	@Override

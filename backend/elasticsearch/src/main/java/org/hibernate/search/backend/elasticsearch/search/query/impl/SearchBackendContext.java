@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ReferenceHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
@@ -35,7 +35,7 @@ public class SearchBackendContext {
 	private final ElasticsearchWorkOrchestrator orchestrator;
 
 	private final ObjectHitExtractor objectHitExtractor;
-	private final DocumentReferenceHitExtractor referenceHitExtractor;
+	private final ReferenceHitExtractor referenceHitExtractor;
 
 	private final DocumentReferenceSearchProjectionBuilderImpl documentReferenceProjectionBuilder;
 	private final ObjectSearchProjectionBuilderImpl objectProjectionBuilder;
@@ -56,7 +56,7 @@ public class SearchBackendContext {
 				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
 
 		this.objectHitExtractor = new ObjectHitExtractor( documentReferenceExtractorHelper );
-		this.referenceHitExtractor = new DocumentReferenceHitExtractor( documentReferenceExtractorHelper );
+		this.referenceHitExtractor = new ReferenceHitExtractor( documentReferenceExtractorHelper );
 
 		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
 		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
@@ -73,7 +73,7 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	public DocumentReferenceHitExtractor getReferenceHitExtractor() {
+	public ReferenceHitExtractor getReferenceHitExtractor() {
 		return referenceHitExtractor;
 	}
 

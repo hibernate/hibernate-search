@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.DocumentReferenceHitCollector;
+import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -105,7 +105,7 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<DocumentReferenceHitCollector> behavior) {
+			StubSearchWorkBehavior<ReferenceHitCollector> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );
 	}
 
