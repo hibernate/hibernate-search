@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
 public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
@@ -41,15 +42,22 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 		this.store = store;
 		this.sortable = sortable;
 
-		if ( Store.YES.equals( store ) ) {
-			latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
-			longitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LONGITUDE );
-			storedFields = CollectionHelper.asSet( latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
-		}
-		else {
-			latitudeAbsoluteFieldPath = null;
-			longitudeAbsoluteFieldPath = null;
-			storedFields = Collections.emptySet();
+		switch ( store ) {
+			case DEFAULT:
+			case NO:
+				latitudeAbsoluteFieldPath = null;
+				longitudeAbsoluteFieldPath = null;
+				storedFields = Collections.emptySet();
+				break;
+			case COMPRESS:
+				// TODO HSEARCH-3081
+			case YES:
+				latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
+				longitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LONGITUDE );
+				storedFields = CollectionHelper.asSet( latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
+				break;
+			default: // The compiler wants a default entry, even if it doesn't make any sense
+				throw new AssertionFailure( "Unexpected value for Store: " + store );
 		}
 	}
 
@@ -59,12 +67,25 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 			return;
 		}
 
-		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
-			documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
+		switch ( store ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
+				documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
+				break;
+			case COMPRESS:
+				// TODO HSEARCH-3081
+				break;
 		}
-		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+		switch ( sortable ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
+				break;
 		}
 
 		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );

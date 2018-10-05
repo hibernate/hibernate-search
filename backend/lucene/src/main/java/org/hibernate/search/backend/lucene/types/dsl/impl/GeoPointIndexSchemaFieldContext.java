@@ -24,7 +24,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  */
 public class GeoPointIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<GeoPoint> {
 
-	private Sortable sortable;
+	private Sortable sortable = Sortable.DEFAULT;
 
 	public GeoPointIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, GeoPoint.class );

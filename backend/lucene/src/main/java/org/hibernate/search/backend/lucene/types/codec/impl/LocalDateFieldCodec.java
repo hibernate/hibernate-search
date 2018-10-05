@@ -53,14 +53,27 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 			return;
 		}
 
-		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
+		switch ( store ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
+				break;
+			case COMPRESS:
+				// TODO HSEARCH-3081
+				break;
 		}
 
 		long valueToEpochDay = value.toEpochDay();
 
-		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
+		switch ( sortable ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
+				break;
 		}
 
 		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );

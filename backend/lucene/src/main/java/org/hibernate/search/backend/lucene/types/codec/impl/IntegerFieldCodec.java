@@ -34,12 +34,25 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 			return;
 		}
 
-		if ( Store.YES.equals( store ) ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
+		switch ( store ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
+				break;
+			case COMPRESS:
+				// TODO HSEARCH-3081
+				break;
 		}
 
-		if ( Sortable.YES.equals( sortable ) ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
+		switch ( sortable ) {
+			case DEFAULT:
+			case NO:
+				break;
+			case YES:
+				documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
+				break;
 		}
 
 		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );

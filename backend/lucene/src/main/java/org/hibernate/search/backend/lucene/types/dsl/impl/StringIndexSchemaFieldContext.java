@@ -42,7 +42,7 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	private String normalizerName;
 	private Analyzer normalizer;
 
-	private Sortable sortable;
+	private Sortable sortable = Sortable.DEFAULT;
 
 	public StringIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, String.class );
@@ -77,12 +77,18 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
-		if ( Sortable.YES.equals( sortable ) && analyzer != null ) {
-			throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
-		}
+		if ( analyzer != null ) {
+			switch ( sortable ) {
+				case DEFAULT:
+				case NO:
+					break;
+				case YES:
+					throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
+			}
 
-		if ( analyzer != null && normalizer != null ) {
-			throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
+			if ( normalizer != null ) {
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
+			}
 		}
 
 		// TODO GSM: the idea would be to create only one global QueryBuilder object per analyzer/normalizer
@@ -141,7 +147,18 @@ public class StringIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFiel
 			 */
 			fieldType.setTokenized( true );
 		}
-		fieldType.setStored( Store.YES.equals( store ) );
+		switch ( store ) {
+			case DEFAULT:
+			case NO:
+				fieldType.setStored( false );
+				break;
+			case YES:
+				fieldType.setStored( true );
+				break;
+			case COMPRESS:
+				// TODO HSEARCH-3081
+				break;
+		}
 		fieldType.freeze();
 
 		return fieldType;

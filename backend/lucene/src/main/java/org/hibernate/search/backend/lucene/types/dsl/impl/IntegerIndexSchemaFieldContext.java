@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContr
  */
 public class IntegerIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<Integer> {
 
-	private Sortable sortable;
+	private Sortable sortable = Sortable.DEFAULT;
 
 	public IntegerIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, Integer.class );
