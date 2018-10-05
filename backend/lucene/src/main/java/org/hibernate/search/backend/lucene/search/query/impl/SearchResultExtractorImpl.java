@@ -35,21 +35,11 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 	}
 
 	@Override
-	public SearchResult<T> extract(IndexSearcher indexSearcher, TopDocs topDocs) throws IOException {
-		hitAggregator.init( topDocs.scoreDocs.length );
+	public SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs) throws IOException {
+		List<T> finalHits = extractHits( indexSearcher, topDocs );
 
-		for ( ScoreDoc hit : topDocs.scoreDocs ) {
-			indexSearcher.doc( hit.doc, storedFieldVisitor );
-			Document document = storedFieldVisitor.getDocumentAndReset();
-
-			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, document );
-		}
-
-		long totalHits = topDocs.totalHits;
-
-		final List<T> finalHits = Collections.unmodifiableList( hitAggregator.build() );
 		return new SearchResult<T>() {
+
 			@Override
 			public long getHitCount() {
 				return totalHits;
@@ -60,5 +50,23 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 				return finalHits;
 			}
 		};
+	}
+
+	private List<T> extractHits(IndexSearcher indexSearcher, TopDocs topDocs) throws IOException {
+		if ( topDocs == null ) {
+			return Collections.emptyList();
+		}
+
+		hitAggregator.init( topDocs.scoreDocs.length );
+
+		for ( ScoreDoc hit : topDocs.scoreDocs ) {
+			indexSearcher.doc( hit.doc, storedFieldVisitor );
+			Document document = storedFieldVisitor.getDocumentAndReset();
+
+			C hitCollector = hitAggregator.nextCollector();
+			hitExtractor.extract( hitCollector, document );
+		}
+
+		return Collections.unmodifiableList( hitAggregator.build() );
 	}
 }

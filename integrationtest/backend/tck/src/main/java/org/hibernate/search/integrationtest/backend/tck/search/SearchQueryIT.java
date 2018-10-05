@@ -157,6 +157,22 @@ public class SearchQueryIT {
 	}
 
 	@Test
+	public void maxResults_zero() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().matchAll().end()
+				.sort().byField( "string" ).asc().end()
+				.build();
+		query.setMaxResults( 0L );
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasHitCount( 3 )
+				.hasNoHits();
+	}
+
+	@Test
 	public void getQueryString() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
