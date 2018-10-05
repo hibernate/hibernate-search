@@ -30,7 +30,7 @@ import org.apache.lucene.analysis.Analyzer;
 public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnalysisDefinitionContainerContext,
 		LuceneAnalysisDefinitionContributor {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneAnalysisComponentFactory factory;
 
@@ -97,14 +97,14 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 	private void addAnalyzer(String name, LuceneAnalyzerBuilder definition) {
 		LuceneAnalysisComponentBuilder<Analyzer> existing = analyzers.putIfAbsent( name, definition );
 		if ( existing != null ) {
-			throw LOG.analyzerDefinitionNamingConflict( name );
+			throw log.analyzerDefinitionNamingConflict( name );
 		}
 	}
 
 	private void addNormalizer(String name, LuceneAnalyzerBuilder definition) {
 		LuceneAnalysisComponentBuilder<Analyzer> existing = normalizers.putIfAbsent( name, definition );
 		if ( existing != null ) {
-			throw LOG.normalizerDefinitionNamingConflict( name );
+			throw log.normalizerDefinitionNamingConflict( name );
 		}
 	}
 

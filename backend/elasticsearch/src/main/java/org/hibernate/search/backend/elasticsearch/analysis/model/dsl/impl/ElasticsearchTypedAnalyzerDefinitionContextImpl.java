@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class ElasticsearchTypedAnalyzerDefinitionContextImpl
 		extends ElasticsearchAnalysisComponentDefinitionContextImpl<AnalyzerDefinition> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public ElasticsearchTypedAnalyzerDefinitionContextImpl(String name, String type) {
 		super( name, new AnalyzerDefinition() );
@@ -27,7 +27,7 @@ public class ElasticsearchTypedAnalyzerDefinitionContextImpl
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw LOG.invalidElasticsearchTypedAnalyzerDefinition( name );
+			throw log.invalidElasticsearchTypedAnalyzerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

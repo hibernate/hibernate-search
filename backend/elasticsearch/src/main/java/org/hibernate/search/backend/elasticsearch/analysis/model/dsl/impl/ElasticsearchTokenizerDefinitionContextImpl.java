@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class ElasticsearchTokenizerDefinitionContextImpl
 		extends ElasticsearchAnalysisComponentDefinitionContextImpl<TokenizerDefinition> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	ElasticsearchTokenizerDefinitionContextImpl(String name) {
 		super( name, new TokenizerDefinition() );
@@ -30,7 +30,7 @@ public class ElasticsearchTokenizerDefinitionContextImpl
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw LOG.invalidElasticsearchTokenizerDefinition( name );
+			throw log.invalidElasticsearchTokenizerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

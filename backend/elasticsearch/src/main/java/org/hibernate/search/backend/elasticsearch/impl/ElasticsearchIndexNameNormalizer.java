@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  */
 public class ElasticsearchIndexNameNormalizer {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private ElasticsearchIndexNameNormalizer() {
 	}
@@ -27,7 +27,7 @@ public class ElasticsearchIndexNameNormalizer {
 	public static String normalize(String indexName) {
 		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
 		if ( !esIndexName.equals( indexName ) ) {
-			LOG.debugf( "Normalizing index name from '%1$s' to '%2$s'", indexName, esIndexName );
+			log.debugf( "Normalizing index name from '%1$s' to '%2$s'", indexName, esIndexName );
 		}
 		return esIndexName;
 	}

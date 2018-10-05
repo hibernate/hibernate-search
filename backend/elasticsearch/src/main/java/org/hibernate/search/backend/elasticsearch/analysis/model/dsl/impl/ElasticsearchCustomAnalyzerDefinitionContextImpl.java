@@ -26,7 +26,7 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 		ElasticsearchAnalyzerDefinitionWithTokenizerContext,
 		ElasticsearchAnalysisDefinitionContributor {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -64,7 +64,7 @@ public class ElasticsearchCustomAnalyzerDefinitionContextImpl
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getTokenizer() ) ) {
-			throw LOG.invalidElasticsearchAnalyzerDefinition( name );
+			throw log.invalidElasticsearchAnalyzerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

@@ -29,7 +29,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  */
 public final class ElasticsearchAnalysisDefinitionRegistry {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Map<String, AnalyzerDefinition> analyzerDefinitions;
 	private final Map<String, NormalizerDefinition> normalizerDefinitions;
@@ -57,7 +57,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 			public void collect(String name, AnalyzerDefinition definition) {
 				AnalyzerDefinition previous = analyzerDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw LOG.analyzerNamingConflict( name );
+					throw log.analyzerNamingConflict( name );
 				}
 			}
 
@@ -65,7 +65,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 			public void collect(String name, NormalizerDefinition definition) {
 				NormalizerDefinition previous = normalizerDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw LOG.normalizerNamingConflict( name );
+					throw log.normalizerNamingConflict( name );
 				}
 			}
 
@@ -73,7 +73,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 			public void collect(String name, TokenizerDefinition definition) {
 				TokenizerDefinition previous = tokenizerDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw LOG.tokenizerNamingConflict( name );
+					throw log.tokenizerNamingConflict( name );
 				}
 			}
 
@@ -81,7 +81,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 			public void collect(String name, TokenFilterDefinition definition) {
 				TokenFilterDefinition previous = tokenFilterDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw LOG.tokenFilterNamingConflict( name );
+					throw log.tokenFilterNamingConflict( name );
 				}
 			}
 
@@ -89,7 +89,7 @@ public final class ElasticsearchAnalysisDefinitionRegistry {
 			public void collect(String name, CharFilterDefinition definition) {
 				CharFilterDefinition previous = charFilterDefinitions.putIfAbsent( name, definition );
 				if ( previous != null && previous != definition ) {
-					throw LOG.charFilterNamingConflict( name );
+					throw log.charFilterNamingConflict( name );
 				}
 			}
 		} );

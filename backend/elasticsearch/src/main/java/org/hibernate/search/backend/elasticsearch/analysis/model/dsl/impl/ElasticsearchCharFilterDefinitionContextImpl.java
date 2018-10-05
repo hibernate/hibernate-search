@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class ElasticsearchCharFilterDefinitionContextImpl
 		extends ElasticsearchAnalysisComponentDefinitionContextImpl<CharFilterDefinition> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	ElasticsearchCharFilterDefinitionContextImpl(String name) {
 		super( name, new CharFilterDefinition() );
@@ -29,7 +29,7 @@ public class ElasticsearchCharFilterDefinitionContextImpl
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw LOG.invalidElasticsearchCharFilterDefinition( name );
+			throw log.invalidElasticsearchCharFilterDefinition( name );
 		}
 		collector.collect( name, definition );
 	}

@@ -29,7 +29,7 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 		ElasticsearchAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisDefinitionContributor {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	protected final String name;
 
@@ -54,7 +54,7 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 		}
 		JsonElement previous = parameters.putIfAbsent( name, value );
 		if ( previous != null ) {
-			throw LOG.analysisComponentParameterConflict( name, previous, value );
+			throw log.analysisComponentParameterConflict( name, previous, value );
 		}
 		return this;
 	}

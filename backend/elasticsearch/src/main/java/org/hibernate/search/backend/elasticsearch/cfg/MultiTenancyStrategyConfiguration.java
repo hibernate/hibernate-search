@@ -23,7 +23,7 @@ public enum MultiTenancyStrategyConfiguration {
 	 */
 	DISCRIMINATOR("discriminator");
 
-	private static Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String externalRepresentation;
 
@@ -39,7 +39,7 @@ public enum MultiTenancyStrategyConfiguration {
 			return DISCRIMINATOR;
 		}
 		else {
-			throw LOG.unknownMultiTenancyStrategyConfiguration( multiTenancyStrategy );
+			throw log.unknownMultiTenancyStrategyConfiguration( multiTenancyStrategy );
 		}
 	}
 }

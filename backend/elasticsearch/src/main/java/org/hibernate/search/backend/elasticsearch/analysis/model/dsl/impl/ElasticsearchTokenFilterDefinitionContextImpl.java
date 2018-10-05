@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class ElasticsearchTokenFilterDefinitionContextImpl
 		extends ElasticsearchAnalysisComponentDefinitionContextImpl<TokenFilterDefinition> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	ElasticsearchTokenFilterDefinitionContextImpl(String name) {
 		super( name, new TokenFilterDefinition() );
@@ -29,7 +29,7 @@ public class ElasticsearchTokenFilterDefinitionContextImpl
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw LOG.invalidElasticsearchTokenFilterDefinition( name );
+			throw log.invalidElasticsearchTokenFilterDefinition( name );
 		}
 		collector.collect( name, definition );
 	}
