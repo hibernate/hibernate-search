@@ -21,13 +21,13 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractElasticsearchIndexSchemaFieldTypedContext<F>
+public abstract class AbstractElasticsearchStandardIndexSchemaFieldTypedContext<F>
 		implements ElasticsearchStandardIndexSchemaFieldTypedContext<F>,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
-	AbstractElasticsearchIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, Class<F> fieldType) {
+	AbstractElasticsearchStandardIndexSchemaFieldTypedContext(IndexSchemaContext schemaContext, Class<F> fieldType) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
 	}
 

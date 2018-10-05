@@ -12,6 +12,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchem
 /**
  * @author Guillaume Smet
  */
-public interface LuceneIndexSchemaFieldTypedContext<F> extends StandardIndexSchemaFieldTypedContext<F> {
+public interface LuceneStandardIndexSchemaFieldTypedContext<F> extends StandardIndexSchemaFieldTypedContext<F> {
 
 }

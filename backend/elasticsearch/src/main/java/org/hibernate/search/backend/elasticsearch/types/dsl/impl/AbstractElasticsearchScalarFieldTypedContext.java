@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Yoann Rodiere
  */
-abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchIndexSchemaFieldTypedContext<F> {
+abstract class AbstractElasticsearchScalarFieldTypedContext<F> extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -32,7 +32,7 @@ abstract class AbstractScalarFieldTypedContext<F> extends AbstractElasticsearchI
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	AbstractScalarFieldTypedContext(IndexSchemaContext schemaContext,
+	AbstractElasticsearchScalarFieldTypedContext(IndexSchemaContext schemaContext,
 			String relativeFieldName, Class<F> fieldType, DataType dataType) {
 		super( schemaContext, fieldType );
 		this.relativeFieldName = relativeFieldName;

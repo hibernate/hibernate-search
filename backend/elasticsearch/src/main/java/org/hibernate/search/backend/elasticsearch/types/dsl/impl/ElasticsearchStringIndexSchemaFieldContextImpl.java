@@ -32,7 +32,7 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSchemaFieldTypedContext<String> {
+public class ElasticsearchStringIndexSchemaFieldContextImpl extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<String> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -42,7 +42,7 @@ public class StringIndexSchemaFieldContext extends AbstractElasticsearchIndexSch
 	private Store store = Store.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public StringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchStringIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 	}

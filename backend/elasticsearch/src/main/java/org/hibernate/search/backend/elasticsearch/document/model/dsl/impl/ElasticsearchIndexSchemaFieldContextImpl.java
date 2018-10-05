@@ -16,11 +16,11 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.GeoPointIndexSchemaFieldContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.IntegerIndexSchemaFieldContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndexSchemaFieldContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.LocalDateIndexSchemaFieldContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.StringIndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchGeoPointIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIntegerIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.JsonStringIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLocalDateIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchStringIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -70,27 +70,27 @@ class ElasticsearchIndexSchemaFieldContextImpl
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<String> asString() {
-		return setDelegate( new StringIndexSchemaFieldContext( this, relativeFieldName ) );
+		return setDelegate( new ElasticsearchStringIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<Integer> asInteger() {
-		return setDelegate( new IntegerIndexSchemaFieldContext( this, relativeFieldName ) );
+		return setDelegate( new ElasticsearchIntegerIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<LocalDate> asLocalDate() {
-		return setDelegate( new LocalDateIndexSchemaFieldContext( this, relativeFieldName ) );
+		return setDelegate( new ElasticsearchLocalDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<GeoPoint> asGeoPoint() {
-		return setDelegate( new GeoPointIndexSchemaFieldContext( this, relativeFieldName ) );
+		return setDelegate( new ElasticsearchGeoPointIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
 	public IndexSchemaFieldTypedContext<String> asJsonString(String mappingJsonString) {
-		return setDelegate( new JsonStringIndexSchemaFieldContext( this, relativeFieldName, mappingJsonString ) );
+		return setDelegate( new JsonStringIndexSchemaFieldContextImpl( this, relativeFieldName, mappingJsonString ) );
 	}
 
 	@Override

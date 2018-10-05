@@ -23,16 +23,17 @@ import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortCon
 /**
  * @author Guillaume Smet
  */
-public class LocalDateIndexSchemaFieldContext extends AbstractLuceneIndexSchemaFieldTypedContext<LocalDate> {
+public class LuceneLocalDateIndexSchemaFieldContextImpl extends
+		AbstractLuceneStandardIndexSchemaFieldTypedContext<LocalDate> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LocalDateIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneLocalDateIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, LocalDate.class );
 	}
 
 	@Override
-	public LocalDateIndexSchemaFieldContext sortable(Sortable sortable) {
+	public LuceneLocalDateIndexSchemaFieldContextImpl sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
