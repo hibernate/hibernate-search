@@ -24,8 +24,10 @@ public class ElasticsearchSearchTargetContext
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchProjectionFactory = new ElasticsearchSearchProjectionFactoryImpl();
-		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
+		this.searchProjectionFactory = new ElasticsearchSearchProjectionFactoryImpl( searchBackendContext,
+				searchTargetModel );
+		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel,
+				this.searchProjectionFactory );
 	}
 
 	@Override

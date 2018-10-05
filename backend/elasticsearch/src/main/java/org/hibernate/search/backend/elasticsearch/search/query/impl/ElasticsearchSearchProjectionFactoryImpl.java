@@ -9,12 +9,9 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ScoreSearchProjectionBuilderImpl;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
@@ -28,32 +25,39 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	ElasticsearchSearchProjectionFactoryImpl() {
+	private final SearchBackendContext searchBackendContext;
+
+	private final ElasticsearchSearchTargetModel searchTargetModel;
+
+	ElasticsearchSearchProjectionFactoryImpl(SearchBackendContext searchBackendContext,
+			ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchBackendContext = searchBackendContext;
+		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
 	public DocumentReferenceSearchProjectionBuilder documentReference() {
-		return DocumentReferenceSearchProjectionBuilderImpl.get();
+		return searchBackendContext.getDocumentReferenceProjectionBuilder();
 	}
 
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
-		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, clazz );
+		return new FieldSearchProjectionBuilderImpl<>( searchTargetModel, absoluteFieldPath, clazz );
 	}
 
 	@Override
 	public ObjectSearchProjectionBuilder object() {
-		return ObjectSearchProjectionBuilderImpl.get();
+		return searchBackendContext.getObjectProjectionBuilder();
 	}
 
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
-		return ReferenceSearchProjectionBuilderImpl.get();
+		return searchBackendContext.getReferenceProjectionBuilder();
 	}
 
 	@Override
 	public ScoreSearchProjectionBuilder score() {
-		return ScoreSearchProjectionBuilderImpl.get();
+		return searchBackendContext.getScoreProjectionBuilder();
 	}
 
 	@Override

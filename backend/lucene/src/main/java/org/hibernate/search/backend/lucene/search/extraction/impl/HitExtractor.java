@@ -17,7 +17,8 @@ public interface HitExtractor<C> {
 	 *
 	 * @param luceneCollectorBuilder the Lucene collector builder.
 	 */
-	void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder);
+	default void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+	}
 
 	/**
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
@@ -25,7 +26,8 @@ public interface HitExtractor<C> {
 	 *
 	 * @param absoluteFieldPaths The set of absolute field paths contributed.
 	 */
-	void contributeFields(Set<String> absoluteFieldPaths);
+	default void contributeFields(Set<String> absoluteFieldPaths) {
+	}
 
 	/**
 	 * Perform hit extraction.

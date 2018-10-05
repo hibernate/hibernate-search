@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -28,7 +29,10 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<Lucen
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	LuceneSearchProjectionFactoryImpl() {
+	private final LuceneSearchTargetModel searchTargetModel;
+
+	LuceneSearchProjectionFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
+		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
@@ -38,7 +42,7 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<Lucen
 
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
-		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, clazz );
+		return new FieldSearchProjectionBuilderImpl<>( searchTargetModel, absoluteFieldPath, clazz );
 	}
 
 	@Override

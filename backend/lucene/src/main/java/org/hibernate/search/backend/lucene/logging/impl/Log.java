@@ -10,7 +10,6 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
@@ -250,8 +249,8 @@ public interface Log extends BasicLogger {
 			LuceneIndexManager otherTarget, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 26,
-			value = "Unknown projections %1$s.")
-	SearchException unknownProjectionForSearch(Collection<SearchProjection<?>> projections, @Param EventContext context);
+			value = "Invalid projection on unknown field '%1$s'.")
+	SearchException invalidProjectionUnknownField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "An IOException happened while executing the query '%1$s'.")
@@ -369,4 +368,9 @@ public interface Log extends BasicLogger {
 			value = "A Lucene query cannot include search projections built using a non-Lucene search target."
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
+
+	@Message(id = ID_OFFSET_2 + 56, value = "Invalid type '%2$s' for projection on field '%1$s'.")
+	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> type,
+			@Param EventContext context);
 }

@@ -6,28 +6,28 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
-public class DocumentReferenceSearchProjectionImpl implements ElasticsearchSearchProjection<DocumentReference> {
+public class NullSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 
-	private final DocumentReferenceExtractorHelper helper;
+	@SuppressWarnings("rawtypes")
+	private static final NullSearchProjectionImpl INSTANCE = new NullSearchProjectionImpl();
 
-	public DocumentReferenceSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
-		this.helper = helper;
+	@SuppressWarnings("unchecked")
+	public static <U> NullSearchProjectionImpl<U> get() {
+		return (NullSearchProjectionImpl<U>) INSTANCE;
 	}
 
 	@Override
 	public void contributeRequest(JsonObject requestBody) {
-		helper.contributeRequest( requestBody );
+		// Nothing to contribute
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
-		collector.collectProjection( helper.extractDocumentReference( hit ) );
+		collector.collectProjection( null );
 	}
 
 	@Override

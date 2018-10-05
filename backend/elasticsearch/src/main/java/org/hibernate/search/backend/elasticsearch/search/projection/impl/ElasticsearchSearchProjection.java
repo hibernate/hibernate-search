@@ -6,16 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public interface ElasticsearchSearchProjection<T> extends SearchProjection<T> {
+public interface ElasticsearchSearchProjection<T> extends SearchProjection<T>, HitExtractor<ProjectionHitCollector> {
 
-	Optional<HitExtractor<? super ProjectionHitCollector>> getHitExtractor(SearchBackendContext searchBackendContext,
-			ElasticsearchIndexModel indexModel);
 }

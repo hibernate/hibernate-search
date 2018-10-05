@@ -6,44 +6,49 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
-import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference> {
+public class IndexSensitiveSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
-	private static final DocumentReferenceSearchProjectionImpl INSTANCE = new DocumentReferenceSearchProjectionImpl();
+	private final Map<String, LuceneSearchProjection<T>> projectionsByIndex;
 
-	static DocumentReferenceSearchProjectionImpl get() {
-		return INSTANCE;
-	}
-
-	private DocumentReferenceSearchProjectionImpl() {
+	IndexSensitiveSearchProjectionImpl(Map<String, LuceneSearchProjection<T>> projectionsByIndex) {
+		this.projectionsByIndex = projectionsByIndex;
 	}
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireTopDocsCollector();
+		for ( LuceneSearchProjection<T> projection : projectionsByIndex.values() ) {
+			projection.contributeCollectors( luceneCollectorBuilder );
+		}
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
 		absoluteFieldPaths.add( LuceneFields.indexFieldName() );
-		absoluteFieldPaths.add( LuceneFields.idFieldName() );
+		for ( LuceneSearchProjection<T> projection : projectionsByIndex.values() ) {
+			projection.contributeFields( absoluteFieldPaths );
+		}
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, Document document, Float score) {
-		collector.collectProjection( DocumentReferenceExtractorHelper.extractDocumentReference( document ) );
+		projectionsByIndex.get( document.get( LuceneFields.indexFieldName() ) )
+				.extract( collector, document, score );
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName();
+		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( projectionsByIndex )
+				.append( "]" );
+		return sb.toString();
 	}
 }

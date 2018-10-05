@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Optional;
+import java.util.Set;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.apache.lucene.document.Document;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -25,8 +25,18 @@ public class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object
 	}
 
 	@Override
-	public Optional<HitExtractor<? super ProjectionHitCollector>> getHitExtractor(LuceneIndexModel indexModel) {
-		return Optional.of( ObjectHitExtractor.get() );
+	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+		ObjectHitExtractor.get().contributeCollectors( luceneCollectorBuilder );
+	}
+
+	@Override
+	public void contributeFields(Set<String> absoluteFieldPaths) {
+		ObjectHitExtractor.get().contributeFields( absoluteFieldPaths );
+	}
+
+	@Override
+	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+		ObjectHitExtractor.get().extract( collector, document, score );
 	}
 
 	@Override

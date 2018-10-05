@@ -7,7 +7,6 @@
 
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -21,7 +20,6 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;
-
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;
@@ -160,8 +158,8 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET_3 + 7,
-			value = "Unknown projections %1$s.")
-	SearchException unknownProjectionForSearch(Collection<SearchProjection<?>> projections, @Param EventContext context);
+			value = "Invalid projection on unknown field '%1$s'.")
+	SearchException invalidProjectionUnknownField(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 8,
 			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
@@ -291,4 +289,9 @@ public interface Log extends BasicLogger {
 			value = "An Elasticsearch query cannot include search projections built using a non-Elasticsearch search target."
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
+
+	@Message(id = ID_OFFSET_3 + 39, value = "Invalid type '%2$s' for projection on field '%1$s'.")
+	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
+			@FormatWith(ClassFormatter.class) Class<?> type,
+			@Param EventContext context);
 }

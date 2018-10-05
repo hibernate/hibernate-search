@@ -267,7 +267,7 @@ public class SearchMultiIndexIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unknown projections" )
+				.hasMessageContaining( "Invalid projection on unknown field" )
 				.hasMessageContaining( "unknownField" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames(

@@ -6,28 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+
+import com.google.gson.JsonObject;
 
 public class ObjectSearchProjectionImpl implements ElasticsearchSearchProjection<Object> {
 
-	private static final ObjectSearchProjectionImpl INSTANCE = new ObjectSearchProjectionImpl();
+	private final DocumentReferenceExtractorHelper helper;
 
-	static ObjectSearchProjectionImpl get() {
-		return INSTANCE;
-	}
-
-	private ObjectSearchProjectionImpl() {
+	ObjectSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+		this.helper = helper;
 	}
 
 	@Override
-	public Optional<HitExtractor<? super ProjectionHitCollector>> getHitExtractor(SearchBackendContext searchBackendContext,
-			ElasticsearchIndexModel indexModel) {
-		return Optional.of( searchBackendContext.getObjectHitExtractor() );
+	public void contributeRequest(JsonObject requestBody) {
+		helper.contributeRequest( requestBody );
+	}
+
+	@Override
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+		collector.collectForLoading( helper.extractDocumentReference( hit ) );
 	}
 
 	@Override

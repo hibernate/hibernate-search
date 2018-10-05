@@ -14,10 +14,12 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceHitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceProjectionHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ObjectHitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ScoreHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ScoreSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -32,10 +34,13 @@ public class SearchBackendContext {
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
 
-	private final DocumentReferenceHitExtractor documentReferenceHitExtractor;
 	private final ObjectHitExtractor objectHitExtractor;
-	private final DocumentReferenceProjectionHitExtractor documentReferenceProjectionHitExtractor;
-	private final ScoreHitExtractor scoreHitExtractor;
+	private final DocumentReferenceHitExtractor referenceHitExtractor;
+
+	private final DocumentReferenceSearchProjectionBuilderImpl documentReferenceProjectionBuilder;
+	private final ObjectSearchProjectionBuilderImpl objectProjectionBuilder;
+	private final ReferenceSearchProjectionBuilderImpl referenceProjectionBuilder;
+	private final ScoreSearchProjectionBuilderImpl scoreProjectionBuilder;
 
 	public SearchBackendContext(EventContext eventContext,
 			ElasticsearchWorkFactory workFactory,
@@ -49,11 +54,14 @@ public class SearchBackendContext {
 
 		DocumentReferenceExtractorHelper documentReferenceExtractorHelper =
 				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
-		this.documentReferenceHitExtractor = new DocumentReferenceHitExtractor( documentReferenceExtractorHelper );
+
 		this.objectHitExtractor = new ObjectHitExtractor( documentReferenceExtractorHelper );
-		this.documentReferenceProjectionHitExtractor =
-				new DocumentReferenceProjectionHitExtractor( documentReferenceExtractorHelper );
-		this.scoreHitExtractor = new ScoreHitExtractor( documentReferenceExtractorHelper );
+		this.referenceHitExtractor = new DocumentReferenceHitExtractor( documentReferenceExtractorHelper );
+
+		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
+		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
+		this.referenceProjectionBuilder = new ReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
+		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
 	}
 
 	@Override
@@ -65,20 +73,28 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	public DocumentReferenceHitExtractor getDocumentReferenceHitExtractor() {
-		return documentReferenceHitExtractor;
+	public DocumentReferenceHitExtractor getReferenceHitExtractor() {
+		return referenceHitExtractor;
 	}
 
 	public ObjectHitExtractor getObjectHitExtractor() {
 		return objectHitExtractor;
 	}
 
-	public DocumentReferenceProjectionHitExtractor getDocumentReferenceProjectionHitExtractor() {
-		return documentReferenceProjectionHitExtractor;
+	public DocumentReferenceSearchProjectionBuilderImpl getDocumentReferenceProjectionBuilder() {
+		return documentReferenceProjectionBuilder;
 	}
 
-	public ScoreHitExtractor getScoreHitExtractor() {
-		return scoreHitExtractor;
+	public ObjectSearchProjectionBuilderImpl getObjectProjectionBuilder() {
+		return objectProjectionBuilder;
+	}
+
+	public ReferenceSearchProjectionBuilderImpl getReferenceProjectionBuilder() {
+		return referenceProjectionBuilder;
+	}
+
+	public ScoreSearchProjectionBuilderImpl getScoreProjectionBuilder() {
+		return scoreProjectionBuilder;
 	}
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(

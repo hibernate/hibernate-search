@@ -32,11 +32,11 @@ public class DocumentReferenceExtractorHelper {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
-	void contributeRequest(JsonObject requestBody) {
+	public void contributeRequest(JsonObject requestBody) {
 		multiTenancyStrategy.contributeToSearchRequest( requestBody );
 	}
 
-	DocumentReference extractDocumentReference(JsonObject hit) {
+	public DocumentReference extractDocumentReference(JsonObject hit) {
 		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
 				.map( indexNameConverter )
 				.orElseThrow( log::elasticsearchResponseMissingData );

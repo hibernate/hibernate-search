@@ -16,6 +16,7 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.hibernate.search.util.AssertionFailure;
 
 public class LuceneCollectorsBuilder {
 
@@ -52,7 +53,12 @@ public class LuceneCollectorsBuilder {
 	}
 
 	public LuceneCollectors build() {
+		if ( luceneCollectors.isEmpty() ) {
+			throw new AssertionFailure( "No collectors have been defined: we need at least one." );
+		}
+
 		Collector compositeCollector;
+
 		if ( luceneCollectors.size() == 1 ) {
 			compositeCollector = topDocsCollector != null ? topDocsCollector : totalHitCountCollector;
 		}

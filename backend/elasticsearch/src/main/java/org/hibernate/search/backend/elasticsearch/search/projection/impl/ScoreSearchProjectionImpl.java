@@ -6,32 +6,32 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+
+import com.google.gson.JsonObject;
 
 public class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> {
 
-	private static final ScoreSearchProjectionImpl INSTANCE = new ScoreSearchProjectionImpl();
+	private final DocumentReferenceExtractorHelper helper;
 
-	static ScoreSearchProjectionImpl get() {
-		return INSTANCE;
-	}
-
-	private ScoreSearchProjectionImpl() {
+	ScoreSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+		this.helper = helper;
 	}
 
 	@Override
-	public Optional<HitExtractor<? super ProjectionHitCollector>> getHitExtractor(SearchBackendContext searchBackendContext,
-			ElasticsearchIndexModel indexModel) {
-		return Optional.of( searchBackendContext.getScoreHitExtractor() );
+	public void contributeRequest(JsonObject requestBody) {
+		helper.contributeRequest( requestBody );
+	}
+
+	@Override
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+		collector.collectProjection( hit.get( "_score" ).getAsFloat() );
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
 	}
+
 }

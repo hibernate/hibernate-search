@@ -26,7 +26,7 @@ public class LuceneSearchTargetContext
 	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchProjectionFactory = new LuceneSearchProjectionFactoryImpl();
+		this.searchProjectionFactory = new LuceneSearchProjectionFactoryImpl( searchTargetModel );
 		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
 

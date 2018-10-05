@@ -6,33 +6,51 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Optional;
-
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.SourceHitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 
-	private final String absoluteFieldPath;
+	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
+	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
-	FieldSearchProjectionImpl(String absoluteFieldPath, Class<T> type) {
+	private final String absoluteFieldPath;
+	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
+	private final ElasticsearchFieldConverter converter;
+
+	FieldSearchProjectionImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.property( absoluteFieldPath );
+		this.converter = converter;
 	}
 
 	@Override
-	public Optional<HitExtractor<? super ProjectionHitCollector>> getHitExtractor(SearchBackendContext searchBackendContext,
-			ElasticsearchIndexModel indexModel) {
-		ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
-
-		if ( schemaNode == null ) {
-			return Optional.empty();
+	public void contributeRequest(JsonObject requestBody) {
+		JsonArray source = REQUEST_SOURCE_ACCESSOR.get( requestBody )
+				.orElseGet( () -> {
+					JsonArray newSource = new JsonArray();
+					REQUEST_SOURCE_ACCESSOR.set( requestBody, newSource );
+					return newSource;
+				} );
+		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
+		if ( !source.contains( fieldPathJson ) ) {
+			source.add( fieldPathJson );
 		}
+	}
 
-		return Optional.of( new SourceHitExtractor<T>( absoluteFieldPath, schemaNode.getConverter() ) );
+	@Override
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
+		collector.collectProjection( converter.convertFromProjection( fieldValue ) );
 	}
 
 	@Override

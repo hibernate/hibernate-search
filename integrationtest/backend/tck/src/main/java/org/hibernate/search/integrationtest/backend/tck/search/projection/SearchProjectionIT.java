@@ -100,16 +100,27 @@ public class SearchProjectionIT {
 	}
 
 	@Test
+	public void field_single_invalidProjectionType() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Invalid type" );
+		thrown.expectMessage( "for projection on field" );
+		thrown.expectMessage( INDEX_NAME );
+
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, Integer.class ).toProjection();
+	}
+
+	@Test
 	public void field_withProjectionConverters() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			SearchQuery<List<?>> query;
 			String fieldPath = fieldModel.relativeFieldName;
-			Class<?> fieldType = fieldModel.type;
 
 			query = searchTarget.query( sessionContext )
-					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
+					.asProjections( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
 					.predicate().matchAll().end()
 					.build();
 			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
@@ -119,6 +130,19 @@ public class SearchProjectionIT {
 				b.projection( new ValueWrapper<>( null ) ); // Empty document
 			} );
 		}
+	}
+
+	@Test
+	public void field_withProjectionConverter_invalidProjectionType() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Invalid type" );
+		thrown.expectMessage( "for projection on field" );
+		thrown.expectMessage( INDEX_NAME );
+
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
+		searchTarget.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
 	}
 
 	@Test
@@ -300,7 +324,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
+		thrown.expectMessage( "Invalid projection on unknown field" );
 		thrown.expectMessage( "unknownField" );
 		thrown.expectMessage( INDEX_NAME );
 
@@ -315,7 +339,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
+		thrown.expectMessage( "Invalid projection on unknown field" );
 		thrown.expectMessage( "nestedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
@@ -330,7 +354,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown projections" );
+		thrown.expectMessage( "Invalid projection on unknown field" );
 		thrown.expectMessage( "flattenedObject" );
 		thrown.expectMessage( INDEX_NAME );
 

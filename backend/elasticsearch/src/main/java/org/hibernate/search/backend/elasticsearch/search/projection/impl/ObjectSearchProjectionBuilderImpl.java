@@ -6,23 +6,21 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 
 
 public class ObjectSearchProjectionBuilderImpl implements ObjectSearchProjectionBuilder {
 
-	private static final ObjectSearchProjectionBuilderImpl INSTANCE = new ObjectSearchProjectionBuilderImpl();
+	private final ObjectSearchProjectionImpl projection;
 
-	public static ObjectSearchProjectionBuilderImpl get() {
-		return INSTANCE;
-	}
-
-	private ObjectSearchProjectionBuilderImpl() {
+	public ObjectSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
+		this.projection = new ObjectSearchProjectionImpl( helper );
 	}
 
 	@Override
 	public SearchProjection<Object> build() {
-		return ObjectSearchProjectionImpl.get();
+		return projection;
 	}
 }

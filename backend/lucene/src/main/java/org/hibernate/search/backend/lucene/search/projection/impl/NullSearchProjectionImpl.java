@@ -4,35 +4,41 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.search.extraction.impl;
+package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class ScoreHitExtractor implements HitExtractor<ProjectionHitCollector> {
+public class NullSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
-	private static final ScoreHitExtractor INSTANCE = new ScoreHitExtractor();
+	@SuppressWarnings("rawtypes")
+	private static final NullSearchProjectionImpl INSTANCE = new NullSearchProjectionImpl();
 
-	private ScoreHitExtractor() {
-	}
-
-	public static ScoreHitExtractor get() {
-		return INSTANCE;
+	@SuppressWarnings("unchecked")
+	public static <U> NullSearchProjectionImpl<U> get() {
+		return (NullSearchProjectionImpl<U>) INSTANCE;
 	}
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireTopDocsCollector();
+		// Nothing to contribute
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
+		// Nothing to contribute
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, Document document, Float score) {
-		collector.collectProjection( score );
+		collector.collectProjection( null );
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
 	}
 }
