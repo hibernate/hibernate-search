@@ -24,6 +24,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.ReflectionHelper;
 
 /**
  * A very simple introspector roughly following Java Beans conventions.
@@ -51,7 +52,15 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <T> PojoRawTypeModel<T> getTypeModel(Class<T> clazz) {
+		if ( clazz.isPrimitive() ) {
+			/*
+			 * We'll never manipulate the primitive type, as we're using generics everywhere,
+			 * so let's consider every occurrence of the primitive type as an occurrence of its wrapper type.
+			 */
+			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
+		}
 		return (PojoRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
 	}
 
