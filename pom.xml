@@ -157,11 +157,6 @@
         <module>integrationtest</module>
         <module>documentation</module>
         <module>legacy</module>
-        <!--
-             WARNING: this MUST be the very last module, in particular when deploying artifacts to a Nexus repository.
-             See this module's POM for more information.
-         -->
-        <module>reports</module>
     </modules>
 
     <properties>
@@ -2456,5 +2451,25 @@
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
         </profile>
+
+        <!--
+             WARNING: this MUST be the very last profile,
+             so that the "report" module is the very last module,
+             in particular when deploying artifacts to a Nexus repository.
+             See the "reports" module POM for more information.
+         -->
+        <profile>
+            <id>report-as-last-module</id>
+            <activation>
+                <property>
+                    <name>!some.property.that.will.never.exist</name>
+                </property>
+            </activation>
+            <modules>
+                <module>reports</module>
+            </modules>
+        </profile>
+
+        <!-- DO NOT ADD ANY PROFILE AFTER THIS: see above -->
     </profiles>
 </project>
