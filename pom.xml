@@ -528,6 +528,12 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-documentation</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -1669,6 +1675,9 @@
             <properties>
                 <failOnJavaDocError>true</failOnJavaDocError>
             </properties>
+            <modules>
+                <module>distribution</module>
+            </modules>
             <build>
                 <plugins>
                     <plugin>
