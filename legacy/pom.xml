@@ -786,7 +786,7 @@
         <profile>
             <id>dist</id>
             <modules>
-                <module>distribution</module>
+                <module>../distribution</module>
             </modules>
         </profile>
 
