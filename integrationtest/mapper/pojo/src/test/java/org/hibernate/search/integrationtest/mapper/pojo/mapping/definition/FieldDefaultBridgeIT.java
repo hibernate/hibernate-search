@@ -92,6 +92,34 @@ public class FieldDefaultBridgeIT {
 	}
 
 	@Test
+	public void primitiveInteger() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			int myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public int getMyProperty() {
+				return myProperty;
+			}
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Integer.class,
+				42
+		);
+	}
+
+	@Test
 	public void localDate() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
