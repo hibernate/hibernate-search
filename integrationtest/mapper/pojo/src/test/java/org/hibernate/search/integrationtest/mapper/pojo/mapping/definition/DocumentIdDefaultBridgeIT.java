@@ -63,6 +63,28 @@ public class DocumentIdDefaultBridgeIT {
 	}
 
 	@Test
+	public void primitiveInteger() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			int id;
+			@DocumentId
+			public int getId() {
+				return id;
+			}
+		}
+		doTestBridge(
+				IndexedEntity.class,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					return entity;
+				},
+				42,
+				"42"
+		);
+	}
+
+	@Test
 	public void myEnum() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {

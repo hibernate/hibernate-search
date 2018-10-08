@@ -542,7 +542,6 @@ public class ProgrammaticMappingSmokeIT {
 
 		public static final String INDEX = "IndexedEntity";
 
-		// TODO make it work with a primitive int too
 		private Integer id;
 
 		private String text;
@@ -598,7 +597,6 @@ public class ProgrammaticMappingSmokeIT {
 
 		public static final String INDEX = "OtherIndexedEntity";
 
-		// TODO make it work with a primitive int too
 		private Integer id;
 
 		private Integer numeric;
