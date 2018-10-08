@@ -25,82 +25,45 @@
     </formats>
 
     <!-- Configure the module artifacts which make it into the distribution bundle -->
-    <!-- first the actual project artifacts -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory>dist</outputDirectory>
-            <includes>
-                <include>org.hibernate:hibernate-search-engine</include>
-                <include>org.hibernate:hibernate-search-orm</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/required</outputDirectory>
+            <outputDirectory>dist/engine</outputDirectory>
             <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <!-- hibernate-search-engine -->
-                <include>org.apache.lucene:lucene-core</include>
-                <include>org.apache.lucene:lucene-queryparser</include>
-                <include>org.hibernate.common:hibernate-commons-annotations</include>
-                <include>org.jboss.logging:jboss-logging</include>
-
-                <!-- hibernate-search-orm -->
-                <include>org.hibernate:hibernate-core</include>
-                <include>dom4j:dom4j</include>
-                <include>org.javassist:javassist</include>
+                <include>org.hibernate.search:hibernate-search-engine</include>
             </includes>
-            <excludes>
-                <exclude>org.jboss:jandex</exclude>
-            </excludes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/analyzers</outputDirectory>
+            <outputDirectory>dist/mapper/orm</outputDirectory>
             <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.apache.lucene:lucene-analyzers</include>
+                <include>org.hibernate.search:hibernate-search-orm</include>
+                <include>org.hibernate.search:hibernate-search-mapper-pojo</include>
             </includes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/tika</outputDirectory>
+            <outputDirectory>dist/backend/lucene</outputDirectory>
             <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
-                <include>org.apache.tika:tika-parsers</include>
+                <include>org.hibernate.search:hibernate-search-backend-lucene</include>
             </includes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/backend-jgroups</outputDirectory>
+            <outputDirectory>dist/backend/elasticsearch</outputDirectory>
             <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-backend-jgroups</include>
-                <include>org.jgroups:jgroups</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/backend-jms</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-backend-jms</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/optional/elasticsearch</outputDirectory>
-            <scope>runtime</scope>
+            <useProjectArtifact>false</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <useTransitiveFiltering>true</useTransitiveFiltering>
             <includes>
@@ -109,57 +72,16 @@
                     because of a bug in maven-assembly-plugin.
                     See https://issues.apache.org/jira/browse/MASSEMBLY-865
                  -->
-                <include>org.hibernate:hibernate-search-elasticsearch:*</include>
+                <include>org.hibernate.search:hibernate-search-backend-elasticsearch:*</include>
             </includes>
         </dependencySet>
 
         <dependencySet>
-            <outputDirectory>dist/lib/optional/elasticsearch-aws</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-elasticsearch-aws</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/optional/clustering/serialization-avro</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-serialization-avro</include>
-                <include>org.apache.avro:avro</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/optional/jsr352-core</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-jsr352-core</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <outputDirectory>dist/lib/optional/jsr352-jberet</outputDirectory>
-            <scope>runtime</scope>
-            <useTransitiveDependencies>true</useTransitiveDependencies>
-            <useTransitiveFiltering>true</useTransitiveFiltering>
-            <includes>
-                <include>org.hibernate:hibernate-search-jsr352-jberet</include>
-            </includes>
-        </dependencySet>
-
-        <dependencySet>
-            <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>/dist/lib/provided</outputDirectory>
+            <outputDirectory>dist/provided</outputDirectory>
             <scope>provided</scope>
+            <useProjectArtifact>false</useProjectArtifact>
+            <useTransitiveDependencies>false</useTransitiveDependencies>
             <includes>
-                <include>org.jboss.spec.javax.jms:*</include>
                 <include>org.jboss.spec.javax.annotation:*</include>
                 <include>javax.persistence:javax.persistence-api</include>
                 <include>org.jboss.spec.javax.transaction:*</include>
@@ -168,7 +90,6 @@
                 <include>javax.enterprise:cdi-api</include>
             </includes>
         </dependencySet>
-
     </dependencySets>
 
     <files>
@@ -193,18 +114,13 @@
             <source>../copyright.txt</source>
             <outputDirectory></outputDirectory>
         </file>
-        <file>
-            <source>../legacy/infinispan/moved.txt</source>
-            <!-- The following path is where we used to distribute the Infinispan integration -->
-            <outputDirectory>dist/lib/optional/clustering/directory-infinispan</outputDirectory>
-        </file>
     </files>
 
     <fileSets>
         <!-- Include all sources -->
         <fileSet>
             <directory>..</directory>
-            <outputDirectory>project</outputDirectory>
+            <outputDirectory>src</outputDirectory>
             <useDefaultExcludes>true</useDefaultExcludes>
             <excludes>
                 <!-- we already have these files at the top level of the distribution -->

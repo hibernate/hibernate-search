@@ -9,10 +9,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>hibernate-search-legacy-parent</artifactId>
-        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <groupId>org.hibernate.search</groupId>
         <version>6.0.0-SNAPSHOT</version>
-        <relativePath>../legacy/pom.xml</relativePath>
     </parent>
 
     <artifactId>hibernate-search-distribution</artifactId>
@@ -30,59 +29,30 @@
         <!-- The modules to include in the distribution. Any non-optional/provided dependencies will
                      automatically be included as well -->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-engine</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-orm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
 
         <!-- Making sure the docs get build prior to running the assembly -->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-documentation</artifactId>
             <type>pom</type>
         </dependency>
 
         <!-- Need to list out optional/provided dependencies here again in order to include them via assembly dependency set -->
-        <dependency>
-            <groupId>org.apache.tika</groupId>
-            <artifactId>tika-parsers</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-serialization-avro</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-elasticsearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-elasticsearch-aws</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-backend-jms</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-backend-jgroups</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-jsr352-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-search-jsr352-jberet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.jms</groupId>
-            <artifactId>jboss-jms-api_2.0_spec</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.jboss.spec.javax.annotation</groupId>
             <artifactId>jboss-annotations-api_1.2_spec</artifactId>
@@ -129,15 +99,12 @@
                         <id>generate-javadoc</id>
                         <configuration>
                             <sourcepath>
-                                ${basedir}/../legacy/engine/src/main/java;
-                                ${basedir}/../legacy/orm/src/main/java;
-                                ${basedir}/../legacy/serialization/avro/src/main/java;
-                                ${basedir}/../legacy/backends/jgroups/src/main/java;
-                                ${basedir}/../legacy/backends/jms/src/main/java;
-                                ${basedir}/../legacy/elasticsearch/src/main/java;
-                                ${basedir}/../legacy/elasticsearch-aws/src/main/java;
-                                ${basedir}/../legacy/jsr352/core/src/main/java;
-                                ${basedir}/../legacy/jsr352/jberet/src/main/java;
+                                ${basedir}/../engine/src/main/java;
+                                ${basedir}/../util/internal/common/src/main/java;
+                                ${basedir}/../mapper/pojo/src/main/java;
+                                ${basedir}/../mapper/orm/src/main/java;
+                                ${basedir}/../backend/elasticsearch/src/main/java;
+                                ${basedir}/../backend/lucene/src/main/java;
                             </sourcepath>
                             <docfilessubdirs>true</docfilessubdirs>
                             <packagesheader>Hibernate Search Packages</packagesheader>
