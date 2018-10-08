@@ -38,9 +38,9 @@ public class IndexSensitiveSearchProjectionImpl<T> implements LuceneSearchProjec
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
 		projectionsByIndex.get( document.get( LuceneFields.indexFieldName() ) )
-				.extract( collector, document, score );
+				.extract( collector, document, docId, score );
 	}
 
 	@Override

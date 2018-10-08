@@ -65,7 +65,7 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 			Document document = storedFieldVisitor.getDocumentAndReset();
 
 			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, document, hit.score );
+			hitExtractor.extract( hitCollector, document, hit.doc, hit.score );
 		}
 
 		return Collections.unmodifiableList( hitAggregator.build() );

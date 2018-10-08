@@ -37,7 +37,7 @@ public class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
 		T rawValue = schemaNode.getCodec().decode( document, schemaNode.getAbsoluteFieldPath() );
 		collector.collectProjection( schemaNode.getConverter().convertFromProjection( rawValue ) );
 	}

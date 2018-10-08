@@ -33,7 +33,7 @@ public class NullSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
 		collector.collectProjection( null );
 	}
 

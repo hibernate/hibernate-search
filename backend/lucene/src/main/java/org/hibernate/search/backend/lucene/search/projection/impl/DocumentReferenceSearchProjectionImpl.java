@@ -38,7 +38,7 @@ public class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjec
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
 		collector.collectProjection( DocumentReferenceExtractorHelper.extractDocumentReference( document ) );
 	}
 

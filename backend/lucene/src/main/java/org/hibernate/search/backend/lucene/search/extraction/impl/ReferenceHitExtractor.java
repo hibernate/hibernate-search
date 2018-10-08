@@ -21,7 +21,7 @@ public class ReferenceHitExtractor extends AbstractDocumentReferenceHitExtractor
 	}
 
 	@Override
-	public void extract(ReferenceHitCollector collector, Document document, Float score) {
+	public void extract(ReferenceHitCollector collector, Document document, int docId, Float score) {
 		collector.collectReference( extractDocumentReference( document ) );
 	}
 }

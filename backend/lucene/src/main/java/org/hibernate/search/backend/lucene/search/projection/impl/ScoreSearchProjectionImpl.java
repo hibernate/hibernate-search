@@ -34,7 +34,7 @@ public class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> 
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, Float score) {
+	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
 		collector.collectProjection( score );
 	}
 
