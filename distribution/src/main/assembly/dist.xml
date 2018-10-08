@@ -173,28 +173,28 @@
 
     <files>
         <file>
-            <source>../../README.md</source>
+            <source>../README.md</source>
             <outputDirectory></outputDirectory>
             <filtered>true</filtered>
         </file>
         <file>
-            <source>../../CONTRIBUTING.md</source>
+            <source>../CONTRIBUTING.md</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../../lgpl.txt</source>
+            <source>../lgpl.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../../changelog.txt</source>
+            <source>../changelog.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../../copyright.txt</source>
+            <source>../copyright.txt</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>../infinispan/moved.txt</source>
+            <source>../legacy/infinispan/moved.txt</source>
             <!-- The following path is where we used to distribute the Infinispan integration -->
             <outputDirectory>dist/lib/optional/clustering/directory-infinispan</outputDirectory>
         </file>
@@ -233,6 +233,9 @@
                 <exclude>**/*.iml</exclude>
                 <exclude>atlassian-ide-plugin.xml</exclude>
                 <exclude>.sonar-ide.properties</exclude>
+                <exclude>Jenkinsfile</exclude>
+                <exclude>jenkins/**</exclude>
+                <exclude>.empty/**</exclude>
             </excludes>
         </fileSet>
 
