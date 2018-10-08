@@ -208,8 +208,11 @@
         <javadoc.org.jberet.url>http://docs.jboss.org/jberet/1.2.0.Final/javadoc/jberet-core/</javadoc.org.jberet.url>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
-        <!-- Used in the ORM integration and various tests -->
+        <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
+        <version.javax.inject>1</version.javax.inject>
         <version.javax.enterprise>2.0</version.javax.enterprise>
+        <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
+        <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <!-- This is used to generate a link to the Java EE javadoc -->
         <javadoc.javaee.url>https://docs.oracle.com/javaee/7/api/</javadoc.javaee.url>
 
@@ -693,16 +696,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>javax.persistence</groupId>
-                <artifactId>javax.persistence-api</artifactId>
-                <version>${version.javax.persistence}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>${version.javax.enterprise}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.hibernate.common</groupId>
                 <artifactId>hibernate-commons-annotations</artifactId>
                 <version>${version.org.hibernate.commons.annotations}</version>
@@ -755,6 +748,44 @@
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-sandbox</artifactId>
                 <version>${version.org.apache.lucene}</version>
+            </dependency>
+
+            <!-- JavaEE/JakartaEE dependencies -->
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>${version.javax.persistence}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.enterprise</groupId>
+                <artifactId>cdi-api</artifactId>
+                <version>${version.javax.enterprise}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>${version.javax.inject}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.annotation</groupId>
+                <artifactId>jboss-annotations-api_1.2_spec</artifactId>
+                <version>${version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.spec.javax.transaction</groupId>
+                <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+                <version>${version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>javax.batch</groupId>
+                <artifactId>javax.batch-api</artifactId>
+                <version>${version.javax.batch}</version>
+                <scope>provided</scope>
             </dependency>
 
             <!-- To be removed in HSEARCH-3376 -->
