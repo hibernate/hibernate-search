@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
+import org.hibernate.search.engine.search.dsl.projection.DistanceFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
@@ -13,6 +14,8 @@ import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionCont
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.impl.common.Contracts;
 
 
 public class SearchProjectionContainerContextImpl implements SearchProjectionContainerContext {
@@ -53,5 +56,12 @@ public class SearchProjectionContainerContextImpl implements SearchProjectionCon
 	@Override
 	public ScoreProjectionContext score() {
 		return new ScoreProjectionContextImpl( factory );
+	}
+
+	@Override
+	public DistanceFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center) {
+		Contracts.assertNotNull( center, "center" );
+
+		return new DistanceFieldProjectionContextImpl( factory, absoluteFieldPath, center );
 	}
 }

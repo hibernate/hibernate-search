@@ -10,15 +10,18 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceFieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactory<ElasticsearchSearchProjection<?>> {
@@ -58,6 +61,11 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 	@Override
 	public ScoreSearchProjectionBuilder score() {
 		return searchBackendContext.getScoreProjectionBuilder();
+	}
+
+	@Override
+	public DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
 	@Override

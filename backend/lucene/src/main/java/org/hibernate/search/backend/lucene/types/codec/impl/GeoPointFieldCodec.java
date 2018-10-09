@@ -78,15 +78,9 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 				// TODO HSEARCH-3081
 				break;
 		}
-		switch ( sortable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
-				break;
-		}
 
+		// the doc values field is also used when projecting on the distance
+		documentBuilder.addField( new LatLonDocValuesField( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 		documentBuilder.addField( new LatLonPoint( absoluteFieldPath, value.getLatitude(), value.getLongitude() ) );
 	}
 

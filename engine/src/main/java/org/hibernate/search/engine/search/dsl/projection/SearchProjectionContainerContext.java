@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.dsl.projection;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A context allowing to create a projection.
@@ -79,4 +80,10 @@ public interface SearchProjectionContainerContext {
 	 */
 	ScoreProjectionContext score();
 
+	/**
+	 * Project on the distance from the center to a {@link GeoPoint} field.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	DistanceFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
 }

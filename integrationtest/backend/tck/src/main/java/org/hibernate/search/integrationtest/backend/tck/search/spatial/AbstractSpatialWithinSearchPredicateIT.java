@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.tck.search.predicate.spatial;
+package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
@@ -12,14 +12,16 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -111,7 +113,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			geoPoint = root.field( "geoPoint" ).asGeoPoint().createAccessor();
 			geoPoint_1 = root.field( "geoPoint_1" ).asGeoPoint().createAccessor();
 			geoPoint_2 = root.field( "geoPoint_2" ).asGeoPoint().createAccessor();
-			string = root.field( "string" ).asString().createAccessor();
+			string = root.field( "string" ).asString().store( Store.YES ).sortable( Sortable.YES ).createAccessor();
 		}
 	}
 }

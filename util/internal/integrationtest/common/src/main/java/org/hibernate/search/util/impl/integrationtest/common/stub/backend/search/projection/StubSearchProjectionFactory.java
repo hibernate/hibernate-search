@@ -8,12 +8,15 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.spatial.DistanceUnit;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class StubSearchProjectionFactory implements SearchProjectionFactory<StubSearchProjection<?>> {
 
@@ -76,6 +79,23 @@ public class StubSearchProjectionFactory implements SearchProjectionFactory<Stub
 			@Override
 			public SearchProjection<Float> build() {
 				return (SearchProjection<Float>) PROJECTION;
+			}
+		};
+	}
+
+	@Override
+	public DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceFieldSearchProjectionBuilder() {
+
+			@Override
+			public DistanceFieldSearchProjectionBuilder unit(DistanceUnit unit) {
+				return this;
+			}
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public SearchProjection<Double> build() {
+				return (SearchProjection<Double>) PROJECTION;
 			}
 		};
 	}

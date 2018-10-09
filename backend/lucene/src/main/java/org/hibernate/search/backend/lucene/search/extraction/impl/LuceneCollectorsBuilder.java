@@ -16,6 +16,7 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.AssertionFailure;
 
 public class LuceneCollectorsBuilder {
@@ -48,8 +49,14 @@ public class LuceneCollectorsBuilder {
 		}
 	}
 
-	void addCollector(Collector collector) {
+	public void addCollector(Collector collector) {
 		luceneCollectors.add( collector );
+	}
+
+	public DistanceCollector addDistanceCollector(String absoluteFieldPath, GeoPoint center) {
+		DistanceCollector distanceCollector = new DistanceCollector( absoluteFieldPath, center, maxDocs );
+		luceneCollectors.add( distanceCollector );
+		return distanceCollector;
 	}
 
 	public LuceneCollectors build() {

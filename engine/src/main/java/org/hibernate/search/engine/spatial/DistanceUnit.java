@@ -34,4 +34,12 @@ public enum DistanceUnit {
 
 		return distance * toMeters;
 	}
+
+	public Double fromMeters(Double distanceInMeters) {
+		if ( distanceInMeters == null ) {
+			return null;
+		}
+
+		return distanceInMeters / toMeters;
+	}
 }

@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.projection.impl.DistanceFieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -17,12 +18,14 @@ import org.hibernate.search.backend.lucene.search.projection.impl.ObjectSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.ScoreSearchProjectionBuilderImpl;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<LuceneSearchProjection<?>> {
@@ -58,6 +61,11 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<Lucen
 	@Override
 	public ScoreSearchProjectionBuilder score() {
 		return ScoreSearchProjectionBuilderImpl.get();
+	}
+
+	@Override
+	public DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.projection.spi;
 
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -26,6 +27,8 @@ public interface SearchProjectionFactory<P extends SearchProjection<?>> {
 	ReferenceSearchProjectionBuilder reference();
 
 	ScoreSearchProjectionBuilder score();
+
+	DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
 
 	/**
 	 * Convert a {@link SearchProjection} object to the backend-specific implementation.
