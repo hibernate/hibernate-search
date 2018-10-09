@@ -15,11 +15,6 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 public interface HibernateOrmSearchManager extends PojoSearchManager {
 
 	@Override
-	default HibernateOrmSearchTarget<Object> search() {
-		return search( Collections.singleton( Object.class ) );
-	}
-
-	@Override
 	default <T> HibernateOrmSearchTarget<T> search(Class<T> targetedType) {
 		return search( Collections.singleton( targetedType ) );
 	}
