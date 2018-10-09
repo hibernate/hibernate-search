@@ -33,6 +33,6 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 
 		JsonObject outerObject = new JsonObject();
 		GEO_DISTANCE.add( outerObject, getInnerObject() );
-		collector.collectSort( outerObject );
+		collector.collectDistanceSort( outerObject, absoluteFieldPath, location );
 	}
 }

@@ -10,17 +10,21 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchProjection<Double> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
+	private static final JsonArrayAccessor SCORE_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
@@ -32,6 +36,8 @@ public class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchPro
 
 	private final String scriptFieldName;
 
+	private Integer distanceSortIndex;
+
 	DistanceFieldSearchProjectionImpl(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
@@ -40,18 +46,44 @@ public class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchPro
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody) {
-		SCRIPT_FIELDS_ACCESSOR
-				.property( scriptFieldName ).asObject()
-				.property( "script" ).asObject()
-				.set( requestBody, createScript( absoluteFieldPath, center ) );
+	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
+		this.distanceSortIndex = elementCollector.getDistanceSortIndex( absoluteFieldPath, center );
+
+		if ( distanceSortIndex == null ) {
+			// we rely on a script to compute the distance
+			SCRIPT_FIELDS_ACCESSOR
+					.property( scriptFieldName ).asObject()
+					.property( "script" ).asObject()
+					.set( requestBody, createScript( absoluteFieldPath, center ) );
+		}
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
-		Optional<Double> distance = FIELDS_ACCESSOR.property( scriptFieldName ).asArray()
-				.element( 0 )
-				.asDouble().get( hit );
+		Optional<Double> distance;
+
+		if ( distanceSortIndex == null ) {
+			// we extract the value from the fields computed by the script_fields
+			distance = FIELDS_ACCESSOR.property( scriptFieldName ).asArray()
+					.element( 0 )
+					.asDouble().get( hit );
+		}
+		else {
+			// we extract the value from the score element
+			Optional<JsonElement> scoreDistanceElement = SCORE_ACCESSOR.element( distanceSortIndex ).get( hit );
+
+			if ( !scoreDistanceElement.isPresent() ) {
+				distance = Optional.empty();
+			}
+			else if ( !scoreDistanceElement.get().getAsJsonPrimitive().isNumber() ) {
+				// Elasticsearch will return "Infinity" if the distance has not been computed.
+				// Usually, it's because the indexed object doesn't have a location defined for this field.
+				distance = Optional.empty();
+			}
+			else {
+				distance = Optional.of( scoreDistanceElement.get().getAsJsonPrimitive().getAsDouble() );
+			}
+		}
 
 		collector.collectProjection( distance.isPresent() && Double.isFinite( distance.get() ) ?
 				unit.fromMeters( distance.get() ) : null );

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
@@ -21,7 +22,7 @@ public class NullSearchProjectionImpl<T> implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody) {
+	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
 		// Nothing to contribute
 	}
 

@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+
 import com.google.gson.JsonObject;
 
 /**
@@ -24,9 +26,9 @@ public class CompositeHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody) {
+	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
 		for ( HitExtractor<?> extractor : extractors ) {
-			extractor.contributeRequest( requestBody );
+			extractor.contributeRequest( requestBody, elementCollector );
 		}
 	}
 

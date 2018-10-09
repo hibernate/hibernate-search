@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -21,7 +22,7 @@ public class DocumentReferenceSearchProjectionImpl implements ElasticsearchSearc
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody) {
+	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
 		helper.contributeRequest( requestBody );
 	}
 

@@ -12,6 +12,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -32,9 +33,9 @@ public class IndexSensitiveSearchProjectionImpl<T> implements ElasticsearchSearc
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody) {
+	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
 		for ( HitExtractor<?> extractor : projectionsByIndex.values() ) {
-			extractor.contributeRequest( requestBody );
+			extractor.contributeRequest( requestBody, elementCollector );
 		}
 	}
 

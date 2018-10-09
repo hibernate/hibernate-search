@@ -108,6 +108,31 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	}
 
 	@Test
+	public void distanceProjection_distanceSort() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections(
+						searchTarget.projection().field( "string", String.class ).toProjection(),
+						searchTarget.projection().distance( "geoPoint", center ).toProjection()
+				)
+				.predicate().matchAll().end()
+				.sort()
+						.byField( "string" ).onMissingValue().sortLast().asc().then()
+						.byDistance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
+						.byDistance( "geoPoint", center ).end()
+				.build();
+		SearchResult<List<?>> results = query.execute();
+
+		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+	}
+
+	@Test
 	public void distanceProjection_invalidType() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );

@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.spatial.GeoPoint;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -25,5 +27,7 @@ public interface ElasticsearchSearchSortCollector {
 	void collectSort(JsonArray sorts);
 
 	void collectSort(JsonElement sort);
+
+	void collectDistanceSort(JsonElement sort, String absoluteFieldPath, GeoPoint center);
 
 }

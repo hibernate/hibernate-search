@@ -85,7 +85,7 @@ class SearchQueryBuilderImpl<C, T>
 			payload.add( "sort", jsonSort );
 		}
 
-		hitExtractor.contributeRequest( payload );
+		hitExtractor.contributeRequest( payload, elementCollector );
 
 		SearchResultExtractor<T> searchResultExtractor =
 				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator );

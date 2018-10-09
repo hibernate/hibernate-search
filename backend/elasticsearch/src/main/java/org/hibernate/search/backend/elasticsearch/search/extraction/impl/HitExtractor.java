@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+
 import com.google.gson.JsonObject;
 
 public interface HitExtractor<C> {
 
 	/**
 	 * Contribute to the request, making sure that the requirements for this extractors are met.
+	 *
+	 * @param requestBody The request body.
+	 * @param elementCollector The query element collector.
 	 */
-	void contributeRequest(JsonObject requestBody);
+	void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector);
 
 	/**
 	 * Perform hit extraction

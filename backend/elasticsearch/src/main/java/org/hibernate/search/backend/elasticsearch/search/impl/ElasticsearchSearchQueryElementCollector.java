@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.Map;
+import java.util.Objects;
+
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.impl.common.CollectionHelper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -18,6 +23,8 @@ public class ElasticsearchSearchQueryElementCollector
 
 	private JsonObject jsonPredicate;
 	private JsonArray jsonSort;
+
+	private Map<DistanceSortKey, Integer> distanceSorts;
 
 	@Override
 	public void collectPredicate(JsonObject jsonQuery) {
@@ -30,6 +37,18 @@ public class ElasticsearchSearchQueryElementCollector
 			jsonSort = new JsonArray();
 		}
 		this.jsonSort.add( sort );
+	}
+
+	@Override
+	public void collectDistanceSort(JsonElement sort, String absoluteFieldPath, GeoPoint center) {
+		collectSort( sort );
+
+		int index = jsonSort.size() - 1;
+		if ( distanceSorts == null ) {
+			distanceSorts = CollectionHelper.newHashMap( 3 );
+		}
+
+		distanceSorts.put( new DistanceSortKey( absoluteFieldPath, center ), index );
 	}
 
 	@Override
@@ -48,4 +67,43 @@ public class ElasticsearchSearchQueryElementCollector
 		return jsonSort;
 	}
 
+	public Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
+		if ( distanceSorts == null ) {
+			return null;
+		}
+
+		return distanceSorts.get( new DistanceSortKey( absoluteFieldPath, location ) );
+	}
+
+	private static class DistanceSortKey {
+
+		private final String absoluteFieldPath;
+
+		private final GeoPoint location;
+
+		private DistanceSortKey(String absoluteFieldPath, GeoPoint location) {
+			this.absoluteFieldPath = absoluteFieldPath;
+			this.location = location;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj == this ) {
+				return true;
+			}
+			if ( !(obj instanceof DistanceSortKey) ) {
+				return false;
+			}
+
+			DistanceSortKey other = (DistanceSortKey) obj;
+
+			return Objects.equals( this.absoluteFieldPath, other.absoluteFieldPath )
+					&& Objects.equals( this.location, other.location );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( absoluteFieldPath, location );
+		}
+	}
 }
