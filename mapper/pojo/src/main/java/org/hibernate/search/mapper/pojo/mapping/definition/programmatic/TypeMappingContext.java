@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -19,20 +20,46 @@ public interface TypeMappingContext {
 
 	TypeMappingContext indexed(String indexName);
 
-	TypeMappingContext routingKeyBridge(String bridgeName);
-
+	/**
+	 * @param bridgeClass The class of the bridge to use.
+	 * @return {@code this}, for method chaining.
+	 */
 	TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass);
 
-	TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass);
+	/**
+	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
+	 * The bridge must implement {@link RoutingKeyBridge}.
+	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
+	 * (by name, by type, ...).
+	 * @return {@code this}, for method chaining.
+	 */
+	TypeMappingContext routingKeyBridge(BeanReference bridgeReference);
 
+	/**
+	 * @param builder A bridge builder.
+	 * @return {@code this}, for method chaining.
+	 */
 	TypeMappingContext routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder);
 
-	TypeMappingContext bridge(String bridgeName);
-
+	/**
+	 * @param bridgeClass The class of the bridge to use.
+	 * @return {@code this}, for method chaining.
+	 */
 	TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass);
 
-	TypeMappingContext bridge(String bridgeName, Class<? extends TypeBridge> bridgeClass);
+	/**
+	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
+	 * The bridge must implement {@link TypeBridge}.
+	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
+	 * (by name, by type, ...).
+	 * @return {@code this}, for method chaining.
+	 */
+	TypeMappingContext bridge(BeanReference bridgeReference);
 
+	/**
+	 * @param builder A bridge builder.
+	 * @return {@code this}, for method chaining.
+	 */
 	TypeMappingContext bridge(BridgeBuilder<? extends TypeBridge> builder);
 
 	PropertyMappingContext property(String propertyName);

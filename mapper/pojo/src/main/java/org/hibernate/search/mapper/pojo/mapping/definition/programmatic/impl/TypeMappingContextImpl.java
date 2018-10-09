@@ -77,21 +77,12 @@ public class TypeMappingContextImpl
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(String bridgeName) {
-		return routingKeyBridge( BeanReference.ofName( bridgeName ) );
-	}
-
-	@Override
 	public TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
 		return routingKeyBridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass) {
-		return routingKeyBridge( BeanReference.of( bridgeName, bridgeClass ) );
-	}
-
-	private TypeMappingContext routingKeyBridge(BeanReference bridgeReference) {
+	public TypeMappingContext routingKeyBridge(BeanReference bridgeReference) {
 		return routingKeyBridge( new BeanResolverBridgeBuilder<>( RoutingKeyBridge.class, bridgeReference ) );
 	}
 
@@ -102,21 +93,12 @@ public class TypeMappingContextImpl
 	}
 
 	@Override
-	public TypeMappingContext bridge(String bridgeName) {
-		return bridge( BeanReference.ofName( bridgeName ) );
-	}
-
-	@Override
 	public TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass) {
 		return bridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(String bridgeName, Class<? extends TypeBridge> bridgeClass) {
-		return bridge( BeanReference.of( bridgeName, bridgeClass ) );
-	}
-
-	private TypeMappingContext bridge(BeanReference bridgeReference) {
+	public TypeMappingContext bridge(BeanReference bridgeReference) {
 		return bridge( new BeanResolverBridgeBuilder<>( TypeBridge.class, bridgeReference ) );
 	}
 
