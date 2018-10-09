@@ -11,8 +11,6 @@ import javax.persistence.EntityManager;
 
 public interface FullTextEntityManager extends EntityManager {
 
-	FullTextSearchTarget<Object> search();
-
 	<T> FullTextSearchTarget<T> search(Class<T> type);
 
 	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);

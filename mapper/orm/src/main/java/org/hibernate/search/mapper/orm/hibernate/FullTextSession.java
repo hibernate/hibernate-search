@@ -14,9 +14,6 @@ import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 public interface FullTextSession extends Session, FullTextEntityManager {
 
 	@Override
-	FullTextSearchTarget<Object> search();
-
-	@Override
 	<T> FullTextSearchTarget<T> search(Class<T> type);
 
 	@Override

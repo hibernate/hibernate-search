@@ -38,11 +38,6 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 	}
 
 	@Override
-	public FullTextSearchTarget<Object> search() {
-		return new FullTextSearchTargetImpl<>( getSearchManager().search() );
-	}
-
-	@Override
 	public final <T> FullTextSearchTarget<T> search(Class<T> type) {
 		return new FullTextSearchTargetImpl<>( getSearchManager().search( type ) );
 	}

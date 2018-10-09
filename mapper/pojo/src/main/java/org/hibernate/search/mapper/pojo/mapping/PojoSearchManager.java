@@ -17,10 +17,6 @@ import org.hibernate.search.engine.common.SearchManager;
  */
 public interface PojoSearchManager extends SearchManager {
 
-	default PojoSearchTarget<?> search() {
-		return search( Collections.singleton( Object.class ) );
-	}
-
 	default <T> PojoSearchTarget<?> search(Class<T> targetedType) {
 		return search( Collections.singleton( targetedType ) );
 	}
