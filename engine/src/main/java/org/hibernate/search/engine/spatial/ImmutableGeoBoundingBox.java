@@ -10,23 +10,18 @@ import java.util.Objects;
 
 import org.hibernate.search.util.impl.common.Contracts;
 
-public class ImmutableGeoBoundingBox implements GeoBoundingBox {
+final class ImmutableGeoBoundingBox implements GeoBoundingBox {
 
 	private GeoPoint topLeft;
 
 	private GeoPoint bottomRight;
 
-	public ImmutableGeoBoundingBox(GeoPoint topLeft, GeoPoint bottomRight) {
+	ImmutableGeoBoundingBox(GeoPoint topLeft, GeoPoint bottomRight) {
 		Contracts.assertNotNull( topLeft, "topLeft" );
 		Contracts.assertNotNull( bottomRight, "bottomRight" );
 
 		this.topLeft = topLeft;
 		this.bottomRight = bottomRight;
-	}
-
-	public ImmutableGeoBoundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude, double bottomRightLongitude) {
-		this.topLeft = new ImmutableGeoPoint( topLeftLatitude, topLeftLongitude );
-		this.bottomRight = new ImmutableGeoPoint( bottomRightLatitude, bottomRightLongitude );
 	}
 
 	@Override
@@ -62,6 +57,6 @@ public class ImmutableGeoBoundingBox implements GeoBoundingBox {
 
 	@Override
 	public String toString() {
-		return "GeoBoundingBox [topLeft=" + topLeft + ", bottomRight=" + bottomRight + "]";
+		return "ImmutableGeoBoundingBox[topLeft=" + topLeft + ", bottomRight=" + bottomRight + "]";
 	}
 }

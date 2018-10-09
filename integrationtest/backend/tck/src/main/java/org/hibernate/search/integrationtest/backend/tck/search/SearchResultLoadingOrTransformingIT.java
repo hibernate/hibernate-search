@@ -37,7 +37,6 @@ import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 import org.junit.Before;
@@ -58,7 +57,7 @@ public class SearchResultLoadingOrTransformingIT {
 	private static final String STRING_VALUE = "string";
 	private static final String STRING_ANALYZED_VALUE = "analyzed string";
 	private static final LocalDate LOCAL_DATE_VALUE = LocalDate.of( 2018, 2, 1 );
-	private static final GeoPoint GEO_POINT_VALUE = new ImmutableGeoPoint( 42.0, -42.0 );
+	private static final GeoPoint GEO_POINT_VALUE = GeoPoint.of( 42.0, -42.0 );
 	private static final Integer NESTED_OBJECT_INTEGER_VALUE = 142;
 	private static final String NESTED_OBJECT_STRING_VALUE = "nested object string";
 	private static final Integer FLATTENED_OBJECT_INTEGER_VALUE = 242;

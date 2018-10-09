@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
@@ -78,19 +77,19 @@ public class LuceneSearchSortIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "HSEARCH600043" );
 
-		simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ).desc() );
+		simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc() );
 	}
 
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7705687,4.835233 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
 		} );
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7541719, 4.8386221 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7530374, 4.8510299 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 

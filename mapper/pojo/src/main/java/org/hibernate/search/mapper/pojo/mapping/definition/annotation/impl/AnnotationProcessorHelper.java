@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -281,7 +280,7 @@ class AnnotationProcessorHelper {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( new ImmutableBeanReference( cleanedUpName, cleanedUpType ) );
+			return Optional.of( BeanReference.of( cleanedUpName, cleanedUpType ) );
 		}
 	}
 }

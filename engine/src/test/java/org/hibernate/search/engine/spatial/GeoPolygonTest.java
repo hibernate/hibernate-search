@@ -23,23 +23,23 @@ public class GeoPolygonTest {
 
 	@Test
 	public void validPolygon() {
-		GeoPolygon polygon = new ImmutableGeoPolygon( new ImmutableGeoPoint( 26, 23 ), new ImmutableGeoPoint( 26, 26 ), new ImmutableGeoPoint( 24, 26 ),
-				new ImmutableGeoPoint( 24, 23 ), new ImmutableGeoPoint( 26, 23 ) );
+		GeoPolygon polygon = GeoPolygon.of( GeoPoint.of( 26, 23 ), GeoPoint.of( 26, 26 ), GeoPoint.of( 24, 26 ),
+				GeoPoint.of( 24, 23 ), GeoPoint.of( 26, 23 ) );
 		assertNotNull( polygon );
 
-		polygon = new ImmutableGeoPolygon( Arrays.asList( new ImmutableGeoPoint( 26, 23 ), new ImmutableGeoPoint( 26, 26 ), new ImmutableGeoPoint( 24, 26 ),
-				new ImmutableGeoPoint( 24, 23 ), new ImmutableGeoPoint( 26, 23 ) ) );
+		polygon = GeoPolygon.of( Arrays.asList( GeoPoint.of( 26, 23 ), GeoPoint.of( 26, 26 ), GeoPoint.of( 24, 26 ),
+				GeoPoint.of( 24, 23 ), GeoPoint.of( 26, 23 ) ) );
 		assertNotNull( polygon );
 	}
 
 	@Test
 	public void invalidPolygon() {
 		SubTest.expectException(
-				() -> new ImmutableGeoPolygon(
-						new ImmutableGeoPoint( 26, 23 ),
-						new ImmutableGeoPoint( 26, 26 ),
-						new ImmutableGeoPoint( 24, 26 ),
-						new ImmutableGeoPoint( 24, 23 )
+				() -> GeoPolygon.of(
+						GeoPoint.of( 26, 23 ),
+						GeoPoint.of( 26, 26 ),
+						GeoPoint.of( 24, 26 ),
+						GeoPoint.of( 24, 23 )
 				)
 		)
 				.assertThrown()
@@ -47,11 +47,11 @@ public class GeoPolygonTest {
 				.hasMessageContaining( "HSEARCH000516" );
 
 		SubTest.expectException(
-				() -> new ImmutableGeoPolygon( Arrays.asList(
-						new ImmutableGeoPoint( 26, 23 ),
-						new ImmutableGeoPoint( 26, 26 ),
-						new ImmutableGeoPoint( 24, 26 ),
-						new ImmutableGeoPoint( 24, 23 )
+				() -> GeoPolygon.of( Arrays.asList(
+						GeoPoint.of( 26, 23 ),
+						GeoPoint.of( 26, 26 ),
+						GeoPoint.of( 24, 26 ),
+						GeoPoint.of( 24, 23 )
 				) )
 		)
 				.assertThrown()

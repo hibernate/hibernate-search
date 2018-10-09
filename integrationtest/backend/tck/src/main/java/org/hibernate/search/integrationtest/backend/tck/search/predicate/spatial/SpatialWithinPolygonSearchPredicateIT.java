@@ -15,8 +15,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPolygon;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -26,28 +24,28 @@ import org.junit.Test;
 
 public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithinSearchPredicateIT {
 
-	private static final GeoPolygon POLYGON_1 = new ImmutableGeoPolygon(
-			new ImmutableGeoPoint( 45.785889, 4.819749 ),
-			new ImmutableGeoPoint( 45.753050, 4.811030 ),
-			new ImmutableGeoPoint( 45.746915, 4.844146 ),
-			new ImmutableGeoPoint( 45.785889, 4.848877 ),
-			new ImmutableGeoPoint( 45.785889, 4.819749 )
+	private static final GeoPolygon POLYGON_1 = GeoPolygon.of(
+			GeoPoint.of( 45.785889, 4.819749 ),
+			GeoPoint.of( 45.753050, 4.811030 ),
+			GeoPoint.of( 45.746915, 4.844146 ),
+			GeoPoint.of( 45.785889, 4.848877 ),
+			GeoPoint.of( 45.785889, 4.819749 )
 	);
 
-	private static final GeoPolygon POLYGON_2 = new ImmutableGeoPolygon(
-			new ImmutableGeoPoint( 45.762111, 4.841442 ),
-			new ImmutableGeoPoint( 45.751826, 4.837118 ),
-			new ImmutableGeoPoint( 45.742692, 4.857632 ),
-			new ImmutableGeoPoint( 45.758982, 4.866473 ),
-			new ImmutableGeoPoint( 45.762111, 4.841442 )
+	private static final GeoPolygon POLYGON_2 = GeoPolygon.of(
+			GeoPoint.of( 45.762111, 4.841442 ),
+			GeoPoint.of( 45.751826, 4.837118 ),
+			GeoPoint.of( 45.742692, 4.857632 ),
+			GeoPoint.of( 45.758982, 4.866473 ),
+			GeoPoint.of( 45.762111, 4.841442 )
 	);
 
-	private static final GeoPolygon CHEZ_MARGOTTE_POLYGON = new ImmutableGeoPolygon(
-			new ImmutableGeoPoint( 45.7530375, 4.8510298 ),
-			new ImmutableGeoPoint( 45.7530373, 4.8510298 ),
-			new ImmutableGeoPoint( 45.7530373, 4.8510300 ),
-			new ImmutableGeoPoint( 45.7530375, 4.8510300 ),
-			new ImmutableGeoPoint( 45.7530375, 4.8510298 )
+	private static final GeoPolygon CHEZ_MARGOTTE_POLYGON = GeoPolygon.of(
+			GeoPoint.of( 45.7530375, 4.8510298 ),
+			GeoPoint.of( 45.7530373, 4.8510298 ),
+			GeoPoint.of( 45.7530373, 4.8510300 ),
+			GeoPoint.of( 45.7530375, 4.8510300 ),
+			GeoPoint.of( 45.7530375, 4.8510298 )
 	);
 
 	private static final GeoPolygon POLYGON_1_1 = movePolygon( POLYGON_1, -1 );
@@ -223,9 +221,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		List<GeoPoint> movedPoints = new ArrayList<>();
 
 		for ( GeoPoint originalPoint : originalPolygon.getPoints() ) {
-			movedPoints.add( new ImmutableGeoPoint( originalPoint.getLatitude() + degrees, originalPoint.getLongitude() + degrees ) );
+			movedPoints.add( GeoPoint.of( originalPoint.getLatitude() + degrees, originalPoint.getLongitude() + degrees ) );
 		}
 
-		return new ImmutableGeoPolygon( movedPoints );
+		return GeoPolygon.of( movedPoints );
 	}
 }

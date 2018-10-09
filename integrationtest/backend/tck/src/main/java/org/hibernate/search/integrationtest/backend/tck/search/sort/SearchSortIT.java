@@ -34,7 +34,6 @@ import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -228,7 +227,7 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_asc() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ) );
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
@@ -249,7 +248,7 @@ public class SearchSortIT {
 		);
 
 		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.byDistance( "geoPoint", new ImmutableGeoPoint( 45.757864, 4.834496 ) ).desc()
+				b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
@@ -264,7 +263,7 @@ public class SearchSortIT {
 		// Important: do not index the documents in the expected order after sorts
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.string.write( document, "george" );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7705687,4.835233 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray" );
 			indexAccessors.unsortable.write( document, "george" );
@@ -281,7 +280,7 @@ public class SearchSortIT {
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "aaron" );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7541719, 4.8386221 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray Hooray" );
 			indexAccessors.unsortable.write( document, "aaron" );
@@ -298,7 +297,7 @@ public class SearchSortIT {
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
 			indexAccessors.string.write( document, "zach" );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.7530374, 4.8510299 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
 
 			indexAccessors.string_analyzed_forScore.write( document, "Hooray" );
 			indexAccessors.unsortable.write( document, "zach" );

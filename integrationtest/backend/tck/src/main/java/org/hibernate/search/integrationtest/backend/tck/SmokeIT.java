@@ -25,7 +25,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -283,7 +282,7 @@ public class SmokeIT {
 			indexAccessors.string_analyzed.write( document, "text 1" );
 			indexAccessors.integer.write( document, 1 );
 			indexAccessors.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 0, 1 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
 
 			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
 			indexAccessors.flattenedObject.string.write( flattenedObject, "text 1_1" );
@@ -305,7 +304,7 @@ public class SmokeIT {
 			indexAccessors.string_analyzed.write( document, "text 2" );
 			indexAccessors.integer.write( document, 2 );
 			indexAccessors.localDate.write( document, LocalDate.of( 2018, 1, 2 ) );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 0, 2 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 0, 2 ) );
 
 			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
 			indexAccessors.flattenedObject.string.write( flattenedObject, "text 2_1" );

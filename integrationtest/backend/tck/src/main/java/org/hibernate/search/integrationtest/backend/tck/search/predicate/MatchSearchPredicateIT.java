@@ -34,7 +34,6 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -416,8 +415,8 @@ public class MatchSearchPredicateIT {
 			unsupportedFieldModels = Arrays.asList(
 					ByTypeFieldModel.mapper(
 							GeoPoint.class,
-							new ImmutableGeoPoint( 40, 70 ),
-							new ImmutableGeoPoint( 45, 98 )
+							GeoPoint.of( 40, 70 ),
+							GeoPoint.of( 45, 98 )
 					)
 							.map( root, "geoPoint" )
 			);

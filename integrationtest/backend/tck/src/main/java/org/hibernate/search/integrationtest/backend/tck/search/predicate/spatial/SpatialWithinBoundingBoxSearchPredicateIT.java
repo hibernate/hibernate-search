@@ -16,8 +16,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoBoundingBox;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -27,20 +25,20 @@ import org.junit.Test;
 
 public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWithinSearchPredicateIT {
 
-	private static final GeoBoundingBox BOUNDING_BOX_1 = new ImmutableGeoBoundingBox(
-			new ImmutableGeoPoint( 45.785889, 4.819749 ),
-			new ImmutableGeoPoint( 45.746915, 4.844146 )
+	private static final GeoBoundingBox BOUNDING_BOX_1 = GeoBoundingBox.of(
+			GeoPoint.of( 45.785889, 4.819749 ),
+			GeoPoint.of( 45.746915, 4.844146 )
 	);
 
-	private static final GeoBoundingBox BOUNDING_BOX_2 = new ImmutableGeoBoundingBox(
-			new ImmutableGeoPoint( 45.762111, 4.83 ),
-			new ImmutableGeoPoint( 45.742692, 4.857632 )
+	private static final GeoBoundingBox BOUNDING_BOX_2 = GeoBoundingBox.of(
+			GeoPoint.of( 45.762111, 4.83 ),
+			GeoPoint.of( 45.742692, 4.857632 )
 	);
 
 
-	private static final GeoBoundingBox CHEZ_MARGOTTE_BOUNDING_BOX = new ImmutableGeoBoundingBox(
-			new ImmutableGeoPoint( 45.7530375, 4.8510298 ),
-			new ImmutableGeoPoint( 45.7530373, 4.8510300 )
+	private static final GeoBoundingBox CHEZ_MARGOTTE_BOUNDING_BOX = GeoBoundingBox.of(
+			GeoPoint.of( 45.7530375, 4.8510298 ),
+			GeoPoint.of( 45.7530373, 4.8510300 )
 	);
 
 	private static final GeoBoundingBox BOUNDING_BOX_1_1 = moveBoundingBox( BOUNDING_BOX_1, -1 );
@@ -49,10 +47,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	private static final GeoBoundingBox BOUNDING_BOX_2_2 = moveBoundingBox( BOUNDING_BOX_2, -2 );
 
 	private static final String ADDITIONAL_POINT_1_ID = "additional_1";
-	private static final GeoPoint ADDITIONAL_POINT_1_GEO_POINT = new ImmutableGeoPoint( 24.5, 25.5 );
+	private static final GeoPoint ADDITIONAL_POINT_1_GEO_POINT = GeoPoint.of( 24.5, 25.5 );
 
 	private static final String ADDITIONAL_POINT_2_ID = "additional_2";
-	private static final GeoPoint ADDITIONAL_POINT_2_GEO_POINT = new ImmutableGeoPoint( 24.5, 23.5 );
+	private static final GeoPoint ADDITIONAL_POINT_2_GEO_POINT = GeoPoint.of( 24.5, 23.5 );
 
 	@Test
 	public void within_boundingBox() {
@@ -104,7 +102,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().spatial().within().onField( "geoPoint" )
-						.boundingBox( new ImmutableGeoBoundingBox( new ImmutableGeoPoint( 25, 23 ), new ImmutableGeoPoint( 24, 26 ) ) ).end()
+						.boundingBox( GeoBoundingBox.of( GeoPoint.of( 25, 23 ), GeoPoint.of( 24, 26 ) ) ).end()
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -279,7 +277,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	}
 
 	private static GeoBoundingBox moveBoundingBox(GeoBoundingBox originalBoundingBox, double degrees) {
-		return new ImmutableGeoBoundingBox( originalBoundingBox.getTopLeft().getLatitude() + degrees, originalBoundingBox.getTopLeft().getLongitude() + degrees,
+		return GeoBoundingBox.of( originalBoundingBox.getTopLeft().getLatitude() + degrees, originalBoundingBox.getTopLeft().getLongitude() + degrees,
 				originalBoundingBox.getBottomRight().getLatitude() + degrees, originalBoundingBox.getBottomRight().getLongitude() + degrees );
 	}
 }

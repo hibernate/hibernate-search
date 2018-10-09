@@ -54,7 +54,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.tool.schema.Action;
 
@@ -325,7 +324,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		withinSession( sessionFactory, session -> {
 			DocumentDao dao = daoFactory.createDocumentDao( session );
 
-			GeoPoint myLocation = new ImmutableGeoPoint( 42.0, 0.5 );
+			GeoPoint myLocation = GeoPoint.of( 42.0, 0.5 );
 
 			List<Document<?>> documents = dao.searchAroundMe(
 					null, null,
@@ -367,7 +366,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					session.get( Book.class, CALLIGRAPHY_ID )
 			);
 
-			myLocation = new ImmutableGeoPoint( 42.0, 0.75 );
+			myLocation = GeoPoint.of( 42.0, 0.75 );
 			documents = dao.searchAroundMe(
 					null, null,
 					myLocation, 40.0,

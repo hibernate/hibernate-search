@@ -16,13 +16,13 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class ImmutableGeoPolygon implements GeoPolygon {
+final class ImmutableGeoPolygon implements GeoPolygon {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private List<GeoPoint> points;
 
-	public ImmutableGeoPolygon(List<GeoPoint> points) {
+	ImmutableGeoPolygon(List<GeoPoint> points) {
 		Contracts.assertNotNull( points, "points" );
 
 		GeoPoint firstPoint = points.get( 0 );
@@ -34,11 +34,8 @@ public class ImmutableGeoPolygon implements GeoPolygon {
 		this.points = CollectionHelper.toImmutableList( new ArrayList<>( points ) );
 	}
 
-	public ImmutableGeoPolygon(GeoPoint firstPoint, GeoPoint secondPoint, GeoPoint thirdPoint, GeoPoint fourthPoint, GeoPoint... additionalPoints) {
-		Contracts.assertNotNull( firstPoint, "firstPoint" );
-		Contracts.assertNotNull( secondPoint, "secondPoint" );
-		Contracts.assertNotNull( thirdPoint, "thirdPoint" );
-		Contracts.assertNotNull( fourthPoint, "fourthPoint" );
+	ImmutableGeoPolygon(GeoPoint firstPoint, GeoPoint secondPoint, GeoPoint thirdPoint, GeoPoint fourthPoint, GeoPoint... additionalPoints) {
+
 
 		List<GeoPoint> points = new ArrayList<>();
 		points.add( firstPoint );
@@ -86,6 +83,6 @@ public class ImmutableGeoPolygon implements GeoPolygon {
 
 	@Override
 	public String toString() {
-		return "GeoPolygon [points=" + points + "]";
+		return "ImmutableGeoPolygon[points=" + points + "]";
 	}
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -71,17 +70,17 @@ public class PropertyMappingContextImpl
 
 	@Override
 	public PropertyMappingContext bridge(String bridgeName) {
-		return bridge( new ImmutableBeanReference( bridgeName ) );
+		return bridge( BeanReference.ofName( bridgeName ) );
 	}
 
 	@Override
 	public PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass) {
-		return bridge( new ImmutableBeanReference( bridgeClass ) );
+		return bridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
 	public PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass) {
-		return bridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+		return bridge( BeanReference.of( bridgeName, bridgeClass ) );
 	}
 
 	private PropertyMappingContext bridge(BeanReference bridgeReference) {

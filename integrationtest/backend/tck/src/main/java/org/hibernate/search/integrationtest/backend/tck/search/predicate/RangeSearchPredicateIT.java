@@ -28,7 +28,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
@@ -676,10 +675,10 @@ public class RangeSearchPredicateIT {
 			unsupportedFieldModels = Arrays.asList(
 					ByTypeFieldModel.mapper(
 							GeoPoint.class,
-							new ImmutableGeoPoint( 40, 70 ),
-							new ImmutableGeoPoint( 40, 71 ),
-							new ImmutableGeoPoint( 40, 72 ),
-							new ImmutableGeoPoint( 30, 60 ), new ImmutableGeoPoint( 50, 80 )
+							GeoPoint.of( 40, 70 ),
+							GeoPoint.of( 40, 71 ),
+							GeoPoint.of( 40, 72 ),
+							GeoPoint.of( 30, 60 ), GeoPoint.of( 50, 80 )
 					)
 							.map( root, "geoPoint" )
 			);

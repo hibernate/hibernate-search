@@ -41,7 +41,6 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -492,13 +491,13 @@ public class SearchSortByFieldIT {
 		return Arrays.asList(
 				ByTypeFieldModel.mapper(
 						GeoPoint.class,
-						new ImmutableGeoPoint( 40, 70 ),
-						new ImmutableGeoPoint( 40, 75 ),
-						new ImmutableGeoPoint( 40, 80 ),
-						new ImmutableGeoPoint( 0, 0 ),
-						new ImmutableGeoPoint( 40, 72 ),
-						new ImmutableGeoPoint( 40, 77 ),
-						new ImmutableGeoPoint( 89, 89 )
+						GeoPoint.of( 40, 70 ),
+						GeoPoint.of( 40, 75 ),
+						GeoPoint.of( 40, 80 ),
+						GeoPoint.of( 0, 0 ),
+						GeoPoint.of( 40, 72 ),
+						GeoPoint.of( 40, 77 ),
+						GeoPoint.of( 89, 89 )
 				)
 						.map( root, "geoPoint" )
 		);

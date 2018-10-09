@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.StreamHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -141,7 +140,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 					return null;
 				}
 
-				return new ImmutableGeoPoint( latitude, longitude );
+				return GeoPoint.of( latitude, longitude );
 			};
 		}
 	}

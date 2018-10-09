@@ -36,7 +36,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ProjectionConstants;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -442,9 +441,9 @@ public class SearchProjectionIT {
 						.map( root, prefix + "localDate", additionalConfiguration ),
 				FieldModel.mapper(
 						GeoPoint.class,
-						new ImmutableGeoPoint( 40, 70 ),
-						new ImmutableGeoPoint( 40, 75 ),
-						new ImmutableGeoPoint( 40, 80 )
+						GeoPoint.of( 40, 70 ),
+						GeoPoint.of( 40, 75 ),
+						GeoPoint.of( 40, 80 )
 				)
 						.map( root, prefix + "geoPoint", additionalConfiguration )
 		);

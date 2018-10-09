@@ -27,7 +27,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubTypeModel;
@@ -225,7 +224,7 @@ public class IndexFieldAccessorIT {
 		accessors.string_analyzed.write( document, "text 1" );
 		accessors.integer.write( document, 1 );
 		accessors.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
-		accessors.geoPoint.write( document, new ImmutableGeoPoint( 0, 1 ) );
+		accessors.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
 	}
 
 	private void setNullValues(AllTypesAccessors accessors, DocumentElement document) {
