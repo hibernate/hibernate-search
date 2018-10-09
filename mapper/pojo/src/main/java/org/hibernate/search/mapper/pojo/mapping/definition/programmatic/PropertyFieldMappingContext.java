@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
@@ -19,12 +20,25 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 
 	S store(Store store);
 
-	S valueBridge(String bridgeName);
-
+	/**
+	 * @param bridgeClass The class of the bridge to use.
+	 * @return {@code this}, for method chaining.
+	 */
 	S valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass);
 
-	S valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass);
+	/**
+	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
+	 * The bridge must implement {@link ValueBridge}.
+	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
+	 * (by name, by type, ...).
+	 * @return {@code this}, for method chaining.
+	 */
+	S valueBridge(BeanReference bridgeReference);
 
+	/**
+	 * @param builder A bridge builder.
+	 * @return {@code this}, for method chaining.
+	 */
 	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
 	default S withExtractor(

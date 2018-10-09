@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
@@ -42,18 +43,13 @@ class DelegatingPropertyMappingContext implements PropertyMappingContext {
 	}
 
 	@Override
-	public PropertyMappingContext bridge(String bridgeName) {
-		return delegate.bridge( bridgeName );
-	}
-
-	@Override
 	public PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass) {
 		return delegate.bridge( bridgeClass );
 	}
 
 	@Override
-	public PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass) {
-		return delegate.bridge( bridgeName, bridgeClass );
+	public PropertyMappingContext bridge(BeanReference bridgeReference) {
+		return delegate.bridge( bridgeReference );
 	}
 
 	@Override

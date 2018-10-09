@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
@@ -25,12 +26,25 @@ public interface PropertyMappingContext {
 
 	PropertyDocumentIdMappingContext documentId();
 
-	PropertyMappingContext bridge(String bridgeName);
-
+	/**
+	 * @param bridgeClass The class of the bridge to use.
+	 * @return {@code this}, for method chaining.
+	 */
 	PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass);
 
-	PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass);
+	/**
+	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
+	 * The bridge must implement {@link PropertyBridge}.
+	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
+	 * (by name, by type, ...).
+	 * @return {@code this}, for method chaining.
+	 */
+	PropertyMappingContext bridge(BeanReference bridgeReference);
 
+	/**
+	 * @param builder A bridge builder.
+	 * @return {@code this}, for method chaining.
+	 */
 	PropertyMappingContext bridge(BridgeBuilder<? extends PropertyBridge> builder);
 
 	PropertyMappingContext marker(MarkerBuilder builder);

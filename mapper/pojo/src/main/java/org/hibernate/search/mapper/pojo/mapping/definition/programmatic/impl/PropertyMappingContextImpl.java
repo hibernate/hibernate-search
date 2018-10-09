@@ -69,21 +69,12 @@ public class PropertyMappingContextImpl
 	}
 
 	@Override
-	public PropertyMappingContext bridge(String bridgeName) {
-		return bridge( BeanReference.ofName( bridgeName ) );
-	}
-
-	@Override
 	public PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass) {
 		return bridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyMappingContext bridge(String bridgeName, Class<? extends PropertyBridge> bridgeClass) {
-		return bridge( BeanReference.of( bridgeName, bridgeClass ) );
-	}
-
-	private PropertyMappingContext bridge(BeanReference bridgeReference) {
+	public PropertyMappingContext bridge(BeanReference bridgeReference) {
 		return bridge( new BeanResolverBridgeBuilder<>( PropertyBridge.class, bridgeReference ) );
 	}
 

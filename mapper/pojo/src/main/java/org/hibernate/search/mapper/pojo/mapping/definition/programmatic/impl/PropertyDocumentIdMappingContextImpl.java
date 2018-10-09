@@ -40,23 +40,14 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName) {
-		return identifierBridge( BeanReference.ofName( bridgeName ) );
-	}
-
-	@Override
 	public PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
 		return identifierBridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass) {
-		return identifierBridge( BeanReference.of( bridgeName, bridgeClass ) );
-	}
-
 	// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
 	@SuppressWarnings( "unchecked" )
-	private PropertyDocumentIdMappingContext identifierBridge(BeanReference bridgeReference) {
+	public PropertyDocumentIdMappingContext identifierBridge(BeanReference bridgeReference) {
 		return identifierBridge(
 				(BridgeBuilder<? extends IdentifierBridge<?>>)
 						new BeanResolverBridgeBuilder( IdentifierBridge.class, bridgeReference )
