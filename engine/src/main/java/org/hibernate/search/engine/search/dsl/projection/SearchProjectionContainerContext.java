@@ -65,9 +65,18 @@ public interface SearchProjectionContainerContext {
 	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type);
 
 	/**
+	 * Project to a field of the indexed document without specifying a type.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	FieldProjectionContext<Object> field(String absoluteFieldPath);
+
+	/**
 	 * Project on the score of the hit.
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	ScoreProjectionContext score();
+
 }

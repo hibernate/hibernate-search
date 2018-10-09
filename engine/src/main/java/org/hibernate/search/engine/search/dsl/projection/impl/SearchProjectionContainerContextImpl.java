@@ -36,6 +36,11 @@ public class SearchProjectionContainerContextImpl implements SearchProjectionCon
 	}
 
 	@Override
+	public FieldProjectionContext<Object> field(String absoluteFieldPath) {
+		return field( absoluteFieldPath, Object.class );
+	}
+
+	@Override
 	public ReferenceProjectionContext reference() {
 		return new ReferenceProjectionContextImpl( factory );
 	}

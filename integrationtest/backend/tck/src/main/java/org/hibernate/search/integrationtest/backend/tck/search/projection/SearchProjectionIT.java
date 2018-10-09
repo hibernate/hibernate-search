@@ -100,6 +100,27 @@ public class SearchProjectionIT {
 	}
 
 	@Test
+	public void field_single_noClass() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SearchQuery<List<?>> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			query = searchTarget.query( sessionContext )
+					.asProjections( searchTarget.projection().field( fieldPath ).toProjection() )
+					.predicate().matchAll().end()
+					.build();
+			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
+				b.projection( fieldModel.document1Value.indexedValue );
+				b.projection( fieldModel.document2Value.indexedValue );
+				b.projection( fieldModel.document3Value.indexedValue );
+				b.projection( null ); // Empty document
+			} );
+		}
+	}
+
+	@Test
 	public void field_single_invalidProjectionType() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );
