@@ -30,6 +30,8 @@ public class SearchProjectionContainerContextImpl implements SearchProjectionCon
 
 	@Override
 	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> clazz) {
+		Contracts.assertNotNull( clazz, "clazz" );
+
 		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz );
 	}
 

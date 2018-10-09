@@ -112,6 +112,17 @@ public class SearchProjectionIT {
 	}
 
 	@Test
+	public void field_single_nullClass() {
+		thrown.expect( IllegalArgumentException.class );
+		thrown.expectMessage( "must not be null" );
+		thrown.expectMessage( "clazz" );
+
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, null ).toProjection();
+	}
+
+	@Test
 	public void field_withProjectionConverters() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
