@@ -14,7 +14,6 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
@@ -67,17 +66,17 @@ abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingCon
 
 	@Override
 	public S valueBridge(String bridgeName) {
-		return valueBridge( new ImmutableBeanReference( bridgeName ) );
+		return valueBridge( BeanReference.ofName( bridgeName ) );
 	}
 
 	@Override
 	public S valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
-		return valueBridge( new ImmutableBeanReference( bridgeClass ) );
+		return valueBridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
 	public S valueBridge(String bridgeName, Class<? extends ValueBridge<?, ?>> bridgeClass) {
-		return valueBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+		return valueBridge( BeanReference.of( bridgeName, bridgeClass ) );
 	}
 
 	// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe

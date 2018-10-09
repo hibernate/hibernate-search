@@ -8,9 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
@@ -79,17 +78,17 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext routingKeyBridge(String bridgeName) {
-		return routingKeyBridge( new ImmutableBeanReference( bridgeName ) );
+		return routingKeyBridge( BeanReference.ofName( bridgeName ) );
 	}
 
 	@Override
 	public TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
-		return routingKeyBridge( new ImmutableBeanReference( bridgeClass ) );
+		return routingKeyBridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
 	public TypeMappingContext routingKeyBridge(String bridgeName, Class<? extends RoutingKeyBridge> bridgeClass) {
-		return routingKeyBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+		return routingKeyBridge( BeanReference.of( bridgeName, bridgeClass ) );
 	}
 
 	private TypeMappingContext routingKeyBridge(BeanReference bridgeReference) {
@@ -104,17 +103,17 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext bridge(String bridgeName) {
-		return bridge( new ImmutableBeanReference( bridgeName ) );
+		return bridge( BeanReference.ofName( bridgeName ) );
 	}
 
 	@Override
 	public TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass) {
-		return bridge( new ImmutableBeanReference( bridgeClass ) );
+		return bridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
 	public TypeMappingContext bridge(String bridgeName, Class<? extends TypeBridge> bridgeClass) {
-		return bridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+		return bridge( BeanReference.of( bridgeName, bridgeClass ) );
 	}
 
 	private TypeMappingContext bridge(BeanReference bridgeReference) {

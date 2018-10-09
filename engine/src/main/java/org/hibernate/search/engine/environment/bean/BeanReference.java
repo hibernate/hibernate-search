@@ -23,4 +23,38 @@ public interface BeanReference {
 	 */
 	Class<?> getType();
 
+	/**
+	 * Create a {@link BeanReference} referencing a bean by its name.
+	 * <p>
+	 * Note: when no dependency injection framework is used, Hibernate Search uses reflection to resolve beans,
+	 * and in that case "names" are interpreted as fully qualified class names.
+	 *
+	 * @param name The bean name.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static BeanReference ofName(String name) {
+		return new ImmutableBeanReference( name, null );
+	}
+
+	/**
+	 * Create a {@link BeanReference} referencing a bean by its type.
+	 *
+	 * @param type The bean type.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static BeanReference ofType(Class<?> type) {
+		return new ImmutableBeanReference( null, type );
+	}
+
+	/**
+	 * Create a {@link BeanReference} referencing a bean by its name and type.
+	 *
+	 * @param name The bean name.
+	 * @param type The bean type.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static BeanReference of(String name, Class<?> type) {
+		return new ImmutableBeanReference( name, type );
+	}
+
 }

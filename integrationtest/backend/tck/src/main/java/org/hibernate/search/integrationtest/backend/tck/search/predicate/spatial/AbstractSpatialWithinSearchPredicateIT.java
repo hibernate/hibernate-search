@@ -20,7 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
 import org.junit.Rule;
@@ -30,15 +29,15 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	protected static final String INDEX_NAME = "IndexName";
 
 	protected static final String OURSON_QUI_BOIT_ID = "ourson qui boit";
-	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = new ImmutableGeoPoint( 45.7705687,4.835233 );
+	protected static final GeoPoint OURSON_QUI_BOIT_GEO_POINT = GeoPoint.of( 45.7705687,4.835233 );
 	protected static final String OURSON_QUI_BOIT_STRING = "L'ourson qui boit";
 
 	protected static final String IMOUTO_ID = "imouto";
-	protected static final GeoPoint IMOUTO_GEO_POINT = new ImmutableGeoPoint( 45.7541719, 4.8386221 );
+	protected static final GeoPoint IMOUTO_GEO_POINT = GeoPoint.of( 45.7541719, 4.8386221 );
 	protected static final String IMOUTO_STRING = "Imouto";
 
 	protected static final String CHEZ_MARGOTTE_ID = "chez margotte";
-	protected static final GeoPoint CHEZ_MARGOTTE_GEO_POINT = new ImmutableGeoPoint( 45.7530374, 4.8510299 );
+	protected static final GeoPoint CHEZ_MARGOTTE_GEO_POINT = GeoPoint.of( 45.7530374, 4.8510299 );
 	protected static final String CHEZ_MARGOTTE_STRING = "Chez Margotte";
 
 	protected static final String EMPTY_ID = "empty";
@@ -68,25 +67,25 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			indexAccessors.string.write( document, OURSON_QUI_BOIT_STRING );
 			indexAccessors.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
+			indexAccessors.geoPoint_1.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
+			indexAccessors.geoPoint_2.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			indexAccessors.string.write( document, IMOUTO_STRING );
 			indexAccessors.geoPoint.write( document, IMOUTO_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( IMOUTO_GEO_POINT.getLatitude() - 1,
+			indexAccessors.geoPoint_1.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
 					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( IMOUTO_GEO_POINT.getLatitude() - 2,
+			indexAccessors.geoPoint_2.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			indexAccessors.string.write( document, CHEZ_MARGOTTE_STRING );
 			indexAccessors.geoPoint.write( document, CHEZ_MARGOTTE_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, new ImmutableGeoPoint( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
+			indexAccessors.geoPoint_1.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, new ImmutableGeoPoint( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
+			indexAccessors.geoPoint_2.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.spi.ImmutableBeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -42,17 +41,17 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 
 	@Override
 	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName) {
-		return identifierBridge( new ImmutableBeanReference( bridgeName ) );
+		return identifierBridge( BeanReference.ofName( bridgeName ) );
 	}
 
 	@Override
 	public PropertyDocumentIdMappingContext identifierBridge(Class<? extends IdentifierBridge<?>> bridgeClass) {
-		return identifierBridge( new ImmutableBeanReference( bridgeClass ) );
+		return identifierBridge( BeanReference.ofType( bridgeClass ) );
 	}
 
 	@Override
 	public PropertyDocumentIdMappingContext identifierBridge(String bridgeName, Class<? extends IdentifierBridge<?>> bridgeClass) {
-		return identifierBridge( new ImmutableBeanReference( bridgeName, bridgeClass ) );
+		return identifierBridge( BeanReference.of( bridgeName, bridgeClass ) );
 	}
 
 	// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe

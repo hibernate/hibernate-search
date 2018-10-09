@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
@@ -92,7 +91,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b
-							.field( "location", new ImmutableGeoPoint( 42.0, 42.0 ) )
+							.field( "location", GeoPoint.of( 42.0, 42.0 ) )
 					)
 					.preparedThenExecuted();
 		} );

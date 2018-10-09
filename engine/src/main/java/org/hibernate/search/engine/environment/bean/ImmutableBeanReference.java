@@ -4,31 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.environment.bean.spi;
+package org.hibernate.search.engine.environment.bean;
 
 
 import java.util.StringJoiner;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-
 /**
  * @author Yoann Rodiere
  */
-public final class ImmutableBeanReference implements BeanReference {
+final class ImmutableBeanReference implements BeanReference {
 
 	private final String name;
 
 	private final Class<?> type;
 
-	public ImmutableBeanReference(String name) {
-		this( name, null );
-	}
-
-	public ImmutableBeanReference(Class<?> type) {
-		this( null, type );
-	}
-
-	public ImmutableBeanReference(String name, Class<?> type) {
+	ImmutableBeanReference(String name, Class<?> type) {
 		this.name = name;
 		this.type = type;
 	}

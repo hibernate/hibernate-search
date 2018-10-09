@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 
 /**
@@ -81,7 +80,7 @@ public interface SearchSortContainerContext<N> {
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	default DistanceSortContext<N> byDistance(String absoluteFieldPath, double latitude, double longitude) {
-		return byDistance( absoluteFieldPath, new ImmutableGeoPoint( latitude, longitude ) );
+		return byDistance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
 	// TODO other sorts

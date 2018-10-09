@@ -8,12 +8,12 @@ package org.hibernate.search.engine.spatial;
 
 import java.util.Objects;
 
-public final class ImmutableGeoPoint implements GeoPoint {
+final class ImmutableGeoPoint implements GeoPoint {
 
 	private final double latitude;
 	private final double longitude;
 
-	public ImmutableGeoPoint(double latitude, double longitude) {
+	ImmutableGeoPoint(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}

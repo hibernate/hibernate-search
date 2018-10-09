@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
@@ -146,10 +145,10 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 
 			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
 					.add( "1", b -> b
-							.field( "homeLocation", new ImmutableGeoPoint(
+							.field( "homeLocation", GeoPoint.of(
 									entity1.getHomeLatitude(), entity1.getHomeLongitude()
 							) )
-							.field( "workLocation", new ImmutableGeoPoint(
+							.field( "workLocation", GeoPoint.of(
 									entity1.getWorkLatitude(), entity1.getWorkLongitude()
 							) )
 					)
@@ -162,10 +161,10 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 					.preparedThenExecuted();
 			backendMock.expectWorks( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
 					.add( "3", b -> b
-							.field( "coord", new ImmutableGeoPoint(
+							.field( "coord", GeoPoint.of(
 									entity3.getCoord().getLat(), entity3.getCoord().getLon()
 							) )
-							.field( "location", new ImmutableGeoPoint(
+							.field( "location", GeoPoint.of(
 									entity3.getCoord().getLat(), entity3.getCoord().getLon()
 							) )
 					)

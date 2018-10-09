@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -22,15 +21,15 @@ import org.junit.Test;
 
 public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinSearchPredicateIT {
 
-	private static final GeoPoint METRO_HOTEL_DE_VILLE = new ImmutableGeoPoint( 45.7673396, 4.833743 );
-	private static final GeoPoint METRO_GARIBALDI = new ImmutableGeoPoint( 45.7515926, 4.8514779 );
+	private static final GeoPoint METRO_HOTEL_DE_VILLE = GeoPoint.of( 45.7673396, 4.833743 );
+	private static final GeoPoint METRO_GARIBALDI = GeoPoint.of( 45.7515926, 4.8514779 );
 
-	private static final GeoPoint METRO_HOTEL_DE_VILLE_1 = new ImmutableGeoPoint( METRO_HOTEL_DE_VILLE.getLatitude() - 1,
+	private static final GeoPoint METRO_HOTEL_DE_VILLE_1 = GeoPoint.of( METRO_HOTEL_DE_VILLE.getLatitude() - 1,
 			METRO_HOTEL_DE_VILLE.getLongitude() - 1 );
-	private static final GeoPoint METRO_HOTEL_DE_VILLE_2 = new ImmutableGeoPoint( METRO_HOTEL_DE_VILLE.getLatitude() - 2,
+	private static final GeoPoint METRO_HOTEL_DE_VILLE_2 = GeoPoint.of( METRO_HOTEL_DE_VILLE.getLatitude() - 2,
 			METRO_HOTEL_DE_VILLE.getLongitude() - 2 );
-	private static final GeoPoint METRO_GARIBALDI_1 = new ImmutableGeoPoint( METRO_GARIBALDI.getLatitude() - 1, METRO_GARIBALDI.getLongitude() - 1 );
-	private static final GeoPoint METRO_GARIBALDI_2 = new ImmutableGeoPoint( METRO_GARIBALDI.getLatitude() - 2, METRO_GARIBALDI.getLongitude() - 2 );
+	private static final GeoPoint METRO_GARIBALDI_1 = GeoPoint.of( METRO_GARIBALDI.getLatitude() - 1, METRO_GARIBALDI.getLongitude() - 1 );
+	private static final GeoPoint METRO_GARIBALDI_2 = GeoPoint.of( METRO_GARIBALDI.getLatitude() - 2, METRO_GARIBALDI.getLongitude() - 2 );
 
 	@Test
 	public void within_circle() {
@@ -209,7 +208,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null distance unit",
 				() -> searchTarget.predicate().spatial().within().onField( "geoPoint" )
-						.circle( new ImmutableGeoPoint( 45, 4 ), 100, null )
+						.circle( GeoPoint.of( 45, 4 ), 100, null )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )

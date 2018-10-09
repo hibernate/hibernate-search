@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -52,7 +51,7 @@ public class GeoPointFieldCodec implements ElasticsearchFieldCodec<GeoPoint> {
 		JsonObject object = JsonElementTypes.OBJECT.fromElement( element );
 		double latitude = LATITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
 		double longitude = LONGITUDE_ACCESSOR.get( object ).orElseThrow( log::elasticsearchResponseMissingData );
-		return new ImmutableGeoPoint( latitude, longitude );
+		return GeoPoint.of( latitude, longitude );
 	}
 
 	@Override

@@ -46,7 +46,6 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
@@ -436,7 +435,7 @@ public class ExtensionIT {
 			indexAccessors.sort3.write( document, "z" );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 40.12, -71.34 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 40.12, -71.34 ) );
 
 			indexAccessors.nativeField.write( document, 13 );
 			indexAccessors.nativeField_unsupportedProjection.write( document, 13 );
@@ -457,7 +456,7 @@ public class ExtensionIT {
 			// This document should not match any query
 			indexAccessors.string.write( document, "text 2" );
 			indexAccessors.integer.write( document, 1 );
-			indexAccessors.geoPoint.write( document, new ImmutableGeoPoint( 45.12, -75.34 ) );
+			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.12, -75.34 ) );
 
 			indexAccessors.nativeField.write( document, 53 );
 			indexAccessors.nativeField_unsupportedProjection.write( document, 53 );

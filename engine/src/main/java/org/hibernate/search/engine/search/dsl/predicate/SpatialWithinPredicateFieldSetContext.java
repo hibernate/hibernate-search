@@ -11,8 +11,6 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
-import org.hibernate.search.engine.spatial.ImmutableGeoBoundingBox;
-import org.hibernate.search.engine.spatial.ImmutableGeoPoint;
 
 /**
  * The context used when defining a spatial predicate, after at least one field was mentioned.
@@ -83,7 +81,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @return A context allowing to end the predicate definition.
 	 */
 	default ExplicitEndContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
-		return circle( new ImmutableGeoPoint( latitude, longitude ), radius, unit );
+		return circle( GeoPoint.of( latitude, longitude ), radius, unit );
 	}
 
 	/**
@@ -96,7 +94,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @return A context allowing to end the predicate definition.
 	 */
 	default ExplicitEndContext<N> circle(double latitude, double longitude, double radiusInMeters) {
-		return circle( new ImmutableGeoPoint( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
+		return circle( GeoPoint.of( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
 	}
 
 	/**
@@ -126,6 +124,6 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 */
 	default ExplicitEndContext<N> boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
 			double bottomRightLongitude) {
-		return boundingBox( new ImmutableGeoBoundingBox( topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude ) );
+		return boundingBox( GeoBoundingBox.of( topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude ) );
 	}
 }

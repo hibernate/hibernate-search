@@ -19,4 +19,15 @@ public interface GeoPoint {
 	 * @return the longitude, in degrees
 	 */
 	double getLongitude();
+
+	/**
+	 * Create a {@link GeoPoint} from a latitude and a longitude.
+	 *
+	 * @param latitude The latitude of the GeoPoint, in degrees.
+	 * @param longitude The longitude of the GeoPoint, in degrees.
+	 * @return The corresponding {@link GeoPoint}.
+	 */
+	static GeoPoint of(double latitude, double longitude) {
+		return new ImmutableGeoPoint( latitude, longitude );
+	}
 }
