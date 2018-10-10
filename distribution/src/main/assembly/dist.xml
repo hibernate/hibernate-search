@@ -191,7 +191,7 @@
     <dependencySets>
         <dependencySet>
             <useProjectArtifact>false</useProjectArtifact>
-            <outputDirectory>dist/provided</outputDirectory>
+            <outputDirectory>dist/lib/provided</outputDirectory>
             <scope>provided</scope>
             <includes>
                 <include>org.jboss.spec.javax.annotation:*</include>
