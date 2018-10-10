@@ -61,7 +61,7 @@ public class SearchBackendContext {
 		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
 		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
 		this.referenceProjectionBuilder = new ReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
+		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl();
 	}
 
 	@Override

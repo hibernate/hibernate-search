@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -14,15 +14,15 @@ import com.google.gson.JsonObject;
 
 public class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> {
 
-	private final DocumentReferenceExtractorHelper helper;
+	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
+			.asBoolean();
 
-	ScoreSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
-		this.helper = helper;
+	ScoreSearchProjectionImpl() {
 	}
 
 	@Override
 	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
-		helper.contributeRequest( requestBody );
+		TRACK_SCORES_ACCESSOR.set( requestBody, true );
 	}
 
 	@Override
