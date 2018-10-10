@@ -9,6 +9,6 @@ package org.hibernate.search.engine.search.dsl.projection;
 /**
  * The context used when starting to define a score projection.
  */
-public interface ScoreProjectionContext extends EndProjectionContext<Float> {
+public interface ScoreProjectionContext extends SearchProjectionTerminalContext<Float> {
 
 }

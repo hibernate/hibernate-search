@@ -11,6 +11,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 /**
  * The context used when starting to define a document reference projection.
  */
-public interface DocumentReferenceProjectionContext extends EndProjectionContext<DocumentReference> {
+public interface DocumentReferenceProjectionContext extends SearchProjectionTerminalContext<DocumentReference> {
 
 }

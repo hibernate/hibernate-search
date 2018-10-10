@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.DistanceFieldProjectionContext;
-import org.hibernate.search.engine.search.dsl.projection.EndProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -25,7 +25,7 @@ public class DistanceFieldProjectionContextImpl implements DistanceFieldProjecti
 	}
 
 	@Override
-	public EndProjectionContext<Double> unit(DistanceUnit unit) {
+	public SearchProjectionTerminalContext<Double> unit(DistanceUnit unit) {
 		Contracts.assertNotNull( unit, "unit" );
 
 		distanceFieldProjectionBuilder.unit( unit );

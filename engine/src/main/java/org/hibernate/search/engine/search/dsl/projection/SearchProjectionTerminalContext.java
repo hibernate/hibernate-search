@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.SearchProjection;
  *
  * @param <T> The type returned by the projection.
  */
-public interface EndProjectionContext<T> {
+public interface SearchProjectionTerminalContext<T> {
 
 	SearchProjection<T> toProjection();
 

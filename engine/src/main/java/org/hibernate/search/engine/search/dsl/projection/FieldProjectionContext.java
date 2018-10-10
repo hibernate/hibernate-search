@@ -9,6 +9,6 @@ package org.hibernate.search.engine.search.dsl.projection;
 /**
  * The context used when starting to define a field projection.
  */
-public interface FieldProjectionContext<T> extends EndProjectionContext<T> {
+public interface FieldProjectionContext<T> extends SearchProjectionTerminalContext<T> {
 
 }
