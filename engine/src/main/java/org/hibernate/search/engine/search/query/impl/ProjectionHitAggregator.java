@@ -26,7 +26,6 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 	private final ObjectLoader<R, ?> objectLoader;
 	private final Function<List<?>, T> hitTransformer;
 	private final int expectedHitSize;
-	private final int expectedLoadCountPerHit;
 	private final HitCollectorImpl hitCollector = new HitCollectorImpl();
 
 	private final ArrayList<R> referencesToLoad = new ArrayList<>();
@@ -35,19 +34,17 @@ public final class ProjectionHitAggregator<R, T> implements HitAggregator<Projec
 	public ProjectionHitAggregator(
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, ?> objectLoader, Function<List<?>, T> hitTransformer,
-			int expectedHitSize, int expectedLoadCountPerHit) {
+			int expectedHitSize) {
 		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
 		this.hitTransformer = hitTransformer;
 		this.expectedHitSize = expectedHitSize;
-		this.expectedLoadCountPerHit = expectedLoadCountPerHit;
 	}
 
 	@Override
 	public void init(int expectedHitCount) {
 		referencesToLoad.clear();
 		hits.clear();
-		referencesToLoad.ensureCapacity( expectedHitCount * expectedLoadCountPerHit );
 		hits.ensureCapacity( expectedHitCount );
 	}
 
