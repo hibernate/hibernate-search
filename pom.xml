@@ -190,7 +190,7 @@
         <!-- >>> ORM -->
         <version.org.hibernate>5.3.6.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
-        <version.org.hibernate.commons.annotations>5.0.4.Final</version.org.hibernate.commons.annotations>
+        <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
         <!--
             Explicit JAXB/javax.xml.bind dependencies: to be removed in HSEARCH-3376
