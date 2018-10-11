@@ -481,15 +481,15 @@ public class ExtensionIT {
 					.asGeoPoint()
 					.createAccessor();
 			nativeField = root.field( "nativeField" )
-					.withExtension( LuceneExtension.get() )
+					.extension( LuceneExtension.get() )
 					.asLuceneField( ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
 					.createAccessor();
 			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
-					.withExtension( LuceneExtension.get() )
+					.extension( LuceneExtension.get() )
 					.asLuceneField( ExtensionIT::contributeNativeField )
 					.createAccessor();
 			nativeField_invalidFieldPath = root.field( "nativeField_invalidFieldPath" )
-					.withExtension( LuceneExtension.get() )
+					.extension( LuceneExtension.get() )
 					.asLuceneField( ExtensionIT::contributeNativeFieldInvalidFieldPath )
 					.createAccessor();
 

@@ -17,7 +17,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
  *
  * @param <T> The type of extended schema field contexts. Should generally extend {@link IndexSchemaFieldContext}.
  *
- * @see IndexSchemaFieldContext#withExtension(IndexSchemaFieldContextExtension)
+ * @see IndexSchemaFieldContext#extension(IndexSchemaFieldContextExtension)
  */
 public interface IndexSchemaFieldContextExtension<T> {
 
