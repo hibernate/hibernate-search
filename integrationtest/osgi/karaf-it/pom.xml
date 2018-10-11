@@ -169,6 +169,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <maven.settings.localRepository>${settings.localRepository}</maven.settings.localRepository>
+                        <maven.jboss.public.repo.url>${repository.jboss-public.url}</maven.jboss.public.repo.url>
                     </systemPropertyVariables>
                 </configuration>
                 <executions>

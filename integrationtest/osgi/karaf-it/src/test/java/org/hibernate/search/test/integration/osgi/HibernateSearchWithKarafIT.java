@@ -6,6 +6,18 @@
  */
 package org.hibernate.search.test.integration.osgi;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.ops4j.pax.exam.CoreOptions.maven;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
+import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
+
 import java.io.File;
 import java.util.concurrent.atomic.AtomicLong;
 import java.io.IOException;
@@ -39,17 +51,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.wiring.BundleRevision;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.ops4j.pax.exam.CoreOptions.maven;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.keepRuntimeFolder;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.logLevel;
 
 /**
  * A basic integration test that executes Hibernate Search in Apache Karaf using
@@ -118,6 +119,7 @@ public class HibernateSearchWithKarafIT {
 				.versionAsInProject();
 
 		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
+		String jbossPublicRepository = System.getProperty( "maven.jboss.public.repo.url" );
 
 		File examDir = new File( "target/exam" );
 		File ariesLogDir = new File( examDir, "/aries/log" );
@@ -181,6 +183,14 @@ public class HibernateSearchWithKarafIT {
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.localRepository",
 						mavenLocalRepository
+				),
+				editConfigurationFileExtend( // Extend, not put: we want to keep the defaults (Maven Central in particular)
+						"etc/org.ops4j.pax.url.mvn.cfg",
+						"org.ops4j.pax.url.mvn.repositories",
+						jbossPublicRepository
+								+ "@snapshots" // Include snapshots, useful when experimenting with new ORM versions
+								+ "@noreleases" // Exclude releases as we expect all releases to be available on central
+								+ "@id=jboss-public-repository"
 				)
 		};
 	}
