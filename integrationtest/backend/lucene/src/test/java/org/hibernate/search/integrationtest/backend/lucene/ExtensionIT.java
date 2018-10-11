@@ -99,19 +99,12 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					b.should().withExtensionOptional(
-							LuceneExtension.get(),
-							// FIXME find some way to forbid using the context twice... ?
-							c -> c.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) )
-					);
-					b.should().withExtension( LuceneExtension.get() )
+					b.should().extension( LuceneExtension.get() )
+							.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) );
+					b.should().extension( LuceneExtension.get() )
 							.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) );
-					b.should().withExtensionOptional(
-							LuceneExtension.get(),
-							// FIXME find some way to forbid using the context twice... ?
-							c -> c.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ),
-							c -> Assert.fail( "Expected the extension to be present" )
-					);
+					b.should().extension( LuceneExtension.get() )
+							.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) );
 				} )
 				.build();
 		assertThat( query )
@@ -123,19 +116,12 @@ public class ExtensionIT {
 	public void predicate_fromJsonString_separatePredicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate1 = searchTarget.predicate().withExtensionOptional(
-				LuceneExtension.get(),
-				// FIXME find some way to forbid using the context twice... ?
-				c -> c.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) )
-		);
-		SearchPredicate predicate2 = searchTarget.predicate().withExtension( LuceneExtension.get() )
+		SearchPredicate predicate1 = searchTarget.predicate().extension( LuceneExtension.get() )
+				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) );
+		SearchPredicate predicate2 = searchTarget.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) );
-		SearchPredicate predicate3 = searchTarget.predicate().withExtensionOptional(
-				LuceneExtension.get(),
-				// FIXME find some way to forbid using the context twice... ?
-				c -> c.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ),
-				c -> Assert.fail( "Expected the extension to be present" )
-		);
+		SearchPredicate predicate3 = searchTarget.predicate().extension( LuceneExtension.get() )
+				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) );
 		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
 			b.should( predicate1 );
 			b.should( predicate2 );
@@ -295,7 +281,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate()
-						.withExtension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
+						.extension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
 				.build();
 
 		assertThat( query )
@@ -324,7 +310,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate()
-						.withExtension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
+						.extension( LuceneExtension.get() ).fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
 				.build();
 
 		assertThat( query )

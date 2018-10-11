@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
@@ -16,8 +16,9 @@ import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
@@ -90,30 +91,15 @@ public class SearchPredicateContainerContextImpl<N, B> implements SearchPredicat
 	}
 
 	@Override
-	public <T> T withExtension(SearchPredicateContainerContextExtension<N, T> extension) {
-		return extension.extendOrFail( this, factory, dslContext );
+	public <T> T extension(SearchPredicateContainerContextExtension<N, T> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, factory, dslContext )
+		);
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
-			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor) {
-		extension.extendOptional( this, factory, dslContext ).ifPresent( predicateContributor );
-		return dslContext.getNextContext();
-	}
-
-	@Override
-	public <T> N withExtensionOptional(
-			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> predicateContributor,
-			Consumer<SearchPredicateContainerContext<N>> fallbackPredicateContributor) {
-		Optional<T> optional = extension.extendOptional( this, factory, dslContext );
-		if ( optional.isPresent() ) {
-			predicateContributor.accept( optional.get() );
-		}
-		else {
-			fallbackPredicateContributor.accept( this );
-		}
-		return dslContext.getNextContext();
+	public SearchPredicateContainerExtensionContext<N> extension() {
+		return new SearchPredicateContainerExtensionContextImpl<>( this, factory, dslContext );
 	}
 
 }

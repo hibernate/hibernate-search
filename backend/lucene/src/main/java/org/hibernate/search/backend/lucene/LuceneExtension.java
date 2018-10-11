@@ -61,20 +61,6 @@ public final class LuceneExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> LuceneSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
-		if ( factory instanceof LuceneSearchPredicateFactory ) {
-			return extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext );
-		}
-		else {
-			throw log.luceneExtensionOnUnknownType( factory );
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public <C, B> Optional<LuceneSearchPredicateContainerContext<N>> extendOptional(
 			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C, B> factory,
 			SearchPredicateDslContext<N, ? super B> dslContext) {

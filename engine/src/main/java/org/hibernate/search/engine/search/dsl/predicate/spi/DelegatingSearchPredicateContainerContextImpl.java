@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 
 /**
@@ -72,23 +73,13 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
-	public <T> T withExtension(SearchPredicateContainerContextExtension<N, T> extension) {
-		return delegate.withExtension( extension );
+	public <T> T extension(SearchPredicateContainerContextExtension<N, T> extension) {
+		return delegate.extension( extension );
 	}
 
 	@Override
-	public <T> N withExtensionOptional(
-			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> predicateContributor) {
-		return delegate.withExtensionOptional( extension, predicateContributor );
-	}
-
-	@Override
-	public <T> N withExtensionOptional(
-			SearchPredicateContainerContextExtension<N, T> extension,
-			Consumer<T> predicateContributor,
-			Consumer<SearchPredicateContainerContext<N>> fallbackPredicateContributor) {
-		return delegate.withExtensionOptional( extension, predicateContributor, fallbackPredicateContributor );
+	public SearchPredicateContainerExtensionContext<N> extension() {
+		return delegate.extension();
 	}
 
 	protected SearchPredicateContainerContext<N> getDelegate() {

@@ -84,17 +84,12 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().bool( b -> {
-					b.should().withExtensionOptional(
-							ElasticsearchExtension.get(),
-							// FIXME find some way to forbid using the context twice... ?
-							c -> c.fromJsonString( "{'match': {'string': 'text 1'}}" )
-					);
-					b.should().withExtension( ElasticsearchExtension.get() )
+					b.should().extension( ElasticsearchExtension.get() )
+							.fromJsonString( "{'match': {'string': 'text 1'}}" );
+					b.should().extension( ElasticsearchExtension.get() )
 							.fromJsonString( "{'match': {'integer': 2}}" );
-					b.should().withExtensionOptional(
-							ElasticsearchExtension.get(),
-							// FIXME find some way to forbid using the context twice... ?
-							c -> c.fromJsonString(
+					b.should().extension( ElasticsearchExtension.get() )
+							.fromJsonString(
 									"{"
 										+ "'geo_distance': {"
 											+ "'distance': '200km',"
@@ -103,9 +98,8 @@ public class ExtensionIT {
 												+ "'lon': -70"
 											+ "}"
 										+ "}"
-									+ "}" ),
-							c -> Assert.fail( "Expected the extension to be present" )
-					);
+									+ "}"
+							);
 					// Also test using the standard DSL on a field defined with the extension
 					b.should().match().onField( "yearDays" ).matching( "'2018:12'" );
 				} )
@@ -119,17 +113,12 @@ public class ExtensionIT {
 	public void predicate_fromJsonString_separatePredicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate1 = searchTarget.predicate().withExtensionOptional(
-				ElasticsearchExtension.get(),
-				// FIXME find some way to forbid using the context twice... ?
-				c -> c.fromJsonString( "{'match': {'string': 'text 1'}}" )
-		);
-		SearchPredicate predicate2 = searchTarget.predicate().withExtension( ElasticsearchExtension.get() )
+		SearchPredicate predicate1 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
+				.fromJsonString( "{'match': {'string': 'text 1'}}" );
+		SearchPredicate predicate2 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'match': {'integer': 2}}" );
-		SearchPredicate predicate3 = searchTarget.predicate().withExtensionOptional(
-				ElasticsearchExtension.get(),
-				// FIXME find some way to forbid using the context twice... ?
-				c -> c.fromJsonString(
+		SearchPredicate predicate3 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
+				.fromJsonString(
 						"{"
 							+ "'geo_distance': {"
 								+ "'distance': '200km',"
@@ -138,9 +127,8 @@ public class ExtensionIT {
 									+ "'lon': -70"
 								+ "}"
 							+ "}"
-						+ "}" ),
-				c -> Assert.fail( "Expected the extension to be present" )
-		);
+						+ "}"
+				);
 		// Also test using the standard DSL on a field defined with the extension
 		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
 				.matching( "'2018:12'" ).end();

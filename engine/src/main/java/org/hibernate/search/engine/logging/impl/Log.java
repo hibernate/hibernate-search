@@ -9,11 +9,11 @@ package org.hibernate.search.engine.logging.impl;
 
 import java.util.List;
 
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
@@ -166,4 +166,17 @@ public interface Log extends BasicLogger {
 			value = "Multiple calls to createAccessor() for the same field definition."
 					+ " You must call createAccessor() exactly once.")
 	SearchException cannotCreateAccessorMultipleTimes(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 25,
+			value = "Cannot call ifSupported(...) after orElse(...)."
+					+ " Use a separate extension() context, or move the orElse(...) call last."
+	)
+	SearchException cannotCallDslExtensionIfSupportedAfterOrElse();
+
+	@Message(id = ID_OFFSET_2 + 26,
+			value = "None of the provided extensions can be applied to the current context. "
+					+ " Attempted extensions: %1$s."
+					+ " If you want to ignore this, use .extension().ifSupported(...).orElse(ignored -> { })."
+	)
+	SearchException dslExtensionNoMatch(List<?> attemptedExtensions);
 }
