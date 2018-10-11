@@ -61,20 +61,6 @@ public final class ElasticsearchExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> ElasticsearchSearchPredicateContainerContext<N> extendOrFail(SearchPredicateContainerContext<N> original,
-			SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
-		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
-			return extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext );
-		}
-		else {
-			throw log.elasticsearchExtensionOnUnknownType( factory );
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public <C, B> Optional<ElasticsearchSearchPredicateContainerContext<N>> extendOptional(
 			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C, B> factory,
 			SearchPredicateDslContext<N, ? super B> dslContext) {

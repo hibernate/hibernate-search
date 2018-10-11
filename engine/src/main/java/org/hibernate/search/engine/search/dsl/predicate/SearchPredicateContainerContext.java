@@ -150,44 +150,17 @@ public interface SearchPredicateContainerContext<N> {
 	 * @return The extended context.
 	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T withExtension(SearchPredicateContainerContextExtension<N, T> extension);
+	<T> T extension(SearchPredicateContainerContextExtension<N, T> extension);
 
 	/**
-	 * Extend the current context with the given extension if possible,
-	 * resulting in an extended context offering different types of predicates,
-	 * to which the given contributor will be applied.
+	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * failing only if <em>none</em> of the extensions is supported.
 	 * <p>
-	 * If the extension is not compatible with the current context (wrong underlying backend, ...),
-	 * this call won't have any effect.
+	 * If you only need to apply a single extension and fail if it is not supported,
+	 * use the simpler {@link #extension(SearchPredicateContainerContextExtension)} method instead.
 	 *
-	 * @param <T> The type of context provided by the extension.
-	 * @param extension The extension to the predicate DSL.
-	 * @param predicateContributor A consumer that will add a predicate to the (extended) context passed in parameter,
-	 * if the extension is successfully applied.
-	 * Should generally be a lambda expression.
-	 * @return The extended context.
+	 * @return A context allowing to define the extensions to attempt, and the corresponding predicates.
 	 */
-	<T> N withExtensionOptional(SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor);
-
-	/**
-	 * Extend the current context with the given extension if possible,
-	 * resulting in an extended context offering different types of predicates,
-	 * to which the given contributor will be applied.
-	 * <p>
-	 * If the extension is not compatible with the current context (wrong underlying backend, ...),
-	 * the fallback contributor will be applied to the current context.
-	 *
-	 * @param <T> The type of context provided by the extension.
-	 * @param extension The extension to the predicate DSL.
-	 * @param predicateContributor A consumer that will add a predicate to the (extended) context passed in parameter,
-	 * if the extension is successfully applied.
-	 * Should generally be a lambda expression.
-	 * @param fallbackPredicateContributor A consumer that will add a predicate to the (non-extended) context passed in parameter,
-	 * if the extension cannot be successfully applied.
-	 * Should generally be a lambda expression.
-	 * @return The extended context.
-	 */
-	<T> N withExtensionOptional(SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor,
-			Consumer<SearchPredicateContainerContext<N>> fallbackPredicateContributor);
+	SearchPredicateContainerExtensionContext<N> extension();
 
 }

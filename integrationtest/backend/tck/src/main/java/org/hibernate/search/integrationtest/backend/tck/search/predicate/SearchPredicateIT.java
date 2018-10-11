@@ -9,24 +9,30 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -143,6 +149,95 @@ public class SearchPredicateIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
 	}
 
+	@Test
+	public void extension() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		SearchQuery<DocumentReference> query;
+
+		// Mandatory extension
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().extension( new SupportedExtension<>() )
+						.match().onField( "string" ).matching( MATCHING_STRING ).end()
+				.build();
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+
+		// Conditional extensions with orElse - two, both supported
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().extension()
+						// FIXME find some way to forbid using the context passed to the consumers twice... ?
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElseFail()
+				.build();
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+
+		// Conditional extensions with orElse - two, second supported
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+						)
+						.orElse(
+								ignored -> Assert.fail( "This should not be called" )
+						)
+				.build();
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+
+		// Conditional extensions with orElse - two, both unsupported
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElse(
+								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+						)
+				.build();
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+
+		// Conditional extensions without orElse - one, unsupported
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate().bool()
+						.must( c -> c.extension()
+								.ifSupported(
+										new UnSupportedExtension<>(),
+										ignored -> Assert.fail( "This should not be called" )
+								)
+						)
+						.must(
+								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+						)
+						.end()
+				.build();
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 		workPlan.add( referenceProvider( MATCHING_ID ), document -> {
@@ -169,6 +264,34 @@ public class SearchPredicateIT {
 
 		IndexAccessors(IndexSchemaElement root) {
 			string = root.field( "string" ).asString().createAccessor();
+		}
+	}
+
+	private static class SupportedExtension<N> implements SearchPredicateContainerContextExtension<N, MyExtendedContext<N>> {
+		@Override
+		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchPredicateContainerContext<N> original,
+				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
+			return Optional.of( new MyExtendedContext<>( original ) );
+		}
+	}
+
+	private static class UnSupportedExtension<N> implements SearchPredicateContainerContextExtension<N, MyExtendedContext<N>> {
+		@Override
+		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchPredicateContainerContext<N> original,
+				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
+			return Optional.empty();
+		}
+	}
+
+	private static class MyExtendedContext<N> extends DelegatingSearchPredicateContainerContextImpl<N> {
+		MyExtendedContext(SearchPredicateContainerContext<N> delegate) {
+			super( delegate );
 		}
 	}
 }
