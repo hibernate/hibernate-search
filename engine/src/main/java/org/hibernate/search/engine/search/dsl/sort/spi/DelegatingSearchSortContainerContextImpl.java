@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
@@ -15,6 +13,7 @@ import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -61,23 +60,13 @@ public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortCo
 	}
 
 	@Override
-	public <T> T withExtension(SearchSortContainerContextExtension<N, T> extension) {
-		return delegate.withExtension( extension );
+	public <T> T extension(SearchSortContainerContextExtension<N, T> extension) {
+		return delegate.extension( extension );
 	}
 
 	@Override
-	public <T> NonEmptySortContext<N> withExtensionOptional(
-			SearchSortContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor) {
-		return delegate.withExtensionOptional( extension, clauseContributor );
-	}
-
-	@Override
-	public <T> NonEmptySortContext<N> withExtensionOptional(
-			SearchSortContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor,
-			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor) {
-		return delegate.withExtensionOptional( extension, clauseContributor, fallbackClauseContributor );
+	public SearchSortContainerExtensionContext<N> extension() {
+		return delegate.extension();
 	}
 
 	protected SearchSortContainerContext<N> getDelegate() {
