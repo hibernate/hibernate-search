@@ -76,20 +76,6 @@ public final class ElasticsearchExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> ElasticsearchSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
-			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
-		if ( factory instanceof ElasticsearchSearchSortFactory ) {
-			return extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext );
-		}
-		else {
-			throw log.elasticsearchExtensionOnUnknownType( factory );
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public <C, B> Optional<ElasticsearchSearchSortContainerContext<N>> extendOptional(
 			SearchSortContainerContext<N> original, SearchSortFactory<C, B> factory,
 			SearchSortDslContext<N, ? super B> dslContext) {

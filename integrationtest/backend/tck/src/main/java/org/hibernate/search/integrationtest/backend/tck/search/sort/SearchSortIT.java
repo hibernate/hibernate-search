@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Do
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -20,23 +21,29 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
-import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
+import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
+import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+
+import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -258,6 +265,139 @@ public class SearchSortIT {
 				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 	}
 
+	@Test
+	public void extension() {
+		SearchQuery<DocumentReference> query;
+
+		// Mandatory extension
+		query = simpleQuery( c -> c
+				.extension( new SupportedExtension<>() ).byField( "string" ).onMissingValue().sortLast().end()
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		query = simpleQuery( b -> b
+				.extension( new SupportedExtension<>() ).byField( "string" ).desc().onMissingValue().sortLast().end()
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		// Conditional extensions with orElse - two, both supported
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElseFail()
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElseFail()
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		// Conditional extensions with orElse - two, second supported
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+						)
+						.orElse( ignored -> Assert.fail( "This should not be called" ) )
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+						)
+						.orElse( ignored -> Assert.fail( "This should not be called" ) )
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+
+		// Conditional extensions with orElse - two, both unsupported
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElse(
+								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+						)
+		);
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		query = simpleQuery( b -> b
+				.extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								ignored -> Assert.fail( "This should not be called" )
+						)
+						.orElse(
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+						)
+		);
+
+		// Conditional extensions without orElse - one, unsupported
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		query = simpleQuery( b -> {
+			b.extension()
+					.ifSupported(
+							new UnSupportedExtension<>(),
+							ignored -> Assert.fail( "This should not be called" )
+					);
+			b.byField( "string" ).onMissingValue().sortLast().end();
+		} );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		query = simpleQuery( b -> {
+			b.extension()
+					.ifSupported(
+							new UnSupportedExtension<>(),
+							ignored -> Assert.fail( "This should not be called" )
+					);
+			b.byField( "string" ).desc().onMissingValue().sortLast().end();
+		} );
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
 		// Important: do not index the documents in the expected order after sorts
@@ -359,6 +499,34 @@ public class SearchSortIT {
 			self = objectField.createAccessor();
 			string = objectField.field( "string" ).asString().sortable( Sortable.YES ).createAccessor();
 			integer = objectField.field( "integer" ).asInteger().sortable( Sortable.YES ).createAccessor();
+		}
+	}
+
+	private static class SupportedExtension<N> implements SearchSortContainerContextExtension<N, MyExtendedContext<N>> {
+		@Override
+		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchSortContainerContext<N> original,
+				SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
+			return Optional.of( new MyExtendedContext<>( original ) );
+		}
+	}
+
+	private static class UnSupportedExtension<N> implements SearchSortContainerContextExtension<N, MyExtendedContext<N>> {
+		@Override
+		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchSortContainerContext<N> original,
+				SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
+			return Optional.empty();
+		}
+	}
+
+	private static class MyExtendedContext<N> extends DelegatingSearchSortContainerContextImpl<N> {
+		MyExtendedContext(SearchSortContainerContext<N> delegate) {
+			super( delegate );
 		}
 	}
 }

@@ -51,7 +51,6 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -145,17 +144,12 @@ public class ExtensionIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.sort( c -> c
-						.withExtensionOptional(
-								LuceneExtension.get(),
-								c2 -> c2.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
-						)
-						.then().withExtension( LuceneExtension.get() )
+						.extension( LuceneExtension.get() )
+								.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
+						.then().extension( LuceneExtension.get() )
 								.fromLuceneSortField( new SortField( "sort2", Type.STRING ) )
-						.then().withExtensionOptional(
-								LuceneExtension.get(),
-								c2 -> c2.fromLuceneSortField( new SortField( "sort3", Type.STRING ) ),
-								c2 -> Assert.fail( "Expected the extension to be present" )
-						)
+						.then().extension( LuceneExtension.get() )
+								.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
 				)
 				.build();
 		assertThat( query ).hasReferencesHitsExactOrder(
@@ -167,7 +161,7 @@ public class ExtensionIT {
 				.asReferences()
 				.predicate().matchAll().end()
 				.sort( c -> c
-						.withExtensionOptional(
+						.extension().ifSupported(
 								LuceneExtension.get(),
 								c2 -> c2.fromLuceneSort( new Sort(
 										new SortField( "sort3", Type.STRING ),
@@ -188,21 +182,22 @@ public class ExtensionIT {
 	public void sort_fromJsonString_separateSort() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchSort sort1 = searchTarget.sort()
-				.withExtensionOptional(
-						LuceneExtension.get(),
-						c2 -> c2.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
-				)
+		SearchSort sort1 = searchTarget.sort().extension()
+						.ifSupported(
+								LuceneExtension.get(),
+								c2 -> c2.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
+						)
+						.orElseFail()
 				.end();
-		SearchSort sort2 = searchTarget.sort().withExtension( LuceneExtension.get() )
+		SearchSort sort2 = searchTarget.sort().extension( LuceneExtension.get() )
 				.fromLuceneSortField( new SortField( "sort2", Type.STRING ) )
 				.end();
-		SearchSort sort3 = searchTarget.sort()
-				.withExtensionOptional(
+		SearchSort sort3 = searchTarget.sort().extension()
+				.ifSupported(
 						LuceneExtension.get(),
-						c2 -> c2.fromLuceneSortField( new SortField( "sort3", Type.STRING ) ),
-						c2 -> Assert.fail( "Expected the extension to be present" )
+						c2 -> c2.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
 				)
+				.orElseFail()
 				.end();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
@@ -214,14 +209,11 @@ public class ExtensionIT {
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = searchTarget.sort()
-				.withExtensionOptional(
-						LuceneExtension.get(),
-						c2 -> c2.fromLuceneSort( new Sort(
-								new SortField( "sort3", Type.STRING ),
-								new SortField( "sort2", Type.STRING ),
-								new SortField( "sort1", Type.STRING )
-							)
-						)
+				.extension( LuceneExtension.get() ).fromLuceneSort( new Sort(
+						new SortField( "sort3", Type.STRING ),
+						new SortField( "sort2", Type.STRING ),
+						new SortField( "sort1", Type.STRING )
+					)
 				)
 				.end();
 
@@ -341,7 +333,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate().matchAll().end()
-				.sort().withExtension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ).end()
+				.sort().extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ).end()
 				.build();
 
 		assertThat( query )

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.sort;
 
-import java.util.function.Consumer;
-
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -95,11 +93,26 @@ public interface SearchSortContainerContext<N> {
 	 */
 	NonEmptySortContext<N> by(SearchSort sort);
 
-	<T> T withExtension(SearchSortContainerContextExtension<N, T> extension);
+	/**
+	 * Extend the current context with the given extension,
+	 * resulting in an extended context offering different types of sorts.
+	 *
+	 * @param extension The extension to the sort DSL.
+	 * @param <T> The type of context provided by the extension.
+	 * @return The extended context.
+	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<T> T extension(SearchSortContainerContextExtension<N, T> extension);
 
-	<T> NonEmptySortContext<N> withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor);
-
-	<T> NonEmptySortContext<N> withExtensionOptional(SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor,
-			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor);
+	/**
+	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * failing only if <em>none</em> of the extensions is supported.
+	 * <p>
+	 * If you only need to apply a single extension and fail if it is not supported,
+	 * use the simpler {@link #extension(SearchSortContainerContextExtension)} method instead.
+	 *
+	 * @return A context allowing to define the extensions to attempt, and the corresponding sorts.
+	 */
+	SearchSortContainerExtensionContext<N> extension();
 
 }

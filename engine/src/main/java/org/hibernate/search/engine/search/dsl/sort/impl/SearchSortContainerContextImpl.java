@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import java.util.Optional;
-import java.util.function.Consumer;
-
+import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
@@ -16,6 +14,7 @@ import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -79,43 +78,19 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	}
 
 	@Override
-	public <T> T withExtension(SearchSortContainerContextExtension<N, T> extension) {
-		return extension.extendOrFail( this, factory, dslContext );
+	public <T> T extension(SearchSortContainerContextExtension<N, T> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, factory, dslContext )
+		);
 	}
 
 	@Override
-	public <T> NonEmptySortContext<N> withExtensionOptional(
-			SearchSortContainerContextExtension<N, T> extension, Consumer<T> clauseContributor) {
-		extension.extendOptional( this, factory, dslContext ).ifPresent( clauseContributor );
-		return nonEmptyContext();
-	}
-
-	@Override
-	public <T> NonEmptySortContext<N> withExtensionOptional(
-			SearchSortContainerContextExtension<N, T> extension,
-			Consumer<T> clauseContributor,
-			Consumer<SearchSortContainerContext<N>> fallbackClauseContributor) {
-		Optional<T> optional = extension.extendOptional( this, factory, dslContext );
-		if ( optional.isPresent() ) {
-			clauseContributor.accept( optional.get() );
-		}
-		else {
-			fallbackClauseContributor.accept( this );
-		}
-		return nonEmptyContext();
+	public SearchSortContainerExtensionContext<N> extension() {
+		return new SearchSortContainerExtensionContextImpl<>( this, factory, dslContext );
 	}
 
 	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContext<N>() {
-			@Override
-			public SearchSortContainerContext<N> then() {
-				return SearchSortContainerContextImpl.this;
-			}
-
-			@Override
-			public N end() {
-				return dslContext.getNextContext();
-			}
-		};
+		return new NonEmptySortContextImpl<>( this, dslContext );
 	}
+
 }

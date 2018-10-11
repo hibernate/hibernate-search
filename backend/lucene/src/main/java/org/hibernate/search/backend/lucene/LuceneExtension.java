@@ -76,20 +76,6 @@ public final class LuceneExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> LuceneSearchSortContainerContext<N> extendOrFail(SearchSortContainerContext<N> original,
-			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
-		if ( factory instanceof LuceneSearchSortFactory ) {
-			return extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext );
-		}
-		else {
-			throw log.luceneExtensionOnUnknownType( factory );
-		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
 	public <C, B> Optional<LuceneSearchSortContainerContext<N>> extendOptional(
 			SearchSortContainerContext<N> original, SearchSortFactory<C, B> factory,
 			SearchSortDslContext<N, ? super B> dslContext) {
