@@ -30,7 +30,7 @@ public interface IndexSchemaFieldContext {
 	// TODO JavaTimeBridgeProvider
 	// TODO BasicJDKTypesBridgeProvider
 
-	default <T> T withExtension(IndexSchemaFieldContextExtension<T> extension) {
+	default <T> T extension(IndexSchemaFieldContextExtension<T> extension) {
 		return extension.extendOrFail( this );
 	}
 

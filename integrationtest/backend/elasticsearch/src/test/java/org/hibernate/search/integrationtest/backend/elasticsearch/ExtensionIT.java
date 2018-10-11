@@ -378,40 +378,40 @@ public class ExtensionIT {
 
 		IndexAccessors(IndexSchemaElement root) {
 			integer = root.field( "integer" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'integer'}" )
 					.createAccessor();
 			string = root.field( "string" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword'}" )
 					.createAccessor();
 			geoPoint = root.field( "geoPoint" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'geo_point'}" )
 					.createAccessor();
 			yearDays = root.field( "yearDays" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'date', 'format': 'yyyy:DDD'}" )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 					.createAccessor();
 			sort2 = root.field( "sort2" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 					.createAccessor();
 			sort3 = root.field( "sort3" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 					.createAccessor();
 			sort4 = root.field( "sort4" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 					.createAccessor();
 			sort5 = root.field( "sort5" )
-					.withExtension( ElasticsearchExtension.get() )
+					.extension( ElasticsearchExtension.get() )
 					.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 					.createAccessor();
 		}
