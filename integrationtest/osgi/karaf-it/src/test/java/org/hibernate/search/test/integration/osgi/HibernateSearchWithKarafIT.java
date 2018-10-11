@@ -177,6 +177,7 @@ public class HibernateSearchWithKarafIT {
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.defaultRepositories",
 						"file://" + mavenLocalRepository
+								+ "@id=local-repo-from-maven-settings"
 				),
 				editConfigurationFilePut(
 						"etc/org.ops4j.pax.url.mvn.cfg",
