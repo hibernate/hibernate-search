@@ -1653,14 +1653,17 @@
                                      <bundledSignature>jdk-unsafe-1.8</bundledSignature>
                                      <bundledSignature>jdk-unsafe-9</bundledSignature>
                                      <bundledSignature>jdk-unsafe-10</bundledSignature>
+                                     <bundledSignature>jdk-unsafe-11</bundledSignature>
 
                                      <bundledSignature>jdk-deprecated-1.8</bundledSignature>
                                      <bundledSignature>jdk-deprecated-9</bundledSignature>
                                      <bundledSignature>jdk-deprecated-10</bundledSignature>
+                                     <bundledSignature>jdk-deprecated-11</bundledSignature>
 
                                      <bundledSignature>jdk-internal-1.8</bundledSignature>
                                      <bundledSignature>jdk-internal-9</bundledSignature>
                                      <bundledSignature>jdk-internal-10</bundledSignature>
+                                     <bundledSignature>jdk-internal-11</bundledSignature>
                                  </bundledSignatures>
                                  <failOnMissingClasses>false</failOnMissingClasses>
                                  <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
