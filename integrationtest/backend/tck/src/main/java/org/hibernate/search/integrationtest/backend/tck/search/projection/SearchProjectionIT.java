@@ -14,17 +14,18 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -491,9 +492,10 @@ public class SearchProjectionIT {
 			string2Field = FieldModel.mapper( String.class, "ddd", "nnn", "yyy" )
 					.map( root, "string2" );
 
-			scoreField = FieldModel.mapper( String.class, "scorepattern scorepattern", "scorepattern", "xxx" )
-					.map( root, "score", c -> ( (StringIndexSchemaFieldTypedContext<?>) c )
-							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ) );
+			scoreField = FieldModel.mapper( String.class,
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+					"scorepattern scorepattern", "scorepattern", "xxx" )
+					.map( root, "score" );
 
 			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
 			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
@@ -518,14 +520,10 @@ public class SearchProjectionIT {
 		return Arrays.asList(
 				FieldModel
 						// Mix capitalized and non-capitalized text on purpose
-						.mapper( String.class, "Aaron", "george", "Zach" )
-						.map(
-								root, prefix + "normalizedString",
-								c -> {
-									( (StringIndexSchemaFieldTypedContext<?>) c ).normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
-									additionalConfiguration.accept( c );
-								}
-						),
+						.mapper( String.class,
+								c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ),
+								"Aaron", "george", "Zach" )
+						.map( root, prefix + "normalizedString", additionalConfiguration ),
 				FieldModel.mapper( String.class, "aaron", "george", "zach" )
 						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
 				FieldModel.mapper( Integer.class, 1, 3, 5 )
@@ -564,10 +562,21 @@ public class SearchProjectionIT {
 	private static class FieldModel<F> {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
-			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<?, F> context = parent.field( name ).as( type );
+			return mapper(
+					type,
+					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
+					document1Value, document2Value, document3Value
+			);
+		}
+
+		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
+				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
+				F document1Value, F document2Value, F document3Value) {
+			return (parent, name, additionalConfiguration) -> {
+				IndexSchemaFieldContext untypedContext = parent.field( name );
+				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
 				context.store( Store.YES );
-				configuration.accept( context );
+				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new FieldModel<>(
 						accessor, name, type,
