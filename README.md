@@ -54,6 +54,10 @@ which connects to an external Elasticsearch cluster over the network.
 
 ## Getting started
 
+**NOTE**: Hibernate Search 6 is still work in progress.
+Summary documentation will be made available with the first Alpha release,
+and will be progressively improved with each subsequent Alpha/Beta release.
+
 All necessary information is available on the Hibernate Search website:
 
 * [Getting started guide for the latest stable version](http://hibernate.org/search/documentation/getting-started/)
