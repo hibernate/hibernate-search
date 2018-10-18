@@ -137,37 +137,29 @@ on our website at [Contribute to Hibernate Search](http://hibernate.org/search/c
 
 The project is split in several Maven modules:
 
-* _backends_: Remote backends receiving an indexing job and executing it via different protocols.
-
-* _build-config_: Code-related artifacts like checkstyle rules.
-
-* _distribution_: Builds the distribution package.
-
-* _documentation_: The project documentation.
-
-* _elasticsearch_: The core of the Elasticsearch integration.
-
-* _elasticsearch-aws_: Specific bits enabling connection to an AWS-hosted Elasticsearch cluster
-
-* _engine_: The engine of the project. Most of the beef is here.
-
-* _integrationtest_: Integration tests with various technologies like WildFly, Spring and Karaf.
+* `backend`: The backends, i.e. the modules that provide integration to actual indexing services.
+  * `elasticsearch`: A backend that connects to a remote Elasticsearch cluster.
+  * `lucene`: A backend that uses an embedded (same JVM) Lucene instance.
+* `build-config`: Code-related artifacts like [checkstyle](https://checkstyle.org/) and [forbiddenapis](https://github.com/policeman-tools/forbidden-apis) rules.
+* `distribution`: Builds the distribution package.
+* `documentation`: The project documentation.
+* `engine`: The Hibernate Search engine.
+This module handles most of the basic integration work (configuration properties, bean instantiation, ...),
+defines APIs common to every mapper/backend (the Search DSL in particular),
+and provides the "glue" between mappers and backends.
+* `integrationtest`: Integration tests for backends (Elasticsearch, Lucene) and mappers (Hibernate ORM),
+as well as any other technology Hibernate Search integrates with.
 Also includes performance tests.
-
-* _jbossmodules_: Integration with [WildFly](http://www.wildfly.org/) using JBoss Modules.
-
-* _jsr352_: JSR 352 - Batch Applications for the Java Platform integration.
-
-* _orm_: Native integration for [Hibernate ORM](http://hibernate.org/orm/), and also home of most public API code.
-
-* _reports_: Last-built module, producing reports related to test coverage in particular.
-
-* _serialization_: Serialization code used by remote backends.
-
-* _sharedtestresources_: Internal module providing various test resources to our integration tests.
-
-* _testing_: Various helper classes to write tests using Hibernate Search. This module is
-semi private.
+* `legacy`: Legacy code from Search 5. This code is not part of the distributed JARs.
+Parts of it will progressively be re-integrated into the main (Search 6+) code base.
+* `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
+and do the work of converting between user entities and documents to be indexed.
+  * `javabean`: An experimental (not published) mapper for Java Beans without Hibernate ORM.
+  Mostly useful for tests of the `pojo` module.
+  * `orm`: A mapper for [Hibernate ORM](http://hibernate.org/orm/) entities.
+  * `pojo`: Contains base classes and APIs that are re-used in other POJO-based mapper.
+* `reports`: Module built last, producing reports related to test coverage in particular.
+* `util`: Various modules containing util classes, both for runtime and for tests.
 
 ## Contact
 
