@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -33,9 +33,9 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void within_circle() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -47,7 +47,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -59,7 +59,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -71,7 +71,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -83,7 +83,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -98,7 +98,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void unsupported_field_types() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate on field with unsupported type",
@@ -117,9 +117,9 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void boost() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within()
@@ -138,7 +138,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within()
@@ -160,11 +160,11 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void multi_fields() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// onField(...).orField(...)
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
@@ -176,7 +176,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
@@ -190,7 +190,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		// onField().orFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
@@ -202,7 +202,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
@@ -214,7 +214,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
@@ -228,7 +228,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		// onFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
@@ -240,7 +240,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
@@ -255,7 +255,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void circle_error_null() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate with null center",
@@ -278,7 +278,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 	@Test
 	public void unknown_field() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"spatial().within().circle() predicate on unknown field",

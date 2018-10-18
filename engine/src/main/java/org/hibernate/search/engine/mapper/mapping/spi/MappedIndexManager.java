@@ -23,7 +23,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
 
-	IndexSearchTargetBuilder createSearchTarget();
+	IndexSearchTargetBuilder createSearchTargetBuilder();
 
 	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
 }

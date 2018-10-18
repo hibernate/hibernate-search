@@ -17,18 +17,16 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,8 +58,7 @@ public class ExtensionIT {
 
 	private SearchIntegration integration;
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -78,9 +75,9 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_fromJsonString() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
@@ -114,7 +111,7 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_fromJsonString_separatePredicate() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'match': {'string': 'text 1'}}" ).toPredicate();
@@ -143,7 +140,7 @@ public class ExtensionIT {
 			b.should( predicate4 );
 		} );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( booleanPredicate )
 				.build();
@@ -154,9 +151,9 @@ public class ExtensionIT {
 
 	@Test
 	public void sort_fromJsonString() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
@@ -176,7 +173,7 @@ public class ExtensionIT {
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
@@ -198,7 +195,7 @@ public class ExtensionIT {
 
 	@Test
 	public void sort_fromJsonString_separateSort() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchSort sort1Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'asc'}" )
@@ -215,7 +212,7 @@ public class ExtensionIT {
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
@@ -237,7 +234,7 @@ public class ExtensionIT {
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
@@ -307,7 +304,7 @@ public class ExtensionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
 			indexAccessors.integer.write( document, "2" );
 
@@ -358,8 +355,8 @@ public class ExtensionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

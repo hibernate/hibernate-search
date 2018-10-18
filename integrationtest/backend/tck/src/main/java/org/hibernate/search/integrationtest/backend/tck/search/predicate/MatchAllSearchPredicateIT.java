@@ -12,15 +12,14 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,8 +41,7 @@ public class MatchAllSearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -60,9 +58,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -73,9 +71,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll_except() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ).toPredicate() ).toPredicate() )
 				.build();
@@ -84,7 +82,7 @@ public class MatchAllSearchPredicateIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().except( searchPredicate ).toPredicate() )
 				.build();
@@ -94,9 +92,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll_multipleExcepts() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll()
 						.except( f.match().onField( "string" ).matching( STRING_1 ) )
@@ -111,7 +109,7 @@ public class MatchAllSearchPredicateIT {
 		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).toPredicate();
 		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ).toPredicate() )
 				.build();
@@ -121,7 +119,7 @@ public class MatchAllSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexAccessors.string.write( document, STRING_1 );
 		} );
@@ -135,8 +133,8 @@ public class MatchAllSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

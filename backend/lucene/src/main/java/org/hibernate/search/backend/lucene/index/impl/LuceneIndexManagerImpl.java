@@ -77,7 +77,7 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTarget() {
+	public IndexSearchTargetBuilder createSearchTargetBuilder() {
 		return new LuceneIndexSearchTargetBuilder( searchBackendContext, this );
 	}
 

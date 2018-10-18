@@ -14,14 +14,12 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,8 +46,7 @@ public class SearchQueryIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -66,9 +63,9 @@ public class SearchQueryIT {
 
 	@Test
 	public void paging() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -79,7 +76,7 @@ public class SearchQueryIT {
 				.hasHitCount( 3 )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -91,7 +88,7 @@ public class SearchQueryIT {
 				.hasHitCount( 3 )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -102,7 +99,7 @@ public class SearchQueryIT {
 				.hasHitCount( 3 )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -117,9 +114,9 @@ public class SearchQueryIT {
 
 	@Test
 	public void paging_reuse_query() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -144,7 +141,7 @@ public class SearchQueryIT {
 				.hasHitCount( 3 )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -160,9 +157,9 @@ public class SearchQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3389")
 	public void maxResults_zero() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -176,9 +173,9 @@ public class SearchQueryIT {
 
 	@Test
 	public void getQueryString() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
 				.build();
@@ -188,9 +185,9 @@ public class SearchQueryIT {
 
 	@Test
 	public void asWrappedQuery() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		QueryWrapper queryWrapper = searchTarget.query( sessionContext )
+		QueryWrapper queryWrapper = searchTarget.query()
 				.asReferences()
 				.asWrappedQuery( q -> new QueryWrapper( q ) )
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
@@ -200,7 +197,7 @@ public class SearchQueryIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexAccessors.string.write( document, STRING_1 );
 		} );
@@ -214,8 +211,8 @@ public class SearchQueryIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

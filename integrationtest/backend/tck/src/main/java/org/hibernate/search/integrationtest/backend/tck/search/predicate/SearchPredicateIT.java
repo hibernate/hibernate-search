@@ -16,10 +16,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -28,7 +25,8 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -51,8 +49,7 @@ public class SearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -69,9 +66,9 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_fluid() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
@@ -82,11 +79,11 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_search_predicate() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.build();
@@ -97,9 +94,9 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_lambda() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
@@ -110,7 +107,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_lambda_caching_root() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -127,7 +124,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( cachingContributor )
 				.build();
@@ -137,7 +134,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( cachingContributor )
 				.build();
@@ -148,7 +145,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_lambda_caching_nonRoot() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -165,7 +162,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool().must( cachingContributor ).toPredicate() )
 				.build();
@@ -175,7 +172,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( cachingContributor )
@@ -190,11 +187,11 @@ public class SearchPredicateIT {
 
 	@Test
 	public void extension() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query;
 
 		// Mandatory extension
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
@@ -204,7 +201,7 @@ public class SearchPredicateIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both supported
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
@@ -223,7 +220,7 @@ public class SearchPredicateIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.extension()
 						.ifSupported(
@@ -243,7 +240,7 @@ public class SearchPredicateIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.extension()
 						.ifSupported(
@@ -264,7 +261,7 @@ public class SearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexAccessors.string.write( document, STRING_1 );
 		} );
@@ -276,8 +273,8 @@ public class SearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

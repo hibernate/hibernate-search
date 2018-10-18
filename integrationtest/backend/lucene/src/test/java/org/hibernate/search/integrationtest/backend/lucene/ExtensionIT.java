@@ -35,10 +35,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
-import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -49,7 +48,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Before;
 import org.junit.Rule;
@@ -75,8 +73,7 @@ public class ExtensionIT {
 
 	private SearchIntegration integration;
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -93,9 +90,9 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_fromLuceneQuery() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( f.extension( LuceneExtension.get() )
@@ -117,7 +114,7 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_fromLuceneQuery_separatePredicate() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).toPredicate();
@@ -131,7 +128,7 @@ public class ExtensionIT {
 			b.should( predicate3 );
 		} );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( booleanPredicate )
 				.build();
@@ -142,9 +139,9 @@ public class ExtensionIT {
 
 	@Test
 	public void sort_fromLuceneSortField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
@@ -161,7 +158,7 @@ public class ExtensionIT {
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
@@ -184,7 +181,7 @@ public class ExtensionIT {
 
 	@Test
 	public void sort_fromLuceneSortField_separateSort() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchSort sort1 = searchTarget.sort().extension()
 						.ifSupported(
@@ -204,7 +201,7 @@ public class ExtensionIT {
 				.orElseFail()
 				.toSort();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
@@ -221,7 +218,7 @@ public class ExtensionIT {
 				)
 				.toSort();
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort ) )
@@ -232,11 +229,11 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_nativeField_throwsException() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"match() predicate on unsupported native field",
-				() -> searchTarget.query( sessionContext )
+				() -> searchTarget.query()
 						.asReferences()
 						.predicate( f -> f.match().onField( "nativeField" ).matching( "37" ).toPredicate() )
 						.build()
@@ -251,11 +248,11 @@ public class ExtensionIT {
 
 	@Test
 	public void sort_nativeField_throwsException() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"sort on unsupported native field",
-				() -> searchTarget.query( sessionContext )
+				() -> searchTarget.query()
 						.asReferences()
 						.predicate( f -> f.matchAll().toPredicate() )
 						.sort( c -> c.byField( "nativeField" ) )
@@ -271,9 +268,9 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_nativeField_nativeQuery() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
@@ -287,9 +284,9 @@ public class ExtensionIT {
 
 	@Test
 	public void projection_nativeField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "nativeField", Integer.class ).toProjection() )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
@@ -301,10 +298,10 @@ public class ExtensionIT {
 
 	@Test
 	public void projection_nativeField_unsupportedProjection() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// let's check that it's possible to query the field beforehand
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
@@ -319,7 +316,7 @@ public class ExtensionIT {
 		SubTest.expectException(
 				"projection on native field not supporting projections",
 				() -> {
-						SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
+						SearchQuery<List<?>> projectionQuery = searchTarget.query()
 								.asProjections( searchTarget.projection().field( "nativeField_unsupportedProjection", Integer.class ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build();
@@ -335,9 +332,9 @@ public class ExtensionIT {
 
 	@Test
 	public void predicate_nativeField_nativeSort() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
@@ -349,7 +346,7 @@ public class ExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
@@ -398,7 +395,7 @@ public class ExtensionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
 			indexAccessors.string.write( document, "text 1" );
 
@@ -454,8 +451,8 @@ public class ExtensionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

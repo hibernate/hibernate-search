@@ -19,11 +19,10 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
@@ -35,7 +34,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -55,8 +53,7 @@ public class RangeSearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -73,13 +70,13 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void above() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
@@ -91,13 +88,13 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void above_withDslConverter() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
@@ -109,7 +106,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void above_include_exclude() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -117,7 +114,7 @@ public class RangeSearchPredicateIT {
 
 			// Default is inclusion
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
@@ -127,7 +124,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit inclusion
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
 					.build();
@@ -137,7 +134,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit exclusion
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
 					.build();
@@ -149,13 +146,13 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void below() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
@@ -167,13 +164,13 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void below_withDslConverter() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
@@ -185,7 +182,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void below_include_exclude() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -193,7 +190,7 @@ public class RangeSearchPredicateIT {
 
 			// Default is inclusion
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
@@ -203,7 +200,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit inclusion
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
 					.build();
@@ -213,7 +210,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit exclusion
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
 					.build();
@@ -225,14 +222,14 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void fromTo() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
 					.build();
@@ -244,14 +241,14 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void fromTo_withDslConverter() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
 					.build();
@@ -263,7 +260,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void fromTo_include_exclude() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -273,7 +270,7 @@ public class RangeSearchPredicateIT {
 
 			// Default is inclusion
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ).toPredicate() )
 					.build();
@@ -283,7 +280,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit inclusion
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch, RangeBoundInclusion.INCLUDED )
@@ -297,7 +294,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit exclusion for the from clause
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch, RangeBoundInclusion.EXCLUDED )
@@ -311,7 +308,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit exclusion for the to clause
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch, RangeBoundInclusion.INCLUDED )
@@ -325,7 +322,7 @@ public class RangeSearchPredicateIT {
 
 			// explicit exclusion for both clauses
 
-			query = searchTarget.query( sessionContext )
+			query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch, RangeBoundInclusion.EXCLUDED )
@@ -341,7 +338,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void unsupported_field_types() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -361,9 +358,9 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void boost() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.bool()
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName )
@@ -380,7 +377,7 @@ public class RangeSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.bool()
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
@@ -400,11 +397,11 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void multi_fields() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// onField(...).orField(...)
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
@@ -416,7 +413,7 @@ public class RangeSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
@@ -430,7 +427,7 @@ public class RangeSearchPredicateIT {
 
 		// onField().orFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -442,7 +439,7 @@ public class RangeSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -454,7 +451,7 @@ public class RangeSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -468,7 +465,7 @@ public class RangeSearchPredicateIT {
 
 		// onFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
@@ -479,7 +476,7 @@ public class RangeSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
@@ -493,7 +490,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void range_error_null() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -535,7 +532,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void unknown_field() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"range() predicate with unknown field",
@@ -576,7 +573,7 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void error_invalidType() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
 		fieldModels.addAll( indexMapping.supportedFieldModels );
@@ -642,7 +639,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
@@ -672,8 +669,8 @@ public class RangeSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

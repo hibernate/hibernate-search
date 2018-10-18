@@ -19,14 +19,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -56,8 +55,7 @@ public class ObjectFieldStorageIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private StubSessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -74,7 +72,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidDocumentElement_root() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
@@ -90,7 +88,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidDocumentElement_flattened() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
@@ -105,7 +103,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidDocumentElement_nested() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid parent object for this field accessor" );
@@ -120,9 +118,9 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_match() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( MATCHING_STRING ) )
@@ -136,7 +134,7 @@ public class ObjectFieldStorageIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -155,9 +153,9 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_range() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.range().onField( "flattenedObject.string" )
@@ -176,7 +174,7 @@ public class ObjectFieldStorageIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -201,7 +199,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonNestedField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject'" );
@@ -211,7 +209,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonObjectField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject.string'" );
@@ -221,7 +219,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_missingField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
@@ -230,7 +228,7 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectAccessors accessors;
 			DocumentElement object;
@@ -325,8 +323,8 @@ public class ObjectFieldStorageIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

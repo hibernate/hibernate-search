@@ -33,8 +33,8 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTarget() {
-		return implementor.createSearchTarget();
+	public IndexSearchTargetBuilder createSearchTargetBuilder() {
+		return implementor.createSearchTargetBuilder();
 	}
 
 	@Override

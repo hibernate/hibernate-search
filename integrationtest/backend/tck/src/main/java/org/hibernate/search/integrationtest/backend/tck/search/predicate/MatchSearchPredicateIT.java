@@ -22,9 +22,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
@@ -37,7 +36,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -57,8 +55,7 @@ public class MatchSearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -75,13 +72,13 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void match() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.predicateParameterValue;
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
 					.build();
@@ -93,13 +90,13 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void match_withDslConverter() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = new ValueWrapper<>( fieldModel.predicateParameterValue );
 
-			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReferences()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
 					.build();
@@ -111,11 +108,11 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void match_emptyStringBeforeAnalysis() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ).toPredicate() )
 				.build();
@@ -126,11 +123,11 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void match_noTokenAfterAnalysis() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				// Use a stopword, which should be removed by the analysis
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ).toPredicate() )
@@ -142,7 +139,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void unsupported_field_types() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
@@ -163,7 +160,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void match_error_null() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectException(
@@ -181,9 +178,9 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void boost() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.bool()
 						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
@@ -200,7 +197,7 @@ public class MatchSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( root -> root.bool()
 						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
@@ -220,11 +217,11 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void multi_fields() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// onField(...).orField(...)
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
@@ -236,7 +233,7 @@ public class MatchSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
@@ -250,7 +247,7 @@ public class MatchSearchPredicateIT {
 
 		// onField().orFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -262,7 +259,7 @@ public class MatchSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -274,7 +271,7 @@ public class MatchSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
@@ -288,7 +285,7 @@ public class MatchSearchPredicateIT {
 
 		// onFields(...)
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
@@ -299,7 +296,7 @@ public class MatchSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
@@ -313,7 +310,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void unknown_field() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
 				"match() predicate with unknown field",
@@ -354,7 +351,7 @@ public class MatchSearchPredicateIT {
 
 	@Test
 	public void error_invalidType() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
 		fieldModels.addAll( indexMapping.supportedFieldModels );
@@ -380,7 +377,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
@@ -407,8 +404,8 @@ public class MatchSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

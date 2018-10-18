@@ -10,13 +10,14 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -28,9 +29,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).toProjection()
@@ -48,9 +49,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_unit() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection()
@@ -71,9 +72,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_several() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection()
@@ -110,11 +111,11 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_distanceSort() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().distance( "geoPoint", center ).toProjection()
@@ -136,9 +137,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_longCalculatedField() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().distance( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
@@ -161,7 +162,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "Distance related operations are not supported" );
 		thrown.expectMessage( "string" );
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		searchTarget.projection()
 				.distance( "string", GeoPoint.of( 43.749828, 1.854172 ) )
 				.toProjection();
@@ -173,7 +174,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "center" );
 		thrown.expectMessage( "must not be null" );
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		searchTarget.projection()
 				.distance( "geoPoint", null )
 				.toProjection();
@@ -185,7 +186,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "unit" );
 		thrown.expectMessage( "must not be null" );
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		searchTarget.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
 				.toProjection();
@@ -193,7 +194,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_nonProjectable() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException( () -> {
 			searchTarget.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
@@ -212,7 +213,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_unsortable() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException( () -> {
 			searchTarget.sort().byDistance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );

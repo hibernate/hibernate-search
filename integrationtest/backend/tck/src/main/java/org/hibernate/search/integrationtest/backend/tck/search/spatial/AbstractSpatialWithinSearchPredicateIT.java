@@ -14,15 +14,14 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+
 import org.junit.Before;
 import org.junit.Rule;
 
@@ -48,8 +47,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	protected IndexAccessors indexAccessors;
-	protected MappedIndexManager<?> indexManager;
-	protected SessionContext sessionContext = new StubSessionContext();
+	protected StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -65,7 +63,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			indexAccessors.string.write( document, OURSON_QUI_BOIT_STRING );
 			indexAccessors.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
@@ -98,8 +96,8 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

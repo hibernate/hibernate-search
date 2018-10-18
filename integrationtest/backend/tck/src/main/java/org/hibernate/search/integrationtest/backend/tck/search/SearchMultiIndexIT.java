@@ -100,12 +100,12 @@ public class SearchMultiIndexIT {
 				.withIndex(
 						"MappedType_1_1", INDEX_NAME_1_1,
 						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager_1_1 = indexManager
+						indexMapping -> this.indexManager_1_1 = indexMapping.getIndexManager()
 				)
 				.withIndex(
 						"MappedType_1_2", INDEX_NAME_1_2,
 						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager_1_2 = indexManager
+						indexMapping -> this.indexManager_1_2 = indexMapping.getIndexManager()
 				)
 				.setup();
 
@@ -113,7 +113,7 @@ public class SearchMultiIndexIT {
 				.withIndex(
 						"MappedType_2_1", INDEX_NAME_2_1,
 						ctx -> this.indexAccessors_2_1 = new IndexAccessors_2_1( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager_2_1 = indexManager
+						indexMapping -> this.indexManager_2_1 = indexMapping.getIndexManager()
 				)
 				.setup();
 
@@ -122,7 +122,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_across_multiple_indexes() {
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -139,7 +139,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void sort_across_multiple_indexes() {
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -170,7 +170,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void projection_across_multiple_indexes() {
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -189,7 +189,7 @@ public class SearchMultiIndexIT {
 	@Test
 	public void field_in_one_index_only_is_supported() {
 		// Predicate
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -216,14 +216,14 @@ public class SearchMultiIndexIT {
 		ProjectionsSearchResultAssert.assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( c -> {
 			c.projection( ADDITIONAL_FIELD_1_1_1 );
 			c.projection( ADDITIONAL_FIELD_1_1_2 );
-			c.projection( (Object) null );
+			c.projection( null );
 		} );
 	}
 
 	@Test
 	public void unknown_field_throws_exception() {
 		// Predicate
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -279,7 +279,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_with_incompatible_types_throws_exception() {
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
 		IndexSearchTarget searchTarget = searchTargetBuilder.build();
 
@@ -314,7 +314,7 @@ public class SearchMultiIndexIT {
 		SubTest.expectException(
 				"search across multiple backends",
 				() -> {
-					IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTarget();
+					IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder();
 					indexManager_2_1.addToSearchTarget( searchTargetBuilder );
 					searchTargetBuilder.build();
 				}
@@ -345,7 +345,7 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTarget().build();
+		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTargetBuilder().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -364,7 +364,7 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_1_2.createSearchTarget().build();
+		searchTarget = indexManager_1_2.createSearchTargetBuilder().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -384,7 +384,7 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_2_1.createSearchTarget().build();
+		searchTarget = indexManager_2_1.createSearchTargetBuilder().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )

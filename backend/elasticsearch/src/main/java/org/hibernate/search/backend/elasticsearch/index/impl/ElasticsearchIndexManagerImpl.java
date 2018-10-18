@@ -71,7 +71,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTarget() {
+	public IndexSearchTargetBuilder createSearchTargetBuilder() {
 		return new ElasticsearchIndexSearchTargetBuilder( searchBackendContext, this );
 	}
 

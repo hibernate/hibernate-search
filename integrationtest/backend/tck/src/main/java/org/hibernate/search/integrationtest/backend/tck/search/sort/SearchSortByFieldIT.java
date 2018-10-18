@@ -25,11 +25,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -43,7 +42,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Assume;
 import org.junit.Before;
@@ -67,8 +65,7 @@ public class SearchSortByFieldIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -84,8 +81,8 @@ public class SearchSortByFieldIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		return searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		return searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
@@ -233,7 +230,7 @@ public class SearchSortByFieldIT {
 
 	@Test
 	public void error_unsortable() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsortableSupportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -252,7 +249,7 @@ public class SearchSortByFieldIT {
 		Assume.assumeTrue( "Errors on attempt to sort on unknown fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on unknown fields
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		String absoluteFieldPath = "unknownField";
 
@@ -261,7 +258,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query( sessionContext )
+		searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -273,7 +270,7 @@ public class SearchSortByFieldIT {
 		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on object fields
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName;
 
@@ -282,7 +279,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query( sessionContext )
+		searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -294,7 +291,7 @@ public class SearchSortByFieldIT {
 		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on object fields
 
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName;
 
@@ -303,7 +300,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query( sessionContext )
+		searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -312,7 +309,7 @@ public class SearchSortByFieldIT {
 
 	@Test
 	public void error_invalidType() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
 		fieldModels.addAll( indexMapping.supportedFieldModels );
@@ -344,7 +341,7 @@ public class SearchSortByFieldIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -405,8 +402,8 @@ public class SearchSortByFieldIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

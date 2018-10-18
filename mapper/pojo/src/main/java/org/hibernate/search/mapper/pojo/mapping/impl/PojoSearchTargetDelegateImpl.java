@@ -74,7 +74,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	private IndexSearchTarget getIndexSearchTarget() {
 		if ( indexSearchTarget == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends T, ?>> iterator = targetedTypeManagers.iterator();
-			IndexSearchTargetBuilder builder = iterator.next().createSearchTarget();
+			IndexSearchTargetBuilder builder = iterator.next().createSearchTargetBuilder();
 			while ( iterator.hasNext() ) {
 				iterator.next().addToSearchTarget( builder );
 			}

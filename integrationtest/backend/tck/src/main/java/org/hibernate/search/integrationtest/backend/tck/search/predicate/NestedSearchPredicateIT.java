@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -54,7 +54,7 @@ public class NestedSearchPredicateIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
+	private StubMappingIndexManager indexManager;
 
 	private StubSessionContext sessionContext = new StubSessionContext();
 
@@ -73,9 +73,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -116,9 +116,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
@@ -157,9 +157,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -191,7 +191,7 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_separatePredicates() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchPredicate predicate1 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
@@ -219,7 +219,7 @@ public class NestedSearchPredicateIT {
 				)
 				.toPredicate();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -237,7 +237,7 @@ public class NestedSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			ObjectAccessors accessors;
 			SecondLevelObjectAccessors secondLevelAccessors;
@@ -353,8 +353,8 @@ public class NestedSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

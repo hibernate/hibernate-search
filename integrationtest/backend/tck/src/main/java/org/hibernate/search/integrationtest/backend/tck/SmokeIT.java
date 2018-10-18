@@ -15,12 +15,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -43,8 +41,7 @@ public class SmokeIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexAccessors indexAccessors;
-	private MappedIndexManager<?> indexManager;
-	private SessionContext sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager;
 
 	@Before
 	public void setup() {
@@ -61,9 +58,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_match() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
@@ -71,7 +68,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
 				.build();
@@ -79,7 +76,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
 				.hasHitCount( 3 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
 				.build();
@@ -87,7 +84,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ).toPredicate() )
 				.build();
@@ -95,7 +92,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ).toPredicate() )
 				.build();
@@ -106,9 +103,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_range() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ).toPredicate() )
 				.build();
@@ -116,7 +113,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ).toPredicate() )
 				.build();
@@ -124,7 +121,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ).toPredicate() )
 				.build();
@@ -132,7 +129,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( "localDate" )
 						.from( LocalDate.of( 2018, 1, 2 ) )
@@ -144,7 +141,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ).toPredicate() )
 				.build();
@@ -155,9 +152,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_boolean() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "integer" ).matching( 1 ) )
@@ -169,7 +166,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
@@ -181,7 +178,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
@@ -196,10 +193,10 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_nested() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
@@ -212,7 +209,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		// With nested storage, we expect direct queries to never match
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
 				.build();
@@ -221,7 +218,7 @@ public class SmokeIT {
 				.hasHitCount( 0 );
 
 		// ... and predicates within nested queries to be unable to match on different objects
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -236,7 +233,7 @@ public class SmokeIT {
 				.hasHitCount( 0 );
 
 		// ... but predicates should still be able to match on the same object
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -253,10 +250,10 @@ public class SmokeIT {
 
 	@Test
 	public void separatePredicate() {
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.build();
@@ -265,7 +262,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.build();
@@ -277,7 +274,7 @@ public class SmokeIT {
 				.should( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
 				.should( f -> f.match().onField( "integer" ).matching( 2 ).toPredicate() )
 				.toPredicate();
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.build();
@@ -287,7 +284,7 @@ public class SmokeIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( "1" ), document -> {
 			indexAccessors.string.write( document, "text 1" );
 			indexAccessors.string_analyzed.write( document, "text 1" );
@@ -349,8 +346,8 @@ public class SmokeIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();

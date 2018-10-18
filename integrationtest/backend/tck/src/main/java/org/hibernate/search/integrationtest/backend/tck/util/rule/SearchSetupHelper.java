@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -138,7 +138,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public interface IndexSetupListener {
 
-		void onSetup(MappedIndexManager<?> indexManager);
+		void onSetup(StubMappingIndexManager indexMapping);
 
 	}
 
@@ -162,7 +162,7 @@ public class SearchSetupHelper implements TestRule {
 
 		void afterBuild(StubMapping mapping) {
 			listener.onSetup(
-					mapping.getIndexManagerByTypeIdentifier( typeName )
+					mapping.getIndexMappingByTypeIdentifier( typeName )
 			);
 		}
 

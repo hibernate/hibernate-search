@@ -62,7 +62,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTarget() {
+	public IndexSearchTargetBuilder createSearchTargetBuilder() {
 		return new StubIndexSearchTarget.Builder( backend, name );
 	}
 

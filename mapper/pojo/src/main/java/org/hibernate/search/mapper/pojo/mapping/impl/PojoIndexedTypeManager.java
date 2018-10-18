@@ -118,8 +118,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	IndexSearchTargetBuilder createSearchTarget() {
-		return indexManager.createSearchTarget();
+	IndexSearchTargetBuilder createSearchTargetBuilder() {
+		return indexManager.createSearchTargetBuilder();
 	}
 
 	void addToSearchTarget(IndexSearchTargetBuilder builder) {
