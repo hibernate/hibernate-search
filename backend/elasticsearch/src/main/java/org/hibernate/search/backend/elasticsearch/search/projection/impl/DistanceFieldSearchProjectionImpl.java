@@ -20,7 +20,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchProjection<Double> {
+class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchProjection<Double> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();

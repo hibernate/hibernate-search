@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ReferenceHitEx
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class ReferenceSearchProjectionImpl implements LuceneSearchProjection<Object> {
+class ReferenceSearchProjectionImpl implements LuceneSearchProjection<Object> {
 
 	private static final ReferenceSearchProjectionImpl INSTANCE = new ReferenceSearchProjectionImpl();
 

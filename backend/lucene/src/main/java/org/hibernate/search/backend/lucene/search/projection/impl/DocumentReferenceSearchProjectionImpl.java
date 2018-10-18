@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference> {
+class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference> {
 
 	private static final DocumentReferenceSearchProjectionImpl INSTANCE = new DocumentReferenceSearchProjectionImpl();
 

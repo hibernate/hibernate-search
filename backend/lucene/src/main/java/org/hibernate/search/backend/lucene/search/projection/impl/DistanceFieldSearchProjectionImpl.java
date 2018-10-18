@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class DistanceFieldSearchProjectionImpl implements LuceneSearchProjection<Double> {
+class DistanceFieldSearchProjectionImpl implements LuceneSearchProjection<Double> {
 
 	private final LuceneIndexSchemaFieldNode<GeoPoint> schemaNode;
 

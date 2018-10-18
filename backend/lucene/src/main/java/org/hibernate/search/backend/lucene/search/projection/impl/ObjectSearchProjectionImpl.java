@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {
+class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {
 
 	private static final ObjectSearchProjectionImpl INSTANCE = new ObjectSearchProjectionImpl();
 

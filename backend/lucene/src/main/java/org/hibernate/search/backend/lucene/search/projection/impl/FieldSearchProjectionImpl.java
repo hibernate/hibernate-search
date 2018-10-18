@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
+class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
 	private final LuceneIndexSchemaFieldNode<T> schemaNode;
 

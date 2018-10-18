@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
-public class ObjectSearchProjectionImpl implements ElasticsearchSearchProjection<Object> {
+class ObjectSearchProjectionImpl implements ElasticsearchSearchProjection<Object> {
 
 	private final DocumentReferenceExtractorHelper helper;
 

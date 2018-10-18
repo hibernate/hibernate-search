@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class IndexSensitiveSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
+class IndexSensitiveSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
 	private final Map<String, LuceneSearchProjection<T>> projectionsByIndex;
 

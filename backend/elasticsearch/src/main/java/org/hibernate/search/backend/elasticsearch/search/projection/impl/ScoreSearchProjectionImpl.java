@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
-public class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> {
+class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> {
 
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();

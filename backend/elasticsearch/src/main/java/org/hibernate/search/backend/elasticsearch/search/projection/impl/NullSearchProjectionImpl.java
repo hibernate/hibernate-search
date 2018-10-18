@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
 
-public class NullSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
+class NullSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
 	private static final NullSearchProjectionImpl INSTANCE = new NullSearchProjectionImpl();

@@ -12,7 +12,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class NullSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
+class NullSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
 	private static final NullSearchProjectionImpl INSTANCE = new NullSearchProjectionImpl();

@@ -12,7 +12,7 @@ import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-public class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
+class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
 
 	private static final ScoreSearchProjectionImpl INSTANCE = new ScoreSearchProjectionImpl();
 
