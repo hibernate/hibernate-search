@@ -26,10 +26,10 @@ legacy modules use `org.hibernate`, while newer modules use `org.hibernate.searc
 
 ## Description
 
-Full text search for Java objects
+*Full text search for Java objects*
 
 This project provides synchronization between entities managed by Hibernate ORM and full-text
-indexing services like Apache Lucene and Elasticsearch.
+indexing backends like Apache Lucene and Elasticsearch.
 
 It will automatically apply changes to indexes, which is tedious and error prone coding work,
 while leaving you full control on the query aspects. The development community constantly
@@ -40,16 +40,17 @@ specific annotations and the knowledge it can gather from your existing Hibernat
 mapping.
 
 Queries can be defined by any combination of:
- - "native" Apache Lucene queries
- - writing "native" Elasticsearch queries in Json format (if using Elasticsearch, which is optional)
- - using our DSL which abstracts the previous two generating optimal backend specific queries
+* passing "native" queries directly (`org.apache.lucene.Query` for the Lucene backend, JSON for the Elasticsearch backend)
+* using our backend-agnostic DSL which generates the appropriate native queries based on the available schema metadata
 
 Query results can include projections to be loaded directly from the index, or can materialize
 fully managed Hibernate entities loaded from the database within the current transactional scope.
 
-Hibernate Search is using [Apache Lucene](http://lucene.apache.org/) under the cover; this
-can be used directly (running embedded in the same JVM) or remotely provided by Elasticsearch
-over its REST API.
+Hibernate Search provides two backends, you can use whichever suits your application best:
+* an embedded [Apache Lucene](http://lucene.apache.org/) backend,
+which runs the indexing engine in the same JVM as your application.
+* an [Elasticsearch](https://www.elastic.co/products/elasticsearch) backend,
+which connects to an external Elasticsearch cluster over the network.
 
 ## Getting started
 
