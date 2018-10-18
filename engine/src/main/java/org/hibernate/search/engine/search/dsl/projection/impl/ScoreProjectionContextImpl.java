@@ -16,7 +16,7 @@ public class ScoreProjectionContextImpl implements ScoreProjectionContext {
 
 	private ScoreSearchProjectionBuilder scoreProjectionBuilder;
 
-	ScoreProjectionContextImpl(SearchProjectionFactory<?> factory) {
+	ScoreProjectionContextImpl(SearchProjectionFactory factory) {
 		this.scoreProjectionBuilder = factory.score();
 	}
 

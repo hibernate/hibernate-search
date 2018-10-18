@@ -16,7 +16,7 @@ public class ObjectProjectionContextImpl implements ObjectProjectionContext {
 
 	private ObjectSearchProjectionBuilder objectProjectionBuilder;
 
-	ObjectProjectionContextImpl(SearchProjectionFactory<?> factory) {
+	ObjectProjectionContextImpl(SearchProjectionFactory factory) {
 		this.objectProjectionBuilder = factory.object();
 	}
 

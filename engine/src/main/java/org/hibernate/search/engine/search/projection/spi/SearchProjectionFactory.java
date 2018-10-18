@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
 
 /**
  * A factory for search projections.
@@ -16,7 +14,7 @@ import org.hibernate.search.util.SearchException;
  * This is the main entry point for the engine
  * to ask the backend to build search projections.
  */
-public interface SearchProjectionFactory<P extends SearchProjection<?>> {
+public interface SearchProjectionFactory {
 
 	DocumentReferenceSearchProjectionBuilder documentReference();
 
@@ -29,14 +27,4 @@ public interface SearchProjectionFactory<P extends SearchProjection<?>> {
 	ScoreSearchProjectionBuilder score();
 
 	DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
-
-	/**
-	 * Convert a {@link SearchProjection} object to the backend-specific implementation.
-	 *
-	 * @param projection The {@link SearchProjection} object to convert.
-	 * @return The corresponding projection implementation.
-	 * @throws SearchException If the {@link SearchProjection} object was created
-	 * by a different, incompatible factory.
-	 */
-	P toImplementation(SearchProjection<?> projection);
 }

@@ -63,7 +63,7 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 	}
 
 	@Override
-	public SearchProjectionFactory<?> getSearchProjectionFactory() {
+	public SearchProjectionFactory getSearchProjectionFactory() {
 		return projectionFactory;
 	}
 

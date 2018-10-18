@@ -16,7 +16,7 @@ public class ReferenceProjectionContextImpl implements ReferenceProjectionContex
 
 	private ReferenceSearchProjectionBuilder referenceProjectionBuilder;
 
-	ReferenceProjectionContextImpl(SearchProjectionFactory<?> factory) {
+	ReferenceProjectionContextImpl(SearchProjectionFactory factory) {
 		this.referenceProjectionBuilder = factory.reference();
 	}
 

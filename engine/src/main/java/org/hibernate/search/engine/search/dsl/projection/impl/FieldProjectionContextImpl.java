@@ -16,7 +16,7 @@ public class FieldProjectionContextImpl<T> implements FieldProjectionContext<T> 
 
 	private FieldSearchProjectionBuilder<T> fieldProjectionBuilder;
 
-	FieldProjectionContextImpl(SearchProjectionFactory<?> factory, String absoluteFieldPath, Class<T> clazz) {
+	FieldProjectionContextImpl(SearchProjectionFactory factory, String absoluteFieldPath, Class<T> clazz) {
 		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz );
 	}
 

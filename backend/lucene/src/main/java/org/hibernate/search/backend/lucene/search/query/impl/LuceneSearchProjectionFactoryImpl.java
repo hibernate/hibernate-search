@@ -28,7 +28,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<LuceneSearchProjection<?>> {
+class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,7 +68,6 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory<Lucen
 		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
-	@Override
 	public LuceneSearchProjection<?> toImplementation(SearchProjection<?> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );

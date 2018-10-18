@@ -17,7 +17,7 @@ public class DocumentReferenceProjectionContextImpl implements DocumentReference
 
 	private DocumentReferenceSearchProjectionBuilder documentReferenceProjectionBuilder;
 
-	DocumentReferenceProjectionContextImpl(SearchProjectionFactory<?> factory) {
+	DocumentReferenceProjectionContextImpl(SearchProjectionFactory factory) {
 		this.documentReferenceProjectionBuilder = factory.documentReference();
 	}
 

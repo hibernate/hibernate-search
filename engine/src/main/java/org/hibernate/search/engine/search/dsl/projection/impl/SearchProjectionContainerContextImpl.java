@@ -20,9 +20,9 @@ import org.hibernate.search.util.impl.common.Contracts;
 
 public class SearchProjectionContainerContextImpl implements SearchProjectionContainerContext {
 
-	private final SearchProjectionFactory<?> factory;
+	private final SearchProjectionFactory factory;
 
-	public SearchProjectionContainerContextImpl(SearchProjectionFactory<?> factory) {
+	public SearchProjectionContainerContextImpl(SearchProjectionFactory factory) {
 		this.factory = factory;
 	}
 

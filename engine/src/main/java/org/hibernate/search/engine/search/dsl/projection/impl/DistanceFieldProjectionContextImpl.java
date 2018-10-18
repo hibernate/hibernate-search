@@ -20,7 +20,7 @@ public class DistanceFieldProjectionContextImpl implements DistanceFieldProjecti
 
 	private final DistanceFieldSearchProjectionBuilder distanceFieldProjectionBuilder;
 
-	DistanceFieldProjectionContextImpl(SearchProjectionFactory<?> factory, String absoluteFieldPath, GeoPoint center) {
+	DistanceFieldProjectionContextImpl(SearchProjectionFactory factory, String absoluteFieldPath, GeoPoint center) {
 		this.distanceFieldProjectionBuilder = factory.distance( absoluteFieldPath, center );
 	}
 

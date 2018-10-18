@@ -18,7 +18,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class StubSearchProjectionFactory implements SearchProjectionFactory<StubSearchProjection<?>> {
+public class StubSearchProjectionFactory implements SearchProjectionFactory {
 
 	@SuppressWarnings("rawtypes")
 	private static final StubSearchProjection PROJECTION = new StubSearchProjection<>();
@@ -98,10 +98,5 @@ public class StubSearchProjectionFactory implements SearchProjectionFactory<Stub
 				return (SearchProjection<Double>) PROJECTION;
 			}
 		};
-	}
-
-	@Override
-	public StubSearchProjection<?> toImplementation(SearchProjection<?> projection) {
-		return (StubSearchProjection<?>) projection;
 	}
 }

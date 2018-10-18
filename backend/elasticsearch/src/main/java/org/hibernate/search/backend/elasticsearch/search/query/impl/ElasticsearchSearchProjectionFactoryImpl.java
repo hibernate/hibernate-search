@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactory<ElasticsearchSearchProjection<?>> {
+class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,7 +68,6 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
-	@Override
 	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
