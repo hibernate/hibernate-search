@@ -42,7 +42,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default StandardIndexSchemaFieldTypedContext<?, F> bind(ValueBridgeBindingContext context) {
+	default StandardIndexSchemaFieldTypedContext<?, F> bind(ValueBridgeBindingContext<V> context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 

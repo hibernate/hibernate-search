@@ -238,7 +238,7 @@ public class FullTextFieldIT {
 
 	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, String> {
 		@Override
-		public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
+		public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<WrappedValue> context) {
 			return context.getIndexSchemaFieldContext().asString();
 		}
 		@Override
@@ -257,7 +257,7 @@ public class FullTextFieldIT {
 
 	public static class InvalidExplicitBindingBridge implements ValueBridge<String, Integer> {
 		@Override
-		public StandardIndexSchemaFieldTypedContext<?, Integer> bind(ValueBridgeBindingContext context) {
+		public StandardIndexSchemaFieldTypedContext<?, Integer> bind(ValueBridgeBindingContext<String> context) {
 			return context.getIndexSchemaFieldContext().asInteger();
 		}
 		@Override

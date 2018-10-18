@@ -19,7 +19,7 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 			new ISBNFromIndexFieldValueConverter();
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext context) {
+	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
 		return context.getIndexSchemaFieldContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
 				.projectionConverter( FROM_INDEX_FIELD_VALUE_CONVERTER );

@@ -10,18 +10,18 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
-public class ValueBridgeBindingContextImpl implements ValueBridgeBindingContext {
-	private final PojoModelValue bridgedElement;
+public class ValueBridgeBindingContextImpl<T> implements ValueBridgeBindingContext<T> {
+	private final PojoModelValue<T> bridgedElement;
 	private final IndexSchemaFieldContext indexSchemaFieldContext;
 
-	public ValueBridgeBindingContextImpl(PojoModelValue bridgedElement,
+	public ValueBridgeBindingContextImpl(PojoModelValue<T> bridgedElement,
 			IndexSchemaFieldContext indexSchemaFieldContext) {
 		this.bridgedElement = bridgedElement;
 		this.indexSchemaFieldContext = indexSchemaFieldContext;
 	}
 
 	@Override
-	public PojoModelValue getBridgedElement() {
+	public PojoModelValue<T> getBridgedElement() {
 		return bridgedElement;
 	}
 

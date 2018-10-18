@@ -13,12 +13,12 @@ import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 /**
  * The context provided to the {@link ValueBridge#bind(ValueBridgeBindingContext)} method.
  */
-public interface ValueBridgeBindingContext {
+public interface ValueBridgeBindingContext<V> {
 
 	/**
 	 * @return An entry point allowing to inspect the type of values that will be passed to this bridge.
 	 */
-	PojoModelValue getBridgedElement();
+	PojoModelValue<V> getBridgedElement();
 
 	/**
 	 * @return An entry point allowing to declare expectations regarding the index schema.
