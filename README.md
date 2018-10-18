@@ -172,7 +172,7 @@ and do the work of converting between user entities and documents to be indexed.
 * Hibernate JIRA [HSEARCH](https://hibernate.atlassian.net/browse/HSEARCH) (preferred)
 * [hibernate-dev@lists.jboss.org](mailto:hibernate-dev@lists.jboss.org)
 
-### Free Technical Support:
+### Community Support:
 
 * [Hibernate Forum](https://discourse.hibernate.org/c/hibernate-search)
 * [Stackoverflow](http://stackoverflow.com/questions/tagged/hibernate-search); please use tag `hibernate-search`.
