@@ -92,7 +92,7 @@ To build the distribution bundle run:
 
 #### Elasticsearch
 
-The Elasticsearch module tests against one single version of Elasticsearch at a time,
+The Elasticsearch integration tests run against one single version of Elasticsearch at a time,
 launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.host.version` property, while disabling the default profile:
@@ -102,10 +102,10 @@ You may redefine the version to use by specifying the right profile and using th
 The following profiles are available:
 
  * `elasticsearch-5.6` for 5.6.x and later 5.x (the default)
- * `elasticsearch-6.0` for 6.0.x
+ * `elasticsearch-6.0` for 6.x
 
 A list of available versions for `test.elasticsearch.host.version` can be found on
-[Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.elasticsearch%22%20AND%20a%3A%22elasticsearch%22).
+[Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
