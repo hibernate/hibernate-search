@@ -502,7 +502,7 @@ take care to resolve it for every concrete "source" entity type,
 and to apply all of the resulting inverse paths.
 +
 If you want to observe the algorithm handling this live, try debugging
-`OrmAutomaticIndexingPolymorphicOriginalSideAssociationIT` or `OrmAutomaticIndexingPolymorphicInverseSideAssociationIT`,
+`AutomaticIndexingPolymorphicOriginalSideAssociationIT` or `AutomaticIndexingPolymorphicInverseSideAssociationIT`,
 and put breakpoints in the `collectDependency`/`markForReindexing` methods of dependency collectors.
 
 Embedded types::
@@ -510,15 +510,27 @@ Types in the dependency collector tree may not always be entity types.
 Thus, the path of associations (both the ones to invert and the inverse paths) may be more complex
 than just one property plus one container value extractor.
 +
-If you want to observe the algorithm handling this live, try debugging `OrmAutomaticIndexingEmbeddableIT`,
+If you want to observe the algorithm handling this live, try debugging `AutomaticIndexingEmbeddableIT`,
 and put breakpoints in the `collectDependency`/`markForReindexing` methods of dependency collectors.
 
 Fine-grained dirty checking::
-Fine-grained dirty checking is not implemented at the time of writing.
-Entities are considered dirty or not at the type level, with no information about which property changed exactly.
-However, we will ultimately take this information into account, and then we will have to remember,
-for each reindexing resolver node being built, which properties of the contained entity have lead us to that node.
-This will allow us to only apply part of the reindexing resolver tree at runtime depending on which property is dirty.
+Fine-grained dirty checking consists in keeping track of which properties are dirty in a given entity,
+so as to only reindex "containing" entities that actually use at least one of the dirty properties.
+Without this, Hibernate Search could trigger unnecessary reindexing from time to time,
+which could have a very bad impact on performance depending on the user model.
++
+In order to implement fined-grained dirty checking,
+each reindexing resolver node builder not only stores the information that the corresponding node
+should be reindexed whenever the root entity changes,
+but it also keeps track of *which properties* of the root entity should trigger reindexing of this particular node.
+Each builder keeps this state in a `PojoImplicitReindexingResolverMarkingNodeBuilder` instance it delegates to.
++
+If you want to observe the algorithm handling this live, try debugging `AutomaticIndexingBasicIT.directValueUpdate_nonIndexedField`,
+and put breakpoints in the `collectDependency`/`markForReindexing` methods of dependency collectors
+(to see what happens at bootstrap),
+and in the `resolveEntitiesToReindex` method of `PojoImplicitReindexingResolverDirtinessFilterNode`
+(to see what happens at runtime).
+
 
 === JSON mapper
 
