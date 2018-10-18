@@ -122,6 +122,24 @@ public class SearchProjectionIT {
 	}
 
 	@Test
+	public void field_single_validSuperClass() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections( searchTarget.projection()
+						.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection() )
+				.predicate().matchAll().end()
+				.build();
+
+		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
+			b.projection( indexMapping.string1Field.document1Value.indexedValue );
+			b.projection( indexMapping.string1Field.document2Value.indexedValue );
+			b.projection( indexMapping.string1Field.document3Value.indexedValue );
+			b.projection( null ); // Empty document
+		} );
+	}
+
+	@Test
 	public void field_single_invalidProjectionType() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );
