@@ -2,3 +2,28 @@
 == Getting started
 
 TODO
+
+.Book and Author entities BEFORE adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/gettingstarted/model/before/Book.java[tags=book-entity-before-hsearch-gettingstarted]
+----
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/gettingstarted/model/before/Author.java[tags=author-entity-before-hsearch-gettingstarted]
+----
+====
+
+.Book and Author entities AFTER adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/gettingstarted/model/after/Book.java[tags=book-entity-after-hsearch-gettingstarted]
+----
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/gettingstarted/model/after/Author.java[tags=author-entity-after-hsearch-gettingstarted]
+----
+====
+
