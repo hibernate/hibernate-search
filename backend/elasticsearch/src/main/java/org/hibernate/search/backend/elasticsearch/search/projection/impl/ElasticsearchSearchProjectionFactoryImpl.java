@@ -4,19 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.search.query.impl;
+package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
-import org.hibernate.search.backend.lucene.search.projection.impl.DistanceFieldSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.ObjectSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.ScoreSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
@@ -28,19 +21,23 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
+public class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
-	LuceneSearchProjectionFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
+	private final ElasticsearchSearchTargetModel searchTargetModel;
+
+	public ElasticsearchSearchProjectionFactoryImpl(SearchProjectionBackendContext searchProjectionBackendContext,
+			ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchProjectionBackendContext = searchProjectionBackendContext;
 		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
 	public DocumentReferenceSearchProjectionBuilder documentReference() {
-		return DocumentReferenceSearchProjectionBuilderImpl.get();
+		return searchProjectionBackendContext.getDocumentReferenceProjectionBuilder();
 	}
 
 	@Override
@@ -50,17 +47,17 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	@Override
 	public ObjectSearchProjectionBuilder object() {
-		return ObjectSearchProjectionBuilderImpl.get();
+		return searchProjectionBackendContext.getObjectProjectionBuilder();
 	}
 
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
-		return ReferenceSearchProjectionBuilderImpl.get();
+		return searchProjectionBackendContext.getReferenceProjectionBuilder();
 	}
 
 	@Override
 	public ScoreSearchProjectionBuilder score() {
-		return ScoreSearchProjectionBuilderImpl.get();
+		return searchProjectionBackendContext.getScoreProjectionBuilder();
 	}
 
 	@Override
@@ -68,11 +65,11 @@ class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
 		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
-	public LuceneSearchProjection<?> toImplementation(SearchProjection<?> projection) {
-		if ( !( projection instanceof LuceneSearchProjection ) ) {
-			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
+	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {
+		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
+			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
-		return (LuceneSearchProjection<?>) projection;
+		return (ElasticsearchSearchProjection<?>) projection;
 	}
 
 }

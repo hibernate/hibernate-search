@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SearchSortFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
@@ -24,7 +25,8 @@ public class ElasticsearchSearchTargetContext
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortFactoryImpl( searchTargetModel );
-		this.searchProjectionFactory = new ElasticsearchSearchProjectionFactoryImpl( searchBackendContext,
+		this.searchProjectionFactory = new ElasticsearchSearchProjectionFactoryImpl(
+				searchBackendContext.getSearchProjectionBackendContext(),
 				searchTargetModel );
 		this.searchQueryFactory = new SearchQueryFactoryImpl( searchBackendContext, searchTargetModel,
 				this.searchProjectionFactory );

@@ -13,13 +13,10 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ReferenceHitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ObjectHitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ScoreSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.extraction.impl.ReferenceHitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -37,10 +34,7 @@ public class SearchBackendContext {
 	private final ObjectHitExtractor objectHitExtractor;
 	private final ReferenceHitExtractor referenceHitExtractor;
 
-	private final DocumentReferenceSearchProjectionBuilderImpl documentReferenceProjectionBuilder;
-	private final ObjectSearchProjectionBuilderImpl objectProjectionBuilder;
-	private final ReferenceSearchProjectionBuilderImpl referenceProjectionBuilder;
-	private final ScoreSearchProjectionBuilderImpl scoreProjectionBuilder;
+	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public SearchBackendContext(EventContext eventContext,
 			ElasticsearchWorkFactory workFactory,
@@ -58,10 +52,7 @@ public class SearchBackendContext {
 		this.objectHitExtractor = new ObjectHitExtractor( documentReferenceExtractorHelper );
 		this.referenceHitExtractor = new ReferenceHitExtractor( documentReferenceExtractorHelper );
 
-		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.referenceProjectionBuilder = new ReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl();
+		this.searchProjectionBackendContext = new SearchProjectionBackendContext( documentReferenceExtractorHelper );
 	}
 
 	@Override
@@ -81,20 +72,8 @@ public class SearchBackendContext {
 		return objectHitExtractor;
 	}
 
-	public DocumentReferenceSearchProjectionBuilderImpl getDocumentReferenceProjectionBuilder() {
-		return documentReferenceProjectionBuilder;
-	}
-
-	public ObjectSearchProjectionBuilderImpl getObjectProjectionBuilder() {
-		return objectProjectionBuilder;
-	}
-
-	public ReferenceSearchProjectionBuilderImpl getReferenceProjectionBuilder() {
-		return referenceProjectionBuilder;
-	}
-
-	public ScoreSearchProjectionBuilderImpl getScoreProjectionBuilder() {
-		return scoreProjectionBuilder;
+	public SearchProjectionBackendContext getSearchProjectionBackendContext() {
+		return searchProjectionBackendContext;
 	}
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(

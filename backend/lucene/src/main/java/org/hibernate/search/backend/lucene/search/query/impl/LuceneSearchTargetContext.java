@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateFactoryImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortFactoryImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 

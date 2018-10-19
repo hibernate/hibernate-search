@@ -4,15 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.query.impl;
+package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceFieldSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
@@ -24,23 +21,19 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactory {
+public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchBackendContext searchBackendContext;
+	private final LuceneSearchTargetModel searchTargetModel;
 
-	private final ElasticsearchSearchTargetModel searchTargetModel;
-
-	ElasticsearchSearchProjectionFactoryImpl(SearchBackendContext searchBackendContext,
-			ElasticsearchSearchTargetModel searchTargetModel) {
-		this.searchBackendContext = searchBackendContext;
+	public LuceneSearchProjectionFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
 		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
 	public DocumentReferenceSearchProjectionBuilder documentReference() {
-		return searchBackendContext.getDocumentReferenceProjectionBuilder();
+		return DocumentReferenceSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
@@ -50,17 +43,17 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 
 	@Override
 	public ObjectSearchProjectionBuilder object() {
-		return searchBackendContext.getObjectProjectionBuilder();
+		return ObjectSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
-		return searchBackendContext.getReferenceProjectionBuilder();
+		return ReferenceSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
 	public ScoreSearchProjectionBuilder score() {
-		return searchBackendContext.getScoreProjectionBuilder();
+		return ScoreSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
@@ -68,11 +61,11 @@ class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectionFactor
 		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
-	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {
-		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
-			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
+	public LuceneSearchProjection<?> toImplementation(SearchProjection<?> projection) {
+		if ( !( projection instanceof LuceneSearchProjection ) ) {
+			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
-		return (ElasticsearchSearchProjection<?>) projection;
+		return (LuceneSearchProjection<?>) projection;
 	}
 
 }
