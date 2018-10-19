@@ -13,7 +13,7 @@
         <version>6.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>hibernate-search-documentation</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <name>Hibernate Search Documentation</name>
     <description>Hibernate Search reference documentation</description>
@@ -22,6 +22,8 @@
         <asciidoctor.base-output-dir>${project.build.directory}/asciidoctor/en-US</asciidoctor.base-output-dir>
         <asciidoctor.theme-dir>${project.build.directory}/hibernate-asciidoctor-theme</asciidoctor.theme-dir>
         <asciidoctor.aggregated-resources-dir>${project.build.directory}/aggregated-resources</asciidoctor.aggregated-resources-dir>
+        <asciidoctor.examples-source-dir>${basedir}/src/test/java</asciidoctor.examples-source-dir>
+        <asciidoctor.examples-resources-dir>${basedir}/src/test/resources</asciidoctor.examples-resources-dir>
 
         <html.meta.description>Hibernate Search, full text search for your entities - Reference Documentation</html.meta.description>
         <html.meta.keywords>hibernate, search, hibernate search, full text, lucene, elasticsearch</html.meta.keywords>
@@ -34,6 +36,14 @@
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-orm</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -160,6 +170,8 @@
                 <configuration>
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
+                        <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
+                        <resourcesdir>${asciidoctor.examples-resource-dir}</resourcesdir>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
                         <icons>font</icons>
                         <tabsize>4</tabsize>
