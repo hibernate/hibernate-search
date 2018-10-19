@@ -8,8 +8,6 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
-
 public interface HitExtractor<C> {
 
 	/**
@@ -33,9 +31,7 @@ public interface HitExtractor<C> {
 	 * Perform hit extraction.
 	 *
 	 * @param collector The hit collector, which will receive the result of the extraction.
-	 * @param document The Lucene document extracted from the index.
-	 * @param docId The Lucene document id.
-	 * @param score The score of the hit.
+	 * @param documentResult A wrapper on top of the Lucene document extracted from the index.
 	 */
-	void extract(C collector, Document document, int docId, Float score);
+	void extract(C collector, LuceneResult documentResult);
 }

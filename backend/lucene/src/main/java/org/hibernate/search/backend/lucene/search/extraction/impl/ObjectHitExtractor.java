@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 
 public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
@@ -33,7 +32,7 @@ public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
 	}
 
 	@Override
-	public void extract(LoadingHitCollector collector, Document document, int docId, Float score) {
-		collector.collectForLoading( DocumentReferenceExtractorHelper.extractDocumentReference( document ) );
+	public void extract(LoadingHitCollector collector, LuceneResult documentResult) {
+		collector.collectForLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
 	}
 }

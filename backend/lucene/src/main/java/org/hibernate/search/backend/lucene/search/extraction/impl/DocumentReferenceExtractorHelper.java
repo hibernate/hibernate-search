@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -27,10 +26,10 @@ public final class DocumentReferenceExtractorHelper {
 		absoluteFieldPaths.add( LuceneFields.idFieldName() );
 	}
 
-	public static DocumentReference extractDocumentReference(Document document) {
+	public static DocumentReference extractDocumentReference(LuceneResult documentResult) {
 		return new LuceneDocumentReference(
-				document.get( LuceneFields.indexFieldName() ),
-				document.get( LuceneFields.idFieldName() )
+				documentResult.getStringValue( LuceneFields.indexFieldName() ),
+				documentResult.getStringValue( LuceneFields.idFieldName() )
 		);
 	}
 }

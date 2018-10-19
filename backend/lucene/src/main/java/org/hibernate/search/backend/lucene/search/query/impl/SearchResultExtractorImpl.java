@@ -14,6 +14,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
@@ -65,7 +66,7 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 			Document document = storedFieldVisitor.getDocumentAndReset();
 
 			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, document, hit.doc, hit.score );
+			hitExtractor.extract( hitCollector, new LuceneResult( document, hit.doc, hit.score ) );
 		}
 
 		return Collections.unmodifiableList( hitAggregator.build() );

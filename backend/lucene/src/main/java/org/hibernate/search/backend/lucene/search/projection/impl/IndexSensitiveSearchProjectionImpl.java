@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -38,9 +38,9 @@ class IndexSensitiveSearchProjectionImpl<T> implements LuceneSearchProjection<T>
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
-		projectionsByIndex.get( document.get( LuceneFields.indexFieldName() ) )
-				.extract( collector, document, docId, score );
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
+		projectionsByIndex.get( documentResult.getStringValue( LuceneFields.indexFieldName() ) )
+				.extract( collector, documentResult );
 	}
 
 	@Override

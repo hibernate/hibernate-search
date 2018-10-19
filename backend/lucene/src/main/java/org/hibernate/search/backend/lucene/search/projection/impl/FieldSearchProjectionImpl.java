@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -37,8 +37,8 @@ class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
-		T rawValue = schemaNode.getCodec().decode( document, schemaNode.getAbsoluteFieldPath() );
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
+		T rawValue = schemaNode.getCodec().decode( documentResult.getDocument(), schemaNode.getAbsoluteFieldPath() );
 		collector.collectProjection( schemaNode.getConverter().convertFromProjection( rawValue ) );
 	}
 

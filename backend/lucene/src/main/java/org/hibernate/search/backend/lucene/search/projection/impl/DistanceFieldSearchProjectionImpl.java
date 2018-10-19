@@ -8,9 +8,9 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -44,8 +44,8 @@ class DistanceFieldSearchProjectionImpl implements LuceneSearchProjection<Double
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
-		collector.collectProjection( unit.fromMeters( distanceCollector.getDistance( docId ) ) );
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
+		collector.collectProjection( unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) ) );
 	}
 
 	@Override

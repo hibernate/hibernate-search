@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.document.Document;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -35,8 +35,8 @@ class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Document document, int docId, Float score) {
-		ObjectHitExtractor.get().extract( collector, document, docId, score );
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
+		ObjectHitExtractor.get().extract( collector, documentResult );
 	}
 
 	@Override
