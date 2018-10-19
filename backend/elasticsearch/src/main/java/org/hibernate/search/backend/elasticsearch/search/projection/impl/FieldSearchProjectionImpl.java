@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -35,7 +34,7 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonArray source = REQUEST_SOURCE_ACCESSOR.get( requestBody )
 				.orElseGet( () -> {
 					JsonArray newSource = new JsonArray();
@@ -49,7 +48,7 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
 		collector.collectProjection( converter.convertFromProjection( fieldValue ) );
 	}

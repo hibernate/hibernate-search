@@ -12,6 +12,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
@@ -34,11 +35,15 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 	private final HitExtractor<? super C> hitExtractor;
 	private final HitAggregator<C, List<T>> hitAggregator;
 
+	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
+
 	public SearchResultExtractorImpl(
 			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator) {
+			HitAggregator<C, List<T>> hitAggregator,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
+		this.searchProjectionExecutionContext = searchProjectionExecutionContext;
 	}
 
 	@Override
@@ -52,7 +57,7 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 		for ( JsonElement hit : jsonHits ) {
 			JsonObject hitObject = hit.getAsJsonObject();
 			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, responseBody, hitObject );
+			hitExtractor.extract( hitCollector, responseBody, hitObject, searchProjectionExecutionContext );
 		}
 
 		final List<T> finalHits = Collections.unmodifiableList( hitAggregator.build() );

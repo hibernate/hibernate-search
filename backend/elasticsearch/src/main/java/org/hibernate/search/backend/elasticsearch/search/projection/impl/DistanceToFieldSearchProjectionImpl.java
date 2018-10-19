@@ -12,7 +12,6 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -36,8 +35,6 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 
 	private final String scriptFieldName;
 
-	private Integer distanceSortIndex;
-
 	DistanceToFieldSearchProjectionImpl(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
@@ -46,10 +43,8 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
-		this.distanceSortIndex = elementCollector.getDistanceSortIndex( absoluteFieldPath, center );
-
-		if ( distanceSortIndex == null ) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+		if ( searchProjectionExecutionContext.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
 			// we rely on a script to compute the distance
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
@@ -59,8 +54,10 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		Optional<Double> distance;
+
+		Integer distanceSortIndex = searchProjectionExecutionContext.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex == null ) {
 			// we extract the value from the fields computed by the script_fields

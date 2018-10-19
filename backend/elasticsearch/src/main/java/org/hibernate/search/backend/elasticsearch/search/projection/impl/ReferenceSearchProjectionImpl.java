@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 import com.google.gson.JsonObject;
@@ -21,12 +20,12 @@ class ReferenceSearchProjectionImpl implements ElasticsearchSearchProjection<Obj
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		helper.contributeRequest( requestBody );
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		collector.collectReference( helper.extractDocumentReference( hit ) );
 	}
 

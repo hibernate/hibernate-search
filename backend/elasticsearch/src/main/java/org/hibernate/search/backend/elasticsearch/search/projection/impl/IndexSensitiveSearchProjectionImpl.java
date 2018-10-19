@@ -12,7 +12,6 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -33,16 +32,16 @@ class IndexSensitiveSearchProjectionImpl<T> implements ElasticsearchSearchProjec
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		for ( HitExtractor<?> extractor : projectionsByIndex.values() ) {
-			extractor.contributeRequest( requestBody, elementCollector );
+			extractor.contributeRequest( requestBody, searchProjectionExecutionContext );
 		}
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		String elasticsearchIndexName = HIT_INDEX_NAME_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
-		projectionsByIndex.get( elasticsearchIndexName ).extract( collector, responseBody, hit );
+		projectionsByIndex.get( elasticsearchIndexName ).extract( collector, responseBody, hit, searchProjectionExecutionContext );
 	}
 
 	@Override

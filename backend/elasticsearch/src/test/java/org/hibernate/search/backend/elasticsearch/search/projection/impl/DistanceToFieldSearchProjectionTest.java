@@ -30,9 +30,12 @@ public class DistanceToFieldSearchProjectionTest {
 
 		JsonObject requestBody = new JsonObject();
 
-		projection.contributeRequest( requestBody, elementCollector );
+		SearchProjectionExecutionContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext();
 
-		assertThat( elementCollector.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
+		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+
+		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNotNull();
 	}
 
@@ -47,9 +50,12 @@ public class DistanceToFieldSearchProjectionTest {
 
 		JsonObject requestBody = new JsonObject();
 
-		projection.contributeRequest( requestBody, elementCollector );
+		SearchProjectionExecutionContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext();
 
-		assertThat( elementCollector.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
+		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+
+		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNull();
 	}
 }

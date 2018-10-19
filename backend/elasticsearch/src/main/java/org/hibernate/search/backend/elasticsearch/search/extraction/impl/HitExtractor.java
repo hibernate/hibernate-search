@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 
 import com.google.gson.JsonObject;
 
@@ -16,9 +16,9 @@ public interface HitExtractor<C> {
 	 * Contribute to the request, making sure that the requirements for this extractors are met.
 	 *
 	 * @param requestBody The request body.
-	 * @param elementCollector The query element collector.
+	 * @param searchProjectionExecutionContext An execution context for the search projections.
 	 */
-	void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector);
+	void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext);
 
 	/**
 	 * Perform hit extraction
@@ -26,7 +26,9 @@ public interface HitExtractor<C> {
 	 * @param collector The hit collector, which will receive the result of the extraction.
 	 * @param responseBody The full body of the response.
 	 * @param hit The part of the response body relevant to the hit to extract.
+	 * @param searchProjectionExecutionContext An execution context for the search projections.
 	 */
-	void extract(C collector, JsonObject responseBody, JsonObject hit);
+	void extract(C collector, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext);
 
 }

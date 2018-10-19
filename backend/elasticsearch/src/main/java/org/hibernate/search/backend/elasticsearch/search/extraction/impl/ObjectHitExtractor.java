@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.extraction.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
@@ -28,12 +28,12 @@ public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, ElasticsearchSearchQueryElementCollector elementCollector) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		helper.contributeRequest( requestBody );
 	}
 
 	@Override
-	public void extract(LoadingHitCollector collector, JsonObject responseBody, JsonObject hit) {
+	public void extract(LoadingHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		collector.collectForLoading( helper.extractDocumentReference( hit ) );
 	}
 
