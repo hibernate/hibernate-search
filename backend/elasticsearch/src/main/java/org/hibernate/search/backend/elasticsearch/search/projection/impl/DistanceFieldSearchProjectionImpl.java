@@ -121,7 +121,7 @@ class DistanceFieldSearchProjectionImpl implements ElasticsearchSearchProjection
 		JsonObject scriptContent = new JsonObject();
 		scriptContent.addProperty( "lang", "painless" );
 		scriptContent.add( "params", jsonCenter );
-		scriptContent.addProperty( "inline", "doc['" + absoluteFieldPath + "'].value !== null ?"
+		scriptContent.addProperty( "source", "doc['" + absoluteFieldPath + "'].value !== null ?"
 				+ " doc['" + absoluteFieldPath + "'].arcDistance(params.lat, params.lon)"
 				+ " : null" );
 
