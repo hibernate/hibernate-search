@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
-import org.hibernate.search.engine.search.dsl.projection.DistanceFieldProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
@@ -59,9 +59,9 @@ public class SearchProjectionContainerContextImpl implements SearchProjectionCon
 	}
 
 	@Override
-	public DistanceFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
 
-		return new DistanceFieldProjectionContextImpl( factory, absoluteFieldPath, center );
+		return new DistanceToFieldProjectionContextImpl( factory, absoluteFieldPath, center );
 	}
 }

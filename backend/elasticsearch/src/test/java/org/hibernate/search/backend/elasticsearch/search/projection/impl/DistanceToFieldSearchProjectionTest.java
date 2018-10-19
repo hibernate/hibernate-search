@@ -15,7 +15,7 @@ import org.junit.Test;
 
 import com.google.gson.JsonObject;
 
-public class DistanceFieldSearchProjectionTest {
+public class DistanceToFieldSearchProjectionTest {
 
 	private static final String FIELD = "myField";
 
@@ -25,7 +25,7 @@ public class DistanceFieldSearchProjectionTest {
 	public void projection_script() {
 		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector();
 
-		DistanceFieldSearchProjectionImpl projection = new DistanceFieldSearchProjectionImpl( FIELD,
+		DistanceToFieldSearchProjectionImpl projection = new DistanceToFieldSearchProjectionImpl( FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();
@@ -42,7 +42,7 @@ public class DistanceFieldSearchProjectionTest {
 		elementCollector.collectSort( new JsonObject() );
 		elementCollector.collectDistanceSort( new JsonObject(), FIELD, LOCATION );
 
-		DistanceFieldSearchProjectionImpl projection = new DistanceFieldSearchProjectionImpl( FIELD,
+		DistanceToFieldSearchProjectionImpl projection = new DistanceToFieldSearchProjectionImpl( FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();

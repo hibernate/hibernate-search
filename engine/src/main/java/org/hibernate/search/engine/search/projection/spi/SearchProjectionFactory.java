@@ -26,5 +26,5 @@ public interface SearchProjectionFactory {
 
 	ScoreSearchProjectionBuilder score();
 
-	DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
 }

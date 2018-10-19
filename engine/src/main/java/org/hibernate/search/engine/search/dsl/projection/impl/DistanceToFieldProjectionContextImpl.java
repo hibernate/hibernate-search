@@ -7,20 +7,20 @@
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.dsl.projection.DistanceFieldProjectionContext;
+import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
-import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
-public class DistanceFieldProjectionContextImpl implements DistanceFieldProjectionContext {
+public class DistanceToFieldProjectionContextImpl implements DistanceToFieldProjectionContext {
 
-	private final DistanceFieldSearchProjectionBuilder distanceFieldProjectionBuilder;
+	private final DistanceToFieldSearchProjectionBuilder distanceFieldProjectionBuilder;
 
-	DistanceFieldProjectionContextImpl(SearchProjectionFactory factory, String absoluteFieldPath, GeoPoint center) {
+	DistanceToFieldProjectionContextImpl(SearchProjectionFactory factory, String absoluteFieldPath, GeoPoint center) {
 		this.distanceFieldProjectionBuilder = factory.distance( absoluteFieldPath, center );
 	}
 

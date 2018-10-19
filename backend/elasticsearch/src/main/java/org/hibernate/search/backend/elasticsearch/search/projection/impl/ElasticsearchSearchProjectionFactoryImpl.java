@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
@@ -61,8 +61,8 @@ public class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectio
 	}
 
 	@Override
-	public DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return new DistanceFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
+	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceToFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
 	}
 
 	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {

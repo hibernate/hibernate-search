@@ -8,19 +8,19 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DistanceFieldSearchProjectionBuilderImpl extends AbstractFieldSearchProjectionBuilderImpl<GeoPoint, Double>
-		implements DistanceFieldSearchProjectionBuilder {
+public class DistanceToFieldSearchProjectionBuilderImpl extends AbstractFieldSearchProjectionBuilderImpl<GeoPoint, Double>
+		implements DistanceToFieldSearchProjectionBuilder {
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public DistanceFieldSearchProjectionBuilderImpl(ElasticsearchSearchTargetModel searchTargetModel,
+	public DistanceToFieldSearchProjectionBuilderImpl(ElasticsearchSearchTargetModel searchTargetModel,
 			String absoluteFieldPath,
 			GeoPoint center) {
 		super( searchTargetModel, absoluteFieldPath, GeoPoint.class );
@@ -28,7 +28,7 @@ public class DistanceFieldSearchProjectionBuilderImpl extends AbstractFieldSearc
 	}
 
 	@Override
-	public DistanceFieldSearchProjectionBuilder unit(DistanceUnit unit) {
+	public DistanceToFieldSearchProjectionBuilder unit(DistanceUnit unit) {
 		this.unit = unit;
 		return this;
 	}
@@ -36,6 +36,6 @@ public class DistanceFieldSearchProjectionBuilderImpl extends AbstractFieldSearc
 	@Override
 	protected ElasticsearchSearchProjection<Double> createProjection(String absoluteFieldPath,
 			ElasticsearchIndexSchemaFieldNode<GeoPoint> schemaNode) {
-		return new DistanceFieldSearchProjectionImpl( absoluteFieldPath, center, unit );
+		return new DistanceToFieldSearchProjectionImpl( absoluteFieldPath, center, unit );
 	}
 }

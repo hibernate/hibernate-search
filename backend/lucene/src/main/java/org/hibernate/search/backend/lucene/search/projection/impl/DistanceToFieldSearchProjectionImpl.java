@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceFieldSearchProjectionImpl implements LuceneSearchProjection<Double> {
+class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Double> {
 
 	private final LuceneIndexSchemaFieldNode<GeoPoint> schemaNode;
 
@@ -26,7 +26,7 @@ class DistanceFieldSearchProjectionImpl implements LuceneSearchProjection<Double
 
 	private DistanceCollector distanceCollector;
 
-	DistanceFieldSearchProjectionImpl(LuceneIndexSchemaFieldNode<GeoPoint> schemaNode, GeoPoint center,
+	DistanceToFieldSearchProjectionImpl(LuceneIndexSchemaFieldNode<GeoPoint> schemaNode, GeoPoint center,
 			DistanceUnit unit) {
 		this.schemaNode = schemaNode;
 		this.center = center;

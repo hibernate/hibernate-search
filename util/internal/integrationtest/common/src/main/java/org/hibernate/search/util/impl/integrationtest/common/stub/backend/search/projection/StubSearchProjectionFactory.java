@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DistanceFieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
@@ -84,11 +84,11 @@ public class StubSearchProjectionFactory implements SearchProjectionFactory {
 	}
 
 	@Override
-	public DistanceFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return new DistanceFieldSearchProjectionBuilder() {
+	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceToFieldSearchProjectionBuilder() {
 
 			@Override
-			public DistanceFieldSearchProjectionBuilder unit(DistanceUnit unit) {
+			public DistanceToFieldSearchProjectionBuilder unit(DistanceUnit unit) {
 				return this;
 			}
 

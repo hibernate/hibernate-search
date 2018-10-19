@@ -11,7 +11,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 /**
  * The context used when starting to define a distance field projection.
  */
-public interface DistanceFieldProjectionContext extends SearchProjectionTerminalContext<Double> {
+public interface DistanceToFieldProjectionContext extends SearchProjectionTerminalContext<Double> {
 
 	/**
 	 * Defines the unit of the computed distance (default is meters).

@@ -85,5 +85,5 @@ public interface SearchProjectionContainerContext {
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	DistanceFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
 }
