@@ -50,8 +50,8 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	private class DefaultEnumFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, V> {
 
 		@Override
-		public Class<?> getConvertedType() {
-			return enumType;
+		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+			return superTypeCandidate.isAssignableFrom( enumType );
 		}
 
 		@Override

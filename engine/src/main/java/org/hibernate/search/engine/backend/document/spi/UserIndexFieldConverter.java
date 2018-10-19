@@ -84,6 +84,6 @@ public final class UserIndexFieldConverter<F> {
 			return projectionType.isAssignableFrom( indexFieldType );
 		}
 
-		return projectionType.isAssignableFrom( projectionFromIndexConverter.getConvertedType() );
+		return projectionFromIndexConverter.isConvertedTypeAssignableTo( projectionType );
 	}
 }

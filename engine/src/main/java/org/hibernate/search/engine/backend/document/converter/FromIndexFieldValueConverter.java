@@ -15,9 +15,15 @@ package org.hibernate.search.engine.backend.document.converter;
 public interface FromIndexFieldValueConverter<F, V> {
 
 	/**
-	 * @return The type of the converted value.
+	 * Check whether converted values can be assigned to the given type.
+	 * <p>
+	 * This method is generally implemented like this:
+	 * {@code return superTypeCandidate.isAssignableFrom( TheConvertedType.class )}.
+	 * @param superTypeCandidate A candidate type for assignment of converted values.
+	 * @return {@code true} if the converted type {@link V} is a subtype of {@code superTypeCandidate},
+	 * {@code false} otherwise.
 	 */
-	Class<?> getConvertedType();
+	boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate);
 
 	/**
 	 * @param value The index field value to convert.

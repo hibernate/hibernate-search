@@ -43,8 +43,8 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	private static class ISBNFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, ISBN> {
 
 		@Override
-		public Class<ISBN> getConvertedType() {
-			return ISBN.class;
+		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+			return superTypeCandidate.isAssignableFrom( ISBN.class );
 		}
 
 		@Override

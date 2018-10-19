@@ -22,8 +22,7 @@ public final class PassThroughFromIndexFieldValueConverter<F> implements FromInd
 	}
 
 	@Override
-	public Class<?> getConvertedType() {
-		return fieldType;
+	public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+		return superTypeCandidate.isAssignableFrom( fieldType );
 	}
-
 }

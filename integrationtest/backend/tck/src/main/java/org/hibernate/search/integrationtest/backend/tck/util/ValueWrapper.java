@@ -37,8 +37,8 @@ public final class ValueWrapper<T> {
 		return new FromIndexFieldValueConverter<T, ValueWrapper<T>>() {
 
 			@Override
-			public Class<?> getConvertedType() {
-				return ValueWrapper.class;
+			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
 			}
 
 			@Override
