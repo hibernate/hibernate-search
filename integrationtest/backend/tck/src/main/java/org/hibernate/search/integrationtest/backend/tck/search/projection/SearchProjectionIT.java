@@ -79,6 +79,18 @@ public class SearchProjectionIT {
 	}
 
 	@Test
+	public void field_noProjections() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections()
+				.predicate().matchAll().end()
+				.build();
+
+		assertThat( query ).hasHitCount( 4 );
+	}
+
+	@Test
 	public void field_single() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 

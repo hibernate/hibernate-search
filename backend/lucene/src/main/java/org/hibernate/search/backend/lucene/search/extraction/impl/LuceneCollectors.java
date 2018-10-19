@@ -27,12 +27,7 @@ public class LuceneCollectors {
 	}
 
 	public long getTotalHits() {
-		if ( topDocsCollector != null ) {
-			return topDocsCollector.getTotalHits();
-		}
-		else {
-			return totalHitCountCollector.getTotalHits();
-		}
+		return totalHitCountCollector.getTotalHits();
 	}
 
 	public TopDocs getTopDocs(long firstResultIndex, Long maxResultsCount) {

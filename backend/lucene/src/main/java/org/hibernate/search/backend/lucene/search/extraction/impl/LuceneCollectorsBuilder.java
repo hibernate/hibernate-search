@@ -17,7 +17,6 @@ import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.AssertionFailure;
 
 public class LuceneCollectorsBuilder {
 
@@ -34,16 +33,13 @@ public class LuceneCollectorsBuilder {
 	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
 		this.sort = sort;
 		this.maxDocs = maxDocs;
+
+		this.totalHitCountCollector = new TotalHitCountCollector();
+		this.luceneCollectors.add( this.totalHitCountCollector );
 	}
 
 	public void requireTopDocsCollector() {
-		if ( maxDocs == 0 ) {
-			if ( totalHitCountCollector == null ) {
-				totalHitCountCollector = new TotalHitCountCollector();
-				luceneCollectors.add( totalHitCountCollector );
-			}
-		}
-		else if ( topDocsCollector == null ) {
+		if ( maxDocs > 0 ) {
 			topDocsCollector = createTopDocsCollector( sort, maxDocs );
 			luceneCollectors.add( topDocsCollector );
 		}
@@ -60,14 +56,10 @@ public class LuceneCollectorsBuilder {
 	}
 
 	public LuceneCollectors build() {
-		if ( luceneCollectors.isEmpty() ) {
-			throw new AssertionFailure( "No collectors have been defined: we need at least one." );
-		}
-
 		Collector compositeCollector;
 
 		if ( luceneCollectors.size() == 1 ) {
-			compositeCollector = topDocsCollector != null ? topDocsCollector : totalHitCountCollector;
+			compositeCollector = luceneCollectors.get( 0 );
 		}
 		else {
 			compositeCollector = MultiCollector.wrap( luceneCollectors );
