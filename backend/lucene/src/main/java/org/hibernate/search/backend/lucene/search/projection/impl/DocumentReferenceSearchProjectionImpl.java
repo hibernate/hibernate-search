@@ -11,7 +11,6 @@ import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
@@ -28,13 +27,12 @@ class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<Do
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireTopDocsCollector();
+		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		absoluteFieldPaths.add( LuceneFields.indexFieldName() );
-		absoluteFieldPaths.add( LuceneFields.idFieldName() );
+		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
 	@Override

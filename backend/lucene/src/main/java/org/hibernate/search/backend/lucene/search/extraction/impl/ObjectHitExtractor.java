@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
+import java.util.Set;
+
 import org.apache.lucene.document.Document;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 
-public class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<LoadingHitCollector> {
+public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
 
 	private static final ObjectHitExtractor INSTANCE = new ObjectHitExtractor();
 
@@ -21,7 +23,17 @@ public class ObjectHitExtractor extends AbstractDocumentReferenceHitExtractor<Lo
 	}
 
 	@Override
+	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
+	}
+
+	@Override
+	public void contributeFields(Set<String> absoluteFieldPaths) {
+		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
+	}
+
+	@Override
 	public void extract(LoadingHitCollector collector, Document document, int docId, Float score) {
-		collector.collectForLoading( extractDocumentReference( document ) );
+		collector.collectForLoading( DocumentReferenceExtractorHelper.extractDocumentReference( document ) );
 	}
 }
