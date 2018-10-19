@@ -133,6 +133,27 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	}
 
 	@Test
+	public void distanceProjection_longCalculatedField() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+				.asProjections(
+						searchTarget.projection().field( "string", String.class ).toProjection(),
+						searchTarget.projection().distance( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
+								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 ) ).toProjection()
+				)
+				.predicate().matchAll().end()
+				.sort().byField( "string" ).onMissingValue().sortLast().asc().end()
+				.build();
+		SearchResult<List<?>> results = query.execute();
+
+		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 2 ), "L'ourson qui boit", 1, 2730d, Offset.offset( 10d ) );
+		checkResult( results.getHits().get( 3 ), null, 1, null, null );
+	}
+
+	@Test
 	public void distanceProjection_invalidType() {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );

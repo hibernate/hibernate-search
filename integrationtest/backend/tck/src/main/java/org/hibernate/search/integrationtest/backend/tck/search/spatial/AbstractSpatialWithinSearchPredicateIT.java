@@ -73,6 +73,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
 			indexAccessors.geoPoint_2.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
+			indexAccessors.geoPoint_with_longName.write( document, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
 			indexAccessors.string.write( document, IMOUTO_STRING );
@@ -81,6 +82,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
 			indexAccessors.geoPoint_2.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
+			indexAccessors.geoPoint_with_longName.write( document, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			indexAccessors.string.write( document, CHEZ_MARGOTTE_STRING );
@@ -89,6 +91,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
 			indexAccessors.geoPoint_2.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
+			indexAccessors.geoPoint_with_longName.write( document, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -107,12 +110,14 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 		final IndexFieldAccessor<GeoPoint> geoPoint_1;
 		final IndexFieldAccessor<GeoPoint> geoPoint_2;
+		final IndexFieldAccessor<GeoPoint> geoPoint_with_longName;
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
 			geoPoint = root.field( "geoPoint" ).asGeoPoint().createAccessor();
 			geoPoint_1 = root.field( "geoPoint_1" ).asGeoPoint().createAccessor();
 			geoPoint_2 = root.field( "geoPoint_2" ).asGeoPoint().createAccessor();
+			geoPoint_with_longName = root.field( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name" ).asGeoPoint().createAccessor();
 			string = root.field( "string" ).asString().store( Store.YES ).sortable( Sortable.YES ).createAccessor();
 		}
 	}
