@@ -8,17 +8,25 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
 class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
-	private final LuceneIndexSchemaFieldNode<T> schemaNode;
+	private final String absoluteFieldPath;
 
-	FieldSearchProjectionImpl(LuceneIndexSchemaFieldNode<T> schemaNode) {
-		this.schemaNode = schemaNode;
+	private final LuceneFieldCodec<T> codec;
+
+	private final LuceneFieldConverter<T, ?> converter;
+
+	FieldSearchProjectionImpl(String absoluteFieldPath, LuceneFieldCodec<T> codec,
+			LuceneFieldConverter<T, ?> converter) {
+		this.absoluteFieldPath = absoluteFieldPath;
+		this.codec = codec;
+		this.converter = converter;
 	}
 
 	@Override
@@ -28,25 +36,25 @@ class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		if ( schemaNode.getCodec().getOverriddenStoredFields().isEmpty() ) {
-			absoluteFieldPaths.add( schemaNode.getAbsoluteFieldPath() );
+		if ( codec.getOverriddenStoredFields().isEmpty() ) {
+			absoluteFieldPaths.add( absoluteFieldPath );
 		}
 		else {
-			absoluteFieldPaths.addAll( schemaNode.getCodec().getOverriddenStoredFields() );
+			absoluteFieldPaths.addAll( codec.getOverriddenStoredFields() );
 		}
 	}
 
 	@Override
 	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
-		T rawValue = schemaNode.getCodec().decode( documentResult.getDocument(), schemaNode.getAbsoluteFieldPath() );
-		collector.collectProjection( schemaNode.getConverter().convertFromProjection( rawValue ) );
+		T rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
+		collector.collectProjection( converter.convertFromProjection( rawValue ) );
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( schemaNode.getAbsoluteFieldPath() )
+				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
 				.append( "]" );
 		return sb.toString();
 	}

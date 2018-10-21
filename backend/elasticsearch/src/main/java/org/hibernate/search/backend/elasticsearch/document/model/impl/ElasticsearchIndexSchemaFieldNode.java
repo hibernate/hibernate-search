@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 
 /**
  * @author Yoann Rodiere
@@ -24,14 +25,18 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	private final ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory;
 
+	private final ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory;
+
 	public ElasticsearchIndexSchemaFieldNode(ElasticsearchIndexSchemaObjectNode parent,
 			ElasticsearchFieldConverter converter,
 			ElasticsearchFieldCodec<F> codec,
-			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory) {
+			ElasticsearchFieldPredicateBuilderFactory predicateBuilderFactory,
+			ElasticsearchFieldProjectionBuilderFactory projectionBuilderFactory) {
 		this.parent = parent;
 		this.converter = converter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
+		this.projectionBuilderFactory = projectionBuilderFactory;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getParent() {
@@ -50,10 +55,15 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 		return predicateBuilderFactory;
 	}
 
+	public ElasticsearchFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+		return projectionBuilderFactory;
+	}
+
 	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode<?> other) {
 		return converter.isDslCompatibleWith( other.converter )
 				&& Objects.equals( codec, other.codec )
-				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory );
+				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
+				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );
 	}
 
 	@Override
@@ -62,6 +72,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 				.append( "parent=" ).append( parent )
 				.append( ", converter=" ).append( converter )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
+				.append( ", projectionBuilderFactory=" ).append( projectionBuilderFactory )
 				.append( "]" );
 		return sb.toString();
 	}

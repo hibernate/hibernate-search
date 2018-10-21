@@ -6,23 +6,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 
 
-public class FieldSearchProjectionBuilderImpl<T> extends AbstractFieldSearchProjectionBuilderImpl<T, T>
-		implements FieldSearchProjectionBuilder<T> {
+public class FieldSearchProjectionBuilderImpl<T> implements FieldSearchProjectionBuilder<T> {
 
-	public FieldSearchProjectionBuilderImpl(ElasticsearchSearchTargetModel searchTargetModel,
-			String absoluteFieldPath,
-			Class<T> type) {
-		super( searchTargetModel, absoluteFieldPath, type );
+	private final String absoluteFieldPath;
+
+	private final ElasticsearchFieldConverter converter;
+
+	public FieldSearchProjectionBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+		this.absoluteFieldPath = absoluteFieldPath;
+		this.converter = converter;
 	}
 
 	@Override
-	protected ElasticsearchSearchProjection<T> createProjection(String absoluteFieldPath,
-			ElasticsearchIndexSchemaFieldNode<T> schemaNode) {
-		return new FieldSearchProjectionImpl<>( absoluteFieldPath, schemaNode.getConverter() );
+	public SearchProjection<T> build() {
+		return new FieldSearchProjectionImpl<>( absoluteFieldPath, converter );
 	}
 }

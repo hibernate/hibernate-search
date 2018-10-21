@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -36,9 +37,18 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 		return DocumentReferenceSearchProjectionBuilderImpl.get();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
-		return new FieldSearchProjectionBuilderImpl<>( searchTargetModel, absoluteFieldPath, clazz );
+		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		if ( !schemaNode.getConverter().isProjectionCompatibleWith( clazz ) ) {
+			throw log.invalidProjectionInvalidType( absoluteFieldPath, clazz,
+					searchTargetModel.getIndexesEventContext() );
+		}
+
+		return (FieldSearchProjectionBuilder<T>) schemaNode.getProjectionBuilderFactory()
+				.createFieldValueProjectionBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -58,7 +68,10 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 
 	@Override
 	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return new DistanceToFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
+		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		return schemaNode.getProjectionBuilderFactory()
+				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
 	public LuceneSearchProjection<?> toImplementation(SearchProjection<?> projection) {

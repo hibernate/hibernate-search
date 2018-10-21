@@ -248,10 +248,6 @@ public interface Log extends BasicLogger {
 	SearchException cannotMixLuceneSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget,
 			LuceneIndexManager otherTarget, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 26,
-			value = "Invalid projection on unknown field '%1$s'.")
-	SearchException invalidProjectionUnknownField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "An IOException happened while executing the query '%1$s'.")
 	SearchException ioExceptionOnQueryExecution(Query luceneQuery, @Param EventContext context, @Cause IOException e);
@@ -373,4 +369,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> type,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 57, value = "This field does not support projections.")
+	SearchException unsupportedDSLProjections(@Param EventContext context);
 }

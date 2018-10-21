@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.IntegerFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.IntegerFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortContributor;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -40,13 +41,16 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		IntegerFieldCodec codec = new IntegerFieldCodec( getStore(), sortable );
+
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
 				converter,
-				new IntegerFieldCodec( getStore(), sortable ),
+				codec,
 				new IntegerFieldPredicateBuilderFactory( converter ),
-				IntegerFieldSortContributor.INSTANCE
+				IntegerFieldSortContributor.INSTANCE,
+				new StandardFieldProjectionBuilderFactory<>( codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

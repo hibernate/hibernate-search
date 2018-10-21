@@ -156,7 +156,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	@Test
 	public void distanceProjection_invalidType() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid type" );
+		thrown.expectMessage( "Distance related operations are not supported" );
 		thrown.expectMessage( "string" );
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -18,6 +16,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.GeoPointFieldProjectionBuilderFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
@@ -46,8 +47,11 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 				helper.createUserIndexFieldConverter(),
 				GeoPointFieldCodec.INSTANCE
 		);
+
 		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, GeoPointFieldCodec.INSTANCE, GeoPointFieldPredicateBuilderFactory.INSTANCE
+				parentNode, converter, GeoPointFieldCodec.INSTANCE,
+				GeoPointFieldPredicateBuilderFactory.INSTANCE,
+				new GeoPointFieldProjectionBuilderFactory( converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

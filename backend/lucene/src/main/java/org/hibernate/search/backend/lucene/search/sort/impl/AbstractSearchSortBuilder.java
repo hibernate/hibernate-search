@@ -22,6 +22,7 @@ abstract class AbstractSearchSortBuilder implements SearchSortBuilder<LuceneSear
 		return this;
 	}
 
+	@Override
 	public void order(SortOrder order) {
 		this.order = order;
 	}

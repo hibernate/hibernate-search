@@ -6,21 +6,28 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 
-public class FieldSearchProjectionBuilderImpl<T> extends AbstractFieldSearchProjectionBuilderImpl<T, T>
-		implements FieldSearchProjectionBuilder<T> {
+public class FieldSearchProjectionBuilderImpl<T> implements FieldSearchProjectionBuilder<T> {
 
-	public FieldSearchProjectionBuilderImpl(LuceneSearchTargetModel searchTargetModel,
-			String absoluteFieldPath,
-			Class<T> type) {
-		super( searchTargetModel, absoluteFieldPath, type );
+	private final String absoluteFieldPath;
+
+	private final LuceneFieldCodec<T> codec;
+
+	private final LuceneFieldConverter<T, ?> converter;
+
+	public FieldSearchProjectionBuilderImpl(String absoluteFieldPath, LuceneFieldCodec<T> codec,
+			LuceneFieldConverter<T, ?> converter) {
+		this.absoluteFieldPath = absoluteFieldPath;
+		this.codec = codec;
+		this.converter = converter;
 	}
 
 	@Override
-	protected LuceneSearchProjection<T> createProjection(LuceneIndexSchemaFieldNode<T> schemaNode) {
-		return new FieldSearchProjectionImpl<>( (LuceneIndexSchemaFieldNode<T>) schemaNode );
+	public SearchProjection<T> build() {
+		return new FieldSearchProjectionImpl<>( absoluteFieldPath, codec, converter );
 	}
 }

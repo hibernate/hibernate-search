@@ -8,17 +8,16 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Double> {
 
-	private final LuceneIndexSchemaFieldNode<GeoPoint> schemaNode;
+	private final String absoluteFieldPath;
 
 	private final GeoPoint center;
 
@@ -26,21 +25,20 @@ class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Doub
 
 	private DistanceCollector distanceCollector;
 
-	DistanceToFieldSearchProjectionImpl(LuceneIndexSchemaFieldNode<GeoPoint> schemaNode, GeoPoint center,
-			DistanceUnit unit) {
-		this.schemaNode = schemaNode;
+	DistanceToFieldSearchProjectionImpl(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 		this.unit = unit;
 	}
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		this.distanceCollector = luceneCollectorBuilder.addDistanceCollector( schemaNode.getAbsoluteFieldPath(), center );
+		this.distanceCollector = luceneCollectorBuilder.addDistanceCollector( absoluteFieldPath, center );
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		absoluteFieldPaths.add( schemaNode.getAbsoluteFieldPath() );
+		absoluteFieldPaths.add( absoluteFieldPath );
 	}
 
 	@Override
@@ -52,7 +50,7 @@ class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Doub
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "absoluteFieldPath=" ).append( schemaNode.getAbsoluteFieldPath() )
+				.append( "absoluteFieldPath=" ).append( absoluteFieldPath )
 				.append( ", center=" ).append( center )
 				.append( "]" );
 		return sb.toString();

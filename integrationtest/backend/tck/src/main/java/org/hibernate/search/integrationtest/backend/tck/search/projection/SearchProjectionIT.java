@@ -387,7 +387,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid projection on unknown field" );
+		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "unknownField" );
 		thrown.expectMessage( INDEX_NAME );
 
@@ -402,7 +402,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid projection on unknown field" );
+		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "nestedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
@@ -417,7 +417,7 @@ public class SearchProjectionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid projection on unknown field" );
+		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "flattenedObject" );
 		thrown.expectMessage( INDEX_NAME );
 

@@ -18,7 +18,9 @@ public interface LuceneFieldSortContributor {
 
 	// equals()/hashCode() needs to be implemented if the sort contributor is not a singleton
 
+	@Override
 	boolean equals(Object obj);
 
+	@Override
 	int hashCode();
 }

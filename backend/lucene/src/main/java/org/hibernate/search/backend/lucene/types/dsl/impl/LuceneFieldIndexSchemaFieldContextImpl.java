@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
@@ -20,6 +15,12 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.AssertionFailure;
 
 /**
@@ -72,13 +73,17 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
+		StandardFieldConverter<F> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
+
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				relativeFieldName,
-				new StandardFieldConverter<>( helper.createUserIndexFieldConverter() ),
-				new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor ),
+				converter,
+				codec,
 				null,
-				null
+				null,
+				new StandardFieldProjectionBuilderFactory<>( codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

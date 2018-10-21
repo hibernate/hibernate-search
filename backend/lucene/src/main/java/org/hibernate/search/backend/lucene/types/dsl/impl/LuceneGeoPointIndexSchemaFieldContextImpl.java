@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.GeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.GeoPointFieldSortContributor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -40,13 +41,19 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
+				helper.createUserIndexFieldConverter() );
+		GeoPointFieldCodec codec = new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
+				getStore(), sortable );
+
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				new StandardFieldConverter<>( helper.createUserIndexFieldConverter() ),
-				new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ), getStore(), sortable ),
+				converter,
+				codec,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				GeoPointFieldSortContributor.INSTANCE
+				GeoPointFieldSortContributor.INSTANCE,
+				new GeoPointFieldProjectionBuilderFactory<>( codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

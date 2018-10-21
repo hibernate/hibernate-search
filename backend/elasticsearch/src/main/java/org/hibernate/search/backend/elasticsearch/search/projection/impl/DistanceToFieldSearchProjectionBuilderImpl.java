@@ -6,24 +6,22 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DistanceToFieldSearchProjectionBuilderImpl extends AbstractFieldSearchProjectionBuilderImpl<GeoPoint, Double>
-		implements DistanceToFieldSearchProjectionBuilder {
+public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFieldSearchProjectionBuilder {
+
+	private final String absoluteFieldPath;
 
 	private final GeoPoint center;
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public DistanceToFieldSearchProjectionBuilderImpl(ElasticsearchSearchTargetModel searchTargetModel,
-			String absoluteFieldPath,
-			GeoPoint center) {
-		super( searchTargetModel, absoluteFieldPath, GeoPoint.class );
+	public DistanceToFieldSearchProjectionBuilderImpl(String absoluteFieldPath, GeoPoint center) {
+		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 	}
 
@@ -34,8 +32,7 @@ public class DistanceToFieldSearchProjectionBuilderImpl extends AbstractFieldSea
 	}
 
 	@Override
-	protected ElasticsearchSearchProjection<Double> createProjection(String absoluteFieldPath,
-			ElasticsearchIndexSchemaFieldNode<GeoPoint> schemaNode) {
+	public SearchProjection<Double> build() {
 		return new DistanceToFieldSearchProjectionImpl( absoluteFieldPath, center, unit );
 	}
 }

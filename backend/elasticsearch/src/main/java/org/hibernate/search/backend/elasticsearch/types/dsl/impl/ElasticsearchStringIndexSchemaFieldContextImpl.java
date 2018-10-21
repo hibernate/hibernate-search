@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
@@ -85,7 +86,8 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 		);
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, StringFieldCodec.INSTANCE,
-				new StandardFieldPredicateBuilderFactory( converter )
+				new StandardFieldPredicateBuilderFactory( converter ),
+				new StandardFieldProjectionBuilderFactory( converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

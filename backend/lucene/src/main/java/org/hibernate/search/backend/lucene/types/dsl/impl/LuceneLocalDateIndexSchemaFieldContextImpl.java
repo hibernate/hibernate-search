@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.LocalDateFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LocalDateFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortContributor;
 
 /**
@@ -42,13 +43,16 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 	protected void contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		LocalDateFieldConverter converter = new LocalDateFieldConverter( helper.createUserIndexFieldConverter() );
+		LocalDateFieldCodec codec = new LocalDateFieldCodec( getStore(), sortable );
+
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
 				converter,
-				new LocalDateFieldCodec( getStore(), sortable ),
+				codec,
 				new LocalDateFieldPredicateBuilderFactory( converter ),
-				LocalDateFieldSortContributor.INSTANCE
+				LocalDateFieldSortContributor.INSTANCE,
+				new StandardFieldProjectionBuilderFactory<>( codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

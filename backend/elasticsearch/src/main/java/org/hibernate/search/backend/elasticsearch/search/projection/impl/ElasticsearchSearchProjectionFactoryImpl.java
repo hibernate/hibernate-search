@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -40,9 +41,18 @@ public class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectio
 		return searchProjectionBackendContext.getDocumentReferenceProjectionBuilder();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
-		return new FieldSearchProjectionBuilderImpl<>( searchTargetModel, absoluteFieldPath, clazz );
+		ElasticsearchIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		if ( !schemaNode.getConverter().isProjectionCompatibleWith( clazz ) ) {
+			throw log.invalidProjectionInvalidType( absoluteFieldPath, clazz,
+					searchTargetModel.getIndexesEventContext() );
+		}
+
+		return (FieldSearchProjectionBuilder<T>) schemaNode.getProjectionBuilderFactory()
+				.createFieldValueProjectionBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -62,7 +72,10 @@ public class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectio
 
 	@Override
 	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return new DistanceToFieldSearchProjectionBuilderImpl( searchTargetModel, absoluteFieldPath, center );
+		ElasticsearchIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		return schemaNode.getProjectionBuilderFactory()
+				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
 	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {

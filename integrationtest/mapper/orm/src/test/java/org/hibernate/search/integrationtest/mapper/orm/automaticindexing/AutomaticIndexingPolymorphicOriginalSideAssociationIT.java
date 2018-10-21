@@ -230,6 +230,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 			return containedSingle;
 		}
 
+		@Override
 		public void setContainedSingle(ContainedEntity containedSingle) {
 			this.containedSingle = containedSingle;
 		}
@@ -250,6 +251,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 			return containedSingle;
 		}
 
+		@Override
 		public void setContainedSingle(ContainedEntity containedSingle) {
 			this.containedSingle = containedSingle;
 		}

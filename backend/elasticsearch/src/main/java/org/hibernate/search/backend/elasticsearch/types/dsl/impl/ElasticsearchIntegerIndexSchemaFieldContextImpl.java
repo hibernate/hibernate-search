@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.IntegerFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 
 import com.google.gson.JsonElement;
 
@@ -45,10 +46,11 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl
 				helper.createUserIndexFieldConverter(),
 				IntegerFieldCodec.INSTANCE
 		);
-		StandardFieldPredicateBuilderFactory predicateBuilderFactory =
-				new StandardFieldPredicateBuilderFactory( converter );
+
 		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, IntegerFieldCodec.INSTANCE, predicateBuilderFactory
+				parentNode, converter, IntegerFieldCodec.INSTANCE,
+				new StandardFieldPredicateBuilderFactory( converter ),
+				new StandardFieldProjectionBuilderFactory( converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

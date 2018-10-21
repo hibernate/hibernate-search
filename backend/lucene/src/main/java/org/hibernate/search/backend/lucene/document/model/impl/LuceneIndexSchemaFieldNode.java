@@ -13,9 +13,10 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
-import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -39,9 +40,12 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final LuceneFieldSortContributor sortContributor;
 
+	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
+
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
 			LuceneFieldConverter<F, ?> converter, LuceneFieldCodec<F> codec,
-			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor) {
+			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor,
+			LuceneFieldProjectionBuilderFactory projectionBuilderFactory) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
@@ -49,6 +53,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortContributor = sortContributor;
+		this.projectionBuilderFactory = projectionBuilderFactory;
 	}
 
 	public LuceneIndexSchemaObjectNode getParent() {
@@ -85,11 +90,19 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return sortContributor;
 	}
 
+	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
+		if ( projectionBuilderFactory == null ) {
+			throw log.unsupportedDSLProjections( getEventContext() );
+		}
+		return projectionBuilderFactory;
+	}
+
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
 		return converter.isDslCompatibleWith( other.converter )
 				&& Objects.equals( codec, other.codec )
 				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
-				&& Objects.equals( sortContributor, other.sortContributor );
+				&& Objects.equals( sortContributor, other.sortContributor )
+				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );
 	}
 
 	@Override
@@ -101,6 +114,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
 				.append( ", sortContributor=" ).append( sortContributor )
+				.append( ", projectionBuilderFactory=" ).append( projectionBuilderFactory )
 				.append( "]" );
 		return sb.toString();
 	}
