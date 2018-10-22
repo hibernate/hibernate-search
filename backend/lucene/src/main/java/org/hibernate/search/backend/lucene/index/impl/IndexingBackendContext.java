@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuild
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
 
 import org.apache.lucene.store.Directory;
@@ -50,7 +50,7 @@ public class IndexingBackendContext {
 
 	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, SessionContext sessionContext) {
+			String indexName, SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexWorkPlan( workFactory, multiTenancyStrategy, orchestrator,

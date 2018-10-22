@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrc
 import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
@@ -48,7 +48,7 @@ public class SearchBackendContext {
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			LuceneSearchTargetModel searchTargetModel,
-			SessionContext sessionContext,
+			SessionContextImplementor sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );

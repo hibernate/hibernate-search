@@ -11,12 +11,11 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -46,13 +45,13 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoWorkPlan createWorkPlan(PojoSessionContext sessionContext) {
+	public PojoWorkPlan createWorkPlan(PojoSessionContextImplementor sessionContext) {
 		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
 	}
 
 	@Override
 	public <T> PojoSearchTargetDelegate<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes,
-			SessionContext sessionContext) {
+			PojoSessionContextImplementor sessionContext) {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();
 		}

@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -68,7 +68,7 @@ public class LuceneSearchMultiIndexIT {
 	private IndexAccessors_1_2 indexAccessors_1_2;
 	private MappedIndexManager<?> indexManager_1_2;
 
-	private SessionContext sessionContext = new StubSessionContext();
+	private SessionContextImplementor sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {

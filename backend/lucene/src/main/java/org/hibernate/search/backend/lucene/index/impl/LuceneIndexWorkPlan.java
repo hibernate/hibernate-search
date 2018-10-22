@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 
 /**
@@ -37,7 +37,7 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 
 	LuceneIndexWorkPlan(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
-			String indexName, SessionContext sessionContext) {
+			String indexName, SessionContextImplementor sessionContext) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;

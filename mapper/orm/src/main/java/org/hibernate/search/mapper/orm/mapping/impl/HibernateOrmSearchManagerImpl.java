@@ -12,12 +12,12 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
+import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		implements HibernateOrmSearchManager {
@@ -45,13 +45,8 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		}
 
 		@Override
-		protected String getTenantId() {
-			return sessionImplementor.getTenantIdentifier();
-		}
-
-		@Override
-		protected PojoRuntimeIntrospector getRuntimeIntrospector() {
-			return new HibernateOrmRuntimeIntrospector( sessionImplementor );
+		protected PojoSessionContextImplementor buildSessionContext() {
+			return new HibernateOrmSessionContextImpl( sessionImplementor );
 		}
 
 		@Override

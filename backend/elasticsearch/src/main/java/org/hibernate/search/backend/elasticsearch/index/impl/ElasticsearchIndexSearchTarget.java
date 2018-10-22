@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -41,7 +41,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 
 	@Override
 	public <R, O> SearchQueryResultDefinitionContext<R, O> query(
-			SessionContext context,
+			SessionContextImplementor context,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {
 		return new SearchQueryResultDefinitionContextImpl<>( searchTargetContext, context,

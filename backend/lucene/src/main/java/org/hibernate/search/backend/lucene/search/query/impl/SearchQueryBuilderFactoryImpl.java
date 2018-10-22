@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtra
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
@@ -44,19 +44,19 @@ class SearchQueryBuilderFactoryImpl
 
 	@Override
 	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObjects(
-			SessionContext sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return createSearchQueryBuilder( sessionContext, ObjectHitExtractor.get(), hitAggregator );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReferences(
-			SessionContext sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return createSearchQueryBuilder( sessionContext, ReferenceHitExtractor.get(), hitAggregator );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asProjections(
-			SessionContext sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
+			SessionContextImplementor sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
 			SearchProjection<?>... projections) {
 		HitExtractor<? super ProjectionHitCollector> hitExtractor = createProjectionHitExtractor( projections );
 
@@ -78,7 +78,7 @@ class SearchQueryBuilderFactoryImpl
 	}
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
-			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchTargetModel, sessionContext, hitExtractor, hitAggregator
 		);

@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
  * @param <E> The contained entity type.
@@ -25,7 +25,7 @@ class PojoContainedTypeWorkPlan<E> extends PojoTypeWorkPlan {
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, PojoSessionContext sessionContext) {
+	PojoContainedTypeWorkPlan(PojoContainedTypeManager<E> typeManager, PojoSessionContextImplementor sessionContext) {
 		super( sessionContext );
 		this.typeManager = typeManager;
 	}

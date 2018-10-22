@@ -13,8 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoSessionContextImpl;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 
 /**
@@ -23,12 +22,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 
 	private final PojoMappingDelegate mappingDelegate;
-	private final PojoSessionContext sessionContext;
+	private final PojoSessionContextImplementor sessionContext;
 	private PojoWorkPlan workPlan;
 
 	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManager> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
-		this.sessionContext = new PojoSessionContextImpl( builder.getRuntimeIntrospector(), builder.getTenantId() );
+		this.sessionContext = builder.buildSessionContext();
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 		return mappingDelegate;
 	}
 
-	protected final PojoSessionContext getSessionContext() {
+	protected final PojoSessionContextImplementor getSessionContext() {
 		return sessionContext;
 	}
 
@@ -79,9 +78,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 			this.mappingDelegate = mappingDelegate;
 		}
 
-		protected abstract PojoRuntimeIntrospector getRuntimeIntrospector();
-
-		protected abstract String getTenantId();
+		protected abstract PojoSessionContextImplementor buildSessionContext();
 
 		@Override
 		public abstract T build();

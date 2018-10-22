@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -92,7 +92,7 @@ public class SearchMultiIndexIT {
 	private IndexAccessors_2_1 indexAccessors_2_1;
 	private MappedIndexManager<?> indexManager_2_1;
 
-	private SessionContext sessionContext = new StubSessionContext();
+	private SessionContextImplementor sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {

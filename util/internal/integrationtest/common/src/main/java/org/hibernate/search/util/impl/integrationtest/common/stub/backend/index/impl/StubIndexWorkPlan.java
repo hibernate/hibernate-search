@@ -13,20 +13,20 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
 class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	private final StubIndexManager indexManager;
-	private final SessionContext sessionContext;
+	private final SessionContextImplementor sessionContext;
 
 	private final List<StubIndexWork> works = new ArrayList<>();
 
 	private int preparedIndex = 0;
 
-	StubIndexWorkPlan(StubIndexManager indexManager, SessionContext sessionContext) {
+	StubIndexWorkPlan(StubIndexManager indexManager, SessionContextImplementor sessionContext) {
 		this.sessionContext = sessionContext;
 		this.indexManager = indexManager;
 	}

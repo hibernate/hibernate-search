@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import java.util.List;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
@@ -30,19 +30,19 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObjects(SessionContext sessionContext,
+	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObjects(SessionContextImplementor sessionContext,
 			HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.OBJECTS, hitAggregator );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReferences(SessionContext sessionContext,
+	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReferences(SessionContextImplementor sessionContext,
 			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.REFERENCES, hitAggregator );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjections(SessionContext sessionContext,
+	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjections(SessionContextImplementor sessionContext,
 			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.PROJECTIONS, hitAggregator );
 	}

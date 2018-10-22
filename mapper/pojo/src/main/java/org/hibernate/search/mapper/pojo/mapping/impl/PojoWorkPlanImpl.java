@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -28,7 +28,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
-	private final PojoSessionContext sessionContext;
+	private final PojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -37,7 +37,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
-			PojoSessionContext sessionContext) {
+			PojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 		this.sessionContext = sessionContext;

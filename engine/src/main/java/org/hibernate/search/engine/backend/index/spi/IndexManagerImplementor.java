@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
  * The object responsible for applying works and searches to a full-text index.
@@ -22,7 +22,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 */
 	IndexManager toAPI();
 
-	IndexWorkPlan<D> createWorkPlan(SessionContext sessionContext);
+	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
 	IndexSearchTargetBuilder createSearchTargetBuilder();
 

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElastic
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
 
 public class IndexingBackendContext {
@@ -69,7 +69,7 @@ public class IndexingBackendContext {
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
-			SessionContext sessionContext) {
+			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkPlan( workFactory, multiTenancyStrategy, orchestrator,

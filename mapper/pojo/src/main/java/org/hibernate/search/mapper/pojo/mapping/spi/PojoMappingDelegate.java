@@ -8,18 +8,18 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 public interface PojoMappingDelegate extends PojoMapping, AutoCloseable {
 
 	@Override
 	void close();
 
-	PojoWorkPlan createWorkPlan(PojoSessionContext sessionContext);
+	PojoWorkPlan createWorkPlan(PojoSessionContextImplementor sessionContext);
 
 	<T> PojoSearchTargetDelegate<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes,
-			SessionContext sessionContext);
+			PojoSessionContextImplementor sessionContext);
 
 }

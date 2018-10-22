@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
@@ -18,11 +18,12 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface IndexSearchTarget {
 
-	default SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(SessionContext context) {
+	default SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(
+			SessionContextImplementor context) {
 		return query( context, Function.identity(), ObjectLoader.identity() );
 	}
 
-	<R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContext context,
+	<R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContextImplementor context,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader);
 

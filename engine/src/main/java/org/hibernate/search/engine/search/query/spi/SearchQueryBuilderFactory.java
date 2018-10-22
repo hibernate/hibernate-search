@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.query.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 
 /**
@@ -21,13 +21,13 @@ import org.hibernate.search.engine.search.SearchProjection;
  */
 public interface SearchQueryBuilderFactory<C> {
 
-	<O> SearchQueryBuilder<O, C> asObjects(SessionContext sessionContext,
+	<O> SearchQueryBuilder<O, C> asObjects(SessionContextImplementor sessionContext,
 			HitAggregator<LoadingHitCollector, List<O>> hitAggregator);
 
-	<T> SearchQueryBuilder<T, C> asReferences(SessionContext sessionContext,
+	<T> SearchQueryBuilder<T, C> asReferences(SessionContextImplementor sessionContext,
 			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator);
 
-	<T> SearchQueryBuilder<T, C> asProjections(SessionContext sessionContext,
+	<T> SearchQueryBuilder<T, C> asProjections(SessionContextImplementor sessionContext,
 			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projection);
 
 }

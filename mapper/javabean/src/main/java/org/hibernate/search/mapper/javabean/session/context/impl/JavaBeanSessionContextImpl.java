@@ -4,22 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.mapping.impl;
+package org.hibernate.search.mapper.javabean.session.context.impl;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class PojoSessionContextImpl implements PojoSessionContext {
-	private final PojoRuntimeIntrospector proxyIntrospector;
+public class JavaBeanSessionContextImpl implements PojoSessionContextImplementor {
 	private final String tenantId;
+	private final PojoRuntimeIntrospector proxyIntrospector;
 
-	public PojoSessionContextImpl(PojoRuntimeIntrospector proxyIntrospector, String tenantId) {
-		this.proxyIntrospector = proxyIntrospector;
+	public JavaBeanSessionContextImpl(String tenantId, PojoRuntimeIntrospector proxyIntrospector) {
 		this.tenantId = tenantId;
+		this.proxyIntrospector = proxyIntrospector;
 	}
 
 	@Override

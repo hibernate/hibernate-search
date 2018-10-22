@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchTargetContext;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -40,7 +40,7 @@ class LuceneIndexSearchTarget extends IndexSearchTargetBase {
 
 	@Override
 	public <R, O> SearchQueryResultDefinitionContext<R, O> query(
-			SessionContext context,
+			SessionContextImplementor context,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {
 		return new SearchQueryResultDefinitionContextImpl<>( searchTargetContext, context,

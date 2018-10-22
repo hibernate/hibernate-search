@@ -9,13 +9,15 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.javabean.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
+public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 	private JavaBeanSearchManagerImpl(Builder builder) {
 		super( builder );
 	}
@@ -25,7 +27,7 @@ class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 		return getMappingDelegate().createPojoSearchTarget( targetedTypes, getSessionContext() );
 	}
 
-	static class Builder extends AbstractBuilder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {
+	public static class Builder extends AbstractBuilder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {
 		private String tenantId;
 
 		public Builder(PojoMappingDelegate mappingDelegate) {
@@ -39,13 +41,8 @@ class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 		}
 
 		@Override
-		protected PojoRuntimeIntrospector getRuntimeIntrospector() {
-			return PojoRuntimeIntrospector.noProxy();
-		}
-
-		@Override
-		protected String getTenantId() {
-			return tenantId;
+		protected PojoSessionContextImplementor buildSessionContext() {
+			return new JavaBeanSessionContextImpl( tenantId, PojoRuntimeIntrospector.noProxy() );
 		}
 
 		@Override

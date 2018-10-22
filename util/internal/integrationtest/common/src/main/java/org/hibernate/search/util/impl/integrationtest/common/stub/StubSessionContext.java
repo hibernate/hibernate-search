@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
-public class StubSessionContext implements SessionContext {
+public class StubSessionContext implements SessionContextImplementor {
 
 	private final String tenantIdentifier;
 

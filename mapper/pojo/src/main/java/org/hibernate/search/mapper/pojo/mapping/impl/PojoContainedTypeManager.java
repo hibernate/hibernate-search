@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
@@ -45,9 +45,9 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
-	Supplier<E> toEntitySupplier(PojoSessionContext sessionContext, Object entity) {
-		PojoRuntimeIntrospector proxyIntrospector = sessionContext.getRuntimeIntrospector();
-		return new CachingCastingEntitySupplier<>( caster, proxyIntrospector, entity );
+	Supplier<E> toEntitySupplier(PojoSessionContextImplementor sessionContext, Object entity) {
+		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
+		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
@@ -57,7 +57,7 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 		);
 	}
 
-	PojoContainedTypeWorkPlan<E> createWorkPlan(PojoSessionContext sessionContext) {
+	PojoContainedTypeWorkPlan<E> createWorkPlan(PojoSessionContextImplementor sessionContext) {
 		return new PojoContainedTypeWorkPlan<>(
 				this, sessionContext
 		);

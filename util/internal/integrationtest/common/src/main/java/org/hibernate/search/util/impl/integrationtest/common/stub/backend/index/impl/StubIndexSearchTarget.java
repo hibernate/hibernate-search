@@ -14,7 +14,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -41,7 +41,7 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 	}
 
 	@Override
-	public <R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContext context,
+	public <R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContextImplementor context,
 			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
 		return new SearchQueryResultDefinitionContextImpl<>( this, context,
 				documentReferenceTransformer, objectLoader );

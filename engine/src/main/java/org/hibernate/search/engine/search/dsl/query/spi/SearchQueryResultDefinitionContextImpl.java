@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.query.spi;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -31,14 +31,14 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 
 	private final SearchTargetContext<C> targetContext;
 
-	private final SessionContext sessionContext;
+	private final SessionContextImplementor sessionContext;
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
 
 	private final ObjectLoader<R, O> objectLoader;
 
 	public SearchQueryResultDefinitionContextImpl(SearchTargetContext<C> targetContext,
-			SessionContext sessionContext,
+			SessionContextImplementor sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {
 		this.targetContext = targetContext;

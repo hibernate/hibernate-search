@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -44,7 +44,7 @@ class SearchQueryBuilderImpl<C, T>
 			LuceneQueryWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
 			LuceneSearchTargetModel searchTargetModel,
-			SessionContext sessionContext,
+			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {

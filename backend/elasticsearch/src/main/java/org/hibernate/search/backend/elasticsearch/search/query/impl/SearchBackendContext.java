@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.search.extraction.impl.Referen
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.util.EventContext;
 
@@ -78,7 +78,7 @@ public class SearchBackendContext {
 
 	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
 			Set<URLEncodedString> indexNames,
-			SessionContext sessionContext,
+			SessionContextImplementor sessionContext,
 			HitExtractor<? super C> hitExtractor,
 			HitAggregator<C, List<T>> hitAggregator) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );

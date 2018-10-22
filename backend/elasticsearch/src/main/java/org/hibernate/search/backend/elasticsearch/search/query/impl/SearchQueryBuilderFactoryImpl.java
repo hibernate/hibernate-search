@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtr
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
@@ -41,7 +41,7 @@ class SearchQueryBuilderFactoryImpl
 
 	@Override
 	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObjects(
-			SessionContext sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return createSearchQueryBuilder(
 				sessionContext, searchBackendContext.getObjectHitExtractor(), hitAggregator
 		);
@@ -49,7 +49,7 @@ class SearchQueryBuilderFactoryImpl
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
-			SessionContext sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return createSearchQueryBuilder(
 				sessionContext, searchBackendContext.getReferenceHitExtractor(), hitAggregator
 		);
@@ -57,7 +57,7 @@ class SearchQueryBuilderFactoryImpl
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjections(
-			SessionContext sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
+			SessionContextImplementor sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
 			SearchProjection<?>... projections) {
 		HitExtractor<? super ProjectionHitCollector> hitExtractor = createProjectionHitExtractor( projections );
 
@@ -79,7 +79,7 @@ class SearchQueryBuilderFactoryImpl
 	}
 
 	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
-			SessionContext sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+			SessionContextImplementor sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchTargetModel.getElasticsearchIndexNames(),
 				sessionContext,

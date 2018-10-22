@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -28,12 +28,12 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers;
-	private final SessionContext sessionContext;
+	private final SessionContextImplementor sessionContext;
 	private IndexSearchTarget indexSearchTarget;
 
 	public PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers,
-			SessionContext sessionContext) {
+			SessionContextImplementor sessionContext) {
 		this.typeManagers = typeManagers;
 		this.targetedTypeManagers = targetedTypeManagers;
 		this.sessionContext = sessionContext;
