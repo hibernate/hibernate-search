@@ -301,7 +301,7 @@ initial batch index of your books. You can achieve this by using one of the foll
 ====
 [source, JAVA]
 ----
-FullTextSession fullTextSession = Search.getFullTextSession(session);
+FullTextSession fullTextSession = org.hibernate.search.Search.getFullTextSession(session);
 fullTextSession.createIndexer().startAndWait();
 ----
 ====
@@ -311,7 +311,7 @@ fullTextSession.createIndexer().startAndWait();
 [source, JAVA]
 ----
 EntityManager em = entityManagerFactory.createEntityManager();
-FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager(em);
+FullTextEntityManager fullTextEntityManager = org.hibernate.search.jpa.Search.getFullTextEntityManager(em);
 fullTextEntityManager.createIndexer().startAndWait();
 ----
 ====

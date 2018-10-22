@@ -902,7 +902,7 @@ you can directly create Elasticsearch queries by using either its String format 
 ====
 [source,java]
 ----
-FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextEntityManager fullTextEm = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 QueryDescriptor query = ElasticsearchQueries.fromQueryString("title:tales");
 List<?> result = fullTextEm.createFullTextQuery(query, ComicBook.class).getResultList();
 ----
@@ -912,7 +912,7 @@ List<?> result = fullTextEm.createFullTextQuery(query, ComicBook.class).getResul
 ====
 [source,java]
 ----
-FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextEntityManager fullTextEm = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 QueryDescriptor query = ElasticsearchQueries.fromJson(
       "{ 'query': { 'match' : { 'lastName' : 'Brand' } } }");
 List<?> result = fullTextEm.createFullTextQuery(query, GolfPlayer.class).getResultList();
@@ -990,7 +990,7 @@ If you happen to need an advanced Elasticsearch sorting feature that is not nati
 ====
 [source, JAVA]
 ----
-FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextEntityManager fullTextEm = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 org.hibernate.search.query.dsl.QueryBuilder queryBuilder =
         fullTextEm.getSearchFactory()
         .buildQueryBuilder().forEntity(Book.class).get();
@@ -1016,7 +1016,7 @@ You can also retrieve the full JSON document by using `org.hibernate.search.elas
 
 [source,java]
 --
-FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextEntityManager fullTextEm = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 FullTextQuery query = fullTextEm.createFullTextQuery(
                     qb.keyword()
                     .onField( "tags" )
@@ -1033,7 +1033,7 @@ If you're looking for information about execution time, you may also use `org.hi
 
 [source,java]
 --
-FullTextEntityManager fullTextEm = Search.getFullTextEntityManager(entityManager);
+FullTextEntityManager fullTextEm = org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
 FullTextQuery query = fullTextEm.createFullTextQuery(
                     qb.keyword()
                     .onField( "tags" )
