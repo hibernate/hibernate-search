@@ -8,10 +8,8 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -19,7 +17,9 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LocalDateFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LocalDateFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.sort.impl.LocalDateFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
  * @author Guillaume Smet
@@ -51,7 +51,7 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new LocalDateFieldPredicateBuilderFactory( converter ),
-				LocalDateFieldSortContributor.INSTANCE,
+				new LocalDateFieldSortBuilderFactory( converter ),
 				new StandardFieldProjectionBuilderFactory<>( codec, converter )
 		);
 

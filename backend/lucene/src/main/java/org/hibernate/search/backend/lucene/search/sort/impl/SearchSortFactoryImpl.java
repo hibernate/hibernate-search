@@ -10,6 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
@@ -19,9 +21,6 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 
 /**
  * @author Guillaume Smet
@@ -65,34 +64,28 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
 		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
 
-		return new FieldSortBuilderImpl(
-				absoluteFieldPath,
-				schemaNode.getConverter(),
-				schemaNode.getSortContributor()
-		);
+		return schemaNode.getSortBuilderFactory().createFieldSortBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return new DistanceSortBuilderImpl(
-				absoluteFieldPath,
-				location,
-				searchTargetModel.getSchemaNode( absoluteFieldPath ).getSortContributor()
-		);
+		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
+
+		return schemaNode.getSortBuilderFactory().createDistanceSortBuilder( absoluteFieldPath, location );
 	}
 
 	@Override
 	public LuceneSearchSortBuilder indexOrder() {
-		return IndexOrderSortContributor.INSTANCE;
+		return IndexOrderSortBuilder.INSTANCE;
 	}
 
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField) {
-		return new UserProvidedLuceneSortFieldSortContributor( luceneSortField );
+		return new UserProvidedLuceneSortFieldSortBuilder( luceneSortField );
 	}
 
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
-		return new UserProvidedLuceneSortSortContributor( luceneSort );
+		return new UserProvidedLuceneSortSortBuilder( luceneSort );
 	}
 }

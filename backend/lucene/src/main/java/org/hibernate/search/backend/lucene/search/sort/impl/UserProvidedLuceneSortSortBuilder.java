@@ -6,17 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.Sort;
 
-class IndexOrderSortContributor implements LuceneSearchSortBuilder {
 
-	public static final IndexOrderSortContributor INSTANCE = new IndexOrderSortContributor();
+class UserProvidedLuceneSortSortBuilder implements LuceneSearchSortBuilder {
 
-	private IndexOrderSortContributor() {
+	private final Sort luceneSort;
+
+	UserProvidedLuceneSortSortBuilder(Sort luceneSort) {
+		this.luceneSort = luceneSort;
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( SortField.FIELD_DOC );
+		collector.collectSortFields( luceneSort.getSort() );
 	}
 }

@@ -4,19 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.search.sort.impl;
+package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.apache.lucene.document.LatLonDocValuesField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+import org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
+public class GeoPointDistanceSortBuilder extends AbstractSearchSortBuilder
 		implements DistanceSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -25,12 +28,9 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private final GeoPoint location;
 
-	private final LuceneFieldSortContributor fieldSortContributor;
-
-	DistanceSortBuilderImpl(String absoluteFieldPath, GeoPoint location, LuceneFieldSortContributor fieldSortContributor) {
+	GeoPointDistanceSortBuilder(String absoluteFieldPath, GeoPoint location) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.location = location;
-		this.fieldSortContributor = fieldSortContributor;
 	}
 
 	@Override
@@ -45,6 +45,7 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		fieldSortContributor.contributeDistanceSort( collector, absoluteFieldPath, location, order );
+		collector.collectSortField( LatLonDocValuesField.newDistanceSort( absoluteFieldPath, location.getLatitude(),
+				location.getLongitude() ) );
 	}
 }

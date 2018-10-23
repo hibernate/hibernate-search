@@ -8,6 +8,10 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
@@ -19,17 +23,12 @@ import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.document.FieldType;
-import org.apache.lucene.index.IndexOptions;
-import org.apache.lucene.util.QueryBuilder;
 
 /**
  * @author Guillaume Smet
@@ -114,7 +113,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new StringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
-				StringFieldSortContributor.INSTANCE,
+				new StringFieldSortBuilderFactory( converter ),
 				new StandardFieldProjectionBuilderFactory<>( codec, converter )
 		);
 

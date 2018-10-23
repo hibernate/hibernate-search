@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 /**
  * @author Guillaume Smet
  */
-abstract class AbstractSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>, LuceneSearchSortBuilder {
+public abstract class AbstractSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>,
+		LuceneSearchSortBuilder {
 
 	protected SortOrder order;
 

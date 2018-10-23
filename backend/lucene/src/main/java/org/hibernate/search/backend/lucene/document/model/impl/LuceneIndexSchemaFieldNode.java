@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -37,13 +37,15 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
 
-	private final LuceneFieldSortContributor sortContributor;
+	private final LuceneFieldSortBuilderFactory sortBuilderFactory;
 
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
-			LuceneFieldConverter<F, ?> converter, LuceneFieldCodec<F> codec,
-			LuceneFieldPredicateBuilderFactory predicateBuilderFactory, LuceneFieldSortContributor sortContributor,
+			LuceneFieldConverter<F, ?> converter,
+			LuceneFieldCodec<F> codec,
+			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
+			LuceneFieldSortBuilderFactory sortBuilderFactory,
 			LuceneFieldProjectionBuilderFactory projectionBuilderFactory) {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
@@ -51,7 +53,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.converter = converter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
-		this.sortContributor = sortContributor;
+		this.sortBuilderFactory = sortBuilderFactory;
 		this.projectionBuilderFactory = projectionBuilderFactory;
 	}
 
@@ -82,11 +84,11 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return predicateBuilderFactory;
 	}
 
-	public LuceneFieldSortContributor getSortContributor() {
-		if ( sortContributor == null ) {
+	public LuceneFieldSortBuilderFactory getSortBuilderFactory() {
+		if ( sortBuilderFactory == null ) {
 			throw log.unsupportedDSLSorts( getEventContext() );
 		}
-		return sortContributor;
+		return sortBuilderFactory;
 	}
 
 	public LuceneFieldProjectionBuilderFactory getProjectionBuilderFactory() {
@@ -100,7 +102,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return converter.isDslCompatibleWith( other.converter )
 				&& codec.isCompatibleWith( other.codec )
 				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
-				&& sortContributor.isDslCompatibleWith( other.sortContributor )
+				&& sortBuilderFactory.isDslCompatibleWith( other.sortBuilderFactory )
 				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );
 	}
 
@@ -112,7 +114,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 				.append( ", converter=" ).append( converter )
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
-				.append( ", sortContributor=" ).append( sortContributor )
+				.append( ", sortContributor=" ).append( sortBuilderFactory )
 				.append( ", projectionBuilderFactory=" ).append( projectionBuilderFactory )
 				.append( "]" );
 		return sb.toString();

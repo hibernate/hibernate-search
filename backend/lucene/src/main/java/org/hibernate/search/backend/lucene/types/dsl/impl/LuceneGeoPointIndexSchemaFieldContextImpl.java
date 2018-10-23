@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -17,7 +15,9 @@ import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.GeoPointFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.GeoPointFieldSortContributor;
+import org.hibernate.search.backend.lucene.types.sort.impl.GeoPointFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -52,7 +52,7 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				GeoPointFieldSortContributor.INSTANCE,
+				GeoPointFieldSortBuilderFactory.INSTANCE,
 				new GeoPointFieldProjectionBuilderFactory<>( codec, converter )
 		);
 

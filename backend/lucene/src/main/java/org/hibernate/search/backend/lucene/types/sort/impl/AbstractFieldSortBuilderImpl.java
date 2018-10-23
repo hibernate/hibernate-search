@@ -10,23 +10,57 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractStandardLuceneFieldSortContributor implements LuceneFieldSortContributor {
+abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
+		implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	protected final String absoluteFieldPath;
+
+	protected final LuceneFieldConverter<?, ?> converter;
+
+	protected Object missingValue;
 
 	private Object sortMissingValueFirstPlaceholder;
 
 	private Object sortMissingValueLastPlaceholder;
 
-	protected AbstractStandardLuceneFieldSortContributor(Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+	protected AbstractFieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldConverter<?, ?> converter,
+			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+		this.absoluteFieldPath = absoluteFieldPath;
+		this.converter = converter;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
 		this.sortMissingValueLastPlaceholder = sortMissingValueLastPlaceholder;
+	}
+
+	@Override
+	public void missingFirst() {
+		missingValue = SortMissingValue.MISSING_FIRST;
+	}
+
+	@Override
+	public void missingLast() {
+		missingValue = SortMissingValue.MISSING_LAST;
+	}
+
+	@Override
+	public void missingAs(Object value) {
+		try {
+			missingValue = converter.convertFromDsl( value );
+		}
+		catch (RuntimeException e) {
+			throw log.cannotConvertDslParameter(
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
 	}
 
 	protected void setEffectiveMissingValue(SortField sortField, Object missingValue, SortOrder order) {
@@ -47,12 +81,5 @@ abstract class AbstractStandardLuceneFieldSortContributor implements LuceneField
 		}
 
 		sortField.setMissingValue( effectiveMissingValue );
-	}
-
-	@Override
-	public void contributeDistanceSort(LuceneSearchSortCollector collector, String absoluteFieldPath, GeoPoint location, SortOrder order) {
-		throw log.distanceOperationsNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
 	}
 }
