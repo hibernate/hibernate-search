@@ -29,7 +29,7 @@ public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPr
 
 	@Override
 	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
-		return getClass().equals( other.getClass() );
+		return INSTANCE == other;
 	}
 
 	@Override

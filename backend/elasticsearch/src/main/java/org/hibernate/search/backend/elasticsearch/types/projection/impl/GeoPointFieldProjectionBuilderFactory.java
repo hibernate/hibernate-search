@@ -37,7 +37,7 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 		if ( this == obj ) {
 			return true;
 		}
-		if ( !( obj instanceof GeoPointFieldProjectionBuilderFactory ) ) {
+		if ( obj.getClass() != GeoPointFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 

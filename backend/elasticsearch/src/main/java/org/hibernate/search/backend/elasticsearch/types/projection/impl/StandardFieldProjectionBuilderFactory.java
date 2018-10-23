@@ -45,7 +45,7 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 		if ( this == obj ) {
 			return true;
 		}
-		if ( !( obj instanceof StandardFieldProjectionBuilderFactory ) ) {
+		if ( obj.getClass() != StandardFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 

@@ -41,7 +41,7 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 		if ( this == obj ) {
 			return true;
 		}
-		if ( !( obj instanceof GeoPointFieldProjectionBuilderFactory ) ) {
+		if ( obj.getClass() != GeoPointFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 

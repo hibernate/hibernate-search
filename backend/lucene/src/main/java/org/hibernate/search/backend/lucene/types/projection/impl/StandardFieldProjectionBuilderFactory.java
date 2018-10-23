@@ -49,7 +49,7 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 		if ( this == obj ) {
 			return true;
 		}
-		if ( !( obj instanceof StandardFieldProjectionBuilderFactory ) ) {
+		if ( obj.getClass() != StandardFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 
