@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import org.apache.lucene.search.Query;
 
 
-class UserProvidedLuceneQueryPredicateContributor implements LuceneSearchPredicateBuilder {
+class UserProvidedLuceneQueryPredicateBuilder implements LuceneSearchPredicateBuilder {
 
 	private final Query luceneQuery;
 
-	UserProvidedLuceneQueryPredicateContributor(Query luceneQuery) {
+	UserProvidedLuceneQueryPredicateBuilder(Query luceneQuery) {
 		this.luceneQuery = luceneQuery;
 	}
 

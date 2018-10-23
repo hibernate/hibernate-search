@@ -100,7 +100,7 @@ public class SearchPredicateFactoryImpl implements LuceneSearchPredicateFactory 
 
 	@Override
 	public LuceneSearchPredicateBuilder fromLuceneQuery(Query query) {
-		return new UserProvidedLuceneQueryPredicateContributor( query );
+		return new UserProvidedLuceneQueryPredicateBuilder( query );
 	}
 
 }
