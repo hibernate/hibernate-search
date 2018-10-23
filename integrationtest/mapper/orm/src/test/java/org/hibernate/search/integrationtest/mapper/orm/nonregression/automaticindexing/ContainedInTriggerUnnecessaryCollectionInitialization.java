@@ -129,7 +129,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitialization {
 	@Entity(name = "Group_")
 	@Indexed(index = Group.INDEX)
 	public static class Group {
-		private static final String INDEX = "Group";
+		public static final String INDEX = "Group";
 
 		@Id
 		private Integer id;
@@ -176,7 +176,7 @@ public class ContainedInTriggerUnnecessaryCollectionInitialization {
 	@Entity(name = "Post")
 	@Indexed(index = Post.INDEX)
 	public static class Post {
-		private static final String INDEX = "Post";
+		public static final String INDEX = "Post";
 
 		@Id
 		private Integer id;
