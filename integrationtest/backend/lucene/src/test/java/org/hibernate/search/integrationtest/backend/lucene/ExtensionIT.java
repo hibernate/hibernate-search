@@ -92,7 +92,7 @@ public class ExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromJsonString() {
+	public void predicate_fromLuceneQuery() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
@@ -112,7 +112,7 @@ public class ExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromJsonString_separatePredicate() {
+	public void predicate_fromLuceneQuery_separatePredicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( LuceneExtension.get() )
@@ -137,7 +137,7 @@ public class ExtensionIT {
 	}
 
 	@Test
-	public void sort_fromJsonString() {
+	public void sort_fromLuceneSortField() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
@@ -179,7 +179,7 @@ public class ExtensionIT {
 	}
 
 	@Test
-	public void sort_fromJsonString_separateSort() {
+	public void sort_fromLuceneSortField_separateSort() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchSort sort1 = searchTarget.sort().extension()
