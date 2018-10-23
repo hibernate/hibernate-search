@@ -17,7 +17,7 @@ class ScoreSortBuilderImpl extends AbstractSearchSortBuilder
 	private static final SortField FIELD_SCORE_ASC = new SortField( null, Type.SCORE, true );
 
 	@Override
-	public void buildAndAddTo(LuceneSearchSortCollector collector) {
+	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		if ( order == SortOrder.ASC ) {
 			collector.collectSortField( FIELD_SCORE_ASC );
 		}

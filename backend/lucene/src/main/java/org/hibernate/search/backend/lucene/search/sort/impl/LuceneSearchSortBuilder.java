@@ -8,6 +8,6 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 public interface LuceneSearchSortBuilder {
 
-	void buildAndAddTo(LuceneSearchSortCollector collector);
+	void buildAndContribute(LuceneSearchSortCollector collector);
 
 }

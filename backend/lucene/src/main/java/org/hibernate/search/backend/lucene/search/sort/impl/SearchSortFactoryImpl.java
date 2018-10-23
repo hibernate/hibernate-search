@@ -52,7 +52,7 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	@Override
 	public void contribute(LuceneSearchSortCollector collector, List<LuceneSearchSortBuilder> builders) {
 		for ( LuceneSearchSortBuilder builder : builders ) {
-			builder.buildAndAddTo( collector );
+			builder.buildAndContribute( collector );
 		}
 	}
 

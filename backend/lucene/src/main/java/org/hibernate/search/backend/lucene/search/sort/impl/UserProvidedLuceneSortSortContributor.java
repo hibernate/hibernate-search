@@ -18,7 +18,7 @@ class UserProvidedLuceneSortSortContributor implements LuceneSearchSortBuilder {
 	}
 
 	@Override
-	public void buildAndAddTo(LuceneSearchSortCollector collector) {
+	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		collector.collectSortFields( luceneSort.getSort() );
 	}
 }

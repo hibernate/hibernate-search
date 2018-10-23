@@ -44,7 +44,7 @@ class DistanceSortBuilderImpl extends AbstractSearchSortBuilder
 	}
 
 	@Override
-	public void buildAndAddTo(LuceneSearchSortCollector collector) {
+	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		fieldSortContributor.contributeDistanceSort( collector, absoluteFieldPath, location, order );
 	}
 }

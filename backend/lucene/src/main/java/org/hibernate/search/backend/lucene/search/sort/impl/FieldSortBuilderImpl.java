@@ -59,7 +59,7 @@ class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	}
 
 	@Override
-	public void buildAndAddTo(LuceneSearchSortCollector collector) {
+	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		fieldSortContributor.contribute( collector, absoluteFieldPath, order, missingValue );
 	}
 }
