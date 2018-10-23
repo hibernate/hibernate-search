@@ -25,4 +25,9 @@ public class IntegerFieldSortContributor extends AbstractStandardLuceneFieldSort
 
 		collector.collectSortField( sortField );
 	}
+
+	@Override
+	public boolean isDslCompatibleWith(LuceneFieldSortContributor other) {
+		return INSTANCE == other;
+	}
 }

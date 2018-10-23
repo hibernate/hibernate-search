@@ -12,15 +12,17 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface LuceneFieldSortContributor {
 
+	/**
+	 * Determine whether another sort contributor is DSL-compatible with this one,
+	 * i.e. whether it contributes sort fields that behave the same way.
+	 *
+	 * @param other Another {@link LuceneFieldSortContributor}, never {@code null}.
+	 * @return {@code true} if the given sort contributor is DSL-compatible.
+	 * {@code false} otherwise, or when in doubt.
+	 */
+	boolean isDslCompatibleWith(LuceneFieldSortContributor other);
+
 	void contribute(LuceneSearchSortCollector collector, String absoluteFieldPath, SortOrder order, Object missingValue);
 
 	void contributeDistanceSort(LuceneSearchSortCollector collector, String absoluteFieldPath, GeoPoint location, SortOrder order);
-
-	// equals()/hashCode() needs to be implemented if the sort contributor is not a singleton
-
-	@Override
-	boolean equals(Object obj);
-
-	@Override
-	int hashCode();
 }

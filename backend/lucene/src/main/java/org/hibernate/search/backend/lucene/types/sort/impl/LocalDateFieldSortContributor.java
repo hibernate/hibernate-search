@@ -25,4 +25,9 @@ public class LocalDateFieldSortContributor extends AbstractStandardLuceneFieldSo
 
 		collector.collectSortField( sortField );
 	}
+
+	@Override
+	public boolean isDslCompatibleWith(LuceneFieldSortContributor other) {
+		return INSTANCE == other;
+	}
 }

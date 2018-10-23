@@ -37,4 +37,8 @@ public class GeoPointFieldSortContributor implements LuceneFieldSortContributor 
 		collector.collectSortField( LatLonDocValuesField.newDistanceSort( absoluteFieldPath, location.getLatitude(), location.getLongitude() ) );
 	}
 
+	@Override
+	public boolean isDslCompatibleWith(LuceneFieldSortContributor other) {
+		return INSTANCE == other;
+	}
 }

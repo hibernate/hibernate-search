@@ -101,7 +101,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return converter.isDslCompatibleWith( other.converter )
 				&& Objects.equals( codec, other.codec )
 				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
-				&& Objects.equals( sortContributor, other.sortContributor )
+				&& sortContributor.isDslCompatibleWith( other.sortContributor )
 				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );
 	}
 
