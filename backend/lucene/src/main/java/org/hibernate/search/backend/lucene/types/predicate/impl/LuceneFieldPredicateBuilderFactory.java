@@ -43,12 +43,4 @@ public interface LuceneFieldPredicateBuilderFactory {
 
 	SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath);
-
-	// equals()/hashCode() needs to be implemented if the predicate factory is not a singleton
-
-	@Override
-	boolean equals(Object obj);
-
-	@Override
-	int hashCode();
 }

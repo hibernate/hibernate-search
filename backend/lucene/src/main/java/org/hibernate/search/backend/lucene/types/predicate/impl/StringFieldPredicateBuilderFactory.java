@@ -44,21 +44,4 @@ public final class StringFieldPredicateBuilderFactory
 	public StringRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
 		return new StringRangePredicateBuilder( absoluteFieldPath, converter );
 	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if ( !super.equals( obj ) ) {
-			return false;
-		}
-
-		StringFieldPredicateBuilderFactory other = (StringFieldPredicateBuilderFactory) obj;
-
-		return tokenized == other.tokenized &&
-				Objects.equals( queryBuilder, other.queryBuilder );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( super.hashCode(), tokenized, queryBuilder );
-	}
 }
