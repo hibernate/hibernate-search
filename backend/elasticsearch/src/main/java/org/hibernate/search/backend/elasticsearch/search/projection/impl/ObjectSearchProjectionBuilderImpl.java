@@ -11,11 +11,11 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 
 
-public class ObjectSearchProjectionBuilderImpl implements ObjectSearchProjectionBuilder {
+class ObjectSearchProjectionBuilderImpl implements ObjectSearchProjectionBuilder {
 
 	private final ObjectSearchProjectionImpl projection;
 
-	public ObjectSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
+	ObjectSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
 		this.projection = new ObjectSearchProjectionImpl( helper );
 	}
 

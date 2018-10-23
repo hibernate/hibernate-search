@@ -16,7 +16,7 @@ class DocumentReferenceSearchProjectionImpl implements ElasticsearchSearchProjec
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	public DocumentReferenceSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+	DocumentReferenceSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 

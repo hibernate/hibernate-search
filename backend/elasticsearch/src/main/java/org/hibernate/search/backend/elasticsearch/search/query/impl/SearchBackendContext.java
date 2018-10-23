@@ -64,15 +64,15 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	public ReferenceHitExtractor getReferenceHitExtractor() {
+	ReferenceHitExtractor getReferenceHitExtractor() {
 		return referenceHitExtractor;
 	}
 
-	public ObjectHitExtractor getObjectHitExtractor() {
+	ObjectHitExtractor getObjectHitExtractor() {
 		return objectHitExtractor;
 	}
 
-	public SearchProjectionBackendContext getSearchProjectionBackendContext() {
+	SearchProjectionBackendContext getSearchProjectionBackendContext() {
 		return searchProjectionBackendContext;
 	}
 

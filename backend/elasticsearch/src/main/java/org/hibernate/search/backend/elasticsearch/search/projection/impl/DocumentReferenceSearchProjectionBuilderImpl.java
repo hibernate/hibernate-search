@@ -12,11 +12,11 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 
 
-public class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceSearchProjectionBuilder {
+class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceSearchProjectionBuilder {
 
 	private final DocumentReferenceSearchProjectionImpl projection;
 
-	public DocumentReferenceSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
+	DocumentReferenceSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
 		this.projection = new DocumentReferenceSearchProjectionImpl( helper );
 	}
 

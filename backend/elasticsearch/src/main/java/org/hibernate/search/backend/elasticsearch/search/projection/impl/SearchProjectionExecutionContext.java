@@ -20,7 +20,7 @@ public class SearchProjectionExecutionContext {
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
 	}
 
-	public Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
+	Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {
 		if ( distanceSorts == null ) {
 			return null;
 		}

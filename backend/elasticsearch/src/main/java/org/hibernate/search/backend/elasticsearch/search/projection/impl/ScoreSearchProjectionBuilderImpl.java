@@ -10,11 +10,11 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 
 
-public class ScoreSearchProjectionBuilderImpl implements ScoreSearchProjectionBuilder {
+class ScoreSearchProjectionBuilderImpl implements ScoreSearchProjectionBuilder {
 
 	private final ScoreSearchProjectionImpl projection;
 
-	public ScoreSearchProjectionBuilderImpl() {
+	ScoreSearchProjectionBuilderImpl() {
 		this.projection = new ScoreSearchProjectionImpl();
 	}
 

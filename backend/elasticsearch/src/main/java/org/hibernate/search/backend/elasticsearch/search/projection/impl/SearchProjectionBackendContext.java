@@ -22,19 +22,19 @@ public class SearchProjectionBackendContext {
 		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl();
 	}
 
-	public DocumentReferenceSearchProjectionBuilderImpl getDocumentReferenceProjectionBuilder() {
+	DocumentReferenceSearchProjectionBuilderImpl getDocumentReferenceProjectionBuilder() {
 		return documentReferenceProjectionBuilder;
 	}
 
-	public ObjectSearchProjectionBuilderImpl getObjectProjectionBuilder() {
+	ObjectSearchProjectionBuilderImpl getObjectProjectionBuilder() {
 		return objectProjectionBuilder;
 	}
 
-	public ReferenceSearchProjectionBuilderImpl getReferenceProjectionBuilder() {
+	ReferenceSearchProjectionBuilderImpl getReferenceProjectionBuilder() {
 		return referenceProjectionBuilder;
 	}
 
-	public ScoreSearchProjectionBuilderImpl getScoreProjectionBuilder() {
+	ScoreSearchProjectionBuilderImpl getScoreProjectionBuilder() {
 		return scoreProjectionBuilder;
 	}
 }
