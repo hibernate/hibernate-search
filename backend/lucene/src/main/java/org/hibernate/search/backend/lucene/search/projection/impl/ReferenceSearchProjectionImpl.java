@@ -35,8 +35,9 @@ class ReferenceSearchProjectionImpl implements LuceneSearchProjection<Object> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
-		ReferenceHitExtractor.get().extract( collector, documentResult );
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+			SearchProjectionExecutionContext context) {
+		ReferenceHitExtractor.get().extract( collector, documentResult, context );
 	}
 
 	@Override

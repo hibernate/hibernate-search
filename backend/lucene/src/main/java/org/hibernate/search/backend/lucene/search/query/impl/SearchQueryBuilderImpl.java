@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -32,7 +33,7 @@ class SearchQueryBuilderImpl<C, T>
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final LuceneSearchTargetModel searchTargetModel;
-	private final String tenantId;
+	private final SessionContextImplementor sessionContext;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final HitExtractor<? super C> hitExtractor;
@@ -53,7 +54,7 @@ class SearchQueryBuilderImpl<C, T>
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.searchTargetModel = searchTargetModel;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.sessionContext = sessionContext;
 
 		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
@@ -73,15 +74,20 @@ class SearchQueryBuilderImpl<C, T>
 	}
 
 	private SearchQuery<T> build() {
-		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>( storedFieldVisitor, hitExtractor, hitAggregator );
+		SearchProjectionExecutionContext projectionExecutionContext =
+				new SearchProjectionExecutionContext( sessionContext );
+
+		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>(
+				storedFieldVisitor, hitExtractor, hitAggregator, projectionExecutionContext
+		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
 
-		return new LuceneSearchQuery<T>( queryOrchestrator, workFactory,
+		return new LuceneSearchQuery<>( queryOrchestrator, workFactory,
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),
-				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), tenantId ),
+				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
 				hitExtractor, searchResultExtractor );
 	}

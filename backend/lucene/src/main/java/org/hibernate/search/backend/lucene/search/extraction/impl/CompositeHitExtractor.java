@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+
 /**
  * A hit extractor used when multiple values must be extracted for each hit.
  * <p>
@@ -37,9 +39,9 @@ public class CompositeHitExtractor<C> implements HitExtractor<C> {
 	}
 
 	@Override
-	public void extract(C collector, LuceneResult documentResult) {
+	public void extract(C collector, LuceneResult documentResult, SearchProjectionExecutionContext context) {
 		for ( HitExtractor<? super C> extractor : extractors ) {
-			extractor.extract( collector, documentResult );
+			extractor.extract( collector, documentResult, context );
 		}
 	}
 }

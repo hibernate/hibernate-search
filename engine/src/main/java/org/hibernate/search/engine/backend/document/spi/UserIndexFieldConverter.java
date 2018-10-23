@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.document.spi;
 
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
  * A helper class allowing to convert values between the type expected by the user
@@ -45,12 +46,12 @@ public final class UserIndexFieldConverter<F> {
 		return dslToIndexConverter.convertUnknown( value );
 	}
 
-	public Object convertFromProjection(F projection) {
+	public Object convertFromProjection(F projection, SessionContextImplementor sessionContext) {
 		if ( projectionFromIndexConverter == null ) {
 			// FIXME detect this when the projection is configured and throw an exception with an explicit message instead. A converter set to null means we don't want to enable projections.
 			return projection;
 		}
-		return projectionFromIndexConverter.convert( projection );
+		return projectionFromIndexConverter.convert( projection, sessionContext.toAPI() );
 	}
 
 	/**
@@ -59,7 +60,7 @@ public final class UserIndexFieldConverter<F> {
 	 * to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return true for two different objects,
-	 * e.g. two objects that implement {@link #convertFromProjection(Object)} differently.
+	 * e.g. two objects that implement {@link #convertFromProjection(Object, SessionContextImplementor)} differently.
 	 *
 	 * @param other Another {@link UserIndexFieldConverter}.
 	 * @return {@code true} if the given converter is DSL-compatible.

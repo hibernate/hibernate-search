@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 
 /**
  * A value wrapper used when testing
@@ -28,7 +29,7 @@ public final class ValueWrapper<T> {
 			@SuppressWarnings("unchecked")
 			@Override
 			public T convertUnknown(Object value) {
-				return convert( (ValueWrapper<T>) value );
+				return ( (ValueWrapper<T>) value ).getValue();
 			}
 		};
 	}
@@ -42,7 +43,8 @@ public final class ValueWrapper<T> {
 			}
 
 			@Override
-			public ValueWrapper<T> convert(T indexedValue) {
+			public ValueWrapper<T> convert(T indexedValue,
+					SessionContext sessionContext) {
 				return new ValueWrapper<T>( indexedValue );
 			}
 		};

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T> {
 
@@ -22,8 +23,8 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 	}
 
 	@Override
-	public Object convertFromProjection(F value) {
-		return userConverter.convertFromProjection( value );
+	public Object convertFromProjection(F value, SessionContextImplementor sessionContext) {
+		return userConverter.convertFromProjection( value, sessionContext );
 	}
 
 	@Override

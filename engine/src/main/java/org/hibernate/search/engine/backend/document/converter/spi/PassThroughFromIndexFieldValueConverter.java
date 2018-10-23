@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.document.converter.spi;
 
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 
 public final class PassThroughFromIndexFieldValueConverter<F> implements FromIndexFieldValueConverter<F, F> {
 
@@ -17,7 +18,7 @@ public final class PassThroughFromIndexFieldValueConverter<F> implements FromInd
 	}
 
 	@Override
-	public F convert(F value) {
+	public F convert(F value, SessionContext sessionContext) {
 		return value;
 	}
 

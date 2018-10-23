@@ -35,7 +35,7 @@ class SearchQueryBuilderImpl<C, T>
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final Set<URLEncodedString> indexNames;
-	private final String tenantId;
+	private final SessionContextImplementor sessionContext;
 	private final Set<String> routingKeys;
 
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
@@ -55,7 +55,7 @@ class SearchQueryBuilderImpl<C, T>
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.indexNames = indexNames;
-		this.tenantId = sessionContext.getTenantIdentifier();
+		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
 		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
@@ -87,7 +87,7 @@ class SearchQueryBuilderImpl<C, T>
 		}
 
 		SearchProjectionExecutionContext searchProjectionExecutionContext = elementCollector
-				.toSearchProjectionExecutionContext();
+				.toSearchProjectionExecutionContext( sessionContext );
 
 		hitExtractor.contributeRequest( payload, searchProjectionExecutionContext );
 
@@ -103,7 +103,7 @@ class SearchQueryBuilderImpl<C, T>
 	}
 
 	private JsonObject getJsonQuery() {
-		return multiTenancyStrategy.decorateJsonQuery( elementCollector.toJsonPredicate(), tenantId );
+		return multiTenancyStrategy.decorateJsonQuery( elementCollector.toJsonPredicate(), sessionContext.getTenantIdentifier() );
 	}
 
 	@Override

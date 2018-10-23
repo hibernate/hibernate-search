@@ -16,24 +16,27 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
-public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
+class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-
 	private final HitExtractor<? super C> hitExtractor;
-
 	private final HitAggregator<C, List<T>> hitAggregator;
 
-	public SearchResultExtractorImpl(
+	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
+
+	SearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator) {
+			HitAggregator<C, List<T>> hitAggregator,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.hitExtractor = hitExtractor;
 		this.hitAggregator = hitAggregator;
+		this.searchProjectionExecutionContext = searchProjectionExecutionContext;
 	}
 
 	@Override
@@ -64,9 +67,10 @@ public class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T>
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
 			Document document = storedFieldVisitor.getDocumentAndReset();
+			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
 			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, new LuceneResult( document, hit.doc, hit.score ) );
+			hitExtractor.extract( hitCollector, luceneResult, searchProjectionExecutionContext );
 		}
 
 		return Collections.unmodifiableList( hitAggregator.build() );

@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -48,9 +49,11 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
-		collector.collectProjection( converter.convertFromProjection( fieldValue ) );
+		SessionContextImplementor sessionContext = searchProjectionExecutionContext.getSessionContext();
+		collector.collectProjection( converter.convertFromProjection( fieldValue, sessionContext ) );
 	}
 
 	@Override

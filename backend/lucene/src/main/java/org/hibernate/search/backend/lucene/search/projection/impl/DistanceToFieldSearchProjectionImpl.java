@@ -42,7 +42,8 @@ class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Doub
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
+	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+			SearchProjectionExecutionContext context) {
 		collector.collectProjection( unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) ) );
 	}
 

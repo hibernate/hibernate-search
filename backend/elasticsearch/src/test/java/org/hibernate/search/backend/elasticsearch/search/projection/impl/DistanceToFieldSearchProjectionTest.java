@@ -9,13 +9,15 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.junit.Test;
 
 import com.google.gson.JsonObject;
+import org.easymock.EasyMockSupport;
 
-public class DistanceToFieldSearchProjectionTest {
+public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 	private static final String FIELD = "myField";
 
@@ -30,10 +32,14 @@ public class DistanceToFieldSearchProjectionTest {
 
 		JsonObject requestBody = new JsonObject();
 
-		SearchProjectionExecutionContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext();
+		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
 
+		resetAll();
+		replayAll();
+		SearchProjectionExecutionContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext( sessionContext );
 		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+		verifyAll();
 
 		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isNull();
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNotNull();
@@ -50,10 +56,14 @@ public class DistanceToFieldSearchProjectionTest {
 
 		JsonObject requestBody = new JsonObject();
 
-		SearchProjectionExecutionContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext();
+		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
 
+		resetAll();
+		replayAll();
+		SearchProjectionExecutionContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext( sessionContext );
 		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+		verifyAll();
 
 		assertThat( searchProjectionExecutionContext.getDistanceSortIndex( FIELD, LOCATION ) ).isEqualTo( 1 );
 		assertThat( requestBody.get( "script_fields" ) ).as( "script_fields" ).isNull();

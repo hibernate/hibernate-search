@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+
 public interface HitExtractor<C> {
 
 	/**
@@ -29,9 +31,9 @@ public interface HitExtractor<C> {
 
 	/**
 	 * Perform hit extraction.
-	 *
 	 * @param collector The hit collector, which will receive the result of the extraction.
 	 * @param documentResult A wrapper on top of the Lucene document extracted from the index.
+	 * @param context An execution context for the search projections.
 	 */
-	void extract(C collector, LuceneResult documentResult);
+	void extract(C collector, LuceneResult documentResult, SearchProjectionExecutionContext context);
 }
