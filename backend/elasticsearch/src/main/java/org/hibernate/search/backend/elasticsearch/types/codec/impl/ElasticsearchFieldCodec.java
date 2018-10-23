@@ -21,10 +21,6 @@ public interface ElasticsearchFieldCodec<F> {
 
 	F decode(JsonElement element);
 
-	default boolean supportsSortingByDistance() {
-		return false;
-	}
-
 	/**
 	 * @param obj An object to compare
 	 * @return {@code true} if {@code obj} is a codec whose {@link #encode(Object)} method is

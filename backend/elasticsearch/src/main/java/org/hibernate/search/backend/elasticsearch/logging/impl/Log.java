@@ -294,4 +294,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidProjectionInvalidType(String absoluteFieldPath,
 			@FormatWith(ClassFormatter.class) Class<?> type,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 40,
+			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
+	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
 }

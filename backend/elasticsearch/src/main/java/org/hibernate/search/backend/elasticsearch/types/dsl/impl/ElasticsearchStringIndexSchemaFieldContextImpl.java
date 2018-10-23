@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCo
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
@@ -87,6 +88,7 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, StringFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
+				new StandardFieldSortBuilderFactory( converter ),
 				new StandardFieldProjectionBuilderFactory( converter )
 		);
 

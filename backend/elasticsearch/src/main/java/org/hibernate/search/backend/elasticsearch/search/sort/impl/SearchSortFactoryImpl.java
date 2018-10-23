@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -74,18 +73,15 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		ElasticsearchIndexSchemaFieldNode<?> node = searchTargetModel.getSchemaNode( absoluteFieldPath );
-		return new FieldSortBuilderImpl<>( absoluteFieldPath, node );
+
+		return node.getSortBuilderFactory().createFieldSortBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		if ( !searchTargetModel.getSchemaNode( absoluteFieldPath ).getCodec().supportsSortingByDistance() ) {
-			throw log.distanceOperationsNotSupportedByFieldType(
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
+		ElasticsearchIndexSchemaFieldNode<?> node = searchTargetModel.getSchemaNode( absoluteFieldPath );
 
-		return new DistanceSortBuilderImpl( absoluteFieldPath, location );
+		return node.getSortBuilderFactory().createDistanceSortBuilder( absoluteFieldPath, location );
 	}
 
 	@Override

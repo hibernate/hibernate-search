@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
@@ -20,7 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
+public class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -32,9 +31,9 @@ class FieldSortBuilderImpl<F> extends AbstractSearchSortBuilder
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
-	FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<F> node) {
+	public FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.converter = node.getConverter();
+		this.converter = converter;
 	}
 
 	@Override
