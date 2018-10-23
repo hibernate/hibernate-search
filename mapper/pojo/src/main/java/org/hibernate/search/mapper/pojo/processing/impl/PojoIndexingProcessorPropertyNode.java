@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
@@ -62,17 +63,17 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source) {
+	public final void process(DocumentElement target, T source, PojoSessionContextImplementor sessionContext) {
 		// TODO add generic type parameters to property handles
 		P propertyValue = (P) handle.get( source );
 		if ( !propertyBridges.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
 			for ( PropertyBridge bridge : propertyBridges ) {
-				bridge.write( target, bridgedElement );
+				bridge.write( target, bridgedElement, sessionContext.toAPI() );
 			}
 		}
 		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {
-			nestedNode.process( target, propertyValue );
+			nestedNode.process( target, propertyValue, sessionContext );
 		}
 	}
 }

@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
@@ -61,7 +62,8 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source) {
+	public void write(DocumentElement target, PojoElement source,
+			SessionContext sessionContext) {
 		Account account = accountAccessor.read( source );
 		if ( account == null ) {
 			return;

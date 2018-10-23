@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
  * @param <E> The entity type mapped to an index.
@@ -17,19 +18,19 @@ class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 
-	private final String tenantIdentifier;
+	private final PojoSessionContextImplementor sessionContext;
 	private final Object identifier;
 	private final String documentIdentifier;
 	private final Supplier<E> entitySupplier;
 
 	PojoDocumentReferenceProvider(
 			RoutingKeyProvider<E> routingKeyProvider,
-			String tenantIdentifier,
+			PojoSessionContextImplementor sessionContext,
 			Object identifier,
 			String documentIdentifier,
 			Supplier<E> entitySupplier) {
 		this.routingKeyProvider = routingKeyProvider;
-		this.tenantIdentifier = tenantIdentifier;
+		this.sessionContext = sessionContext;
 		this.identifier = identifier;
 		this.documentIdentifier = documentIdentifier;
 		this.entitySupplier = entitySupplier;
@@ -42,7 +43,11 @@ class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 
 	@Override
 	public String getRoutingKey() {
-		return routingKeyProvider.toRoutingKey( tenantIdentifier, identifier, entitySupplier );
+		return routingKeyProvider.toRoutingKey(
+				identifier,
+				entitySupplier,
+				sessionContext
+		);
 	}
 
 }

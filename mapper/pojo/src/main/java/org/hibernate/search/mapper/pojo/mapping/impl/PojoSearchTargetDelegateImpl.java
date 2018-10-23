@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -22,18 +21,19 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.AssertionFailure;
 
 public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers;
-	private final SessionContextImplementor sessionContext;
+	private final PojoSessionContextImplementor sessionContext;
 	private IndexSearchTarget indexSearchTarget;
 
 	public PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers,
-			SessionContextImplementor sessionContext) {
+			PojoSessionContextImplementor sessionContext) {
 		this.typeManagers = typeManagers;
 		this.targetedTypeManagers = targetedTypeManagers;
 		this.sessionContext = sessionContext;
@@ -88,7 +88,7 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 				.orElseThrow( () -> new AssertionFailure(
 						"Document reference " + documentReference + " could not be converted to a PojoReference" ) );
 		// TODO error handling if typeManager is null
-		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId() );
+		Object id = typeManager.getIdentifierMapping().fromDocumentIdentifier( documentReference.getId(), sessionContext );
 		return new PojoReferenceImpl( typeManager.getIndexedJavaClass(), id );
 	}
 }

@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
  * @param <E> The entity type mapped to the index.
@@ -20,15 +21,19 @@ class PojoDocumentContributor<D extends DocumentElement, E> implements DocumentC
 
 	private final PojoIndexingProcessor<E> processor;
 
+	private final PojoSessionContextImplementor sessionContext;
+
 	private final Supplier<E> entitySupplier;
 
-	PojoDocumentContributor(PojoIndexingProcessor<E> processor, Supplier<E> entitySupplier) {
+	PojoDocumentContributor(PojoIndexingProcessor<E> processor, PojoSessionContextImplementor sessionContext,
+			Supplier<E> entitySupplier) {
 		this.processor = processor;
+		this.sessionContext = sessionContext;
 		this.entitySupplier = entitySupplier;
 	}
 
 	@Override
 	public void contribute(D state) {
-		processor.process( state, entitySupplier.get() );
+		processor.process( state, entitySupplier.get(), sessionContext );
 	}
 }

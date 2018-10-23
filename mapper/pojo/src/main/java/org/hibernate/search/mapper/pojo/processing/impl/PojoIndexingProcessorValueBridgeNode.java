@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
@@ -41,7 +42,7 @@ public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProc
 	}
 
 	@Override
-	public void process(DocumentElement target, V source) {
+	public void process(DocumentElement target, V source, PojoSessionContextImplementor sessionContext) {
 		F indexFieldValue = bridge.toIndexedValue( source );
 		indexFieldAccessor.write( target, indexFieldValue );
 	}

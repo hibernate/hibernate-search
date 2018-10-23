@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
@@ -263,7 +264,8 @@ public class AnnotationMappingDiscoveryIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source) {
+		public void write(DocumentElement target, PojoElement source,
+				SessionContext sessionContext) {
 			for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
 				objectFieldAccessor.add( target );
 			}

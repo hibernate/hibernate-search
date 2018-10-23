@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.test.util;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -88,7 +89,8 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source) {
+	public void write(DocumentElement target, PojoElement source,
+			SessionContext sessionContext) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -103,7 +105,8 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source) {
+	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
+			SessionContext sessionContext) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -113,7 +116,8 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public Object fromDocumentIdentifier(String documentIdentifier) {
+	public Object fromDocumentIdentifier(String documentIdentifier,
+			SessionContext sessionContext) {
 		throw unexpectedRuntimeUse();
 	}
 

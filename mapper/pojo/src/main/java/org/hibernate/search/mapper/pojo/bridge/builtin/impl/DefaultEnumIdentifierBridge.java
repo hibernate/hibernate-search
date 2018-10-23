@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 
@@ -25,7 +26,8 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 	}
 
 	@Override
-	public T fromDocumentIdentifier(String documentIdentifier) {
+	public T fromDocumentIdentifier(String documentIdentifier,
+			SessionContext sessionContext) {
 		return Enum.valueOf( enumType, documentIdentifier );
 	}
 

@@ -20,6 +20,7 @@ import javax.persistence.Id;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -297,7 +298,8 @@ public class AnnotationMappingDiscoveryIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source) {
+		public void write(DocumentElement target, PojoElement source,
+				SessionContext sessionContext) {
 			for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
 				objectFieldAccessor.add( target );
 			}

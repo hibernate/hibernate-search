@@ -92,13 +92,15 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 
 	DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContextImplementor sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
-		String tenantId = sessionContext.getTenantIdentifier();
 		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
-		return new PojoDocumentReferenceProvider<>( routingKeyProvider, tenantId, identifier, documentIdentifier, entitySupplier );
+		return new PojoDocumentReferenceProvider<>(
+				routingKeyProvider, sessionContext,
+				identifier, documentIdentifier, entitySupplier
+		);
 	}
 
-	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier) {
-		return new PojoDocumentContributor<>( processor, entitySupplier );
+	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, PojoSessionContextImplementor sessionContext) {
+		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
 	}
 
 	boolean requiresSelfReindexing(Set<String> dirtyPaths) {

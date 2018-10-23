@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to an index.
@@ -22,6 +24,6 @@ public interface IdentifierMapping<I, E> extends AutoCloseable {
 
 	String toDocumentIdentifier(I identifier);
 
-	I fromDocumentIdentifier(String documentId);
+	I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor sessionContext);
 
 }

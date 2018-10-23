@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 
 /**
@@ -43,12 +44,15 @@ public interface IdentifierBridge<I> extends AutoCloseable {
 	 * Transform the given document identifier value back to the value of the POJO property.
 	 * <p>
 	 * Must be the exact inverse function of {@link #toDocumentIdentifier(Object)},
-	 * i.e. {@code object.equals(fromDocumentIdentifier(toDocumentIdentifier(object)))} must always be true.
+	 * i.e. {@code object.equals(fromDocumentIdentifier(toDocumentIdentifier(object, sessionContext)))}
+	 * must always be true.
 	 *
 	 * @param documentIdentifier The document identifier value to be transformed.
+	 * @param sessionContext A {@link SessionContext} that can be {@link SessionContext#unwrap(Class) unwrapped}
+	 * to a more useful type, such as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The value of the document identifier.
 	 */
-	I fromDocumentIdentifier(String documentIdentifier);
+	I fromDocumentIdentifier(String documentIdentifier, SessionContext sessionContext);
 
 	/**
 	 * Close any resource before the bridge is discarded.

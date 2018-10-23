@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
@@ -61,7 +62,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source) {
+	public final void process(DocumentElement target, T source, PojoSessionContextImplementor sessionContext) {
 		if ( source == null ) {
 			return;
 		}
@@ -72,12 +73,12 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		if ( !bridges.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( source );
 			for ( TypeBridge bridge : bridges ) {
-				bridge.write( parentObject, bridgedElement );
+				bridge.write( parentObject, bridgedElement, sessionContext.toAPI() );
 			}
 		}
 		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {
 			// Recursion here
-			propertyNode.process( parentObject, source );
+			propertyNode.process( parentObject, source, sessionContext );
 		}
 	}
 

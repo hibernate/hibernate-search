@@ -200,11 +200,17 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends PojoTypeW
 			if ( add ) {
 				if ( delete ) {
 					if ( considerAllDirty || typeManager.requiresSelfReindexing( dirtyPaths ) ) {
-						delegate.update( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
+						delegate.update(
+								referenceProvider,
+								typeManager.toDocumentContributor( entitySupplier, sessionContext )
+						);
 					}
 				}
 				else {
-					delegate.add( referenceProvider, typeManager.toDocumentContributor( entitySupplier ) );
+					delegate.add(
+							referenceProvider,
+							typeManager.toDocumentContributor( entitySupplier, sessionContext )
+					);
 				}
 			}
 			else if ( delete ) {

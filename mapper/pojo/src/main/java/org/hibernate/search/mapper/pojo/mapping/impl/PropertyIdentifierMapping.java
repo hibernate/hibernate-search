@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
  * @author Yoann Rodiere
@@ -51,8 +52,8 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
-	public I fromDocumentIdentifier(String documentId) {
-		return bridge.fromDocumentIdentifier( documentId );
+	public I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor sessionContext) {
+		return bridge.fromDocumentIdentifier( documentId, sessionContext.toAPI() );
 	}
 
 }

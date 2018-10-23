@@ -25,6 +25,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -740,7 +741,8 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source) {
+		public void write(DocumentElement target, PojoElement source,
+				SessionContext sessionContext) {
 			DocumentElement typeBridgeObjectField = typeBridgeObjectFieldAccessor.add( target );
 			directFieldTargetAccessor.write( typeBridgeObjectField, directFieldSourceAccessor.read( source ) );
 			DocumentElement childObjectField = childObjectFieldAccessor.add( typeBridgeObjectField );
@@ -775,7 +777,8 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source) {
+		public void write(DocumentElement target, PojoElement source,
+				SessionContext sessionContext) {
 			DocumentElement propertyBridgeObjectField = propertyBridgeObjectFieldAccessor.add( target );
 			includedInPropertyBridgeTargetAccessor.write(
 					propertyBridgeObjectField, includedInPropertyBridgeSourceAccessor.read( source )

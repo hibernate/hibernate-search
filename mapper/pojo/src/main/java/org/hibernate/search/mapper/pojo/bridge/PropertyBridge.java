@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 
@@ -33,7 +34,7 @@ public interface PropertyBridge extends AutoCloseable {
 	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...)
 	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
-	 *     {@link #write(DocumentElement, PojoElement)} method
+	 *     {@link #write(DocumentElement, PojoElement, SessionContext)} method
 	 *     using {@link PropertyBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
 	 *
@@ -52,11 +53,12 @@ public interface PropertyBridge extends AutoCloseable {
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
 	 * {@link #bind(PropertyBridgeBindingContext)} method was called.
-	 *
 	 * @param target The {@link DocumentElement} to write to.
 	 * @param source The {@link PojoElement} to read from.
+	 * @param sessionContext A {@link SessionContext} that can be {@link SessionContext#unwrap(Class) unwrapped}
+	 * to a more useful type, such as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 */
-	void write(DocumentElement target, PojoElement source);
+	void write(DocumentElement target, PojoElement source, SessionContext sessionContext);
 
 	/**
 	 * Close any resource before the bridge is discarded.

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
@@ -72,7 +73,8 @@ public final class CustomTypeBridge implements TypeBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source) {
+	public void write(DocumentElement target, PojoElement source,
+			SessionContext sessionContext) {
 		String textSourceValue = textPropertyAccessor.read( source );
 		LocalDate localDateSourceValue = localDatePropertyAccessor.read( source );
 		if ( textSourceValue != null || localDateSourceValue != null ) {
