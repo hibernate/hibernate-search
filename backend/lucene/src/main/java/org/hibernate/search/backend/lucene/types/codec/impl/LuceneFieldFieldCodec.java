@@ -58,12 +58,9 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
 		if ( this == obj ) {
 			return true;
-		}
-		if ( obj == null ) {
-			return false;
 		}
 		if ( LuceneFieldFieldCodec.class != obj.getClass() ) {
 			return false;
@@ -73,11 +70,6 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 
 		return Objects.equals( fieldContributor, other.fieldContributor )
 				&& Objects.equals( fieldValueExtractor, other.fieldValueExtractor );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( fieldContributor, fieldValueExtractor );
 	}
 
 	private static void contributeField(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, IndexableField field) {

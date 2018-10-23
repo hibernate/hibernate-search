@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -99,7 +98,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
 		return converter.isDslCompatibleWith( other.converter )
-				&& Objects.equals( codec, other.codec )
+				&& codec.isCompatibleWith( other.codec )
 				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
 				&& sortContributor.isDslCompatibleWith( other.sortContributor )
 				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );

@@ -17,9 +17,9 @@ import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -102,12 +102,9 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
 		if ( this == obj ) {
 			return true;
-		}
-		if ( obj == null ) {
-			return false;
 		}
 		if ( GeoPointFieldCodec.class != obj.getClass() ) {
 			return false;
@@ -119,10 +116,5 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 				Objects.equals( sortable, other.sortable ) &&
 				Objects.equals( latitudeAbsoluteFieldPath, other.latitudeAbsoluteFieldPath ) &&
 				Objects.equals( longitudeAbsoluteFieldPath, other.longitudeAbsoluteFieldPath );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( store, sortable, latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
 	}
 }

@@ -33,4 +33,16 @@ public class JsonStringFieldCodec implements ElasticsearchFieldCodec<String> {
 		}
 		return gson.toJson( element );
 	}
+
+	@Override
+	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
+		if ( other == this ) {
+			return true;
+		}
+		if ( other == null ) {
+			return false;
+		}
+
+		return other.getClass() == getClass();
+	}
 }

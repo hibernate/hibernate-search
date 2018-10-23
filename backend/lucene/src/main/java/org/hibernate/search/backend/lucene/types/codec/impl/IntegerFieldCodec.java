@@ -13,9 +13,9 @@ import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Store;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
@@ -70,12 +70,9 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
 		if ( this == obj ) {
 			return true;
-		}
-		if ( obj == null ) {
-			return false;
 		}
 		if ( IntegerFieldCodec.class != obj.getClass() ) {
 			return false;
@@ -84,10 +81,5 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 		IntegerFieldCodec other = (IntegerFieldCodec) obj;
 
 		return Objects.equals( store, other.store ) && Objects.equals( sortable, other.sortable );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( store, sortable );
 	}
 }

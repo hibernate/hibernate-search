@@ -61,12 +61,9 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean isCompatibleWith(LuceneFieldCodec<?> obj) {
 		if ( this == obj ) {
 			return true;
-		}
-		if ( obj == null ) {
-			return false;
 		}
 		if ( StringFieldCodec.class != obj.getClass() ) {
 			return false;
@@ -77,10 +74,5 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 		return Objects.equals( sortable, other.sortable ) &&
 				Objects.equals( fieldType, other.fieldType ) &&
 				Objects.equals( normalizer, other.normalizer );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( sortable, fieldType, normalizer );
 	}
 }

@@ -17,10 +17,10 @@ import com.google.gson.JsonPrimitive;
 
 public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 
-	private final DateTimeFormatter delegate;
+	private final DateTimeFormatter formatter;
 
 	public LocalDateFieldCodec(DateTimeFormatter delegate) {
-		this.delegate = delegate;
+		this.formatter = delegate;
 	}
 
 	@Override
@@ -28,7 +28,7 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return new JsonPrimitive( delegate.format( value ) );
+		return new JsonPrimitive( formatter.format( value ) );
 	}
 
 	@Override
@@ -37,21 +37,20 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 			return null;
 		}
 		String stringValue = JsonElementTypes.STRING.fromElement( element );
-		return LocalDate.parse( stringValue, delegate );
+		return LocalDate.parse( stringValue, formatter );
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if ( obj == null || obj.getClass() != getClass() ) {
+	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj.getClass() != getClass() ) {
 			return false;
 		}
+
 		LocalDateFieldCodec other = (LocalDateFieldCodec) obj;
-		return delegate.equals( other.delegate );
-	}
 
-	@Override
-	public int hashCode() {
-		return delegate.hashCode();
+		return formatter.equals( other.formatter );
 	}
-
 }

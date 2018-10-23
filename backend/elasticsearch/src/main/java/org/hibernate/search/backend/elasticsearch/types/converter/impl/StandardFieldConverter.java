@@ -45,7 +45,7 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 		}
 		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
 		return userConverter.isDslCompatibleWith( castedOther.userConverter )
-				&& codec.equals( castedOther.codec );
+				&& codec.isCompatibleWith( castedOther.codec );
 	}
 
 	@Override

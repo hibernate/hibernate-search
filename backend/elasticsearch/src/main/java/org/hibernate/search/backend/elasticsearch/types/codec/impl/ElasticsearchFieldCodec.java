@@ -22,15 +22,12 @@ public interface ElasticsearchFieldCodec<F> {
 	F decode(JsonElement element);
 
 	/**
-	 * @param obj An object to compare
-	 * @return {@code true} if {@code obj} is a codec whose {@link #encode(Object)} method is
-	 * guaranteed to always return the exact same output value as this codec for any input value,
-	 * {@code false} otherwise.
+	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information
+	 * to/from the document in a compatible way.
+	 *
+	 * @param other Another {@link ElasticsearchFieldCodec}, never {@code null}.
+	 * @return {@code true} if the given codec is compatible. {@code false} otherwise, or when
+	 * in doubt.
 	 */
-	@Override
-	boolean equals(Object obj);
-
-	@Override
-	int hashCode();
-
+	boolean isCompatibleWith(ElasticsearchFieldCodec<?> other);
 }

@@ -34,4 +34,9 @@ public class IntegerFieldCodec implements ElasticsearchFieldCodec<Integer> {
 		}
 		return JsonElementTypes.INTEGER.fromElement( element );
 	}
+
+	@Override
+	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
+		return INSTANCE == other;
+	}
 }

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
@@ -56,7 +55,7 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 		StandardFieldProjectionBuilderFactory<?> other = (StandardFieldProjectionBuilderFactory<?>) obj;
 
-		return Objects.equals( codec, other.codec ) &&
+		return codec.isCompatibleWith( other.codec ) &&
 				converter.isDslCompatibleWith( other.converter );
 	}
 }

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.Objects;
-
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
@@ -70,7 +68,7 @@ public class ElasticsearchIndexSchemaFieldNode<F> {
 
 	public boolean isCompatibleWith(ElasticsearchIndexSchemaFieldNode<?> other) {
 		return converter.isDslCompatibleWith( other.converter )
-				&& Objects.equals( codec, other.codec )
+				&& codec.isCompatibleWith( other.codec )
 				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
 				&& sortBuilderFactory.isDslCompatibleWith( other.sortBuilderFactory )
 				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );

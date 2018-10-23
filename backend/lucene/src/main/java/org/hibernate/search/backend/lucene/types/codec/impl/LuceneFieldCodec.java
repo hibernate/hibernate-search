@@ -49,11 +49,13 @@ public interface LuceneFieldCodec<F> {
 	 */
 	F decode(Document document, String absoluteFieldPath);
 
-	// equals()/hashCode() needs to be implemented if the codec is not a singleton
-
-	@Override
-	boolean equals(Object obj);
-
-	@Override
-	int hashCode();
+	/**
+	 * Determine whether another codec is compatible with this one, i.e. whether it will encode/decode the information
+	 * to/from the document in a compatible way.
+	 *
+	 * @param other Another {@link LuceneFieldCodec}, never {@code null}.
+	 * @return {@code true} if the given codec is compatible. {@code false} otherwise, or when
+	 * in doubt.
+	 */
+	boolean isCompatibleWith(LuceneFieldCodec<?> other);
 }

@@ -34,4 +34,9 @@ public class StringFieldCodec implements ElasticsearchFieldCodec<String> {
 		}
 		return JsonElementTypes.STRING.fromElement( element );
 	}
+
+	@Override
+	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
+		return INSTANCE == other;
+	}
 }

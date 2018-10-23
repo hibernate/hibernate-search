@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
-import java.util.Objects;
-
 import org.hibernate.search.backend.lucene.search.projection.impl.DistanceToFieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -49,7 +47,7 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 		GeoPointFieldProjectionBuilderFactory<?> other = (GeoPointFieldProjectionBuilderFactory<?>) obj;
 
-		return Objects.equals( codec, other.codec ) &&
+		return codec.isCompatibleWith( other.codec ) &&
 				converter.isDslCompatibleWith( other.converter );
 	}
 }
