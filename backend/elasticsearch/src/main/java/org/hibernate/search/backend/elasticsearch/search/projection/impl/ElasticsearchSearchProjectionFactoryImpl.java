@@ -41,18 +41,12 @@ public class ElasticsearchSearchProjectionFactoryImpl implements SearchProjectio
 		return searchProjectionBackendContext.getDocumentReferenceProjectionBuilder();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
+	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType) {
 		ElasticsearchIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
 
-		if ( !schemaNode.getConverter().isProjectionCompatibleWith( clazz ) ) {
-			throw log.invalidProjectionInvalidType( absoluteFieldPath, clazz,
-					searchTargetModel.getIndexesEventContext() );
-		}
-
 		return (FieldSearchProjectionBuilder<T>) schemaNode.getProjectionBuilderFactory()
-				.createFieldValueProjectionBuilder( absoluteFieldPath );
+				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType );
 	}
 
 	@Override

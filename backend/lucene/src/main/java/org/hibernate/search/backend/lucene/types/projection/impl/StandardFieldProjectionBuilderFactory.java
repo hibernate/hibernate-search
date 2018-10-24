@@ -32,7 +32,13 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 	}
 
 	@Override
-	public FieldSearchProjectionBuilder<?> createFieldValueProjectionBuilder(String absoluteFieldPath) {
+	public <U> FieldSearchProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<U> expectedType) {
+		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
+			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
 		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, codec, converter );
 	}
 

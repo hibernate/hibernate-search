@@ -37,18 +37,12 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 		return DocumentReferenceSearchProjectionBuilderImpl.get();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
+	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType) {
 		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
 
-		if ( !schemaNode.getConverter().isProjectionCompatibleWith( clazz ) ) {
-			throw log.invalidProjectionInvalidType( absoluteFieldPath, clazz,
-					searchTargetModel.getIndexesEventContext() );
-		}
-
 		return (FieldSearchProjectionBuilder<T>) schemaNode.getProjectionBuilderFactory()
-				.createFieldValueProjectionBuilder( absoluteFieldPath );
+				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType );
 	}
 
 	@Override

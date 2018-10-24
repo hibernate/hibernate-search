@@ -15,7 +15,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface LuceneFieldProjectionBuilderFactory {
 
-	FieldSearchProjectionBuilder<?> createFieldValueProjectionBuilder(String absoluteFieldPath);
+	<U> FieldSearchProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<U> expectedType);
 
 	DistanceToFieldSearchProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
 

@@ -6,15 +6,22 @@
  */
 package org.hibernate.search.backend.lucene.types.projection.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.DistanceToFieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProjectionBuilderFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneFieldCodec<T> codec;
 
@@ -26,7 +33,13 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 	}
 
 	@Override
-	public FieldSearchProjectionBuilder<?> createFieldValueProjectionBuilder(String absoluteFieldPath) {
+	public <U> FieldSearchProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<U> expectedType) {
+		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
+			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
 		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, codec, converter );
 	}
 

@@ -28,7 +28,13 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 	}
 
 	@Override
-	public FieldSearchProjectionBuilder<?> createFieldValueProjectionBuilder(String absoluteFieldPath) {
+	public <T> FieldSearchProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<T> expectedType) {
+		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
+			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
 		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, converter );
 	}
 

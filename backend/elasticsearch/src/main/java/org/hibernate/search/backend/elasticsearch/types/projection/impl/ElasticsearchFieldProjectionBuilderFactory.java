@@ -13,7 +13,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface ElasticsearchFieldProjectionBuilderFactory {
 
-	FieldSearchProjectionBuilder<?> createFieldValueProjectionBuilder(String absoluteFieldPath);
+	<T> FieldSearchProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<T> expectedType);
 
 	DistanceToFieldSearchProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
 
