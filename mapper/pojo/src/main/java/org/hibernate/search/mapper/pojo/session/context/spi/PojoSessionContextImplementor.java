@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 public abstract class PojoSessionContextImplementor implements SessionContextImplementor {
@@ -21,6 +22,9 @@ public abstract class PojoSessionContextImplementor implements SessionContextImp
 	public PojoSessionContextImplementor() {
 		this.bridgeSessionContext = new BridgeSessionContextImpl( this );
 	}
+
+	@Override
+	public abstract PojoMappingContextImplementor getMappingContext();
 
 	public abstract PojoRuntimeIntrospector getRuntimeIntrospector();
 

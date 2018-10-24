@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchTargetContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
@@ -25,6 +26,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 	private final SearchTargetContext<?> searchTargetContext;
 
 	ElasticsearchIndexSearchTarget(SearchBackendContext searchBackendContext,
+			MappingContextImplementor mappingContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchTargetModel = searchTargetModel;
 		this.searchTargetContext = new ElasticsearchSearchTargetContext( searchBackendContext, searchTargetModel );

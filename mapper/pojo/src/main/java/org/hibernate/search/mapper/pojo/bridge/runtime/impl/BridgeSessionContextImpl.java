@@ -42,17 +42,17 @@ public final class BridgeSessionContextImpl
 	}
 
 	@Override
-	public <T> T extension(PropertyBridgeWriteContextExtension<T> extension) {
-		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
-	}
-
-	@Override
 	public <T> T extension(RoutingKeyBridgeToRoutingKeyContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}
 
 	@Override
 	public <T> T extension(TypeBridgeWriteContextExtension<T> extension) {
+		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
+	}
+
+	@Override
+	public <T> T extension(PropertyBridgeWriteContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, sessionContext ) );
 	}
 }

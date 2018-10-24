@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -28,12 +29,15 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchBackendContext searchBackendContext;
+	private final MappingContextImplementor mappingContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<ElasticsearchIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	ElasticsearchIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, ElasticsearchIndexManagerImpl indexManager) {
+	ElasticsearchIndexSearchTargetBuilder(SearchBackendContext searchBackendContext,
+			MappingContextImplementor mappingContext, ElasticsearchIndexManagerImpl indexManager) {
 		this.searchBackendContext = searchBackendContext;
+		this.mappingContext = mappingContext;
 		this.indexManagers.add( indexManager );
 	}
 
@@ -52,7 +56,7 @@ class ElasticsearchIndexSearchTargetBuilder implements IndexSearchTargetBuilder 
 		Set<ElasticsearchIndexModel> indexModels = indexManagers.stream().map( ElasticsearchIndexManagerImpl::getModel )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 		ElasticsearchSearchTargetModel searchTargetModel = new ElasticsearchSearchTargetModel( indexModels );
-		return new ElasticsearchIndexSearchTarget( searchBackendContext, searchTargetModel );
+		return new ElasticsearchIndexSearchTarget( searchBackendContext, mappingContext, searchTargetModel );
 	}
 
 	@Override

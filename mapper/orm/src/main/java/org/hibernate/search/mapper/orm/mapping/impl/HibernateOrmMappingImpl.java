@@ -10,26 +10,28 @@ import java.lang.invoke.MethodHandles;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Hibernate;
+import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImpl;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class HibernateOrmMappingImpl extends PojoMappingImpl<HibernateOrmMapping>
+public class HibernateOrmMappingImpl extends PojoMappingImplementor<HibernateOrmMapping>
 		implements HibernateOrmMapping {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SessionFactoryImplementor sessionFactoryImplementor;
+	private final HibernateOrmMappingContextImpl mappingContext;
 
 	HibernateOrmMappingImpl(PojoMappingDelegate mappingDelegate, SessionFactoryImplementor sessionFactoryImplementor) {
 		super( mappingDelegate );
-		this.sessionFactoryImplementor = sessionFactoryImplementor;
+		this.mappingContext = new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
 	}
 
 	@Override
@@ -54,12 +56,14 @@ public class HibernateOrmMappingImpl extends PojoMappingImpl<HibernateOrmMapping
 
 	private HibernateOrmSearchManagerBuilder createSearchManagerBuilder(EntityManager entityManager) {
 		SessionImplementor sessionImplementor = entityManager.unwrap( SessionImplementor.class );
-		SessionFactoryImplementor givenSessionFactory = sessionImplementor.getSessionFactory();
 
-		if ( !givenSessionFactory.equals( sessionFactoryImplementor ) ) {
-			throw log.usingDifferentSessionFactories( sessionFactoryImplementor, givenSessionFactory );
+		SessionFactory expectedSessionFactory = mappingContext.getSessionFactory();
+		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
+
+		if ( !givenSessionFactory.equals( expectedSessionFactory ) ) {
+			throw log.usingDifferentSessionFactories( expectedSessionFactory, givenSessionFactory );
 		}
 
-		return new HibernateOrmSearchManagerImpl.Builder( getDelegate(), sessionImplementor );
+		return new HibernateOrmSearchManagerImpl.Builder( getDelegate(), mappingContext, sessionImplementor );
 	}
 }

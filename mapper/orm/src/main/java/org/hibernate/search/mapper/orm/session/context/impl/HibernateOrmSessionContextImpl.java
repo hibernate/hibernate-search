@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.session.context.impl;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -15,13 +16,20 @@ import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextIm
 
 public class HibernateOrmSessionContextImpl extends PojoSessionContextImplementor implements HibernateOrmSessionContext {
 
+	private final HibernateOrmMappingContextImpl mappingContext;
 	private final SessionImplementor sessionImplementor;
-
 	private final HibernateOrmRuntimeIntrospector runtimeIntrospector;
 
-	public HibernateOrmSessionContextImpl(SessionImplementor sessionImplementor) {
+	public HibernateOrmSessionContextImpl(HibernateOrmMappingContextImpl mappingContext,
+			SessionImplementor sessionImplementor) {
+		this.mappingContext = mappingContext;
 		this.sessionImplementor = sessionImplementor;
 		this.runtimeIntrospector = new HibernateOrmRuntimeIntrospector( sessionImplementor );
+	}
+
+	@Override
+	public HibernateOrmMappingContextImpl getMappingContext() {
+		return mappingContext;
 	}
 
 	@Override

@@ -7,12 +7,16 @@
 package org.hibernate.search.engine.mapper.session.context.spi;
 
 
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+
 /**
  * Provides visibility from the lower layers of Hibernate Search (engine, backend)
  * to the session defined in the upper layers (mapping).
  */
 // TODO add more in here? We could add default query timeouts, default query hints, etc.
 public interface SessionContextImplementor {
+
+	MappingContextImplementor getMappingContext();
 
 	String getTenantIdentifier();
 

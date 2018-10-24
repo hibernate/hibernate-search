@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
@@ -24,7 +25,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 
 	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
-	IndexSearchTargetBuilder createSearchTargetBuilder();
+	IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext);
 
 	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
 

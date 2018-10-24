@@ -6,18 +6,27 @@
  */
 package org.hibernate.search.mapper.javabean.session.context.impl;
 
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 
 public class JavaBeanSessionContextImpl extends PojoSessionContextImplementor {
 
+	private final JavaBeanMappingContextImpl mappingContext;
 	private final String tenantId;
 	private final PojoRuntimeIntrospector proxyIntrospector;
 
-	public JavaBeanSessionContextImpl(String tenantId, PojoRuntimeIntrospector proxyIntrospector) {
+	public JavaBeanSessionContextImpl(JavaBeanMappingContextImpl mappingContext,
+			String tenantId, PojoRuntimeIntrospector proxyIntrospector) {
+		this.mappingContext = mappingContext;
 		this.tenantId = tenantId;
 		this.proxyIntrospector = proxyIntrospector;
+	}
+
+	@Override
+	public JavaBeanMappingContextImpl getMappingContext() {
+		return mappingContext;
 	}
 
 	@Override

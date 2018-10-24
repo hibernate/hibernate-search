@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
@@ -120,8 +121,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	IndexSearchTargetBuilder createSearchTargetBuilder() {
-		return indexManager.createSearchTargetBuilder();
+	IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return indexManager.createSearchTargetBuilder( mappingContext );
 	}
 
 	void addToSearchTarget(IndexSearchTargetBuilder builder) {

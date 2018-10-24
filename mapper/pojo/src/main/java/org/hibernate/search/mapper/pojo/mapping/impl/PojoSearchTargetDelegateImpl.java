@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -21,7 +23,6 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.AssertionFailure;
 
 public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
@@ -72,9 +73,10 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	}
 
 	private IndexSearchTarget getIndexSearchTarget() {
+		PojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
 		if ( indexSearchTarget == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends T, ?>> iterator = targetedTypeManagers.iterator();
-			IndexSearchTargetBuilder builder = iterator.next().createSearchTargetBuilder();
+			IndexSearchTargetBuilder builder = iterator.next().createSearchTargetBuilder( mappingContext );
 			while ( iterator.hasNext() ) {
 				iterator.next().addToSearchTarget( builder );
 			}

@@ -21,6 +21,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -77,8 +78,8 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder() {
-		return new LuceneIndexSearchTargetBuilder( searchBackendContext, this );
+	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return new LuceneIndexSearchTargetBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override

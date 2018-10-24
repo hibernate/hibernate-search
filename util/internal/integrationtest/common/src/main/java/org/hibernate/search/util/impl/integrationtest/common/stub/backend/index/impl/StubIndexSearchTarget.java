@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
@@ -75,10 +76,12 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 	static class Builder implements IndexSearchTargetBuilder {
 
 		private final StubBackend backend;
+		private final MappingContextImplementor mappingContext;
 		private final List<String> indexNames = new ArrayList<>();
 
-		Builder(StubBackend backend, String indexName) {
+		Builder(StubBackend backend, MappingContextImplementor mappingContext, String indexName) {
 			this.backend = backend;
+			this.mappingContext = mappingContext;
 			this.indexNames.add( indexName );
 		}
 

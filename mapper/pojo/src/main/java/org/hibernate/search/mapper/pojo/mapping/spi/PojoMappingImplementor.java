@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.util.impl.common.Closer;
 
-public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapping, MappingImplementor<M> {
+public abstract class PojoMappingImplementor<M extends PojoMapping> implements PojoMapping, MappingImplementor<M> {
 
 	private final PojoMappingDelegate delegate;
 
@@ -21,7 +21,7 @@ public abstract class PojoMappingImpl<M extends PojoMapping> implements PojoMapp
 
 	private boolean closed = false;
 
-	public PojoMappingImpl(PojoMappingDelegate delegate) {
+	public PojoMappingImplementor(PojoMappingDelegate delegate) {
 		this.delegate = delegate;
 	}
 

@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -62,8 +63,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder() {
-		return new StubIndexSearchTarget.Builder( backend, name );
+	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return new StubIndexSearchTarget.Builder( backend, mappingContext, name );
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -71,8 +72,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder() {
-		return new ElasticsearchIndexSearchTargetBuilder( searchBackendContext, this );
+	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return new ElasticsearchIndexSearchTargetBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override

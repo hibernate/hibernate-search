@@ -8,9 +8,11 @@ package org.hibernate.search.mapper.orm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
+import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -23,8 +25,12 @@ import org.junit.Test;
 import org.easymock.EasyMockSupport;
 
 public class OrmExtensionTest extends EasyMockSupport {
+	private final SessionFactoryImplementor sessionFactoryImplementor = createMock( SessionFactoryImplementor.class );
 	private final SessionImplementor sessionImplementor = createMock( SessionImplementor.class );
-	private final HibernateOrmSessionContextImpl sessionContext = new HibernateOrmSessionContextImpl( sessionImplementor );
+	private final HibernateOrmMappingContextImpl mappingContext =
+			new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
+	private final HibernateOrmSessionContextImpl sessionContext =
+			new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
 
 	@Test
 	public void identifierBridge() {

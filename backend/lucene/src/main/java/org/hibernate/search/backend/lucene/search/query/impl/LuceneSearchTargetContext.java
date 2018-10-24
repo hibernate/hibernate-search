@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortBuilderFactoryImpl;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 /**
@@ -24,7 +25,9 @@ public class LuceneSearchTargetContext
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory;
 
-	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext, LuceneSearchTargetModel searchTargetModel) {
+	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext,
+			MappingContextImplementor mappingContext,
+			LuceneSearchTargetModel searchTargetModel) {
 		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchTargetModel );
 		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchTargetModel );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactoryImpl( searchTargetModel );

@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -29,12 +30,15 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchBackendContext searchBackendContext;
+	private final MappingContextImplementor mappingContext;
 
 	// Use LinkedHashSet to ensure stable order when generating requests
 	private final Set<LuceneIndexManagerImpl> indexManagers = new LinkedHashSet<>();
 
-	LuceneIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, LuceneIndexManagerImpl indexManager) {
+	LuceneIndexSearchTargetBuilder(SearchBackendContext searchBackendContext, MappingContextImplementor mappingContext,
+			LuceneIndexManagerImpl indexManager) {
 		this.searchBackendContext = searchBackendContext;
+		this.mappingContext = mappingContext;
 		this.indexManagers.add( indexManager );
 	}
 
@@ -57,7 +61,7 @@ class LuceneIndexSearchTargetBuilder implements IndexSearchTargetBuilder {
 		Set<ReaderProvider> readerProviders = indexManagers.stream().map( LuceneIndexManagerImpl::getReaderProvider )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
-		return new LuceneIndexSearchTarget( searchBackendContext, indexModels, readerProviders );
+		return new LuceneIndexSearchTarget( searchBackendContext, mappingContext, indexModels, readerProviders );
 	}
 
 	@Override

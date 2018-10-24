@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
@@ -33,8 +34,8 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder() {
-		return implementor.createSearchTargetBuilder();
+	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return implementor.createSearchTargetBuilder( mappingContext );
 	}
 
 	@Override

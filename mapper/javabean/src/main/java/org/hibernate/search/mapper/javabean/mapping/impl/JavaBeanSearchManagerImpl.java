@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.javabean.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
@@ -28,10 +29,12 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 	}
 
 	public static class Builder extends AbstractBuilder<PojoSearchManager> implements JavaBeanSearchManagerBuilder {
+		private final JavaBeanMappingContextImpl mappingContext;
 		private String tenantId;
 
-		public Builder(PojoMappingDelegate mappingDelegate) {
+		public Builder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContextImpl mappingContext) {
 			super( mappingDelegate );
+			this.mappingContext = mappingContext;
 		}
 
 		@Override
@@ -42,7 +45,7 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl {
 
 		@Override
 		protected PojoSessionContextImplementor buildSessionContext() {
-			return new JavaBeanSessionContextImpl( tenantId, PojoRuntimeIntrospector.noProxy() );
+			return new JavaBeanSessionContextImpl( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
 		}
 
 		@Override

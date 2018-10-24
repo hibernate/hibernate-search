@@ -12,6 +12,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -37,16 +38,20 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 
 	static class Builder extends AbstractBuilder<HibernateOrmSearchManager>
 			implements HibernateOrmSearchManagerBuilder {
+		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;
 
-		public Builder(PojoMappingDelegate mappingDelegate, SessionImplementor sessionImplementor) {
+		public Builder(PojoMappingDelegate mappingDelegate,
+				HibernateOrmMappingContextImpl mappingContext,
+				SessionImplementor sessionImplementor) {
 			super( mappingDelegate );
+			this.mappingContext = mappingContext;
 			this.sessionImplementor = sessionImplementor;
 		}
 
 		@Override
 		protected PojoSessionContextImplementor buildSessionContext() {
-			return new HibernateOrmSessionContextImpl( sessionImplementor );
+			return new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
 		}
 
 		@Override

@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
@@ -36,7 +37,7 @@ public class StubMappingIndexManager {
 	 * Call {@link #getIndexManager()} to build more complex search targets.
 	 */
 	public StubMappingSearchTarget createSearchTarget() {
-		return new StubMappingSearchTarget( indexManager.createSearchTargetBuilder().build() );
+		return new StubMappingSearchTarget( indexManager.createSearchTargetBuilder( new StubMappingContext() ).build() );
 	}
 
 	public MappedIndexManager<?> getIndexManager() {
