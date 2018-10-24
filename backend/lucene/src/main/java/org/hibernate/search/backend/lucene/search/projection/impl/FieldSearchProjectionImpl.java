@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-class FieldSearchProjectionImpl<T> implements LuceneSearchProjection<T> {
+class FieldSearchProjectionImpl<T, U> implements LuceneSearchProjection<U> {
 
 	private final String absoluteFieldPath;
 
