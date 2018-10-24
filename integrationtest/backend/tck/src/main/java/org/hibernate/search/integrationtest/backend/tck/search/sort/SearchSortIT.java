@@ -39,6 +39,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -263,6 +264,17 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).desc() );
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+	}
+
+	@Test
+	public void distanceSort_invalidType() {
+		thrown.expect( SearchException.class );
+		thrown.expectMessage( "Distance related operations are not supported" );
+		thrown.expectMessage( "string" );
+
+		simpleQuery(
+				b -> b.byDistance( "string", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
+		);
 	}
 
 	@Test
