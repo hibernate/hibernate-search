@@ -30,7 +30,7 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
-		return new FieldSortBuilderImpl<>( absoluteFieldPath, converter );
+		return new FieldSortBuilderImpl( absoluteFieldPath, converter );
 	}
 
 	@Override
