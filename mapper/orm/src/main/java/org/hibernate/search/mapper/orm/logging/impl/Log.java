@@ -10,6 +10,7 @@ package org.hibernate.search.mapper.orm.logging.impl;
 import java.util.Collection;
 import java.util.Set;
 
+import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
@@ -101,4 +102,7 @@ public interface Log extends BasicLogger {
 			value = "Unable to find a readable property '%2$s' on type '%1$s'.")
 	SearchException cannotFindReadableProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			String propertyName);
+
+	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a search manager using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
+	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
 }
