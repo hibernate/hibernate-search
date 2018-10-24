@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.session.context.spi;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-public interface PojoSessionContextImplementor extends SessionContextImplementor {
+public abstract class PojoSessionContextImplementor implements SessionContextImplementor {
 
-	PojoRuntimeIntrospector getRuntimeIntrospector();
+	public abstract PojoRuntimeIntrospector getRuntimeIntrospector();
 
 }

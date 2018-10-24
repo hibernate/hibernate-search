@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-public class JavaBeanSessionContextImpl implements PojoSessionContextImplementor, JavaBeanSessionContext {
+public class JavaBeanSessionContextImpl extends PojoSessionContextImplementor implements JavaBeanSessionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

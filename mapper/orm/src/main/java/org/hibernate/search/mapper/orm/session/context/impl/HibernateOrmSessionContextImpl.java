@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class HibernateOrmSessionContextImpl implements PojoSessionContextImplementor, HibernateOrmSessionContext {
+public class HibernateOrmSessionContextImpl extends PojoSessionContextImplementor implements HibernateOrmSessionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
