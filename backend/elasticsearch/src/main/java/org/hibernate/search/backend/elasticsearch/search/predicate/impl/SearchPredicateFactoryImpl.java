@@ -8,8 +8,11 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
@@ -19,6 +22,8 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -34,6 +39,9 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Gson GSON = new GsonBuilder().create();
+
+	private static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
+			new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
@@ -72,31 +80,39 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createMatchPredicateBuilder( absoluteFieldPath );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createMatchPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createRangePredicateBuilder( absoluteFieldPath );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createRangePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinCircle(
 			String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinPolygon(
 			String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return searchTargetModel.getSchemaNode( absoluteFieldPath ).getPredicateBuilderFactory()
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
@@ -111,4 +127,25 @@ public class SearchPredicateFactoryImpl implements ElasticsearchSearchPredicateF
 		return new UserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 
+	private static class PredicateBuilderFactoryRetrievalStrategy
+			implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldPredicateBuilderFactory> {
+
+		@Override
+		public ElasticsearchFieldPredicateBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
+			return schemaNode.getPredicateBuilderFactory();
+		}
+
+		@Override
+		public boolean areCompatible(ElasticsearchFieldPredicateBuilderFactory component1,
+				ElasticsearchFieldPredicateBuilderFactory component2) {
+			return component1.isDslCompatibleWith( component2 );
+		}
+
+		@Override
+		public SearchException createCompatibilityException(String absoluteFieldPath,
+				ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
+				EventContext context) {
+			return log.conflictingFieldTypesForPredicate( absoluteFieldPath, component1, component2, context );
+		}
+	}
 }

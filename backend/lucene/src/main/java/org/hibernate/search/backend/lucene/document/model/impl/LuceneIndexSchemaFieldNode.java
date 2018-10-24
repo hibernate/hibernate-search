@@ -98,14 +98,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return projectionBuilderFactory;
 	}
 
-	public boolean isCompatibleWith(LuceneIndexSchemaFieldNode<?> other) {
-		return converter.isDslCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec )
-				&& predicateBuilderFactory.isDslCompatibleWith( other.predicateBuilderFactory )
-				&& sortBuilderFactory.isDslCompatibleWith( other.sortBuilderFactory )
-				&& projectionBuilderFactory.isDslCompatibleWith( other.projectionBuilderFactory );
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )

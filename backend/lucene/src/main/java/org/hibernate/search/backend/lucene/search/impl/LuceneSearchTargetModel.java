@@ -10,14 +10,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class LuceneSearchTargetModel {
@@ -52,21 +52,28 @@ public class LuceneSearchTargetModel {
 		return readerProviders;
 	}
 
-	public LuceneIndexSchemaFieldNode<?> getSchemaNode(String absoluteFieldPath) {
+	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
+		T selectedComponent = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+
 			if ( schemaNode != null ) {
+				T component = componentRetrievalStrategy.extractComponent( schemaNode );
+
 				if ( selectedSchemaNode == null ) {
 					selectedSchemaNode = schemaNode;
 					indexModelForSelectedSchemaNode = indexModel;
+					selectedComponent = component;
 				}
-				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
-					throw log.conflictingFieldTypesForSearch(
+				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component ) ) {
+					throw componentRetrievalStrategy.createCompatibilityException(
 							absoluteFieldPath,
-							selectedSchemaNode, schemaNode,
+							selectedComponent,
+							component,
 							EventContexts.fromIndexNames(
 									indexModelForSelectedSchemaNode.getIndexName(),
 									indexModel.getIndexName()
@@ -78,7 +85,7 @@ public class LuceneSearchTargetModel {
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		return selectedSchemaNode;
+		return selectedComponent;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

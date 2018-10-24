@@ -10,14 +10,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class ElasticsearchSearchTargetModel {
@@ -54,20 +54,28 @@ public class ElasticsearchSearchTargetModel {
 		return indexModels;
 	}
 
-	public ElasticsearchIndexSchemaFieldNode<?> getSchemaNode(String absoluteFieldPath) {
+	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
+		T selectedComponent = null;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+
 			if ( schemaNode != null ) {
+				T component = componentRetrievalStrategy.extractComponent( schemaNode );
+
 				if ( selectedSchemaNode == null ) {
 					selectedSchemaNode = schemaNode;
 					indexModelForSelectedSchemaNode = indexModel;
+					selectedComponent = component;
 				}
-				else if ( !selectedSchemaNode.isCompatibleWith( schemaNode ) ) {
-					throw log.conflictingFieldTypesForSearch(
-							absoluteFieldPath, selectedSchemaNode, schemaNode,
+				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component ) ) {
+					throw componentRetrievalStrategy.createCompatibilityException(
+							absoluteFieldPath,
+							selectedComponent,
+							component,
 							EventContexts.fromIndexNames(
 									indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
 									indexModel.getHibernateSearchIndexName()
@@ -79,7 +87,7 @@ public class ElasticsearchSearchTargetModel {
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		return selectedSchemaNode;
+		return selectedComponent;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

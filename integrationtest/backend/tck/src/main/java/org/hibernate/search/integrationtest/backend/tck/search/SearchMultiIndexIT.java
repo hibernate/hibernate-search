@@ -290,7 +290,23 @@ public class SearchMultiIndexIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple conflicting types for field 'differentTypesField'" );
+				.hasMessageContaining( "Multiple conflicting types to build a predicate for field 'differentTypesField'" );
+
+		SubTest.expectException(
+				"projection on field with different type among the targeted indexes",
+				() -> searchTarget.projection().field( "differentTypesField" ).toProjection()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a projection for field 'differentTypesField'" );
+
+		SubTest.expectException(
+				"sort on field with different type among the targeted indexes",
+				() -> searchTarget.sort().byField( "differentTypesField" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting types to build a sort for field 'differentTypesField'" );
 	}
 
 	@Test
@@ -385,7 +401,7 @@ public class SearchMultiIndexIT {
 		IndexAccessors_1_1(IndexSchemaElement root) {
 			string = root.field( "string" ).asString().createAccessor();
 			additionalField = root.field( "additionalField" ).asString().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
-			differentTypesField = root.field( "differentTypesField" ).asString().createAccessor();
+			differentTypesField = root.field( "differentTypesField" ).asString().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
 			sortField = root.field( "sortField" ).asString().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
 		}
 	}
@@ -397,7 +413,7 @@ public class SearchMultiIndexIT {
 
 		IndexAccessors_1_2(IndexSchemaElement root) {
 			string = root.field( "string" ).asString().createAccessor();
-			differentTypesField = root.field( "differentTypesField" ).asInteger().createAccessor();
+			differentTypesField = root.field( "differentTypesField" ).asInteger().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
 			sortField = root.field( "sortField" ).asString().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
 		}
 	}

@@ -156,7 +156,7 @@ public class SearchProjectionIT {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );
 		thrown.expectMessage( "for projection on field" );
-		thrown.expectMessage( INDEX_NAME );
+		thrown.expectMessage( indexMapping.string1Field.relativeFieldName );
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
@@ -197,14 +197,15 @@ public class SearchProjectionIT {
 
 	@Test
 	public void field_withProjectionConverter_invalidProjectionType() {
+		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
+
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid type" );
 		thrown.expectMessage( "for projection on field" );
-		thrown.expectMessage( INDEX_NAME );
+		thrown.expectMessage( fieldModel.relativeFieldName );
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
 		searchTarget.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
 	}
 

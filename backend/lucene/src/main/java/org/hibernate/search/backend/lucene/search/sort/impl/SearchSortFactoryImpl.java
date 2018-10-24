@@ -14,12 +14,16 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -28,6 +32,9 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
+			new SortBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
@@ -62,16 +69,16 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
-		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return schemaNode.getSortBuilderFactory().createFieldSortBuilder( absoluteFieldPath );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createFieldSortBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return schemaNode.getSortBuilderFactory().createDistanceSortBuilder( absoluteFieldPath, location );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createDistanceSortBuilder( absoluteFieldPath, location );
 	}
 
 	@Override
@@ -87,5 +94,27 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
 		return new UserProvidedLuceneSortSortBuilder( luceneSort );
+	}
+
+	private static class SortBuilderFactoryRetrievalStrategy
+			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldSortBuilderFactory> {
+
+		@Override
+		public LuceneFieldSortBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
+			return schemaNode.getSortBuilderFactory();
+		}
+
+		@Override
+		public boolean areCompatible(LuceneFieldSortBuilderFactory component1,
+				LuceneFieldSortBuilderFactory component2) {
+			return component1.isDslCompatibleWith( component2 );
+		}
+
+		@Override
+		public SearchException createCompatibilityException(String absoluteFieldPath,
+				LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
+				EventContext context) {
+			return log.conflictingFieldTypesForSort( absoluteFieldPath, component1, component2, context );
+		}
 	}
 }

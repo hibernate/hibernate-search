@@ -10,7 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
@@ -20,11 +22,16 @@ import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjecti
 import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
+			new ProjectionBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
@@ -39,9 +46,8 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType) {
-		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return (FieldSearchProjectionBuilder<T>) schemaNode.getProjectionBuilderFactory()
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType );
 	}
 
@@ -62,9 +68,8 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 
 	@Override
 	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		LuceneIndexSchemaFieldNode<?> schemaNode = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return schemaNode.getProjectionBuilderFactory()
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
@@ -75,4 +80,25 @@ public class LuceneSearchProjectionFactoryImpl implements SearchProjectionFactor
 		return (LuceneSearchProjection<?>) projection;
 	}
 
+	private static class ProjectionBuilderFactoryRetrievalStrategy
+			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldProjectionBuilderFactory> {
+
+		@Override
+		public LuceneFieldProjectionBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
+			return schemaNode.getProjectionBuilderFactory();
+		}
+
+		@Override
+		public boolean areCompatible(LuceneFieldProjectionBuilderFactory component1,
+				LuceneFieldProjectionBuilderFactory component2) {
+			return component1.isDslCompatibleWith( component2 );
+		}
+
+		@Override
+		public SearchException createCompatibilityException(String absoluteFieldPath,
+				LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
+				EventContext context) {
+			return log.conflictingFieldTypesForProjection( absoluteFieldPath, component1, component2, context );
+		}
+	}
 }

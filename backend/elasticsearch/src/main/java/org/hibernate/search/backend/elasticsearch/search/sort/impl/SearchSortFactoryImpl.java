@@ -14,11 +14,15 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -34,6 +38,9 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final Gson GSON = new GsonBuilder().create();
+
+	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
+			new SortBuilderFactoryRetrievalStrategy();
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
@@ -72,16 +79,16 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
-		ElasticsearchIndexSchemaFieldNode<?> node = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return node.getSortBuilderFactory().createFieldSortBuilder( absoluteFieldPath );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createFieldSortBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		ElasticsearchIndexSchemaFieldNode<?> node = searchTargetModel.getSchemaNode( absoluteFieldPath );
-
-		return node.getSortBuilderFactory().createDistanceSortBuilder( absoluteFieldPath, location );
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.createDistanceSortBuilder( absoluteFieldPath, location );
 	}
 
 	@Override
@@ -92,5 +99,27 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	@Override
 	public ElasticsearchSearchSortBuilder fromJsonString(String jsonString) {
 		return new UserProvidedJsonSortContributor( GSON.fromJson( jsonString, JsonObject.class ) );
+	}
+
+	private static class SortBuilderFactoryRetrievalStrategy
+			implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldSortBuilderFactory> {
+
+		@Override
+		public ElasticsearchFieldSortBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
+			return schemaNode.getSortBuilderFactory();
+		}
+
+		@Override
+		public boolean areCompatible(ElasticsearchFieldSortBuilderFactory component1,
+				ElasticsearchFieldSortBuilderFactory component2) {
+			return component1.isDslCompatibleWith( component2 );
+		}
+
+		@Override
+		public SearchException createCompatibilityException(String absoluteFieldPath,
+				ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
+				EventContext context) {
+			return log.conflictingFieldTypesForSort( absoluteFieldPath, component1, component2, context );
+		}
 	}
 }

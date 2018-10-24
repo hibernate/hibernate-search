@@ -9,8 +9,10 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -145,12 +147,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 4,
 			value = "Unknown field '%1$s'.")
 	SearchException unknownFieldForSearch(String absoluteFieldPath, @Param EventContext context);
-
-	@Message(id = ID_OFFSET_3 + 5,
-			value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
-			ElasticsearchIndexSchemaFieldNode<?> schemaNode1, ElasticsearchIndexSchemaFieldNode<?> schemaNode2,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 6,
 			value = "The Elasticsearch extension can only be applied to objects"
@@ -298,4 +294,22 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 40,
 			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
 	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 41,
+			value = "Multiple conflicting types to build a predicate for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForPredicate(String absoluteFieldPath,
+			ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 42,
+			value = "Multiple conflicting types to build a sort for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForSort(String absoluteFieldPath,
+			ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 43,
+			value = "Multiple conflicting types to build a projection for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
+			ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2,
+			@Param EventContext context);
 }

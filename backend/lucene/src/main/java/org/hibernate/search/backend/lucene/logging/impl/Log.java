@@ -14,8 +14,10 @@ import java.nio.file.Path;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -181,12 +183,6 @@ public interface Log extends BasicLogger {
 			value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
 			+ " Given predicate was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherPredicates(SearchPredicate predicate);
-
-	@Message(id = ID_OFFSET_2 + 11,
-			value = "Multiple conflicting types for field '%1$s': '%2$s' vs. '%3$s'.")
-	SearchException conflictingFieldTypesForSearch(String absoluteFieldPath,
-			LuceneIndexSchemaFieldNode<?> schemaNode1, LuceneIndexSchemaFieldNode<?> schemaNode2,
-			@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 12,
 			value = "Field '%1$s' is not an object field.")
@@ -372,4 +368,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 57, value = "This field does not support projections.")
 	SearchException unsupportedDSLProjections(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 58,
+			value = "Multiple conflicting types to build a predicate for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForPredicate(String absoluteFieldPath,
+			LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 59,
+			value = "Multiple conflicting types to build a sort for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForSort(String absoluteFieldPath,
+			LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 60,
+			value = "Multiple conflicting types to build a projection for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
+			LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
+			@Param EventContext context);
 }
