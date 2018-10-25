@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
@@ -22,7 +23,7 @@ public interface IdentifierMapping<I, E> extends AutoCloseable {
 
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
-	String toDocumentIdentifier(I identifier);
+	String toDocumentIdentifier(I identifier, PojoMappingContextImplementor context);
 
 	I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor sessionContext);
 

@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -118,7 +119,8 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public String toDocumentIdentifier(Object propertyValue) {
+	public String toDocumentIdentifier(Object propertyValue,
+			IdentifierBridgeToDocumentIdentifierContext context) {
 		throw unexpectedRuntimeUse();
 	}
 

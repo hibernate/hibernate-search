@@ -9,9 +9,10 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
  * @author Yoann Rodiere
@@ -47,8 +48,8 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
-	public String toDocumentIdentifier(I identifier) {
-		return bridge.toDocumentIdentifier( identifier );
+	public String toDocumentIdentifier(I identifier, PojoMappingContextImplementor context) {
+		return bridge.toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override

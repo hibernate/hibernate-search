@@ -46,7 +46,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 *
 	 * @param tenantIdentifier The tenant identifier currently in use ({@code null} if none).
 	 * @param entityIdentifier The value of the POJO property used to generate the document identifier,
-	 * i.e. the same value that was passed to {@link IdentifierBridge#toDocumentIdentifier(Object)}.
+	 * i.e. the same value that was passed to {@link IdentifierBridge#toDocumentIdentifier(Object, org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext)}.
 	 * @param source The {@link PojoElement} to read from.
 	 * @param context A context that can be
 	 * {@link RoutingKeyBridgeToRoutingKeyContext#extension(RoutingKeyBridgeToRoutingKeyContextExtension) extended}

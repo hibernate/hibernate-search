@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 
 public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements IdentifierBridge<T> {
 
@@ -21,7 +22,8 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 	}
 
 	@Override
-	public String toDocumentIdentifier(T propertyValue) {
+	public String toDocumentIdentifier(T propertyValue,
+			IdentifierBridgeToDocumentIdentifierContext context) {
 		return propertyValue.name();
 	}
 

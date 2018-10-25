@@ -93,7 +93,9 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 
 	DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContextImplementor sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
-		String documentIdentifier = identifierMapping.toDocumentIdentifier( identifier );
+		String documentIdentifier = identifierMapping.toDocumentIdentifier(
+				identifier, sessionContext.getMappingContext()
+		);
 		return new PojoDocumentReferenceProvider<>(
 				routingKeyProvider, sessionContext,
 				identifier, documentIdentifier, entitySupplier

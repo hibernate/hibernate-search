@@ -10,10 +10,14 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
@@ -22,7 +26,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 
 public final class OrmExtension
-		implements IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
+		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
+		IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
 		RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
 		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
@@ -36,6 +41,15 @@ public final class OrmExtension
 
 	private OrmExtension() {
 		// Private constructor, use get() instead.
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<HibernateOrmMappingContext> extendOptional(IdentifierBridgeToDocumentIdentifierContext original,
+			MappingContextImplementor mappingContext) {
+		return extendToOrmMappingContext( mappingContext );
 	}
 
 	/**
@@ -81,6 +95,15 @@ public final class OrmExtension
 	public Optional<HibernateOrmSessionContext> extendOptional(FromIndexFieldValueConvertContext original,
 			SessionContextImplementor sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
+	}
+
+	private Optional<HibernateOrmMappingContext> extendToOrmMappingContext(MappingContextImplementor mappingContext) {
+		if ( mappingContext instanceof HibernateOrmMappingContext ) {
+			return Optional.of( (HibernateOrmMappingContext) mappingContext );
+		}
+		else {
+			return Optional.empty();
+		}
 	}
 
 	private Optional<HibernateOrmSessionContext> extendToOrmSessionContext(SessionContextImplementor sessionContext) {

@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 /**
@@ -36,7 +37,7 @@ public class ProvidedStringIdentifierMapping implements IdentifierMapping<String
 	}
 
 	@Override
-	public String toDocumentIdentifier(String identifier) {
+	public String toDocumentIdentifier(String identifier, PojoMappingContextImplementor context) {
 		return identifier;
 	}
 

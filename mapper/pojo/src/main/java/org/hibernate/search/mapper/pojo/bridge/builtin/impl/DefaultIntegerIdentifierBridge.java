@@ -8,11 +8,13 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 
 public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<Integer> {
 
 	@Override
-	public String toDocumentIdentifier(Integer propertyValue) {
+	public String toDocumentIdentifier(Integer propertyValue,
+			IdentifierBridgeToDocumentIdentifierContext context) {
 		return propertyValue.toString();
 	}
 

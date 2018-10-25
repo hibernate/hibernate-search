@@ -15,10 +15,12 @@ import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIn
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 
 import org.junit.Test;
 
@@ -34,6 +36,13 @@ public class OrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void identifierBridge() {
+		IdentifierBridgeToDocumentIdentifierContext toDocumentContext =
+				new IdentifierBridgeToDocumentIdentifierContextImpl( mappingContext );
+		resetAll();
+		replayAll();
+		assertThat( toDocumentContext.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
+		verifyAll();
+
 		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new BridgeSessionContextImpl( sessionContext );
 		resetAll();
 		replayAll();
