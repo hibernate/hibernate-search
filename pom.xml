@@ -239,8 +239,8 @@
         <version.org.apache.derby>10.13.1.1</version.org.apache.derby>
 
         <!-- This should be aligned with the version used in ORM -->
+        <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
         <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
-        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
 
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
@@ -683,6 +683,7 @@
                 <!--
                      Dependency management is necessary to avoid divergence between the version required by unitils
                      and the one required by commons-beanutils used in jaxb
+                     HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB
                  -->
                 <groupId>commons-collections</groupId>
                 <artifactId>commons-collections</artifactId>
@@ -1142,15 +1143,11 @@
                 </exclusions>
             </dependency>
 
+            <!-- HSEARCH-3237: this should be removed when we remove the dependency from the Elasticsearch module to JAXB -->
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>${version.javax.xml.bind.jaxb-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <version>${version.org.glassfish.jaxb}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
