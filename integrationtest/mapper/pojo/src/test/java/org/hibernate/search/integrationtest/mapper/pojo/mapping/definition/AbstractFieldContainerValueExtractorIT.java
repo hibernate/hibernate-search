@@ -24,6 +24,7 @@ import java.util.function.BiFunction;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -308,7 +309,8 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 	public static class PrefixedStringBridge implements ValueBridge<String, String> {
 		public static final String PREFIX = "Prefix - ";
 		@Override
-		public String toIndexedValue(String value) {
+		public String toIndexedValue(String value,
+				ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : PREFIX + value;
 		}
 		@Override

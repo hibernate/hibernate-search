@@ -15,6 +15,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanM
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -255,7 +256,8 @@ public class KeywordFieldIT {
 
 	public static class ValidImplicitBindingBridge implements ValueBridge<WrappedValue, String> {
 		@Override
-		public String toIndexedValue(WrappedValue value) {
+		public String toIndexedValue(WrappedValue value,
+				ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.wrapped;
 		}
 		@Override
@@ -270,7 +272,8 @@ public class KeywordFieldIT {
 			return context.getIndexSchemaFieldContext().asString();
 		}
 		@Override
-		public String toIndexedValue(WrappedValue value) {
+		public String toIndexedValue(WrappedValue value,
+				ValueBridgeToIndexedValueContext context) {
 			return value == null ? null : value.wrapped;
 		}
 		@Override
@@ -289,7 +292,8 @@ public class KeywordFieldIT {
 			return context.getIndexSchemaFieldContext().asInteger();
 		}
 		@Override
-		public Integer toIndexedValue(String value) {
+		public Integer toIndexedValue(String value,
+				ValueBridgeToIndexedValueContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 		@Override

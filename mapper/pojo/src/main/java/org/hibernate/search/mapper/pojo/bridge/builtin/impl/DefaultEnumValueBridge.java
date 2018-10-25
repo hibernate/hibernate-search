@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexF
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBridge<V, String> {
 
@@ -30,7 +31,8 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	}
 
 	@Override
-	public String toIndexedValue(V value) {
+	public String toIndexedValue(V value,
+			ValueBridgeToIndexedValueContext context) {
 		return value == null ? null : value.name();
 	}
 

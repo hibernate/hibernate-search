@@ -6,11 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContextExtension;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 
 final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements ToIndexFieldValueConverter<V, F> {
+
 	private final ValueBridge<U, F> bridge;
 
 	ValueBridgeToIndexFieldValueConverter(ValueBridge<U, F> bridge) {
@@ -24,12 +31,12 @@ final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements 
 
 	@Override
 	public F convert(V value, ToIndexFieldValueConvertContext context) {
-		return bridge.toIndexedValue( value );
+		return bridge.toIndexedValue( value, context.extension( ToValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
 	public F convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
-		return bridge.toIndexedValue( bridge.cast( value ) );
+		return bridge.toIndexedValue( bridge.cast( value ), context.extension( ToValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
@@ -40,5 +47,22 @@ final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements 
 		ValueBridgeToIndexFieldValueConverter<?, ?, ?> castedOther =
 				(ValueBridgeToIndexFieldValueConverter<?, ?, ?>) other;
 		return bridge.isCompatibleWith( castedOther.bridge );
+	}
+
+	private static class ToValueBridgeContextExtension
+			implements ToIndexFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext> {
+		private static final ToValueBridgeContextExtension INSTANCE = new ToValueBridgeContextExtension();
+
+		@Override
+		public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToIndexFieldValueConvertContext original,
+			MappingContextImplementor mappingContext) {
+			if ( mappingContext instanceof PojoMappingContextImplementor ) {
+				PojoMappingContextImplementor pojoMappingContext = (PojoMappingContextImplementor) mappingContext;
+				return Optional.of( pojoMappingContext.getToIndexedValueContext() );
+			}
+			else {
+				return Optional.empty();
+			}
+		}
 	}
 }

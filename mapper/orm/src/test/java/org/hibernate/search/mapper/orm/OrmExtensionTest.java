@@ -21,8 +21,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
 
 import org.junit.Test;
 
@@ -76,6 +78,15 @@ public class OrmExtensionTest extends EasyMockSupport {
 		resetAll();
 		replayAll();
 		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		verifyAll();
+	}
+
+	@Test
+	public void valueBridge() {
+		ValueBridgeToIndexedValueContext context = new ValueBridgeToIndexedValueContextImpl( mappingContext );
+		resetAll();
+		replayAll();
+		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 	}
 

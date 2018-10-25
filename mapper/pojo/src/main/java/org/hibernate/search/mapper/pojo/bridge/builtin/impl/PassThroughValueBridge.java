@@ -11,6 +11,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.util.impl.common.Contracts;
 
 /**
@@ -47,7 +48,8 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public F toIndexedValue(F value) {
+	public F toIndexedValue(F value,
+			ValueBridgeToIndexedValueContext context) {
 		return value;
 	}
 

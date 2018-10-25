@@ -43,7 +43,7 @@ public class PojoIndexingProcessorValueBridgeNode<V, F> extends PojoIndexingProc
 
 	@Override
 	public void process(DocumentElement target, V source, PojoSessionContextImplementor sessionContext) {
-		F indexFieldValue = bridge.toIndexedValue( source );
+		F indexFieldValue = bridge.toIndexedValue( source, sessionContext.getMappingContext().getToIndexedValueContext() );
 		indexFieldAccessor.write( target, indexFieldValue );
 	}
 

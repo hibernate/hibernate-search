@@ -17,6 +17,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.IterableElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
@@ -481,7 +482,8 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 
 	public static class FirstCollectionElementBridge implements ValueBridge<Collection<String>, String> {
 		@Override
-		public String toIndexedValue(Collection<String> value) {
+		public String toIndexedValue(Collection<String> value,
+				ValueBridgeToIndexedValueContext context) {
 			return value == null || value.isEmpty() ? null : value.iterator().next();
 		}
 		@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class IntegerAsStringValueBridge implements ValueBridge<Integer, String> {
 
@@ -16,7 +17,8 @@ public final class IntegerAsStringValueBridge implements ValueBridge<Integer, St
 	}
 
 	@Override
-	public String toIndexedValue(Integer value) {
+	public String toIndexedValue(Integer value,
+			ValueBridgeToIndexedValueContext context) {
 		return value == null ? null : value.toString();
 	}
 

@@ -9,11 +9,13 @@ package org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge;
 import java.util.OptionalInt;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public final class OptionalIntAsStringValueBridge implements ValueBridge<OptionalInt, String> {
 
 	@Override
-	public String toIndexedValue(OptionalInt value) {
+	public String toIndexedValue(OptionalInt value,
+			ValueBridgeToIndexedValueContext context) {
 		return value == null || !value.isPresent()
 				? "empty"
 				: String.valueOf( value.getAsInt() );

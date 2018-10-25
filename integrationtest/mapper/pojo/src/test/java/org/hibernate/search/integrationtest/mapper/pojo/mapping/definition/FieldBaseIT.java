@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -232,7 +233,8 @@ public class FieldBaseIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 		@Override
-		public String toIndexedValue(String value) {
+		public String toIndexedValue(String value,
+				ValueBridgeToIndexedValueContext context) {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 		@Override

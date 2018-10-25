@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
 
 /**
  * A bridge between a POJO-extracted value of type {@code V} and an index field of type {@code F}.
@@ -50,9 +52,12 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * Transform the given POJO-extracted value to the value of the indexed field.
 	 *
 	 * @param value The POJO-extracted value to be transformed.
+	 * @param context A context that can be
+	 * {@link ValueBridgeToIndexedValueContext#extension(ValueBridgeToIndexedValueContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The value of the indexed field.
 	 */
-	F toIndexedValue(V value);
+	F toIndexedValue(V value, ValueBridgeToIndexedValueContext context);
 
 	/**
 	 * Cast an input value to the expected type {@link V}.
@@ -68,7 +73,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	/**
 	 * @param other Another {@link ValueBridge}, never {@code null}.
 	 * @return {@code true} if the given object is also a {@link ValueBridge}
-	 * that behaves exactly the same as this object, i.e. its {@link #cast(Object)} and {@link #toIndexedValue(Object)}
+	 * that behaves exactly the same as this object, i.e. its {@link #cast(Object)} and {@link #toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */

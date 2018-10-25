@@ -13,6 +13,7 @@ import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAna
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
@@ -27,7 +28,8 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	}
 
 	@Override
-	public String toIndexedValue(ISBN value) {
+	public String toIndexedValue(ISBN value,
+			ValueBridgeToIndexedValueContext context) {
 		return value == null ? null : value.getStringValue();
 	}
 
