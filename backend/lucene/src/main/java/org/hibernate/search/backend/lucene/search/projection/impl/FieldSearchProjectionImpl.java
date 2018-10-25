@@ -14,16 +14,16 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 
-class FieldSearchProjectionImpl<T, U> implements LuceneSearchProjection<U> {
+class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldCodec<T> codec;
+	private final LuceneFieldCodec<F> codec;
 
-	private final LuceneFieldConverter<T, ?> converter;
+	private final LuceneFieldConverter<F, ?> converter;
 
-	FieldSearchProjectionImpl(String absoluteFieldPath, LuceneFieldCodec<T> codec,
-			LuceneFieldConverter<T, ?> converter) {
+	FieldSearchProjectionImpl(String absoluteFieldPath, LuceneFieldCodec<F> codec,
+			LuceneFieldConverter<F, ?> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.converter = converter;
@@ -46,7 +46,7 @@ class FieldSearchProjectionImpl<T, U> implements LuceneSearchProjection<U> {
 
 	@Override
 	public void extract(ProjectionHitCollector collector, LuceneResult documentResult) {
-		T rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
+		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
 		collector.collectProjection( converter.convertFromProjection( rawValue ) );
 	}
 

@@ -11,23 +11,23 @@ import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConve
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 
-public class FieldSearchProjectionBuilderImpl<T, U> implements FieldSearchProjectionBuilder<U> {
+public class FieldSearchProjectionBuilderImpl<F, T> implements FieldSearchProjectionBuilder<T> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldCodec<T> codec;
+	private final LuceneFieldCodec<F> codec;
 
-	private final LuceneFieldConverter<T, ?> converter;
+	private final LuceneFieldConverter<F, ?> converter;
 
-	public FieldSearchProjectionBuilderImpl(String absoluteFieldPath, LuceneFieldCodec<T> codec,
-			LuceneFieldConverter<T, ?> converter) {
+	public FieldSearchProjectionBuilderImpl(String absoluteFieldPath, LuceneFieldCodec<F> codec,
+			LuceneFieldConverter<F, ?> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.converter = converter;
 	}
 
 	@Override
-	public SearchProjection<U> build() {
+	public SearchProjection<T> build() {
 		return new FieldSearchProjectionImpl<>( absoluteFieldPath, codec, converter );
 	}
 }
