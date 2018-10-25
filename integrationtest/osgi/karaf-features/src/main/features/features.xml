@@ -11,16 +11,14 @@
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
     <feature name="hibernate-search" version="${project.version}">
+        <feature>aries-blueprint</feature>
 
         <!-- JTA -->
-        <bundle dependency="true" start-level="30">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
-        <bundle start-level="30">mvn:org.apache.aries.proxy/org.apache.aries.proxy/1.0.0</bundle>
-        <bundle start-level="30">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint/1.0.0</bundle>
-        <bundle start-level="30">mvn:org.apache.aries.transaction/org.apache.aries.transaction.blueprint/1.0.0</bundle>
-        <bundle start-level="30">mvn:org.apache.aries.transaction/org.apache.aries.transaction.manager/1.0.1</bundle>
+        <feature>transaction-api</feature>
+        <feature>transaction-manager-geronimo</feature>
 
         <!-- JPA -->
-        <bundle start-level="30">mvn:javax.persistence/javax.persistence-api/${version.javax.persistence}</bundle>
+        <bundle>mvn:javax.persistence/javax.persistence-api/${version.javax.persistence}</bundle>
 
         <!-- JBoss Logging and Hibernate Commons Annotations -->
         <bundle>mvn:org.jboss.logging/jboss-logging/${version.org.jboss.logging.jboss-logging}</bundle>
