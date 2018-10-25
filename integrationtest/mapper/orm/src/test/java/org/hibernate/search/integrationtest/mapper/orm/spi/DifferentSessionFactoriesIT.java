@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,13 +44,11 @@ public class DifferentSessionFactoriesIT {
 
 	private SessionFactory sessionFactory;
 	private SessionFactory sessionFactoryAlt;
-	private EntityManager entityManager;
 
 	@Before
 	public void setup() {
 		sessionFactory = initABasicSessionFactory();
 		sessionFactoryAlt = initABasicSessionFactory();
-		entityManager = sessionFactory.createEntityManager();
 	}
 
 	@Test
@@ -62,7 +61,9 @@ public class DifferentSessionFactoriesIT {
 				.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
 
 		// try to use an entityManager owned by the original session factory instead
-		serviceMapping.createSearchManager( entityManager );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			serviceMapping.createSearchManager( session );
+		} );
 	}
 
 	private SessionFactory initABasicSessionFactory() {
