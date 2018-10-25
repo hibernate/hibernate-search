@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.converter.impl;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 import com.google.gson.JsonElement;
 
@@ -27,10 +27,10 @@ public interface ElasticsearchFieldConverter {
 
 	/**
 	 * @param value The projected value returned by the codec.
-	 * @param sessionContext The session context provided by the mapper.
+	 * @param context The context to use when converting.
 	 * @return A value of the type expected by users when projecting.
 	 */
-	Object convertFromProjection(JsonElement value, SessionContextImplementor sessionContext);
+	Object convertFromProjection(JsonElement value, FromIndexFieldValueConvertContext context);
 
 	/**
 	 * Determine whether another converter is DSL-compatible with this one.

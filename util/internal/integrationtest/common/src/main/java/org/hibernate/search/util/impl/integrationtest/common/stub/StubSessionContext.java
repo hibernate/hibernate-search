@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
-public class StubSessionContext implements SessionContextImplementor, SessionContext {
+public class StubSessionContext implements SessionContextImplementor {
 
 	private final String tenantIdentifier;
 
@@ -19,16 +18,6 @@ public class StubSessionContext implements SessionContextImplementor, SessionCon
 
 	public StubSessionContext(String tenantIdentifier) {
 		this.tenantIdentifier = tenantIdentifier;
-	}
-
-	@Override
-	public <T> T unwrap(Class<T> clazz) {
-		return clazz.cast( this );
-	}
-
-	@Override
-	public SessionContext toAPI() {
-		return this;
 	}
 
 	@Override

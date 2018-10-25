@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
-import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -108,8 +107,4 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_2 + 13,
-			value = "A Hibernate ORM session context ('%2$s') cannot be unwrapped to '%1$s'.")
-	SearchException sessionContextUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
-			@FormatWith(ClassFormatter.class) Class<?> actualClass);
 }

@@ -52,8 +52,8 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
-	public I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor sessionContext) {
-		return bridge.fromDocumentIdentifier( documentId, sessionContext.toAPI() );
+	public I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor context) {
+		return bridge.fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
 	}
 
 }

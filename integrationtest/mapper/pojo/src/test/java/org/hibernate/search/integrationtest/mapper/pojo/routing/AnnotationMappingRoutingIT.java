@@ -12,12 +12,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Collections;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -193,7 +193,7 @@ public class AnnotationMappingRoutingIT {
 
 		@Override
 		public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
-				SessionContext sessionContext) {
+				RoutingKeyBridgeToRoutingKeyContext context) {
 			EntityCategory category = categoryAccessor.read( source );
 			StringBuilder keyBuilder = new StringBuilder();
 			if ( tenantIdentifier != null ) {

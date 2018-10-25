@@ -42,8 +42,4 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 4, value = "Exception while retrieving property type model for '%1$s' on '%2$s'")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_1 + 5,
-			value = "A JavaBean session context ('%2$s') cannot be unwrapped to '%1$s'.")
-	SearchException sessionContextUnwrappingWithUnknownType(@FormatWith(ClassFormatter.class) Class<?> requestedClass,
-			@FormatWith(ClassFormatter.class) Class<?> actualClass);
 }

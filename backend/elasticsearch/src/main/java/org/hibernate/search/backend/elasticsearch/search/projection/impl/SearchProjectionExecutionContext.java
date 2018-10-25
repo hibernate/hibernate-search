@@ -10,22 +10,24 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class SearchProjectionExecutionContext {
 
-	private final SessionContextImplementor sessionContext;
+	private final FromIndexFieldValueConvertContext fromIndexFieldValueConvertContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	public SearchProjectionExecutionContext(SessionContextImplementor sessionContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
-		this.sessionContext = sessionContext;
+		this.fromIndexFieldValueConvertContext = new FromIndexFieldValueConvertContextImpl( sessionContext );
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
 	}
 
-	SessionContextImplementor getSessionContext() {
-		return sessionContext;
+	FromIndexFieldValueConvertContext getFromIndexFieldValueConvertContext() {
+		return fromIndexFieldValueConvertContext;
 	}
 
 	Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location) {

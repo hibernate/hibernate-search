@@ -7,8 +7,9 @@
 package org.hibernate.search.mapper.pojo.bridge;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 
 /**
@@ -34,7 +35,7 @@ public interface TypeBridge extends AutoCloseable {
 	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...).
 	 *     using {@link TypeBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
-	 *     {@link #write(DocumentElement, PojoElement, SessionContext)} method
+	 *     {@link #write(DocumentElement, PojoElement, TypeBridgeWriteContext)} method
 	 *     using {@link TypeBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
 	 *
@@ -53,12 +54,13 @@ public interface TypeBridge extends AutoCloseable {
 	 * Reading from the {@link PojoElement} should be done using
 	 * {@link org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor}s retrieved when the
 	 * {@link #bind(TypeBridgeBindingContext)} method was called.
-	 *  @param target The {@link DocumentElement} to write to.
+	 * @param target The {@link DocumentElement} to write to.
 	 * @param source The {@link PojoElement} to read from.
-	 * @param sessionContext A {@link SessionContext} that can be {@link SessionContext#unwrap(Class) unwrapped}
-	 * to a more useful type, such as a Hibernate ORM Session (if using the Hibernate ORM mapper).
+	 * @param context A context that can be
+	 * {@link TypeBridgeWriteContext#extension(TypeBridgeWriteContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 */
-	void write(DocumentElement target, PojoElement source, SessionContext sessionContext);
+	void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context);
 
 	/**
 	 * Close any resource before the bridge is discarded.

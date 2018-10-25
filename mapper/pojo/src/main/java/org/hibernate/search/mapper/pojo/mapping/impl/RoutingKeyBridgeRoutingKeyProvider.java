@@ -31,7 +31,7 @@ public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider
 		return bridge.toRoutingKey(
 				context.getTenantIdentifier(), identifier,
 				new PojoElementImpl( entitySupplier.get() ),
-				context.toAPI()
+				context.getRoutingKeyBridgeToRoutingKeyContext()
 		);
 	}
 }

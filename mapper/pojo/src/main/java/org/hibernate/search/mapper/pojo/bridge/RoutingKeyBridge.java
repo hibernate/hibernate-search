@@ -6,8 +6,9 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContextExtension;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 
 /**
@@ -27,7 +28,7 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 *     <li>Declare its expectations regarding the POJO model (input type, expected properties and their type, ...)
 	 *     using {@link RoutingKeyBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Retrieve accessors to the POJO and to the index fields that will later be used in the
-	 *     {@link #toRoutingKey(String, Object, PojoElement, SessionContext)} method
+	 *     {@link #toRoutingKey(String, Object, PojoElement, RoutingKeyBridgeToRoutingKeyContext)} method
 	 *     using {@link RoutingKeyBridgeBindingContext#getBridgedElement()}.
 	 * </ul>
 	 *
@@ -47,12 +48,13 @@ public interface RoutingKeyBridge extends AutoCloseable {
 	 * @param entityIdentifier The value of the POJO property used to generate the document identifier,
 	 * i.e. the same value that was passed to {@link IdentifierBridge#toDocumentIdentifier(Object)}.
 	 * @param source The {@link PojoElement} to read from.
-	 * @param sessionContext A {@link SessionContext} that can be {@link SessionContext#unwrap(Class) unwrapped}
-	 * to a more useful type, such as a Hibernate ORM Session (if using the Hibernate ORM mapper).
+	 * @param context A context that can be
+	 * {@link RoutingKeyBridgeToRoutingKeyContext#extension(RoutingKeyBridgeToRoutingKeyContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The resulting routing key. Never null.
 	 */
 	String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
-			SessionContext sessionContext);
+			RoutingKeyBridgeToRoutingKeyContext context);
 
 	/**
 	 * Close any resource before the bridge is discarded.

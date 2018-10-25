@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 
 public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<Integer> {
 
@@ -17,8 +17,7 @@ public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<In
 	}
 
 	@Override
-	public Integer fromDocumentIdentifier(String documentIdentifier,
-			SessionContext sessionContext) {
+	public Integer fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
 		return Integer.parseInt( documentIdentifier );
 	}
 

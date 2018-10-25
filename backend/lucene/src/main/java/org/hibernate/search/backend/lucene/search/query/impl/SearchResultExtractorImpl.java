@@ -10,15 +10,16 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.HitAggregator;
+
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
-import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
 

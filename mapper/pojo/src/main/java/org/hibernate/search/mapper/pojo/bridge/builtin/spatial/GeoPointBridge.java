@@ -15,13 +15,14 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
@@ -154,8 +155,16 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source,
-			SessionContext sessionContext) {
+	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		doWrite( target, source );
+	}
+
+	@Override
+	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+		doWrite( target, source );
+	}
+
+	private void doWrite(DocumentElement target, PojoElement source) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
 		fieldAccessor.write( target, coordinates );
 	}

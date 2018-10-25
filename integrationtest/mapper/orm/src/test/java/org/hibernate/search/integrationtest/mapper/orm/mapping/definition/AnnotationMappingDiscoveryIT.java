@@ -20,7 +20,6 @@ import javax.persistence.Id;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -31,6 +30,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -298,8 +298,7 @@ public class AnnotationMappingDiscoveryIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
 				objectFieldAccessor.add( target );
 			}

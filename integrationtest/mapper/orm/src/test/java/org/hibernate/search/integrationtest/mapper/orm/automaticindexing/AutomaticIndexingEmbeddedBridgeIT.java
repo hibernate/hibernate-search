@@ -25,12 +25,12 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
@@ -301,8 +301,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
 			DocumentElement objectField = objectFieldAccessor.add( target );
 			valueTargetAccessor.write( objectField, valueSourceAccessor.read( source ) );
 		}
@@ -331,8 +330,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
 			DocumentElement objectField = objectFieldAccessor.add( target );
 			valueTargetAccessor.write( objectField, valueSourceAccessor.read( source ) );
 		}

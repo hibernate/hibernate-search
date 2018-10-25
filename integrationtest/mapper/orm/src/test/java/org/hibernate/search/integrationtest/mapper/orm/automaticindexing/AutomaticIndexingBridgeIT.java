@@ -25,7 +25,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -34,6 +33,8 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -741,8 +742,7 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
 			DocumentElement typeBridgeObjectField = typeBridgeObjectFieldAccessor.add( target );
 			directFieldTargetAccessor.write( typeBridgeObjectField, directFieldSourceAccessor.read( source ) );
 			DocumentElement childObjectField = childObjectFieldAccessor.add( typeBridgeObjectField );
@@ -777,8 +777,7 @@ public class AutomaticIndexingBridgeIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			DocumentElement propertyBridgeObjectField = propertyBridgeObjectFieldAccessor.add( target );
 			includedInPropertyBridgeTargetAccessor.write(
 					propertyBridgeObjectField, includedInPropertyBridgeSourceAccessor.read( source )

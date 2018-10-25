@@ -73,7 +73,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		if ( !bridges.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( source );
 			for ( TypeBridge bridge : bridges ) {
-				bridge.write( parentObject, bridgedElement, sessionContext.toAPI() );
+				bridge.write( parentObject, bridgedElement, sessionContext.getTypeBridgeWriteContext() );
 			}
 		}
 		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {

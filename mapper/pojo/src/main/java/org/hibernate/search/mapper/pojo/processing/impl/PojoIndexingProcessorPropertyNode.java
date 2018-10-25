@@ -69,7 +69,7 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 		if ( !propertyBridges.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
 			for ( PropertyBridge bridge : propertyBridges ) {
-				bridge.write( target, bridgedElement, sessionContext.toAPI() );
+				bridge.write( target, bridgedElement, sessionContext.getPropertyBridgeWriteContext() );
 			}
 		}
 		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {

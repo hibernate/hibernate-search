@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.converter;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
 
 /**
  * A converter from a source index field value to a different value.
@@ -29,10 +30,11 @@ public interface FromIndexFieldValueConverter<F, V> {
 
 	/**
 	 * @param value The index field value to convert.
-	 * @param sessionContext A {@link SessionContext} that can be {@link SessionContext#unwrap(Class) unwrapped}
-	 * to a more useful type, such as a Hibernate ORM Session (if using the Hibernate ORM mapper).
+	 * @param context A context that can be
+	 * {@link FromIndexFieldValueConvertContext#extension(FromIndexFieldValueConvertContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The converted value.
 	 */
-	V convert(F value, SessionContext sessionContext);
+	V convert(F value, FromIndexFieldValueConvertContext context);
 
 }

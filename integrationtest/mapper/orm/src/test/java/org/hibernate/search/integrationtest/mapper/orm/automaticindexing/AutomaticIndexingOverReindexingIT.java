@@ -18,11 +18,11 @@ import javax.persistence.OneToOne;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -323,8 +323,7 @@ public class AutomaticIndexingOverReindexingIT {
 		}
 
 		@Override
-		public void write(DocumentElement target, PojoElement source,
-				SessionContext sessionContext) {
+		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
 			typeBridgeFieldAccessor.write(
 					target,
 					level3Property1SourceAccessor.read( source )

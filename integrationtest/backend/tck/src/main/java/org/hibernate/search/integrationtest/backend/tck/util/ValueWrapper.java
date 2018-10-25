@@ -10,8 +10,8 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 
 /**
  * A value wrapper used when testing
@@ -44,7 +44,7 @@ public final class ValueWrapper<T> {
 
 			@Override
 			public ValueWrapper<T> convert(T indexedValue,
-					SessionContext sessionContext) {
+					FromIndexFieldValueConvertContext context) {
 				return new ValueWrapper<T>( indexedValue );
 			}
 		};

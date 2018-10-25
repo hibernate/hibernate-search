@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.mapper.pojo.test.util;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -16,6 +15,10 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -89,8 +92,12 @@ public class StartupStubBridge
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source,
-			SessionContext sessionContext) {
+	public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+		throw unexpectedRuntimeUse();
+	}
+
+	@Override
+	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -106,7 +113,7 @@ public class StartupStubBridge
 
 	@Override
 	public String toRoutingKey(String tenantIdentifier, Object entityIdentifier, PojoElement source,
-			SessionContext sessionContext) {
+			RoutingKeyBridgeToRoutingKeyContext context) {
 		throw unexpectedRuntimeUse();
 	}
 
@@ -117,7 +124,7 @@ public class StartupStubBridge
 
 	@Override
 	public Object fromDocumentIdentifier(String documentIdentifier,
-			SessionContext sessionContext) {
+			IdentifierBridgeFromDocumentIdentifierContext context) {
 		throw unexpectedRuntimeUse();
 	}
 

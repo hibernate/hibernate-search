@@ -4,9 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean.session.context;
+package org.hibernate.search.mapper.pojo.bridge.runtime;
 
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
+public interface IdentifierBridgeFromDocumentIdentifierContext {
 
-public interface JavaBeanSessionContext extends SessionContext {
+	<T> T extension(IdentifierBridgeFromDocumentIdentifierContextExtension<T> extension);
+
 }

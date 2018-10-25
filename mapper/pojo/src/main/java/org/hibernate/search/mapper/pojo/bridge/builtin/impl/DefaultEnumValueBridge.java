@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 
@@ -56,7 +56,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		}
 
 		@Override
-		public V convert(String indexedValue, SessionContext sessionContext) {
+		public V convert(String indexedValue, FromIndexFieldValueConvertContext context) {
 			return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
 		}
 	}

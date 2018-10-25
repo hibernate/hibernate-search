@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.mapper.session.context.SessionContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 
@@ -69,8 +69,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	}
 
 	@Override
-	public void write(DocumentElement target, PojoElement source,
-			SessionContext sessionContext) {
+	public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 		String sourceValue = sourceAccessor.read( source );
 		if ( sourceValue != null ) {
 			String[] items = separatorPattern.split( sourceValue );

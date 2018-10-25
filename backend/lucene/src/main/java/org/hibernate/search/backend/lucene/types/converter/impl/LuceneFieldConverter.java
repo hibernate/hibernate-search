@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
  * Defines how a given value will be converted when performing search queries.
@@ -29,10 +29,10 @@ public interface LuceneFieldConverter<F, T> {
 
 	/**
 	 * @param value The projected value returned by the codec.
-	 * @param sessionContext
+	 * @param context The context to use when converting.
 	 * @return A value of the type expected by users when projecting.
 	 */
-	Object convertFromProjection(F value, SessionContextImplementor sessionContext);
+	Object convertFromProjection(F value, FromIndexFieldValueConvertContext context);
 
 	/**
 	 * Determine whether another converter is DSL-compatible with this one.

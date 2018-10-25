@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.converter.impl;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 import com.google.gson.JsonElement;
 
@@ -34,9 +34,9 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 	}
 
 	@Override
-	public Object convertFromProjection(JsonElement element, SessionContextImplementor sessionContext) {
+	public Object convertFromProjection(JsonElement element, FromIndexFieldValueConvertContext context) {
 		F rawValue = codec.decode( element );
-		return userConverter.convertFromProjection( rawValue, sessionContext );
+		return userConverter.convertFromProjection( rawValue, context );
 	}
 
 	@Override
