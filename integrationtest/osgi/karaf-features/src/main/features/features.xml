@@ -56,27 +56,5 @@
 
         <!-- Hibernate ORM -->
         <feature version="${version.org.hibernate}">hibernate-orm</feature>
-
-        <!--
-             To be removed in HSEARCH-3376, once the Hibernate ORM feature properly declares its dependency to JAXB.
-
-             This is a hack to make the JAXB runtime available to Hibernate ORM through the application classpath.
-             We cannot rely on Hibernate ORM declaring the dependency itself, because it does not (for now).
-             We cannot rely on the JAXB runtime being provided by the JDK, because the JAXB runtime was removed in JDK11.
-             We cannot rely on the JAXB runtime being provided by Karaf, because Karaf only provides the JAXB API (strangely).
-             So we must add the bundle ourselves, and more importantly, make it visible to Hibernate ORM somehow.
-
-             To make the bundle visible to Hibernate ORM, we declare the "META-INF.services" "package" as exported
-             by the bundle; this is enough to make the JAXB API find the service file pointing to the JAXBContext class.
-             This will work as long as the test bundle imports the "META-INF.services" "package", or just "*".
-             
-             There are probably better ways to do this, but all the solutions I found were worse or didn't work:
-             - using the mvn:com.sun.xml.bind/jaxb-osgi/${version.org.glassfish.jaxb} bundle would require us to
-             add a gazillion extra system packages to the Karaf configuration:
-             https://github.com/eclipse-ee4j/jaxb-ri/blob/afa88da958e1cfb953fb4c38f0b4a1cfec608162/jaxb-ri/bundles/osgi/tests/pom.xml#L85
-             - using the mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/2.2.11_1 bundle from
-             Apache ServiceMix does not seem to work: the runtime is not found.
-         -->
-        <bundle>wrap:mvn:org.glassfish.jaxb/jaxb-runtime/${version.org.glassfish.jaxb}$Bundle-SymbolicName=org.hibernate.org.glassfish.jaxb.runtime&amp;Export-Package=com.sun.xml.bind.v2;version="${version.org.glassfish.jaxb}&amp;Export-Package=META-INF.services;version="${version.org.glassfish.jaxb}"</bundle>
     </feature>
 </features>
