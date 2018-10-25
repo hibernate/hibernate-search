@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.mapping.impl;
+package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,12 +16,13 @@ import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
+import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
-class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
+public class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		implements HibernateOrmSearchManager {
 	private final SessionImplementor sessionImplementor;
 
@@ -42,12 +43,16 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 
 	@Override
 	public <T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
-				.createPojoSearchTarget( targetedTypes, getSessionContext() );
+		PojoSearchTargetDelegate<T> searchTargetDelegate = getDelegate().createPojoSearchTarget( targetedTypes );
 		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
-	static class Builder extends AbstractBuilder<HibernateOrmSearchManagerImpl>
+	@Override
+	public PojoWorkPlan createWorkPlan() {
+		return getDelegate().createWorkPlan();
+	}
+
+	public static class Builder extends AbstractBuilder<HibernateOrmSearchManagerImpl>
 			implements HibernateOrmSearchManagerBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;

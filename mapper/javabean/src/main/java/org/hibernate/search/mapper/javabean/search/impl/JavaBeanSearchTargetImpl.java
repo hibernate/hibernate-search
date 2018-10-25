@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {

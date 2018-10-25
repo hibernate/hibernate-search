@@ -10,16 +10,14 @@ import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 
 public interface PojoMappingDelegate extends AutoCloseable {
 
 	@Override
 	void close();
 
-	PojoWorkPlan createWorkPlan(PojoSessionContextImplementor sessionContext);
-
-	<T> PojoSearchTargetDelegate<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes,
-			PojoSessionContextImplementor sessionContext);
+	PojoSearchManagerDelegate createSearchManagerDelegate(PojoSessionContextImplementor sessionContext);
 
 	/**
 	 * @param type A Java type.
@@ -38,7 +36,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	/**
 	 * @param type A Java type.
 	 * @return {@code true} if this type is searchable
-	 * (i.e. it can be passed to {@link #createPojoSearchTarget(Collection, PojoSessionContextImplementor)}),
+	 * (i.e. it can be passed to {@link PojoSearchManagerDelegate#createPojoSearchTarget(Collection)}),
 	 * {@code false} if it is not.
 	 */
 	boolean isSearchable(Class<?> type);

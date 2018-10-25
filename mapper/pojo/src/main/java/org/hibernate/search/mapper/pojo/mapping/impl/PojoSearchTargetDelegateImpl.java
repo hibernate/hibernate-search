@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;

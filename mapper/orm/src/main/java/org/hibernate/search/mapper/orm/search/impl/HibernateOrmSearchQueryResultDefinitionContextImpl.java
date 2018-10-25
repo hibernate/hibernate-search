@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDe
 import org.hibernate.search.mapper.orm.impl.FullTextQueryImpl;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
 public class HibernateOrmSearchQueryResultDefinitionContextImpl<O>
 		implements HibernateOrmSearchQueryResultDefinitionContext<O> {

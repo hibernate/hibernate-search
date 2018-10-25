@@ -6,26 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-/**
- * @author Yoann Rodiere
- */
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
@@ -45,29 +32,6 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoWorkPlan createWorkPlan(PojoSessionContextImplementor sessionContext) {
-		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
-	}
-
-	@Override
-	public <T> PojoSearchTargetDelegate<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes,
-			PojoSessionContextImplementor sessionContext) {
-		if ( targetedTypes.isEmpty() ) {
-			throw log.cannotSearchOnEmptyTarget();
-		}
-
-		Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers = new LinkedHashSet<>();
-		for ( Class<? extends T> targetedType : targetedTypes ) {
-			targetedTypeManagers.addAll(
-					indexedTypeManagers.getAllBySuperClass( targetedType )
-							.orElseThrow( () -> log.notIndexedType( targetedType ) )
-			);
-		}
-
-		return new PojoSearchTargetDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
-	}
-
-	@Override
 	public boolean isWorkable(Class<?> type) {
 		return indexedTypeManagers.getByExactClass( type ).isPresent()
 				|| containedTypeManagers.getByExactClass( type ).isPresent();
@@ -81,5 +45,13 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	@Override
 	public boolean isSearchable(Class<?> type) {
 		return indexedTypeManagers.getAllBySuperClass( type ).isPresent();
+	}
+
+	@Override
+	public PojoSearchManagerDelegate createSearchManagerDelegate(PojoSessionContextImplementor sessionContextImplementor) {
+		return new PojoSearchManagerDelegateImpl(
+				indexedTypeManagers, containedTypeManagers,
+				sessionContextImplementor
+		);
 	}
 }

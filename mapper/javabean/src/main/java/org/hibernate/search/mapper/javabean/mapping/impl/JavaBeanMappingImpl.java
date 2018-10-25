@@ -11,6 +11,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
 

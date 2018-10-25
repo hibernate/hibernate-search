@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.javabean.mapping.impl;
+package org.hibernate.search.mapper.javabean.session.impl;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchManagerImpl;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
@@ -39,14 +39,14 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements 
 	@Override
 	public <T> JavaBeanSearchTarget search(Collection<? extends Class<? extends T>> targetedTypes) {
 		return new JavaBeanSearchTargetImpl(
-				getMappingDelegate().createPojoSearchTarget( targetedTypes, getSessionContext() )
+				getDelegate().createPojoSearchTarget( targetedTypes )
 		);
 	}
 
 	@Override
 	public PojoWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			workPlan = createWorkPlan();
+			workPlan = getDelegate().createWorkPlan();
 		}
 		return workPlan;
 	}
