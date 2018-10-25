@@ -15,6 +15,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchManagerImpl;
 import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
