@@ -11,7 +11,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 
-public class HibernateOrmMappingContextImpl implements PojoMappingContextImplementor, HibernateOrmMappingContext {
+public class HibernateOrmMappingContextImpl extends PojoMappingContextImplementor implements HibernateOrmMappingContext {
 	private final SessionFactoryImplementor sessionFactory;
 
 	public HibernateOrmMappingContextImpl(SessionFactoryImplementor sessionFactory) {

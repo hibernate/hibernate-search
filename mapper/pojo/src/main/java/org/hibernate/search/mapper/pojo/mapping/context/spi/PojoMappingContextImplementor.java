@@ -8,5 +8,5 @@ package org.hibernate.search.mapper.pojo.mapping.context.spi;
 
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
-public interface PojoMappingContextImplementor extends MappingContextImplementor {
+public abstract class PojoMappingContextImplementor implements MappingContextImplementor {
 }
