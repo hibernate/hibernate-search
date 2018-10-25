@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SearchSortBuilderFactoryImpl;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
 public class ElasticsearchSearchTargetContext
@@ -21,10 +23,13 @@ public class ElasticsearchSearchTargetContext
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final ElasticsearchSearchProjectionBuilderFactoryImpl searchProjectionFactory;
 
-	public ElasticsearchSearchTargetContext(SearchBackendContext searchBackendContext,
+	public ElasticsearchSearchTargetContext(
+			MappingContextImplementor mappingContext,
+			SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
-		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchTargetModel );
-		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchTargetModel );
+		ElasticsearchSearchContext searchContext = new ElasticsearchSearchContext( mappingContext );
+		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactoryImpl(
 				searchBackendContext.getSearchProjectionBackendContext(),
 				searchTargetModel );

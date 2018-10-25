@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 
 public final class IntegerFieldPredicateBuilderFactory
@@ -16,12 +17,14 @@ public final class IntegerFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public IntegerMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new IntegerMatchPredicateBuilder( absoluteFieldPath, converter );
+	public IntegerMatchPredicateBuilder createMatchPredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new IntegerMatchPredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override
-	public IntegerRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new IntegerRangePredicateBuilder( absoluteFieldPath, converter );
+	public IntegerRangePredicateBuilder createRangePredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new IntegerRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }

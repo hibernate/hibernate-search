@@ -7,14 +7,17 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.apache.lucene.search.SortField;
+
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 public class IntegerFieldSortBuilder extends AbstractFieldSortBuilderImpl {
 
-	IntegerFieldSortBuilder(String absoluteFieldPath, LuceneFieldConverter<Integer, ?> converter) {
-		super( absoluteFieldPath, converter, Integer.MIN_VALUE, Integer.MAX_VALUE );
+	IntegerFieldSortBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<Integer, ?> converter) {
+		super( searchContext, absoluteFieldPath, converter, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
 	@Override

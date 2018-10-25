@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements ToIndexFieldValueConverter<V, F> {
@@ -22,12 +23,12 @@ final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements 
 	}
 
 	@Override
-	public F convert(V value) {
+	public F convert(V value, ToIndexFieldValueConvertContext context) {
 		return bridge.toIndexedValue( value );
 	}
 
 	@Override
-	public F convertUnknown(Object value) {
+	public F convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
 		return bridge.toIndexedValue( bridge.cast( value ) );
 	}
 

@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -31,10 +32,14 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private static final JsonObjectAccessor MATCH = JsonAccessor.root().property( "match" ).asObject();
 
+	private final ElasticsearchSearchContext searchContext;
+
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
-	public MatchPredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	public MatchPredicateBuilderImpl(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
@@ -43,7 +48,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	public void value(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertFromDsl( value );
+			element = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

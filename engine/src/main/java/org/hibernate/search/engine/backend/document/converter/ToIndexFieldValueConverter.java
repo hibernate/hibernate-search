@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.backend.document.converter;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContextExtension;
+
 /**
  * A converter from a source value to a target value that should be indexed.
  *
@@ -16,9 +19,12 @@ public interface ToIndexFieldValueConverter<V, F> {
 
 	/**
 	 * @param value The source value to convert.
+	 * @param context A context that can be
+	 * {@link ToIndexFieldValueConvertContext#extension(ToIndexFieldValueConvertContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 */
-	F convert(V value);
+	F convert(V value, ToIndexFieldValueConvertContext context);
 
 	/**
 	 * Convert an input value of unknown type that may not have the required type {@code V}.
@@ -26,15 +32,18 @@ public interface ToIndexFieldValueConverter<V, F> {
 	 * Called when passing values to the predicate DSL in particular.
 	 *
 	 * @param value The value to convert.
+	 * @param context A context that can be
+	 * {@link ToIndexFieldValueConvertContext#extension(ToIndexFieldValueConvertContextExtension) extended}
+	 * to a more useful type, giving access to such things as a Hibernate ORM SessionFactory (if using the Hibernate ORM mapper).
 	 * @return The converted index field value.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	F convertUnknown(Object value);
+	F convertUnknown(Object value, ToIndexFieldValueConvertContext context);
 
 	/**
 	 * @param other Another {@link ToIndexFieldValueConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
-	 * i.e. its {@link #convert(Object)} and {@link #convertUnknown(Object)}
+	 * i.e. its {@link #convert(Object, ToIndexFieldValueConvertContext)} and {@link #convertUnknown(Object, ToIndexFieldValueConvertContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */

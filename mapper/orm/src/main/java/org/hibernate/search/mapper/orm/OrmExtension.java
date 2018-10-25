@@ -10,6 +10,8 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContextExtension;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
@@ -31,6 +33,7 @@ public final class OrmExtension
 		RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
 		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
+		ToIndexFieldValueConvertContextExtension<HibernateOrmMappingContext>,
 		FromIndexFieldValueConvertContextExtension<HibernateOrmSessionContext> {
 
 	private static final OrmExtension INSTANCE = new OrmExtension();
@@ -86,6 +89,15 @@ public final class OrmExtension
 	public Optional<HibernateOrmSessionContext> extendOptional(PropertyBridgeWriteContext original,
 			SessionContextImplementor sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<HibernateOrmMappingContext> extendOptional(ToIndexFieldValueConvertContext original,
+			MappingContextImplementor mappingContext) {
+		return extendToOrmMappingContext( mappingContext );
 	}
 
 	/**

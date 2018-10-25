@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexFieldValueConvertContextImpl;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -74,6 +76,15 @@ public class OrmExtensionTest extends EasyMockSupport {
 		resetAll();
 		replayAll();
 		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		verifyAll();
+	}
+
+	@Test
+	public void toIndexValueConverter() {
+		ToIndexFieldValueConvertContext context = new ToIndexFieldValueConvertContextImpl( mappingContext );
+		resetAll();
+		replayAll();
+		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 	}
 

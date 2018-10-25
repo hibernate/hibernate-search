@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -34,6 +35,8 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private static final JsonAccessor<JsonElement> LT = JsonAccessor.root().property( "lt" );
 	private static final JsonAccessor<JsonElement> LTE = JsonAccessor.root().property( "lte" );
 
+	private final ElasticsearchSearchContext searchContext;
+
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
@@ -42,7 +45,9 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private JsonElement upperLimit;
 	private boolean excludeUpperLimit = false;
 
-	public RangePredicateBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	public RangePredicateBuilderImpl(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
@@ -50,7 +55,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			this.lowerLimit = converter.convertFromDsl( value );
+			this.lowerLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -67,7 +72,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			this.upperLimit = converter.convertFromDsl( value );
+			this.upperLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

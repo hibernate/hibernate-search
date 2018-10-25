@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
 public final class StandardFieldConverter<F> extends AbstractFieldConverter<F, F> {
@@ -15,7 +16,8 @@ public final class StandardFieldConverter<F> extends AbstractFieldConverter<F, F
 	}
 
 	@Override
-	public F convertFromDsl(Object value) {
-		return userConverter.convertFromDsl( value );
+	public F convertFromDsl(Object value,
+			ToIndexFieldValueConvertContext context) {
+		return userConverter.convertFromDsl( value, context );
 	}
 }

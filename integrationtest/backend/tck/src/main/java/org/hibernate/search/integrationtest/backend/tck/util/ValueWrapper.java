@@ -11,6 +11,7 @@ import java.util.Objects;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 
 /**
@@ -22,13 +23,13 @@ public final class ValueWrapper<T> {
 	public static <T> ToIndexFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
 		return new ToIndexFieldValueConverter<ValueWrapper<T>, T>() {
 			@Override
-			public T convert(ValueWrapper<T> value) {
+			public T convert(ValueWrapper<T> value, ToIndexFieldValueConvertContext context) {
 				return value.getValue();
 			}
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public T convertUnknown(Object value) {
+			public T convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
 				return ( (ValueWrapper<T>) value ).getValue();
 			}
 		};

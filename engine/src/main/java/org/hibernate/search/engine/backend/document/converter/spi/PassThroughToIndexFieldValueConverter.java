@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.document.converter.spi;
 
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.util.impl.common.Contracts;
 
 public final class PassThroughToIndexFieldValueConverter<F> implements ToIndexFieldValueConverter<F, F> {
@@ -23,12 +24,12 @@ public final class PassThroughToIndexFieldValueConverter<F> implements ToIndexFi
 	}
 
 	@Override
-	public F convert(F value) {
+	public F convert(F value, ToIndexFieldValueConvertContext context) {
 		return value;
 	}
 
 	@Override
-	public F convertUnknown(Object value) {
+	public F convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
 		return valueType.cast( value );
 	}
 

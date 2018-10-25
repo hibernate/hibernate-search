@@ -29,7 +29,7 @@ class ElasticsearchIndexSearchTarget extends IndexSearchTargetBase {
 			MappingContextImplementor mappingContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchTargetModel = searchTargetModel;
-		this.searchTargetContext = new ElasticsearchSearchTargetContext( searchBackendContext, searchTargetModel );
+		this.searchTargetContext = new ElasticsearchSearchTargetContext( mappingContext, searchBackendContext, searchTargetModel );
 	}
 
 	@Override

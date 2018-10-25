@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -28,9 +29,11 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	 */
 	boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other);
 
-	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(String absoluteFieldPath);
+	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath);
 
-	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(String absoluteFieldPath);
+	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);

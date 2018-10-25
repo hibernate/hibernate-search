@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
@@ -15,7 +16,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface LuceneFieldSortBuilderFactory {
 
-	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath);
+	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath);
 
 	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, GeoPoint center);
 

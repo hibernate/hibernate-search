@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -28,10 +29,14 @@ public class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
+	private final ElasticsearchSearchContext searchContext;
+
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
-	public FieldSortBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	public FieldSortBuilderImpl(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
@@ -50,7 +55,7 @@ public class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	public void missingAs(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertFromDsl( value );
+			element = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

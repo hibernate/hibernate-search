@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 
 public final class LocalDateFieldPredicateBuilderFactory
@@ -16,12 +17,14 @@ public final class LocalDateFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public LocalDateMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new LocalDateMatchPredicateBuilder( absoluteFieldPath, converter );
+	public LocalDateMatchPredicateBuilder createMatchPredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new LocalDateMatchPredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override
-	public LocalDateRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new LocalDateRangePredicateBuilder( absoluteFieldPath, converter );
+	public LocalDateRangePredicateBuilder createRangePredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new LocalDateRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }

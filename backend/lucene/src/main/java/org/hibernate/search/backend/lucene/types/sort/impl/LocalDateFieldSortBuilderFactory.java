@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.time.LocalDate;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -19,9 +20,10 @@ public class LocalDateFieldSortBuilderFactory extends AbstractStandardLuceneFiel
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
+	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new LocalDateFieldSortBuilder( absoluteFieldPath, converter );
+		return new LocalDateFieldSortBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }

@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -27,7 +28,8 @@ public class GeoPointFieldSortBuilderFactory implements LuceneFieldSortBuilderFa
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
+	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		throw log.traditionalSortNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}

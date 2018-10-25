@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
@@ -23,6 +24,8 @@ abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final LuceneSearchContext searchContext;
+
 	protected final String absoluteFieldPath;
 
 	protected final LuceneFieldConverter<?, ?> converter;
@@ -33,8 +36,11 @@ abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private Object sortMissingValueLastPlaceholder;
 
-	protected AbstractFieldSortBuilderImpl(String absoluteFieldPath, LuceneFieldConverter<?, ?> converter,
+	protected AbstractFieldSortBuilderImpl(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, ?> converter,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
@@ -54,7 +60,7 @@ abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
 	@Override
 	public void missingAs(Object value) {
 		try {
-			missingValue = converter.convertFromDsl( value );
+			missingValue = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

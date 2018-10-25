@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -19,6 +20,8 @@ public abstract class AbstractRangePredicateBuilder<F> extends AbstractSearchPre
 		implements RangePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final LuceneSearchContext searchContext;
 
 	protected final String absoluteFieldPath;
 
@@ -32,7 +35,10 @@ public abstract class AbstractRangePredicateBuilder<F> extends AbstractSearchPre
 
 	protected boolean excludeUpperLimit = false;
 
-	protected AbstractRangePredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<?, F> converter) {
+	protected AbstractRangePredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, F> converter) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
@@ -40,7 +46,7 @@ public abstract class AbstractRangePredicateBuilder<F> extends AbstractSearchPre
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			lowerLimit = converter.convertFromDsl( value );
+			lowerLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -57,7 +63,7 @@ public abstract class AbstractRangePredicateBuilder<F> extends AbstractSearchPre
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			upperLimit = converter.convertFromDsl( value );
+			upperLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

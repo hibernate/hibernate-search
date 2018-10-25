@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.converter.impl;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
@@ -28,8 +29,8 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 	}
 
 	@Override
-	public JsonElement convertFromDsl(Object value) {
-		F rawValue = userConverter.convertFromDsl( value );
+	public JsonElement convertFromDsl(Object value, ToIndexFieldValueConvertContext context) {
+		F rawValue = userConverter.convertFromDsl( value, context );
 		return codec.encode( rawValue );
 	}
 

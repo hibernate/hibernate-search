@@ -12,6 +12,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -37,9 +38,12 @@ public class SearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateB
 	private static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new PredicateBuilderFactoryRetrievalStrategy();
 
+	private final LuceneSearchContext searchContext;
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	public SearchPredicateBuilderFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
+	public SearchPredicateBuilderFactoryImpl(LuceneSearchContext searchContext,
+			LuceneSearchTargetModel searchTargetModel) {
+		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
 	}
 
@@ -76,14 +80,14 @@ public class SearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateB
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createMatchPredicateBuilder( absoluteFieldPath );
+				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createRangePredicateBuilder( absoluteFieldPath );
+				.createRangePredicateBuilder( searchContext, absoluteFieldPath );
 	}
 
 	@Override

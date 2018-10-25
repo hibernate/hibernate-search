@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
@@ -42,9 +43,13 @@ public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuil
 	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new SortBuilderFactoryRetrievalStrategy();
 
+	private final ElasticsearchSearchContext searchContext;
+
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	public SearchSortBuilderFactoryImpl(ElasticsearchSearchTargetModel searchTargetModel) {
+	public SearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
+			ElasticsearchSearchTargetModel searchTargetModel) {
+		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
 	}
 
@@ -81,7 +86,7 @@ public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuil
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createFieldSortBuilder( absoluteFieldPath );
+				.createFieldSortBuilder( searchContext, absoluteFieldPath );
 	}
 
 	@Override

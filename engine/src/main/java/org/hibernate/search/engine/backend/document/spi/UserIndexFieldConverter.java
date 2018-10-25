@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.document.spi;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 
 /**
  * A helper class allowing to convert values between the type expected by the user
@@ -42,8 +43,8 @@ public final class UserIndexFieldConverter<F> {
 				+ "]";
 	}
 
-	public F convertFromDsl(Object value) {
-		return dslToIndexConverter.convertUnknown( value );
+	public F convertFromDsl(Object value, ToIndexFieldValueConvertContext context) {
+		return dslToIndexConverter.convertUnknown( value, context );
 	}
 
 	public Object convertFromProjection(F projection, FromIndexFieldValueConvertContext context) {
@@ -56,7 +57,7 @@ public final class UserIndexFieldConverter<F> {
 
 	/**
 	 * Determine whether another converter is DSL-compatible with this one,
-	 * i.e. its {@link #convertFromDsl(Object)} method is guaranteed
+	 * i.e. its {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is guaranteed
 	 * to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return true for two different objects,

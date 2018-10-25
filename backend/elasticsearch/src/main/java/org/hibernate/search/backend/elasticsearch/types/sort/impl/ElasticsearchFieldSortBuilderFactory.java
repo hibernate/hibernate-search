@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -14,7 +15,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface ElasticsearchFieldSortBuilderFactory {
 
-	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath);
+	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath);
 
 	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
 			GeoPoint center);

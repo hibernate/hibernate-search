@@ -9,14 +9,17 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.time.LocalDate;
 
 import org.apache.lucene.search.SortField;
+
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 public class LocalDateFieldSortBuilder extends AbstractFieldSortBuilderImpl {
 
-	LocalDateFieldSortBuilder(String absoluteFieldPath, LuceneFieldConverter<LocalDate, ?> converter) {
-		super( absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
+	LocalDateFieldSortBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<LocalDate, ?> converter) {
+		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
 	}
 
 	@Override

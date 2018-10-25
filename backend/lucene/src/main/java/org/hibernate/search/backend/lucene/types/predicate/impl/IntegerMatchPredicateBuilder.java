@@ -9,14 +9,17 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 
 class IntegerMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Integer, Integer> {
 
-	IntegerMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<?, Integer> converter) {
-		super( absoluteFieldPath, converter );
+	IntegerMatchPredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, Integer> converter) {
+		super( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override

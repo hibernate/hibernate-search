@@ -11,14 +11,17 @@ import java.time.LocalDate;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
 
 class LocalDateMatchPredicateBuilder extends AbstractMatchPredicateBuilder<LocalDate, Long> {
 
-	LocalDateMatchPredicateBuilder(String absoluteFieldPath, LocalDateFieldConverter converter) {
-		super( absoluteFieldPath, converter );
+	LocalDateMatchPredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, LocalDateFieldConverter converter) {
+		super( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override

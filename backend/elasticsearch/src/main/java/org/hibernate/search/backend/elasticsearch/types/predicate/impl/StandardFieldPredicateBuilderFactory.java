@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilderImpl;
@@ -42,14 +43,14 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( absoluteFieldPath, converter );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
+		return new MatchPredicateBuilderImpl( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( absoluteFieldPath, converter );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
+		return new RangePredicateBuilderImpl( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override

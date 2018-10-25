@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldCon
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -32,12 +33,12 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 	private static final ToIndexFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
 			new ToIndexFieldValueConverter<Object, Object>() {
 				@Override
-				public Object convert(Object value) {
+				public Object convert(Object value, ToIndexFieldValueConvertContext context) {
 					return value;
 				}
 
 				@Override
-				public Object convertUnknown(Object value) {
+				public Object convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
 					throw new AssertionFailure(
 							"Attempt to perform an unsafe conversion on a field with native type;"
 							+ " this should not have happened since the DSL is disabled for such fields."

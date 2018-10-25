@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import org.apache.lucene.analysis.Analyzer;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
@@ -28,8 +29,9 @@ public final class StringFieldConverter extends AbstractFieldConverter<String, S
 	}
 
 	@Override
-	public String convertFromDsl(Object value) {
-		return userConverter.convertFromDsl( value );
+	public String convertFromDsl(Object value,
+			ToIndexFieldValueConvertContext context) {
+		return userConverter.convertFromDsl( value, context );
 	}
 
 	@Override

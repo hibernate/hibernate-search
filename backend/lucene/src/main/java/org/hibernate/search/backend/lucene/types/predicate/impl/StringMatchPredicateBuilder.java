@@ -12,6 +12,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
@@ -22,8 +23,10 @@ class StringMatchPredicateBuilder extends AbstractMatchPredicateBuilder<String, 
 
 	private final QueryBuilder queryBuilder;
 
-	StringMatchPredicateBuilder(String absoluteFieldPath, StringFieldConverter converter, QueryBuilder queryBuilder) {
-		super( absoluteFieldPath, converter );
+	StringMatchPredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, StringFieldConverter converter, QueryBuilder queryBuilder) {
+		super( searchContext, absoluteFieldPath, converter );
 		this.converter = converter;
 		this.queryBuilder = queryBuilder;
 	}

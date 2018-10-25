@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
+
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
@@ -16,8 +18,10 @@ class StringRangePredicateBuilder extends AbstractRangePredicateBuilder<String> 
 
 	private final StringFieldConverter stringConverter;
 
-	StringRangePredicateBuilder(String absoluteFieldPath, StringFieldConverter stringConverter) {
-		super( absoluteFieldPath, stringConverter );
+	StringRangePredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, StringFieldConverter stringConverter) {
+		super( searchContext, absoluteFieldPath, stringConverter );
 		this.stringConverter = stringConverter;
 	}
 

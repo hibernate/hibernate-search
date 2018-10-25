@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -37,7 +38,7 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			String absoluteFieldPath) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -45,7 +46,7 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			String absoluteFieldPath) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

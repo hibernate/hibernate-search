@@ -15,6 +15,7 @@ import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
@@ -36,9 +37,12 @@ public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFact
 	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new SortBuilderFactoryRetrievalStrategy();
 
+	private final LuceneSearchContext searchContext;
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	public SearchSortBuilderFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
+	public SearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
+			LuceneSearchTargetModel searchTargetModel) {
+		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
 	}
 
@@ -71,7 +75,7 @@ public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFact
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createFieldSortBuilder( absoluteFieldPath );
+				.createFieldSortBuilder( searchContext, absoluteFieldPath );
 	}
 
 	@Override

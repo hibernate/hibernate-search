@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.converter.impl;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
 import com.google.gson.JsonElement;
@@ -20,10 +21,12 @@ public interface ElasticsearchFieldConverter {
 
 	/**
 	 * @param value A value passed through the predicate or sort DSL.
+	 * @param context
 	 * @return A value of the type used internally when querying this field.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	JsonElement convertFromDsl(Object value);
+	JsonElement convertFromDsl(Object value,
+			ToIndexFieldValueConvertContext context);
 
 	/**
 	 * @param value The projected value returned by the codec.

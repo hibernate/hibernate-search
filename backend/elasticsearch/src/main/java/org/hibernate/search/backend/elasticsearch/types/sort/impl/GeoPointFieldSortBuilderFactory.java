@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.DistanceSortBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -28,7 +29,9 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 	}
 
 	@Override
-	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
+	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
+			ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath) {
 		throw log.traditionalSortNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

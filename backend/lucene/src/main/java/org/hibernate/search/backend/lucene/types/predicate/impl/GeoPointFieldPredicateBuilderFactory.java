@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -33,14 +34,16 @@ public final class GeoPointFieldPredicateBuilderFactory implements LuceneFieldPr
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(String absoluteFieldPath) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(String absoluteFieldPath) {
+	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

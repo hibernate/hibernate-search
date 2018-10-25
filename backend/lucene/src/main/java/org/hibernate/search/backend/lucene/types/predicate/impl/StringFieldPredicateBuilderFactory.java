@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 
 public final class StringFieldPredicateBuilderFactory
@@ -36,12 +37,14 @@ public final class StringFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public StringMatchPredicateBuilder createMatchPredicateBuilder(String absoluteFieldPath) {
-		return new StringMatchPredicateBuilder( absoluteFieldPath, converter, queryBuilder );
+	public StringMatchPredicateBuilder createMatchPredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new StringMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, queryBuilder );
 	}
 
 	@Override
-	public StringRangePredicateBuilder createRangePredicateBuilder(String absoluteFieldPath) {
-		return new StringRangePredicateBuilder( absoluteFieldPath, converter );
+	public StringRangePredicateBuilder createRangePredicateBuilder(
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new StringRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }

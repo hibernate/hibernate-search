@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -20,12 +21,16 @@ public abstract class AbstractMatchPredicateBuilder<F, T> extends AbstractSearch
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final LuceneSearchContext searchContext;
 	protected final String absoluteFieldPath;
 	private final LuceneFieldConverter<?, T> converter;
 
 	protected T value;
 
-	protected AbstractMatchPredicateBuilder(String absoluteFieldPath, LuceneFieldConverter<?, T> converter) {
+	protected AbstractMatchPredicateBuilder(
+			LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, T> converter) {
+		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
@@ -33,7 +38,7 @@ public abstract class AbstractMatchPredicateBuilder<F, T> extends AbstractSearch
 	@Override
 	public void value(Object value) {
 		try {
-			this.value = converter.convertFromDsl( value );
+			this.value = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

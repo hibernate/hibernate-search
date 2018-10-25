@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateBuilderFactoryImpl;
@@ -28,8 +29,9 @@ public class LuceneSearchTargetContext
 	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext,
 			LuceneSearchTargetModel searchTargetModel) {
-		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchTargetModel );
-		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchTargetModel );
+		LuceneSearchContext searchContext = new LuceneSearchContext( mappingContext );
+		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactoryImpl( searchTargetModel );
 		this.searchQueryFactory = new SearchQueryBuilderFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
