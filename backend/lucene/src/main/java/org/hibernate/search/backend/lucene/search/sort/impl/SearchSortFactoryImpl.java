@@ -48,7 +48,7 @@ public class SearchSortFactoryImpl implements LuceneSearchSortFactory {
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<LuceneSearchSortBuilder> implementationConsumer) {
+	public void toImplementation(SearchSort sort, Consumer<? super LuceneSearchSortBuilder> implementationConsumer) {
 		if ( !( sort instanceof LuceneSearchSort ) ) {
 			throw log.cannotMixLuceneSearchSortWithOtherSorts( sort );
 		}

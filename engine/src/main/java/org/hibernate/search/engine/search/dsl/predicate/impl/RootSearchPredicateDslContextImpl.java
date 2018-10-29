@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A DSL context used when building a {@link SearchPredicate} object,
@@ -24,10 +28,12 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 public final class RootSearchPredicateDslContextImpl<B>
 		implements SearchPredicateDslContext<SearchPredicate, B> {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final SearchPredicateFactory<?, B> factory;
 
-	private final SearchPredicateContributorAggregator<B> aggregator = new SearchPredicateContributorAggregator<>();
-
+	private SearchPredicateContributor<? extends B> singlePredicateContributor;
+	private boolean usedContributor = false;
 	private SearchPredicate predicateResult;
 
 	public RootSearchPredicateDslContextImpl(SearchPredicateFactory<?, B> factory) {
@@ -36,13 +42,26 @@ public final class RootSearchPredicateDslContextImpl<B>
 
 	@Override
 	public void addChild(SearchPredicateContributor<? extends B> child) {
-		aggregator.add( child );
+		if ( usedContributor ) {
+			throw log.cannotAddPredicateToUsedContext();
+		}
+		if ( this.singlePredicateContributor != null ) {
+			throw log.cannotAddMultiplePredicatesToQueryRoot();
+		}
+		this.singlePredicateContributor = child;
 	}
 
 	@Override
 	public SearchPredicate getNextContext() {
 		if ( predicateResult == null ) {
-			predicateResult = factory.toSearchPredicate( aggregator.contribute() );
+			if ( usedContributor ) {
+				// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
+				throw new AssertionFailure(
+						"A predicate object was requested after the corresponding information was contributed to the DSL." +
+						" There is a bug in Hibernate Search, please report it."
+				);
+			}
+			predicateResult = factory.toSearchPredicate( getResultingBuilder() );
 		}
 		return predicateResult;
 	}
@@ -58,12 +77,19 @@ public final class RootSearchPredicateDslContextImpl<B>
 			return factory.toImplementation( predicateResult );
 		}
 		else {
+			if ( usedContributor ) {
+				// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
+				throw new AssertionFailure(
+						"A predicate contributor was called twice. There is a bug in Hibernate Search, please report it."
+				);
+			}
+			usedContributor = true;
 			/*
 			 * Optimization: we know the user will not be able to request a SearchPredicate object anymore,
 			 * so we don't need to build a SearchPredicate object in this case,
 			 * we can just use the builder collected by the aggregator directly.
 			 */
-			return aggregator.contribute();
+			return singlePredicateContributor.contribute();
 		}
 	}
 }

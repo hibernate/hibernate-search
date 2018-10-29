@@ -46,7 +46,7 @@ public interface SearchSortFactory<C, B> {
 	 * @throws SearchException If the {@link SearchSort} object was created
 	 * by a different, incompatible factory.
 	 */
-	void toImplementation(SearchSort sort, Consumer<B> implementationConsumer);
+	void toImplementation(SearchSort sort, Consumer<? super B> implementationConsumer);
 
 	/**
 	 * Contribute a sort builder to a collector.

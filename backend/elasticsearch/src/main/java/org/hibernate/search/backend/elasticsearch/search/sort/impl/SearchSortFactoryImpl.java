@@ -58,7 +58,7 @@ public class SearchSortFactoryImpl implements ElasticsearchSearchSortFactory {
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<ElasticsearchSearchSortBuilder> implementationConsumer) {
+	public void toImplementation(SearchSort sort, Consumer<? super ElasticsearchSearchSortBuilder> implementationConsumer) {
 		if ( !( sort instanceof ElasticsearchSearchSort ) ) {
 			throw log.cannotMixElasticsearchSearchSortWithOtherSorts( sort );
 		}

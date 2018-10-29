@@ -25,7 +25,7 @@ public class StubSearchSortFactory implements SearchSortFactory<StubQueryElement
 	}
 
 	@Override
-	public void toImplementation(SearchSort sort, Consumer<StubSortBuilder> implementationConsumer) {
+	public void toImplementation(SearchSort sort, Consumer<? super StubSortBuilder> implementationConsumer) {
 		((StubSearchSort) sort).getBuilders().forEach( implementationConsumer );
 	}
 

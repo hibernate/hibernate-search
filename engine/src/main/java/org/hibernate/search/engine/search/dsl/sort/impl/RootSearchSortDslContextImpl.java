@@ -6,16 +6,20 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A DSL context used when building a {@link SearchSort} object,
@@ -26,26 +30,37 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 public final class RootSearchSortDslContextImpl<B>
 		implements SearchSortDslContext<SearchSort, B> {
 
-	private final SearchSortFactory<?, B> factory;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchSortContributorAggregator<B> aggregator = new SearchSortContributorAggregator<>();
+	protected final SearchSortFactory<?, B> factory;
 
+	private final List<SearchSortContributor<? extends B>> sortContributors = new ArrayList<>();
 	private SearchSort sortResult;
+	private boolean usedContributors = false;
 
 	public RootSearchSortDslContextImpl(SearchSortFactory<?, B> factory) {
 		this.factory = factory;
 	}
 
 	@Override
-	public void addChild(SearchSortContributor<? extends B> contributor) {
-		aggregator.add( contributor );
+	public void addChild(SearchSortContributor<? extends B> child) {
+		if ( usedContributors ) {
+			throw log.cannotAddSortToUsedContext();
+		}
+		sortContributors.add( child );
 	}
 
 	@Override
 	public SearchSort getNextContext() {
 		if ( sortResult == null ) {
-			List<B> builderResult = new ArrayList<>();
-			aggregator.contribute( builderResult::add );
+			if ( usedContributors ) {
+				// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
+				throw new AssertionFailure(
+						"A sort object was requested after the corresponding information was contributed to the DSL." +
+						" There is a bug in Hibernate Search, please report it."
+				);
+			}
+			List<B> builderResult = getResultingBuilders();
 			sortResult = factory.toSearchSort( builderResult );
 		}
 		return sortResult;
@@ -63,12 +78,21 @@ public final class RootSearchSortDslContextImpl<B>
 			factory.toImplementation( sortResult, builderResult::add );
 		}
 		else {
+			if ( usedContributors ) {
+				// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
+				throw new AssertionFailure(
+						"A sort contributor was called twice. There is a bug in Hibernate Search, please report it."
+				);
+			}
+			usedContributors = true;
 			/*
 			 * Optimization: we know the user will not be able to request a SearchSort object anymore,
 			 * so we don't need to build a SearchSort object in this case,
 			 * we can just use the builders collected by the aggregator directly.
 			 */
-			aggregator.contribute( builderResult::add );
+			for ( SearchSortContributor<? extends B> sortContributor : sortContributors ) {
+				sortContributor.contribute( builderResult::add );
+			}
 		}
 		return builderResult;
 	}
