@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * The context used when defining a "nested" predicate, after the object field was mentioned.
@@ -29,7 +28,7 @@ public interface NestedPredicateFieldContext<N> {
 	 * @param searchPredicate The predicate that must be matched by at least one element of the nested object field.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> nest(SearchPredicate searchPredicate);
+	SearchPredicateTerminalContext<N> nest(SearchPredicate searchPredicate);
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
@@ -50,6 +49,6 @@ public interface NestedPredicateFieldContext<N> {
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor);
+	SearchPredicateTerminalContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor);
 
 }

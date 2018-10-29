@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -56,7 +55,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param unit The unit used for the radius.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> circle(GeoPoint center, double radius, DistanceUnit unit);
+	SearchPredicateTerminalContext<N> circle(GeoPoint center, double radius, DistanceUnit unit);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given circle,
@@ -66,7 +65,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	default ExplicitEndContext<N> circle(GeoPoint center, double radiusInMeters) {
+	default SearchPredicateTerminalContext<N> circle(GeoPoint center, double radiusInMeters) {
 		return circle( center, radiusInMeters, DistanceUnit.METERS );
 	}
 
@@ -80,7 +79,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param unit The unit used for the radius.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	default ExplicitEndContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
+	default SearchPredicateTerminalContext<N> circle(double latitude, double longitude, double radius, DistanceUnit unit) {
 		return circle( GeoPoint.of( latitude, longitude ), radius, unit );
 	}
 
@@ -93,7 +92,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	default ExplicitEndContext<N> circle(double latitude, double longitude, double radiusInMeters) {
+	default SearchPredicateTerminalContext<N> circle(double latitude, double longitude, double radiusInMeters) {
 		return circle( GeoPoint.of( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
 	}
 
@@ -103,7 +102,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param polygon The bounding polygon.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> polygon(GeoPolygon polygon);
+	SearchPredicateTerminalContext<N> polygon(GeoPolygon polygon);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given box (~rectangle).
@@ -111,7 +110,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param boundingBox The bounding box.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> boundingBox(GeoBoundingBox boundingBox);
+	SearchPredicateTerminalContext<N> boundingBox(GeoBoundingBox boundingBox);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given box (~rectangle).
@@ -122,7 +121,7 @@ public interface SpatialWithinPredicateFieldSetContext<N> extends MultiFieldPred
 	 * @param bottomRightLongitude The longitude of the bottom-right corner of the box.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	default ExplicitEndContext<N> boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
+	default SearchPredicateTerminalContext<N> boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
 			double bottomRightLongitude) {
 		return boundingBox( GeoBoundingBox.of( topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude ) );
 	}

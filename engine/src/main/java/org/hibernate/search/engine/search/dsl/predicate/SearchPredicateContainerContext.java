@@ -10,7 +10,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * A context allowing to specify the type of a predicate.
@@ -62,7 +61,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * Match all documents.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see MatchAllPredicateContext
 	 */
 	MatchAllPredicateContext<N> matchAll();
@@ -71,7 +70,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * Match documents if they match a combination of boolean clauses.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see BooleanJunctionPredicateContext
 	 */
 	BooleanJunctionPredicateContext<N> bool();
@@ -97,7 +96,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * while analyzed, full-text fields imply approximate matches depending on how they are analyzed.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see MatchPredicateContext
 	 */
 	MatchPredicateContext<N> match();
@@ -106,7 +105,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * Match documents where targeted fields have a value within lower and upper bounds.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see RangePredicateContext
 	 */
 	RangePredicateContext<N> range();
@@ -117,7 +116,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * matches a given predicate.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link ExplicitEndContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see NestedPredicateContext
 	 */
 	NestedPredicateContext<N> nested();

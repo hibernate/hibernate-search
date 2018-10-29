@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
@@ -57,7 +57,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public ExplicitEndContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
+	public SearchPredicateTerminalContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
 		Contracts.assertNotNull( center, "center" );
 		Contracts.assertNotNull( radius, "radius" );
 		Contracts.assertNotNull( unit, "unit" );
@@ -66,14 +66,14 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public ExplicitEndContext<N> polygon(GeoPolygon polygon) {
+	public SearchPredicateTerminalContext<N> polygon(GeoPolygon polygon) {
 		Contracts.assertNotNull( polygon, "polygon" );
 
 		return commonState.polygon( polygon );
 	}
 
 	@Override
-	public ExplicitEndContext<N> boundingBox(GeoBoundingBox boundingBox) {
+	public SearchPredicateTerminalContext<N> boundingBox(GeoBoundingBox boundingBox) {
 		Contracts.assertNotNull( boundingBox, "boundingBox" );
 
 		return commonState.boundingBox( boundingBox );
@@ -120,13 +120,13 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 	}
 
 	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, SpatialWithinPredicateFieldSetContextImpl<N, B>>
-			implements ExplicitEndContext<N> {
+			implements SearchPredicateTerminalContext<N> {
 
 		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
 			super( factory, nextContextProvider );
 		}
 
-		public ExplicitEndContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
+		public SearchPredicateTerminalContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
 			}
@@ -134,7 +134,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 			return this;
 		}
 
-		public ExplicitEndContext<N> polygon(GeoPolygon polygon) {
+		public SearchPredicateTerminalContext<N> polygon(GeoPolygon polygon) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinPolygonQueryBuilders( polygon );
 			}
@@ -142,7 +142,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 			return this;
 		}
 
-		public ExplicitEndContext<N> boundingBox(GeoBoundingBox boundingBox) {
+		public SearchPredicateTerminalContext<N> boundingBox(GeoBoundingBox boundingBox) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
 			}

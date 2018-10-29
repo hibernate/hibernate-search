@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * The context used when defining a boolean junction, allowing in particular to add clauses.
@@ -62,10 +61,10 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  * <p>
  * Matching "should" clauses are taken into account in score computation.
  *
- * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
+ * @param <N> The type of the next context (returned by {@link SearchPredicateTerminalContext#end()}).
  */
 public interface BooleanJunctionPredicateContext<N> extends
-		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext<N>>, ExplicitEndContext<N> {
+		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext<N>>, SearchPredicateTerminalContext<N> {
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.

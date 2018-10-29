@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.sort;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
-
 /**
  * A superinterface for contexts allowing to define sorts.
  *
@@ -16,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface NonEmptySortContext<N> extends ExplicitEndContext<N> {
+public interface NonEmptySortContext<N> extends SearchSortTerminalContext<N> {
 
 	/**
 	 * Start defining another sort, to be applied after the current one.

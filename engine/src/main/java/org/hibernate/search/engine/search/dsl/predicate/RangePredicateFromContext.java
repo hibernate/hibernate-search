@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
-
 /**
  * The context used when defining a range predicate,
  * after the lower bound was provided but before the upper bound was provided.
@@ -30,7 +28,7 @@ public interface RangePredicateFromContext<N> {
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to set the upper bound of the range.
 	 */
-	ExplicitEndContext<N> to(Object value, RangeBoundInclusion inclusion);
+	SearchPredicateTerminalContext<N> to(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
@@ -46,7 +44,7 @@ public interface RangePredicateFromContext<N> {
 	 *
 	 * @see #to(Object, RangeBoundInclusion)
 	 */
-	default ExplicitEndContext<N> to(Object value) {
+	default SearchPredicateTerminalContext<N> to(Object value) {
 		return to( value, RangeBoundInclusion.INCLUDED );
 	}
 

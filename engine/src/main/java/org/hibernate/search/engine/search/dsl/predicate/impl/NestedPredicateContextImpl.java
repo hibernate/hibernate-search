@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class NestedPredicateContextImpl<N, B>
-		implements NestedPredicateContext<N>, NestedPredicateFieldContext<N>, ExplicitEndContext<N>,
+		implements NestedPredicateContext<N>, NestedPredicateFieldContext<N>, SearchPredicateTerminalContext<N>,
 		SearchPredicateDslContext<N, B>, SearchPredicateContributor<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -49,13 +49,13 @@ class NestedPredicateContextImpl<N, B>
 	}
 
 	@Override
-	public ExplicitEndContext<N> nest(SearchPredicate searchPredicate) {
+	public SearchPredicateTerminalContext<N> nest(SearchPredicate searchPredicate) {
 		containerContext.predicate( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public ExplicitEndContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor) {
+	public SearchPredicateTerminalContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor) {
 		predicateContributor.accept( containerContext );
 		return this;
 	}
