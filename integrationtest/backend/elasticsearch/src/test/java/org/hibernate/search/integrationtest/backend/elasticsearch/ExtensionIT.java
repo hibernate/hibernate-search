@@ -82,12 +82,14 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool( b -> {
-					b.should().extension( ElasticsearchExtension.get() )
-							.fromJsonString( "{'match': {'string': 'text 1'}}" );
-					b.should().extension( ElasticsearchExtension.get() )
-							.fromJsonString( "{'match': {'integer': 2}}" );
-					b.should().extension( ElasticsearchExtension.get() )
+				.predicate( root -> root.bool( b -> {
+					b.should( c -> c.extension( ElasticsearchExtension.get() )
+							.fromJsonString( "{'match': {'string': 'text 1'}}" )
+					);
+					b.should( c -> c.extension( ElasticsearchExtension.get() )
+							.fromJsonString( "{'match': {'integer': 2}}" )
+					);
+					b.should( c -> c.extension( ElasticsearchExtension.get() )
 							.fromJsonString(
 									"{"
 										+ "'geo_distance': {"
@@ -98,10 +100,11 @@ public class ExtensionIT {
 											+ "}"
 										+ "}"
 									+ "}"
-							);
+							)
+					);
 					// Also test using the standard DSL on a field defined with the extension
-					b.should().match().onField( "yearDays" ).matching( "'2018:12'" );
-				} )
+					b.should( c -> c.match().onField( "yearDays" ).matching( "'2018:12'" ) );
+				} ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
@@ -153,7 +156,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'asc'}" )
@@ -173,7 +176,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'desc'}" )
@@ -212,7 +215,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
 				.build();
 		assertThat( query )
@@ -234,7 +237,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
 				.build();
 		assertThat( query )
@@ -356,7 +359,7 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder(
 				INDEX_NAME,

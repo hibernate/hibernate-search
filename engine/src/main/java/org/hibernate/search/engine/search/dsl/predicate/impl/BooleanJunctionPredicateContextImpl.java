@@ -57,65 +57,45 @@ class BooleanJunctionPredicateContextImpl<N, B>
 
 	@Override
 	public BooleanJunctionPredicateContext<N> must(SearchPredicate searchPredicate) {
-		return must().predicate( searchPredicate );
+		return must.containerContext.predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> mustNot(SearchPredicate searchPredicate) {
-		return mustNot().predicate( searchPredicate );
+		return mustNot.containerContext.predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> should(SearchPredicate searchPredicate) {
-		return should().predicate( searchPredicate );
+		return should.containerContext.predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate) {
-		return filter().predicate( searchPredicate );
-	}
-
-	@Override
-	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> must() {
-		return must.containerContext;
-	}
-
-	@Override
-	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> mustNot() {
-		return mustNot.containerContext;
-	}
-
-	@Override
-	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> should() {
-		return should.containerContext;
-	}
-
-	@Override
-	public SearchPredicateContainerContext<BooleanJunctionPredicateContext<N>> filter() {
-		return filter.containerContext;
+		return filter.containerContext.predicate( searchPredicate );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( must() );
+		clauseContributor.accept( must.containerContext );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( mustNot() );
+		clauseContributor.accept( mustNot.containerContext );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( should() );
+		clauseContributor.accept( should.containerContext );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( filter() );
+		clauseContributor.accept( filter.containerContext );
 		return this;
 	}
 

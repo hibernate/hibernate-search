@@ -128,7 +128,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( STRING_1 ).end()
+				.predicate( root -> root.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( c -> {
@@ -145,7 +145,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "sortField" ).asc().end()
 				.build();
 
@@ -157,7 +157,7 @@ public class SearchMultiIndexIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "sortField" ).desc().end()
 				.build();
 
@@ -176,7 +176,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
 				.asProjections( searchTarget.projection().field( "sortField", String.class ).toProjection() )
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 
 		ProjectionsSearchResultAssert.assertThat( query ).hasProjectionsHitsAnyOrder( c -> {
@@ -195,7 +195,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).end()
+				.predicate( root -> root.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -210,7 +210,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
 				.asProjections( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 
 		ProjectionsSearchResultAssert.assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( c -> {
@@ -348,7 +348,7 @@ public class SearchMultiIndexIT {
 		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
@@ -367,7 +367,7 @@ public class SearchMultiIndexIT {
 		searchTarget = indexManager_1_2.createSearchTarget().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 
@@ -387,7 +387,7 @@ public class SearchMultiIndexIT {
 		searchTarget = indexManager_2_1.createSearchTarget().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}

@@ -7,11 +7,9 @@
 package org.hibernate.search.engine.search.dsl.query.impl;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.impl.FluidSearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.RootSearchPredicateDslContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
@@ -46,12 +44,5 @@ class SearchQueryPredicateCollector<C, B> {
 		SearchPredicateContainerContext<SearchPredicate> containerContext =
 				new SearchPredicateContainerContextImpl<>( factory, rootDslContext );
 		dslPredicateContributor.accept( containerContext );
-	}
-
-	<N> SearchPredicateContainerContext<N> createContainerContext(Supplier<N> nextContextSupplier) {
-		return new SearchPredicateContainerContextImpl<>(
-				factory,
-				new FluidSearchPredicateDslContextImpl<>( rootDslContext, nextContextSupplier )
-		);
 	}
 }

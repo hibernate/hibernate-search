@@ -63,11 +63,6 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 		return getNext();
 	}
 
-	@Override
-	public SearchPredicateContainerContext<SearchQueryContext<Q>> predicate() {
-		return searchPredicateCollector.createContainerContext( this::getNext );
-	}
-
 	private SearchQueryContext<Q> getNext() {
 		return new SearchQueryContextImpl<>(
 				targetContext, searchQueryBuilder, searchQueryWrapperFactory,
