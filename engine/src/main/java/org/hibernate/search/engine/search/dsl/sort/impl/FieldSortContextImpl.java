@@ -7,28 +7,27 @@
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.FieldSortMissingValueContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
 class FieldSortContextImpl<N, B>
+		extends NonEmptySortContextImpl<N>
 		implements FieldSortContext<N>, FieldSortMissingValueContext<FieldSortContext<N>>, SearchSortContributor<B> {
 
-	private final SearchSortContainerContext<N> containerContext;
-	private final Supplier<N> nextContextProvider;
 	private final FieldSortBuilder<B> builder;
 
 	FieldSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, Supplier<N> nextContextProvider,
+			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext,
 			String absoluteFieldPath) {
-		this.containerContext = containerContext;
-		this.nextContextProvider = nextContextProvider;
+		super( containerContext, dslContext );
 		this.builder = factory.field( absoluteFieldPath );
 	}
 
@@ -59,16 +58,6 @@ class FieldSortContextImpl<N, B>
 	public FieldSortContext<N> use(Object value) {
 		builder.missingAs( value );
 		return this;
-	}
-
-	@Override
-	public SearchSortContainerContext<N> then() {
-		return containerContext;
-	}
-
-	@Override
-	public N end() {
-		return nextContextProvider.get();
 	}
 
 	@Override

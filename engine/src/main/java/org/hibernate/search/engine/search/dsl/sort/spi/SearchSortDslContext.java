@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.spi;
 
+import org.hibernate.search.engine.search.SearchSort;
+
 /**
  * Represents the current context in the search DSL,
  * i.e. the current position in the sort tree.
@@ -34,5 +36,13 @@ public interface SearchSortDslContext<N, B> {
 	 * @return The context that should be exposed to the user after the current predicate has been fully defined.
 	 */
 	N getNextContext();
+
+	/**
+	 * Create a {@link SearchSort} instance
+	 * matching the definition given in the previous DSL steps.
+	 *
+	 * @return The {@link SearchSort} instance.
+	 */
+	SearchSort toSort();
 
 }

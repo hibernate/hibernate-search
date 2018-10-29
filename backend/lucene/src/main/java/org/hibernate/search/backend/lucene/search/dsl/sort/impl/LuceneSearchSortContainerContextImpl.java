@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFact
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
@@ -46,16 +47,6 @@ public class LuceneSearchSortContainerContextImpl<N>
 	}
 
 	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContext<N>() {
-			@Override
-			public SearchSortContainerContext<N> then() {
-				return LuceneSearchSortContainerContextImpl.this;
-			}
-
-			@Override
-			public N end() {
-				return dslContext.getNextContext();
-			}
-		};
+		return new NonEmptySortContextImpl<>( this, dslContext );
 	}
 }

@@ -7,25 +7,25 @@
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-class ScoreSortContextImpl<N, B> implements ScoreSortContext<N>, SearchSortContributor<B> {
+class ScoreSortContextImpl<N, B>
+		extends NonEmptySortContextImpl<N>
+		implements ScoreSortContext<N>, SearchSortContributor<B> {
 
-	private final SearchSortContainerContext<N> containerContext;
-	private final Supplier<N> nextContextProvider;
 	private final ScoreSortBuilder<B> builder;
 
 	ScoreSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.containerContext = containerContext;
-		this.nextContextProvider = nextContextProvider;
+			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext) {
+		super( containerContext, dslContext );
 		this.builder = factory.score();
 	}
 
@@ -33,16 +33,6 @@ class ScoreSortContextImpl<N, B> implements ScoreSortContext<N>, SearchSortContr
 	public ScoreSortContext<N> order(SortOrder order) {
 		builder.order( order );
 		return this;
-	}
-
-	@Override
-	public SearchSortContainerContext<N> then() {
-		return containerContext;
-	}
-
-	@Override
-	public N end() {
-		return nextContextProvider.get();
 	}
 
 	@Override

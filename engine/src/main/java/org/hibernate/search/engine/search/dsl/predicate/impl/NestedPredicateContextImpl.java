@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -24,12 +25,12 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class NestedPredicateContextImpl<N, B>
+		extends AbstractObjectCreatingSearchPredicateContributor<B>
 		implements NestedPredicateContext<N>, NestedPredicateFieldContext<N>, SearchPredicateTerminalContext<N>,
 		SearchPredicateDslContext<N, B>, SearchPredicateContributor<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateFactory<?, B> factory;
 	private final Supplier<N> nextContextProvider;
 
 	private final SearchPredicateContainerContext<?> containerContext;
@@ -37,7 +38,7 @@ class NestedPredicateContextImpl<N, B>
 	private SearchPredicateContributor<? extends B> childPredicateContributor;
 
 	NestedPredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.factory = factory;
+		super( factory );
 		this.nextContextProvider = nextContextProvider;
 		this.containerContext = new SearchPredicateContainerContextImpl<>( factory, this );
 	}
@@ -79,7 +80,7 @@ class NestedPredicateContextImpl<N, B>
 	}
 
 	@Override
-	public B contribute() {
+	protected B doContribute() {
 		builder.nested( childPredicateContributor.contribute() );
 		return builder.toImplementation();
 	}

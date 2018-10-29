@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.dsl.sort;
 
 
+import org.hibernate.search.engine.search.SearchSort;
+
 /**
  * The terminal context of the sort DSL.
  *
@@ -20,5 +22,13 @@ public interface SearchSortTerminalContext<N> {
 	 * @return The next context.
 	 */
 	N end();
+
+	/**
+	 * Create a {@link SearchSort} instance
+	 * matching the definition given in the previous DSL steps.
+	 *
+	 * @return The {@link SearchSort} resulting from the previous DSL steps.
+	 */
+	SearchSort toSort();
 
 }

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -22,9 +23,8 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class BooleanJunctionPredicateContextImpl<N, B>
+		extends AbstractObjectCreatingSearchPredicateContributor<B>
 		implements BooleanJunctionPredicateContext<N>, SearchPredicateContributor<B> {
-
-	private final SearchPredicateFactory<?, B> factory;
 
 	private final Supplier<N> nextContextProvider;
 
@@ -39,7 +39,7 @@ class BooleanJunctionPredicateContextImpl<N, B>
 
 	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory,
 			Supplier<N> nextContextProvider) {
-		this.factory = factory;
+		super( factory );
 		this.nextContextProvider = nextContextProvider;
 		this.builder = factory.bool();
 		this.must = new OccurContext();
@@ -112,7 +112,7 @@ class BooleanJunctionPredicateContextImpl<N, B>
 	}
 
 	@Override
-	public B contribute() {
+	protected B doContribute() {
 		must.contribute( builder::must );
 		mustNot.contribute( builder::mustNot );
 		should.contribute( builder::should );

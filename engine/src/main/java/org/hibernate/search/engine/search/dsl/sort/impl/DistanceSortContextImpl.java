@@ -7,27 +7,27 @@
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.sort.DistanceSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
+import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceSortContextImpl<N, B> implements DistanceSortContext<N>, SearchSortContributor<B> {
+class DistanceSortContextImpl<N, B>
+		extends NonEmptySortContextImpl<N>
+		implements DistanceSortContext<N>, SearchSortContributor<B> {
 
-	private final SearchSortContainerContext<N> containerContext;
-	private final Supplier<N> nextContextProvider;
 	private final DistanceSortBuilder<B> builder;
 
 	DistanceSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, Supplier<N> nextContextProvider,
+			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext,
 			String absoluteFieldPath, GeoPoint location) {
-		this.containerContext = containerContext;
-		this.nextContextProvider = nextContextProvider;
+		super( containerContext, dslContext );
 		this.builder = factory.distance( absoluteFieldPath, location );
 	}
 
@@ -35,16 +35,6 @@ class DistanceSortContextImpl<N, B> implements DistanceSortContext<N>, SearchSor
 	public DistanceSortContext<N> order(SortOrder order) {
 		builder.order( order );
 		return this;
-	}
-
-	@Override
-	public SearchSortContainerContext<N> then() {
-		return containerContext;
-	}
-
-	@Override
-	public N end() {
-		return nextContextProvider.get();
 	}
 
 	@Override

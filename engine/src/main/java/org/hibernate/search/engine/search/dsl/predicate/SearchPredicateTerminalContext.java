@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.search.dsl.predicate;
 
 
+import org.hibernate.search.engine.search.SearchPredicate;
+
 /**
  * The terminal context of the predicate DSL.
  *
@@ -20,5 +22,13 @@ public interface SearchPredicateTerminalContext<N> {
 	 * @return The next context.
 	 */
 	N end();
+
+	/**
+	 * Create a {@link SearchPredicate} instance
+	 * matching the definition given in the previous DSL steps.
+	 *
+	 * @return The {@link SearchPredicate} resulting from the previous DSL steps.
+	 */
+	SearchPredicate toPredicate();
 
 }

@@ -11,21 +11,21 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 class MultiFieldPredicateCommonState<N, B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
+		extends AbstractObjectCreatingSearchPredicateContributor<B>
 		implements SearchPredicateContributor<B> {
-
-	private final SearchPredicateFactory<?, B> factory;
 
 	private final Supplier<N> nextContextProvider;
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
 	MultiFieldPredicateCommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.factory = factory;
+		super( factory );
 		this.nextContextProvider = nextContextProvider;
 	}
 
@@ -46,7 +46,7 @@ class MultiFieldPredicateCommonState<N, B, F extends MultiFieldPredicateCommonSt
 	}
 
 	@Override
-	public B contribute() {
+	protected B doContribute() {
 		List<B> predicateBuilders = new ArrayList<>();
 		for ( F fieldSetContext : fieldSetContexts ) {
 			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );

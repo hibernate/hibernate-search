@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
@@ -22,9 +23,9 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class MatchAllPredicateContextImpl<N, B>
+		extends AbstractObjectCreatingSearchPredicateContributor<B>
 		implements MatchAllPredicateContext<N>, SearchPredicateContributor<B> {
 
-	private final SearchPredicateFactory<?, B> factory;
 	private final Supplier<N> nextContextProvider;
 
 	private final MatchAllPredicateBuilder<B> matchAllBuilder;
@@ -32,7 +33,7 @@ class MatchAllPredicateContextImpl<N, B>
 
 	MatchAllPredicateContextImpl(SearchPredicateFactory<?, B> factory,
 			Supplier<N> nextContextProvider) {
-		this.factory = factory;
+		super( factory );
 		this.nextContextProvider = nextContextProvider;
 		this.matchAllBuilder = factory.matchAll();
 	}
@@ -56,7 +57,7 @@ class MatchAllPredicateContextImpl<N, B>
 	}
 
 	@Override
-	public B contribute() {
+	protected B doContribute() {
 		if ( exceptContext != null ) {
 			return exceptContext.contribute();
 		}

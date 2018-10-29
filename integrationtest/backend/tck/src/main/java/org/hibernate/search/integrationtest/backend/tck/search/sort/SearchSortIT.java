@@ -208,9 +208,9 @@ public class SearchSortIT {
 	public void lambda_caching() {
 		AtomicReference<SearchSort> cache = new AtomicReference<>();
 
-		Consumer<? super SearchSortContainerContext<SearchSort>> cachingContributor = c -> {
+		Consumer<? super SearchSortContainerContext<?>> cachingContributor = c -> {
 			if ( cache.get() == null ) {
-				SearchSort result = c.byField( "string" ).onMissingValue().sortLast().end();
+				SearchSort result = c.byField( "string" ).onMissingValue().sortLast().toSort();
 				cache.set( result );
 			}
 			else {
