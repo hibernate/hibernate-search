@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
@@ -14,6 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaF
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSchemaFieldContextImpl;
@@ -26,8 +28,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaF
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
@@ -35,6 +37,8 @@ import org.hibernate.search.util.impl.common.Contracts;
  */
 class LuceneIndexSchemaFieldContextImpl
 		implements LuceneIndexSchemaFieldContext, LuceneIndexSchemaNodeContributor, LuceneIndexSchemaContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
@@ -66,7 +70,7 @@ class LuceneIndexSchemaFieldContextImpl
 		}
 		else {
 			// TODO implement other types
-			throw new SearchException( "Cannot guess field type for input type " + inputType );
+			throw log.cannotGuessFieldType( inputType, getEventContext() );
 		}
 	}
 
@@ -119,7 +123,7 @@ class LuceneIndexSchemaFieldContextImpl
 
 	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {
 		if ( delegate != null ) {
-			throw new SearchException( "You cannot set the type of a field more than once" );
+			throw log.tryToSetFieldTypeMoreThanOnce( getEventContext() );
 		}
 		delegate = context;
 		return context;

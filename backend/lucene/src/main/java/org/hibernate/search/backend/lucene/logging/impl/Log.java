@@ -386,4 +386,16 @@ public interface Log extends BasicLogger {
 	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
 			LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 61, value = "Failed to shut down the Lucene index manager.")
+	SearchException failedToShutdownBackend(@Cause Exception cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 62, value = "Cannot guess field type for input type: '%1$s'.")
+	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 63, value = "You cannot set the type of a field more than once.")
+	SearchException tryToSetFieldTypeMoreThanOnce(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
+	SearchException documentIdNotCollected(Integer documentId);
 }

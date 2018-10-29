@@ -105,4 +105,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a search manager using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
 	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
+
+	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
+	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 }

@@ -11,7 +11,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.util.SearchException;
 
 /**
  * @author Yoann Rodiere
@@ -40,15 +39,10 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 		if ( providedId != null ) {
 			return (I) caster.cast( providedId );
 		}
-		else if ( property != null ) {
-			Object id = property.get( entitySupplier.get() );
-			// TODO avoid this cast? By construction, the property handle should always return type I
-			return (I) caster.cast( id );
-		}
-		else {
-			throw new SearchException( "No identifier was provided, and this mapping does not define"
-					+ " how to extract the identifier from the entity" );
-		}
+
+		Object id = property.get( entitySupplier.get() );
+		// TODO avoid this cast? By construction, the property handle should always return type I
+		return (I) caster.cast( id );
 	}
 
 	@Override

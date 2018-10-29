@@ -11,8 +11,10 @@ import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
+import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -34,4 +36,9 @@ public interface Log extends BasicLogger {
 	SearchException cannotReadProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			String propertyName);
 
+	@Message(id = ID_OFFSET_1 + 3, value = "Exception while retrieving the type model for '%1$s'.")
+	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_1 + 4, value = "Exception while retrieving property type model for '%1$s' on '%2$s'")
+	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 }

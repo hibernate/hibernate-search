@@ -6,13 +6,18 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
 
 public class BeanProviderImpl implements BeanProvider {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 
@@ -23,7 +28,7 @@ public class BeanProviderImpl implements BeanProvider {
 	@Override
 	public <T> T getBean(Class<?> typeReference, Class<T> expectedClass) {
 		if ( typeReference == null ) {
-			throw new SearchException( "Got an empty bean reference (type is null)" );
+			throw log.emptyBeanReferenceTypeNull();
 		}
 		return beanResolver.resolve( typeReference, expectedClass );
 	}
@@ -31,7 +36,7 @@ public class BeanProviderImpl implements BeanProvider {
 	@Override
 	public <T> T getBean(String nameReference, Class<T> expectedClass) {
 		if ( StringHelper.isEmpty( nameReference ) ) {
-			throw new SearchException( "Got an empty bean reference (name is null or empty)" );
+			throw log.emptyBeanReferenceNameNullOrEmpty();
 		}
 		return beanResolver.resolve( nameReference, expectedClass );
 	}
@@ -39,7 +44,7 @@ public class BeanProviderImpl implements BeanProvider {
 	@Override
 	public <T> T getBean(BeanReference reference, Class<T> expectedClass) {
 		if ( reference == null ) {
-			throw new SearchException( "Got an empty bean reference (reference is null)" );
+			throw log.emptyBeanReferenceNull();
 		}
 
 		String nameReference = reference.getName();
@@ -57,7 +62,7 @@ public class BeanProviderImpl implements BeanProvider {
 			return beanResolver.resolve( typeReference, expectedClass );
 		}
 		else {
-			throw new SearchException( "Got an empty bean reference (no name, no type)" );
+			throw log.emptyBeanReferenceNoNameNoType();
 		}
 	}
 }

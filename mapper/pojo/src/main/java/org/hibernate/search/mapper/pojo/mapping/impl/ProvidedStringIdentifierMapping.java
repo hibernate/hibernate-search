@@ -6,14 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public class ProvidedStringIdentifierMapping implements IdentifierMapping<String, Object> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ProvidedStringIdentifierMapping INSTANCE = new ProvidedStringIdentifierMapping();
 
@@ -25,8 +29,7 @@ public class ProvidedStringIdentifierMapping implements IdentifierMapping<String
 	@Override
 	public String getIdentifier(Object providedId, Supplier<?> entityProvider) {
 		if ( providedId == null ) {
-			throw new SearchException( "The identifier for this entity should always be provided,"
-					+ " but the provided identifier was null." );
+			log.nullProvidedIdentifier();
 		}
 		return String.valueOf( providedId );
 	}

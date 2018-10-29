@@ -7,12 +7,15 @@
 package org.hibernate.search.engine.environment.classpath.spi;
 
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.net.URL;
 import java.util.LinkedHashSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoader;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * Default implementation of {@code ClassResolver} using the old pre class loader service approach of
@@ -21,6 +24,8 @@ import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoa
  * @author Hardy Ferentschik
  */
 public final class DefaultClassAndResourceResolver implements ClassResolver, ResourceResolver {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AggregatedClassLoader aggregatedClassLoader;
 
@@ -60,7 +65,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 			return (Class<T>) Class.forName( className, true, aggregatedClassLoader );
 		}
 		catch (Exception | LinkageError e) {
-			throw new ClassLoadingException( "Unable to load class [" + className + "]", e );
+			throw log.unableToLoadTheClass( className, e );
 		}
 	}
 

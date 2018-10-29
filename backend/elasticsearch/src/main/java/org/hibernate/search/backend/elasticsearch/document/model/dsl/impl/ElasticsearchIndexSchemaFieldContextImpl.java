@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
@@ -26,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
@@ -35,6 +37,8 @@ import org.hibernate.search.util.SearchException;
 class ElasticsearchIndexSchemaFieldContextImpl
 		implements ElasticsearchIndexSchemaFieldContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>,
 				IndexSchemaContext {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
@@ -65,7 +69,7 @@ class ElasticsearchIndexSchemaFieldContextImpl
 		}
 		else {
 			// TODO implement other types
-			throw new SearchException( "Cannot guess field type for input type " + inputType );
+			throw log.cannotGuessFieldType( inputType, getEventContext() );
 		}
 	}
 
@@ -109,7 +113,7 @@ class ElasticsearchIndexSchemaFieldContextImpl
 
 	private <T extends ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> T setDelegate(T context) {
 		if ( delegate != null ) {
-			throw new SearchException( "You cannot set the type of a field more than once" );
+			throw log.tryToSetFieldTypeMoreThanOnce( getEventContext() );
 		}
 		delegate = context;
 		return context;

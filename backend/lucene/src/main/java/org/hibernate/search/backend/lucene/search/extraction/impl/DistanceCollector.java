@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 
 import org.apache.lucene.geo.GeoEncodingUtils;
@@ -18,8 +19,10 @@ import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.util.SloppyMath;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A Lucene distance {@code Collector} for spatial searches.
@@ -28,6 +31,8 @@ import org.hibernate.search.util.SearchException;
  * @author Nicolas Helleringer
  */
 public class DistanceCollector implements Collector {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 	private final GeoPoint center;
@@ -139,7 +144,7 @@ public class DistanceCollector implements Collector {
 				}
 			}
 
-			throw new SearchException( "Unexpected index: this documentId was not collected" );
+			throw log.documentIdNotCollected( index );
 		}
 
 		void put(int documentId, double latitude, double longitude) {

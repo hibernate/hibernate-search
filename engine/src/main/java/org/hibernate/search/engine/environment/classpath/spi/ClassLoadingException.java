@@ -25,15 +25,6 @@ public class ClassLoadingException extends SearchException {
 	public ClassLoadingException(String message, Throwable cause) {
 		super( message, cause );
 	}
-
-	/**
-	 * Constructs a {@code ClassLoadingException} using the specified message.
-	 *
-	 * @param message A message explaining the exception condition.
-	 */
-	public ClassLoadingException(String message) {
-		super( message );
-	}
 }
 
 

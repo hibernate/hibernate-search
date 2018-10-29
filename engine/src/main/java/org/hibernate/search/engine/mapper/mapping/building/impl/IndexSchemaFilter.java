@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A schema filter, responsible for deciding which parts of a mapping will actually make it to the index schema.
@@ -61,6 +63,8 @@ import org.hibernate.search.util.SearchException;
  * @author Yoann Rodiere
  */
 class IndexSchemaFilter {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final IndexSchemaFilter ROOT = new IndexSchemaFilter(
 			null, null, null, null, Collections.emptySet()
@@ -147,8 +151,7 @@ class IndexSchemaFilter {
 		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
 		if ( cyclicRecursionPath != null ) {
 			cyclicRecursionPath += relativePrefix;
-			throw new SearchException( "Found an infinite IndexedEmbedded recursion involving path '"
-					+ cyclicRecursionPath + "' on type '" + parentTypeModel + "'" );
+			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, parentTypeModel );
 		}
 
 		Set<String> nullSafeIncludePaths = includePaths == null ? Collections.emptySet() : includePaths;

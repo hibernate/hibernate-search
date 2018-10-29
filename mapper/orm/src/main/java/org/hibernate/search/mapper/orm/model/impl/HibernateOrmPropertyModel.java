@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -16,12 +17,15 @@ import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.XProperty;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final HibernateOrmRawTypeModel<?> holderTypeModel;
@@ -79,8 +83,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
-				throw new SearchException( "Exception while retrieving property type model for '"
-						+ getName() + "' on '" + holderTypeModel + "'", e );
+				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
 			}
 		}
 		return typeModel;
@@ -93,8 +96,7 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 				handle = introspector.createPropertyHandle( name, member );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
-				throw new SearchException( "Exception while retrieving property handle for '"
-						+ getName() + "' on '" + holderTypeModel + "'", e );
+				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
 			}
 		}
 		return handle;

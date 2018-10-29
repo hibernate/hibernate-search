@@ -431,8 +431,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		public void mapToIndex(String indexName) {
 			if ( this.indexName != null ) {
-				throw new SearchException( "Type '" + typeModel + "' mapped to multiple indexes: '"
-						+ this.indexName + "', '" + indexName + "'." );
+				throw log.multipleIndexMapping( typeModel, this.indexName, indexName );
 			}
 			this.indexName = indexName;
 		}

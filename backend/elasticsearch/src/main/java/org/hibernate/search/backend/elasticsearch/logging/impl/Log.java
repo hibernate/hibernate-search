@@ -312,4 +312,13 @@ public interface Log extends BasicLogger {
 	SearchException conflictingFieldTypesForProjection(String absoluteFieldPath,
 			ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2,
 			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 44, value = "Failed to shut down the Elasticsearch backend.")
+	SearchException failedToShutdownBackend(@Cause Exception cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 45, value = "Cannot guess field type for input type %1$s.")
+	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 46, value = "You cannot set the type of a field more than once.")
+	SearchException tryToSetFieldTypeMoreThanOnce(@Param EventContext context);
 }

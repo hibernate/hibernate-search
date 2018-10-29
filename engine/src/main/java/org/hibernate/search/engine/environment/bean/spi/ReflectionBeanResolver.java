@@ -6,15 +6,20 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
 public final class ReflectionBeanResolver implements BeanResolver {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ClassResolver classResolver;
 
@@ -47,9 +52,7 @@ public final class ReflectionBeanResolver implements BeanResolver {
 
 	@Override
 	public <T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass) {
-		throw new SearchException( "This bean resolver does not support"
-				+ " bean references using both a name and a type."
-				+ " Got both '" + nameReference + "' and '" + typeReference + "' in the same reference" );
+		throw log.resolveBeanUsingBothNameAndType( nameReference, typeReference );
 	}
 
 }
