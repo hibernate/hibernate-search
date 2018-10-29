@@ -36,8 +36,8 @@ class ObjectSyntaxPersonDao extends PersonDao {
 				)
 				.sort(
 						target.sort()
-						.by( target.sort().byField( "lastName_sort" ).end() )
-						.then().by( target.sort().byField( "firstName_sort" ).end() )
+						.byField( "lastName_sort" )
+						.then().byField( "firstName_sort" )
 						.end()
 				)
 				.build();

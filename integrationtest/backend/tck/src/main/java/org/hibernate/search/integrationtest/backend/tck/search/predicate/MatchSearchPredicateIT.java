@@ -193,7 +193,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
 						)
 				)
-				.sort().byScore().end()
+				.sort( c -> c.byScore() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -209,7 +209,7 @@ public class MatchSearchPredicateIT {
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
 						)
 				)
-				.sort().byScore().end()
+				.sort( c -> c.byScore() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )

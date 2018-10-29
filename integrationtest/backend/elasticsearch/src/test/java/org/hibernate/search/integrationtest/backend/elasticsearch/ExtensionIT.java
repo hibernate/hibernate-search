@@ -198,17 +198,17 @@ public class ExtensionIT {
 	public void sort_fromJsonString_separateSort() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchSort sort1 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort1Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'asc'}" )
 				.end();
-		SearchSort sort2 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort2Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'asc'}" )
 				.end();
-		SearchSort sort3 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort3Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'asc'}" )
 				.end();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchSort sort4 = searchTarget.sort()
+		SearchSort sort4Asc = searchTarget.sort()
 				.byField( "sort4" ).asc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.end();
@@ -216,21 +216,21 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
+				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
-		sort1 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort1Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'desc'}" )
 				.end();
-		sort2 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort2Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'desc'}" )
 				.end();
-		sort3 = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort3Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'desc'}" )
 				.end();
-		sort4 = searchTarget.sort()
+		SearchSort sort4Desc = searchTarget.sort()
 				.byField( "sort4" ).desc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.end();
@@ -238,7 +238,7 @@ public class ExtensionIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).then().by( sort4 ).end()
+				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );

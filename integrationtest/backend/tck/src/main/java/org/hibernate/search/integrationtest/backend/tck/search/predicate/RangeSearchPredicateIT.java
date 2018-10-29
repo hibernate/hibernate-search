@@ -369,7 +369,7 @@ public class RangeSearchPredicateIT {
 								.below( indexMapping.string1Field.document1Value.indexedValue ).end()
 						)
 				)
-				.sort().byScore().end()
+				.sort( c -> c.byScore() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -385,7 +385,7 @@ public class RangeSearchPredicateIT {
 								.below( indexMapping.string1Field.document1Value.indexedValue ).end()
 						)
 				)
-				.sort().byScore().end()
+				.sort( c -> c.byScore() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )

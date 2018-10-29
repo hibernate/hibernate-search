@@ -71,7 +71,7 @@ public class SearchQueryIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
 
@@ -82,7 +82,7 @@ public class SearchQueryIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
 		query.setMaxResults( 1L );
@@ -94,7 +94,7 @@ public class SearchQueryIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setMaxResults( 2L );
 
@@ -105,7 +105,7 @@ public class SearchQueryIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( null );
 		query.setMaxResults( null );
@@ -122,7 +122,7 @@ public class SearchQueryIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
 
@@ -147,7 +147,7 @@ public class SearchQueryIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( null );
 		query.setMaxResults( null );
@@ -165,7 +165,7 @@ public class SearchQueryIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "string" ).asc().end()
+				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setMaxResults( 0L );
 

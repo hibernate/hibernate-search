@@ -265,7 +265,7 @@ public class SearchSortByFieldIT {
 		searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( absoluteFieldPath ).end()
+				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
 
@@ -286,7 +286,7 @@ public class SearchSortByFieldIT {
 		searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( absoluteFieldPath ).end()
+				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
 
@@ -307,7 +307,7 @@ public class SearchSortByFieldIT {
 		searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( absoluteFieldPath ).end()
+				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
 
