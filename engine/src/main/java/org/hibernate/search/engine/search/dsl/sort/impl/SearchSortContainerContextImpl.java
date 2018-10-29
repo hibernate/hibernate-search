@@ -34,16 +34,7 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	@Override
 	public NonEmptySortContext<N> by(SearchSort sort) {
 		factory.toImplementation( sort, dslContext::addChild );
-		return new NonEmptySortContext<N>() {
-			@Override
-			public SearchSortContainerContext<N> then() {
-				return SearchSortContainerContextImpl.this;
-			}
-			@Override
-			public N end() {
-				return dslContext.getNextContext();
-			}
-		};
+		return nonEmptyContext();
 	}
 
 	@Override
