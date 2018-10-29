@@ -44,7 +44,7 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
 				helper.createUserIndexFieldConverter() );
 		GeoPointFieldCodec codec = new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
-				getStore(), sortable );
+				store, sortable );
 
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,

@@ -32,7 +32,7 @@ public abstract class AbstractLuceneStandardIndexSchemaFieldTypedContext<S exten
 
 	private final String relativeFieldName;
 
-	private Store store = Store.DEFAULT;
+	protected Store store = Store.DEFAULT;
 
 	protected AbstractLuceneStandardIndexSchemaFieldTypedContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> fieldType) {
@@ -78,10 +78,6 @@ public abstract class AbstractLuceneStandardIndexSchemaFieldTypedContext<S exten
 
 	protected String getRelativeFieldName() {
 		return relativeFieldName;
-	}
-
-	protected Store getStore() {
-		return store;
 	}
 
 	protected final LuceneIndexSchemaContext getSchemaContext() {

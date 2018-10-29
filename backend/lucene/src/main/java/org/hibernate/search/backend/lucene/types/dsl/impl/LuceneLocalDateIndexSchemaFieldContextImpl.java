@@ -43,7 +43,7 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 	protected void contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		LocalDateFieldConverter converter = new LocalDateFieldConverter( helper.createUserIndexFieldConverter() );
-		LocalDateFieldCodec codec = new LocalDateFieldCodec( getStore(), sortable );
+		LocalDateFieldCodec codec = new LocalDateFieldCodec( store, sortable );
 
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,

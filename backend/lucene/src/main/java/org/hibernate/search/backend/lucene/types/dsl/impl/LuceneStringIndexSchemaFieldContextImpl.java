@@ -103,7 +103,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 		);
 		StringFieldCodec codec = new StringFieldCodec(
 				sortable,
-				getFieldType( getStore(), analyzer != null ),
+				getFieldType( store, analyzer != null ),
 				analyzerOrNormalizer
 		);
 
