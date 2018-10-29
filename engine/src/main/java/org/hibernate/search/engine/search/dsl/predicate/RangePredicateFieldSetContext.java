@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
-
 /**
  * The context used when defining a range predicate, after at least one field was mentioned.
  *
@@ -88,7 +86,7 @@ public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion);
+	SearchPredicateTerminalContext<N> above(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "higher than or equal to" the given value,
@@ -103,7 +101,7 @@ public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 *
 	 * @see #above(Object, RangeBoundInclusion)
 	 */
-	default ExplicitEndContext<N> above(Object value) {
+	default SearchPredicateTerminalContext<N> above(Object value) {
 		return above( value, RangeBoundInclusion.INCLUDED );
 	}
 
@@ -118,7 +116,7 @@ public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion);
+	SearchPredicateTerminalContext<N> below(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than or equal to" the given value,
@@ -133,7 +131,7 @@ public interface RangePredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 *
 	 * @see #below(Object, RangeBoundInclusion)
 	 */
-	default ExplicitEndContext<N> below(Object value) {
+	default SearchPredicateTerminalContext<N> below(Object value) {
 		return below( value, RangeBoundInclusion.INCLUDED );
 	}
 

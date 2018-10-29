@@ -9,14 +9,14 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 
 /**
  * The context used when starting to define a match all predicate.
  *
- * @param <N> The type of the next context (returned by {@link ExplicitEndContext#end()}).
+ * @param <N> The type of the next context (returned by {@link SearchPredicateTerminalContext#end()}).
  */
-public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldContext<MatchAllPredicateContext<N>>, ExplicitEndContext<N> {
+public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldContext<MatchAllPredicateContext<N>>,
+		SearchPredicateTerminalContext<N> {
 
 	/**
 	 * Add a "must not" clause based on a previously-built {@link SearchPredicate},

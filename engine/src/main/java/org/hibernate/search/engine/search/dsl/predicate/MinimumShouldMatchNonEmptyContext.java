@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
-
 /**
  * The context used when at least one "minimum should match" constraint was defined,
  * allowing to {@link #ifMoreThan(int) define more constraints}
@@ -17,6 +15,13 @@ import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
  *
  * @param <N> The type of the next context (returned by {@link MinimumShouldMatchNonEmptyContext#end()}).
  */
-public interface MinimumShouldMatchNonEmptyContext<N> extends MinimumShouldMatchContext<N>, ExplicitEndContext<N> {
+public interface MinimumShouldMatchNonEmptyContext<N> extends MinimumShouldMatchContext<N> {
+
+	/**
+	 * End the current context and continue to the next one.
+	 *
+	 * @return The next context.
+	 */
+	N end();
 
 }

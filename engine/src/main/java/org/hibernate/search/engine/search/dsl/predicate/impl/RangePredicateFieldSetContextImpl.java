@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
@@ -62,12 +62,12 @@ class RangePredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion) {
+	public SearchPredicateTerminalContext<N> above(Object value, RangeBoundInclusion inclusion) {
 		return commonState.above( value, inclusion );
 	}
 
 	@Override
-	public ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion) {
+	public SearchPredicateTerminalContext<N> below(Object value, RangeBoundInclusion inclusion) {
 		return commonState.below( value, inclusion );
 	}
 
@@ -79,7 +79,7 @@ class RangePredicateFieldSetContextImpl<N, B>
 	}
 
 	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, RangePredicateFieldSetContextImpl<N, B>>
-			implements RangePredicateFromContext<N>, ExplicitEndContext<N> {
+			implements RangePredicateFromContext<N>, SearchPredicateTerminalContext<N> {
 
 		private boolean hasNonNullBound = false;
 
@@ -110,11 +110,11 @@ class RangePredicateFieldSetContextImpl<N, B>
 		}
 
 		@Override
-		public ExplicitEndContext<N> to(Object value, RangeBoundInclusion inclusion) {
+		public SearchPredicateTerminalContext<N> to(Object value, RangeBoundInclusion inclusion) {
 			return below( value, inclusion );
 		}
 
-		ExplicitEndContext<N> above(Object value, RangeBoundInclusion inclusion) {
+		SearchPredicateTerminalContext<N> above(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
@@ -130,7 +130,7 @@ class RangePredicateFieldSetContextImpl<N, B>
 			return this;
 		}
 
-		ExplicitEndContext<N> below(Object value, RangeBoundInclusion inclusion) {
+		SearchPredicateTerminalContext<N> below(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.upperLimit( value ) );

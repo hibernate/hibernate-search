@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
-
 /**
  * The context used when defining a match predicate, after at least one field was mentioned.
  *
@@ -52,6 +50,6 @@ public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	ExplicitEndContext<N> matching(Object value);
+	SearchPredicateTerminalContext<N> matching(Object value);
 
 }
