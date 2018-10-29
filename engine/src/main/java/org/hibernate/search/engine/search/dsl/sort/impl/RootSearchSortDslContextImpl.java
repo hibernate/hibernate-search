@@ -52,12 +52,17 @@ public final class RootSearchSortDslContextImpl<B>
 
 	@Override
 	public SearchSort getNextContext() {
+		return toSort();
+	}
+
+	@Override
+	public SearchSort toSort() {
 		if ( sortResult == null ) {
 			if ( usedContributors ) {
 				// HSEARCH-3207: we must never call a contribution twice. Contributions may have side-effects.
 				throw new AssertionFailure(
 						"A sort object was requested after the corresponding information was contributed to the DSL." +
-						" There is a bug in Hibernate Search, please report it."
+								" There is a bug in Hibernate Search, please report it."
 				);
 			}
 			List<B> builderResult = getResultingBuilders();

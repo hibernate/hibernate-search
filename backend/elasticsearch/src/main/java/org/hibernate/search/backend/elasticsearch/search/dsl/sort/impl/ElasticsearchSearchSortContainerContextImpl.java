@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
@@ -38,16 +39,6 @@ public class ElasticsearchSearchSortContainerContextImpl<N>
 	}
 
 	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContext<N>() {
-			@Override
-			public SearchSortContainerContext<N> then() {
-				return ElasticsearchSearchSortContainerContextImpl.this;
-			}
-
-			@Override
-			public N end() {
-				return dslContext.getNextContext();
-			}
-		};
+		return new NonEmptySortContextImpl<>( this, dslContext );
 	}
 }

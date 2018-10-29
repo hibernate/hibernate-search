@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -39,7 +40,7 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 
 	@Override
 	public ScoreSortContext<N> byScore() {
-		ScoreSortContextImpl<N, B> child = new ScoreSortContextImpl<>( this, factory, dslContext::getNextContext );
+		ScoreSortContextImpl<N, B> child = new ScoreSortContextImpl<>( this, factory, dslContext );
 		dslContext.addChild( child );
 		return child;
 	}
@@ -53,7 +54,7 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	@Override
 	public FieldSortContext<N> byField(String absoluteFieldPath) {
 		FieldSortContextImpl<N, B> child = new FieldSortContextImpl<>(
-				this, factory, dslContext::getNextContext, absoluteFieldPath
+				this, factory, dslContext, absoluteFieldPath
 		);
 		dslContext.addChild( child );
 		return child;
@@ -62,7 +63,7 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	@Override
 	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
 		DistanceSortContextImpl<N, B> child = new DistanceSortContextImpl<>(
-				this, factory, dslContext::getNextContext, absoluteFieldPath, location
+				this, factory, dslContext, absoluteFieldPath, location
 		);
 		dslContext.addChild( child );
 		return child;

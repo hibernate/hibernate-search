@@ -43,13 +43,12 @@ public class SearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	private static final String MATCHING_ID = "matching";
-	private static final String NON_MATCHING_ID = "nonMatching";
-	private static final String EMPTY_ID = "empty";
+	private static final String DOCUMENT_1 = "doc1";
+	private static final String DOCUMENT_2 = "doc2";
+	private static final String EMPTY = "empty";
 
-	private static final String MATCHING_STRING = "Irving";
-
-	private static final String NON_MATCHING_STRING = "Auster";
+	private static final String STRING_1 = "Irving";
+	private static final String STRING_2 = "Auster";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -77,18 +76,18 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string" ).matching( MATCHING_STRING ) )
+				.predicate( root -> root.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
 	public void match_search_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( MATCHING_STRING ).end();
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).end();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -96,7 +95,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -105,22 +104,22 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string" ).matching( MATCHING_STRING ) )
+				.predicate( root -> root.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
-	public void match_lambda_caching() {
+	public void match_lambda_caching_root() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Consumer<? super SearchPredicateContainerContext<SearchPredicate>> cachingContributor = c -> {
+		Consumer<? super SearchPredicateContainerContext<?>> cachingContributor = c -> {
 			if ( cache.get() == null ) {
-				SearchPredicate result = c.match().onField( "string" ).matching( MATCHING_STRING ).end();
+				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
 			}
 			else {
@@ -136,7 +135,7 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
@@ -146,7 +145,47 @@ public class SearchPredicateIT {
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void match_lambda_caching_nonRoot() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
+
+		Consumer<? super SearchPredicateContainerContext<?>> cachingContributor = c -> {
+			if ( cache.get() == null ) {
+				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
+				cache.set( result );
+			}
+			else {
+				c.predicate( cache.get() );
+			}
+		};
+
+		Assertions.assertThat( cache ).hasValue( null );
+
+		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( root -> root.bool().must( cachingContributor ) )
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		Assertions.assertThat( cache ).doesNotHaveValue( null );
+
+		query = searchTarget.query( sessionContext )
+				.asReferences()
+				.predicate( root -> root.bool()
+						.should( cachingContributor )
+						.should( c -> c.match().onField( "string" ).matching( STRING_2 ) )
+				)
+				.build();
+
+		DocumentReferencesSearchResultAssert.assertThat( query )
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -158,11 +197,11 @@ public class SearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.extension( new SupportedExtension<>() )
-						.match().onField( "string" ).matching( MATCHING_STRING )
+						.match().onField( "string" ).matching( STRING_1 )
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both supported
 		query = searchTarget.query( sessionContext )
@@ -171,7 +210,7 @@ public class SearchPredicateIT {
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension<>(),
-								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 						.ifSupported(
 								new SupportedExtension<>(),
@@ -181,7 +220,7 @@ public class SearchPredicateIT {
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query( sessionContext )
@@ -193,7 +232,7 @@ public class SearchPredicateIT {
 						)
 						.ifSupported(
 								new SupportedExtension<>(),
-								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 						.orElse(
 								ignored -> Assert.fail( "This should not be called" )
@@ -201,7 +240,7 @@ public class SearchPredicateIT {
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query( sessionContext )
@@ -216,12 +255,12 @@ public class SearchPredicateIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions without orElse - one, unsupported
 		query = searchTarget.query( sessionContext )
@@ -234,24 +273,24 @@ public class SearchPredicateIT {
 								)
 						)
 						.must(
-								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 						.end()
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
+				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( sessionContext );
-		workPlan.add( referenceProvider( MATCHING_ID ), document -> {
-			indexAccessors.string.write( document, MATCHING_STRING );
+		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+			indexAccessors.string.write( document, STRING_1 );
 		} );
-		workPlan.add( referenceProvider( NON_MATCHING_ID ), document -> {
-			indexAccessors.string.write( document, NON_MATCHING_STRING );
+		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+			indexAccessors.string.write( document, STRING_2 );
 		} );
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 
 		workPlan.execute().join();
 
@@ -261,7 +300,7 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate( root -> root.matchAll() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID );
+		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
 
 	private static class IndexAccessors {
