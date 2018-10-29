@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 		for ( Class<? extends T> targetedType : targetedTypes ) {
 			targetedTypeManagers.addAll(
 					indexedTypeManagers.getAllBySuperClass( targetedType )
-							.orElseThrow( () -> new SearchException( "Type " + targetedType + " is not indexed and hasn't any indexed supertype." ) )
+							.orElseThrow( () -> log.notIndexedType( targetedType ) )
 			);
 		}
 

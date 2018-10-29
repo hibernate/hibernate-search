@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.Backend;
@@ -14,12 +15,15 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class SearchIntegrationImpl implements SearchIntegration {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 
@@ -43,7 +47,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 		@SuppressWarnings("unchecked")
 		MappingImplementor<M> mappingImplementor = (MappingImplementor<M>) mappings.get( mappingKey );
 		if ( mappingImplementor == null ) {
-			throw new SearchException( "No mapping registered for mapping key '" + mappingKey + "'" );
+			throw log.noMappingRegistered( mappingKey );
 		}
 		return mappingImplementor.toAPI();
 	}
@@ -52,7 +56,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public Backend getBackend(String backendName) {
 		BackendImplementor<?> backend = backends.get( backendName );
 		if ( backend == null ) {
-			throw new SearchException( "No backend registered for backend name '" + backendName + "'" );
+			throw log.noBackendRegistered( backendName );
 		}
 		return backend.toAPI();
 	}
@@ -61,7 +65,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public IndexManager getIndexManager(String indexManagerName) {
 		IndexManagerImplementor<?> indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
-			throw new SearchException( "No index manager registered for index manager name '" + indexManagerName + "'" );
+			throw log.noIndexManagerRegistered( indexManagerName );
 		}
 		return indexManager.toAPI();
 	}

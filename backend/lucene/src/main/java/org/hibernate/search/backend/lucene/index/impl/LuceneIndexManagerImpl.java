@@ -24,7 +24,6 @@ import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContex
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -113,7 +112,7 @@ class LuceneIndexManagerImpl
 			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {
-			throw new SearchException( "Failed to shut down the Lucene index manager", e );
+			throw log.failedToShutdownBackend( e, getBackendAndIndexEventContext() );
 		}
 	}
 

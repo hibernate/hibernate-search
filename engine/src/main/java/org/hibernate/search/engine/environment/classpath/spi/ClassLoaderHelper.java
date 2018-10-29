@@ -100,10 +100,10 @@ public class ClassLoaderHelper {
 		}
 		catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			if ( StringHelper.isEmpty( componentDescription ) ) {
-				throw new SearchException( "Unable to instantiate class: '" + classToLoad.getName() + "'. Class or constructor is not accessible." );
+				throw log.unableToInstantiateClass( classToLoad, e.getMessage(), e );
 			}
 			else {
-				throw new SearchException( "Unable to instantiate " + componentDescription + " class: '" + classToLoad.getName() + "'. Class or constructor is not accessible." );
+				throw log.unableToInstantiateComponent( componentDescription, classToLoad, e.getMessage(), e );
 			}
 		}
 	}
@@ -123,16 +123,10 @@ public class ClassLoaderHelper {
 		if ( !targetSuperType.isInstance( instance ) ) {
 			// have a proper error message according to interface implementation or subclassing
 			if ( targetSuperType.isInterface() ) {
-				throw new SearchException(
-						"Wrong configuration of " + componentDescription + ": class " + classToLoad.getName()
-								+ " does not implement interface " + targetSuperType.getName()
-				);
+				throw log.interfaceImplementedExpected( componentDescription, classToLoad, targetSuperType );
 			}
 			else {
-				throw new SearchException(
-						"Wrong configuration of " + componentDescription + ": class " + classToLoad.getName()
-								+ " is not a subtype of " + targetSuperType.getName()
-				);
+				throw log.subtypeExpected( componentDescription, classToLoad, targetSuperType );
 			}
 		}
 		else {
@@ -167,20 +161,14 @@ public class ClassLoaderHelper {
 			instance = singleMapConstructor.newInstance( constructorParameter );
 		}
 		catch (Exception e) {
-			throw new SearchException(
-					"Unable to instantiate " + componentDescription + " class: " + classToLoad.getName() +
-							". The implementation class did not recognize the applied parameters.", e
-			);
+			throw log.unableToInstantiateComponent( componentDescription, classToLoad, e.getMessage(), e );
 		}
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
 	}
 
 	private static void checkClassType(Class<?> classToLoad, String componentDescription) {
 		if ( classToLoad.isInterface() ) {
-			throw new SearchException(
-					classToLoad.getName() + " defined for component " + componentDescription
-							+ " is an interface: implementation required."
-			);
+			throw log.implementationRequired( componentDescription, classToLoad );
 		}
 	}
 
@@ -196,10 +184,7 @@ public class ClassLoaderHelper {
 			return classToLoad.getConstructor();
 		}
 		catch (SecurityException e) {
-			throw new SearchException(
-					classToLoad.getName() + " defined for component " + componentDescription
-							+ " could not be instantiated because of a security manager error", e
-			);
+			throw log.securityManagerLoadingError( componentDescription, classToLoad, e );
 		}
 		catch (NoSuchMethodException e) {
 			throw log.noPublicNoArgConstructor( componentDescription, classToLoad );
@@ -211,16 +196,10 @@ public class ClassLoaderHelper {
 			return classToLoad.getConstructor( Map.class );
 		}
 		catch (SecurityException e) {
-			throw new SearchException(
-					classToLoad.getName() + " defined for component " + componentDescription
-							+ " could not be instantiated because of a security manager error", e
-			);
+			throw log.securityManagerLoadingError( componentDescription, classToLoad, e );
 		}
 		catch (NoSuchMethodException e) {
-			throw new SearchException(
-					classToLoad.getName() + " defined for component " + componentDescription
-							+ " is missing an appropriate constructor: expected a public constructor with a single parameter of type Map"
-			);
+			throw log.missingConstructor( componentDescription, classToLoad );
 		}
 	}
 
@@ -230,10 +209,7 @@ public class ClassLoaderHelper {
 			clazz = classResolver.classForName( classNameToLoad );
 		}
 		catch (ClassLoadingException e) {
-			throw new SearchException(
-					"Unable to find " + componentDescription +
-							" implementation class: " + classNameToLoad, e
-			);
+			throw log.unableToFindComponentImplementation( componentDescription, classNameToLoad, e );
 		}
 		return clazz;
 	}
@@ -247,10 +223,7 @@ public class ClassLoaderHelper {
 			return clazzDef.asSubclass( targetSuperType );
 		}
 		catch (ClassCastException cce) {
-			throw new SearchException(
-					"Unable to load class for " + componentDescription + ". Configured implementation " + classNameToLoad +
-							" is not assignable to type " + targetSuperType
-			);
+			throw log.notAssignableImplementation( componentDescription, classNameToLoad, targetSuperType );
 		}
 	}
 

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -23,7 +24,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.ReflectionHelper;
 
 /**
@@ -34,6 +35,8 @@ import org.hibernate.search.util.impl.common.ReflectionHelper;
  * @author Yoann Rodiere
  */
 public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final MethodHandles.Lookup lookup;
 	private final AnnotationHelper annotationHelper;
@@ -96,7 +99,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 			);
 		}
 		catch (IntrospectionException | RuntimeException e) {
-			throw new SearchException( "Exception while retrieving the type model for '" + clazz + "'", e );
+			throw log.errorRetrievingTypeModel( clazz, e );
 		}
 	}
 }

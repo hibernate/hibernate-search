@@ -7,14 +7,18 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Yoann Rodiere
  */
 public final class MemberPropertyHandle implements PropertyHandle {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 	private final Member member;
@@ -48,7 +52,7 @@ public final class MemberPropertyHandle implements PropertyHandle {
 			if ( e instanceof InterruptedException ) {
 				Thread.currentThread().interrupt();
 			}
-			throw new SearchException( "Exception while invoking '" + member + "' on '" + thiz + "'" , e );
+			throw log.errorInvokingMember( member, thiz, e );
 		}
 	}
 

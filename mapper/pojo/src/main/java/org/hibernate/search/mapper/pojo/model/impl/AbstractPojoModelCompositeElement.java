@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.model.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
@@ -21,12 +23,14 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @param <V> The type of the element, i.e. the type of values returned by accessors to this element.
  */
 abstract class AbstractPojoModelCompositeElement<V> implements PojoModelCompositeElement {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	// Use a LinkedHashMap for deterministic iteration
@@ -44,7 +48,7 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 	@SuppressWarnings("unchecked") // The cast is checked using reflection
 	public final <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
-			throw new SearchException( "Requested incompatible type for '" + createAccessor() + "': '" + requestedType + "'" );
+			log.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
 		}
 		return (PojoModelElementAccessor<T>) createAccessor();
 	}

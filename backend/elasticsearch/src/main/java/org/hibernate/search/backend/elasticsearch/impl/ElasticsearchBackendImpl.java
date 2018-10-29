@@ -33,7 +33,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -154,7 +153,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchClient::close, client );
 		}
 		catch (IOException | RuntimeException e) {
-			throw new SearchException( "Failed to shut down the Elasticsearch backend", e );
+			throw log.failedToShutdownBackend( e, eventContext );
 		}
 	}
 

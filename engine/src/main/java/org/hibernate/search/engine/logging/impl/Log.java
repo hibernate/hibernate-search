@@ -9,7 +9,10 @@ package org.hibernate.search.engine.logging.impl;
 
 import java.util.List;
 
+import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
+import org.hibernate.search.engine.logging.spi.MappingKeyFormatter;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
@@ -179,4 +182,64 @@ public interface Log extends BasicLogger {
 					+ " If you want to ignore this, use .extension().ifSupported(...).orElse(ignored -> { })."
 	)
 	SearchException dslExtensionNoMatch(List<?> attemptedExtensions);
+
+	@Message(id = ID_OFFSET_2 + 27, value = "Unable to instantiate %1$s, class '%2$s': %3$s")
+	SearchException unableToInstantiateComponent(String componentDescription, @FormatWith(ClassFormatter.class) Class<?> classToLoad, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 28, value = "%2$s defined for component %1$s could not be instantiated because of a security manager error")
+	SearchException securityManagerLoadingError(String componentDescription, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 29, value = "Unable to find %1$s implementation class: %2$s")
+	SearchException unableToFindComponentImplementation(String componentDescription, String classNameToLoad, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 30, value = "Unable to load class [%1$s]")
+	ClassLoadingException unableToLoadTheClass(String className, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET_2 + 31, value = "Trying to map the Type '%1$s' mapped to multiple indexes: '%2$s', '%3$s'.")
+	SearchException multipleIndexMapping(@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName, String otherIndexName);
+
+	@Message(id = ID_OFFSET_2 + 32, value = "No mapping registered for mapping key: '%1$s'.")
+	SearchException noMappingRegistered(@FormatWith(MappingKeyFormatter.class) MappingKey mappingKey);
+
+	@Message(id = ID_OFFSET_2 + 33, value = "No backend registered for backend name: '%1$s'.")
+	SearchException noBackendRegistered(String backendName);
+
+	@Message(id = ID_OFFSET_2 + 34, value = "No index manager registered for index manager name: '%1$s'.")
+	SearchException noIndexManagerRegistered(String indexManagerName);
+
+	@Message(id = ID_OFFSET_2 + 35, value = "Got an empty bean reference (type is null).")
+	SearchException emptyBeanReferenceTypeNull();
+
+	@Message(id = ID_OFFSET_2 + 36, value = "Got an empty bean reference (name is null or empty).")
+	SearchException emptyBeanReferenceNameNullOrEmpty();
+
+	@Message(id = ID_OFFSET_2 + 37, value = "Got an empty bean reference (reference is null.)")
+	SearchException emptyBeanReferenceNull();
+
+	@Message(id = ID_OFFSET_2 + 38, value = "Got an empty bean reference (no name, no type).")
+	SearchException emptyBeanReferenceNoNameNoType();
+
+	@Message(id = ID_OFFSET_2 + 39, value = "This bean resolver does not support bean references using both a name and a type. Got both '%1$s' and '%2$s' in the same reference.")
+	SearchException resolveBeanUsingBothNameAndType(String nameReference, @FormatWith(ClassFormatter.class) Class<?> typeReference);
+
+	@Message(id = ID_OFFSET_2 + 40, value = "Unable to instantiate class '%1$s': %2$s.")
+	SearchException unableToInstantiateClass(@FormatWith(ClassFormatter.class) Class<?> classToLoad, String causeMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 41, value = "Wrong configuration of %1$s: class %2$s does not implement interface %3$s.")
+	SearchException interfaceImplementedExpected(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+
+	@Message(id = ID_OFFSET_2 + 42, value = "Wrong configuration of %1$s: class %2$s is not a subtype of %3$s.")
+	SearchException subtypeExpected(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+
+	@Message(id = ID_OFFSET_2 + 43, value = "%2$s defined for component %1$s is an interface: implementation required.")
+	SearchException implementationRequired(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad);
+
+	@Message(id = ID_OFFSET_2 + 44, value = "%2$s defined for component %1$s is missing an appropriate constructor: expected a public constructor with a single parameter of type Map.")
+	SearchException missingConstructor(String component, @FormatWith(ClassFormatter.class) Class<?> classToLoad);
+
+	@Message(id = ID_OFFSET_2 + 45, value = "Unable to load class for %1$s. Configured implementation %2$s  is not assignable to type %3$s.")
+	SearchException notAssignableImplementation(String component, String classToLoad, @FormatWith(ClassFormatter.class) Class<?> superType);
+
+	@Message(id = ID_OFFSET_2 + 46, value = "Found an infinite IndexedEmbedded recursion involving path '%1$s' on type '%2$s'.")
+	SearchException indexedEmbeddedCyclicRecursion(String cyclicRecursionPath, @FormatWith(MappableTypeModelFormatter.class) MappableTypeModel parentTypeModel);
 }

@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
+public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

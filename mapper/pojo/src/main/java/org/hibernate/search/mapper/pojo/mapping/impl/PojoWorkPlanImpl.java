@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,13 +15,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class PojoWorkPlanImpl implements PojoWorkPlan {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
@@ -150,10 +154,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 				return delegate;
 			}
 		}
-		throw new SearchException(
-				"Cannot work on type " + clazz + ", because it is not indexed,"
-				+ " neither directly nor as a contained entity in another type."
-		);
+		throw log.notIndexedTypeNorAsDelegate( clazz );
 	}
 
 	private PojoIndexedTypeWorkPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {

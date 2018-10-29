@@ -8,6 +8,7 @@
 package org.hibernate.search.mapper.pojo.logging.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.Set;
 
@@ -280,4 +281,25 @@ public interface Log extends BasicLogger {
 	)
 	SearchException invalidFieldEncodingForKeywordFieldMapping(IndexSchemaFieldTypedContext<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
+
+	@Message(id = ID_OFFSET_2 + 33, value = "Exception while invoking '%1$s' on '%2$s'.")
+	SearchException errorInvokingMember(Member member, Object component, @Cause Throwable e);
+
+	@Message(id = ID_OFFSET_2 + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
+	SearchException propertyMarkerNotFound(String markerName, String fieldName, String markerSet);
+
+	@Message(id = ID_OFFSET_2 + 35, value = "Found multiple properties with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
+	SearchException multiplePropertiesForMarker(String markerName, String fieldName, String markerSet);
+
+	@Message(id = ID_OFFSET_2 + 36, value = "Type '%1$s' is not indexed and hasn't any indexed supertype.")
+	SearchException notIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+
+	@Message(id = ID_OFFSET_2 + 37, value = "Cannot work on type %1$s, because it is not indexed, neither directly nor as a contained entity in another type.")
+	SearchException notIndexedTypeNorAsDelegate(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+
+	@Message(id = ID_OFFSET_2 + 38, value = "The identifier for this entity should always be provided, but the provided identifier was null." )
+	SearchException nullProvidedIdentifier();
+
+	@Message(id = ID_OFFSET_2 + 39, value = "Requested incompatible type for '%1$s': '%2$s'")
+	SearchException incompatibleRequestedType(@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode accessor, @FormatWith(ClassFormatter.class) Class<?> requestedType);
 }

@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelCompositeElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.StreamHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -148,10 +147,8 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private static Collector<PojoModelCompositeElement, ?, PojoModelCompositeElement> singleMarkedProperty(
 			String markerName, String fieldName, String markerSet) {
 		return StreamHelper.singleElement(
-				() -> new SearchException( "Could not find a property with the " + markerName
-						+ " marker for field '" + fieldName + "' (marker set: '" + markerSet + "')" ),
-				() -> new SearchException( "Found multiple properties with the " + markerName
-						+ " marker for field '" + fieldName + "' (marker set: '" + markerSet + "')" )
+				() -> log.propertyMarkerNotFound( markerName, fieldName, markerSet ),
+				() -> log.multiplePropertiesForMarker( markerName, fieldName, markerSet )
 				);
 	}
 

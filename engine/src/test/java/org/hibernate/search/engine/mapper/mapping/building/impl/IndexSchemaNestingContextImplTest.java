@@ -99,6 +99,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		resetAll();
+		EasyMock.expect( typeModel2Mock.getName() ).andReturn( "typeModel2Mock" );
 		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel2Mock ) ).andReturn( true );
 		replayAll();
 		thrown.expect( SearchException.class );
@@ -131,6 +132,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		);
 
 		resetAll();
+		EasyMock.expect( typeModel3Mock.getName() ).andReturn( "typeModel3Mock" );
 		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel3Mock ) ).andReturn( true );
 		replayAll();
 		thrown.expect( SearchException.class );
