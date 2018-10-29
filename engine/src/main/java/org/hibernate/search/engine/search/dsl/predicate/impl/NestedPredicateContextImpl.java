@@ -7,11 +7,15 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.ExplicitEndContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -20,15 +24,15 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class NestedPredicateContextImpl<N, B>
-		implements NestedPredicateContext<N>, SearchPredicateDslContext<N, B>, SearchPredicateContributor<B> {
+		implements NestedPredicateContext<N>, NestedPredicateFieldContext<N>, ExplicitEndContext<N>,
+		SearchPredicateDslContext<N, B>, SearchPredicateContributor<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final SearchPredicateFactory<?, B> factory;
 	private final Supplier<N> nextContextProvider;
 
-	private final SearchPredicateContainerContextImpl<N, B> containerContext;
-
+	private final SearchPredicateContainerContext<?> containerContext;
 	private NestedPredicateBuilder<B> builder;
 	private SearchPredicateContributor<? extends B> childPredicateContributor;
 
@@ -41,7 +45,24 @@ class NestedPredicateContextImpl<N, B>
 	@Override
 	public NestedPredicateFieldContext<N> onObjectField(String absoluteFieldPath) {
 		this.builder = factory.nested( absoluteFieldPath );
-		return new NestedPredicateFieldContextImpl<>( containerContext, builder );
+		return this;
+	}
+
+	@Override
+	public ExplicitEndContext<N> nest(SearchPredicate searchPredicate) {
+		containerContext.predicate( searchPredicate );
+		return this;
+	}
+
+	@Override
+	public ExplicitEndContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor) {
+		predicateContributor.accept( containerContext );
+		return this;
+	}
+
+	@Override
+	public N end() {
+		return getNextContext();
 	}
 
 	@Override
@@ -62,4 +83,5 @@ class NestedPredicateContextImpl<N, B>
 		builder.nested( childPredicateContributor.contribute() );
 		return builder.toImplementation();
 	}
+
 }

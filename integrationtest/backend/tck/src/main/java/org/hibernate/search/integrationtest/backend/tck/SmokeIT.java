@@ -218,10 +218,10 @@ public class SmokeIT {
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool( b -> {
-					b.must( c -> c.match().onField( "nestedObject.string" ).matching( "text 1_2" ) );
-					b.must( c -> c.match().onField( "nestedObject.integer" ).matching( 101 ) );
-				} ) )
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
+					b.must( c2 -> c2.match().onField( "nestedObject.string" ).matching( "text 1_2" ) );
+					b.must( c2 -> c2.match().onField( "nestedObject.integer" ).matching( 101 ) );
+				} ) ) )
 				.build();
 		assertThat( query )
 				.hasNoHits()
@@ -230,10 +230,10 @@ public class SmokeIT {
 		// ... but predicates should still be able to match on the same object
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool( b -> {
-					b.must( c -> c.match().onField( "nestedObject.string" ).matching( "text 1_1" ) );
-					b.must( c -> c.match().onField( "nestedObject.integer" ).matching( 101 ) );
-				} ) )
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
+					b.must( c2 -> c2.match().onField( "nestedObject.string" ).matching( "text 1_1" ) );
+					b.must( c2 -> c2.match().onField( "nestedObject.integer" ).matching( 101 ) );
+				} ) ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )

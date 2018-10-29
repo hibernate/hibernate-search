@@ -69,7 +69,8 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 
 		booleanBuilder.must(
 				target.predicate().nested().onObjectField( "copies" )
-				.match().onField( "copies.medium" ).matching( medium ).end()
+						.nest( target.predicate().match().onField( "copies.medium" ).matching( medium ).end() )
+						.end()
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
@@ -120,18 +121,20 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 
 		if ( myLocation != null && maxDistanceInKilometers != null ) {
 			booleanBuilder.must(
-					target.predicate().nested().onObjectField( "copies" ).spatial()
-							.within()
-							.onField( "copies.library.location" )
-							.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
+					target.predicate().nested().onObjectField( "copies" )
+							.nest( target.predicate().spatial()
+									.within()
+									.onField( "copies.library.location" )
+									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
+									.end()
+							)
 							.end()
 			);
 		}
 
 		// Nested query + must loop
 		if ( libraryServices != null && !libraryServices.isEmpty() ) {
-			BooleanJunctionPredicateContext<SearchPredicate> nestedBoolean =
-					target.predicate().nested().onObjectField( "copies" ).bool();
+			BooleanJunctionPredicateContext<SearchPredicate> nestedBoolean = target.predicate().bool();
 			for ( LibraryService service : libraryServices ) {
 				nestedBoolean.must(
 						target.predicate().match()
@@ -140,7 +143,11 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						.end()
 				);
 			}
-			booleanBuilder.must( nestedBoolean.end() );
+			booleanBuilder.must(
+					target.predicate().nested().onObjectField( "copies" )
+							.nest( nestedBoolean.end() )
+							.end()
+			);
 		}
 
 		FullTextQuery<Document<?>> query = target.query()
