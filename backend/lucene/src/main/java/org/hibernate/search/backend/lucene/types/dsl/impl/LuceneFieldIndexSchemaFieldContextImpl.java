@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldPr
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.AssertionFailure;
@@ -83,7 +84,8 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 				codec,
 				null,
 				null,
-				new StandardFieldProjectionBuilderFactory<>( codec, converter )
+				new StandardFieldProjectionBuilderFactory<>(
+						fieldValueExtractor != null ? Projectable.YES : Projectable.NO, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

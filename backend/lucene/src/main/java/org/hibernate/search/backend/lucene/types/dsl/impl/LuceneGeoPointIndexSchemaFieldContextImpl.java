@@ -53,7 +53,7 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 				codec,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
 				GeoPointFieldSortBuilderFactory.INSTANCE,
-				new GeoPointFieldProjectionBuilderFactory<>( codec, converter )
+				new GeoPointFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

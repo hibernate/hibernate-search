@@ -319,9 +319,9 @@ public class ExtensionIT {
 						projectionQuery.execute();
 				} )
 				.assertThrown()
-				.hasCauseInstanceOf( SearchException.class )
-				.hasMessageContaining( "This native field does not support projection." )
-				.satisfies( FailureReportUtils.hasCauseWithContext(
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Projections are not enabled for field" )
+				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( "nativeField_unsupportedProjection" )
 				) );
 	}

@@ -74,7 +74,7 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
 				parentNode, converter, codec,
 				new StandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory( converter )
+				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

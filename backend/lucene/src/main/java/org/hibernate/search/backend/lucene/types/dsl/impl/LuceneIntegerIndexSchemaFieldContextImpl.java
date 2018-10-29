@@ -50,7 +50,7 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 				codec,
 				new IntegerFieldPredicateBuilderFactory( converter ),
 				new IntegerFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory<>( codec, converter )
+				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -321,4 +321,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 46, value = "You cannot set the type of a field more than once.")
 	SearchException tryToSetFieldTypeMoreThanOnce(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 47,
+			value = "Projections are not enabled for field '%1$s'. Make sure the field is marked as projectable.")
+	SearchException nonProjectableField(String absoluteFieldPath, @Param EventContext context);
 }

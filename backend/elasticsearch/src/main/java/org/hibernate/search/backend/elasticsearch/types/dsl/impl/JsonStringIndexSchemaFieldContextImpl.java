@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -86,7 +87,7 @@ public class JsonStringIndexSchemaFieldContextImpl implements IndexSchemaFieldTy
 				parentNode, converter, CODEC,
 				new StandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory( converter )
+				new StandardFieldProjectionBuilderFactory( Projectable.YES, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

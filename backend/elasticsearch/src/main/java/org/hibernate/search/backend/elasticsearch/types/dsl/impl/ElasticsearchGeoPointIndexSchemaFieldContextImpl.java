@@ -53,7 +53,7 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 				parentNode, converter, GeoPointFieldCodec.INSTANCE,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
 				GeoPointFieldSortBuilderFactory.INSTANCE,
-				new GeoPointFieldProjectionBuilderFactory( converter )
+				new GeoPointFieldProjectionBuilderFactory( projectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

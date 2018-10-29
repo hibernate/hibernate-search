@@ -89,7 +89,7 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 				parentNode, converter, StringFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory( converter )
+				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceToFieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
@@ -22,15 +23,20 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Projectable projectable;
+
 	private final ElasticsearchFieldConverter converter;
 
-	public GeoPointFieldProjectionBuilderFactory(ElasticsearchFieldConverter converter) {
+	public GeoPointFieldProjectionBuilderFactory(Projectable projectable, ElasticsearchFieldConverter converter) {
+		this.projectable = projectable;
 		this.converter = converter;
 	}
 
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
 			Class<T> expectedType) {
+		checkProjectable( absoluteFieldPath, projectable );
+
 		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
@@ -42,6 +48,8 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 	@Override
 	public DistanceToFieldSearchProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
 			GeoPoint center) {
+		checkProjectable( absoluteFieldPath, projectable );
+
 		return new DistanceToFieldSearchProjectionBuilderImpl( absoluteFieldPath, center );
 	}
 
@@ -57,5 +65,16 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 		GeoPointFieldProjectionBuilderFactory other = (GeoPointFieldProjectionBuilderFactory) obj;
 
 		return converter.isDslCompatibleWith( other.converter );
+	}
+
+	private static void checkProjectable(String absoluteFieldPath, Projectable projectable) {
+		switch ( projectable ) {
+			case YES:
+				break;
+			case DEFAULT:
+			case NO:
+				throw log.nonProjectableField( absoluteFieldPath,
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }

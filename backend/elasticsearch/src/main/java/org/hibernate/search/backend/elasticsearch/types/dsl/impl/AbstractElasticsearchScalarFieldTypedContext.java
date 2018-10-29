@@ -22,8 +22,8 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<S, F> {
 
 	private final DataType dataType;
-	private Projectable projectable = Projectable.DEFAULT;
-	private Sortable sortable = Sortable.DEFAULT;
+	protected Projectable projectable = Projectable.DEFAULT;
+	protected Sortable sortable = Sortable.DEFAULT;
 
 	AbstractElasticsearchScalarFieldTypedContext(IndexSchemaContext schemaContext,
 			Class<F> fieldType, DataType dataType) {

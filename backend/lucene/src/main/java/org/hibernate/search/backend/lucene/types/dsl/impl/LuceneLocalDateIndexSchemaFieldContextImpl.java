@@ -52,7 +52,7 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 				codec,
 				new LocalDateFieldPredicateBuilderFactory( converter ),
 				new LocalDateFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory<>( codec, converter )
+				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -187,6 +188,25 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		searchTarget.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
 				.toProjection();
+	}
+
+	@Test
+	public void distanceProjection_nonProjectable() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException( () -> {
+			searchTarget.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
+		} ).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Projections are not enabled for field" )
+				.hasMessageContaining( "nonProjectableGeoPoint" );
+
+		SubTest.expectException( () -> {
+			searchTarget.projection().distance( "nonProjectableGeoPoint", GeoPoint.of( 43d, 4d ) ).toProjection();
+		} ).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Projections are not enabled for field" )
+				.hasMessageContaining( "nonProjectableGeoPoint" );
 	}
 
 	private void checkResult(List<?> result, String name, int distanceIndex, Double distance, Offset<Double> offset) {

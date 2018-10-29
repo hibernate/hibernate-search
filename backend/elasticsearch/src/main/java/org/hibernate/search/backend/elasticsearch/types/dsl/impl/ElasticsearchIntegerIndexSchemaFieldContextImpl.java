@@ -52,7 +52,7 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl
 				parentNode, converter, IntegerFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory( converter )
+				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -41,6 +41,7 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -429,9 +430,20 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void error_notProjectable() {
-		Assume.assumeTrue( "Checks preventing from projecting on un-projectable fields are not implemented yet", false );
-		// TODO  Throw an exception when trying to project on an un-projectable field
+	public void error_nonProjectable() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( FieldModel<?> fieldModel : indexMapping.nonProjectableSupportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+			Class<?> fieldType = fieldModel.type;
+
+			SubTest.expectException( () -> {
+					searchTarget.projection().field( fieldPath, fieldType ).toProjection();
+			} ).assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Projections are not enabled for field" )
+					.hasMessageContaining( fieldPath );
+		}
 	}
 
 	private void initData() {
@@ -504,6 +516,7 @@ public class SearchProjectionIT {
 	private static class IndexMapping {
 		final List<FieldModel<?>> supportedFieldModels;
 		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels;
+		final List<FieldModel<?>> nonProjectableSupportedFieldModels;
 
 		final FieldModel<String> string1Field;
 		final FieldModel<String> string2Field;
@@ -517,6 +530,8 @@ public class SearchProjectionIT {
 			supportedFieldWithProjectionConverterModels = mapSupportedFields(
 					root, "converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
 			);
+			nonProjectableSupportedFieldModels = mapSupportedFields( root, "nonProjectable_",
+					c -> c.projectable( Projectable.NO ) );
 
 			string1Field = FieldModel.mapper( String.class, "ccc", "mmm", "xxx" )
 					.map( root, "string1" );

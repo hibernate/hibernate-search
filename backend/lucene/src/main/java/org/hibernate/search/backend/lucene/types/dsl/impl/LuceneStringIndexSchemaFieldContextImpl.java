@@ -114,7 +114,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				codec,
 				new StringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
 				new StringFieldSortBuilderFactory( converter ),
-				new StandardFieldProjectionBuilderFactory<>( codec, converter )
+				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
