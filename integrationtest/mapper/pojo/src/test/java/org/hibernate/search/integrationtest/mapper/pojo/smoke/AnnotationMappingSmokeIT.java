@@ -365,7 +365,7 @@ public class AnnotationMappingSmokeIT {
 			)
 					.query()
 					.asReferences()
-					.predicate().matchAll().end()
+					.predicate( root -> root.matchAll() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -408,7 +408,7 @@ public class AnnotationMappingSmokeIT {
 							searchTarget.projection().documentReference().toProjection(),
 							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
-					.predicate().matchAll().end()
+					.predicate( root -> root.matchAll() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );

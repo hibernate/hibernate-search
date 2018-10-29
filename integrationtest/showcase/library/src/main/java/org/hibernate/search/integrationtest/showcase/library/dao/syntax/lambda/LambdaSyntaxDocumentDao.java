@@ -39,7 +39,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 				fullTextSession.search( Book.class ).query()
 				.asEntities()
 				// TODO allow to bypass the bridge in the DSL
-				.predicate( c -> c.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
+				.predicate( root -> root.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -49,7 +49,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
-				.predicate().bool( b -> {
+				.predicate( root -> root.bool( b -> {
 					b.must( ctx -> {
 						if ( terms != null && !terms.isEmpty() ) {
 							ctx.match()
@@ -61,7 +61,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 					b.must( ctx -> ctx.nested().onObjectField( "copies" )
 							.match().onField( "copies.medium" ).matching( medium )
 					);
-				} )
+				} ) )
 				.sort( b -> b.byField( "title_sort" ) )
 				.build();
 
@@ -78,7 +78,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 			int offset, int limit) {
 		FullTextQuery<Document<?>> query = entityManager.search( DOCUMENT_CLASS ).query()
 				.asEntities()
-				.predicate().bool( b -> {
+				.predicate( root -> root.bool( b -> {
 					// Match query
 					b.must( ctx -> {
 						if ( terms != null && !terms.isEmpty() ) {
@@ -124,7 +124,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 							} );
 						}
 					} );
-				} )
+				} ) )
 				// TODO facets (tag, medium, library in particular)
 				.sort( b -> b.byScore() )
 				.build();

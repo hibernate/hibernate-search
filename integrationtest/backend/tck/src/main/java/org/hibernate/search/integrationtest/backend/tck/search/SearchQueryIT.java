@@ -70,7 +70,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setFirstResult( 1L );
@@ -81,7 +81,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setFirstResult( 1L );
@@ -93,7 +93,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setMaxResults( 2L );
@@ -104,7 +104,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setFirstResult( null );
@@ -121,7 +121,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setFirstResult( 1L );
@@ -146,7 +146,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setFirstResult( null );
@@ -164,7 +164,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.sort().byField( "string" ).asc().end()
 				.build();
 		query.setMaxResults( 0L );
@@ -180,7 +180,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( "platypus" ).end()
+				.predicate( root -> root.match().onField( "string" ).matching( "platypus" ) )
 				.build();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
@@ -193,7 +193,7 @@ public class SearchQueryIT {
 		QueryWrapper queryWrapper = searchTarget.query( sessionContext )
 				.asReferences()
 				.asWrappedQuery( q -> new QueryWrapper( q ) )
-				.predicate().match().onField( "string" ).matching( "platypus" ).end()
+				.predicate( root -> root.match().onField( "string" ).matching( "platypus" ) )
 				.build();
 
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
@@ -217,7 +217,7 @@ public class SearchQueryIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

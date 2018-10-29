@@ -33,8 +33,6 @@ import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
 import org.hibernate.search.integrationtest.showcase.library.dao.PersonDao;
-import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandlambda.FluidAndLambdaSyntaxDaoFactory;
-import org.hibernate.search.integrationtest.showcase.library.dao.syntax.fluidandobject.FluidAndObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.syntax.object.ObjectSyntaxDaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
@@ -78,8 +76,6 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				MappingMode.PROGRAMMATIC_MAPPING
 		};
 		DaoFactory[] daoFactories = new DaoFactory[] {
-				new FluidAndLambdaSyntaxDaoFactory(),
-				new FluidAndObjectSyntaxDaoFactory(),
 				new LambdaSyntaxDaoFactory(),
 				new ObjectSyntaxDaoFactory()
 		};

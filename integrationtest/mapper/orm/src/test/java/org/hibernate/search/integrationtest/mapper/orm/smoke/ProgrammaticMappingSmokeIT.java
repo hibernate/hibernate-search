@@ -303,7 +303,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 					.query()
 					.asEntities()
-					.predicate().matchAll().end()
+					.predicate( root -> root.matchAll() )
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );
@@ -350,7 +350,7 @@ public class ProgrammaticMappingSmokeIT {
 							searchTarget.projection().object().toProjection(),
 							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
-					.predicate().matchAll().end()
+					.predicate( root -> root.matchAll() )
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );

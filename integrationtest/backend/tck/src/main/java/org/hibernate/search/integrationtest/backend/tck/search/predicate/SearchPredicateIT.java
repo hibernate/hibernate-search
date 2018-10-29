@@ -77,7 +77,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( "string" ).matching( MATCHING_STRING ).end()
+				.predicate( root -> root.match().onField( "string" ).matching( MATCHING_STRING ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -105,7 +105,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( c -> c.match().onField( "string" ).matching( MATCHING_STRING ) )
+				.predicate( root -> root.match().onField( "string" ).matching( MATCHING_STRING ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -157,8 +157,9 @@ public class SearchPredicateIT {
 		// Mandatory extension
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().extension( new SupportedExtension<>() )
-						.match().onField( "string" ).matching( MATCHING_STRING ).end()
+				.predicate( root -> root.extension( new SupportedExtension<>() )
+						.match().onField( "string" ).matching( MATCHING_STRING )
+				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
@@ -166,7 +167,7 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, both supported
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().extension()
+				.predicate( root -> root.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension<>(),
@@ -177,6 +178,7 @@ public class SearchPredicateIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElseFail()
+				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
@@ -184,7 +186,7 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().extension()
+				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								ignored -> Assert.fail( "This should not be called" )
@@ -196,6 +198,7 @@ public class SearchPredicateIT {
 						.orElse(
 								ignored -> Assert.fail( "This should not be called" )
 						)
+				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
@@ -203,7 +206,7 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().extension()
+				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								ignored -> Assert.fail( "This should not be called" )
@@ -215,6 +218,7 @@ public class SearchPredicateIT {
 						.orElse(
 								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
 						)
+				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
@@ -222,7 +226,7 @@ public class SearchPredicateIT {
 		// Conditional extensions without orElse - one, unsupported
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool()
+				.predicate( root -> root.bool()
 						.must( c -> c.extension()
 								.ifSupported(
 										new UnSupportedExtension<>(),
@@ -233,6 +237,7 @@ public class SearchPredicateIT {
 								c -> c.match().onField( "string" ).matching( MATCHING_STRING ).end()
 						)
 						.end()
+				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID );
@@ -254,7 +259,7 @@ public class SearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, MATCHING_ID, NON_MATCHING_ID, EMPTY_ID );
 	}

@@ -83,7 +83,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
-					.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch ).end()
+					.predicate( root -> root.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
@@ -101,7 +101,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
-					.predicate().match().onField( absoluteFieldPath ).matching( valueToMatch ).end()
+					.predicate( root -> root.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
@@ -117,7 +117,7 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( fieldModel.relativeFieldName ).matching( "" ).end()
+				.predicate( root -> root.match().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -133,7 +133,7 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				// Use a stopword, which should be removed by the analysis
-				.predicate().match().onField( fieldModel.relativeFieldName ).matching( "a" ).end()
+				.predicate( root -> root.match().onField( fieldModel.relativeFieldName ).matching( "a" ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -185,12 +185,14 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool()
-						.should().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.bool()
+						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
 								.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
-						.should().match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+						)
+						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
-				.end()
+						)
+				)
 				.sort().byScore().end()
 				.build();
 
@@ -199,12 +201,14 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool()
-						.should().match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+				.predicate( root -> root.bool()
+						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
 								.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
-						.should().match().onField( indexMapping.string1Field.relativeFieldName )
+						)
+						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).end()
-				.end()
+						)
+				)
 				.sort().byScore().end()
 				.build();
 
@@ -220,9 +224,10 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
-						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
+						.matching( indexMapping.string1Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -230,9 +235,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
-						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
+						.matching( indexMapping.string2Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -242,9 +248,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
+						.matching( indexMapping.string1Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -252,9 +259,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
+						.matching( indexMapping.string2Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -262,9 +270,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.matching( indexMapping.string3Field.document1Value.indexedValue ).end()
+						.matching( indexMapping.string3Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -274,8 +283,9 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.matching( indexMapping.string1Field.document1Value.indexedValue ).end()
+				.predicate( root -> root.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+						.matching( indexMapping.string1Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -283,8 +293,9 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
-						.matching( indexMapping.string2Field.document1Value.indexedValue ).end()
+				.predicate( root -> root.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
+						.matching( indexMapping.string2Field.document1Value.indexedValue )
+				)
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -390,7 +401,7 @@ public class MatchSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY,
 				DOCUMENT_3

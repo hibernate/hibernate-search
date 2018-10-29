@@ -218,7 +218,7 @@ public class AnalysisCustomIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ).end()
+				.predicate( root -> root.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
 				.build();
 
 		return DocumentReferencesSearchResultAssert.assertThat( query );
@@ -266,7 +266,7 @@ public class AnalysisCustomIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( c -> {

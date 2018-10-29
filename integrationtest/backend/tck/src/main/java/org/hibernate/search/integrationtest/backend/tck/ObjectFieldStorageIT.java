@@ -124,12 +124,14 @@ public class ObjectFieldStorageIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool( b -> {
-					b.must().match().onField( "flattenedObject.string" ).matching( MATCHING_STRING );
-					b.must().match().onField( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED );
-					b.must().match().onField( "flattenedObject.integer" ).matching( MATCHING_INTEGER );
-					b.must().match().onField( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE );
-				} )
+				.predicate( root -> root.bool( b -> {
+					b.must( c -> c.match().onField( "flattenedObject.string" ).matching( MATCHING_STRING ) );
+					b.must( c -> c.match().onField( "flattenedObject.string_analyzed" )
+							.matching( MATCHING_STRING_ANALYZED ) );
+					b.must( c -> c.match().onField( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) );
+					b.must( c -> c.match().onField( "flattenedObject.localDate" )
+									.matching( MATCHING_LOCAL_DATE ) );
+				} ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
@@ -138,10 +140,10 @@ public class ObjectFieldStorageIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool()
-						.must().match().onField( "nestedObject.string" ).matching( MATCHING_STRING ).end()
-						.must().match().onField( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ).end()
-						.must().match().onField( "nestedObject.integer" ).matching( MATCHING_INTEGER ).end()
-						.must().match().onField( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ).end()
+						.must( c -> c.match().onField( "nestedObject.string" ).matching( MATCHING_STRING ) )
+						.must( c -> c.match().onField( "nestedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
+						.must( c -> c.match().onField( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
+						.must( c -> c.match().onField( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 				)
 				.build();
 		assertThat( query )
@@ -155,14 +157,14 @@ public class ObjectFieldStorageIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().bool( b -> {
-					b.must().range().onField( "flattenedObject.string" )
-							.from( MATCHING_STRING ).to( MATCHING_STRING );
-					b.must().range().onField( "flattenedObject.integer" )
-							.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 );
-					b.must().range().onField( "flattenedObject.localDate" )
-							.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) );
-				} )
+				.predicate( root -> root.bool()
+						.must( c -> c.range().onField( "flattenedObject.string" )
+								.from( MATCHING_STRING ).to( MATCHING_STRING ) )
+						.must( c -> c.range().onField( "flattenedObject.integer" )
+								.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 ) )
+						.must( c -> c.range().onField( "flattenedObject.localDate" )
+								.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) ) )
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
@@ -170,14 +172,14 @@ public class ObjectFieldStorageIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().nested().onObjectField( "nestedObject" ).bool( b -> {
-					b.must().range().onField( "nestedObject.string" )
-							.from( MATCHING_STRING ).to( MATCHING_STRING );
-					b.must().range().onField( "nestedObject.integer" )
-							.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 );
-					b.must().range().onField( "nestedObject.localDate" )
-							.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) );
-				} )
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool()
+					.must( c -> c.range().onField( "nestedObject.string" )
+							.from( MATCHING_STRING ).to( MATCHING_STRING ) )
+					.must( c -> c.range().onField( "nestedObject.integer" )
+							.from( MATCHING_INTEGER - 1 ).to( MATCHING_INTEGER + 1 ) )
+					.must( c -> c.range().onField( "nestedObject.localDate" )
+							.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) ) )
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
@@ -313,7 +315,7 @@ public class ObjectFieldStorageIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder(

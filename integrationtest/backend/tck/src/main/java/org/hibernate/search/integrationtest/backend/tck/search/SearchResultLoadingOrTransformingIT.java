@@ -89,7 +89,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -101,7 +101,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asObjects()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -125,7 +125,7 @@ public class SearchResultLoadingOrTransformingIT {
 				sessionContext, referenceTransformerMock, objectLoaderMock
 		)
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -156,7 +156,7 @@ public class SearchResultLoadingOrTransformingIT {
 		SearchQuery<StubLoadedObject> objectsQuery =
 				searchTarget.query( sessionContext, referenceTransformerMock, objectLoaderMock )
 						.asObjects()
-						.predicate().matchAll().end()
+						.predicate( root -> root.matchAll() )
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -199,7 +199,7 @@ public class SearchResultLoadingOrTransformingIT {
 								searchTarget.projection().reference().toProjection(),
 								searchTarget.projection().object().toProjection()
 						)
-						.predicate().matchAll().end()
+						.predicate( root -> root.matchAll() )
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -246,7 +246,7 @@ public class SearchResultLoadingOrTransformingIT {
 						searchTarget.projection().reference().toProjection(),
 						searchTarget.projection().object().toProjection()
 				)
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 
 		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
@@ -292,7 +292,7 @@ public class SearchResultLoadingOrTransformingIT {
 								searchTarget.projection().reference().toProjection(),
 								searchTarget.projection().object().toProjection()
 						)
-						.predicate().matchAll().end()
+						.predicate( root -> root.matchAll() )
 						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -349,7 +349,7 @@ public class SearchResultLoadingOrTransformingIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate().matchAll().end()
+				.predicate( root -> root.matchAll() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );

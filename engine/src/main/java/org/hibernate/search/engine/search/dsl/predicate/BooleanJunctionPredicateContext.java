@@ -100,40 +100,9 @@ public interface BooleanJunctionPredicateContext<N> extends
 	BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate);
 
 	/*
-	 * Fully fluid syntax.
-	 */
-
-	/**
-	 * Add a <a href="#must">"must" clause</a>.
-	 *
-	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "must" clause.
-	 */
-	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> must();
-
-	/**
-	 * Add a <a href="#mustnot">"must not" clause</a>.
-	 *
-	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "must not" clause.
-	 */
-	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> mustNot();
-
-	/**
-	 * Add a <a href="#should">"should" clause</a>.
-	 *
-	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "should" clause.
-	 */
-	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> should();
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a>.
-	 *
-	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "filter" clause.
-	 */
-	SearchPredicateContainerContext<? extends BooleanJunctionPredicateContext<N>> filter();
-
-	/*
 	 * Alternative syntax taking advantage of lambdas,
-	 * allowing to introduce if/else statements in the query building code.
+	 * allowing the structure of the predicate building code to mirror the structure of predicates,
+	 * even for complex predicate building requiring for example if/else statements.
 	 */
 
 	/**
