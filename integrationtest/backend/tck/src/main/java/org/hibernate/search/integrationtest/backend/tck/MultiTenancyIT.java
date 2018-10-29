@@ -117,8 +117,9 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
 				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" )
-								.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						root.nested().onObjectField( "nestedObject" ).nest(
+								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						)
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -129,8 +130,9 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
 				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" )
-								.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						root.nested().onObjectField( "nestedObject" ).nest(
+								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						)
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
@@ -225,8 +227,9 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
 				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" )
-								.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+						root.nested().onObjectField( "nestedObject" ).nest(
+								c -> c.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+						)
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
@@ -248,8 +251,9 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
 				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" )
-								.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+						root.nested().onObjectField( "nestedObject" ).nest(
+								c -> c.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+						)
 				)
 				.build();
 		assertThat( query ).hasNoHits();
@@ -269,8 +273,9 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
 				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" )
-								.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						root.nested().onObjectField( "nestedObject" ).nest(
+								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+						)
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );

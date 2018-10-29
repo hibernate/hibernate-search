@@ -77,22 +77,22 @@ public class NestedSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool( b -> {
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c2 -> c2.bool( b -> {
 					// This is referred to as "condition 1" in the data initialization method
-					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
+					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).nest( c3 -> c3.bool( b2 -> {
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field1" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ) );
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 ) );
-					} ) );
+					} ) ) );
 					// This is referred to as "condition 2" in the data initialization method
-					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
+					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).nest( c3 -> c3.bool( b2 -> {
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field1" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ) );
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 ) );
-					} ) );
-				} ) )
+					} ) ) );
+				} ) ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
@@ -107,19 +107,19 @@ public class NestedSearchPredicateIT {
 				.asReferences()
 				.predicate( root -> root.bool( b -> {
 					// This is referred to as "condition 1" in the data initialization method
-					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
+					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).nest( c2 -> c2.bool( b2 -> {
+						b2.must( c3 -> c3.match().onField( "nestedObject.nestedObject.field1" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 ) );
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
+						b2.must( c3 -> c3.match().onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 ) );
-					} ) );
+					} ) ) );
 					// This is referred to as "condition 2" in the data initialization method
-					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
+					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).nest( c2 -> c2.bool( b2 -> {
+						b2.must( c3 -> c3.match().onField( "nestedObject.nestedObject.field1" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 ) );
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
+						b2.must( c3 -> c3.match().onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 ) );
-					} ) );
+					} ) ) );
 				} ) )
 				.build();
 		assertThat( query )
@@ -133,18 +133,18 @@ public class NestedSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool( b -> {
-					b.must( c -> c.match().onField( "nestedObject.string" ).matching( MATCHING_STRING ) );
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
+					b.must( c2 -> c2.match().onField( "nestedObject.string" ).matching( MATCHING_STRING ) );
 					// This is referred to as "condition 2" in the data initialization method
-					b.must( c -> c.nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
+					b.must( c2 -> c2.nested().onObjectField( "nestedObject.nestedObject" ).nest( c3 -> c3.bool( b2 -> {
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field1" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
 						);
-						b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
+						b2.must( c4 -> c4.match().onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
 						);
-					} ) );
-				} ) )
+					} ) ) );
+				} ) ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
@@ -155,32 +155,32 @@ public class NestedSearchPredicateIT {
 	public void search_nestedOnTwoLevels_separatePredicates() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate1 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-			b2.must( c -> c.match().onField( "nestedObject.nestedObject.field1" )
+		SearchPredicate predicate1 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" ).nest( c -> c.bool( b2 -> {
+			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 )
 			);
-			b2.must( c -> c.match().onField( "nestedObject.nestedObject.field2" )
+			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
 			);
-		} );
+		} ) ).end();
 
-		SearchPredicate predicate2 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" ).bool( b2 -> {
-			b2.must( c -> c.match().onField( "nestedObject.nestedObject.field1" )
+		SearchPredicate predicate2 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" ).nest( c -> c.bool( b2 -> {
+			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 )
 			);
-			b2.must( c -> c.match().onField( "nestedObject.nestedObject.field2" )
+			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
 			);
-		} );
+		} ) ).end();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).bool( b -> {
+				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
 					// This is referred to as "condition 1" in the data initialization method
 					b.must( predicate1 );
 					// This is referred to as "condition 2" in the data initialization method
 					b.must( predicate2 );
-				} ) )
+				} ) ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )

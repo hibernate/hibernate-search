@@ -50,17 +50,17 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
 				.predicate( root -> root.bool( b -> {
-					b.must( ctx -> {
+					b.must( c -> {
 						if ( terms != null && !terms.isEmpty() ) {
-							ctx.match()
+							c.match()
 									.onField( "title" ).boostedTo( 2.0f )
 									.orField( "summary" )
 									.matching( terms );
 						}
 					} );
-					b.must( ctx -> ctx.nested().onObjectField( "copies" )
-							.match().onField( "copies.medium" ).matching( medium )
-					);
+					b.must( c -> c.nested().onObjectField( "copies" ).nest(
+							c2 -> c2.match().onField( "copies.medium" ).matching( medium )
+					) );
 				} ) )
 				.sort( b -> b.byField( "title_sort" ) )
 				.build();
@@ -80,19 +80,19 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 				.asEntities()
 				.predicate( root -> root.bool( b -> {
 					// Match query
-					b.must( ctx -> {
+					b.must( c -> {
 						if ( terms != null && !terms.isEmpty() ) {
-							ctx.match()
+							c.match()
 									.onField( "title" ).boostedTo( 2.0f )
 									.orField( "summary" )
 									.matching( terms );
 						}
 					} );
 					// Bridged query with complex bridge: TODO rely on the bridge to split the String
-					b.must( ctx -> {
+					b.must( c -> {
 						String[] splitTags = tags == null ? null : tags.split( "," );
 						if ( splitTags != null && splitTags.length > 0 ) {
-							ctx.bool().must( c2 -> {
+							c.bool().must( c2 -> {
 								for ( String tag : splitTags ) {
 									c2.match()
 											.onField( "tags" )
@@ -102,26 +102,28 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 						}
 					} );
 					// Spatial query
-					b.must( ctx -> {
+					b.must( c -> {
 						if ( myLocation != null && maxDistanceInKilometers != null ) {
-							ctx.nested().onObjectField( "copies" )
+							c.nested().onObjectField( "copies" ).nest( c2 -> c2
 									.spatial()
 									.within()
 									.onField( "copies.library.location" )
-									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS );
+									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
+							);
 						}
 					} );
 					// Nested query + must loop
-					b.must( ctx -> {
+					b.must( c -> {
 						if ( libraryServices != null && !libraryServices.isEmpty() ) {
-							ctx.nested().onObjectField( "copies" )
-									.bool().must( c2 -> {
-								for ( LibraryService service : libraryServices ) {
-									c2.match()
-											.onField( "copies.library.services" )
-											.matching( service );
-								}
-							} );
+							c.nested().onObjectField( "copies" ).nest( c2 -> c2.bool()
+									.must( c3 -> {
+										for ( LibraryService service : libraryServices ) {
+											c3.match()
+													.onField( "copies.library.services" )
+													.matching( service );
+										}
+									} )
+							);
 						}
 					} );
 				} ) )
