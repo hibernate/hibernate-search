@@ -29,21 +29,9 @@ public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldConte
 	MatchAllPredicateContext<N> except(SearchPredicate searchPredicate);
 
 	/*
-	 * Fully fluid syntax.
-	 */
-
-	/**
-	 * Create a context allowing to define a "must not" clause
-	 * <p>
-	 * Documents matching the "must not" clause won't match the "match all" predicate.
-	 *
-	 * @return A {@link SearchPredicateContainerContext} allowing to define the predicate of the "must not" clause.
-	 */
-	SearchPredicateContainerContext<? extends MatchAllPredicateContext<N>> except();
-
-	/*
 	 * Alternative syntax taking advantage of lambdas,
-	 * allowing to introduce if/else statements in the query building code.
+	 * allowing the structure of the predicate building code to mirror the structure of predicates,
+	 * even for complex predicate building requiring for example if/else statements.
 	 */
 
 	/**

@@ -45,18 +45,13 @@ class MatchAllPredicateContextImpl<N, B>
 
 	@Override
 	public MatchAllPredicateContext<N> except(SearchPredicate searchPredicate) {
-		except().predicate( searchPredicate );
+		getExceptContext().containerContext.predicate( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public SearchPredicateContainerContext<? extends MatchAllPredicateContext<N>> except() {
-		return getExceptContext().containerContext;
-	}
-
-	@Override
 	public MatchAllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
-		clauseContributor.accept( except() );
+		clauseContributor.accept( getExceptContext().containerContext );
 		return this;
 	}
 
