@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -22,7 +22,7 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<S, F> {
 
 	private final DataType dataType;
-	private Store store = Store.DEFAULT;
+	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
 	AbstractElasticsearchScalarFieldTypedContext(IndexSchemaContext schemaContext,
@@ -32,8 +32,8 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 	}
 
 	@Override
-	public S store(Store store) {
-		this.store = store;
+	public S projectable(Projectable projectable) {
+		this.projectable = projectable;
 		return thisAsS();
 	}
 
@@ -52,15 +52,13 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 
 		mapping.setType( dataType );
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 				break;
 			case NO:
 				mapping.setStore( false );
 				break;
 			case YES:
-			case COMPRESS:
-				// TODO what about Store.COMPRESS?
 				mapping.setStore( true );
 				break;
 		}

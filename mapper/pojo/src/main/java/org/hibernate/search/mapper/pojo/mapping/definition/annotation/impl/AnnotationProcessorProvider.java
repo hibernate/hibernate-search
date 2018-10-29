@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -263,8 +263,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		Store getStore(GenericField annotation) {
-			return annotation.store();
+		Projectable getProjectable(GenericField annotation) {
+			return annotation.projectable();
 		}
 
 		@Override
@@ -306,8 +306,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		Store getStore(FullTextField annotation) {
-			return annotation.store();
+		Projectable getProjectable(FullTextField annotation) {
+			return annotation.projectable();
 		}
 
 		@Override
@@ -348,8 +348,8 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		Store getStore(KeywordField annotation) {
-			return annotation.store();
+		Projectable getProjectable(KeywordField annotation) {
+			return annotation.projectable();
 		}
 
 		@Override

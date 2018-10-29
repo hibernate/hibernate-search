@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -429,9 +429,9 @@ public class SearchProjectionIT {
 	}
 
 	@Test
-	public void error_notStored() {
-		Assume.assumeTrue( "Checks preventing from projecting on un-stored fields are not implemented yet", false );
-		// TODO  Throw an exception when trying to project on an un-stored field
+	public void error_notProjectable() {
+		Assume.assumeTrue( "Checks preventing from projecting on un-projectable fields are not implemented yet", false );
+		// TODO  Throw an exception when trying to project on an un-projectable field
 	}
 
 	private void initData() {
@@ -606,7 +606,7 @@ public class SearchProjectionIT {
 			return (parent, name, additionalConfiguration) -> {
 				IndexSchemaFieldContext untypedContext = parent.field( name );
 				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
-				context.store( Store.YES );
+				context.projectable( Projectable.YES );
 				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
 				return new FieldModel<>(

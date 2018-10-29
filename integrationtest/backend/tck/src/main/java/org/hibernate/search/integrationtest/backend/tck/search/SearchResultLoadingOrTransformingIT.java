@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -365,14 +365,14 @@ public class SearchResultLoadingOrTransformingIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().store( Store.YES ).createAccessor();
+			string = root.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
 			string_analyzed = root.field( "string_analyzed" ).asString()
-					.store( Store.YES )
+					.projectable( Projectable.YES )
 					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 					.createAccessor();
-			integer = root.field( "integer" ).asInteger().store( Store.YES ).createAccessor();
-			localDate = root.field( "localDate" ).asLocalDate().store( Store.YES ).createAccessor();
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().store( Store.YES ).createAccessor();
+			integer = root.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
+			localDate = root.field( "localDate" ).asLocalDate().projectable( Projectable.YES ).createAccessor();
+			geoPoint = root.field( "geoPoint" ).asGeoPoint().projectable( Projectable.YES ).createAccessor();
 			IndexSchemaObjectField flattenedObjectField =
 					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
 			flattenedObject = new ObjectAccessors( flattenedObjectField );
@@ -389,8 +389,8 @@ public class SearchResultLoadingOrTransformingIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string" ).asString().store( Store.YES ).createAccessor();
-			integer = objectField.field( "integer" ).asInteger().store( Store.YES ).createAccessor();
+			string = objectField.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
+			integer = objectField.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
 		}
 	}
 

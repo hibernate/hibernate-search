@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
@@ -164,7 +164,7 @@ public class LuceneSearchMultiIndexIT {
 
 		IndexAccessors_1_1(IndexSchemaElement root) {
 			string = root.field( "string" ).asString().createAccessor();
-			additionalField = root.field( "additionalField" ).asString().sortable( Sortable.YES ).store( Store.YES ).createAccessor();
+			additionalField = root.field( "additionalField" ).asString().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
 		}
 	}
 

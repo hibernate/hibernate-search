@@ -15,7 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -28,10 +28,10 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@GenericField(store = Store.NO)
+	@GenericField(projectable = Projectable.NO)
 	private String title;
 
-	@GenericField(store = Store.NO)
+	@GenericField(projectable = Projectable.NO)
 	private String subtitle;
 
 	@IndexedEmbedded

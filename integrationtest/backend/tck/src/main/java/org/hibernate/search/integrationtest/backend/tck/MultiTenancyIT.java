@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -539,8 +539,8 @@ public class MultiTenancyIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().store( Store.YES ).createAccessor();
-			integer = root.field( "integer" ).asInteger().store( Store.YES ).createAccessor();
+			string = root.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
+			integer = root.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
 			nestedObject = new ObjectAccessors( nestedObjectField );
@@ -554,8 +554,8 @@ public class MultiTenancyIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string" ).asString().store( Store.YES ).createAccessor();
-			integer = objectField.field( "integer" ).asInteger().store( Store.YES ).createAccessor();
+			string = objectField.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
+			integer = objectField.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
 		}
 	}
 }

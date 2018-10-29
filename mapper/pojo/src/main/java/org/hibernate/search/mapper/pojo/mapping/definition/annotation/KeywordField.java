@@ -14,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 /**
  * A keyword field in the full text index, holding a single token (word) of text.
@@ -52,10 +52,10 @@ public @interface KeywordField {
 	String normalizer() default "";
 
 	/**
-	 * @return Whether values for this field should be stored (enables projections).
-	 * @see GenericField#store()
+	 * @return Whether projections are enabled for this field.
+	 * @see GenericField#projectable()
 	 */
-	Store store() default Store.DEFAULT;
+	Projectable projectable() default Projectable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be sortable.

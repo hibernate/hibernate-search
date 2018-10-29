@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredi
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -103,7 +103,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 		);
 		StringFieldCodec codec = new StringFieldCodec(
 				sortable,
-				getFieldType( store, analyzer != null ),
+				getFieldType( projectable, analyzer != null ),
 				analyzerOrNormalizer
 		);
 
@@ -135,7 +135,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 		return getSchemaContext().getRoot().getAnalysisDefinitionRegistry();
 	}
 
-	private static FieldType getFieldType(Store store, boolean analyzed) {
+	private static FieldType getFieldType(Projectable projectable, boolean analyzed) {
 		FieldType fieldType = new FieldType();
 		if ( analyzed ) {
 			// TODO GSM: take into account the norms and term vectors options
@@ -156,16 +156,13 @@ public class LuceneStringIndexSchemaFieldContextImpl
 			 */
 			fieldType.setTokenized( true );
 		}
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 			case NO:
 				fieldType.setStored( false );
 				break;
 			case YES:
 				fieldType.setStored( true );
-				break;
-			case COMPRESS:
-				// TODO HSEARCH-3081
 				break;
 		}
 		fieldType.freeze();

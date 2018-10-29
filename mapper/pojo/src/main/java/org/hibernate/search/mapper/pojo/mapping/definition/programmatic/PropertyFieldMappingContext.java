@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
  */
 public interface PropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>> extends PropertyMappingContext {
 
-	S store(Store store);
+	S projectable(Projectable projectable);
 
 	/**
 	 * @param bridgeClass The class of the bridge to use.

@@ -13,7 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -89,10 +89,10 @@ public @interface GeoPointBridge {
 	String fieldName() default "";
 
 	/**
-	 * @return Returns an instance of the {@link Store} enum, indicating whether the value should be stored in the document.
-	 *         Defaults to {@code Store.DEFAULT}
+	 * @return Returns an instance of the {@link Projectable} enum, indicating whether projections are enabled for this
+	 * field. Defaults to {@code Projectable.DEFAULT}.
 	 */
-	Store store() default Store.DEFAULT;
+	Projectable projectable() default Projectable.DEFAULT;
 
 	/**
 	 * @return The name of the marker set this spatial should look into

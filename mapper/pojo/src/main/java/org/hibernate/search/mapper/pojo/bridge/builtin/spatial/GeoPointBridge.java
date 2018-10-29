@@ -14,7 +14,7 @@ import java.util.stream.Collector;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -40,7 +40,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge> {
 
 		private String fieldName;
-		private Store store = Store.DEFAULT;
+		private Projectable projectable = Projectable.DEFAULT;
 		private String markerSet;
 
 		@Override
@@ -48,7 +48,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 				org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge annotation) {
 			fieldName( annotation.fieldName() );
 			markerSet( annotation.markerSet() );
-			store( annotation.store() );
+			projectable( annotation.projectable() );
 		}
 
 		public Builder fieldName(String fieldName) {
@@ -56,8 +56,8 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			return this;
 		}
 
-		public Builder store(Store store) {
-			this.store = store;
+		public Builder projectable(Projectable projectable) {
+			this.projectable = projectable;
 			return this;
 		}
 
@@ -68,13 +68,13 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 		@Override
 		public GeoPointBridge build(BridgeBuildContext buildContext) {
-			return new GeoPointBridge( fieldName, store, markerSet );
+			return new GeoPointBridge( fieldName, projectable, markerSet );
 		}
 
 	}
 
 	private final String fieldName;
-	private final Store store;
+	private final Projectable projectable;
 	private final String markerSet;
 
 	private IndexFieldAccessor<GeoPoint> fieldAccessor;
@@ -83,9 +83,9 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	/*
 	 * Private constructor, use the Builder instead.
 	 */
-	private GeoPointBridge(String fieldName, Store store, String markerSet) {
+	private GeoPointBridge(String fieldName, Projectable projectable, String markerSet) {
 		this.fieldName = fieldName;
-		this.store = store;
+		this.projectable = projectable;
 		this.markerSet = markerSet;
 	}
 
@@ -113,7 +113,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private void bind(String defaultedFieldName, IndexSchemaElement indexSchemaElement,
 			PojoModelCompositeElement bridgedPojoModelElement) {
-		fieldAccessor = indexSchemaElement.field( defaultedFieldName ).asGeoPoint().store( store ).createAccessor();
+		fieldAccessor = indexSchemaElement.field( defaultedFieldName ).asGeoPoint().projectable( projectable ).createAccessor();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
 			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );

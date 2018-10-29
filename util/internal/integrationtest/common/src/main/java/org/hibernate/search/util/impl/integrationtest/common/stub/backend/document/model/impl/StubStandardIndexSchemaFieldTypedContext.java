@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValu
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
@@ -44,8 +44,8 @@ abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIn
 	}
 
 	@Override
-	public S store(Store store) {
-		builder.store( store );
+	public S projectable(Projectable projectable) {
+		builder.projectable( projectable );
 		return thisAsS();
 	}
 

@@ -19,7 +19,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -29,7 +29,7 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 	private static final String LATITUDE = "latitude";
 	private static final String LONGITUDE = "longitude";
 
-	private final Store store;
+	private final Projectable projectable;
 	private final Sortable sortable;
 
 	private final String latitudeAbsoluteFieldPath;
@@ -37,26 +37,24 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
 	private final Set<String> storedFields;
 
-	public GeoPointFieldCodec(String absoluteFieldPath, Store store, Sortable sortable) {
-		this.store = store;
+	public GeoPointFieldCodec(String absoluteFieldPath, Projectable projectable, Sortable sortable) {
+		this.projectable = projectable;
 		this.sortable = sortable;
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 			case NO:
 				latitudeAbsoluteFieldPath = null;
 				longitudeAbsoluteFieldPath = null;
 				storedFields = Collections.emptySet();
 				break;
-			case COMPRESS:
-				// TODO HSEARCH-3081
 			case YES:
 				latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
 				longitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LONGITUDE );
 				storedFields = CollectionHelper.asSet( latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
 				break;
 			default: // The compiler wants a default entry, even if it doesn't make any sense
-				throw new AssertionFailure( "Unexpected value for Store: " + store );
+				throw new AssertionFailure( "Unexpected value for Projectable: " + projectable );
 		}
 	}
 
@@ -66,16 +64,13 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 			return;
 		}
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 			case NO:
 				break;
 			case YES:
 				documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
 				documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
-				break;
-			case COMPRESS:
-				// TODO HSEARCH-3081
 				break;
 		}
 
@@ -112,7 +107,7 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
 		GeoPointFieldCodec other = (GeoPointFieldCodec) obj;
 
-		return Objects.equals( store, other.store ) &&
+		return Objects.equals( projectable, other.projectable ) &&
 				Objects.equals( sortable, other.sortable ) &&
 				Objects.equals( latitudeAbsoluteFieldPath, other.latitudeAbsoluteFieldPath ) &&
 				Objects.equals( longitudeAbsoluteFieldPath, other.longitudeAbsoluteFieldPath );

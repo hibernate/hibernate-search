@@ -41,7 +41,7 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
-		IntegerFieldCodec codec = new IntegerFieldCodec( store, sortable );
+		IntegerFieldCodec codec = new IntegerFieldCodec( projectable, sortable );
 
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,

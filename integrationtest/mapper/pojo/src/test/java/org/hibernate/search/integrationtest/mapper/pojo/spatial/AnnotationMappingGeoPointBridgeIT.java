@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -38,16 +38,16 @@ public class AnnotationMappingGeoPointBridgeIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
-				.field( "homeLocation", GeoPoint.class, b2 -> b2.store( Store.YES ) )
-				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
+				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ) )
+				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.store( Store.NO ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
@@ -124,7 +124,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 	}
 
 	@Indexed(index = GeoPointOnTypeEntity.INDEX)
-	@GeoPointBridge(fieldName = "homeLocation", markerSet = "home", store = Store.YES)
+	@GeoPointBridge(fieldName = "homeLocation", markerSet = "home", projectable = Projectable.YES)
 	@GeoPointBridge(fieldName = "workLocation", markerSet = "work")
 	public static final class GeoPointOnTypeEntity {
 
@@ -206,7 +206,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 		}
 
 		@GeoPointBridge
-		@GeoPointBridge(fieldName = "location", store = Store.NO)
+		@GeoPointBridge(fieldName = "location", projectable = Projectable.NO)
 		public GeoPoint getCoord() {
 			return coord;
 		}

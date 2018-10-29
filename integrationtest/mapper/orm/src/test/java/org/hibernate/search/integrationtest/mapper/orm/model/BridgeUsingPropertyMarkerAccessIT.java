@@ -10,7 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
@@ -71,7 +71,7 @@ public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
 		);
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
 				.setup( modelPrimitives.getModelClass() );

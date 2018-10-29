@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
@@ -38,16 +38,16 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 	@Before
 	public void setup() {
 		backendMock.expectSchema( GeoPointOnTypeEntity.INDEX, b -> b
-				.field( "homeLocation", GeoPoint.class, b2 -> b2.store( Store.YES ) )
-				.field( "workLocation", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
+				.field( "homeLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.YES ) )
+				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.store( Store.NO ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.store( Store.DEFAULT ) )
+				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ) )
 		);
 
 		mapping = setupHelper.withBackendMock( backendMock )
@@ -64,7 +64,7 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 							.bridge( new GeoPointBridge.Builder()
 									.fieldName( "homeLocation" )
 									.markerSet( "home" )
-									.store( Store.YES )
+									.projectable( Projectable.YES )
 							)
 							.bridge(
 									new GeoPointBridge.Builder()
@@ -90,7 +90,7 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 									.bridge( new GeoPointBridge.Builder() )
 									.bridge( new GeoPointBridge.Builder()
 											.fieldName( "location" )
-											.store( Store.NO )
+											.projectable( Projectable.NO )
 									);
 
 					mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )

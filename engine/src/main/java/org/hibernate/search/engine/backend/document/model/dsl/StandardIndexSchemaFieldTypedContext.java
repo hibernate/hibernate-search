@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 public interface StandardIndexSchemaFieldTypedContext<S extends StandardIndexSchemaFieldTypedContext<? extends S, F>, F>
 		extends IndexSchemaFieldTypedContext<S, F> {
 
-	S store(Store store);
+	S projectable(Projectable projectable);
 
 	S sortable(Sortable sortable);
 

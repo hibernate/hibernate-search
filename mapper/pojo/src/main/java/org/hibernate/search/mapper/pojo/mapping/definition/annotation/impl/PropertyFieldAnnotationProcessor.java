@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
@@ -57,9 +57,9 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 				helper.getExtractorPath( getExtractors( annotation ) );
 		fieldContext.withExtractors( extractorPath );
 
-		Store store = getStore( annotation );
-		if ( !Store.DEFAULT.equals( store ) ) {
-			fieldContext.store( store );
+		Projectable projectable = getProjectable( annotation );
+		if ( !Projectable.DEFAULT.equals( projectable ) ) {
+			fieldContext.projectable( projectable );
 		}
 	}
 
@@ -68,7 +68,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	abstract String getName(A annotation);
 
-	abstract Store getStore(A annotation);
+	abstract Projectable getProjectable(A annotation);
 
 	abstract ValueBridgeBeanReference getValueBridge(A annotation);
 

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -59,8 +59,8 @@ abstract class PropertyFieldMappingContextImpl<S extends PropertyFieldMappingCon
 	abstract S thisAsS();
 
 	@Override
-	public S store(Store store) {
-		fieldModelContributor.add( c -> c.store( store ) );
+	public S projectable(Projectable projectable) {
+		fieldModelContributor.add( c -> c.projectable( projectable ) );
 		return thisAsS();
 	}
 

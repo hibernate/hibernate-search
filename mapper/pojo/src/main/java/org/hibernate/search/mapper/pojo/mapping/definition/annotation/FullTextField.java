@@ -13,7 +13,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 /**
  * A full-text field in the full text index, potentially holding multiple tokens (words) of text.
@@ -49,10 +49,10 @@ public @interface FullTextField {
 	String analyzer();
 
 	/**
-	 * @return Whether values for this field should be stored (enables projections).
-	 * @see GenericField#store()
+	 * @return Whether projections are enabled for this field.
+	 * @see GenericField#projectable()
 	 */
-	Store store() default Store.DEFAULT;
+	Projectable projectable() default Projectable.DEFAULT;
 
 	/**
 	 * @return A reference to the value bridge to use for this field.

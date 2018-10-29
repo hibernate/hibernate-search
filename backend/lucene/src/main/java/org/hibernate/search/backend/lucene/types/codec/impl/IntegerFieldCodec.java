@@ -15,16 +15,16 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
-	private final Store store;
+	private final Projectable projectable;
 
 	private final Sortable sortable;
 
-	public IntegerFieldCodec(Store store, Sortable sortable) {
-		this.store = store;
+	public IntegerFieldCodec(Projectable projectable, Sortable sortable) {
+		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
@@ -34,15 +34,12 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 			return;
 		}
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 			case NO:
 				break;
 			case YES:
 				documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
-				break;
-			case COMPRESS:
-				// TODO HSEARCH-3081
 				break;
 		}
 
@@ -80,6 +77,6 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
 		IntegerFieldCodec other = (IntegerFieldCodec) obj;
 
-		return Objects.equals( store, other.store ) && Objects.equals( sortable, other.sortable );
+		return Objects.equals( projectable, other.projectable ) && Objects.equals( sortable, other.sortable );
 	}
 }

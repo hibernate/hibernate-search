@@ -22,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardF
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -43,7 +43,7 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 	private final String relativeFieldName;
 	private String analyzerName;
 	private String normalizerName;
-	private Store store = Store.DEFAULT;
+	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
 	public ElasticsearchStringIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
@@ -64,8 +64,8 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public ElasticsearchStringIndexSchemaFieldContextImpl store(Store store) {
-		this.store = store;
+	public ElasticsearchStringIndexSchemaFieldContextImpl projectable(Projectable projectable) {
+		this.projectable = projectable;
 		return this;
 	}
 
@@ -127,15 +127,13 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 			}
 		}
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 				break;
 			case NO:
 				mapping.setStore( false );
 				break;
 			case YES:
-			case COMPRESS:
-				// TODO what about Store.COMPRESS?
 				mapping.setStore( true );
 				break;
 		}

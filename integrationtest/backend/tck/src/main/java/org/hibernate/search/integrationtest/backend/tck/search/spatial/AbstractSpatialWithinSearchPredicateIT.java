@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
@@ -118,7 +118,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			geoPoint_1 = root.field( "geoPoint_1" ).asGeoPoint().createAccessor();
 			geoPoint_2 = root.field( "geoPoint_2" ).asGeoPoint().createAccessor();
 			geoPoint_with_longName = root.field( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name" ).asGeoPoint().createAccessor();
-			string = root.field( "string" ).asString().store( Store.YES ).sortable( Sortable.YES ).createAccessor();
+			string = root.field( "string" ).asString().projectable( Projectable.YES ).sortable( Sortable.YES ).createAccessor();
 		}
 	}
 }

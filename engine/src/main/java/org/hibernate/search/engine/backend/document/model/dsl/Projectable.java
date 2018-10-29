@@ -8,25 +8,22 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 
 
 /**
- * Whether or not the value is stored in the document
- *
- * @author Emmanuel Bernard
+ * Whether or not we want to be able to obtain the value of the field as a projection.
+ * <p>
+ * This usually means that the field will be stored in the index but it is more subtle than that, for instance in the
+ * case of projection by distance.
  */
-public enum Store {
+public enum Projectable {
 	/**
 	 * Use the backend-specific default.
 	 */
 	DEFAULT,
 	/**
-	 * does not store the value in the index
+	 * Do not allow projection on the field.
 	 */
 	NO,
 	/**
-	 * stores the value in the index
+	 * Allow projection on the field.
 	 */
-	YES,
-	/**
-	 * stores the value in the index in a compressed form
-	 */
-	COMPRESS
+	YES
 }

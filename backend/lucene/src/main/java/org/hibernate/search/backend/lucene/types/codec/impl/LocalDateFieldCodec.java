@@ -25,7 +25,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
@@ -38,12 +38,12 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final Store store;
+	private final Projectable projectable;
 
 	private final Sortable sortable;
 
-	public LocalDateFieldCodec(Store store, Sortable sortable) {
-		this.store = store;
+	public LocalDateFieldCodec(Projectable projectable, Sortable sortable) {
+		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
@@ -53,15 +53,12 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 			return;
 		}
 
-		switch ( store ) {
+		switch ( projectable ) {
 			case DEFAULT:
 			case NO:
 				break;
 			case YES:
 				documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-				break;
-			case COMPRESS:
-				// TODO HSEARCH-3081
 				break;
 		}
 
@@ -107,6 +104,6 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
 		LocalDateFieldCodec other = (LocalDateFieldCodec) obj;
 
-		return Objects.equals( store, other.store ) && Objects.equals( sortable, other.sortable );
+		return Objects.equals( projectable, other.projectable ) && Objects.equals( sortable, other.sortable );
 	}
 }

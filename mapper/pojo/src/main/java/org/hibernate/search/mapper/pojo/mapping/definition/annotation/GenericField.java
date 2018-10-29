@@ -14,7 +14,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 /**
  * A generic annotation that will work for any supported type of field in the full text index:
@@ -38,9 +38,9 @@ public @interface GenericField {
 	String name() default "";
 
 	/**
-	 * @return Whether values for this field should be stored (enables projections).
+	 * @return Whether projections are enabled for this field.
 	 */
-	Store store() default Store.DEFAULT;
+	Projectable projectable() default Projectable.DEFAULT;
 
 	/**
 	 * @return Whether this field should be sortable.

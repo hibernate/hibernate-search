@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.Store;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
@@ -32,7 +32,7 @@ public abstract class AbstractLuceneStandardIndexSchemaFieldTypedContext<S exten
 
 	private final String relativeFieldName;
 
-	protected Store store = Store.DEFAULT;
+	protected Projectable projectable = Projectable.DEFAULT;
 
 	protected AbstractLuceneStandardIndexSchemaFieldTypedContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> fieldType) {
@@ -69,8 +69,8 @@ public abstract class AbstractLuceneStandardIndexSchemaFieldTypedContext<S exten
 			LuceneIndexSchemaObjectNode parentNode);
 
 	@Override
-	public S store(Store store) {
-		this.store = store;
+	public S projectable(Projectable projectable) {
+		this.projectable = projectable;
 		return thisAsS();
 	}
 
