@@ -97,7 +97,7 @@ public class LuceneSearchMultiIndexIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "additionalField" ).asc().onMissingValue().sortLast().end()
+				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
@@ -108,7 +108,7 @@ public class LuceneSearchMultiIndexIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().byField( "additionalField" ).desc().onMissingValue().sortLast().end()
+				.sort( c -> c.byField( "additionalField" ).desc().onMissingValue().sortLast() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {

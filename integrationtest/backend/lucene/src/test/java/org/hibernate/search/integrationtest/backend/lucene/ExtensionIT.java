@@ -206,7 +206,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort1 ).then().by( sort2 ).then().by( sort3 ).end()
+				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
@@ -223,7 +223,7 @@ public class ExtensionIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort ).end()
+				.sort( c -> c.by( sort ) )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
@@ -259,7 +259,7 @@ public class ExtensionIT {
 				() -> searchTarget.query( sessionContext )
 						.asReferences()
 						.predicate( root -> root.matchAll() )
-						.sort().byField( "nativeField" ).end()
+						.sort( c -> c.byField( "nativeField" ) )
 						.build()
 				)
 				.assertThrown()
@@ -339,7 +339,7 @@ public class ExtensionIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ).end()
+				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
 				.build();
 
 		assertThat( query )

@@ -265,7 +265,7 @@ public class SearchProjectionIT {
 		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
 				.asProjections( searchTarget.projection().score().toProjection() )
 				.predicate( root -> root.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
-				.sort().byScore().desc().end()
+				.sort( c -> c.byScore().desc() )
 				.build();
 
 		SearchResult<List<?>> result = query.execute();

@@ -63,11 +63,6 @@ final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 	}
 
 	@Override
-	public SearchSortContainerContext<SearchQueryContext<Q>> sort() {
-		return searchSortCollector.createContainerContext( this );
-	}
-
-	@Override
 	public Q build() {
 		/*
 		 * HSEARCH-3207: we must never call a contribution twice.

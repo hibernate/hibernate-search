@@ -136,7 +136,7 @@ public class SearchSortIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )
-				.sort().byScore().end()
+				.sort( c -> c.byScore() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
@@ -144,7 +144,7 @@ public class SearchSortIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )
-				.sort().byScore().desc().end()
+				.sort( c -> c.byScore().desc() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
@@ -152,7 +152,7 @@ public class SearchSortIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )
-				.sort().byScore().asc().end()
+				.sort( c -> c.byScore().asc() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
@@ -163,14 +163,14 @@ public class SearchSortIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query;
 
-		SearchSort sort = searchTarget.sort()
+		SearchSort sortAsc = searchTarget.sort()
 				.byField( "string" ).asc().onMissingValue().sortLast()
 				.end();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort( sort )
+				.sort( sortAsc )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -178,19 +178,19 @@ public class SearchSortIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort ).end()
+				.sort( c -> c.by( sortAsc ) )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		sort = searchTarget.sort()
+		SearchSort sortDesc = searchTarget.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
 				.end();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort( sort )
+				.sort( sortDesc )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -198,7 +198,7 @@ public class SearchSortIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll() )
-				.sort().by( sort ).end()
+				.sort( c -> c.by( sortDesc ) )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );

@@ -36,8 +36,8 @@ class ObjectSyntaxLibraryDao extends LibraryDao {
 				)
 				.sort(
 						target.sort()
-						.by( target.sort().byField( "collectionSize" ).desc().end() )
-						.then().by( target.sort().byField( "name_sort" ).end() )
+						.byField( "collectionSize" ).desc()
+						.then().byField( "name_sort" )
 						.end()
 				)
 				.build();

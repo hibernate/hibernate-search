@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.FluidSearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.RootSearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -45,12 +44,5 @@ class SearchQuerySortCollector<C, B> {
 		SearchSortContainerContext<SearchSort> containerContext =
 				new SearchSortContainerContextImpl<>( factory, rootDslContext );
 		dslPredicateContributor.accept( containerContext );
-	}
-
-	<N> SearchSortContainerContext<N> createContainerContext(N nextContext) {
-		return new SearchSortContainerContextImpl<>(
-				factory,
-				new FluidSearchSortDslContextImpl<>( rootDslContext, nextContext )
-		);
 	}
 }
