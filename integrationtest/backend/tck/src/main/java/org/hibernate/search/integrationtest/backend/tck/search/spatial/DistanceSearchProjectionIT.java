@@ -209,6 +209,18 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.hasMessageContaining( "nonProjectableGeoPoint" );
 	}
 
+	@Test
+	public void distanceProjection_unsortable() {
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		SubTest.expectException( () -> {
+			searchTarget.sort().byDistance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );
+		} ).assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Sorting is not enabled for field" )
+				.hasMessageContaining( "unsortableGeoPoint" );
+	}
+
 	private void checkResult(List<?> result, String name, int distanceIndex, Double distance, Offset<Double> offset) {
 		Assertions.assertThat( result.get( 0 ) ).as( name + " - name" ).isEqualTo( name );
 		if ( distance == null ) {

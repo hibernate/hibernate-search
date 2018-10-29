@@ -51,7 +51,7 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, IntegerFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( converter ),
+				new StandardFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 

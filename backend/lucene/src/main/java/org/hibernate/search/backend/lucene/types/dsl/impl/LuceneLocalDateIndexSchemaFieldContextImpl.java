@@ -51,7 +51,7 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new LocalDateFieldPredicateBuilderFactory( converter ),
-				new LocalDateFieldSortBuilderFactory( converter ),
+				new LocalDateFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 

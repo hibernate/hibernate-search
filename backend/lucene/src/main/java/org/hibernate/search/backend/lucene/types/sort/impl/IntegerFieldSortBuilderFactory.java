@@ -8,16 +8,19 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class IntegerFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<Integer> {
 
-	public IntegerFieldSortBuilderFactory(LuceneFieldConverter<Integer, ?> converter) {
-		super( converter );
+	public IntegerFieldSortBuilderFactory(Sortable sortable, LuceneFieldConverter<Integer, ?> converter) {
+		super( sortable, converter );
 	}
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
+		checkSortable( absoluteFieldPath );
+
 		return new IntegerFieldSortBuilder( absoluteFieldPath, converter );
 	}
 }

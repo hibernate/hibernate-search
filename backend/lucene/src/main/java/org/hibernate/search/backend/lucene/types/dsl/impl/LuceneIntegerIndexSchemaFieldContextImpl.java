@@ -49,7 +49,7 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new IntegerFieldPredicateBuilderFactory( converter ),
-				new IntegerFieldSortBuilderFactory( converter ),
+				new IntegerFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 

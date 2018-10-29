@@ -88,7 +88,7 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, StringFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( converter ),
+				new StandardFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 

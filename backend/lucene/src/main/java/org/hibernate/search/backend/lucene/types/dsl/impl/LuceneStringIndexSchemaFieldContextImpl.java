@@ -113,7 +113,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new StringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
-				new StringFieldSortBuilderFactory( converter ),
+				new StringFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
 		);
 

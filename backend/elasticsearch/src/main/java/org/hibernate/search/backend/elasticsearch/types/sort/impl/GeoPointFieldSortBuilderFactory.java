@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.DistanceSortBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -21,9 +22,10 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final GeoPointFieldSortBuilderFactory INSTANCE = new GeoPointFieldSortBuilderFactory();
+	private final Sortable sortable;
 
-	private GeoPointFieldSortBuilderFactory() {
+	public GeoPointFieldSortBuilderFactory(Sortable sortable) {
+		this.sortable = sortable;
 	}
 
 	@Override
@@ -36,11 +38,30 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
 			GeoPoint center) {
+		checkSortable( absoluteFieldPath, sortable );
+
 		return new DistanceSortBuilderImpl( absoluteFieldPath, center );
 	}
 
 	@Override
 	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj) {
-		return INSTANCE == obj;
+		if ( obj.getClass() != this.getClass() ) {
+			return false;
+		}
+
+		GeoPointFieldSortBuilderFactory other = (GeoPointFieldSortBuilderFactory) obj;
+
+		return other.sortable == this.sortable;
+	}
+
+	private static void checkSortable(String absoluteFieldPath, Sortable sortable) {
+		switch ( sortable ) {
+			case YES:
+				break;
+			case DEFAULT:
+			case NO:
+				throw log.unsortableField( absoluteFieldPath,
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }

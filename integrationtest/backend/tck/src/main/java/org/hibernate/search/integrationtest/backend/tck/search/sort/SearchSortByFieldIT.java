@@ -25,28 +25,27 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SessionContext;
+import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.SubTest;
-
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
@@ -235,8 +234,18 @@ public class SearchSortByFieldIT {
 
 	@Test
 	public void error_unsortable() {
-		Assume.assumeTrue( "Errors on attempt to sort on unsortable fields are not supported yet", false );
-		// TODO throw an error on attempts to sort on unsortable fields
+		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsortableSupportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException( () -> {
+					searchTarget.sort().byField( fieldPath );
+			} ).assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Sorting is not enabled for field" )
+					.hasMessageContaining( fieldPath );
+		}
 	}
 
 	@Test
@@ -409,6 +418,7 @@ public class SearchSortByFieldIT {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
 		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
+		final List<ByTypeFieldModel<?>> unsortableSupportedFieldModels;
 
 		final MainFieldModel identicalForFirstTwo;
 		final MainFieldModel identicalForLastTwo;
@@ -422,6 +432,7 @@ public class SearchSortByFieldIT {
 					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
 			);
 			unsupportedFieldModels = mapUnsupportedFields( root );
+			unsortableSupportedFieldModels = mapSupportedFields( root, "unsortable_", c -> c.sortable( Sortable.NO ) );
 
 			identicalForFirstTwo = MainFieldModel.mapper(
 					"aaron", "aaron", "zach"

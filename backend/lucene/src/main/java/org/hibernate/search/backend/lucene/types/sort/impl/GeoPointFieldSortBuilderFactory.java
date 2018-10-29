@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -20,9 +21,10 @@ public class GeoPointFieldSortBuilderFactory implements LuceneFieldSortBuilderFa
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final GeoPointFieldSortBuilderFactory INSTANCE = new GeoPointFieldSortBuilderFactory();
+	private final Sortable sortable;
 
-	private GeoPointFieldSortBuilderFactory() {
+	public GeoPointFieldSortBuilderFactory(Sortable sortable) {
+		this.sortable = sortable;
 	}
 
 	@Override
@@ -34,11 +36,30 @@ public class GeoPointFieldSortBuilderFactory implements LuceneFieldSortBuilderFa
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
 			GeoPoint center) {
+		checkSortable( absoluteFieldPath );
+
 		return new GeoPointDistanceSortBuilder( absoluteFieldPath, center );
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other) {
-		return INSTANCE == other;
+	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj) {
+		if ( obj.getClass() != this.getClass() ) {
+			return false;
+		}
+
+		GeoPointFieldSortBuilderFactory other = (GeoPointFieldSortBuilderFactory) obj;
+
+		return other.sortable == this.sortable;
+	}
+
+	protected void checkSortable(String absoluteFieldPath) {
+		switch ( sortable ) {
+			case YES:
+				break;
+			case DEFAULT:
+			case NO:
+				throw log.unsortableField( absoluteFieldPath,
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }

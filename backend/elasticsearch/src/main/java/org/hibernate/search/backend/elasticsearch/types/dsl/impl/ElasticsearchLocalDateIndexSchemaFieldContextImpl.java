@@ -73,7 +73,7 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, codec,
 				new StandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( converter ),
+				new StandardFieldSortBuilderFactory( sortable, converter ),
 				new StandardFieldProjectionBuilderFactory( projectable, converter )
 		);
 

@@ -52,7 +52,7 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, GeoPointFieldCodec.INSTANCE,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				GeoPointFieldSortBuilderFactory.INSTANCE,
+				new GeoPointFieldSortBuilderFactory( sortable ),
 				new GeoPointFieldProjectionBuilderFactory( projectable, converter )
 		);
 

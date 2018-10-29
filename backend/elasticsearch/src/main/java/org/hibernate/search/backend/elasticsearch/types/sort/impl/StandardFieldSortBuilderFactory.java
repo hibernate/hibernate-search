@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.FieldSortBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -22,14 +23,19 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Sortable sortable;
+
 	private final ElasticsearchFieldConverter converter;
 
-	public StandardFieldSortBuilderFactory(ElasticsearchFieldConverter converter) {
+	public StandardFieldSortBuilderFactory(Sortable sortable, ElasticsearchFieldConverter converter) {
+		this.sortable = sortable;
 		this.converter = converter;
 	}
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(String absoluteFieldPath) {
+		checkSortable( absoluteFieldPath, sortable );
+
 		return new FieldSortBuilderImpl( absoluteFieldPath, converter );
 	}
 
@@ -53,5 +59,16 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 		StandardFieldSortBuilderFactory other = (StandardFieldSortBuilderFactory) obj;
 
 		return converter.isDslCompatibleWith( other.converter );
+	}
+
+	private static void checkSortable(String absoluteFieldPath, Sortable sortable) {
+		switch ( sortable ) {
+			case YES:
+				break;
+			case DEFAULT:
+			case NO:
+				throw log.unsortableField( absoluteFieldPath,
+						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
 	}
 }
