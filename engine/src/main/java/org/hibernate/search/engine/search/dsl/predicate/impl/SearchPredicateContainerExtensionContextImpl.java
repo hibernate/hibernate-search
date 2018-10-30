@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerExtensionContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
@@ -20,31 +20,29 @@ final class SearchPredicateContainerExtensionContextImpl<B> implements SearchPre
 
 	private final SearchPredicateContainerContext parent;
 	private final SearchPredicateFactory<?, B> factory;
-	private final SearchPredicateDslContext<? super B> dslContext;
 
-	private final DslExtensionState state = new DslExtensionState();
+	private final DslExtensionState<SearchPredicate> state = new DslExtensionState<>();
 
 	SearchPredicateContainerExtensionContextImpl(SearchPredicateContainerContext parent,
-			SearchPredicateFactory<?, B> factory, SearchPredicateDslContext<? super B> dslContext) {
+			SearchPredicateFactory<?, B> factory) {
 		this.parent = parent;
 		this.factory = factory;
-		this.dslContext = dslContext;
 	}
 
 	@Override
 	public <T> SearchPredicateContainerExtensionContext ifSupported(
-			SearchPredicateContainerContextExtension<T> extension, Consumer<T> predicateContributor) {
-		state.ifSupported( extension, extension.extendOptional( parent, factory, dslContext ), predicateContributor );
+			SearchPredicateContainerContextExtension<T> extension, Function<T, SearchPredicate> predicateContributor) {
+		state.ifSupported( extension, extension.extendOptional( parent, factory ), predicateContributor );
 		return this;
 	}
 
 	@Override
-	public void orElse(Consumer<SearchPredicateContainerContext> predicateContributor) {
-		state.orElse( parent, predicateContributor );
+	public SearchPredicate orElse(Function<SearchPredicateContainerContext, SearchPredicate> predicateContributor) {
+		return state.orElse( parent, predicateContributor );
 	}
 
 	@Override
-	public void orElseFail() {
-		state.orElseFail();
+	public SearchPredicate orElseFail() {
+		return state.orElseFail();
 	}
 }

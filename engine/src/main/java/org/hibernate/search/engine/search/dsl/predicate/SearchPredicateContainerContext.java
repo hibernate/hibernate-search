@@ -126,13 +126,6 @@ public interface SearchPredicateContainerContext {
 	 */
 	SpatialPredicateContext spatial();
 
-	/**
-	 * Match documents that match the given, previously-built {@link SearchPredicate}.
-	 *
-	 * @param searchPredicate The predicate that should match.
-	 */
-	void predicate(SearchPredicate searchPredicate);
-
 	// TODO ids query (Type + list of IDs? Just IDs? See https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-ids-query.html)
 	// TODO other queries (spatial, ...)
 

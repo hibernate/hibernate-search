@@ -8,15 +8,11 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class SpatialPredicateContextImpl<B> implements SpatialPredicateContext, SearchPredicateContributor<B> {
+class SpatialPredicateContextImpl<B> implements SpatialPredicateContext {
 
 	private final SearchPredicateFactory<?, B> factory;
-
-
-	private SearchPredicateContributor<B> child;
 
 	SpatialPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
 		this.factory = factory;
@@ -24,14 +20,7 @@ class SpatialPredicateContextImpl<B> implements SpatialPredicateContext, SearchP
 
 	@Override
 	public SpatialWithinPredicateContext within() {
-		SpatialWithinPredicateContextImpl<B> child = new SpatialWithinPredicateContextImpl<>( factory );
-		this.child = child;
-		return child;
-	}
-
-	@Override
-	public B contribute() {
-		return child.contribute();
+		return new SpatialWithinPredicateContextImpl<>( factory );
 	}
 
 }

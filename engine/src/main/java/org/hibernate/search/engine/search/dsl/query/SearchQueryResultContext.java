@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.query;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
@@ -18,6 +18,6 @@ public interface SearchQueryResultContext<Q> {
 
 	SearchQueryContext<Q> predicate(SearchPredicate predicate);
 
-	SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext> predicateContributor);
+	SearchQueryContext<Q> predicate(Function<? super SearchPredicateContainerContext, SearchPredicate> predicateContributor);
 
 }

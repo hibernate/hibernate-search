@@ -10,14 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 class MultiFieldPredicateCommonState<B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
-		extends AbstractObjectCreatingSearchPredicateContributor<B>
-		implements SearchPredicateContributor<B> {
+		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
@@ -38,7 +36,7 @@ class MultiFieldPredicateCommonState<B, F extends MultiFieldPredicateCommonState
 	}
 
 	@Override
-	protected B doContribute() {
+	protected B toImplementation() {
 		List<B> predicateBuilders = new ArrayList<>();
 		for ( F fieldSetContext : fieldSetContexts ) {
 			fieldSetContext.contributePredicateBuilders( predicateBuilders::add );

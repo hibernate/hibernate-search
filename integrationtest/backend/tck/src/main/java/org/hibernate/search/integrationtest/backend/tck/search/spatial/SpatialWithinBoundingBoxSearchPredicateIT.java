@@ -58,7 +58,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -66,7 +66,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -74,9 +74,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" )
 						.boundingBox( BOUNDING_BOX_2.getTopLeft().getLatitude(), BOUNDING_BOX_2.getTopLeft().getLongitude(),
 								BOUNDING_BOX_2.getBottomRight().getLatitude(), BOUNDING_BOX_2.getBottomRight().getLongitude() )
+						.toPredicate()
 				)
 				.build();
 
@@ -85,9 +86,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" )
 						.boundingBox( BOUNDING_BOX_1.getTopLeft().getLatitude(), BOUNDING_BOX_1.getTopLeft().getLongitude(),
 								BOUNDING_BOX_1.getBottomRight().getLatitude(), BOUNDING_BOX_1.getBottomRight().getLongitude() )
+						.toPredicate()
 				)
 				.build();
 
@@ -101,8 +103,9 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" )
 						.boundingBox( GeoBoundingBox.of( GeoPoint.of( 25, 23 ), GeoPoint.of( 24, 26 ) ) )
+						.toPredicate()
 				)
 				.build();
 
@@ -132,9 +135,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool()
-						.should( c -> c.spatial().within().onField( "geoPoint" ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ) )
-						.should( c -> c.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ) )
+				.predicate( f -> f.bool()
+						.should( f.spatial().within().onField( "geoPoint" ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ).toPredicate() )
+						.should( f.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ).toPredicate() )
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -144,9 +148,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool()
-						.should( c -> c.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ) )
-						.should( c -> c.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				.predicate( f -> f.bool()
+						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ).toPredicate() )
+						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ).toPredicate() )
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -163,7 +168,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -171,7 +176,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_2_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_2_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -181,8 +186,9 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_2 )
+						.toPredicate()
 				)
 				.build();
 
@@ -191,8 +197,9 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_1_1 )
+						.toPredicate()
 				)
 				.build();
 
@@ -201,8 +208,9 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_2_2 )
+						.toPredicate()
 				)
 				.build();
 
@@ -213,7 +221,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_2 ) )
+				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -221,7 +229,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_1_2 ) )
+				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_1_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -274,7 +282,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
 				ADDITIONAL_POINT_2_ID );

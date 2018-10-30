@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.common.dsl.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.Collections;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.util.SearchException;
 
@@ -16,6 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 public class DslExtensionStateTest extends EasyMockSupport {
@@ -24,16 +27,18 @@ public class DslExtensionStateTest extends EasyMockSupport {
 	public final ExpectedException thrown = ExpectedException.none();
 
 	@SuppressWarnings("unchecked")
-	private Consumer<Object> contextConsumer = createMock( Consumer.class );
+	private final Function<Object, MyResultType> contextFunction = createMock( Function.class );
 
-	private DslExtensionState state = new DslExtensionState();
+	private final DslExtensionState<MyResultType> state = new DslExtensionState<>();
+
+	private final MyResultType expectedResult = new MyResultType();
 
 	@Test
 	public void ifSupported_noSupported() {
 		String extensionToString = "EXTENSION_TO_STRING";
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextFunction );
 		verifyAll();
 	}
 
@@ -42,9 +47,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( extendedContext );
+		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
 		verifyAll();
 	}
 
@@ -53,9 +58,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object defaultContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( defaultContext );
+		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -72,7 +77,7 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		String extensionToString = "EXTENSION_TO_STRING";
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextFunction );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "None of the provided extensions can be applied to the current context" );
 		thrown.expectMessage( extensionToString );
@@ -89,9 +94,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( extendedContext );
+		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
 		verifyAll();
 
 		resetAll();
@@ -106,13 +111,13 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
-		contextConsumer.accept( defaultContext );
+		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -122,14 +127,14 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object defaultContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( extendedContext );
+		EasyMock.expect( contextFunction.apply( extendedContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext ), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -141,9 +146,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension( extension1ToString ), Optional.empty(), contextConsumer );
-		state.ifSupported( new MyExtension( extension2ToString ), Optional.empty(), contextConsumer );
-		state.ifSupported( new MyExtension( extension3ToString ), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension( extension1ToString ), Optional.empty(), contextFunction );
+		state.ifSupported( new MyExtension( extension2ToString ), Optional.empty(), contextFunction );
+		state.ifSupported( new MyExtension( extension3ToString ), Optional.empty(), contextFunction );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "None of the provided extensions can be applied to the current context" );
 		thrown.expectMessage( extension1ToString );
@@ -162,19 +167,19 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object extendedContext1 = new Object();
 
 		resetAll();
-		contextConsumer.accept( extendedContext1 );
+		EasyMock.expect( contextFunction.apply( extendedContext1 ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
@@ -190,19 +195,19 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
-		contextConsumer.accept( extendedContext2 );
+		EasyMock.expect( contextFunction.apply( extendedContext2 ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextFunction );
 		verifyAll();
 
 		// Only the first supported extension should be applied
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextFunction );
 		verifyAll();
 
 		resetAll();
@@ -217,23 +222,23 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
-		contextConsumer.accept( defaultContext );
+		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -243,24 +248,24 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object defaultContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( extendedContext1 );
+		EasyMock.expect( contextFunction.apply( extendedContext1 ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext1 ), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -272,24 +277,24 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		verifyAll();
 
 		resetAll();
-		contextConsumer.accept( extendedContext2 );
+		EasyMock.expect( contextFunction.apply( extendedContext2 ) ).andReturn( expectedResult );
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext2 ), contextFunction );
 		verifyAll();
 
 		// Only the first supported extension should be applied
 		resetAll();
 		replayAll();
-		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextConsumer );
+		state.ifSupported( new MyExtension(), Optional.of( extendedContext3 ), contextFunction );
 		verifyAll();
 
 		resetAll();
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 	}
 
@@ -298,9 +303,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		Object defaultContext = new Object();
 
 		resetAll();
-		contextConsumer.accept( defaultContext );
+		EasyMock.expect( contextFunction.apply( defaultContext ) ).andReturn( expectedResult );
 		replayAll();
-		state.orElse( defaultContext, contextConsumer );
+		assertThat( state.orElse( defaultContext, contextFunction ) ).isSameAs( expectedResult );
 		verifyAll();
 
 		resetAll();
@@ -308,7 +313,7 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Cannot call ifSupported(...) after orElse(...)" );
 		try {
-			state.ifSupported( new MyExtension(), Optional.empty(), contextConsumer );
+			state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
 		}
 		finally {
 			verifyAll();
@@ -334,6 +339,9 @@ public class DslExtensionStateTest extends EasyMockSupport {
 				return super.toString();
 			}
 		}
+	}
+
+	private static class MyResultType {
 	}
 
 }

@@ -64,7 +64,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -77,7 +77,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ) ) )
+				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ).toPredicate() ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -86,7 +86,7 @@ public class MatchAllSearchPredicateIT {
 		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll().except( searchPredicate ) )
+				.predicate( f -> f.matchAll().except( searchPredicate ).toPredicate() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -98,9 +98,10 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll()
-						.except( c -> c.match().onField( "string" ).matching( STRING_1 ) )
-						.except( c -> c.match().onField( "string" ).matching( STRING_2 ) )
+				.predicate( f -> f.matchAll()
+						.except( f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
+						.except( f.match().onField( "string" ).matching( STRING_2 ).toPredicate() )
+						.toPredicate()
 				)
 				.build();
 
@@ -112,7 +113,7 @@ public class MatchAllSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
+				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -137,7 +138,7 @@ public class MatchAllSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

@@ -17,13 +17,11 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortContainerContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
@@ -60,10 +58,11 @@ public final class ElasticsearchExtension
 	 */
 	@Override
 	public <C, B> Optional<ElasticsearchSearchPredicateContainerContext> extendOptional(
-			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory,
-			SearchPredicateDslContext<? super B> dslContext) {
+			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory) {
 		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
-			return Optional.of( extendUnsafe( original, (ElasticsearchSearchPredicateFactory) factory, dslContext ) );
+			return Optional.of( new ElasticsearchSearchPredicateContainerContextImpl(
+					original, (ElasticsearchSearchPredicateFactory) factory
+			) );
 		}
 		else {
 			return Optional.empty();
@@ -96,16 +95,6 @@ public final class ElasticsearchExtension
 		else {
 			throw log.elasticsearchExtensionOnUnknownType( original );
 		}
-	}
-
-	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchPredicateBuilder
-	private <B> ElasticsearchSearchPredicateContainerContext extendUnsafe(
-			SearchPredicateContainerContext original, ElasticsearchSearchPredicateFactory factory,
-			SearchPredicateDslContext<? super B> dslContext) {
-		return new ElasticsearchSearchPredicateContainerContextImpl(
-				original, factory,
-				(SearchPredicateDslContext<? super ElasticsearchSearchPredicateBuilder>) dslContext
-		);
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchSortBuilder

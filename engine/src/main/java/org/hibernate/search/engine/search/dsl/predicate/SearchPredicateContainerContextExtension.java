@@ -10,7 +10,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.Optional;
 
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 /**
@@ -34,15 +33,14 @@ public interface SearchPredicateContainerContextExtension<T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchPredicateContainerContext}.
-	 * @param factory A {@link SearchPredicateFactory}.
-	 * @param dslContext A {@link SearchPredicateDslContext}.
 	 * @param <C> The type of query element collector for the given DSL context.
 	 * @param <B> The implementation type of builders for the given DSL context.
+	 * @param original The original, non-extended {@link SearchPredicateContainerContext}.
+	 * @param factory A {@link SearchPredicateFactory}.
 	 * @return An optional containing the extended search predicate container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	<C, B> Optional<T> extendOptional(SearchPredicateContainerContext original,
-			SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<? super B> dslContext);
+			SearchPredicateFactory<C, B> factory);
 
 }
