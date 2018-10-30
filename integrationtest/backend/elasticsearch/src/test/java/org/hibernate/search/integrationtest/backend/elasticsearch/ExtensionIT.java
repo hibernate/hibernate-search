@@ -116,9 +116,9 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'string': 'text 1'}}" );
+				.fromJsonString( "{'match': {'string': 'text 1'}}" ).end();
 		SearchPredicate predicate2 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'integer': 2}}" );
+				.fromJsonString( "{'match': {'integer': 2}}" ).end();
 		SearchPredicate predicate3 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString(
 						"{"
@@ -130,7 +130,8 @@ public class ExtensionIT {
 								+ "}"
 							+ "}"
 						+ "}"
-				);
+				)
+				.end();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
 				.matching( "'2018:12'" ).end();

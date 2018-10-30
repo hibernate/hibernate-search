@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.predicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * A DSL context allowing to specify the type of a predicate, with some Elasticsearch-specific methods.
@@ -18,6 +19,6 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainer
  */
 public interface ElasticsearchSearchPredicateContainerContext<N> extends SearchPredicateContainerContext<N> {
 
-	N fromJsonString(String jsonString);
+	SearchPredicateTerminalContext<N> fromJsonString(String jsonString);
 
 }

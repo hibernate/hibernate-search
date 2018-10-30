@@ -119,11 +119,11 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) );
+				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).end();
 		SearchPredicate predicate2 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) );
+				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ).end();
 		SearchPredicate predicate3 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) );
+				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).end();
 		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
 			b.should( predicate1 );
 			b.should( predicate2 );
