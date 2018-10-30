@@ -6,29 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl;
 
-import java.util.function.Supplier;
-
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 
-final class JsonStringPredicateContextImpl<N>
+final class JsonStringPredicateContextImpl
 		extends AbstractObjectCreatingSearchPredicateContributor<ElasticsearchSearchPredicateBuilder>
-		implements SearchPredicateTerminalContext<N> {
-	private final Supplier<N> nextContextSupplier;
+		implements SearchPredicateTerminalContext {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
-	JsonStringPredicateContextImpl(ElasticsearchSearchPredicateFactory factory, Supplier<N> nextContextSupplier,
-			String jsonString) {
+	JsonStringPredicateContextImpl(ElasticsearchSearchPredicateFactory factory, String jsonString) {
 		super( factory );
-		this.nextContextSupplier = nextContextSupplier;
 		this.builder = factory.fromJsonString( jsonString );
-	}
-
-	@Override
-	public final N end() {
-		return nextContextSupplier.get();
 	}
 
 	@Override

@@ -19,7 +19,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -55,7 +54,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextSearchTarget<Book> target = entityManager.search( Book.class );
-		BooleanJunctionPredicateContext<SearchPredicate> booleanBuilder = target.predicate().bool();
+		BooleanJunctionPredicateContext booleanBuilder = target.predicate().bool();
 
 		if ( terms != null && !terms.isEmpty() ) {
 			booleanBuilder.must(
@@ -91,7 +90,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 			List<LibraryService> libraryServices,
 			int offset, int limit) {
 		FullTextSearchTarget<Document<?>> target = entityManager.search( DOCUMENT_CLASS );
-		BooleanJunctionPredicateContext<SearchPredicate> booleanBuilder = target.predicate().bool();
+		BooleanJunctionPredicateContext booleanBuilder = target.predicate().bool();
 
 		// Match query
 		if ( terms != null && !terms.isEmpty() ) {
@@ -134,7 +133,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 
 		// Nested query + must loop
 		if ( libraryServices != null && !libraryServices.isEmpty() ) {
-			BooleanJunctionPredicateContext<SearchPredicate> nestedBoolean = target.predicate().bool();
+			BooleanJunctionPredicateContext nestedBoolean = target.predicate().bool();
 			for ( LibraryService service : libraryServices ) {
 				nestedBoolean.must(
 						target.predicate().match()

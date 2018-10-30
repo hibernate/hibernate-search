@@ -28,7 +28,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
 public final class RootSearchSortDslContextImpl<B>
-		implements SearchSortDslContext<SearchSort, B> {
+		implements SearchSortDslContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,11 +48,6 @@ public final class RootSearchSortDslContextImpl<B>
 			throw log.cannotAddSortToUsedContext();
 		}
 		sortContributors.add( child );
-	}
-
-	@Override
-	public SearchSort getNextContext() {
-		return toSort();
 	}
 
 	@Override

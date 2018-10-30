@@ -9,10 +9,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 /**
  * The context used when starting to define a spatial predicate.
- *
- * @param <N> The type of the next context.
  */
-public interface SpatialWithinPredicateContext<N> {
+public interface SpatialWithinPredicateContext {
 
 	/**
 	 * Target the given field in the "within" predicate.
@@ -24,7 +22,7 @@ public interface SpatialWithinPredicateContext<N> {
 	 * @return A {@link SpatialWithinPredicateFieldSetContext} allowing to
 	 * continue the definition of the spatial predicate.
 	 */
-	default SpatialWithinPredicateFieldSetContext<N> onField(String absoluteFieldPath) {
+	default SpatialWithinPredicateFieldSetContext onField(String absoluteFieldPath) {
 		return onFields( absoluteFieldPath );
 	}
 
@@ -42,6 +40,6 @@ public interface SpatialWithinPredicateContext<N> {
 	 *
 	 * @see #onField(String)
 	 */
-	SpatialWithinPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
+	SpatialWithinPredicateFieldSetContext onFields(String ... absoluteFieldPaths);
 
 }

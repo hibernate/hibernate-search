@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,17 +24,17 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class RangePredicateFieldSetContextImpl<N, B>
-		implements RangePredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<B> {
+class RangePredicateFieldSetContextImpl<B>
+		implements RangePredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<N, B> commonState;
+	private final CommonState<B> commonState;
 
 	private final List<String> absoluteFieldPaths;
 	private final List<RangePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
-	RangePredicateFieldSetContextImpl(CommonState<N, B> commonState, List<String> absoluteFieldPaths) {
+	RangePredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
@@ -46,28 +45,28 @@ class RangePredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public RangePredicateFieldSetContext<N> orFields(String... absoluteFieldPaths) {
+	public RangePredicateFieldSetContext orFields(String... absoluteFieldPaths) {
 		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public RangePredicateFieldSetContext<N> boostedTo(float boost) {
+	public RangePredicateFieldSetContext boostedTo(float boost) {
 		predicateBuilders.forEach( b -> b.boost( boost ) );
 		return this;
 	}
 
 	@Override
-	public RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
+	public RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion) {
 		return commonState.from( value, inclusion );
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> above(Object value, RangeBoundInclusion inclusion) {
+	public SearchPredicateTerminalContext above(Object value, RangeBoundInclusion inclusion) {
 		return commonState.above( value, inclusion );
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> below(Object value, RangeBoundInclusion inclusion) {
+	public SearchPredicateTerminalContext below(Object value, RangeBoundInclusion inclusion) {
 		return commonState.below( value, inclusion );
 	}
 
@@ -78,13 +77,13 @@ class RangePredicateFieldSetContextImpl<N, B>
 		}
 	}
 
-	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, RangePredicateFieldSetContextImpl<N, B>>
-			implements RangePredicateFromContext<N>, SearchPredicateTerminalContext<N> {
+	static class CommonState<B> extends MultiFieldPredicateCommonState<B, RangePredicateFieldSetContextImpl<B>>
+			implements RangePredicateFromContext, SearchPredicateTerminalContext {
 
 		private boolean hasNonNullBound = false;
 
-		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-			super( factory, nextContextProvider );
+		CommonState(SearchPredicateFactory<?, B> factory) {
+			super( factory );
 		}
 
 		@Override
@@ -94,7 +93,7 @@ class RangePredicateFieldSetContextImpl<N, B>
 			return super.doContribute();
 		}
 
-		RangePredicateFromContext<N> from(Object value, RangeBoundInclusion inclusion) {
+		RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
@@ -110,11 +109,11 @@ class RangePredicateFieldSetContextImpl<N, B>
 		}
 
 		@Override
-		public SearchPredicateTerminalContext<N> to(Object value, RangeBoundInclusion inclusion) {
+		public SearchPredicateTerminalContext to(Object value, RangeBoundInclusion inclusion) {
 			return below( value, inclusion );
 		}
 
-		SearchPredicateTerminalContext<N> above(Object value, RangeBoundInclusion inclusion) {
+		SearchPredicateTerminalContext above(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
@@ -130,7 +129,7 @@ class RangePredicateFieldSetContextImpl<N, B>
 			return this;
 		}
 
-		SearchPredicateTerminalContext<N> below(Object value, RangeBoundInclusion inclusion) {
+		SearchPredicateTerminalContext below(Object value, RangeBoundInclusion inclusion) {
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
@@ -144,11 +143,6 @@ class RangePredicateFieldSetContextImpl<N, B>
 			}
 			checkHasNonNullBound();
 			return this;
-		}
-
-		@Override
-		public N end() {
-			return getNextContextProvider().get();
 		}
 
 		private List<String> collectAbsoluteFieldPaths() {

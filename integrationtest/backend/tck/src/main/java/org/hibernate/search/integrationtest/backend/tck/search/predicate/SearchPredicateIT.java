@@ -117,7 +117,7 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Consumer<? super SearchPredicateContainerContext<?>> cachingContributor = c -> {
+		Consumer<? super SearchPredicateContainerContext> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -154,7 +154,7 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Consumer<? super SearchPredicateContainerContext<?>> cachingContributor = c -> {
+		Consumer<? super SearchPredicateContainerContext> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -196,7 +196,7 @@ public class SearchPredicateIT {
 		// Mandatory extension
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.extension( new SupportedExtension<>() )
+				.predicate( root -> root.extension( new SupportedExtension() )
 						.match().onField( "string" ).matching( STRING_1 )
 				)
 				.build();
@@ -209,11 +209,11 @@ public class SearchPredicateIT {
 				.predicate( root -> root.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElseFail()
@@ -227,11 +227,11 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate( root -> root.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
 						)
 						.orElse(
@@ -247,11 +247,11 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate( root -> root.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
@@ -268,7 +268,7 @@ public class SearchPredicateIT {
 				.predicate( root -> root.bool()
 						.must( c -> c.extension()
 								.ifSupported(
-										new UnSupportedExtension<>(),
+										new UnSupportedExtension(),
 										ignored -> Assert.fail( "This should not be called" )
 								)
 						)
@@ -311,21 +311,21 @@ public class SearchPredicateIT {
 		}
 	}
 
-	private static class SupportedExtension<N> implements SearchPredicateContainerContextExtension<N, MyExtendedContext<N>> {
+	private static class SupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchPredicateContainerContext<N> original,
-				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
+				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
-			return Optional.of( new MyExtendedContext<>( original ) );
+			return Optional.of( new MyExtendedContext( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension<N> implements SearchPredicateContainerContextExtension<N, MyExtendedContext<N>> {
+	private static class UnSupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchPredicateContainerContext<N> original,
-				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
+				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
@@ -333,8 +333,8 @@ public class SearchPredicateIT {
 		}
 	}
 
-	private static class MyExtendedContext<N> extends DelegatingSearchPredicateContainerContextImpl<N> {
-		MyExtendedContext(SearchPredicateContainerContext<N> delegate) {
+	private static class MyExtendedContext extends DelegatingSearchPredicateContainerContextImpl {
+		MyExtendedContext(SearchPredicateContainerContext delegate) {
 			super( delegate );
 		}
 	}

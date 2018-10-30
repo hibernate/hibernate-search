@@ -11,10 +11,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 
 /**
  * The context used when starting to define a nested predicate.
- *
- * @param <N> The type of the next context (returned after the nested query was defined).
  */
-public interface NestedPredicateContext<N> {
+public interface NestedPredicateContext {
 
 	/**
 	 * Set the object field to "nest" on.
@@ -25,6 +23,6 @@ public interface NestedPredicateContext<N> {
 	 * @return A {@link NestedPredicateFieldContext} allowing to define the predicate
 	 * that should match on a single object.
 	 */
-	NestedPredicateFieldContext<N> onObjectField(String absoluteFieldPath);
+	NestedPredicateFieldContext onObjectField(String absoluteFieldPath);
 
 }

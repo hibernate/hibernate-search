@@ -18,44 +18,44 @@ import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-class FieldSortContextImpl<N, B>
-		extends NonEmptySortContextImpl<N>
-		implements FieldSortContext<N>, FieldSortMissingValueContext<FieldSortContext<N>>, SearchSortContributor<B> {
+class FieldSortContextImpl<B>
+		extends NonEmptySortContextImpl
+		implements FieldSortContext, FieldSortMissingValueContext<FieldSortContext>, SearchSortContributor<B> {
 
 	private final FieldSortBuilder<B> builder;
 
-	FieldSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext,
+	FieldSortContextImpl(SearchSortContainerContext containerContext,
+			SearchSortFactory<?, B> factory, SearchSortDslContext<?> dslContext,
 			String absoluteFieldPath) {
 		super( containerContext, dslContext );
 		this.builder = factory.field( absoluteFieldPath );
 	}
 
 	@Override
-	public FieldSortContext<N> order(SortOrder order) {
+	public FieldSortContext order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public FieldSortMissingValueContext<FieldSortContext<N>> onMissingValue() {
+	public FieldSortMissingValueContext<FieldSortContext> onMissingValue() {
 		return this;
 	}
 
 	@Override
-	public FieldSortContext<N> sortFirst() {
+	public FieldSortContext sortFirst() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortContext<N> sortLast() {
+	public FieldSortContext sortLast() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public FieldSortContext<N> use(Object value) {
+	public FieldSortContext use(Object value) {
 		builder.missingAs( value );
 		return this;
 	}

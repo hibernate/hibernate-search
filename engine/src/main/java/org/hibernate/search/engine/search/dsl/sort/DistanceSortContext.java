@@ -8,10 +8,8 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 /**
  * The context used when defining a field sort.
- *
- * @param <N> The type of the end context (returned by {@link DistanceSortContext#end()}).
  */
-public interface DistanceSortContext<N>
-		extends NonEmptySortContext<N>, SortOrderContext<DistanceSortContext<N>> {
+public interface DistanceSortContext
+		extends NonEmptySortContext, SortOrderContext<DistanceSortContext> {
 
 }

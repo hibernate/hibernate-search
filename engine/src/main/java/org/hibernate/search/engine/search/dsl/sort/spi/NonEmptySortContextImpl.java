@@ -10,23 +10,18 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class NonEmptySortContextImpl<N> implements NonEmptySortContext<N> {
-	private final SearchSortContainerContext<N> containerContext;
-	protected final SearchSortDslContext<N, ?> dslContext;
+public class NonEmptySortContextImpl implements NonEmptySortContext {
+	private final SearchSortContainerContext containerContext;
+	protected final SearchSortDslContext<?> dslContext;
 
-	public NonEmptySortContextImpl(SearchSortContainerContext<N> containerContext, SearchSortDslContext<N, ?> dslContext) {
+	public NonEmptySortContextImpl(SearchSortContainerContext containerContext, SearchSortDslContext<?> dslContext) {
 		this.containerContext = containerContext;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public final SearchSortContainerContext<N> then() {
+	public final SearchSortContainerContext then() {
 		return containerContext;
-	}
-
-	@Override
-	public final N end() {
-		return dslContext.getNextContext();
 	}
 
 	@Override

@@ -11,17 +11,17 @@ import org.hibernate.search.engine.search.SearchPredicate;
 
 /**
  * The terminal context of the predicate DSL.
- *
- * @param <N> The type of the next context (returned by {@link #end()}).
  */
-public interface SearchPredicateTerminalContext<N> {
+public interface SearchPredicateTerminalContext {
 
 	/**
-	 * End the current context and continue to the next one.
+	 * End the current context and get the resulting {@link SearchPredicate} object.
 	 *
-	 * @return The next context.
+	 * @return The {@link SearchPredicate} resulting from the previous DSL steps.
 	 */
-	N end();
+	default SearchPredicate end() {
+		return toPredicate();
+	}
 
 	/**
 	 * Create a {@link SearchPredicate} instance

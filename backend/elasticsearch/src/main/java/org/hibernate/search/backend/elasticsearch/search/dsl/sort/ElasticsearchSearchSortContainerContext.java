@@ -6,19 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.dsl.sort;
 
-import org.hibernate.search.engine.search.dsl.sort.FieldSortContext;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
-import org.hibernate.search.engine.search.dsl.sort.ScoreSortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * A DSL context allowing to specify the sort order, with some Elasticsearch-specific methods.
- *
- * @param <N> The type of the next context (returned by terminal calls such as {@link ScoreSortContext#end()}
- * or {@link FieldSortContext#end()}).
  */
-public interface ElasticsearchSearchSortContainerContext<N> extends SearchSortContainerContext<N> {
+public interface ElasticsearchSearchSortContainerContext extends SearchSortContainerContext {
 
-	NonEmptySortContext<N> fromJsonString(String jsonString);
+	NonEmptySortContext fromJsonString(String jsonString);
 
 }

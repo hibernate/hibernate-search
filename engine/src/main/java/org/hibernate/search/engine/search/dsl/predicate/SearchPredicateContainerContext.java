@@ -51,11 +51,8 @@ import org.hibernate.search.engine.search.SearchPredicate;
  * Note that custom bridges have the ability to customize the expected type of arguments in the DSL:
  * for example they could accept {@link String} arguments when targeting {@link Integer} fields.
  * See the documentation of bridges for more information on custom bridges.
- *
- * @param <N> The type of the next context (returned by terminal calls such as {@link BooleanJunctionPredicateContext#end() end}
- * or {@link MatchPredicateFieldSetContext#matching(Object)}).
  */
-public interface SearchPredicateContainerContext<N> {
+public interface SearchPredicateContainerContext {
 
 	/**
 	 * Match all documents.
@@ -64,7 +61,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see MatchAllPredicateContext
 	 */
-	MatchAllPredicateContext<N> matchAll();
+	MatchAllPredicateContext matchAll();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses.
@@ -73,7 +70,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see BooleanJunctionPredicateContext
 	 */
-	BooleanJunctionPredicateContext<N> bool();
+	BooleanJunctionPredicateContext bool();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses,
@@ -86,7 +83,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * @return A context allowing to end the predicate definition.
 	 * @see BooleanJunctionPredicateContext
 	 */
-	SearchPredicateTerminalContext<N> bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor);
+	SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
@@ -99,7 +96,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see MatchPredicateContext
 	 */
-	MatchPredicateContext<N> match();
+	MatchPredicateContext match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -108,7 +105,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see RangePredicateContext
 	 */
-	RangePredicateContext<N> range();
+	RangePredicateContext range();
 
 	/**
 	 * Match documents where a
@@ -119,7 +116,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 * @see NestedPredicateContext
 	 */
-	NestedPredicateContext<N> nested();
+	NestedPredicateContext nested();
 
 	/**
 	 * Access the different types of spatial predicates.
@@ -127,15 +124,14 @@ public interface SearchPredicateContainerContext<N> {
 	 * @return A context allowing to define the type of spatial predicate.
 	 * @see SpatialPredicateContext
 	 */
-	SpatialPredicateContext<N> spatial();
+	SpatialPredicateContext spatial();
 
 	/**
 	 * Match documents that match the given, previously-built {@link SearchPredicate}.
 	 *
 	 * @param searchPredicate The predicate that should match.
-	 * @return The next context.
 	 */
-	N predicate(SearchPredicate searchPredicate);
+	void predicate(SearchPredicate searchPredicate);
 
 	// TODO ids query (Type + list of IDs? Just IDs? See https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-ids-query.html)
 	// TODO other queries (spatial, ...)
@@ -149,7 +145,7 @@ public interface SearchPredicateContainerContext<N> {
 	 * @return The extended context.
 	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchPredicateContainerContextExtension<N, T> extension);
+	<T> T extension(SearchPredicateContainerContextExtension<T> extension);
 
 	/**
 	 * Create a context allowing to try to apply multiple extensions one after the other,
@@ -160,6 +156,6 @@ public interface SearchPredicateContainerContext<N> {
 	 *
 	 * @return A context allowing to define the extensions to attempt, and the corresponding predicates.
 	 */
-	SearchPredicateContainerExtensionContext<N> extension();
+	SearchPredicateContainerExtensionContext extension();
 
 }

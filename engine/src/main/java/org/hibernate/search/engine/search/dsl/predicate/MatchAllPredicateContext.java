@@ -12,11 +12,9 @@ import org.hibernate.search.engine.search.SearchPredicate;
 
 /**
  * The context used when starting to define a match all predicate.
- *
- * @param <N> The type of the next context (returned by {@link SearchPredicateTerminalContext#end()}).
  */
-public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldContext<MatchAllPredicateContext<N>>,
-		SearchPredicateTerminalContext<N> {
+public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<MatchAllPredicateContext>,
+		SearchPredicateTerminalContext {
 
 	/**
 	 * Add a "must not" clause based on a previously-built {@link SearchPredicate},
@@ -26,7 +24,7 @@ public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldConte
 	 * @param searchPredicate The predicate that must not match.
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchAllPredicateContext<N> except(SearchPredicate searchPredicate);
+	MatchAllPredicateContext except(SearchPredicate searchPredicate);
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
@@ -46,6 +44,6 @@ public interface MatchAllPredicateContext<N> extends SearchPredicateNoFieldConte
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchAllPredicateContext<N> except(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	MatchAllPredicateContext except(Consumer<? super SearchPredicateContainerContext> clauseContributor);
 
 }

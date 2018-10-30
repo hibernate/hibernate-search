@@ -9,11 +9,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 /**
  * The context used when starting to define a range predicate.
- *
- * @param <N> The type of the next context (returned by {@link RangePredicateFieldSetContext#above(Object)}
- * or {@link RangePredicateFromContext#to(Object)} for example).
  */
-public interface RangePredicateContext<N> {
+public interface RangePredicateContext {
 
 	/**
 	 * Target the given field in the range predicate.
@@ -30,7 +27,7 @@ public interface RangePredicateContext<N> {
 	 * or simply to continue the definition of the range predicate
 	 * ({@link RangePredicateFieldSetContext#from(Object) bounds}, ...).
 	 */
-	default RangePredicateFieldSetContext<N> onField(String absoluteFieldPath) {
+	default RangePredicateFieldSetContext onField(String absoluteFieldPath) {
 		return onFields( absoluteFieldPath );
 	}
 
@@ -48,6 +45,6 @@ public interface RangePredicateContext<N> {
 	 *
 	 * @see #onField(String)
 	 */
-	RangePredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
+	RangePredicateFieldSetContext onFields(String ... absoluteFieldPaths);
 
 }

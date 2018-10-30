@@ -32,7 +32,6 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
@@ -84,7 +83,7 @@ public class SearchSortByFieldIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()

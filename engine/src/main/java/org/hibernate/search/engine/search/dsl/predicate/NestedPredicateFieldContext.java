@@ -12,10 +12,8 @@ import org.hibernate.search.engine.search.SearchPredicate;
 
 /**
  * The context used when defining a "nested" predicate, after the object field was mentioned.
- *
- * @param <N> The type of the next context (returned after the nested query was defined).
  */
-public interface NestedPredicateFieldContext<N> {
+public interface NestedPredicateFieldContext {
 
 	// TODO add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 
@@ -28,7 +26,7 @@ public interface NestedPredicateFieldContext<N> {
 	 * @param searchPredicate The predicate that must be matched by at least one element of the nested object field.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	SearchPredicateTerminalContext<N> nest(SearchPredicate searchPredicate);
+	SearchPredicateTerminalContext nest(SearchPredicate searchPredicate);
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
@@ -49,6 +47,6 @@ public interface NestedPredicateFieldContext<N> {
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	SearchPredicateTerminalContext<N> nest(Consumer<? super SearchPredicateContainerContext<?>> predicateContributor);
+	SearchPredicateTerminalContext nest(Consumer<? super SearchPredicateContainerContext> predicateContributor);
 
 }

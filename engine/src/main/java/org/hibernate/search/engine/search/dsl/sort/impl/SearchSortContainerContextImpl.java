@@ -21,39 +21,39 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class SearchSortContainerContextImpl<N, B> implements SearchSortContainerContext<N> {
+public class SearchSortContainerContextImpl<B> implements SearchSortContainerContext {
 
 	private final SearchSortFactory<?, B> factory;
 
-	private final SearchSortDslContext<N, ? super B> dslContext;
+	private final SearchSortDslContext<? super B> dslContext;
 
-	public SearchSortContainerContextImpl(SearchSortFactory<?, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
+	public SearchSortContainerContextImpl(SearchSortFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public NonEmptySortContext<N> by(SearchSort sort) {
+	public NonEmptySortContext by(SearchSort sort) {
 		factory.toImplementation( sort, dslContext::addChild );
 		return nonEmptyContext();
 	}
 
 	@Override
-	public ScoreSortContext<N> byScore() {
-		ScoreSortContextImpl<N, B> child = new ScoreSortContextImpl<>( this, factory, dslContext );
+	public ScoreSortContext byScore() {
+		ScoreSortContextImpl<B> child = new ScoreSortContextImpl<>( this, factory, dslContext );
 		dslContext.addChild( child );
 		return child;
 	}
 
 	@Override
-	public NonEmptySortContext<N> byIndexOrder() {
+	public NonEmptySortContext byIndexOrder() {
 		dslContext.addChild( factory.indexOrder() );
 		return nonEmptyContext();
 	}
 
 	@Override
-	public FieldSortContext<N> byField(String absoluteFieldPath) {
-		FieldSortContextImpl<N, B> child = new FieldSortContextImpl<>(
+	public FieldSortContext byField(String absoluteFieldPath) {
+		FieldSortContextImpl<B> child = new FieldSortContextImpl<>(
 				this, factory, dslContext, absoluteFieldPath
 		);
 		dslContext.addChild( child );
@@ -61,8 +61,8 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	}
 
 	@Override
-	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
-		DistanceSortContextImpl<N, B> child = new DistanceSortContextImpl<>(
+	public DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location) {
+		DistanceSortContextImpl<B> child = new DistanceSortContextImpl<>(
 				this, factory, dslContext, absoluteFieldPath, location
 		);
 		dslContext.addChild( child );
@@ -70,19 +70,19 @@ public class SearchSortContainerContextImpl<N, B> implements SearchSortContainer
 	}
 
 	@Override
-	public <T> T extension(SearchSortContainerContextExtension<N, T> extension) {
+	public <T> T extension(SearchSortContainerContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension, extension.extendOptional( this, factory, dslContext )
 		);
 	}
 
 	@Override
-	public SearchSortContainerExtensionContext<N> extension() {
+	public SearchSortContainerExtensionContext extension() {
 		return new SearchSortContainerExtensionContextImpl<>( this, factory, dslContext );
 	}
 
-	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContextImpl<>( this, dslContext );
+	private NonEmptySortContext nonEmptyContext() {
+		return new NonEmptySortContextImpl( this, dslContext );
 	}
 
 }

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchTargetPredicateRootContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
@@ -19,12 +17,12 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 public abstract class IndexSearchTargetBase implements IndexSearchTarget {
 
 	@Override
-	public SearchPredicateContainerContext<SearchPredicate> predicate() {
+	public SearchPredicateContainerContext predicate() {
 		return new SearchTargetPredicateRootContext<>( getSearchTargetContext().getSearchPredicateFactory() );
 	}
 
 	@Override
-	public SearchSortContainerContext<SearchSort> sort() {
+	public SearchSortContainerContext sort() {
 		return new SearchTargetSortRootContext<>( getSearchTargetContext().getSearchSortFactory() );
 	}
 

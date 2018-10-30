@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  */
 public final class RootSearchPredicateDslContextImpl<B>
 		extends AbstractObjectCreatingSearchPredicateContributor<B>
-		implements SearchPredicateDslContext<SearchPredicate, B> {
+		implements SearchPredicateDslContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -46,11 +46,6 @@ public final class RootSearchPredicateDslContextImpl<B>
 			throw log.cannotAddMultiplePredicatesToQueryRoot();
 		}
 		this.singlePredicateContributor = child;
-	}
-
-	@Override
-	public SearchPredicate getNextContext() {
-		return toPredicate();
 	}
 
 	public B getResultingBuilder() {

@@ -9,18 +9,16 @@ package org.hibernate.search.engine.search.dsl.sort;
 /**
  * A superinterface for contexts allowing to define sorts.
  *
- * @param <N> The type of the end context (returned by {@link NonEmptySortContext#end()}).
- *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface NonEmptySortContext<N> extends SearchSortTerminalContext<N> {
+public interface NonEmptySortContext extends SearchSortTerminalContext {
 
 	/**
 	 * Start defining another sort, to be applied after the current one.
 	 *
 	 * @return A {@link SearchSortContainerContext} allowing to define a sort.
 	 */
-	SearchSortContainerContext<N> then();
+	SearchSortContainerContext then();
 
 }

@@ -25,65 +25,65 @@ import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
  * <p>
  * Mainly useful when implementing a {@link SearchPredicateContainerContextExtension}.
  */
-public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchPredicateContainerContext<N> {
+public class DelegatingSearchPredicateContainerContextImpl implements SearchPredicateContainerContext {
 
-	private final SearchPredicateContainerContext<N> delegate;
+	private final SearchPredicateContainerContext delegate;
 
-	public DelegatingSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate) {
+	public DelegatingSearchPredicateContainerContextImpl(SearchPredicateContainerContext delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public MatchAllPredicateContext<N> matchAll() {
+	public MatchAllPredicateContext matchAll() {
 		return delegate.matchAll();
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> bool() {
+	public BooleanJunctionPredicateContext bool() {
 		return delegate.bool();
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor) {
+	public SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
 		return delegate.bool( clauseContributor );
 	}
 
 	@Override
-	public MatchPredicateContext<N> match() {
+	public MatchPredicateContext match() {
 		return delegate.match();
 	}
 
 	@Override
-	public RangePredicateContext<N> range() {
+	public RangePredicateContext range() {
 		return delegate.range();
 	}
 
 	@Override
-	public NestedPredicateContext<N> nested() {
+	public NestedPredicateContext nested() {
 		return delegate.nested();
 	}
 
 	@Override
-	public SpatialPredicateContext<N> spatial() {
+	public SpatialPredicateContext spatial() {
 		return delegate.spatial();
 	}
 
 	@Override
-	public N predicate(SearchPredicate predicate) {
-		return delegate.predicate( predicate );
+	public void predicate(SearchPredicate predicate) {
+		delegate.predicate( predicate );
 	}
 
 	@Override
-	public <T> T extension(SearchPredicateContainerContextExtension<N, T> extension) {
+	public <T> T extension(SearchPredicateContainerContextExtension<T> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public SearchPredicateContainerExtensionContext<N> extension() {
+	public SearchPredicateContainerExtensionContext extension() {
 		return delegate.extension();
 	}
 
-	protected SearchPredicateContainerContext<N> getDelegate() {
+	protected SearchPredicateContainerContext getDelegate() {
 		return delegate;
 	}
 }

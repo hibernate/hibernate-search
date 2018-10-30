@@ -21,55 +21,55 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <p>
  * Mainly useful when implementing a {@link SearchSortContainerContextExtension}.
  */
-public class DelegatingSearchSortContainerContextImpl<N> implements SearchSortContainerContext<N> {
+public class DelegatingSearchSortContainerContextImpl implements SearchSortContainerContext {
 
-	private final SearchSortContainerContext<N> delegate;
+	private final SearchSortContainerContext delegate;
 
-	public DelegatingSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate) {
+	public DelegatingSearchSortContainerContextImpl(SearchSortContainerContext delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public ScoreSortContext<N> byScore() {
+	public ScoreSortContext byScore() {
 		return delegate.byScore();
 	}
 
 	@Override
-	public NonEmptySortContext<N> byIndexOrder() {
+	public NonEmptySortContext byIndexOrder() {
 		return delegate.byIndexOrder();
 	}
 
 	@Override
-	public FieldSortContext<N> byField(String absoluteFieldPath) {
+	public FieldSortContext byField(String absoluteFieldPath) {
 		return delegate.byField( absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location) {
 		return delegate.byDistance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortContext<N> byDistance(String absoluteFieldPath, double latitude, double longitude) {
+	public DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return delegate.byDistance( absoluteFieldPath, latitude, longitude );
 	}
 
 	@Override
-	public NonEmptySortContext<N> by(SearchSort sort) {
+	public NonEmptySortContext by(SearchSort sort) {
 		return delegate.by( sort );
 	}
 
 	@Override
-	public <T> T extension(SearchSortContainerContextExtension<N, T> extension) {
+	public <T> T extension(SearchSortContainerContextExtension<T> extension) {
 		return delegate.extension( extension );
 	}
 
 	@Override
-	public SearchSortContainerExtensionContext<N> extension() {
+	public SearchSortContainerExtensionContext extension() {
 		return delegate.extension();
 	}
 
-	protected SearchSortContainerContext<N> getDelegate() {
+	protected SearchSortContainerContext getDelegate() {
 		return delegate;
 	}
 }

@@ -21,14 +21,13 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
  * In short, users are only expected to get instances of this type from an API ({@code SomeExtension.get()})
  * and pass it to another API.
  *
- * @param <N> The next context type
  * @param <T> The type of extended search container contexts. Should generally extend
  * {@link SearchSortContainerContext}.
  *
  * @see SearchSortContainerContext#extension(SearchSortContainerContextExtension)
  * @see DelegatingSearchSortContainerContextImpl
  */
-public interface SearchSortContainerContextExtension<N, T> {
+public interface SearchSortContainerContextExtension<T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
@@ -44,7 +43,7 @@ public interface SearchSortContainerContextExtension<N, T> {
 	 * of success, or an empty optional otherwise.
 	 */
 	<C, B> Optional<T> extendOptional(
-			SearchSortContainerContext<N> original,
-			SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext);
+			SearchSortContainerContext original,
+			SearchSortFactory<C, B> factory, SearchSortDslContext<? super B> dslContext);
 
 }

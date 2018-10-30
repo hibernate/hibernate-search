@@ -40,8 +40,8 @@ class SearchQuerySortCollector<C, B> {
 		factory.toImplementation( sort, rootDslContext::addChild );
 	}
 
-	void collect(Consumer<? super SearchSortContainerContext<SearchSort>> dslPredicateContributor) {
-		SearchSortContainerContext<SearchSort> containerContext =
+	void collect(Consumer<? super SearchSortContainerContext> dslPredicateContributor) {
+		SearchSortContainerContext containerContext =
 				new SearchSortContainerContextImpl<>( factory, rootDslContext );
 		dslPredicateContributor.accept( containerContext );
 	}

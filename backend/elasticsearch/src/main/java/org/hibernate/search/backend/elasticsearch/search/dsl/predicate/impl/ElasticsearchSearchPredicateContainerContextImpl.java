@@ -15,26 +15,26 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPred
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 
 
-public class ElasticsearchSearchPredicateContainerContextImpl<N>
-		extends DelegatingSearchPredicateContainerContextImpl<N>
-		implements ElasticsearchSearchPredicateContainerContext<N> {
+public class ElasticsearchSearchPredicateContainerContextImpl
+		extends DelegatingSearchPredicateContainerContextImpl
+		implements ElasticsearchSearchPredicateContainerContext {
 
 	private final ElasticsearchSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, ? super ElasticsearchSearchPredicateBuilder> dslContext;
+	private final SearchPredicateDslContext<? super ElasticsearchSearchPredicateBuilder> dslContext;
 
-	public ElasticsearchSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
+	public ElasticsearchSearchPredicateContainerContextImpl(SearchPredicateContainerContext delegate,
 			ElasticsearchSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ? super ElasticsearchSearchPredicateBuilder> dslContext) {
+			SearchPredicateDslContext<? super ElasticsearchSearchPredicateBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> fromJsonString(String jsonString) {
-		JsonStringPredicateContextImpl<N> child =
-				new JsonStringPredicateContextImpl<>( factory, dslContext::getNextContext, jsonString );
+	public SearchPredicateTerminalContext fromJsonString(String jsonString) {
+		JsonStringPredicateContextImpl child =
+				new JsonStringPredicateContextImpl( factory, jsonString );
 		dslContext.addChild( child );
 		return child;
 	}

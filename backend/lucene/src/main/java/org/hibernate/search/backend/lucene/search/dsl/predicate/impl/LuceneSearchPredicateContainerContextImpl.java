@@ -17,26 +17,26 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslCo
 import org.apache.lucene.search.Query;
 
 
-public class LuceneSearchPredicateContainerContextImpl<N>
-		extends DelegatingSearchPredicateContainerContextImpl<N>
-		implements LuceneSearchPredicateContainerContext<N> {
+public class LuceneSearchPredicateContainerContextImpl
+		extends DelegatingSearchPredicateContainerContextImpl
+		implements LuceneSearchPredicateContainerContext {
 
 	private final LuceneSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder> dslContext;
+	private final SearchPredicateDslContext<? super LuceneSearchPredicateBuilder> dslContext;
 
-	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext<N> delegate,
+	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext delegate,
 			LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder> dslContext) {
+			SearchPredicateDslContext<? super LuceneSearchPredicateBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> fromLuceneQuery(Query luceneQuery) {
-		LuceneQueryPredicateContextImpl<N> child =
-				new LuceneQueryPredicateContextImpl<>( factory, dslContext::getNextContext, luceneQuery );
+	public SearchPredicateTerminalContext fromLuceneQuery(Query luceneQuery) {
+		LuceneQueryPredicateContextImpl child =
+				new LuceneQueryPredicateContextImpl( factory, luceneQuery );
 		dslContext.addChild( child );
 		return child;
 	}

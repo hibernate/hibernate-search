@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
@@ -15,16 +14,16 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContr
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class RangePredicateContextImpl<N, B> implements RangePredicateContext<N>, SearchPredicateContributor<B> {
+class RangePredicateContextImpl<B> implements RangePredicateContext, SearchPredicateContributor<B> {
 
-	private final RangePredicateFieldSetContextImpl.CommonState<N, B> commonState;
+	private final RangePredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	RangePredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
+	RangePredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 
 	@Override
-	public RangePredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths) {
+	public RangePredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

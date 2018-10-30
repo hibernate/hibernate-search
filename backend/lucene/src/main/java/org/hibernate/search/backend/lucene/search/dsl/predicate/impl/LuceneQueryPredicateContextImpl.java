@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
-import java.util.function.Supplier;
-
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
@@ -15,22 +13,14 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreati
 
 import org.apache.lucene.search.Query;
 
-final class LuceneQueryPredicateContextImpl<N>
+final class LuceneQueryPredicateContextImpl
 		extends AbstractObjectCreatingSearchPredicateContributor<LuceneSearchPredicateBuilder>
-		implements SearchPredicateTerminalContext<N> {
-	private final Supplier<N> nextContextSupplier;
+		implements SearchPredicateTerminalContext {
 	private final LuceneSearchPredicateBuilder builder;
 
-	LuceneQueryPredicateContextImpl(LuceneSearchPredicateFactory factory, Supplier<N> nextContextSupplier,
-			Query luceneQuery) {
+	LuceneQueryPredicateContextImpl(LuceneSearchPredicateFactory factory, Query luceneQuery) {
 		super( factory );
-		this.nextContextSupplier = nextContextSupplier;
 		this.builder = factory.fromLuceneQuery( luceneQuery );
-	}
-
-	@Override
-	public final N end() {
-		return nextContextSupplier.get();
 	}
 
 	@Override

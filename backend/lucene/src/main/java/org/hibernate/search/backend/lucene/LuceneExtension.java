@@ -38,18 +38,16 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  */
-public final class LuceneExtension<N>
-		implements SearchPredicateContainerContextExtension<N, LuceneSearchPredicateContainerContext<N>>,
-		SearchSortContainerContextExtension<N, LuceneSearchSortContainerContext<N>>,
+public final class LuceneExtension
+		implements SearchPredicateContainerContextExtension<LuceneSearchPredicateContainerContext>,
+		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		IndexSchemaFieldContextExtension<LuceneIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	@SuppressWarnings("rawtypes")
 	private static final LuceneExtension INSTANCE = new LuceneExtension();
 
-	@SuppressWarnings("unchecked")
-	public static <N> LuceneExtension<N> get() {
+	public static LuceneExtension get() {
 		return INSTANCE;
 	}
 
@@ -61,9 +59,9 @@ public final class LuceneExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<LuceneSearchPredicateContainerContext<N>> extendOptional(
-			SearchPredicateContainerContext<N> original, SearchPredicateFactory<C, B> factory,
-			SearchPredicateDslContext<N, ? super B> dslContext) {
+	public <C, B> Optional<LuceneSearchPredicateContainerContext> extendOptional(
+			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory,
+			SearchPredicateDslContext<? super B> dslContext) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext ) );
 		}
@@ -76,9 +74,9 @@ public final class LuceneExtension<N>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<LuceneSearchSortContainerContext<N>> extendOptional(
-			SearchSortContainerContext<N> original, SearchSortFactory<C, B> factory,
-			SearchSortDslContext<N, ? super B> dslContext) {
+	public <C, B> Optional<LuceneSearchSortContainerContext> extendOptional(
+			SearchSortContainerContext original, SearchSortFactory<C, B> factory,
+			SearchSortDslContext<? super B> dslContext) {
 		if ( factory instanceof LuceneSearchSortFactory ) {
 			return Optional.of( extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext ) );
 		}
@@ -101,22 +99,22 @@ public final class LuceneExtension<N>
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchPredicateBuilder
-	private <B> LuceneSearchPredicateContainerContext<N> extendUnsafe(
-			SearchPredicateContainerContext<N> original, LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<N, ? super B> dslContext) {
-		return new LuceneSearchPredicateContainerContextImpl<>(
+	private <B> LuceneSearchPredicateContainerContext extendUnsafe(
+			SearchPredicateContainerContext original, LuceneSearchPredicateFactory factory,
+			SearchPredicateDslContext<? super B> dslContext) {
+		return new LuceneSearchPredicateContainerContextImpl(
 				original, factory,
-				(SearchPredicateDslContext<N, ? super LuceneSearchPredicateBuilder>) dslContext
+				(SearchPredicateDslContext<? super LuceneSearchPredicateBuilder>) dslContext
 		);
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchSortBuilder
-	private <B> LuceneSearchSortContainerContext<N> extendUnsafe(
-			SearchSortContainerContext<N> original, LuceneSearchSortFactory factory,
-			SearchSortDslContext<N, ? super B> dslContext) {
-		return new LuceneSearchSortContainerContextImpl<>(
+	private <B> LuceneSearchSortContainerContext extendUnsafe(
+			SearchSortContainerContext original, LuceneSearchSortFactory factory,
+			SearchSortDslContext<? super B> dslContext) {
+		return new LuceneSearchSortContainerContextImpl(
 				original, factory,
-				(SearchSortDslContext<N, ? super LuceneSearchSortBuilder>) dslContext
+				(SearchSortDslContext<? super LuceneSearchSortBuilder>) dslContext
 		);
 	}
 }

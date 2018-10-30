@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
@@ -22,25 +21,21 @@ import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicate
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class BooleanJunctionPredicateContextImpl<N, B>
+class BooleanJunctionPredicateContextImpl<B>
 		extends AbstractObjectCreatingSearchPredicateContributor<B>
-		implements BooleanJunctionPredicateContext<N>, SearchPredicateContributor<B> {
-
-	private final Supplier<N> nextContextProvider;
+		implements BooleanJunctionPredicateContext, SearchPredicateContributor<B> {
 
 	private final BooleanJunctionPredicateBuilder<B> builder;
 
-	private final MinimumShouldMatchContextImpl<BooleanJunctionPredicateContext<N>> minimumShouldMatchContext;
+	private final MinimumShouldMatchContextImpl<BooleanJunctionPredicateContext> minimumShouldMatchContext;
 
 	private final OccurContext must;
 	private final OccurContext mustNot;
 	private final OccurContext should;
 	private final OccurContext filter;
 
-	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory,
-			Supplier<N> nextContextProvider) {
+	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
 		super( factory );
-		this.nextContextProvider = nextContextProvider;
 		this.builder = factory.bool();
 		this.must = new OccurContext();
 		this.mustNot = new OccurContext();
@@ -50,62 +45,66 @@ class BooleanJunctionPredicateContextImpl<N, B>
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> boostedTo(float boost) {
+	public BooleanJunctionPredicateContext boostedTo(float boost) {
 		builder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> must(SearchPredicate searchPredicate) {
-		return must.containerContext.predicate( searchPredicate );
+	public BooleanJunctionPredicateContext must(SearchPredicate searchPredicate) {
+		must.containerContext.predicate( searchPredicate );
+		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> mustNot(SearchPredicate searchPredicate) {
-		return mustNot.containerContext.predicate( searchPredicate );
+	public BooleanJunctionPredicateContext mustNot(SearchPredicate searchPredicate) {
+		mustNot.containerContext.predicate( searchPredicate );
+		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> should(SearchPredicate searchPredicate) {
-		return should.containerContext.predicate( searchPredicate );
+	public BooleanJunctionPredicateContext should(SearchPredicate searchPredicate) {
+		should.containerContext.predicate( searchPredicate );
+		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate) {
-		return filter.containerContext.predicate( searchPredicate );
+	public BooleanJunctionPredicateContext filter(SearchPredicate searchPredicate) {
+		filter.containerContext.predicate( searchPredicate );
+		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+	public BooleanJunctionPredicateContext must(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
 		clauseContributor.accept( must.containerContext );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+	public BooleanJunctionPredicateContext mustNot(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
 		clauseContributor.accept( mustNot.containerContext );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+	public BooleanJunctionPredicateContext should(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
 		clauseContributor.accept( should.containerContext );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor) {
+	public BooleanJunctionPredicateContext filter(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
 		clauseContributor.accept( filter.containerContext );
 		return this;
 	}
 
 	@Override
-	public MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext<N>> minimumShouldMatch() {
+	public MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext> minimumShouldMatch() {
 		return minimumShouldMatchContext;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext<N> minimumShouldMatch(
+	public BooleanJunctionPredicateContext minimumShouldMatch(
 			Consumer<? super MinimumShouldMatchContext<?>> constraintContributor) {
 		constraintContributor.accept( minimumShouldMatchContext );
 		return this;
@@ -120,14 +119,9 @@ class BooleanJunctionPredicateContextImpl<N, B>
 		return builder.toImplementation();
 	}
 
-	@Override
-	public N end() {
-		return nextContextProvider.get();
-	}
+	private class OccurContext implements SearchPredicateDslContext<B> {
 
-	private class OccurContext implements SearchPredicateDslContext<BooleanJunctionPredicateContext<N>, B> {
-
-		private final SearchPredicateContainerContextImpl<BooleanJunctionPredicateContext<N>, B> containerContext;
+		private final SearchPredicateContainerContextImpl<B> containerContext;
 
 		private List<SearchPredicateContributor<? extends B>> clauseContributors;
 
@@ -143,11 +137,6 @@ class BooleanJunctionPredicateContextImpl<N, B>
 				clauseContributors = new ArrayList<>();
 			}
 			clauseContributors.add( contributor );
-		}
-
-		@Override
-		public BooleanJunctionPredicateContext<N> getNextContext() {
-			return BooleanJunctionPredicateContextImpl.this;
 		}
 
 		void contribute(Consumer<B> builderCollector) {
