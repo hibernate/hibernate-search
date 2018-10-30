@@ -57,7 +57,8 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 		StandardFieldSortBuilderFactory other = (StandardFieldSortBuilderFactory) obj;
 
-		return converter.isDslCompatibleWith( other.converter );
+		return sortable == other.sortable &&
+				converter.isDslCompatibleWith( other.converter );
 	}
 
 	private static void checkSortable(String absoluteFieldPath, boolean sortable) {

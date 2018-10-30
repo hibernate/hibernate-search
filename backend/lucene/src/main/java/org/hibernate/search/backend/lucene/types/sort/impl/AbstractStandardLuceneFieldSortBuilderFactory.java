@@ -48,7 +48,8 @@ abstract class AbstractStandardLuceneFieldSortBuilderFactory<F> implements Lucen
 
 		AbstractStandardLuceneFieldSortBuilderFactory<?> other = (AbstractStandardLuceneFieldSortBuilderFactory<?>) obj;
 
-		return converter.isDslCompatibleWith( other.converter );
+		return sortable == other.sortable &&
+				converter.isDslCompatibleWith( other.converter );
 	}
 
 	protected void checkSortable(String absoluteFieldPath) {
