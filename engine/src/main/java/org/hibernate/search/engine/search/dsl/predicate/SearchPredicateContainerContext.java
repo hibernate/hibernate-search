@@ -83,10 +83,10 @@ public interface SearchPredicateContainerContext<N> {
 	 *
 	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return The next context.
+	 * @return A context allowing to end the predicate definition.
 	 * @see BooleanJunctionPredicateContext
 	 */
-	N bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor);
+	SearchPredicateTerminalContext<N> bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.

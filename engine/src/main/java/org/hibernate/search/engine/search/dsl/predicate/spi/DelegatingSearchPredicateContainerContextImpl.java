@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerExtensionContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 
 /**
@@ -43,7 +44,7 @@ public class DelegatingSearchPredicateContainerContextImpl<N> implements SearchP
 	}
 
 	@Override
-	public N bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor) {
+	public SearchPredicateTerminalContext<N> bool(Consumer<? super BooleanJunctionPredicateContext<?>> clauseContributor) {
 		return delegate.bool( clauseContributor );
 	}
 
