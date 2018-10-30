@@ -15,15 +15,6 @@ import org.hibernate.search.engine.search.SearchSort;
 public interface SearchSortTerminalContext {
 
 	/**
-	 * End the current context and get the resulting {@link SearchSort} object.
-	 *
-	 * @return The {@link SearchSort} resulting from the previous DSL steps.
-	 */
-	default SearchSort end() {
-		return toSort();
-	}
-
-	/**
 	 * Create a {@link SearchSort} instance
 	 * matching the definition given in the previous DSL steps.
 	 *

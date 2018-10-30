@@ -87,7 +87,7 @@ public class SearchPredicateIT {
 	public void match_search_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).end();
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -210,7 +210,7 @@ public class SearchPredicateIT {
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -232,7 +232,7 @@ public class SearchPredicateIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
 						)
 						.orElse(
 								ignored -> Assert.fail( "This should not be called" )
@@ -255,7 +255,7 @@ public class SearchPredicateIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
 						)
 				)
 				.build();
@@ -273,9 +273,9 @@ public class SearchPredicateIT {
 								)
 						)
 						.must(
-								c -> c.match().onField( "string" ).matching( STRING_1 ).end()
+								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
 						)
-						.end()
+						.toPredicate()
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )

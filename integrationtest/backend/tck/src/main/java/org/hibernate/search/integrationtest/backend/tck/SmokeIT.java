@@ -244,7 +244,7 @@ public class SmokeIT {
 	public void separatePredicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( "text 1" ).end();
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )
@@ -253,7 +253,7 @@ public class SmokeIT {
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).end();
+		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )
@@ -265,7 +265,7 @@ public class SmokeIT {
 		predicate = searchTarget.predicate().bool()
 				.should( c -> c.match().onField( "integer" ).matching( 1 ) )
 				.should( c -> c.match().onField( "integer" ).matching( 2 ) )
-				.end();
+				.toPredicate();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( predicate )

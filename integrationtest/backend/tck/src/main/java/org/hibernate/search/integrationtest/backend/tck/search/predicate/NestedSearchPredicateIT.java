@@ -162,7 +162,7 @@ public class NestedSearchPredicateIT {
 			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
 			);
-		} ) ).end();
+		} ) ).toPredicate();
 
 		SearchPredicate predicate2 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" ).nest( c -> c.bool( b2 -> {
 			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field1" )
@@ -171,7 +171,7 @@ public class NestedSearchPredicateIT {
 			b2.must( c2 -> c2.match().onField( "nestedObject.nestedObject.field2" )
 					.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
 			);
-		} ) ).end();
+		} ) ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()

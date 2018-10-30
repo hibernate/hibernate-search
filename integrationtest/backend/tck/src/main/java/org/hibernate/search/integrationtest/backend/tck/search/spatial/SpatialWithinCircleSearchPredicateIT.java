@@ -226,7 +226,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		SubTest.expectException(
 				"spatial().within().circle() predicate on unknown field",
 				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
-						.circle( METRO_GARIBALDI, 100 ).end()
+						.circle( METRO_GARIBALDI, 100 ).toPredicate()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

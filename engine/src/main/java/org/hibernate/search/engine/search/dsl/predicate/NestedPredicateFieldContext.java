@@ -24,7 +24,7 @@ public interface NestedPredicateFieldContext {
 	 * matches the inner predicate.
 	 *
 	 * @param searchPredicate The predicate that must be matched by at least one element of the nested object field.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext nest(SearchPredicate searchPredicate);
 
@@ -45,7 +45,7 @@ public interface NestedPredicateFieldContext {
 	 *
 	 * @param predicateContributor A consumer that will add a predicate to the context passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext nest(Consumer<? super SearchPredicateContainerContext> predicateContributor);
 

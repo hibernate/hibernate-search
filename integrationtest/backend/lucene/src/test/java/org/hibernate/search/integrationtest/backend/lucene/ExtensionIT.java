@@ -119,16 +119,16 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).end();
+				.fromLuceneQuery( new TermQuery( new Term( "string", "text 1" ) ) ).toPredicate();
 		SearchPredicate predicate2 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ).end();
+				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ).toPredicate();
 		SearchPredicate predicate3 = searchTarget.predicate().extension( LuceneExtension.get() )
-				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).end();
+				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).toPredicate();
 		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
 			b.should( predicate1 );
 			b.should( predicate2 );
 			b.should( predicate3 );
-		} ).end();
+		} ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -191,17 +191,17 @@ public class ExtensionIT {
 								c2 -> c2.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
 						)
 						.orElseFail()
-				.end();
+				.toSort();
 		SearchSort sort2 = searchTarget.sort().extension( LuceneExtension.get() )
 				.fromLuceneSortField( new SortField( "sort2", Type.STRING ) )
-				.end();
+				.toSort();
 		SearchSort sort3 = searchTarget.sort().extension()
 				.ifSupported(
 						LuceneExtension.get(),
 						c2 -> c2.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
 				)
 				.orElseFail()
-				.end();
+				.toSort();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -218,7 +218,7 @@ public class ExtensionIT {
 						new SortField( "sort1", Type.STRING )
 					)
 				)
-				.end();
+				.toSort();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()

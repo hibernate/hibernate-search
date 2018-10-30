@@ -24,7 +24,7 @@ public interface SearchSortContainerContext {
 	 * The default order is <strong>descending</strong>, i.e. higher scores come first.
 	 *
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 */
 	ScoreSortContext byScore();
 
@@ -32,7 +32,7 @@ public interface SearchSortContainerContext {
 	 * Order elements by their internal index order.
 	 *
 	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 */
 	NonEmptySortContext byIndexOrder();
 
@@ -43,7 +43,7 @@ public interface SearchSortContainerContext {
 	 *
 	 * @param absoluteFieldPath The absolute path of the index field to sort by
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 * @throws SearchException If the sort field type could not be automatically determined.
 	 */
 	FieldSortContext byField(String absoluteFieldPath);
@@ -56,7 +56,7 @@ public interface SearchSortContainerContext {
 	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
 	 * @param location The location to which we want to compute the distance.
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location);
@@ -70,7 +70,7 @@ public interface SearchSortContainerContext {
 	 * @param latitude The latitude of the location to which we want to compute the distance.
 	 * @param longitude The longitude of the location to which we want to compute the distance.
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	default DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
@@ -85,7 +85,7 @@ public interface SearchSortContainerContext {
 	 *
 	 * @param sort A previously-built {@link SearchSort} object.
 	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
-	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
 	 */
 	NonEmptySortContext by(SearchSort sort);
 

@@ -58,7 +58,7 @@ public interface SearchPredicateContainerContext {
 	 * Match all documents.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 * @see MatchAllPredicateContext
 	 */
 	MatchAllPredicateContext matchAll();
@@ -67,7 +67,7 @@ public interface SearchPredicateContainerContext {
 	 * Match documents if they match a combination of boolean clauses.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 * @see BooleanJunctionPredicateContext
 	 */
 	BooleanJunctionPredicateContext bool();
@@ -80,7 +80,7 @@ public interface SearchPredicateContainerContext {
 	 *
 	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 * @see BooleanJunctionPredicateContext
 	 */
 	SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
@@ -93,7 +93,7 @@ public interface SearchPredicateContainerContext {
 	 * while analyzed, full-text fields imply approximate matches depending on how they are analyzed.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 * @see MatchPredicateContext
 	 */
 	MatchPredicateContext match();
@@ -102,7 +102,7 @@ public interface SearchPredicateContainerContext {
 	 * Match documents where targeted fields have a value within lower and upper bounds.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 * @see RangePredicateContext
 	 */
 	RangePredicateContext range();
@@ -113,7 +113,7 @@ public interface SearchPredicateContainerContext {
 	 * matches a given predicate.
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 * @see NestedPredicateContext
 	 */
 	NestedPredicateContext nested();

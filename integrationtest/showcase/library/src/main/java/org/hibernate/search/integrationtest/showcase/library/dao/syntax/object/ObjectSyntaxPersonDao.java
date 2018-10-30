@@ -32,13 +32,13 @@ class ObjectSyntaxPersonDao extends PersonDao {
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).end()
+						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).toPredicate()
 				)
 				.sort(
 						target.sort()
 						.byField( "lastName_sort" )
 						.then().byField( "firstName_sort" )
-						.end()
+						.toSort()
 				)
 				.build();
 
@@ -55,10 +55,10 @@ class ObjectSyntaxPersonDao extends PersonDao {
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().matchAll().end()
+						target.predicate().matchAll().toPredicate()
 				)
 				.sort(
-						target.sort().by( target.sort().byField( borrowalsCountField ).desc().end() ).end()
+						target.sort().by( target.sort().byField( borrowalsCountField ).desc().toSort() ).toSort()
 				)
 				.build();
 
