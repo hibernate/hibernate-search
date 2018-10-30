@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
@@ -15,17 +14,17 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContr
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class SpatialWithinPredicateContextImpl<N, B> implements SpatialWithinPredicateContext<N>,
+class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateContext,
 		SearchPredicateContributor<B> {
 
-	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<N, B> commonState;
+	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	SpatialWithinPredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
+	SpatialWithinPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths) {
+	public SpatialWithinPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new SpatialWithinPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

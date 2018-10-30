@@ -18,8 +18,6 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
@@ -59,12 +57,12 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 	}
 
 	@Override
-	public SearchPredicateContainerContext<SearchPredicate> predicate() {
+	public SearchPredicateContainerContext predicate() {
 		return getIndexSearchTarget().predicate();
 	}
 
 	@Override
-	public SearchSortContainerContext<SearchSort> sort() {
+	public SearchSortContainerContext sort() {
 		return getIndexSearchTarget().sort();
 	}
 

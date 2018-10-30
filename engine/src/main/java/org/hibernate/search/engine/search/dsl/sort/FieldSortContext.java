@@ -9,17 +9,15 @@ package org.hibernate.search.engine.search.dsl.sort;
 /**
  * The context used when defining a field sort.
  *
- * @param <N> The type of the end context (returned by {@link FieldSortContext#end()}).
- *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface FieldSortContext<N>
-		extends NonEmptySortContext<N>, SortOrderContext<FieldSortContext<N>> {
+public interface FieldSortContext
+		extends NonEmptySortContext, SortOrderContext<FieldSortContext> {
 
 	/**
 	 * @return A context allowing to describe how to treat missing values when doing the sorting.
 	 */
-	FieldSortMissingValueContext<FieldSortContext<N>> onMissingValue();
+	FieldSortMissingValueContext<FieldSortContext> onMissingValue();
 
 }

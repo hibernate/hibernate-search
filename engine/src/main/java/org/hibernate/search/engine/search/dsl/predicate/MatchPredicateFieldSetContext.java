@@ -8,10 +8,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 /**
  * The context used when defining a match predicate, after at least one field was mentioned.
- *
- * @param <N> The type of the next context (returned by {@link #matching(Object)}).
  */
-public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFieldSetContext<MatchPredicateFieldSetContext<N>> {
+public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldSetContext<MatchPredicateFieldSetContext> {
 
 	/**
 	 * Target the given field in the match predicate,
@@ -24,7 +22,7 @@ public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 *
 	 * @see MatchPredicateContext#onField(String)
 	 */
-	default MatchPredicateFieldSetContext<N> orField(String absoluteFieldPath) {
+	default MatchPredicateFieldSetContext orField(String absoluteFieldPath) {
 		return orFields( absoluteFieldPath );
 	}
 
@@ -39,7 +37,7 @@ public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 *
 	 * @see MatchPredicateContext#onFields(String...)
 	 */
-	MatchPredicateFieldSetContext<N> orFields(String ... absoluteFieldPaths);
+	MatchPredicateFieldSetContext orFields(String ... absoluteFieldPaths);
 
 	/**
 	 * Require at least one of the targeted fields to match the given value.
@@ -50,6 +48,6 @@ public interface MatchPredicateFieldSetContext<N> extends MultiFieldPredicateFie
 	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @return A context allowing to end the predicate definition.
 	 */
-	SearchPredicateTerminalContext<N> matching(Object value);
+	SearchPredicateTerminalContext matching(Object value);
 
 }

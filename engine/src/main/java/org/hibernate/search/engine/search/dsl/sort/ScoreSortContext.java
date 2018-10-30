@@ -9,11 +9,9 @@ package org.hibernate.search.engine.search.dsl.sort;
 /**
  * The context used when defining a score sort.
  *
- * @param <N> The type of the end context (returned by {@link FieldSortContext#end()}).
- *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface ScoreSortContext<N>
-		extends NonEmptySortContext<N>, SortOrderContext<ScoreSortContext<N>> {
+public interface ScoreSortContext
+		extends NonEmptySortContext, SortOrderContext<ScoreSortContext> {
 }

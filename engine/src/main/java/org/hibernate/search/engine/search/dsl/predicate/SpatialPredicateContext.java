@@ -8,11 +8,9 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * The context used when starting to define a spatial predicate.
- *
- * @param <N> The type of the next context.
+ * The terminal context of the predicate DSL.
  */
-public interface SpatialPredicateContext<N> {
+public interface SpatialPredicateContext {
 
 	/**
 	 * Match documents where targeted fields point to a location within given bounds:
@@ -21,6 +19,6 @@ public interface SpatialPredicateContext<N> {
 	 * @return A context allowing to define the predicate more precisely
 	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
 	 */
-	SpatialWithinPredicateContext<N> within();
+	SpatialWithinPredicateContext within();
 
 }

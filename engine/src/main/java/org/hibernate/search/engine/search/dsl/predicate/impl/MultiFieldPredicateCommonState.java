@@ -9,24 +9,20 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
-class MultiFieldPredicateCommonState<N, B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
+class MultiFieldPredicateCommonState<B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
 		extends AbstractObjectCreatingSearchPredicateContributor<B>
 		implements SearchPredicateContributor<B> {
 
-	private final Supplier<N> nextContextProvider;
-
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	MultiFieldPredicateCommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
+	MultiFieldPredicateCommonState(SearchPredicateFactory<?, B> factory) {
 		super( factory );
-		this.nextContextProvider = nextContextProvider;
 	}
 
 	public SearchPredicateFactory<?, B> getFactory() {
@@ -35,10 +31,6 @@ class MultiFieldPredicateCommonState<N, B, F extends MultiFieldPredicateCommonSt
 
 	public void add(F fieldSetContext) {
 		fieldSetContexts.add( fieldSetContext );
-	}
-
-	public Supplier<N> getNextContextProvider() {
-		return nextContextProvider;
 	}
 
 	List<F> getFieldSetContexts() {

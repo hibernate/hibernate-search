@@ -17,20 +17,20 @@ import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 
-class ScoreSortContextImpl<N, B>
-		extends NonEmptySortContextImpl<N>
-		implements ScoreSortContext<N>, SearchSortContributor<B> {
+class ScoreSortContextImpl<B>
+		extends NonEmptySortContextImpl
+		implements ScoreSortContext, SearchSortContributor<B> {
 
 	private final ScoreSortBuilder<B> builder;
 
-	ScoreSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext) {
+	ScoreSortContextImpl(SearchSortContainerContext containerContext,
+			SearchSortFactory<?, B> factory, SearchSortDslContext<?> dslContext) {
 		super( containerContext, dslContext );
 		this.builder = factory.score();
 	}
 
 	@Override
-	public ScoreSortContext<N> order(SortOrder order) {
+	public ScoreSortContext order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

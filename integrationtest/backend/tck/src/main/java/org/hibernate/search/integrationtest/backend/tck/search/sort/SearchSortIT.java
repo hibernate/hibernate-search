@@ -90,7 +90,7 @@ public class SearchSortIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext<SearchSort>> sortContributor) {
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()
@@ -208,7 +208,7 @@ public class SearchSortIT {
 	public void lambda_caching() {
 		AtomicReference<SearchSort> cache = new AtomicReference<>();
 
-		Consumer<? super SearchSortContainerContext<?>> cachingContributor = c -> {
+		Consumer<? super SearchSortContainerContext> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchSort result = c.byField( "string" ).onMissingValue().sortLast().toSort();
 				cache.set( result );
@@ -283,12 +283,12 @@ public class SearchSortIT {
 
 		// Mandatory extension
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension<>() ).byField( "string" ).onMissingValue().sortLast().end()
+				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast().end()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension<>() ).byField( "string" ).desc().onMissingValue().sortLast().end()
+				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast().end()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -297,11 +297,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.byField( "string" ).onMissingValue().sortLast().end()
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElseFail()
@@ -311,11 +311,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElseFail()
@@ -327,11 +327,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.byField( "string" ).onMissingValue().sortLast().end()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
@@ -341,11 +341,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new SupportedExtension<>(),
+								new SupportedExtension(),
 								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
@@ -357,11 +357,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
@@ -373,11 +373,11 @@ public class SearchSortIT {
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.ifSupported(
-								new UnSupportedExtension<>(),
+								new UnSupportedExtension(),
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
@@ -391,7 +391,7 @@ public class SearchSortIT {
 		query = simpleQuery( b -> {
 			b.extension()
 					.ifSupported(
-							new UnSupportedExtension<>(),
+							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
 			b.byField( "string" ).onMissingValue().sortLast().end();
@@ -401,7 +401,7 @@ public class SearchSortIT {
 		query = simpleQuery( b -> {
 			b.extension()
 					.ifSupported(
-							new UnSupportedExtension<>(),
+							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
 			b.byField( "string" ).desc().onMissingValue().sortLast().end();
@@ -514,21 +514,21 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class SupportedExtension<N> implements SearchSortContainerContextExtension<N, MyExtendedContext<N>> {
+	private static class SupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchSortContainerContext<N> original,
-				SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+				SearchSortFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
-			return Optional.of( new MyExtendedContext<>( original ) );
+			return Optional.of( new MyExtendedContext( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension<N> implements SearchSortContainerContextExtension<N, MyExtendedContext<N>> {
+	private static class UnSupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext<N>> extendOptional(SearchSortContainerContext<N> original,
-				SearchSortFactory<C, B> factory, SearchSortDslContext<N, ? super B> dslContext) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
+				SearchSortFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
@@ -536,8 +536,8 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedContext<N> extends DelegatingSearchSortContainerContextImpl<N> {
-		MyExtendedContext(SearchSortContainerContext<N> delegate) {
+	private static class MyExtendedContext extends DelegatingSearchSortContainerContextImpl {
+		MyExtendedContext(SearchSortContainerContext delegate) {
 			super( delegate );
 		}
 	}

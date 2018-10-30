@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,17 +22,17 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
-class MatchPredicateFieldSetContextImpl<N, B>
-		implements MatchPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<B> {
+class MatchPredicateFieldSetContextImpl<B>
+		implements MatchPredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final CommonState<N, B> commonState;
+	private final CommonState<B> commonState;
 
 	private final List<String> absoluteFieldPaths;
 	private final List<MatchPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
-	MatchPredicateFieldSetContextImpl(CommonState<N, B> commonState, List<String> absoluteFieldPaths) {
+	MatchPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
@@ -44,18 +43,18 @@ class MatchPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public MatchPredicateFieldSetContext<N> orFields(String... absoluteFieldPaths) {
+	public MatchPredicateFieldSetContext orFields(String... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public MatchPredicateFieldSetContext<N> boostedTo(float boost) {
+	public MatchPredicateFieldSetContext boostedTo(float boost) {
 		predicateBuilders.forEach( b -> b.boost( boost ) );
 		return this;
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> matching(Object value) {
+	public SearchPredicateTerminalContext matching(Object value) {
 		return commonState.matching( value );
 	}
 
@@ -66,24 +65,19 @@ class MatchPredicateFieldSetContextImpl<N, B>
 		}
 	}
 
-	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, MatchPredicateFieldSetContextImpl<N, B>>
-			implements SearchPredicateTerminalContext<N> {
+	static class CommonState<B> extends MultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
+			implements SearchPredicateTerminalContext {
 
-		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-			super( factory, nextContextProvider );
+		CommonState(SearchPredicateFactory<?, B> factory) {
+			super( factory );
 		}
 
-		public SearchPredicateTerminalContext<N> matching(Object value) {
+		public SearchPredicateTerminalContext matching(Object value) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
 			getQueryBuilders().forEach( b -> b.value( value ) );
 			return this;
-		}
-
-		@Override
-		public N end() {
-			return getNextContextProvider().get();
 		}
 
 		private List<String> collectAbsoluteFieldPaths() {

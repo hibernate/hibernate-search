@@ -16,29 +16,29 @@ import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-public class ElasticsearchSearchSortContainerContextImpl<N>
-		extends DelegatingSearchSortContainerContextImpl<N>
-		implements ElasticsearchSearchSortContainerContext<N> {
+public class ElasticsearchSearchSortContainerContextImpl
+		extends DelegatingSearchSortContainerContextImpl
+		implements ElasticsearchSearchSortContainerContext {
 
 	private final ElasticsearchSearchSortFactory factory;
 
-	private final SearchSortDslContext<N, ? super ElasticsearchSearchSortBuilder> dslContext;
+	private final SearchSortDslContext<? super ElasticsearchSearchSortBuilder> dslContext;
 
-	public ElasticsearchSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate,
+	public ElasticsearchSearchSortContainerContextImpl(SearchSortContainerContext delegate,
 			ElasticsearchSearchSortFactory factory,
-			SearchSortDslContext<N, ? super ElasticsearchSearchSortBuilder> dslContext) {
+			SearchSortDslContext<? super ElasticsearchSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public NonEmptySortContext<N> fromJsonString(String jsonString) {
+	public NonEmptySortContext fromJsonString(String jsonString) {
 		dslContext.addChild( factory.fromJsonString( jsonString ) );
 		return nonEmptyContext();
 	}
 
-	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContextImpl<>( this, dslContext );
+	private NonEmptySortContext nonEmptyContext() {
+		return new NonEmptySortContextImpl( this, dslContext );
 	}
 }

@@ -15,6 +15,12 @@ import org.hibernate.search.engine.search.SearchProjection;
  */
 public interface SearchProjectionTerminalContext<T> {
 
+	/**
+	 * Create a {@link SearchProjection} instance
+	 * matching the definition given in the previous DSL steps.
+	 *
+	 * @return The {@link SearchProjection} instance.
+	 */
 	SearchProjection<T> toProjection();
 
 }

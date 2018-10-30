@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.SearchSort;
  * Represents the current context in the search DSL,
  * i.e. the current position in the sort tree.
  */
-public interface SearchSortDslContext<N, B> {
+public interface SearchSortDslContext<B> {
 
 	/**
 	 * Add a sort contributor at the current position in the sort tree.
@@ -29,13 +29,8 @@ public interface SearchSortDslContext<N, B> {
 	 * @param builder The builder to add.
 	 */
 	default void addChild(B builder) {
-		addChild( new StaticSearchSortContributor( builder ) );
+		addChild( new StaticSearchSortContributor<>( builder ) );
 	}
-
-	/**
-	 * @return The context that should be exposed to the user after the current predicate has been fully defined.
-	 */
-	N getNextContext();
 
 	/**
 	 * Create a {@link SearchSort} instance

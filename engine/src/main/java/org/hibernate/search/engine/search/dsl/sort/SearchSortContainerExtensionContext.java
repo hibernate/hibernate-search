@@ -12,10 +12,9 @@ import java.util.function.Consumer;
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchSortContainerContext}.
  *
- * @param <N> The type of the next context (returned by {@link #orElse(Consumer)} for example).
  * @see SearchSortContainerContext#extension()
  */
-public interface SearchSortContainerExtensionContext<N> {
+public interface SearchSortContainerExtensionContext {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -32,8 +31,8 @@ public interface SearchSortContainerExtensionContext<N> {
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchSortContainerExtensionContext<N> ifSupported(
-			SearchSortContainerContextExtension<N, T> extension, Consumer<T> sortContributor
+	<T> SearchSortContainerExtensionContext ifSupported(
+			SearchSortContainerContextExtension<T> extension, Consumer<T> sortContributor
 	);
 
 	/**
@@ -45,7 +44,7 @@ public interface SearchSortContainerExtensionContext<N> {
 	 * Should generally be a lambda expression.
 	 * @return The next context.
 	 */
-	NonEmptySortContext<N> orElse(Consumer<SearchSortContainerContext<?>> sortContributor);
+	NonEmptySortContext orElse(Consumer<SearchSortContainerContext> sortContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchSortContainerContextExtension, Consumer)}
@@ -54,6 +53,6 @@ public interface SearchSortContainerExtensionContext<N> {
 	 * @return The next context.
 	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
 	 */
-	NonEmptySortContext<N> orElseFail();
+	NonEmptySortContext orElseFail();
 
 }

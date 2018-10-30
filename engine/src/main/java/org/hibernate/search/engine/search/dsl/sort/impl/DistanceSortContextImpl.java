@@ -18,21 +18,21 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceSortContextImpl<N, B>
-		extends NonEmptySortContextImpl<N>
-		implements DistanceSortContext<N>, SearchSortContributor<B> {
+class DistanceSortContextImpl<B>
+		extends NonEmptySortContextImpl
+		implements DistanceSortContext, SearchSortContributor<B> {
 
 	private final DistanceSortBuilder<B> builder;
 
-	DistanceSortContextImpl(SearchSortContainerContext<N> containerContext,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<N, ?> dslContext,
+	DistanceSortContextImpl(SearchSortContainerContext containerContext,
+			SearchSortFactory<?, B> factory, SearchSortDslContext<?> dslContext,
 			String absoluteFieldPath, GeoPoint location) {
 		super( containerContext, dslContext );
 		this.builder = factory.distance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortContext<N> order(SortOrder order) {
+	public DistanceSortContext order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
@@ -27,10 +26,10 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
-class SpatialWithinPredicateFieldSetContextImpl<N, B>
-		implements SpatialWithinPredicateFieldSetContext<N>, MultiFieldPredicateCommonState.FieldSetContext<B> {
+class SpatialWithinPredicateFieldSetContextImpl<B>
+		implements SpatialWithinPredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
 
-	private final CommonState<N, B> commonState;
+	private final CommonState<B> commonState;
 
 	private final List<String> absoluteFieldPaths;
 
@@ -38,7 +37,7 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 
 	private Float boost;
 
-	SpatialWithinPredicateFieldSetContextImpl(CommonState<N, B> commonState, List<String> absoluteFieldPaths) {
+	SpatialWithinPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = CollectionHelper.toImmutableList( absoluteFieldPaths );
@@ -46,18 +45,18 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldSetContext<N> orFields(String... absoluteFieldPaths) {
+	public SpatialWithinPredicateFieldSetContext orFields(String... absoluteFieldPaths) {
 		return new SpatialWithinPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldSetContext<N> boostedTo(float boost) {
+	public SpatialWithinPredicateFieldSetContext boostedTo(float boost) {
 		this.boost = boost;
 		return this;
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
+	public SearchPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit) {
 		Contracts.assertNotNull( center, "center" );
 		Contracts.assertNotNull( radius, "radius" );
 		Contracts.assertNotNull( unit, "unit" );
@@ -66,14 +65,14 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> polygon(GeoPolygon polygon) {
+	public SearchPredicateTerminalContext polygon(GeoPolygon polygon) {
 		Contracts.assertNotNull( polygon, "polygon" );
 
 		return commonState.polygon( polygon );
 	}
 
 	@Override
-	public SearchPredicateTerminalContext<N> boundingBox(GeoBoundingBox boundingBox) {
+	public SearchPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox) {
 		Contracts.assertNotNull( boundingBox, "boundingBox" );
 
 		return commonState.boundingBox( boundingBox );
@@ -119,41 +118,35 @@ class SpatialWithinPredicateFieldSetContextImpl<N, B>
 		}
 	}
 
-	static class CommonState<N, B> extends MultiFieldPredicateCommonState<N, B, SpatialWithinPredicateFieldSetContextImpl<N, B>>
-			implements SearchPredicateTerminalContext<N> {
+	static class CommonState<B> extends MultiFieldPredicateCommonState<B, SpatialWithinPredicateFieldSetContextImpl<B>>
+			implements SearchPredicateTerminalContext {
 
-		CommonState(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-			super( factory, nextContextProvider );
+		CommonState(SearchPredicateFactory<?, B> factory) {
+			super( factory );
 		}
 
-		public SearchPredicateTerminalContext<N> circle(GeoPoint center, double radius, DistanceUnit unit) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
+		public SearchPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
 			}
 
 			return this;
 		}
 
-		public SearchPredicateTerminalContext<N> polygon(GeoPolygon polygon) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
+		public SearchPredicateTerminalContext polygon(GeoPolygon polygon) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinPolygonQueryBuilders( polygon );
 			}
 
 			return this;
 		}
 
-		public SearchPredicateTerminalContext<N> boundingBox(GeoBoundingBox boundingBox) {
-			for ( SpatialWithinPredicateFieldSetContextImpl<N, B> fieldSetContext : getFieldSetContexts() ) {
+		public SearchPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox) {
+			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
 			}
 
 			return this;
 		}
-
-		@Override
-		public N end() {
-			return getNextContextProvider().get();
-		}
 	}
-
 }

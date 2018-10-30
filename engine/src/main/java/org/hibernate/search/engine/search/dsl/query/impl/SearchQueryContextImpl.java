@@ -57,7 +57,7 @@ final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 	}
 
 	@Override
-	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext<SearchSort>> dslSortContributor) {
+	public SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext> dslSortContributor) {
 		searchSortCollector.collect( dslSortContributor );
 		return this;
 	}

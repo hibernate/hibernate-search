@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
@@ -15,16 +14,16 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContr
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class MatchPredicateContextImpl<N, B> implements MatchPredicateContext<N>, SearchPredicateContributor<B> {
+class MatchPredicateContextImpl<B> implements MatchPredicateContext, SearchPredicateContributor<B> {
 
-	private final MatchPredicateFieldSetContextImpl.CommonState<N, B> commonState;
+	private final MatchPredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	MatchPredicateContextImpl(SearchPredicateFactory<?, B> factory, Supplier<N> nextContextProvider) {
-		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory, nextContextProvider );
+	MatchPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 
 	@Override
-	public MatchPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths) {
+	public MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 

@@ -16,37 +16,35 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslCo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-final class SearchPredicateContainerExtensionContextImpl<N, B> implements SearchPredicateContainerExtensionContext<N> {
+final class SearchPredicateContainerExtensionContextImpl<B> implements SearchPredicateContainerExtensionContext {
 
-	private final SearchPredicateContainerContext<N> parent;
+	private final SearchPredicateContainerContext parent;
 	private final SearchPredicateFactory<?, B> factory;
-	private final SearchPredicateDslContext<N, ? super B> dslContext;
+	private final SearchPredicateDslContext<? super B> dslContext;
 
 	private final DslExtensionState state = new DslExtensionState();
 
-	SearchPredicateContainerExtensionContextImpl(SearchPredicateContainerContext<N> parent,
-			SearchPredicateFactory<?, B> factory, SearchPredicateDslContext<N, ? super B> dslContext) {
+	SearchPredicateContainerExtensionContextImpl(SearchPredicateContainerContext parent,
+			SearchPredicateFactory<?, B> factory, SearchPredicateDslContext<? super B> dslContext) {
 		this.parent = parent;
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public <T> SearchPredicateContainerExtensionContext<N> ifSupported(
-			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor) {
+	public <T> SearchPredicateContainerExtensionContext ifSupported(
+			SearchPredicateContainerContextExtension<T> extension, Consumer<T> predicateContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory, dslContext ), predicateContributor );
 		return this;
 	}
 
 	@Override
-	public N orElse(Consumer<SearchPredicateContainerContext<?>> predicateContributor) {
+	public void orElse(Consumer<SearchPredicateContainerContext> predicateContributor) {
 		state.orElse( parent, predicateContributor );
-		return dslContext.getNextContext();
 	}
 
 	@Override
-	public N orElseFail() {
+	public void orElseFail() {
 		state.orElseFail();
-		return dslContext.getNextContext();
 	}
 }

@@ -12,10 +12,9 @@ import java.util.function.Consumer;
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchPredicateContainerContext}.
  *
- * @param <N> The type of the next context (returned by {@link #orElse(Consumer)} for example).
  * @see SearchPredicateContainerContext#extension()
  */
-public interface SearchPredicateContainerExtensionContext<N> {
+public interface SearchPredicateContainerExtensionContext {
 
 	/**
 	 * If the given extension is supported, and none of the previous extensions passed to
@@ -32,8 +31,8 @@ public interface SearchPredicateContainerExtensionContext<N> {
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
-	<T> SearchPredicateContainerExtensionContext<N> ifSupported(
-			SearchPredicateContainerContextExtension<N, T> extension, Consumer<T> predicateContributor
+	<T> SearchPredicateContainerExtensionContext ifSupported(
+			SearchPredicateContainerContextExtension<T> extension, Consumer<T> predicateContributor
 	);
 
 	/**
@@ -43,17 +42,15 @@ public interface SearchPredicateContainerExtensionContext<N> {
 	 *
 	 * @param predicateContributor A consumer that will add a predicate to the (non-extended) {@link SearchPredicateContainerContext}.
 	 * Should generally be a lambda expression.
-	 * @return The next context.
 	 */
-	N orElse(Consumer<SearchPredicateContainerContext<?>> predicateContributor);
+	void orElse(Consumer<SearchPredicateContainerContext> predicateContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateContainerContextExtension, Consumer)}
 	 * was supported so far, throw an exception; otherwise do nothing.
 	 *
-	 * @return The next context.
 	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
 	 */
-	N orElseFail();
+	void orElseFail();
 
 }

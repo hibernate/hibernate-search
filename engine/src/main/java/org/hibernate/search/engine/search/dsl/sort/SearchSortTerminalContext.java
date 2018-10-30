@@ -11,17 +11,17 @@ import org.hibernate.search.engine.search.SearchSort;
 
 /**
  * The terminal context of the sort DSL.
- *
- * @param <N> The type of the next context (returned by {@link #end()}).
  */
-public interface SearchSortTerminalContext<N> {
+public interface SearchSortTerminalContext {
 
 	/**
-	 * End the current context and continue to the next one.
+	 * End the current context and get the resulting {@link SearchSort} object.
 	 *
-	 * @return The next context.
+	 * @return The {@link SearchSort} resulting from the previous DSL steps.
 	 */
-	N end();
+	default SearchSort end() {
+		return toSort();
+	}
 
 	/**
 	 * Create a {@link SearchSort} instance

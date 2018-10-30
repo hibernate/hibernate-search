@@ -40,8 +40,8 @@ class SearchQueryPredicateCollector<C, B> {
 		rootDslContext.addChild( factory.toImplementation( predicate ) );
 	}
 
-	void collect(Consumer<? super SearchPredicateContainerContext<SearchPredicate>> dslPredicateContributor) {
-		SearchPredicateContainerContext<SearchPredicate> containerContext =
+	void collect(Consumer<? super SearchPredicateContainerContext> dslPredicateContributor) {
+		SearchPredicateContainerContext containerContext =
 				new SearchPredicateContainerContextImpl<>( factory, rootDslContext );
 		dslPredicateContributor.accept( containerContext );
 	}

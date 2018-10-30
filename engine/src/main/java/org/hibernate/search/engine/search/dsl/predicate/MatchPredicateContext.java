@@ -9,10 +9,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 /**
  * The context used when starting to define a match predicate.
- *
- * @param <N> The type of the next context (returned by {@link MatchPredicateFieldSetContext#matching(Object)}).
  */
-public interface MatchPredicateContext<N> {
+public interface MatchPredicateContext {
 
 	// TODO wildcard, fuzzy. Or maybe a separate context?
 
@@ -31,7 +29,7 @@ public interface MatchPredicateContext<N> {
 	 * or simply to continue the definition of the match predicate
 	 * ({@link MatchPredicateFieldSetContext#matching(Object) value to match}, ...).
 	 */
-	default MatchPredicateFieldSetContext<N> onField(String absoluteFieldPath) {
+	default MatchPredicateFieldSetContext onField(String absoluteFieldPath) {
 		return onFields( absoluteFieldPath );
 	}
 
@@ -49,6 +47,6 @@ public interface MatchPredicateContext<N> {
 	 *
 	 * @see #onField(String)
 	 */
-	MatchPredicateFieldSetContext<N> onFields(String ... absoluteFieldPaths);
+	MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths);
 
 }

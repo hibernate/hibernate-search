@@ -13,13 +13,10 @@ import org.hibernate.search.util.SearchException;
 /**
  * A context allowing to add a sort element.
  *
- * @param <N> The type of the next context (returned by terminal calls such as {@link FieldSortContext#end()}
- * or {@link ScoreSortContext#end()}).
- *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  * @author Yoann Rodiere
  */
-public interface SearchSortContainerContext<N> {
+public interface SearchSortContainerContext {
 
 	/**
 	 * Order elements by their relevance score.
@@ -29,7 +26,7 @@ public interface SearchSortContainerContext<N> {
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 */
-	ScoreSortContext<N> byScore();
+	ScoreSortContext byScore();
 
 	/**
 	 * Order elements by their internal index order.
@@ -37,7 +34,7 @@ public interface SearchSortContainerContext<N> {
 	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 */
-	NonEmptySortContext<N> byIndexOrder();
+	NonEmptySortContext byIndexOrder();
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -49,7 +46,7 @@ public interface SearchSortContainerContext<N> {
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 * @throws SearchException If the sort field type could not be automatically determined.
 	 */
-	FieldSortContext<N> byField(String absoluteFieldPath);
+	FieldSortContext byField(String absoluteFieldPath);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -62,7 +59,7 @@ public interface SearchSortContainerContext<N> {
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortContext<N> byDistance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location);
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -76,7 +73,7 @@ public interface SearchSortContainerContext<N> {
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortContext<N> byDistance(String absoluteFieldPath, double latitude, double longitude) {
+	default DistanceSortContext byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return byDistance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
@@ -90,7 +87,7 @@ public interface SearchSortContainerContext<N> {
 	 * @return A context allowing to {@link NonEmptySortContext#then() chain other sorts}
 	 * or {@link SearchSortTerminalContext#end() end the sort definition}.
 	 */
-	NonEmptySortContext<N> by(SearchSort sort);
+	NonEmptySortContext by(SearchSort sort);
 
 	/**
 	 * Extend the current context with the given extension,
@@ -101,7 +98,7 @@ public interface SearchSortContainerContext<N> {
 	 * @return The extended context.
 	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchSortContainerContextExtension<N, T> extension);
+	<T> T extension(SearchSortContainerContextExtension<T> extension);
 
 	/**
 	 * Create a context allowing to try to apply multiple extensions one after the other,
@@ -112,6 +109,6 @@ public interface SearchSortContainerContext<N> {
 	 *
 	 * @return A context allowing to define the extensions to attempt, and the corresponding sorts.
 	 */
-	SearchSortContainerExtensionContext<N> extension();
+	SearchSortContainerExtensionContext extension();
 
 }

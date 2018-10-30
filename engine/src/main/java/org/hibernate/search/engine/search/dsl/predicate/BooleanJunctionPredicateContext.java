@@ -60,11 +60,9 @@ import org.hibernate.search.engine.search.SearchPredicate;
  * </ul>
  * <p>
  * Matching "should" clauses are taken into account in score computation.
- *
- * @param <N> The type of the next context (returned by {@link SearchPredicateTerminalContext#end()}).
  */
-public interface BooleanJunctionPredicateContext<N> extends
-		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext<N>>, SearchPredicateTerminalContext<N> {
+public interface BooleanJunctionPredicateContext extends
+		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext>, SearchPredicateTerminalContext {
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -72,7 +70,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * @param searchPredicate The predicate that must match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> must(SearchPredicate searchPredicate);
+	BooleanJunctionPredicateContext must(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -80,7 +78,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * @param searchPredicate The predicate that must not match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> mustNot(SearchPredicate searchPredicate);
+	BooleanJunctionPredicateContext mustNot(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -88,7 +86,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * @param searchPredicate The predicate that should match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> should(SearchPredicate searchPredicate);
+	BooleanJunctionPredicateContext should(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -96,7 +94,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * @param searchPredicate The predicate that must match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> filter(SearchPredicate searchPredicate);
+	BooleanJunctionPredicateContext filter(SearchPredicate searchPredicate);
 
 	/*
 	 * Alternative syntax taking advantage of lambdas,
@@ -114,7 +112,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> must(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	BooleanJunctionPredicateContext must(Consumer<? super SearchPredicateContainerContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a>,
@@ -126,7 +124,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> mustNot(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	BooleanJunctionPredicateContext mustNot(Consumer<? super SearchPredicateContainerContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a>,
@@ -138,7 +136,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> should(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	BooleanJunctionPredicateContext should(Consumer<? super SearchPredicateContainerContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a>,
@@ -150,7 +148,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> filter(Consumer<? super SearchPredicateContainerContext<?>> clauseContributor);
+	BooleanJunctionPredicateContext filter(Consumer<? super SearchPredicateContainerContext> clauseContributor);
 
 	/*
 	 * Options
@@ -165,7 +163,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanJunctionPredicateContext<N> minimumShouldMatchNumber(int matchingClausesNumber) {
+	default BooleanJunctionPredicateContext minimumShouldMatchNumber(int matchingClausesNumber) {
 		return minimumShouldMatch()
 				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
 				.end();
@@ -180,7 +178,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanJunctionPredicateContext<N> minimumShouldMatchPercent(int matchingClausesPercent) {
+	default BooleanJunctionPredicateContext minimumShouldMatchPercent(int matchingClausesPercent) {
 		return minimumShouldMatch()
 				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
 				.end();
@@ -194,7 +192,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 *
 	 * @return A {@link MinimumShouldMatchContext} allowing to define constraints.
 	 */
-	MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext<N>> minimumShouldMatch();
+	MinimumShouldMatchContext<? extends BooleanJunctionPredicateContext> minimumShouldMatch();
 
 	/**
 	 * Start defining the minimum number of "should" constraints that have to match
@@ -206,7 +204,7 @@ public interface BooleanJunctionPredicateContext<N> extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext<N> minimumShouldMatch(
+	BooleanJunctionPredicateContext minimumShouldMatch(
 			Consumer<? super MinimumShouldMatchContext<?>> constraintContributor);
 
 }

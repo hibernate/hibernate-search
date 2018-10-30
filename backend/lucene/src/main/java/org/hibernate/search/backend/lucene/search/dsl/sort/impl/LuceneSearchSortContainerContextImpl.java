@@ -18,35 +18,35 @@ import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
-public class LuceneSearchSortContainerContextImpl<N>
-		extends DelegatingSearchSortContainerContextImpl<N>
-		implements LuceneSearchSortContainerContext<N> {
+public class LuceneSearchSortContainerContextImpl
+		extends DelegatingSearchSortContainerContextImpl
+		implements LuceneSearchSortContainerContext {
 
 	private final LuceneSearchSortFactory factory;
 
-	private final SearchSortDslContext<N, ? super LuceneSearchSortBuilder> dslContext;
+	private final SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext;
 
-	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext<N> delegate,
+	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext delegate,
 			LuceneSearchSortFactory factory,
-			SearchSortDslContext<N, ? super LuceneSearchSortBuilder> dslContext) {
+			SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}
 
 	@Override
-	public NonEmptySortContext<N> fromLuceneSortField(SortField luceneSortField) {
+	public NonEmptySortContext fromLuceneSortField(SortField luceneSortField) {
 		dslContext.addChild( factory.fromLuceneSortField( luceneSortField ) );
 		return nonEmptyContext();
 	}
 
 	@Override
-	public NonEmptySortContext<N> fromLuceneSort(Sort luceneSort) {
+	public NonEmptySortContext fromLuceneSort(Sort luceneSort) {
 		dslContext.addChild( factory.fromLuceneSort( luceneSort ) );
 		return nonEmptyContext();
 	}
 
-	private NonEmptySortContext<N> nonEmptyContext() {
-		return new NonEmptySortContextImpl<>( this, dslContext );
+	private NonEmptySortContext nonEmptyContext() {
+		return new NonEmptySortContextImpl( this, dslContext );
 	}
 }
