@@ -67,7 +67,8 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 		StandardFieldProjectionBuilderFactory<?> other = (StandardFieldProjectionBuilderFactory<?>) obj;
 
-		return codec.isCompatibleWith( other.codec ) &&
+		return projectable == other.projectable &&
+				codec.isCompatibleWith( other.codec ) &&
 				converter.isDslCompatibleWith( other.converter );
 	}
 

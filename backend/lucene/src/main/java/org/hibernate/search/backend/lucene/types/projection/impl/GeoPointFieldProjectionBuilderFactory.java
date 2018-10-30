@@ -68,7 +68,8 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 		GeoPointFieldProjectionBuilderFactory<?> other = (GeoPointFieldProjectionBuilderFactory<?>) obj;
 
-		return codec.isCompatibleWith( other.codec ) &&
+		return projectable == other.projectable &&
+				codec.isCompatibleWith( other.codec ) &&
 				converter.isDslCompatibleWith( other.converter );
 	}
 

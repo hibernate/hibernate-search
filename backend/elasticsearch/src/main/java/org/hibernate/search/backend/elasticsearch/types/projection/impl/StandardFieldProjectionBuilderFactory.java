@@ -62,7 +62,8 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 
 		StandardFieldProjectionBuilderFactory other = (StandardFieldProjectionBuilderFactory) obj;
 
-		return converter.isDslCompatibleWith( other.converter );
+		return projectable == other.projectable &&
+				converter.isDslCompatibleWith( other.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {
