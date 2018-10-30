@@ -51,8 +51,8 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, IntegerFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( sortable, converter ),
-				new StandardFieldProjectionBuilderFactory( projectable, converter )
+				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -52,8 +52,8 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, GeoPointFieldCodec.INSTANCE,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				new GeoPointFieldSortBuilderFactory( sortable ),
-				new GeoPointFieldProjectionBuilderFactory( projectable, converter )
+				new GeoPointFieldSortBuilderFactory( resolvedSortable ),
+				new GeoPointFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
 import java.util.Locale;
-import java.util.Objects;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LongPoint;
@@ -24,8 +23,6 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
@@ -38,11 +35,11 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final Projectable projectable;
+	private final boolean projectable;
 
-	private final Sortable sortable;
+	private final boolean sortable;
 
-	public LocalDateFieldCodec(Projectable projectable, Sortable sortable) {
+	public LocalDateFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
@@ -53,24 +50,14 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 			return;
 		}
 
-		switch ( projectable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
-				break;
+		if ( projectable ) {
+			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 		}
 
 		long valueToEpochDay = value.toEpochDay();
 
-		switch ( sortable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
-				break;
+		if ( sortable ) {
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
 		}
 
 		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );
@@ -104,6 +91,6 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
 		LocalDateFieldCodec other = (LocalDateFieldCodec) obj;
 
-		return Objects.equals( projectable, other.projectable ) && Objects.equals( sortable, other.sortable );
+		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 }

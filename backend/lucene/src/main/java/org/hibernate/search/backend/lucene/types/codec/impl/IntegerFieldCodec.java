@@ -6,24 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Objects;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 
 public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
-	private final Projectable projectable;
+	private final boolean projectable;
 
-	private final Sortable sortable;
+	private final boolean sortable;
 
-	public IntegerFieldCodec(Projectable projectable, Sortable sortable) {
+	public IntegerFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
@@ -34,22 +30,12 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 			return;
 		}
 
-		switch ( projectable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
-				break;
+		if ( projectable ) {
+			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
 		}
 
-		switch ( sortable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
-				break;
+		if ( sortable ) {
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
 		}
 
 		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );
@@ -77,6 +63,7 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
 		IntegerFieldCodec other = (IntegerFieldCodec) obj;
 
-		return Objects.equals( projectable, other.projectable ) && Objects.equals( sortable, other.sortable );
+		return ( projectable == other.projectable ) &&
+				( sortable == other.sortable );
 	}
 }

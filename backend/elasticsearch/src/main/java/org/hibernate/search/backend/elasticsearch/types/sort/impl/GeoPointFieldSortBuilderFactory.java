@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.DistanceSortBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -22,9 +21,9 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Sortable sortable;
+	private final boolean sortable;
 
-	public GeoPointFieldSortBuilderFactory(Sortable sortable) {
+	public GeoPointFieldSortBuilderFactory(boolean sortable) {
 		this.sortable = sortable;
 	}
 
@@ -54,14 +53,10 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 		return other.sortable == this.sortable;
 	}
 
-	private static void checkSortable(String absoluteFieldPath, Sortable sortable) {
-		switch ( sortable ) {
-			case YES:
-				break;
-			case DEFAULT:
-			case NO:
-				throw log.unsortableField( absoluteFieldPath,
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	private static void checkSortable(String absoluteFieldPath, boolean sortable) {
+		if ( !sortable ) {
+			throw log.unsortableField( absoluteFieldPath,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 }

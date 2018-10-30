@@ -42,8 +42,11 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		boolean resolvedSortable = resolveDefault( sortable );
+		boolean resolvedProjectable = resolveDefault( projectable );
+
 		LocalDateFieldConverter converter = new LocalDateFieldConverter( helper.createUserIndexFieldConverter() );
-		LocalDateFieldCodec codec = new LocalDateFieldCodec( projectable, sortable );
+		LocalDateFieldCodec codec = new LocalDateFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -51,8 +54,8 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new LocalDateFieldPredicateBuilderFactory( converter ),
-				new LocalDateFieldSortBuilderFactory( sortable, converter ),
-				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
+				new LocalDateFieldSortBuilderFactory( resolvedSortable, converter ),
+				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

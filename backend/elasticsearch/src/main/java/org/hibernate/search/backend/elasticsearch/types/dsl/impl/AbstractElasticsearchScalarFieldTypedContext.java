@@ -22,8 +22,12 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<S, F> {
 
 	private final DataType dataType;
-	protected Projectable projectable = Projectable.DEFAULT;
-	protected Sortable sortable = Sortable.DEFAULT;
+
+	private Sortable sortable = Sortable.DEFAULT;
+	protected boolean resolvedSortable;
+
+	private Projectable projectable = Projectable.DEFAULT;
+	protected boolean resolvedProjectable;
 
 	AbstractElasticsearchScalarFieldTypedContext(IndexSchemaContext schemaContext,
 			Class<F> fieldType, DataType dataType) {
@@ -52,27 +56,11 @@ abstract class AbstractElasticsearchScalarFieldTypedContext<S extends AbstractEl
 
 		mapping.setType( dataType );
 
-		switch ( projectable ) {
-			case DEFAULT:
-				break;
-			case NO:
-				mapping.setStore( false );
-				break;
-			case YES:
-				mapping.setStore( true );
-				break;
-		}
+		resolvedSortable = resolveDefault( sortable );
+		resolvedProjectable = resolveDefault( projectable );
 
-		switch ( sortable ) {
-			case DEFAULT:
-				break;
-			case NO:
-				mapping.setDocValues( false );
-				break;
-			case YES:
-				mapping.setDocValues( true );
-				break;
-		}
+		mapping.setStore( resolvedProjectable );
+		mapping.setDocValues( resolvedSortable );
 
 		return mapping;
 	}

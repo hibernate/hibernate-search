@@ -21,8 +21,8 @@ import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -81,19 +81,9 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = new PropertyMapping();
 
-		StandardFieldConverter<String> converter = new StandardFieldConverter<>(
-				helper.createUserIndexFieldConverter(),
-				StringFieldCodec.INSTANCE
-		);
-		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, StringFieldCodec.INSTANCE,
-				new StandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( sortable, converter ),
-				new StandardFieldProjectionBuilderFactory( projectable, converter )
-		);
+		boolean resolvedSortable = resolveDefault( sortable );
+		boolean resolvedProjectable = resolveDefault( projectable );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 		// TODO Use sub-fields? (but in that case, adjust projections accordingly)
 		if ( analyzerName != null ) {
 			mapping.setType( DataType.TEXT );
@@ -103,40 +93,31 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
 			}
 
-			switch ( sortable ) {
-				case DEFAULT:
-				case NO:
-					break;
-				case YES:
-					throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
+			if ( resolvedSortable ) {
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
 			}
 		}
 		else {
 			mapping.setType( DataType.KEYWORD );
 			mapping.setNormalizer( normalizerName );
-
-			switch ( sortable ) {
-				case DEFAULT:
-					break;
-				case NO:
-					mapping.setDocValues( false );
-					break;
-				case YES:
-					mapping.setDocValues( true );
-					break;
-			}
+			mapping.setDocValues( resolvedSortable );
 		}
 
-		switch ( projectable ) {
-			case DEFAULT:
-				break;
-			case NO:
-				mapping.setStore( false );
-				break;
-			case YES:
-				mapping.setStore( true );
-				break;
-		}
+		mapping.setStore( resolvedProjectable );
+
+		StandardFieldConverter<String> converter = new StandardFieldConverter<>(
+				helper.createUserIndexFieldConverter(),
+				StringFieldCodec.INSTANCE
+		);
+		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, converter, StringFieldCodec.INSTANCE,
+				new StandardFieldPredicateBuilderFactory( converter ),
+				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
+		);
+
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
+		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
 		collector.collect( absoluteFieldPath, node );

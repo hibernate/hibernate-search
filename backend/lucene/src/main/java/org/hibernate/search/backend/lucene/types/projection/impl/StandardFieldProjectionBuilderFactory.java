@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
@@ -23,13 +22,13 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Projectable projectable;
+	private final boolean projectable;
 
 	private final LuceneFieldCodec<T> codec;
 
 	private final LuceneFieldConverter<T, ?> converter;
 
-	public StandardFieldProjectionBuilderFactory(Projectable projectable, LuceneFieldCodec<T> codec,
+	public StandardFieldProjectionBuilderFactory(boolean projectable, LuceneFieldCodec<T> codec,
 			LuceneFieldConverter<T, ?> converter) {
 		this.projectable = projectable;
 		this.codec = codec;
@@ -72,14 +71,10 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 				converter.isDslCompatibleWith( other.converter );
 	}
 
-	private static void checkProjectable(String absoluteFieldPath, Projectable projectable) {
-		switch ( projectable ) {
-			case YES:
-				break;
-			case DEFAULT:
-			case NO:
-				throw log.nonProjectableField( absoluteFieldPath,
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {
+		if ( !projectable ) {
+			throw log.nonProjectableField( absoluteFieldPath,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 }

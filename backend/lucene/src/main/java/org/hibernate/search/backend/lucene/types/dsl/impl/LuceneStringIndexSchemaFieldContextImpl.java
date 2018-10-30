@@ -25,7 +25,6 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.StringFieldPredi
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -79,13 +78,12 @@ public class LuceneStringIndexSchemaFieldContextImpl
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		boolean resolvedSortable = resolveDefault( sortable );
+		boolean resolvedProjectable = resolveDefault( projectable );
+
 		if ( analyzer != null ) {
-			switch ( sortable ) {
-				case DEFAULT:
-				case NO:
-					break;
-				case YES:
-					throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
+			if ( resolvedSortable ) {
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
 			}
 
 			if ( normalizer != null ) {
@@ -102,8 +100,8 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				analyzerOrNormalizer
 		);
 		StringFieldCodec codec = new StringFieldCodec(
-				sortable,
-				getFieldType( projectable, analyzer != null ),
+				resolvedSortable,
+				getFieldType( resolvedProjectable, analyzer != null ),
 				analyzerOrNormalizer
 		);
 
@@ -113,8 +111,8 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new StringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
-				new StringFieldSortBuilderFactory( sortable, converter ),
-				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
+				new StringFieldSortBuilderFactory( resolvedSortable, converter ),
+				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
@@ -135,7 +133,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 		return getSchemaContext().getRoot().getAnalysisDefinitionRegistry();
 	}
 
-	private static FieldType getFieldType(Projectable projectable, boolean analyzed) {
+	private static FieldType getFieldType(boolean projectable, boolean analyzed) {
 		FieldType fieldType = new FieldType();
 		if ( analyzed ) {
 			// TODO GSM: take into account the norms and term vectors options
@@ -156,15 +154,8 @@ public class LuceneStringIndexSchemaFieldContextImpl
 			 */
 			fieldType.setTokenized( true );
 		}
-		switch ( projectable ) {
-			case DEFAULT:
-			case NO:
-				fieldType.setStored( false );
-				break;
-			case YES:
-				fieldType.setStored( true );
-				break;
-		}
+
+		fieldType.setStored( projectable );
 		fieldType.freeze();
 
 		return fieldType;

@@ -10,12 +10,11 @@ import java.time.LocalDate;
 
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class LocalDateFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<LocalDate> {
 
-	public LocalDateFieldSortBuilderFactory(Sortable sortable, LuceneFieldConverter<LocalDate, ?> converter) {
+	public LocalDateFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<LocalDate, ?> converter) {
 		super( sortable, converter );
 	}
 

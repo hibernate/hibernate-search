@@ -40,8 +40,11 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		boolean resolvedSortable = resolveDefault( sortable );
+		boolean resolvedProjectable = resolveDefault( projectable );
+
 		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
-		IntegerFieldCodec codec = new IntegerFieldCodec( projectable, sortable );
+		IntegerFieldCodec codec = new IntegerFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -49,8 +52,8 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new IntegerFieldPredicateBuilderFactory( converter ),
-				new IntegerFieldSortBuilderFactory( sortable, converter ),
-				new StandardFieldProjectionBuilderFactory<>( projectable, codec, converter )
+				new IntegerFieldSortBuilderFactory( resolvedSortable, converter ),
+				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

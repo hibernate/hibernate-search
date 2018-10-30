@@ -14,19 +14,18 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.util.BytesRef;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public final class StringFieldCodec implements LuceneFieldCodec<String> {
 
-	private final Sortable sortable;
+	private final boolean sortable;
 
 	private final FieldType fieldType;
 
 	private final Analyzer normalizer;
 
-	public StringFieldCodec(Sortable sortable, FieldType fieldType, Analyzer normalizer) {
+	public StringFieldCodec(boolean sortable, FieldType fieldType, Analyzer normalizer) {
 		this.sortable = sortable;
 		this.fieldType = fieldType;
 		this.normalizer = normalizer;
@@ -40,18 +39,13 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 
 		documentBuilder.addField( new Field( absoluteFieldPath, value, fieldType ) );
 
-		switch ( sortable ) {
-			case DEFAULT:
-			case NO:
-				break;
-			case YES:
-				documentBuilder.addField( new SortedDocValuesField(
-						absoluteFieldPath,
-						new BytesRef(
-								normalizer != null ? AnalyzerUtils.normalize( normalizer, absoluteFieldPath, value ) :
-										value )
-				) );
-				break;
+		if ( sortable ) {
+			documentBuilder.addField( new SortedDocValuesField(
+					absoluteFieldPath,
+					new BytesRef(
+							normalizer != null ? AnalyzerUtils.normalize( normalizer, absoluteFieldPath, value ) :
+									value )
+			) );
 		}
 	}
 
@@ -71,7 +65,7 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 
 		StringFieldCodec other = (StringFieldCodec) obj;
 
-		return Objects.equals( sortable, other.sortable ) &&
+		return ( sortable == other.sortable ) &&
 				Objects.equals( fieldType, other.fieldType ) &&
 				Objects.equals( normalizer, other.normalizer );
 	}

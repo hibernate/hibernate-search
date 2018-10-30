@@ -41,10 +41,13 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 	@Override
 	protected void contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
+		boolean resolvedSortable = resolveDefault( sortable );
+		boolean resolvedProjectable = resolveDefault( projectable );
+
 		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
 				helper.createUserIndexFieldConverter() );
 		GeoPointFieldCodec codec = new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
-				projectable, sortable );
+				resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -52,8 +55,8 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				GeoPointFieldPredicateBuilderFactory.INSTANCE,
-				new GeoPointFieldSortBuilderFactory( sortable ),
-				new GeoPointFieldProjectionBuilderFactory<>( projectable, codec, converter )
+				new GeoPointFieldSortBuilderFactory( resolvedSortable ),
+				new GeoPointFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -14,8 +14,11 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
+import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
+import org.hibernate.search.util.AssertionFailure;
 
 /**
  * @author Yoann Rodiere
@@ -65,4 +68,27 @@ public abstract class AbstractElasticsearchStandardIndexSchemaFieldTypedContext<
 		return helper.getSchemaContext();
 	}
 
+	protected static boolean resolveDefault(Projectable projectable) {
+		switch ( projectable ) {
+			case DEFAULT:
+			case NO:
+				return false;
+			case YES:
+				return true;
+			default:
+				throw new AssertionFailure( "Unexpected value for Projectable: " + projectable );
+		}
+	}
+
+	protected static boolean resolveDefault(Sortable sortable) {
+		switch ( sortable ) {
+			case DEFAULT:
+			case NO:
+				return false;
+			case YES:
+				return true;
+			default:
+				throw new AssertionFailure( "Unexpected value for Sortable: " + sortable );
+		}
+	}
 }

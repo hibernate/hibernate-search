@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -21,11 +20,11 @@ abstract class AbstractStandardLuceneFieldSortBuilderFactory<F> implements Lucen
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Sortable sortable;
+	private final boolean sortable;
 
 	protected final LuceneFieldConverter<F, ?> converter;
 
-	protected AbstractStandardLuceneFieldSortBuilderFactory(Sortable sortable, LuceneFieldConverter<F, ?> converter) {
+	protected AbstractStandardLuceneFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<F, ?> converter) {
 		this.sortable = sortable;
 		this.converter = converter;
 	}
@@ -53,13 +52,9 @@ abstract class AbstractStandardLuceneFieldSortBuilderFactory<F> implements Lucen
 	}
 
 	protected void checkSortable(String absoluteFieldPath) {
-		switch ( sortable ) {
-			case YES:
-				break;
-			case DEFAULT:
-			case NO:
-				throw log.unsortableField( absoluteFieldPath,
-						EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		if ( !sortable ) {
+			throw log.unsortableField( absoluteFieldPath,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 	}
 }
