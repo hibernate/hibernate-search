@@ -131,7 +131,7 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = searchTarget.predicate()
-				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).end();
+				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -165,7 +165,7 @@ public class SearchSortIT {
 
 		SearchSort sortAsc = searchTarget.sort()
 				.byField( "string" ).asc().onMissingValue().sortLast()
-				.end();
+				.toSort();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -185,7 +185,7 @@ public class SearchSortIT {
 
 		SearchSort sortDesc = searchTarget.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
-				.end();
+				.toSort();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -283,12 +283,12 @@ public class SearchSortIT {
 
 		// Mandatory extension
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast().end()
+				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast().toSort()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast().end()
+				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast().toSort()
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -298,7 +298,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -312,7 +312,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -332,7 +332,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
@@ -346,7 +346,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
@@ -365,7 +365,7 @@ public class SearchSortIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
 						)
 		);
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -381,7 +381,7 @@ public class SearchSortIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().end()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
 						)
 		);
 
@@ -394,7 +394,7 @@ public class SearchSortIT {
 							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
-			b.byField( "string" ).onMissingValue().sortLast().end();
+			b.byField( "string" ).onMissingValue().sortLast().toSort();
 		} );
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -404,7 +404,7 @@ public class SearchSortIT {
 							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
-			b.byField( "string" ).desc().onMissingValue().sortLast().end();
+			b.byField( "string" ).desc().onMissingValue().sortLast().toSort();
 		} );
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );

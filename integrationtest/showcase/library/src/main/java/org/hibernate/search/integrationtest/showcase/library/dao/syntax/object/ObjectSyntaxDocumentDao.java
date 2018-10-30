@@ -44,7 +44,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 				.asEntities()
 				.predicate(
 						// TODO allow to bypass the bridge in the DSL
-						target.predicate().match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).end()
+						target.predicate().match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).toPredicate()
 				)
 				.build();
 
@@ -62,20 +62,20 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
-					.end()
+					.toPredicate()
 			);
 		}
 
 		booleanBuilder.must(
 				target.predicate().nested().onObjectField( "copies" )
-						.nest( target.predicate().match().onField( "copies.medium" ).matching( medium ).end() )
-						.end()
+						.nest( target.predicate().match().onField( "copies.medium" ).matching( medium ).toPredicate() )
+						.toPredicate()
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
-				.predicate( booleanBuilder.end() )
-				.sort( target.sort().byField( "title_sort" ).end() )
+				.predicate( booleanBuilder.toPredicate() )
+				.sort( target.sort().byField( "title_sort" ).toSort() )
 				.build();
 
 		query.setFirstResult( offset );
@@ -99,7 +99,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
-					.end()
+					.toPredicate()
 			);
 		}
 
@@ -111,7 +111,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						target.predicate().match()
 						.onField( "tags" )
 						.matching( tag )
-						.end()
+						.toPredicate()
 				);
 			}
 		}
@@ -125,9 +125,9 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 									.within()
 									.onField( "copies.library.location" )
 									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
-									.end()
+									.toPredicate()
 							)
-							.end()
+							.toPredicate()
 			);
 		}
 
@@ -139,21 +139,21 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						target.predicate().match()
 						.onField( "copies.library.services" )
 						.matching( service )
-						.end()
+						.toPredicate()
 				);
 			}
 			booleanBuilder.must(
 					target.predicate().nested().onObjectField( "copies" )
-							.nest( nestedBoolean.end() )
-							.end()
+							.nest( nestedBoolean.toPredicate() )
+							.toPredicate()
 			);
 		}
 
 		FullTextQuery<Document<?>> query = target.query()
 				.asEntities()
-				.predicate( booleanBuilder.end() )
+				.predicate( booleanBuilder.toPredicate() )
 				// TODO facets (tag, medium, library in particular)
-				.sort( target.sort().byScore().end() )
+				.sort( target.sort().byScore().toSort() )
 				.build();
 
 		query.setFirstResult( offset );

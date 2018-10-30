@@ -15,15 +15,6 @@ import org.hibernate.search.engine.search.SearchPredicate;
 public interface SearchPredicateTerminalContext {
 
 	/**
-	 * End the current context and get the resulting {@link SearchPredicate} object.
-	 *
-	 * @return The {@link SearchPredicate} resulting from the previous DSL steps.
-	 */
-	default SearchPredicate end() {
-		return toPredicate();
-	}
-
-	/**
 	 * Create a {@link SearchPredicate} instance
 	 * matching the definition given in the previous DSL steps.
 	 *

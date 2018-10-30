@@ -248,7 +248,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		SubTest.expectException(
 				"spatial().within().boundingBox() predicate on unknown field",
 				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
-						.boundingBox( BOUNDING_BOX_1 ).end()
+						.boundingBox( BOUNDING_BOX_1 ).toPredicate()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

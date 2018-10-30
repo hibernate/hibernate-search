@@ -81,7 +81,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext above(Object value, RangeBoundInclusion inclusion);
 
@@ -94,7 +94,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @param value The lower bound of the range (included)
 	 * (see {@link #above(Object, RangeBoundInclusion)} for details about null-ness and type).
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 *
 	 * @see #above(Object, RangeBoundInclusion)
 	 */
@@ -111,7 +111,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext below(Object value, RangeBoundInclusion inclusion);
 
@@ -124,7 +124,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @param value The upper bound of the range (included)
 	 * (see {@link #below(Object, RangeBoundInclusion)} for details about null-ness and type).
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 *
 	 * @see #below(Object, RangeBoundInclusion)
 	 */

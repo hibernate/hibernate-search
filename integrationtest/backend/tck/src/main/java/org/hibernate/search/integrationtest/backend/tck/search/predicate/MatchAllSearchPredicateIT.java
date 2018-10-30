@@ -83,7 +83,7 @@ public class MatchAllSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).end();
+		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( root -> root.matchAll().except( searchPredicate ) )
@@ -107,8 +107,8 @@ public class MatchAllSearchPredicateIT {
 		DocumentReferencesSearchResultAssert.assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).end();
-		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).end();
+		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).toPredicate();
+		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()

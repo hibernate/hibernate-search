@@ -17,7 +17,7 @@ public interface SpatialPredicateContext {
 	 * a circle (maximum distance matching), a polygon, a bounding box, ...
 	 *
 	 * @return A context allowing to define the predicate more precisely
-	 * and ultimately {@link SearchPredicateTerminalContext#end() end the predicate definition}.
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
 	 */
 	SpatialWithinPredicateContext within();
 

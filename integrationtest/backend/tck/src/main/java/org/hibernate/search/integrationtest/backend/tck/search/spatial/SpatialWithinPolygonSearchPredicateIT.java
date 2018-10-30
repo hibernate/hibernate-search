@@ -212,7 +212,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		SubTest.expectException(
 				"spatial().within().polygon() predicate on unknown field",
 				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
-						.polygon( POLYGON_1 ).end()
+						.polygon( POLYGON_1 ).toPredicate()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

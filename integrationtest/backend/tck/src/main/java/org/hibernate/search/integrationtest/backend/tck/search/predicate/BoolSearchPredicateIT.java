@@ -139,7 +139,7 @@ public class BoolSearchPredicateIT {
 	public void must_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).end();
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -198,8 +198,8 @@ public class BoolSearchPredicateIT {
 	public void should_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate1 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).end();
-		SearchPredicate predicate2 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE3 ).end();
+		SearchPredicate predicate1 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
+		SearchPredicate predicate2 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -258,7 +258,7 @@ public class BoolSearchPredicateIT {
 	public void mustNot_predicate() {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE2 ).end();
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()

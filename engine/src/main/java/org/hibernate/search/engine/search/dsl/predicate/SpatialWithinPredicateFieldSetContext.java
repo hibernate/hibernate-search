@@ -52,7 +52,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * @param center The center of the bounding circle.
 	 * @param radius The radius of the bounding circle, in the unit defined by parameter {@code unit}.
 	 * @param unit The unit used for the radius.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit);
 
@@ -62,7 +62,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 *
 	 * @param center The center of the bounding circle.
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	default SearchPredicateTerminalContext circle(GeoPoint center, double radiusInMeters) {
 		return circle( center, radiusInMeters, DistanceUnit.METERS );
@@ -76,7 +76,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * @param longitude The longitude of the center of the bounding circle.
 	 * @param radius The radius of the bounding circle, in the unit defined by parameter {@code unit}.
 	 * @param unit The unit used for the radius.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	default SearchPredicateTerminalContext circle(double latitude, double longitude, double radius, DistanceUnit unit) {
 		return circle( GeoPoint.of( latitude, longitude ), radius, unit );
@@ -89,7 +89,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * @param latitude The latitude of the center of the bounding circle.
 	 * @param longitude The longitude of the center of the bounding circle.
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	default SearchPredicateTerminalContext circle(double latitude, double longitude, double radiusInMeters) {
 		return circle( GeoPoint.of( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
@@ -99,7 +99,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * Require at least one of the targeted fields to point to a location within the given polygon.
 	 *
 	 * @param polygon The bounding polygon.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext polygon(GeoPolygon polygon);
 
@@ -107,7 +107,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * Require at least one of the targeted fields to point to a location within the given box (~rectangle).
 	 *
 	 * @param boundingBox The bounding box.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox);
 
@@ -118,7 +118,7 @@ public interface SpatialWithinPredicateFieldSetContext
 	 * @param topLeftLongitude The longitude of the top-left corner of the box.
 	 * @param bottomRightLatitude The latitude of the bottom-right corner of the box.
 	 * @param bottomRightLongitude The longitude of the bottom-right corner of the box.
-	 * @return A context allowing to end the predicate definition.
+	 * @return A context allowing to get the resulting predicate.
 	 */
 	default SearchPredicateTerminalContext boundingBox(double topLeftLatitude, double topLeftLongitude, double bottomRightLatitude,
 			double bottomRightLongitude) {

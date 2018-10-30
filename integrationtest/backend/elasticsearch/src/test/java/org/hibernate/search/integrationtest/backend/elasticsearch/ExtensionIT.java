@@ -116,9 +116,9 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		SearchPredicate predicate1 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'string': 'text 1'}}" ).end();
+				.fromJsonString( "{'match': {'string': 'text 1'}}" ).toPredicate();
 		SearchPredicate predicate2 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
-				.fromJsonString( "{'match': {'integer': 2}}" ).end();
+				.fromJsonString( "{'match': {'integer': 2}}" ).toPredicate();
 		SearchPredicate predicate3 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString(
 						"{"
@@ -131,16 +131,16 @@ public class ExtensionIT {
 							+ "}"
 						+ "}"
 				)
-				.end();
+				.toPredicate();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
-				.matching( "'2018:12'" ).end();
+				.matching( "'2018:12'" ).toPredicate();
 		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
 			b.should( predicate1 );
 			b.should( predicate2 );
 			b.should( predicate3 );
 			b.should( predicate4 );
-		} ).end();
+		} ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -201,18 +201,18 @@ public class ExtensionIT {
 
 		SearchSort sort1Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'asc'}" )
-				.end();
+				.toSort();
 		SearchSort sort2Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'asc'}" )
-				.end();
+				.toSort();
 		SearchSort sort3Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'asc'}" )
-				.end();
+				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = searchTarget.sort()
 				.byField( "sort4" ).asc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
-				.end();
+				.toSort();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -224,17 +224,17 @@ public class ExtensionIT {
 
 		SearchSort sort1Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'desc'}" )
-				.end();
+				.toSort();
 		SearchSort sort2Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'desc'}" )
-				.end();
+				.toSort();
 		SearchSort sort3Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'desc'}" )
-				.end();
+				.toSort();
 		SearchSort sort4Desc = searchTarget.sort()
 				.byField( "sort4" ).desc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
-				.end();
+				.toSort();
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()

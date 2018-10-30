@@ -32,13 +32,13 @@ class ObjectSyntaxLibraryDao extends LibraryDao {
 		FullTextQuery<Library> query = target.query()
 				.asEntities()
 				.predicate(
-						target.predicate().match().onField( "name" ).matching( terms ).end()
+						target.predicate().match().onField( "name" ).matching( terms ).toPredicate()
 				)
 				.sort(
 						target.sort()
 						.byField( "collectionSize" ).desc()
 						.then().byField( "name_sort" )
-						.end()
+						.toSort()
 				)
 				.build();
 
