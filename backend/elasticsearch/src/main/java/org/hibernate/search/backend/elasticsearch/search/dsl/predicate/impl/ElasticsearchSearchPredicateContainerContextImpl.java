@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 
@@ -31,8 +32,10 @@ public class ElasticsearchSearchPredicateContainerContextImpl<N>
 	}
 
 	@Override
-	public N fromJsonString(String jsonString) {
-		dslContext.addChild( factory.fromJsonString( jsonString ) );
-		return dslContext.getNextContext();
+	public SearchPredicateTerminalContext<N> fromJsonString(String jsonString) {
+		JsonStringPredicateContextImpl<N> child =
+				new JsonStringPredicateContextImpl<>( factory, dslContext::getNextContext, jsonString );
+		dslContext.addChild( child );
+		return child;
 	}
 }

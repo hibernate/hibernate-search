@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 
@@ -33,8 +34,10 @@ public class LuceneSearchPredicateContainerContextImpl<N>
 	}
 
 	@Override
-	public N fromLuceneQuery(Query luceneQuery) {
-		dslContext.addChild( factory.fromLuceneQuery( luceneQuery ) );
-		return dslContext.getNextContext();
+	public SearchPredicateTerminalContext<N> fromLuceneQuery(Query luceneQuery) {
+		LuceneQueryPredicateContextImpl<N> child =
+				new LuceneQueryPredicateContextImpl<>( factory, dslContext::getNextContext, luceneQuery );
+		dslContext.addChild( child );
+		return child;
 	}
 }

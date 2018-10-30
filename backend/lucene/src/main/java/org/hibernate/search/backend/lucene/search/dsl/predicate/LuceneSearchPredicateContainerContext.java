@@ -10,6 +10,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * A DSL context allowing to specify the type of a predicate, with some Lucene-specific methods.
@@ -19,5 +20,5 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainer
  */
 public interface LuceneSearchPredicateContainerContext<N> extends SearchPredicateContainerContext<N> {
 
-	N fromLuceneQuery(Query query);
+	SearchPredicateTerminalContext<N> fromLuceneQuery(Query query);
 }
