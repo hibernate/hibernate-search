@@ -27,3 +27,11 @@ include::{sourcedir}/org/hibernate/search/gettingstarted/model/after/Author.java
 ----
 ====
 
+.GeoPolygon
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/gettingstarted/example/GeoPolygonTest.java[tags=geopolygon-spatial-hsearch-gettingstarted]
+----
+====
+
