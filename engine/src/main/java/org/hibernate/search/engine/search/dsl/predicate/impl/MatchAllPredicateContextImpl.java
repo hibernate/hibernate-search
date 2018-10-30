@@ -8,28 +8,29 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class MatchAllPredicateContextImpl<B>
-		extends AbstractObjectCreatingSearchPredicateContributor<B>
-		implements MatchAllPredicateContext, SearchPredicateContributor<B> {
+		extends AbstractSearchPredicateTerminalContext<B>
+		implements MatchAllPredicateContext {
+
+	private final SearchPredicateContainerContext containerContext;
 
 	private final MatchAllPredicateBuilder<B> matchAllBuilder;
 	private MatchAllExceptContext exceptContext;
 
-	MatchAllPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	MatchAllPredicateContextImpl(SearchPredicateFactory<?, B> factory, SearchPredicateContainerContext containerContext) {
 		super( factory );
+		this.containerContext = containerContext;
 		this.matchAllBuilder = factory.matchAll();
 	}
 
@@ -41,20 +42,21 @@ class MatchAllPredicateContextImpl<B>
 
 	@Override
 	public MatchAllPredicateContext except(SearchPredicate searchPredicate) {
-		getExceptContext().containerContext.predicate( searchPredicate );
+		getExceptContext().addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public MatchAllPredicateContext except(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
-		clauseContributor.accept( getExceptContext().containerContext );
+	public MatchAllPredicateContext except(
+			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+		getExceptContext().addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
-	protected B doContribute() {
+	protected B toImplementation() {
 		if ( exceptContext != null ) {
-			return exceptContext.contribute();
+			return exceptContext.toImplementation( matchAllBuilder.toImplementation() );
 		}
 		else {
 			return matchAllBuilder.toImplementation();
@@ -68,31 +70,27 @@ class MatchAllPredicateContextImpl<B>
 		return exceptContext;
 	}
 
-	private class MatchAllExceptContext implements SearchPredicateDslContext<B>,
-			SearchPredicateContributor<B> {
+	private class MatchAllExceptContext {
 
 		private final BooleanJunctionPredicateBuilder<B> booleanBuilder;
-		private final List<SearchPredicateContributor<? extends B>> exceptClauseContributors = new ArrayList<>();
-
-		private final SearchPredicateContainerContextImpl<B> containerContext;
+		private final List<B> clauseBuilders = new ArrayList<>();
 
 		MatchAllExceptContext() {
 			this.booleanBuilder = MatchAllPredicateContextImpl.this.factory.bool();
-			this.booleanBuilder.must( matchAllBuilder.toImplementation() );
-			this.containerContext = new SearchPredicateContainerContextImpl<>(
-					MatchAllPredicateContextImpl.this.factory, this
-			);
 		}
 
-		@Override
-		public void addChild(SearchPredicateContributor<? extends B> contributor) {
-			exceptClauseContributors.add( contributor );
+		void addClause(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			addClause( clauseContributor.apply( containerContext ) );
 		}
 
-		@Override
-		public B contribute() {
-			for ( SearchPredicateContributor<? extends B> contributor : exceptClauseContributors ) {
-				booleanBuilder.mustNot( contributor.contribute() );
+		void addClause(SearchPredicate predicate) {
+			clauseBuilders.add( factory.toImplementation( predicate ) );
+		}
+
+		B toImplementation(B matchAllBuilder) {
+			booleanBuilder.must( matchAllBuilder );
+			for ( B builder : clauseBuilders ) {
+				booleanBuilder.mustNot( builder );
 			}
 			return booleanBuilder.toImplementation();
 		}

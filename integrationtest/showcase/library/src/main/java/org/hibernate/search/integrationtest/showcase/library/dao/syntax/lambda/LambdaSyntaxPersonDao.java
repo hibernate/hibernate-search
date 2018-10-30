@@ -31,7 +31,7 @@ class LambdaSyntaxPersonDao extends PersonDao {
 
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
-				.predicate( root -> root.match().onFields( "firstName", "lastName" ).matching( terms ) )
+				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ).toPredicate() )
 				.sort( c -> {
 					c.byField( "lastName_sort" );
 					c.byField( "firstName_sort" );
@@ -50,7 +50,7 @@ class LambdaSyntaxPersonDao extends PersonDao {
 
 		FullTextQuery<Person> query = target.query()
 				.asEntities()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( borrowalsCountField ).desc() )
 				.build();
 

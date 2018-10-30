@@ -35,7 +35,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -58,7 +58,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 								.unit( DistanceUnit.KILOMETERS )
 								.toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -87,7 +87,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 								.unit( DistanceUnit.KILOMETERS )
 								.toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -119,7 +119,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().distance( "geoPoint", center ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
 						.byField( "string" ).onMissingValue().sortLast().asc().then()
 						.byDistance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
@@ -144,7 +144,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						searchTarget.projection().distance( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
 								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 ) ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();

@@ -96,7 +96,7 @@ public class LuceneSearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
 				.build();
 
@@ -107,7 +107,7 @@ public class LuceneSearchMultiIndexIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "additionalField" ).desc().onMissingValue().sortLast() )
 				.build();
 
@@ -136,7 +136,7 @@ public class LuceneSearchMultiIndexIT {
 		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
@@ -153,7 +153,7 @@ public class LuceneSearchMultiIndexIT {
 		searchTarget = indexManager_1_2.createSearchTarget().build();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}

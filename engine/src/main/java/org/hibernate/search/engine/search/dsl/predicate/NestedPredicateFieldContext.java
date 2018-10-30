@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 
@@ -43,10 +43,10 @@ public interface NestedPredicateFieldContext {
 	 * Matching documents are those for which at least one element of the nested object field
 	 * matches the inner predicate.
 	 *
-	 * @param predicateContributor A consumer that will add a predicate to the context passed in parameter.
+	 * @param predicateContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext nest(Consumer<? super SearchPredicateContainerContext> predicateContributor);
+	SearchPredicateTerminalContext nest(Function<? super SearchPredicateContainerContext, SearchPredicate> predicateContributor);
 
 }

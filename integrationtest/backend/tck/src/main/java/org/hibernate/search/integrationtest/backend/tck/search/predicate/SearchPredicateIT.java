@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -25,8 +25,6 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
@@ -76,7 +74,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string" ).matching( STRING_1 ) )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -104,7 +102,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string" ).matching( STRING_1 ) )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -117,13 +115,14 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Consumer<? super SearchPredicateContainerContext> cachingContributor = c -> {
+		Function<? super SearchPredicateContainerContext, SearchPredicate> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
+				return result;
 			}
 			else {
-				c.predicate( cache.get() );
+				return cache.get();
 			}
 		};
 
@@ -154,13 +153,14 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Consumer<? super SearchPredicateContainerContext> cachingContributor = c -> {
+		Function<? super SearchPredicateContainerContext, SearchPredicate> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
+				return result;
 			}
 			else {
-				c.predicate( cache.get() );
+				return cache.get();
 			}
 		};
 
@@ -168,7 +168,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool().must( cachingContributor ) )
+				.predicate( f -> f.bool().must( cachingContributor ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -178,9 +178,10 @@ public class SearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool()
+				.predicate( f -> f.bool()
 						.should( cachingContributor )
-						.should( c -> c.match().onField( "string" ).matching( STRING_2 ) )
+						.should( f.match().onField( "string" ).matching( STRING_2 ).toPredicate() )
+						.toPredicate()
 				)
 				.build();
 
@@ -196,8 +197,8 @@ public class SearchPredicateIT {
 		// Mandatory extension
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.extension( new SupportedExtension() )
-						.match().onField( "string" ).matching( STRING_1 )
+				.predicate( f -> f.extension( new SupportedExtension() )
+						.extendedPredicate( "string", STRING_1 )
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -206,15 +207,15 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, both supported
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.extension()
+				.predicate( f -> f.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
+								extended -> extended.extendedPredicate( "string", STRING_1 )
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								shouldNotBeCalled()
 						)
 						.orElseFail()
 				)
@@ -228,14 +229,14 @@ public class SearchPredicateIT {
 				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								shouldNotBeCalled()
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
+								extended -> extended.extendedPredicate( "string", STRING_1 )
 						)
 						.orElse(
-								ignored -> Assert.fail( "This should not be called" )
+								shouldNotBeCalled()
 						)
 				)
 				.build();
@@ -248,34 +249,15 @@ public class SearchPredicateIT {
 				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								shouldNotBeCalled()
 						)
 						.ifSupported(
 								new UnSupportedExtension(),
-								ignored -> Assert.fail( "This should not be called" )
+								shouldNotBeCalled()
 						)
 						.orElse(
 								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
 						)
-				)
-				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
-
-		// Conditional extensions without orElse - one, unsupported
-		query = searchTarget.query( sessionContext )
-				.asReferences()
-				.predicate( root -> root.bool()
-						.must( c -> c.extension()
-								.ifSupported(
-										new UnSupportedExtension(),
-										ignored -> Assert.fail( "This should not be called" )
-								)
-						)
-						.must(
-								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
-						)
-						.toPredicate()
 				)
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -298,9 +280,15 @@ public class SearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
+	}
+
+	private static <T, R> Function<T, R> shouldNotBeCalled() {
+		return ignored -> {
+			throw new IllegalStateException( "This should not be called" );
+		};
 	}
 
 	private static class IndexAccessors {
@@ -314,10 +302,9 @@ public class SearchPredicateIT {
 	private static class SupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
 		@Override
 		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
-				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<? super B> dslContext) {
+				SearchPredicateFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.of( new MyExtendedContext( original ) );
 		}
 	}
@@ -325,17 +312,22 @@ public class SearchPredicateIT {
 	private static class UnSupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
 		@Override
 		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
-				SearchPredicateFactory<C, B> factory, SearchPredicateDslContext<? super B> dslContext) {
+				SearchPredicateFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
-			Assertions.assertThat( dslContext ).isNotNull();
 			return Optional.empty();
 		}
 	}
 
-	private static class MyExtendedContext extends DelegatingSearchPredicateContainerContextImpl {
+	private static class MyExtendedContext {
+		private final SearchPredicateContainerContext delegate;
+
 		MyExtendedContext(SearchPredicateContainerContext delegate) {
-			super( delegate );
+			this.delegate = delegate;
+		}
+
+		public SearchPredicate extendedPredicate(String fieldName, String value) {
+			return delegate.match().onField( fieldName ).matching( value ).toPredicate();
 		}
 	}
 }

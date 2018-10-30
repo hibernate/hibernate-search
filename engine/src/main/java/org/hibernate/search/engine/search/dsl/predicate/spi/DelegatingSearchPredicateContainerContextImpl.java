@@ -8,7 +8,6 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
@@ -66,11 +65,6 @@ public class DelegatingSearchPredicateContainerContextImpl implements SearchPred
 	@Override
 	public SpatialPredicateContext spatial() {
 		return delegate.spatial();
-	}
-
-	@Override
-	public void predicate(SearchPredicate predicate) {
-		delegate.predicate( predicate );
 	}
 
 	@Override

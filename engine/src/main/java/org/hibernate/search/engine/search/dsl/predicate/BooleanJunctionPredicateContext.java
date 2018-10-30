@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 
@@ -103,52 +104,48 @@ public interface BooleanJunctionPredicateContext extends
 	 */
 
 	/**
-	 * Add a <a href="#must">"must" clause</a>,
-	 * which will be defined by the given consumer.
+	 * Add a <a href="#must">"must" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext must(Consumer<? super SearchPredicateContainerContext> clauseContributor);
+	BooleanJunctionPredicateContext must(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
 
 	/**
-	 * Add a <a href="#mustnot">"must not" clause</a>,
-	 * which will be defined by the given consumer.
+	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext mustNot(Consumer<? super SearchPredicateContainerContext> clauseContributor);
+	BooleanJunctionPredicateContext mustNot(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
 
 	/**
-	 * Add a <a href="#should">"should" clause</a>,
-	 * which will be defined by the given consumer.
+	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext should(Consumer<? super SearchPredicateContainerContext> clauseContributor);
+	BooleanJunctionPredicateContext should(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
 
 	/**
-	 * Add a <a href="#filter">"filter" clause</a>,
-	 * which will be defined by the given consumer.
+	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext filter(Consumer<? super SearchPredicateContainerContext> clauseContributor);
+	BooleanJunctionPredicateContext filter(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
 
 	/*
 	 * Options

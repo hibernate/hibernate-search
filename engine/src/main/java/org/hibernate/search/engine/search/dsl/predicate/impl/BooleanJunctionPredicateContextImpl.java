@@ -9,21 +9,22 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
 class BooleanJunctionPredicateContextImpl<B>
-		extends AbstractObjectCreatingSearchPredicateContributor<B>
-		implements BooleanJunctionPredicateContext, SearchPredicateContributor<B> {
+		extends AbstractSearchPredicateTerminalContext<B>
+		implements BooleanJunctionPredicateContext {
+
+	private final SearchPredicateContainerContext containerContext;
 
 	private final BooleanJunctionPredicateBuilder<B> builder;
 
@@ -34,8 +35,9 @@ class BooleanJunctionPredicateContextImpl<B>
 	private final OccurContext should;
 	private final OccurContext filter;
 
-	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory, SearchPredicateContainerContext containerContext) {
 		super( factory );
+		this.containerContext = containerContext;
 		this.builder = factory.bool();
 		this.must = new OccurContext();
 		this.mustNot = new OccurContext();
@@ -52,49 +54,53 @@ class BooleanJunctionPredicateContextImpl<B>
 
 	@Override
 	public BooleanJunctionPredicateContext must(SearchPredicate searchPredicate) {
-		must.containerContext.predicate( searchPredicate );
+		must.addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext mustNot(SearchPredicate searchPredicate) {
-		mustNot.containerContext.predicate( searchPredicate );
+		mustNot.addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext should(SearchPredicate searchPredicate) {
-		should.containerContext.predicate( searchPredicate );
+		should.addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext filter(SearchPredicate searchPredicate) {
-		filter.containerContext.predicate( searchPredicate );
+		filter.addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext must(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
-		clauseContributor.accept( must.containerContext );
+	public BooleanJunctionPredicateContext must(
+			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+		must.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext mustNot(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
-		clauseContributor.accept( mustNot.containerContext );
+	public BooleanJunctionPredicateContext mustNot(
+			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+		mustNot.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext should(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
-		clauseContributor.accept( should.containerContext );
+	public BooleanJunctionPredicateContext should(
+			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+		should.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
-	public BooleanJunctionPredicateContext filter(Consumer<? super SearchPredicateContainerContext> clauseContributor) {
-		clauseContributor.accept( filter.containerContext );
+	public BooleanJunctionPredicateContext filter(
+			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+		filter.addClause( clauseContributor );
 		return this;
 	}
 
@@ -111,7 +117,7 @@ class BooleanJunctionPredicateContextImpl<B>
 	}
 
 	@Override
-	protected B doContribute() {
+	protected B toImplementation() {
 		must.contribute( builder::must );
 		mustNot.contribute( builder::mustNot );
 		should.contribute( builder::should );
@@ -119,30 +125,28 @@ class BooleanJunctionPredicateContextImpl<B>
 		return builder.toImplementation();
 	}
 
-	private class OccurContext implements SearchPredicateDslContext<B> {
+	private class OccurContext {
 
-		private final SearchPredicateContainerContextImpl<B> containerContext;
-
-		private List<SearchPredicateContributor<? extends B>> clauseContributors;
+		private List<B> clauseBuilders;
 
 		OccurContext() {
-			this.containerContext = new SearchPredicateContainerContextImpl<>(
-					BooleanJunctionPredicateContextImpl.this.factory, this
-			);
 		}
 
-		@Override
-		public void addChild(SearchPredicateContributor<? extends B> contributor) {
-			if ( clauseContributors == null ) {
-				clauseContributors = new ArrayList<>();
+		void addClause(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			addClause( clauseContributor.apply( containerContext ) );
+		}
+
+		void addClause(SearchPredicate predicate) {
+			if ( clauseBuilders == null ) {
+				clauseBuilders = new ArrayList<>();
 			}
-			clauseContributors.add( contributor );
+			clauseBuilders.add( factory.toImplementation( predicate ) );
 		}
 
 		void contribute(Consumer<B> builderCollector) {
-			if ( clauseContributors != null ) {
-				for ( SearchPredicateContributor<? extends B> contributor : clauseContributors ) {
-					builderCollector.accept( contributor.contribute() );
+			if ( clauseBuilders != null ) {
+				for ( B builder : clauseBuilders ) {
+					builderCollector.accept( builder );
 				}
 			}
 		}

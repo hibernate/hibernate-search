@@ -87,7 +87,7 @@ public class SearchSortByFieldIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
 				.build();
 	}
@@ -263,7 +263,7 @@ public class SearchSortByFieldIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -284,7 +284,7 @@ public class SearchSortByFieldIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -305,7 +305,7 @@ public class SearchSortByFieldIT {
 
 		searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -408,7 +408,7 @@ public class SearchSortByFieldIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}

@@ -87,10 +87,10 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		protected B doContribute() {
+		protected B toImplementation() {
 			// Just in case from() was called, but not to()
 			checkHasNonNullBound();
-			return super.doContribute();
+			return super.toImplementation();
 		}
 
 		RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion) {

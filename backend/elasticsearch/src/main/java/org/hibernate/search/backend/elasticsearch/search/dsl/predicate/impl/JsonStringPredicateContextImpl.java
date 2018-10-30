@@ -9,10 +9,10 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 
 final class JsonStringPredicateContextImpl
-		extends AbstractObjectCreatingSearchPredicateContributor<ElasticsearchSearchPredicateBuilder>
+		extends AbstractSearchPredicateTerminalContext<ElasticsearchSearchPredicateBuilder>
 		implements SearchPredicateTerminalContext {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
@@ -22,7 +22,7 @@ final class JsonStringPredicateContextImpl
 	}
 
 	@Override
-	protected ElasticsearchSearchPredicateBuilder doContribute() {
+	protected ElasticsearchSearchPredicateBuilder toImplementation() {
 		return builder;
 	}
 }

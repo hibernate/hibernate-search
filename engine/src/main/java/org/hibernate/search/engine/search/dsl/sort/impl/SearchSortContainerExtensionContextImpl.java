@@ -24,7 +24,7 @@ final class SearchSortContainerExtensionContextImpl<B> implements SearchSortCont
 	private final SearchSortFactory<?, B> factory;
 	private final SearchSortDslContext<? super B> dslContext;
 
-	private final DslExtensionState state = new DslExtensionState();
+	private final DslExtensionState<Void> state = new DslExtensionState<>();
 
 	SearchSortContainerExtensionContextImpl(SearchSortContainerContext parent,
 			SearchSortFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {

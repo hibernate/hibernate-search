@@ -65,7 +65,7 @@ public class SmokeIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string" ).matching( "text 1" ) )
+				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -73,7 +73,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "string_analyzed" ).matching( "text" ) )
+				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
@@ -81,7 +81,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "integer" ).matching( 1 ) )
+				.predicate( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -89,7 +89,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
+				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -97,7 +97,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "flattenedObject.string" ).matching( "text 1_1" ) )
+				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -110,7 +110,7 @@ public class SmokeIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
+				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -118,7 +118,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.range().onField( "string_analyzed" ).from( "2" ).to( "42" ) )
+				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -126,7 +126,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.range().onField( "integer" ).from( 2 ).to( 42 ) )
+				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -134,9 +134,10 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.range().onField( "localDate" )
+				.predicate( f -> f.range().onField( "localDate" )
 						.from( LocalDate.of( 2018, 1, 2 ) )
 						.to( LocalDate.of( 2018, 2, 23 ) )
+						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -145,7 +146,7 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ) )
+				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" )
@@ -158,10 +159,11 @@ public class SmokeIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool( b -> {
-					b.should( c -> c.match().onField( "integer" ).matching( 1 ) );
-					b.should( c -> c.match().onField( "integer" ).matching( 2 ) );
-				} ) )
+				.predicate( f -> f.bool()
+						.should( f.match().onField( "integer" ).matching( 1 ).toPredicate() )
+						.should( f.match().onField( "integer" ).matching( 2 ).toPredicate() )
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" )
@@ -169,10 +171,11 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool( b -> {
-					b.must( c -> c.match().onField( "string_analyzed" ).matching( "text" ) );
-					b.filter( c -> c.match().onField( "integer" ).matching( 1 ) );
-				} ) )
+				.predicate( f -> f.bool()
+						.must( f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
+						.filter( f.match().onField( "integer" ).matching( 1 ).toPredicate() )
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -180,10 +183,11 @@ public class SmokeIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool( b -> {
-					b.must( c -> c.match().onField( "string_analyzed" ).matching( "text" ) );
-					b.mustNot( c -> c.match().onField( "integer" ).matching( 2 ) );
-				} ) )
+				.predicate( f -> f.bool()
+						.must( f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
+						.mustNot( f.match().onField( "integer" ).matching( 2 ).toPredicate() )
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "3" )
@@ -197,10 +201,11 @@ public class SmokeIT {
 		// Without nested storage, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool( b -> {
-					b.must( c -> c.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) );
-					b.must( c -> c.match().onField( "flattenedObject.integer" ).matching( 101 ) );
-				} ) )
+				.predicate( f -> f.bool()
+						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ).toPredicate() )
+						.must( f.match().onField( "flattenedObject.integer" ).matching( 101 ).toPredicate() )
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -209,7 +214,7 @@ public class SmokeIT {
 		// With nested storage, we expect direct queries to never match
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( "nestedObject.integer" ).matching( 101 ) )
+				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
 				.build();
 		assertThat( query )
 				.hasNoHits()
@@ -218,10 +223,14 @@ public class SmokeIT {
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
-					b.must( c2 -> c2.match().onField( "nestedObject.string" ).matching( "text 1_2" ) );
-					b.must( c2 -> c2.match().onField( "nestedObject.integer" ).matching( 101 ) );
-				} ) ) )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.bool()
+								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_2" ).toPredicate() )
+								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
+								.toPredicate()
+						)
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasNoHits()
@@ -230,10 +239,14 @@ public class SmokeIT {
 		// ... but predicates should still be able to match on the same object
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.nested().onObjectField( "nestedObject" ).nest( c -> c.bool( b -> {
-					b.must( c2 -> c2.match().onField( "nestedObject.string" ).matching( "text 1_1" ) );
-					b.must( c2 -> c2.match().onField( "nestedObject.integer" ).matching( 101 ) );
-				} ) ) )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.bool()
+								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_1" ).toPredicate() )
+								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
+								.toPredicate()
+						)
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" )
@@ -263,8 +276,8 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		predicate = searchTarget.predicate().bool()
-				.should( c -> c.match().onField( "integer" ).matching( 1 ) )
-				.should( c -> c.match().onField( "integer" ).matching( 2 ) )
+				.should( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
+				.should( f -> f.match().onField( "integer" ).matching( 2 ).toPredicate() )
 				.toPredicate();
 		query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -341,7 +354,7 @@ public class SmokeIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );

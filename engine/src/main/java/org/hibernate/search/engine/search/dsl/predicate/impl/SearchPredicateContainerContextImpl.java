@@ -9,7 +9,6 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
@@ -20,7 +19,6 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainer
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
@@ -28,26 +26,18 @@ public class SearchPredicateContainerContextImpl<B> implements SearchPredicateCo
 
 	private final SearchPredicateFactory<?, B> factory;
 
-	private final SearchPredicateDslContext<? super B> dslContext;
-
-	public SearchPredicateContainerContextImpl(SearchPredicateFactory<?, B> factory,
-			SearchPredicateDslContext<? super B> dslContext) {
+	public SearchPredicateContainerContextImpl(SearchPredicateFactory<?, B> factory) {
 		this.factory = factory;
-		this.dslContext = dslContext;
 	}
 
 	@Override
 	public MatchAllPredicateContext matchAll() {
-		MatchAllPredicateContextImpl<B> child = new MatchAllPredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
+		return new MatchAllPredicateContextImpl<>( factory, this );
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext bool() {
-		BooleanJunctionPredicateContextImpl<B> child = new BooleanJunctionPredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
+		return new BooleanJunctionPredicateContextImpl<>( factory, this );
 	}
 
 	@Override
@@ -59,47 +49,34 @@ public class SearchPredicateContainerContextImpl<B> implements SearchPredicateCo
 
 	@Override
 	public MatchPredicateContext match() {
-		MatchPredicateContextImpl<B> child = new MatchPredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
+		return new MatchPredicateContextImpl<>( factory );
 	}
 
 	@Override
 	public RangePredicateContext range() {
-		RangePredicateContextImpl<B> child = new RangePredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
+		return new RangePredicateContextImpl<>( factory );
 	}
 
 	@Override
 	public NestedPredicateContext nested() {
-		NestedPredicateContextImpl<B> child = new NestedPredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
+		return new NestedPredicateContextImpl<>( factory, this );
 	}
 
 	@Override
 	public SpatialPredicateContext spatial() {
-		SpatialPredicateContextImpl<B> child = new SpatialPredicateContextImpl<>( factory );
-		dslContext.addChild( child );
-		return child;
-	}
-
-	@Override
-	public void predicate(SearchPredicate predicate) {
-		dslContext.addChild( factory.toImplementation( predicate ) );
+		return new SpatialPredicateContextImpl<>( factory );
 	}
 
 	@Override
 	public <T> T extension(SearchPredicateContainerContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, factory, dslContext )
+				extension, extension.extendOptional( this, factory )
 		);
 	}
 
 	@Override
 	public SearchPredicateContainerExtensionContext extension() {
-		return new SearchPredicateContainerExtensionContextImpl<>( this, factory, dslContext );
+		return new SearchPredicateContainerExtensionContextImpl<>( this, factory );
 	}
 
 }

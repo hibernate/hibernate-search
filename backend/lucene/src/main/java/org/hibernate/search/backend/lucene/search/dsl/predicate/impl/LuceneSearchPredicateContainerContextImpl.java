@@ -7,12 +7,10 @@
 package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateContainerContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateContainerContextImpl;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 
 import org.apache.lucene.search.Query;
 
@@ -23,21 +21,14 @@ public class LuceneSearchPredicateContainerContextImpl
 
 	private final LuceneSearchPredicateFactory factory;
 
-	private final SearchPredicateDslContext<? super LuceneSearchPredicateBuilder> dslContext;
-
 	public LuceneSearchPredicateContainerContextImpl(SearchPredicateContainerContext delegate,
-			LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<? super LuceneSearchPredicateBuilder> dslContext) {
+			LuceneSearchPredicateFactory factory) {
 		super( delegate );
 		this.factory = factory;
-		this.dslContext = dslContext;
 	}
 
 	@Override
 	public SearchPredicateTerminalContext fromLuceneQuery(Query luceneQuery) {
-		LuceneQueryPredicateContextImpl child =
-				new LuceneQueryPredicateContextImpl( factory, luceneQuery );
-		dslContext.addChild( child );
-		return child;
+		return new LuceneQueryPredicateContextImpl( factory, luceneQuery );
 	}
 }

@@ -421,7 +421,7 @@ public class ProgrammaticMappingSmokeIT {
 			)
 					.query()
 					.asReferences()
-					.predicate( root -> root.matchAll() )
+					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -464,7 +464,7 @@ public class ProgrammaticMappingSmokeIT {
 							searchTarget.projection().documentReference().toProjection(),
 							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
-					.predicate( root -> root.matchAll() )
+					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );

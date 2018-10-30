@@ -93,7 +93,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -102,7 +102,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -116,10 +116,12 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" ).nest(
-								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.match()
+								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.toPredicate()
 						)
+						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -129,10 +131,12 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" ).nest(
-								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.match()
+								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.toPredicate()
 						)
+						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
@@ -145,7 +149,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -155,7 +159,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );
@@ -173,7 +177,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
@@ -181,7 +185,7 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -194,7 +198,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( checkQuery )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -217,7 +221,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.match().onField( "string" ).matching( UPDATED_STRING ) )
+				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ).toPredicate() )
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
@@ -226,10 +230,12 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" ).nest(
-								c -> c.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.match()
+								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
+								.toPredicate()
 						)
+						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
@@ -241,7 +247,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ) )
+				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ).toPredicate() )
 				.build();
 		assertThat( query ).hasNoHits();
 
@@ -250,10 +256,12 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" ).nest(
-								c -> c.match().onField( "nestedObject.string" ).matching( UPDATED_STRING )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.match()
+								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
+								.toPredicate()
 						)
+						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasNoHits();
@@ -263,7 +271,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.match().onField( "string" ).matching( STRING_VALUE_1 ) )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -272,10 +280,12 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root ->
-						root.nested().onObjectField( "nestedObject" ).nest(
-								c -> c.match().onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+				.predicate( f -> f.nested().onObjectField( "nestedObject" )
+						.nest( f.match()
+								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
+								.toPredicate()
 						)
+						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -317,7 +327,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -407,7 +417,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -511,7 +521,7 @@ public class MultiTenancyIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -521,7 +531,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_1 );
@@ -530,7 +540,7 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -540,7 +550,7 @@ public class MultiTenancyIT {
 						searchTarget.projection().field( "string", String.class ).toProjection(),
 						searchTarget.projection().field( "integer", Integer.class ).toProjection()
 				)
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
 				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );

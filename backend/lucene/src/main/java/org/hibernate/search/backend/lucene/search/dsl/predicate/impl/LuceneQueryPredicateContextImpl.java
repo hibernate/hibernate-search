@@ -9,12 +9,12 @@ package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractObjectCreatingSearchPredicateContributor;
+import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 
 import org.apache.lucene.search.Query;
 
 final class LuceneQueryPredicateContextImpl
-		extends AbstractObjectCreatingSearchPredicateContributor<LuceneSearchPredicateBuilder>
+		extends AbstractSearchPredicateTerminalContext<LuceneSearchPredicateBuilder>
 		implements SearchPredicateTerminalContext {
 	private final LuceneSearchPredicateBuilder builder;
 
@@ -24,7 +24,7 @@ final class LuceneQueryPredicateContextImpl
 	}
 
 	@Override
-	protected LuceneSearchPredicateBuilder doContribute() {
+	protected LuceneSearchPredicateBuilder toImplementation() {
 		return builder;
 	}
 }

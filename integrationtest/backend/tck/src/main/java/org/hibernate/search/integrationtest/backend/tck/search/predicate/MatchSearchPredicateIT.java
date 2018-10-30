@@ -83,7 +83,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
-					.predicate( root -> root.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
@@ -101,7 +101,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 					.asReferences()
-					.predicate( root -> root.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
 					.build();
 
 			DocumentReferencesSearchResultAssert.assertThat( query )
@@ -117,7 +117,7 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( fieldModel.relativeFieldName ).matching( "" ) )
+				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -133,7 +133,7 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				// Use a stopword, which should be removed by the analysis
-				.predicate( root -> root.match().onField( fieldModel.relativeFieldName ).matching( "a" ) )
+				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -192,6 +192,7 @@ public class MatchSearchPredicateIT {
 						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
 						)
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -208,6 +209,7 @@ public class MatchSearchPredicateIT {
 						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
 								.matching( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
 						)
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -224,9 +226,10 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -235,9 +238,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -248,9 +252,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -259,9 +264,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -270,9 +276,10 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onField( indexMapping.string1Field.relativeFieldName )
+				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string3Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -283,8 +290,9 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
+				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -293,8 +301,9 @@ public class MatchSearchPredicateIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
+				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
+						.toPredicate()
 				)
 				.build();
 
@@ -401,7 +410,7 @@ public class MatchSearchPredicateIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY,
 				DOCUMENT_3

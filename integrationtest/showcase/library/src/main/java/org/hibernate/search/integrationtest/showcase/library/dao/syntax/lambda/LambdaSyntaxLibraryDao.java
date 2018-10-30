@@ -27,7 +27,7 @@ class LambdaSyntaxLibraryDao extends LibraryDao {
 		}
 		FullTextQuery<Library> query = entityManager.search( Library.class ).query()
 				.asEntities()
-				.predicate( root -> root.match().onField( "name" ).matching( terms ) )
+				.predicate( f -> f.match().onField( "name" ).matching( terms ).toPredicate() )
 				.sort( c -> {
 					c.byField( "collectionSize" ).desc();
 					c.byField( "name_sort" );

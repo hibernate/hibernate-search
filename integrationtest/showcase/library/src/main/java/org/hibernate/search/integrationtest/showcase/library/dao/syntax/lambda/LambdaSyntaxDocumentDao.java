@@ -39,7 +39,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 				fullTextSession.search( Book.class ).query()
 				.asEntities()
 				// TODO allow to bypass the bridge in the DSL
-				.predicate( root -> root.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
+				.predicate( f -> f.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).toPredicate() )
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -49,19 +49,20 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntities()
-				.predicate( root -> root.bool( b -> {
-					b.must( c -> {
-						if ( terms != null && !terms.isEmpty() ) {
-							c.match()
-									.onField( "title" ).boostedTo( 2.0f )
-									.orField( "summary" )
-									.matching( terms );
-						}
-					} );
-					b.must( c -> c.nested().onObjectField( "copies" ).nest(
-							c2 -> c2.match().onField( "copies.medium" ).matching( medium )
-					) );
-				} ) )
+				.predicate( f -> f.bool( b -> {
+					if ( terms != null && !terms.isEmpty() ) {
+						b.must( f.match()
+								.onField( "title" ).boostedTo( 2.0f )
+								.orField( "summary" )
+								.matching( terms )
+								.toPredicate()
+						);
+					}
+					b.must( f.nested().onObjectField( "copies" )
+							.nest( f.match().onField( "copies.medium" ).matching( medium ).toPredicate() )
+							.toPredicate()
+					);
+				} ).toPredicate() )
 				.sort( b -> b.byField( "title_sort" ) )
 				.build();
 
@@ -78,55 +79,57 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 			int offset, int limit) {
 		FullTextQuery<Document<?>> query = entityManager.search( DOCUMENT_CLASS ).query()
 				.asEntities()
-				.predicate( root -> root.bool( b -> {
+				.predicate( f -> f.bool( b -> {
 					// Match query
-					b.must( c -> {
-						if ( terms != null && !terms.isEmpty() ) {
-							c.match()
-									.onField( "title" ).boostedTo( 2.0f )
-									.orField( "summary" )
-									.matching( terms );
-						}
-					} );
+					if ( terms != null && !terms.isEmpty() ) {
+						b.must( f.match()
+								.onField( "title" ).boostedTo( 2.0f )
+								.orField( "summary" )
+								.matching( terms )
+								.toPredicate()
+						);
+					}
 					// Bridged query with complex bridge: TODO rely on the bridge to split the String
-					b.must( c -> {
-						String[] splitTags = tags == null ? null : tags.split( "," );
-						if ( splitTags != null && splitTags.length > 0 ) {
-							c.bool().must( c2 -> {
-								for ( String tag : splitTags ) {
-									c2.match()
-											.onField( "tags" )
-											.matching( tag );
-								}
-							} );
-						}
-					} );
+					String[] splitTags = tags == null ? null : tags.split( "," );
+					if ( splitTags != null && splitTags.length > 0 ) {
+						b.must( f.bool( b2 -> {
+							for ( String tag : splitTags ) {
+								b2.must( f.match()
+										.onField( "tags" )
+										.matching( tag )
+										.toPredicate()
+								);
+							}
+						} ).toPredicate() );
+					}
 					// Spatial query
-					b.must( c -> {
-						if ( myLocation != null && maxDistanceInKilometers != null ) {
-							c.nested().onObjectField( "copies" ).nest( c2 -> c2
-									.spatial()
-									.within()
-									.onField( "copies.library.location" )
-									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
-							);
-						}
-					} );
+					if ( myLocation != null && maxDistanceInKilometers != null ) {
+						b.must( f.nested().onObjectField( "copies" )
+								.nest( f.spatial()
+										.within()
+										.onField( "copies.library.location" )
+										.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
+										.toPredicate()
+								)
+								.toPredicate()
+						);
+					}
 					// Nested query + must loop
-					b.must( c -> {
-						if ( libraryServices != null && !libraryServices.isEmpty() ) {
-							c.nested().onObjectField( "copies" ).nest( c2 -> c2.bool()
-									.must( c3 -> {
-										for ( LibraryService service : libraryServices ) {
-											c3.match()
-													.onField( "copies.library.services" )
-													.matching( service );
-										}
-									} )
-							);
-						}
-					} );
-				} ) )
+					if ( libraryServices != null && !libraryServices.isEmpty() ) {
+						b.must( f.nested().onObjectField( "copies" )
+								.nest( f.bool( b2 -> {
+									for ( LibraryService service : libraryServices ) {
+										b2.must( f.match()
+												.onField( "copies.library.services" )
+												.matching( service )
+												.toPredicate()
+										);
+									}
+								} ).toPredicate() )
+								.toPredicate()
+						);
+					}
+				} ).toPredicate() )
 				// TODO facets (tag, medium, library in particular)
 				.sort( b -> b.byScore() )
 				.build();

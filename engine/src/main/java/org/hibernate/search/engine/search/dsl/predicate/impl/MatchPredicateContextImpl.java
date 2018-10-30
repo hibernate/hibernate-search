@@ -10,11 +10,10 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class MatchPredicateContextImpl<B> implements MatchPredicateContext, SearchPredicateContributor<B> {
+class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 
 	private final MatchPredicateFieldSetContextImpl.CommonState<B> commonState;
 
@@ -25,10 +24,5 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext, SearchPredi
 	@Override
 	public MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
-	}
-
-	@Override
-	public B contribute() {
-		return commonState.contribute();
 	}
 }

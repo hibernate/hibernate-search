@@ -59,7 +59,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -67,7 +67,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).polygon( POLYGON_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -96,9 +96,10 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool()
-						.should( c -> c.spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
-						.should( c -> c.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ) )
+				.predicate( f -> f.bool()
+						.should( f.spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ).toPredicate() )
+						.should( f.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ).toPredicate() )
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -108,9 +109,10 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool()
-						.should( c -> c.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).polygon( CHEZ_MARGOTTE_POLYGON ) )
-						.should( c -> c.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				.predicate( f -> f.bool()
+						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).polygon( CHEZ_MARGOTTE_POLYGON ).toPredicate() )
+						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ).toPredicate() )
+						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -127,7 +129,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -135,7 +137,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_2_1 ) )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_2_1 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -145,8 +147,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2 )
+						.toPredicate()
 				)
 				.build();
 
@@ -155,8 +158,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_1_1 )
+						.toPredicate()
 				)
 				.build();
 
@@ -165,8 +169,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
+				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2_2 )
+						.toPredicate()
 				)
 				.build();
 
@@ -177,7 +182,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_2 ) )
+				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -185,7 +190,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ) )
+				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ).toPredicate() )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )

@@ -17,13 +17,11 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateContainerContextImpl;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSortContainerContextImpl;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateDslContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
@@ -60,10 +58,11 @@ public final class LuceneExtension
 	 */
 	@Override
 	public <C, B> Optional<LuceneSearchPredicateContainerContext> extendOptional(
-			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory,
-			SearchPredicateDslContext<? super B> dslContext) {
+			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory) {
 		if ( factory instanceof LuceneSearchPredicateFactory ) {
-			return Optional.of( extendUnsafe( original, (LuceneSearchPredicateFactory) factory, dslContext ) );
+			return Optional.of( new LuceneSearchPredicateContainerContextImpl(
+					original, (LuceneSearchPredicateFactory) factory
+			) );
 		}
 		else {
 			return Optional.empty();
@@ -96,16 +95,6 @@ public final class LuceneExtension
 		else {
 			throw log.luceneExtensionOnUnknownType( original );
 		}
-	}
-
-	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchPredicateBuilder
-	private <B> LuceneSearchPredicateContainerContext extendUnsafe(
-			SearchPredicateContainerContext original, LuceneSearchPredicateFactory factory,
-			SearchPredicateDslContext<? super B> dslContext) {
-		return new LuceneSearchPredicateContainerContextImpl(
-				original, factory,
-				(SearchPredicateDslContext<? super LuceneSearchPredicateBuilder>) dslContext
-		);
 	}
 
 	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchSortBuilder

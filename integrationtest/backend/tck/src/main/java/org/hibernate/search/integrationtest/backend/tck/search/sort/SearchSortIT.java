@@ -94,7 +94,7 @@ public class SearchSortIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		return searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
 				.build();
 	}
@@ -169,7 +169,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortAsc )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -177,7 +177,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortAsc ) )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -189,7 +189,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortDesc )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -197,7 +197,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortDesc ) )
 				.build();
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -472,7 +472,7 @@ public class SearchSortIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}

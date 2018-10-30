@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 
@@ -33,17 +33,16 @@ public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<
 	 */
 
 	/**
-	 * Create a context allowing to define a "must not" clause,
-	 * and apply a consumer to it.
+	 * Add a "must not" clause to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 * <p>
 	 * Documents matching the "must not" clause won't match the "match all" predicate.
 	 *
-	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
+	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchAllPredicateContext except(Consumer<? super SearchPredicateContainerContext> clauseContributor);
+	MatchAllPredicateContext except(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
 
 }

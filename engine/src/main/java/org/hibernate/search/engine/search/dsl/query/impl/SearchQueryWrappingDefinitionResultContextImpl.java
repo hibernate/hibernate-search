@@ -58,7 +58,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	@Override
-	public SearchQueryContext<Q> predicate(Consumer<? super SearchPredicateContainerContext> dslPredicateContributor) {
+	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateContainerContext, SearchPredicate> dslPredicateContributor) {
 		searchPredicateCollector.collect( dslPredicateContributor );
 		return getNext();
 	}

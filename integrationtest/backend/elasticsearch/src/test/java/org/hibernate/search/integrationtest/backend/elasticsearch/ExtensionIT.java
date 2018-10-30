@@ -82,29 +82,33 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.bool( b -> {
-					b.should( c -> c.extension( ElasticsearchExtension.get() )
-							.fromJsonString( "{'match': {'string': 'text 1'}}" )
-					);
-					b.should( c -> c.extension( ElasticsearchExtension.get() )
-							.fromJsonString( "{'match': {'integer': 2}}" )
-					);
-					b.should( c -> c.extension( ElasticsearchExtension.get() )
-							.fromJsonString(
-									"{"
-										+ "'geo_distance': {"
-											+ "'distance': '200km',"
-											+ "'geoPoint': {"
-												+ "'lat': 40,"
-												+ "'lon': -70"
+				.predicate( f -> f.bool()
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJsonString( "{'match': {'string': 'text 1'}}" )
+								.toPredicate()
+						)
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJsonString( "{'match': {'integer': 2}}" )
+								.toPredicate()
+						)
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJsonString(
+										"{"
+											+ "'geo_distance': {"
+												+ "'distance': '200km',"
+												+ "'geoPoint': {"
+													+ "'lat': 40,"
+													+ "'lon': -70"
+												+ "}"
 											+ "}"
 										+ "}"
-									+ "}"
-							)
-					);
-					// Also test using the standard DSL on a field defined with the extension
-					b.should( c -> c.match().onField( "yearDays" ).matching( "'2018:12'" ) );
-				} ) )
+								)
+								.toPredicate()
+						)
+						// Also test using the standard DSL on a field defined with the extension
+						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ).toPredicate() )
+						.toPredicate()
+				)
 				.build();
 		assertThat( query )
 				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
@@ -157,7 +161,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'asc'}" )
@@ -177,7 +181,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'desc'}" )
@@ -216,7 +220,7 @@ public class ExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.build();
 		assertThat( query )
@@ -238,7 +242,7 @@ public class ExtensionIT {
 
 		query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.build();
 		assertThat( query )
@@ -360,7 +364,7 @@ public class ExtensionIT {
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
-				.predicate( root -> root.matchAll() )
+				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasReferencesHitsAnyOrder(
 				INDEX_NAME,

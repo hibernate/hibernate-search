@@ -10,12 +10,10 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.SearchPredicateContributor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
 
 
-class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateContext,
-		SearchPredicateContributor<B> {
+class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateContext {
 
 	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<B> commonState;
 
@@ -26,10 +24,5 @@ class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateCont
 	@Override
 	public SpatialWithinPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new SpatialWithinPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
-	}
-
-	@Override
-	public B contribute() {
-		return commonState.contribute();
 	}
 }
