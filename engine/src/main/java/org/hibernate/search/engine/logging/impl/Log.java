@@ -158,7 +158,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 22,
 			value = "Unexpected empty event context; there is a bug in Hibernate Search, please report it")
-	void unexpectedEmptyEventContext(@Cause SearchException exceptionForStackTrace);
+	void unexpectedEmptyEventContext(@Cause Throwable exceptionForStackTrace);
 
 	@Message(id = ID_OFFSET_2 + 23,
 			value = "Incomplete field definition."

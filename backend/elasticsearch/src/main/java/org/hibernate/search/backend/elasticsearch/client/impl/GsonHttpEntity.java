@@ -23,7 +23,7 @@ import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
 import org.apache.http.nio.entity.HttpAsyncContentProducer;
 import org.apache.http.protocol.HTTP;
-import org.hibernate.search.util.SearchException;
+
 import org.hibernate.search.util.impl.common.Contracts;
 
 import com.google.gson.Gson;
@@ -121,7 +121,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	private ProgressiveCharBufferWriter writer =
 			new ProgressiveCharBufferWriter( CHARSET, CHAR_BUFFER_SIZE, BYTE_BUFFER_PAGE_SIZE );
 
-	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) {
+	public GsonHttpEntity(Gson gson, List<JsonObject> bodyParts) throws IOException {
 		Contracts.assertNotNull( gson, "gson" );
 		Contracts.assertNotNull( bodyParts, "bodyParts" );
 		this.gson = gson;
@@ -210,24 +210,20 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	 * while also being able to hint the client about the {@link #getContentLength()}.
 	 * Incidentally, having this information would avoid chunked output encoding
 	 * which is ideal precisely for small messages which can fit into a single buffer.
+	 *
+	 * @throws IOException This is unlikely to be caused by a real IO operation as there's no output buffer yet,
+	 * but it could also be triggered by the UTF8 encoding operations.
 	 */
-	private void attemptOnePassEncoding() {
+	private void attemptOnePassEncoding() throws IOException {
 		// Essentially attempt to use the writer without going NPE on the output sink
 		// as it's not set yet.
-		try {
-			triggerFullWrite();
-			if ( nextBodyToEncodeIndex == bodyParts.size() ) {
-				writer.flush();
-				// The buffer's current content size is the final content size,
-				// as we know the entire content has been encoded already,
-				// and we also know no content was consumed from the buffer yet.
-				hintContentLength( writer.byteBufferContentSize() );
-			}
-		}
-		catch (IOException e) {
-			// Unlikely to be caused by a real IO operation as there's no output buffer yet,
-			// but it could also be triggered by the UTF8 encoding operations.
-			throw new SearchException( e );
+		triggerFullWrite();
+		if ( nextBodyToEncodeIndex == bodyParts.size() ) {
+			writer.flush();
+			// The buffer's current content size is the final content size,
+			// as we know the entire content has been encoded already,
+			// and we also know no content was consumed from the buffer yet.
+			hintContentLength( writer.byteBufferContentSize() );
 		}
 	}
 
