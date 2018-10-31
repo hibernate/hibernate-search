@@ -34,8 +34,33 @@ class FunctionConfigurationProperty<T> implements ConfigurationProperty<T> {
 			return function.apply( rawValue );
 		}
 		catch (RuntimeException e) {
+			String displayedKey = key;
+
+			// Try to display the key that must be set by the user, if possible
+			try {
+				Optional<String> resolvedKey = source.resolve( key );
+				if ( resolvedKey.isPresent() ) {
+					displayedKey = resolvedKey.get();
+				}
+			}
+			catch (RuntimeException e2) {
+				// Take care not to erase the original exception
+				e.addSuppressed( e2 );
+			}
+
 			throw log.unableToConvertConfigurationProperty(
-					key, rawValue.isPresent() ? rawValue.get() : "", e.getMessage(), e );
+					displayedKey, rawValue.isPresent() ? rawValue.get() : "", e.getMessage(), e
+			);
 		}
+	}
+
+	@Override
+	public Optional<String> resolve(ConfigurationPropertySource source) {
+		return source.resolve( key );
+	}
+
+	@Override
+	public String resolveOrRaw(ConfigurationPropertySource source) {
+		return resolve( source ).orElse( key );
 	}
 }

@@ -24,8 +24,12 @@ public class MaskedConfigurationPropertySource implements ConfigurationPropertyS
 
 	@Override
 	public Optional<?> get(String key) {
-		String compositeKey = radix + key;
-		return propertiesToMask.get( compositeKey );
+		return propertiesToMask.get( radix + key );
+	}
+
+	@Override
+	public Optional<String> resolve(String key) {
+		return propertiesToMask.resolve( radix + key );
 	}
 
 	@Override

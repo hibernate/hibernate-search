@@ -10,20 +10,27 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
-public class FallbackConfigurationPropertySource implements ConfigurationPropertySource {
+/**
+ * This class is very similar to {@link FallbackConfigurationPropertySource}.
+ * We could actually use {@link FallbackConfigurationPropertySource} wherever we use this class,
+ * simply by inverting the constructor parameters, if it wasn't for one detail:
+ * the implementation of {@link #resolve(String)} would not work as expected,
+ * returning the key resolved using the wrong source.
+ */
+public class OverriddenConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource main;
-	private final ConfigurationPropertySource fallback;
+	private final ConfigurationPropertySource override;
 
-	public FallbackConfigurationPropertySource(ConfigurationPropertySource main, ConfigurationPropertySource fallback) {
+	public OverriddenConfigurationPropertySource(ConfigurationPropertySource main, ConfigurationPropertySource override) {
 		this.main = main;
-		this.fallback = fallback;
+		this.override = override;
 	}
 
 	@Override
 	public Optional<?> get(String key) {
-		Optional<?> value = main.get( key );
+		Optional<?> value = override.get( key );
 		if ( !value.isPresent() ) {
-			return fallback.get( key );
+			return main.get( key );
 		}
 		else {
 			return value;
@@ -40,7 +47,7 @@ public class FallbackConfigurationPropertySource implements ConfigurationPropert
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "main=" ).append( main )
-				.append( ", fallback=" ).append( fallback )
+				.append( ", override=" ).append( override )
 				.append( "]" );
 		return sb.toString();
 	}

@@ -13,7 +13,6 @@ import java.util.Set;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -77,9 +76,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 6,
 			value = "Some properties in the Hibernate Search configuration were not used;"
 					+ " there might be misspelled property keys in your configuration. Unused properties were: %1$s."
-					+ " To disable this warning, set '"
-					+ SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING + "' to false.")
-	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys);
+					+ " To disable this warning, set the property '%2$s' to false.")
+	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey);
 
 	@Message(id = ID_OFFSET_2 + 7,
 			value = "Path '%2$s' on entity type '%1$s' cannot be resolved using Hibernate ORM metadata."

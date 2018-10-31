@@ -35,6 +35,16 @@ public class PrefixedConfigurationPropertySource implements ConfigurationPropert
 	}
 
 	@Override
+	public Optional<String> resolve(String key) {
+		if ( key.startsWith( radix ) ) {
+			return propertiesToPrefix.resolve( key.substring( radixLength ) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
 	public ConfigurationPropertySource withPrefix(String prefix) {
 		return new PrefixedConfigurationPropertySource( propertiesToPrefix, prefix + radix.substring( 0, radix.length() - 1 ) );
 	}

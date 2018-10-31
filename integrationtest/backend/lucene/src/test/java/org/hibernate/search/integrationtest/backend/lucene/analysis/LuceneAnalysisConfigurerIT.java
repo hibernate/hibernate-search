@@ -48,7 +48,8 @@ public class LuceneAnalysisConfigurerIT {
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								// TODO HSEARCH-3388 expect the full property key instead of just the radical
-								"Unable to convert configuration property 'analysis_configurer'",
+								"Unable to convert configuration property 'backend." + BACKEND_NAME + "."
+										+ SearchBackendLuceneSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'"
 						)
 						.build()

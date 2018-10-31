@@ -28,6 +28,11 @@ public class EmptyConfigurationPropertySource implements ConfigurationPropertySo
 	}
 
 	@Override
+	public Optional<String> resolve(String key) {
+		return Optional.of( key );
+	}
+
+	@Override
 	public ConfigurationPropertySource withMask(String mask) {
 		return this;
 	}
