@@ -96,8 +96,18 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	private CompletableFuture<Response> send(ElasticsearchRequest request) {
 		Gson gson = gsonProvider.getGson();
-		HttpEntity entity = ElasticsearchClientUtils.toEntity( gson, request );
+
 		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
+
+		HttpEntity entity;
+		try {
+			entity = ElasticsearchClientUtils.toEntity( gson, request );
+		}
+		catch (IOException | RuntimeException e) {
+			completableFuture.completeExceptionally( e );
+			return completableFuture;
+		}
+
 		restClient.performRequestAsync(
 				request.getMethod(),
 				request.getPath(),

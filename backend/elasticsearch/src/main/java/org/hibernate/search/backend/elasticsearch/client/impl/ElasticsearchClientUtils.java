@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -25,7 +26,7 @@ public class ElasticsearchClientUtils {
 		return 200 <= code && code < 300;
 	}
 
-	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) {
+	public static HttpEntity toEntity(Gson gson, ElasticsearchRequest request) throws IOException {
 		final List<JsonObject> bodyParts = request.getBodyParts();
 		if ( bodyParts.isEmpty() ) {
 			return null;

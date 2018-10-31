@@ -112,7 +112,7 @@ public class RootFailureCollector implements FailureCollector {
 			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			if ( elements.isEmpty() ) {
 				// Just log the problem and degrade gracefully.
-				log.unexpectedEmptyEventContext( new SearchException( "Exception for stack trace" ) );
+				log.unexpectedEmptyEventContext( new IllegalStateException( "Exception for stack trace" ) );
 				return withDefaultContext();
 			}
 			else {
