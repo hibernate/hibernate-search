@@ -46,7 +46,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Unable to convert configuration property 'backend." + BACKEND_NAME
 										+ "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER + "'",
-								"'foobar'"
+								"'foobar'",
+								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
 						.build()
 				);
