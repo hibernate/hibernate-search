@@ -98,6 +98,51 @@ public interface BooleanJunctionPredicateContext extends
 	BooleanJunctionPredicateContext filter(SearchPredicate searchPredicate);
 
 	/*
+	 * Syntactic sugar allowing to skip the toPredicate() call by passing a SearchPredicateTerminalContext
+	 * directly.
+	 */
+
+	/**
+	 * Add a <a href="#must">"must" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default BooleanJunctionPredicateContext must(SearchPredicateTerminalContext terminalContext) {
+		return must( terminalContext.toPredicate() );
+	}
+
+	/**
+	 * Add a <a href="#mustnot">"must not" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default BooleanJunctionPredicateContext mustNot(SearchPredicateTerminalContext terminalContext) {
+		return mustNot( terminalContext.toPredicate() );
+	}
+
+	/**
+	 * Add a <a href="#should">"should" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default BooleanJunctionPredicateContext should(SearchPredicateTerminalContext terminalContext) {
+		return should( terminalContext.toPredicate() );
+	}
+
+	/**
+	 * Add a <a href="#filter">"filter" clause</a> based on an almost-built {@link SearchPredicate}.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return {@code this}, for method chaining.
+	 */
+	default BooleanJunctionPredicateContext filter(SearchPredicateTerminalContext terminalContext) {
+		return filter( terminalContext.toPredicate() );
+	}
+
+	/*
 	 * Alternative syntax taking advantage of lambdas,
 	 * allowing the structure of the predicate building code to mirror the structure of predicates,
 	 * even for complex predicate building requiring for example if/else statements.

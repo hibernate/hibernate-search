@@ -91,7 +91,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -102,8 +102,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.toPredicate()
 				)
 				.build();
@@ -113,8 +113,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -161,7 +161,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -172,8 +172,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 						.toPredicate()
 				)
 				.build();
@@ -226,7 +226,7 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -237,8 +237,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -288,9 +288,9 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -306,8 +306,8 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -317,8 +317,8 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 						.toPredicate()
 				)
 				.build();
@@ -335,9 +335,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.bool()
-										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
-										.toPredicate()
+										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						)
 						.toPredicate()
 				)
@@ -350,11 +349,10 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.must( f.bool()
-								.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-								.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
-								.toPredicate()
+								.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+								.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						)
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -374,9 +372,9 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -388,9 +386,9 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -410,9 +408,9 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -424,9 +422,9 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -446,10 +444,10 @@ public class BoolSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -461,10 +459,10 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -482,8 +480,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 1 )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -495,10 +493,10 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
+						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( 1 )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -511,9 +509,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -526,8 +524,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -545,8 +543,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -558,10 +556,10 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
+						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( -1 )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -574,9 +572,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -594,8 +592,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 50 )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -607,10 +605,10 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
+						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( 50 )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -623,9 +621,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 70 ) // The minimum should be rounded down to 2
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -638,8 +636,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 100 )
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.toPredicate()
 				)
 				.build();
@@ -657,8 +655,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( -50 )
-						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -670,10 +668,10 @@ public class BoolSearchPredicateIT {
 		query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.bool()
-						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
+						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( -50 )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -686,9 +684,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( -40 ) // The minimum should be rounded up to 2
-						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() )
-						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() )
-						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ).toPredicate() )
+						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
+						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 						.toPredicate()
 				)
 				.build();
@@ -710,7 +708,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
+					b.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -722,7 +720,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -734,8 +732,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -747,9 +745,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -761,10 +759,10 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -776,11 +774,11 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -792,12 +790,12 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field5" ).matching( FIELD5_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -820,7 +818,7 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -832,8 +830,8 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ).toPredicate() );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 				} ).toPredicate() )
 				.build();
 
@@ -845,9 +843,9 @@ public class BoolSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
-					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ).toPredicate() );
-					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() );
-					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ).toPredicate() );
+					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
+					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
+					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ).toPredicate() )
 				.build();
 

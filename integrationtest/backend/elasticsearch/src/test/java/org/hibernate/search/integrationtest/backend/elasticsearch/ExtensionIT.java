@@ -85,11 +85,9 @@ public class ExtensionIT {
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'match': {'string': 'text 1'}}" )
-								.toPredicate()
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'match': {'integer': 2}}" )
-								.toPredicate()
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJsonString(
@@ -103,10 +101,9 @@ public class ExtensionIT {
 											+ "}"
 										+ "}"
 								)
-								.toPredicate()
 						)
 						// Also test using the standard DSL on a field defined with the extension
-						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ).toPredicate() )
+						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ) )
 						.toPredicate()
 				)
 				.build();

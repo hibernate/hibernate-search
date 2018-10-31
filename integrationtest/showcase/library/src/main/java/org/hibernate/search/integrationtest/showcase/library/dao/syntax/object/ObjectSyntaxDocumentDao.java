@@ -62,14 +62,12 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
-					.toPredicate()
 			);
 		}
 
 		booleanBuilder.must(
 				target.predicate().nested().onObjectField( "copies" )
-						.nest( target.predicate().match().onField( "copies.medium" ).matching( medium ).toPredicate() )
-						.toPredicate()
+						.nest( target.predicate().match().onField( "copies.medium" ).matching( medium ) )
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
@@ -99,7 +97,6 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 					.onField( "title" ).boostedTo( 2.0f )
 					.orField( "summary" )
 					.matching( terms )
-					.toPredicate()
 			);
 		}
 
@@ -111,7 +108,6 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						target.predicate().match()
 						.onField( "tags" )
 						.matching( tag )
-						.toPredicate()
 				);
 			}
 		}
@@ -125,9 +121,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 									.within()
 									.onField( "copies.library.location" )
 									.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
-									.toPredicate()
 							)
-							.toPredicate()
 			);
 		}
 
@@ -139,13 +133,11 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 						target.predicate().match()
 						.onField( "copies.library.services" )
 						.matching( service )
-						.toPredicate()
 				);
 			}
 			booleanBuilder.must(
 					target.predicate().nested().onObjectField( "copies" )
-							.nest( nestedBoolean.toPredicate() )
-							.toPredicate()
+							.nest( nestedBoolean )
 			);
 		}
 

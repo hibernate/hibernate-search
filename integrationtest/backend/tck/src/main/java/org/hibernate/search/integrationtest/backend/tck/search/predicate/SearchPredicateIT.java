@@ -179,7 +179,7 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.bool()
 						.should( cachingContributor )
-						.should( f.match().onField( "string" ).matching( STRING_2 ).toPredicate() )
+						.should( f.match().onField( "string" ).matching( STRING_2 ) )
 						.toPredicate()
 				)
 				.build();

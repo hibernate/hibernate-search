@@ -29,6 +29,24 @@ public interface NestedPredicateFieldContext {
 	SearchPredicateTerminalContext nest(SearchPredicate searchPredicate);
 
 	/*
+	 * Syntactic sugar allowing to skip the toPredicate() call by passing a SearchPredicateTerminalContext
+	 * directly.
+	 */
+
+	/**
+	 * Set the inner predicate to an almost-built {@link SearchPredicate}.
+	 * <p>
+	 * Matching documents are those for which at least one element of the nested object field
+	 * matches the inner predicate.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return A context allowing to get the resulting predicate.
+	 */
+	default SearchPredicateTerminalContext nest(SearchPredicateTerminalContext terminalContext) {
+		return nest( terminalContext.toPredicate() );
+	}
+
+	/*
 	 * Alternative syntax taking advantage of lambdas,
 	 * allowing the structure of the predicate building code to mirror the structure of predicates,
 	 * even for complex predicate building requiring for example if/else statements.
