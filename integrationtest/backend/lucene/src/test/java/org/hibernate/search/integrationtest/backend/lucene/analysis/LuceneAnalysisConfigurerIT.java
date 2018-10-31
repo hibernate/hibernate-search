@@ -50,7 +50,8 @@ public class LuceneAnalysisConfigurerIT {
 								// TODO HSEARCH-3388 expect the full property key instead of just the radical
 								"Unable to convert configuration property 'backend." + BACKEND_NAME + "."
 										+ SearchBackendLuceneSettings.ANALYSIS_CONFIGURER + "'",
-								"'foobar'"
+								"'foobar'",
+								"Unable to find " + LuceneAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
 						.build()
 				);

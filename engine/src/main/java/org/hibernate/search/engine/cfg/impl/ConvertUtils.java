@@ -47,7 +47,7 @@ public final class ConvertUtils {
 					.map( parser );
 		}
 		catch (RuntimeException e) {
-			throw log.invalidPropertyValue( expectedType, e );
+			throw log.invalidPropertyValue( expectedType, e.getMessage(), e );
 		}
 	}
 
