@@ -324,9 +324,6 @@ public class SearchProjectionIT {
 
 	@Test
 	public void field_inFlattenedObject() {
-		Assume.assumeTrue( "Projections on fields within flattened object fields are not supported yet in Elasticsearch", false );
-		// TODO support projections on fields within flattened object fields
-
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
 		for ( FieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
@@ -350,7 +347,7 @@ public class SearchProjectionIT {
 	@Test
 	public void field_inNestedObject() {
 		Assume.assumeTrue( "Projections on fields within nested object fields are not supported yet", false );
-		// TODO support projections on fields within nested object fields
+		// TODO HSEARCH-3062 support projections on fields within nested object fields
 
 		IndexSearchTarget searchTarget = indexManager.createSearchTarget().build();
 
