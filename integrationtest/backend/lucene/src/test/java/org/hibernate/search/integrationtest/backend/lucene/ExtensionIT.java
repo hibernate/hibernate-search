@@ -129,7 +129,7 @@ public class ExtensionIT {
 			b.should( predicate1 );
 			b.should( predicate2 );
 			b.should( predicate3 );
-		} ).toPredicate();
+		} );
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()

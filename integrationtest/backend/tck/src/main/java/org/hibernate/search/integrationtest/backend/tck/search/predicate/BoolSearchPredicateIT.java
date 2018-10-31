@@ -709,7 +709,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -721,7 +721,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -734,7 +734,7 @@ public class BoolSearchPredicateIT {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -748,7 +748,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -763,7 +763,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -779,7 +779,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -796,7 +796,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -819,7 +819,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -832,7 +832,7 @@ public class BoolSearchPredicateIT {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
@@ -846,7 +846,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
-				} ).toPredicate() )
+				} ) )
 				.build();
 
 		DocumentReferencesSearchResultAssert.assertThat( query )
