@@ -9,6 +9,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.search.SearchPredicate;
+
 /**
  * A context allowing to specify the type of a predicate.
  * <p>
@@ -78,10 +80,10 @@ public interface SearchPredicateFactoryContext {
 	 *
 	 * @param clauseContributor A consumer that will add clauses to the context passed in parameter.
 	 * Should generally be a lambda expression.
-	 * @return A context allowing to get the resulting predicate.
+	 * @return The resulting {@link SearchPredicate}
 	 * @see BooleanJunctionPredicateContext
 	 */
-	SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
+	SearchPredicate bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.

@@ -60,7 +60,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 					b.must( f.nested().onObjectField( "copies" )
 							.nest( f.match().onField( "copies.medium" ).matching( medium ) )
 					);
-				} ).toPredicate() )
+				} ) )
 				.sort( b -> b.byField( "title_sort" ) )
 				.build();
 
@@ -121,7 +121,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								} ) )
 						);
 					}
-				} ).toPredicate() )
+				} ) )
 				// TODO facets (tag, medium, library in particular)
 				.sort( b -> b.byScore() )
 				.build();
