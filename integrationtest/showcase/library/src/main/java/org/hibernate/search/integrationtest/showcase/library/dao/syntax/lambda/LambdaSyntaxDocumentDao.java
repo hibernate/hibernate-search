@@ -55,12 +55,10 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								.onField( "title" ).boostedTo( 2.0f )
 								.orField( "summary" )
 								.matching( terms )
-								.toPredicate()
 						);
 					}
 					b.must( f.nested().onObjectField( "copies" )
-							.nest( f.match().onField( "copies.medium" ).matching( medium ).toPredicate() )
-							.toPredicate()
+							.nest( f.match().onField( "copies.medium" ).matching( medium ) )
 					);
 				} ).toPredicate() )
 				.sort( b -> b.byField( "title_sort" ) )
@@ -86,7 +84,6 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								.onField( "title" ).boostedTo( 2.0f )
 								.orField( "summary" )
 								.matching( terms )
-								.toPredicate()
 						);
 					}
 					// Bridged query with complex bridge: TODO rely on the bridge to split the String
@@ -97,10 +94,9 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 								b2.must( f.match()
 										.onField( "tags" )
 										.matching( tag )
-										.toPredicate()
 								);
 							}
-						} ).toPredicate() );
+						} ) );
 					}
 					// Spatial query
 					if ( myLocation != null && maxDistanceInKilometers != null ) {
@@ -109,9 +105,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 										.within()
 										.onField( "copies.library.location" )
 										.circle( myLocation, maxDistanceInKilometers, DistanceUnit.KILOMETERS )
-										.toPredicate()
 								)
-								.toPredicate()
 						);
 					}
 					// Nested query + must loop
@@ -122,11 +116,9 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 										b2.must( f.match()
 												.onField( "copies.library.services" )
 												.matching( service )
-												.toPredicate()
 										);
 									}
-								} ).toPredicate() )
-								.toPredicate()
+								} ) )
 						);
 					}
 				} ).toPredicate() )

@@ -99,8 +99,8 @@ public class MatchAllSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.matchAll()
-						.except( f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
-						.except( f.match().onField( "string" ).matching( STRING_2 ).toPredicate() )
+						.except( f.match().onField( "string" ).matching( STRING_1 ) )
+						.except( f.match().onField( "string" ).matching( STRING_2 ) )
 						.toPredicate()
 				)
 				.build();

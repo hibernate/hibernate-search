@@ -27,6 +27,22 @@ public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<
 	MatchAllPredicateContext except(SearchPredicate searchPredicate);
 
 	/*
+	 * Syntactic sugar allowing to skip the toPredicate() call by passing a SearchPredicateTerminalContext
+	 * directly.
+	 */
+
+	/**
+	 * Add a "must not" clause based on an almost-built {@link SearchPredicate}.
+	 * <p>
+	 * Documents matching the "must not" clause won't match the "match all" predicate.
+	 *
+	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
+	 * @return A context allowing to get the resulting predicate.
+	 */
+	default MatchAllPredicateContext except(SearchPredicateTerminalContext terminalContext) {
+		return except( terminalContext.toPredicate() );
+	}
+	/*
 	 * Alternative syntax taking advantage of lambdas,
 	 * allowing the structure of the predicate building code to mirror the structure of predicates,
 	 * even for complex predicate building requiring for example if/else statements.
