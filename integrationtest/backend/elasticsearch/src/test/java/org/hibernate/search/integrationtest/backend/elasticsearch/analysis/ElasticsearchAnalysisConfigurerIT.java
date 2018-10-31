@@ -44,8 +44,8 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								// TODO HSEARCH-3388 expect the full property key instead of just the radical
-								"Unable to convert configuration property 'analysis_configurer'",
+								"Unable to convert configuration property 'backend." + BACKEND_NAME
+										+ "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'"
 						)
 						.build()

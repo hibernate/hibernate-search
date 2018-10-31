@@ -28,8 +28,16 @@ public final class UnusedPropertyTrackingConfigurationPropertySource implements 
 
 	@Override
 	public Optional<?> get(String key) {
-		unusedPropertyKeys.remove( key );
+		Optional<String> resolved = resolve( key );
+		if ( resolved.isPresent() ) {
+			unusedPropertyKeys.remove( resolved.get() );
+		}
 		return delegate.get( key );
+	}
+
+	@Override
+	public Optional<String> resolve(String key) {
+		return delegate.resolve( key );
 	}
 
 	public Set<String> getUnusedPropertyKeys() {

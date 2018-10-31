@@ -12,8 +12,6 @@ import java.util.Set;
 
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 
 class ConfigurationServicePropertySource implements ConfigurationPropertySource {
 
@@ -28,6 +26,11 @@ class ConfigurationServicePropertySource implements ConfigurationPropertySource 
 	@Override
 	public Optional<?> get(String key) {
 		return Optional.ofNullable( configurationService.getSetting( key, OBJECT_CONVERTER ) );
+	}
+
+	@Override
+	public Optional<String> resolve(String key) {
+		return Optional.of( key );
 	}
 
 	public Set<String> resolveAll(String prefix) {

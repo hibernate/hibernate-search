@@ -13,7 +13,6 @@ import java.nio.file.Path;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
-import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
@@ -80,17 +79,15 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 75,
-			value = "Configuration setting " + SearchBackendLuceneSettings.LUCENE_VERSION
-			+ " was not specified: using LATEST (currently '%1$s'). %2$s")
-	void recommendConfiguringLuceneVersion(Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
+			value = "Configuration setting '%1$s' was not specified: using LATEST (currently '%2$s'). %3$s")
+	void recommendConfiguringLuceneVersion(String key, Version latest, @FormatWith(EventContextFormatter.class) EventContext context);
 
 	@Message(id = ID_OFFSET_1 + 114,
 			value = "Could not load resource: '%1$s'")
 	SearchException unableToLoadResource(String fileName);
 
 	@Message(id = ID_OFFSET_1 + 228,
-			value = "Property " + SearchBackendLuceneSettings.LUCENE_VERSION
-			+ " set to value '%s' is not in a valid format to express a Lucene version: %s" )
+			value = "Value '%1$ss' is not in a valid format to express a Lucene version: %2$s" )
 	SearchException illegalLuceneVersionFormat(String property, String luceneErrorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 284,

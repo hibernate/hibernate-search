@@ -26,6 +26,11 @@ public class PropertiesConfigurationPropertySource implements ConfigurationPrope
 	}
 
 	@Override
+	public Optional<String> resolve(String key) {
+		return Optional.of( key );
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )

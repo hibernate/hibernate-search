@@ -162,8 +162,9 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			ConfigurationPropertySource propertySource;
 			if ( !overriddenProperties.isEmpty() ) {
-				propertySource = ConfigurationPropertySource.fromProperties( overriddenProperties )
-						.withFallback( mainPropertySource );
+				propertySource = mainPropertySource.withOverride(
+						ConfigurationPropertySource.fromProperties( overriddenProperties )
+				);
 			}
 			else {
 				propertySource = mainPropertySource;

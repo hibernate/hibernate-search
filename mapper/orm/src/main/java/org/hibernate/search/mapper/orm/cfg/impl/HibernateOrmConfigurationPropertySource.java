@@ -24,7 +24,7 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 
 	private static final ConfigurationProperty<Boolean> ENABLE_CONFIGURATION_PROPERTY_TRACKING =
 			// We don't use the radical here, but the full property key: the property is retrieved before we apply the mask
-			ConfigurationProperty.forKey( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
 					.asBoolean()
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
 					.build();
@@ -34,28 +34,21 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 
 	public HibernateOrmConfigurationPropertySource(ConfigurationService configurationService) {
 		ConfigurationServicePropertySource serviceSource = new ConfigurationServicePropertySource( configurationService );
+		ConfigurationPropertySource maskedSource = serviceSource.withMask( "hibernate.search" );
 
-		ConfigurationPropertySource unmaskedPropertySource;
-		if ( ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( serviceSource ) ) {
+		if ( ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( maskedSource ) ) {
 			Set<String> availablePropertyKeys = serviceSource.resolveAll( SearchOrmSettings.PREFIX );
 			unusedPropertyTrackingPropertySource =
-					new UnusedPropertyTrackingConfigurationPropertySource( serviceSource, availablePropertyKeys );
+					new UnusedPropertyTrackingConfigurationPropertySource( maskedSource, availablePropertyKeys );
 			// Make sure to mark the "enable configuration property tracking" property as used
 			ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( unusedPropertyTrackingPropertySource );
-			unmaskedPropertySource = unusedPropertyTrackingPropertySource;
+			delegate = unusedPropertyTrackingPropertySource;
 		}
 		else {
 			log.configurationPropertyTrackingDisabled();
 			unusedPropertyTrackingPropertySource = null;
-			unmaskedPropertySource = serviceSource;
+			delegate = maskedSource;
 		}
-
-		/*
-		 * Only apply the mask after we added support for unused property tracking,
-		 * because that tracking must work on the user's keys without a mask,
-		 * so as to report unused keys exactly as they were provided by the user.
-		 */
-		delegate = unmaskedPropertySource.withMask( "hibernate.search" );
 	}
 
 	@Override
@@ -63,11 +56,19 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 		return delegate.get( key );
 	}
 
+	@Override
+	public Optional<String> resolve(String key) {
+		return delegate.resolve( key );
+	}
+
 	public void afterBootstrap() {
 		if ( unusedPropertyTrackingPropertySource != null ) {
 			Set<String> unusedPropertyKeys = unusedPropertyTrackingPropertySource.getUnusedPropertyKeys();
 			if ( !unusedPropertyKeys.isEmpty() ) {
-				log.configurationPropertyTrackingUnusedProperties( unusedPropertyKeys );
+				log.configurationPropertyTrackingUnusedProperties(
+						unusedPropertyKeys,
+						ENABLE_CONFIGURATION_PROPERTY_TRACKING.resolveOrRaw( this )
+				);
 			}
 		}
 	}
