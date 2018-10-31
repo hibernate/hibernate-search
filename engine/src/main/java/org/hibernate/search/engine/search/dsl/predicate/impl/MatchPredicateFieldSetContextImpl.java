@@ -18,7 +18,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -36,7 +36,7 @@ class MatchPredicateFieldSetContextImpl<B>
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
 		}
@@ -68,7 +68,7 @@ class MatchPredicateFieldSetContextImpl<B>
 	static class CommonState<B> extends MultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
-		CommonState(SearchPredicateFactory<?, B> factory) {
+		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 

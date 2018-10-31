@@ -11,10 +11,10 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateFactoryContextImpl;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -28,11 +28,11 @@ class SearchQueryPredicateCollector<C, B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateFactory<C, B> factory;
+	private final SearchPredicateBuilderFactory<C, B> factory;
 
 	private B builder;
 
-	SearchQueryPredicateCollector(SearchPredicateFactory<C, B> factory) {
+	SearchQueryPredicateCollector(SearchPredicateBuilderFactory<C, B> factory) {
 		this.factory = factory;
 	}
 
@@ -44,10 +44,9 @@ class SearchQueryPredicateCollector<C, B> {
 		collect( factory.toImplementation( predicate ) );
 	}
 
-	void collect(Function<? super SearchPredicateContainerContext, SearchPredicate> dslPredicateContributor) {
-		SearchPredicateContainerContext containerContext =
-				new SearchPredicateContainerContextImpl<>( factory );
-		collect( dslPredicateContributor.apply( containerContext ) );
+	void collect(Function<? super SearchPredicateFactoryContext, SearchPredicate> dslPredicateContributor) {
+		SearchPredicateFactoryContext factoryContext = new SearchPredicateFactoryContextImpl<>( factory );
+		collect( dslPredicateContributor.apply( factoryContext ) );
 	}
 
 	private void collect(B builder) {

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+
 public enum ObjectFieldStorage {
 
 	/**
@@ -50,7 +52,7 @@ public enum ObjectFieldStorage {
 	 * <p>
 	 * This storage mode is generally less efficient, but has the advantage of
 	 * keeping structural information, allowing the use of
-	 * {@link org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext#nested() "nested" predicates}.
+	 * {@link SearchPredicateFactoryContext#nested() "nested" predicates}.
 	 */
 	NESTED
 

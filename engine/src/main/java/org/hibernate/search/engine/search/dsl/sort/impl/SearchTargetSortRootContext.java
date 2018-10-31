@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.engine.search.dsl.sort.impl;
 
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public final class SearchTargetSortRootContext<B> extends SearchSortContainerContextImpl<B> {
 
-	public SearchTargetSortRootContext(SearchSortFactory<?, B> factory) {
+	public SearchTargetSortRootContext(SearchSortBuilderFactory<?, B> factory) {
 		super( factory, new RootSearchSortDslContextImpl<>( factory ) );
 	}
 

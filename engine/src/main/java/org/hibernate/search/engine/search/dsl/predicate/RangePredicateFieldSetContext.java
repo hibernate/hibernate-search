@@ -49,7 +49,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
 	 * @return A context allowing to set the upper bound of the range.
 	 */
@@ -79,7 +79,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
 	 * @return A context allowing to get the resulting predicate.
 	 */
@@ -109,7 +109,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to get the resulting predicate.
 	 */

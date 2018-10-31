@@ -11,13 +11,13 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateFieldContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -27,13 +27,13 @@ class NestedPredicateContextImpl<B>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final SearchPredicateContainerContext containerContext;
+	private final SearchPredicateFactoryContext factoryContext;
 	private NestedPredicateBuilder<B> builder;
 	private B childPredicateBuilder;
 
-	NestedPredicateContextImpl(SearchPredicateFactory<?, B> factory, SearchPredicateContainerContext containerContext) {
+	NestedPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
 		super( factory );
-		this.containerContext = containerContext;
+		this.factoryContext = factoryContext;
 	}
 
 	@Override
@@ -53,8 +53,8 @@ class NestedPredicateContextImpl<B>
 
 	@Override
 	public SearchPredicateTerminalContext nest(
-			Function<? super SearchPredicateContainerContext, SearchPredicate> predicateContributor) {
-		return nest( predicateContributor.apply( containerContext ) );
+			Function<? super SearchPredicateFactoryContext, SearchPredicate> predicateContributor) {
+		return nest( predicateContributor.apply( factoryContext ) );
 	}
 
 	@Override

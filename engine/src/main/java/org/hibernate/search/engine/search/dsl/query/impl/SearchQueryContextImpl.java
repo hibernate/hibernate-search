@@ -35,7 +35,7 @@ final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 		this.searchPredicateCollector = searchPredicateCollector;
-		this.searchSortCollector = new SearchQuerySortCollector<>( targetContext.getSearchSortFactory() );
+		this.searchSortCollector = new SearchQuerySortCollector<>( targetContext.getSearchSortBuilderFactory() );
 	}
 
 	@Override

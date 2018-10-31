@@ -10,7 +10,7 @@ import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFactory;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
@@ -22,12 +22,12 @@ public class LuceneSearchSortContainerContextImpl
 		extends DelegatingSearchSortContainerContextImpl
 		implements LuceneSearchSortContainerContext {
 
-	private final LuceneSearchSortFactory factory;
+	private final LuceneSearchSortBuilderFactory factory;
 
 	private final SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext;
 
 	public LuceneSearchSortContainerContextImpl(SearchSortContainerContext delegate,
-			LuceneSearchSortFactory factory,
+			LuceneSearchSortBuilderFactory factory,
 			SearchSortDslContext<? super LuceneSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;

@@ -10,14 +10,14 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class RangePredicateContextImpl<B> implements RangePredicateContext {
 
 	private final RangePredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	RangePredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	RangePredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.commonState = new RangePredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 

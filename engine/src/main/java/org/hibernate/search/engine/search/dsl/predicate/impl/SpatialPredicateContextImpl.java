@@ -8,13 +8,13 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 class SpatialPredicateContextImpl<B> implements SpatialPredicateContext {
 
-	private final SearchPredicateFactory<?, B> factory;
+	private final SearchPredicateBuilderFactory<?, B> factory;
 
-	SpatialPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	SpatialPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.factory = factory;
 	}
 

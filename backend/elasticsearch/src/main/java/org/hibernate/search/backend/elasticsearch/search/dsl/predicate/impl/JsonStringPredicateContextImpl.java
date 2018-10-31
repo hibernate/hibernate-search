@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 
@@ -16,7 +16,7 @@ final class JsonStringPredicateContextImpl
 		implements SearchPredicateTerminalContext {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
-	JsonStringPredicateContextImpl(ElasticsearchSearchPredicateFactory factory, String jsonString) {
+	JsonStringPredicateContextImpl(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
 		super( factory );
 		this.builder = factory.fromJsonString( jsonString );
 	}

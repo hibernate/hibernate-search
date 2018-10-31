@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.dsl.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 
@@ -18,7 +18,7 @@ final class LuceneQueryPredicateContextImpl
 		implements SearchPredicateTerminalContext {
 	private final LuceneSearchPredicateBuilder builder;
 
-	LuceneQueryPredicateContextImpl(LuceneSearchPredicateFactory factory, Query luceneQuery) {
+	LuceneQueryPredicateContextImpl(LuceneSearchPredicateBuilderFactory factory, Query luceneQuery) {
 		super( factory );
 		this.builder = factory.fromLuceneQuery( luceneQuery );
 	}

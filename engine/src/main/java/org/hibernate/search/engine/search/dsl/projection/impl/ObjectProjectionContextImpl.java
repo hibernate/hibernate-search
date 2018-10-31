@@ -9,14 +9,14 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class ObjectProjectionContextImpl implements ObjectProjectionContext {
 
 	private ObjectSearchProjectionBuilder objectProjectionBuilder;
 
-	ObjectProjectionContextImpl(SearchProjectionFactory factory) {
+	ObjectProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.objectProjectionBuilder = factory.object();
 	}
 

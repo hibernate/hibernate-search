@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.jpa;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface FullTextSearchTarget<T> {
 
 	HibernateOrmSearchQueryResultDefinitionContext<T> query();
 
-	SearchPredicateContainerContext predicate();
+	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionContainerContext projection();
+	SearchProjectionFactoryContext projection();
 
 }

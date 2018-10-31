@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateContainerContextImpl;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
-import org.hibernate.search.engine.search.dsl.projection.impl.SearchProjectionContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateFactoryContextImpl;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.impl.SearchProjectionFactoryContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchTargetSortRootContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
@@ -17,18 +17,18 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 public abstract class IndexSearchTargetBase implements IndexSearchTarget {
 
 	@Override
-	public SearchPredicateContainerContext predicate() {
-		return new SearchPredicateContainerContextImpl<>( getSearchTargetContext().getSearchPredicateFactory() );
+	public SearchPredicateFactoryContext predicate() {
+		return new SearchPredicateFactoryContextImpl<>( getSearchTargetContext().getSearchPredicateBuilderFactory() );
 	}
 
 	@Override
 	public SearchSortContainerContext sort() {
-		return new SearchTargetSortRootContext<>( getSearchTargetContext().getSearchSortFactory() );
+		return new SearchTargetSortRootContext<>( getSearchTargetContext().getSearchSortBuilderFactory() );
 	}
 
 	@Override
-	public SearchProjectionContainerContext projection() {
-		return new SearchProjectionContainerContextImpl( getSearchTargetContext().getSearchProjectionFactory() );
+	public SearchProjectionFactoryContext projection() {
+		return new SearchProjectionFactoryContextImpl( getSearchTargetContext().getSearchProjectionFactory() );
 	}
 
 	protected abstract SearchTargetContext<?> getSearchTargetContext();

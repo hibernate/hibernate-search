@@ -10,14 +10,14 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
 import com.google.gson.JsonObject;
 
 /**
  * A hit extractor used when search results are expected to contain document references, potentially transformed.
  *
- * @see SearchQueryFactory#asReferences(SessionContext, HitAggregator)
+ * @see SearchQueryBuilderFactory#asReferences(SessionContext, HitAggregator)
  */
 public class ReferenceHitExtractor implements HitExtractor<ReferenceHitCollector> {
 

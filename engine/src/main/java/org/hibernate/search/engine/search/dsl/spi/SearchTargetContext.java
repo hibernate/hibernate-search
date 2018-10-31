@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.search.dsl.spi;
 
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.spi.SearchQueryFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * The target context during a search, aware of the targeted indexes and of the underlying technology (backend).
@@ -18,12 +18,12 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
  */
 public interface SearchTargetContext<C> {
 
-	SearchPredicateFactory<? super C, ?> getSearchPredicateFactory();
+	SearchPredicateBuilderFactory<? super C, ?> getSearchPredicateBuilderFactory();
 
-	SearchSortFactory<? super C, ?> getSearchSortFactory();
+	SearchSortBuilderFactory<? super C, ?> getSearchSortBuilderFactory();
 
-	SearchQueryFactory<C> getSearchQueryFactory();
+	SearchQueryBuilderFactory<C> getSearchQueryBuilderFactory();
 
-	SearchProjectionFactory getSearchProjectionFactory();
+	SearchProjectionBuilderFactory getSearchProjectionFactory();
 
 }

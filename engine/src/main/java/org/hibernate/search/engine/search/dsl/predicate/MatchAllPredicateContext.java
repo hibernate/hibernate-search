@@ -43,6 +43,6 @@ public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchAllPredicateContext except(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
+	MatchAllPredicateContext except(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
 
 }

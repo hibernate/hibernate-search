@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 class FieldSortContextImpl<B>
 		extends NonEmptySortContextImpl
@@ -25,7 +25,7 @@ class FieldSortContextImpl<B>
 	private final FieldSortBuilder<B> builder;
 
 	FieldSortContextImpl(SearchSortContainerContext containerContext,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<?> dslContext,
+			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<?> dslContext,
 			String absoluteFieldPath) {
 		super( containerContext, dslContext );
 		this.builder = factory.field( absoluteFieldPath );

@@ -12,18 +12,18 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 class MultiFieldPredicateCommonState<B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
 		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	MultiFieldPredicateCommonState(SearchPredicateFactory<?, B> factory) {
+	MultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
 	}
 
-	public SearchPredicateFactory<?, B> getFactory() {
+	public SearchPredicateBuilderFactory<?, B> getFactory() {
 		return factory;
 	}
 

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -38,7 +38,7 @@ class RangePredicateFieldSetContextImpl<B>
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
-		SearchPredicateFactory<?, B> predicateFactory = commonState.getFactory();
+		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
@@ -82,7 +82,7 @@ class RangePredicateFieldSetContextImpl<B>
 
 		private boolean hasNonNullBound = false;
 
-		CommonState(SearchPredicateFactory<?, B> factory) {
+		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 
