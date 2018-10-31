@@ -1299,11 +1299,18 @@
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <excludes>
                                     <!-- JBoss Logger formats messages according to default Locale (bug or feature?) -->
+                                    <!-- Also, we allow JBoss Loggers to use SearchException constructors -->
                                     <exclude>**/*_$logger.class</exclude>
                                     <!-- JBoss message bundles format messages -->
                                     <exclude>**/*_$bundle.class</exclude>
                                     <!-- Easymock uses StringBuffer, we can't do anything about that -->
                                     <exclude>**/EasyMockUtils*.class</exclude>
+                                    <!--
+                                         SearchException and subclasses are allowed to use SearchException constructors,
+                                         on contrary to the rest of the code
+                                      -->
+                                    <exclude>**/SearchException.class</exclude>
+                                    <exclude>**/ClassLoadingException.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
