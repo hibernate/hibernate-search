@@ -19,9 +19,7 @@ import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
@@ -61,38 +59,11 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_DIRTY_CHECK )
 					.build();
 
-	private static final ConfigurationProperty<Boolean> ENABLE_CONFIGURATION_PROPERTY_TRACKING =
-			// We don't use the radical here, but the full property key: the property is retrieved before we apply the mask
-			ConfigurationProperty.forKey( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
-					.asBoolean()
-					.withDefault( SearchOrmSettings.Defaults.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
-					.build();
-
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
-		HibernateOrmConfigurationPropertySource hibernateOrmPropertySource =
+		HibernateOrmConfigurationPropertySource propertySource =
 				new HibernateOrmConfigurationPropertySource( configurationService );
-		UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource;
-		ConfigurationPropertySource unmaskedPropertySource;
-		if ( ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( hibernateOrmPropertySource ) ) {
-			unusedPropertyTrackingPropertySource = hibernateOrmPropertySource.withUnusedPropertyTracking();
-			// Make sure to mark the "enable configuration property tracking" property as used
-			ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( unusedPropertyTrackingPropertySource );
-			unmaskedPropertySource = unusedPropertyTrackingPropertySource;
-		}
-		else {
-			log.configurationPropertyTrackingDisabled();
-			unusedPropertyTrackingPropertySource = null;
-			unmaskedPropertySource = hibernateOrmPropertySource;
-		}
-
-		/*
-		 * Only apply the mask after we added support for unused property tracking,
-		 * because that tracking must work on the user's keys without a mask,
-		 * so as to report unused keys exactly as they were provided by the user.
-		 */
-		ConfigurationPropertySource propertySource = unmaskedPropertySource.withMask( "hibernate.search" );
 		JndiService namingService = serviceRegistry.getService( JndiService.class );
 
 		if ( ! AUTOREGISTER_LISTENERS.get( propertySource ) ) {
@@ -113,7 +84,7 @@ public class HibernateSearchIntegrator implements Integrator {
 				serviceRegistry.locateServiceBinding( ManagedBeanRegistry.class );
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
 				metadata,
-				propertySource, unusedPropertyTrackingPropertySource,
+				propertySource,
 				fullTextIndexEventListener,
 				hibernateOrmClassLoaderService,
 				environmentSynchronizerBinding == null ? null : serviceRegistry.getService( EnvironmentSynchronizer.class ),
