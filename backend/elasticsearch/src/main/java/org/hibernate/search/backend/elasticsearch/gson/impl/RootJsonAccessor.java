@@ -11,21 +11,23 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.util.AssertionFailure;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
  * @author Yoann Rodiere
  */
-class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<JsonObject> {
+class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 
-	static final JsonObjectAccessor INSTANCE = new RootJsonAccessor();
+	// Wrap the instance in a JsonObjectAccessor, because we know the root is an object
+	static final JsonObjectAccessor INSTANCE = new JsonObjectAccessorImpl( new RootJsonAccessor() );
 
 	private RootJsonAccessor() {
 		// Private, use INSTANCE instead.
 	}
 
 	@Override
-	public Optional<JsonObject> get(JsonObject root) {
+	public Optional<JsonElement> get(JsonObject root) {
 		return Optional.of( requireRoot( root ) );
 	}
 
@@ -39,17 +41,17 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 	}
 
 	@Override
-	public void set(JsonObject root, JsonObject value) {
+	public void set(JsonObject root, JsonElement value) {
 		throw new UnsupportedOperationException( "Cannot set the root element" );
 	}
 
 	@Override
-	public void add(JsonObject root, JsonObject value) {
+	public void add(JsonObject root, JsonElement value) {
 		throw new UnsupportedOperationException( "Cannot add a value to the root element" );
 	}
 
 	@Override
-	public JsonObject getOrCreate(JsonObject root, Supplier<? extends JsonObject> newValueSupplier) throws UnexpectedJsonElementTypeException {
+	public JsonObject getOrCreate(JsonObject root, Supplier<? extends JsonElement> newValueSupplier) throws UnexpectedJsonElementTypeException {
 		return requireRoot( root );
 	}
 
@@ -66,10 +68,5 @@ class RootJsonAccessor implements JsonObjectAccessor, JsonCompositeAccessor<Json
 	@Override
 	public String getStaticAbsolutePath() {
 		return null;
-	}
-
-	@Override
-	public UnknownTypeJsonAccessor property(String propertyName) {
-		return new ObjectPropertyJsonAccessor( this, propertyName );
 	}
 }

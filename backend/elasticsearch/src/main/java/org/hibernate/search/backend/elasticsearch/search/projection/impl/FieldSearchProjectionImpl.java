@@ -29,7 +29,7 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 
 	FieldSearchProjectionImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.property( absoluteFieldPath );
+		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
 		this.converter = converter;
 	}
 
