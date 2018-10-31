@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.SessionFactory;
@@ -18,22 +16,19 @@ import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
+import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
@@ -45,10 +40,7 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  */
 public class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final ConfigurationPropertySource propertySource;
-	private final UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource;
+	private final HibernateOrmConfigurationPropertySource propertySource;
 	private final JndiService namingService;
 	private final ClassLoaderService hibernateOrmClassLoaderService;
 	private final EnvironmentSynchronizer environmentSynchronizer;
@@ -66,8 +58,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 	HibernateSearchSessionFactoryObserver(
 			Metadata metadata,
-			ConfigurationPropertySource propertySource,
-			UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource,
+			HibernateOrmConfigurationPropertySource propertySource,
 			FullTextIndexEventListener listener,
 			ClassLoaderService hibernateOrmClassLoaderService,
 			EnvironmentSynchronizer environmentSynchronizer,
@@ -75,7 +66,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			JndiService namingService) {
 		this.metadata = metadata;
 		this.propertySource = propertySource;
-		this.unusedPropertyTrackingPropertySource = unusedPropertyTrackingPropertySource;
 		this.listener = listener;
 		Contracts.assertNotNull( hibernateOrmClassLoaderService, "Hibernate ORM ClassResolver" );
 		this.hibernateOrmClassLoaderService = hibernateOrmClassLoaderService;
@@ -180,12 +170,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			contextService.initialize( integration, mapping );
 			contextFuture.complete( contextService );
 
-			if ( unusedPropertyTrackingPropertySource != null ) {
-				Set<String> unusedPropertyKeys = unusedPropertyTrackingPropertySource.getUnusedPropertyKeys();
-				if ( !unusedPropertyKeys.isEmpty() ) {
-					log.configurationPropertyTrackingUnusedProperties( unusedPropertyKeys );
-				}
-			}
+			propertySource.afterBootstrap();
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
