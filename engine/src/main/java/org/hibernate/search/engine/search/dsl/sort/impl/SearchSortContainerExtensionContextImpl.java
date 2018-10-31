@@ -15,19 +15,19 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExt
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 
 final class SearchSortContainerExtensionContextImpl<B> implements SearchSortContainerExtensionContext {
 
 	private final SearchSortContainerContext parent;
-	private final SearchSortFactory<?, B> factory;
+	private final SearchSortBuilderFactory<?, B> factory;
 	private final SearchSortDslContext<? super B> dslContext;
 
 	private final DslExtensionState<Void> state = new DslExtensionState<>();
 
 	SearchSortContainerExtensionContextImpl(SearchSortContainerContext parent,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
+			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
 		this.parent = parent;
 		this.factory = factory;
 		this.dslContext = dslContext;

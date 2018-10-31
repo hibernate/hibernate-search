@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 class ScoreSortContextImpl<B>
 		extends NonEmptySortContextImpl
@@ -24,7 +24,7 @@ class ScoreSortContextImpl<B>
 	private final ScoreSortBuilder<B> builder;
 
 	ScoreSortContextImpl(SearchSortContainerContext containerContext,
-			SearchSortFactory<?, B> factory, SearchSortDslContext<?> dslContext) {
+			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<?> dslContext) {
 		super( containerContext, dslContext );
 		this.builder = factory.score();
 	}

@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortContributor;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -32,13 +32,13 @@ public final class RootSearchSortDslContextImpl<B>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final SearchSortFactory<?, B> factory;
+	protected final SearchSortBuilderFactory<?, B> factory;
 
 	private final List<SearchSortContributor<? extends B>> sortContributors = new ArrayList<>();
 	private SearchSort sortResult;
 	private boolean usedContributors = false;
 
-	public RootSearchSortDslContextImpl(SearchSortFactory<?, B> factory) {
+	public RootSearchSortDslContextImpl(SearchSortBuilderFactory<?, B> factory) {
 		this.factory = factory;
 	}
 

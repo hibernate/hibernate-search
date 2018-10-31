@@ -9,14 +9,14 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class FieldProjectionContextImpl<T> implements FieldProjectionContext<T> {
 
 	private FieldSearchProjectionBuilder<T> fieldProjectionBuilder;
 
-	FieldProjectionContextImpl(SearchProjectionFactory factory, String absoluteFieldPath, Class<T> clazz) {
+	FieldProjectionContextImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz) {
 		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz );
 	}
 

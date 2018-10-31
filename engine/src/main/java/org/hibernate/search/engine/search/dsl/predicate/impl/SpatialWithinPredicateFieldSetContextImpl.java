@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -121,7 +121,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 	static class CommonState<B> extends MultiFieldPredicateCommonState<B, SpatialWithinPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
-		CommonState(SearchPredicateFactory<?, B> factory) {
+		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 

@@ -45,7 +45,7 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @return A context allowing to get the resulting predicate.
 	 */
 	SearchPredicateTerminalContext matching(Object value);

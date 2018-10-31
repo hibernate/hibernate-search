@@ -11,8 +11,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.spi.SessionContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.ObjectLoader;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
@@ -26,10 +26,10 @@ public interface IndexSearchTarget {
 			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader);
 
-	SearchPredicateContainerContext predicate();
+	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionContainerContext projection();
+	SearchProjectionFactoryContext projection();
 
 }

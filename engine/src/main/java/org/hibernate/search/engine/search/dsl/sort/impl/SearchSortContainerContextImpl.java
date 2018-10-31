@@ -17,17 +17,17 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExt
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
 public class SearchSortContainerContextImpl<B> implements SearchSortContainerContext {
 
-	private final SearchSortFactory<?, B> factory;
+	private final SearchSortBuilderFactory<?, B> factory;
 
 	private final SearchSortDslContext<? super B> dslContext;
 
-	public SearchSortContainerContextImpl(SearchSortFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
+	public SearchSortContainerContextImpl(SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}

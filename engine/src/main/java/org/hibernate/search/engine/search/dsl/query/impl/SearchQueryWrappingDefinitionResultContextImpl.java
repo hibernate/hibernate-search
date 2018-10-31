@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.engine.search.dsl.query.impl;
 
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
@@ -35,7 +34,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;
 		this.searchPredicateCollector = new SearchQueryPredicateCollector<>(
-				targetContext.getSearchPredicateFactory()
+				targetContext.getSearchPredicateBuilderFactory()
 		);
 	}
 
@@ -58,7 +57,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 	}
 
 	@Override
-	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateContainerContext, SearchPredicate> dslPredicateContributor) {
+	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicate> dslPredicateContributor) {
 		searchPredicateCollector.collect( dslPredicateContributor );
 		return getNext();
 	}

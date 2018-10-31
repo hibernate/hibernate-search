@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.RootSearchSortDslContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
  * Collect search sorts to later add them to a search query.
@@ -24,10 +24,10 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
  */
 class SearchQuerySortCollector<C, B> {
 
-	private final SearchSortFactory<C, B> factory;
+	private final SearchSortBuilderFactory<C, B> factory;
 	private final RootSearchSortDslContextImpl<B> rootDslContext;
 
-	SearchQuerySortCollector(SearchSortFactory<C, B> factory) {
+	SearchQuerySortCollector(SearchSortBuilderFactory<C, B> factory) {
 		this.factory = factory;
 		this.rootDslContext = new RootSearchSortDslContextImpl<>( factory );
 	}

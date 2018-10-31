@@ -34,7 +34,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
@@ -517,7 +517,7 @@ public class SearchSortIT {
 	private static class SupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
 		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
-				SearchSortFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
+				SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
@@ -528,7 +528,7 @@ public class SearchSortIT {
 	private static class UnSupportedExtension implements SearchSortContainerContextExtension<MyExtendedContext> {
 		@Override
 		public <C, B> Optional<MyExtendedContext> extendOptional(SearchSortContainerContext original,
-				SearchSortFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
+				SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();

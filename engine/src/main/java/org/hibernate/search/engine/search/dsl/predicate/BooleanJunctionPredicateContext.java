@@ -112,7 +112,7 @@ public interface BooleanJunctionPredicateContext extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext must(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext must(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
@@ -123,7 +123,7 @@ public interface BooleanJunctionPredicateContext extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext mustNot(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext mustNot(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
@@ -134,7 +134,7 @@ public interface BooleanJunctionPredicateContext extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext should(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext should(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
@@ -145,7 +145,7 @@ public interface BooleanJunctionPredicateContext extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext filter(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext filter(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
 
 	/*
 	 * Options

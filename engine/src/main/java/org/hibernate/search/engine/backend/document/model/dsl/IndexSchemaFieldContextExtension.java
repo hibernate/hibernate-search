@@ -27,7 +27,7 @@ public interface IndexSchemaFieldContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link IndexSchemaFieldContext}.
-	 * @return An extended search predicate container context ({@link T})
+	 * @return An extended search predicate factory context ({@link T})
 	 */
 	T extendOrFail(IndexSchemaFieldContext original);
 

@@ -47,6 +47,6 @@ public interface NestedPredicateFieldContext {
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext nest(Function<? super SearchPredicateContainerContext, SearchPredicate> predicateContributor);
+	SearchPredicateTerminalContext nest(Function<? super SearchPredicateFactoryContext, SearchPredicate> predicateContributor);
 
 }

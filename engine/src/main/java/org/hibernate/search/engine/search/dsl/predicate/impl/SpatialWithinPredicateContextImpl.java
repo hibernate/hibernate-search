@@ -10,14 +10,14 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialWithinPredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateContext {
 
 	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	SpatialWithinPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	SpatialWithinPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 

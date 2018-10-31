@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
  * An abstract base for {@link SearchPredicateTerminalContext} implementations.
@@ -19,11 +19,11 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
  */
 public abstract class AbstractSearchPredicateTerminalContext<B> implements SearchPredicateTerminalContext {
 
-	protected final SearchPredicateFactory<?, B> factory;
+	protected final SearchPredicateBuilderFactory<?, B> factory;
 
 	private SearchPredicate predicateResult;
 
-	public AbstractSearchPredicateTerminalContext(SearchPredicateFactory<?, B> factory) {
+	public AbstractSearchPredicateTerminalContext(SearchPredicateBuilderFactory<?, B> factory) {
 		this.factory = factory;
 	}
 

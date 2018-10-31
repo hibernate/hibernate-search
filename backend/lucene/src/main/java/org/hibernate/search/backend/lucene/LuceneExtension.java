@@ -9,24 +9,24 @@ package org.hibernate.search.backend.lucene;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateFactoryContext;
+import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateFactoryContextImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContextExtension;
 import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPredicateContainerContext;
-import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearchPredicateContainerContextImpl;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSortContainerContextImpl;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateFactory;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortFactory;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -37,7 +37,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  */
 public final class LuceneExtension
-		implements SearchPredicateContainerContextExtension<LuceneSearchPredicateContainerContext>,
+		implements SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		IndexSchemaFieldContextExtension<LuceneIndexSchemaFieldContext> {
 
@@ -57,11 +57,11 @@ public final class LuceneExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<LuceneSearchPredicateContainerContext> extendOptional(
-			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory) {
-		if ( factory instanceof LuceneSearchPredicateFactory ) {
-			return Optional.of( new LuceneSearchPredicateContainerContextImpl(
-					original, (LuceneSearchPredicateFactory) factory
+	public <C, B> Optional<LuceneSearchPredicateFactoryContext> extendOptional(
+			SearchPredicateFactoryContext original, SearchPredicateBuilderFactory<C, B> factory) {
+		if ( factory instanceof LuceneSearchPredicateBuilderFactory ) {
+			return Optional.of( new LuceneSearchPredicateFactoryContextImpl(
+					original, (LuceneSearchPredicateBuilderFactory) factory
 			) );
 		}
 		else {
@@ -74,10 +74,10 @@ public final class LuceneExtension
 	 */
 	@Override
 	public <C, B> Optional<LuceneSearchSortContainerContext> extendOptional(
-			SearchSortContainerContext original, SearchSortFactory<C, B> factory,
+			SearchSortContainerContext original, SearchSortBuilderFactory<C, B> factory,
 			SearchSortDslContext<? super B> dslContext) {
-		if ( factory instanceof LuceneSearchSortFactory ) {
-			return Optional.of( extendUnsafe( original, (LuceneSearchSortFactory) factory, dslContext ) );
+		if ( factory instanceof LuceneSearchSortBuilderFactory ) {
+			return Optional.of( extendUnsafe( original, (LuceneSearchSortBuilderFactory) factory, dslContext ) );
 		}
 		else {
 			return Optional.empty();
@@ -99,7 +99,7 @@ public final class LuceneExtension
 
 	@SuppressWarnings("unchecked") // If the target is Lucene, then we know B = LuceSearchSortBuilder
 	private <B> LuceneSearchSortContainerContext extendUnsafe(
-			SearchSortContainerContext original, LuceneSearchSortFactory factory,
+			SearchSortContainerContext original, LuceneSearchSortBuilderFactory factory,
 			SearchSortDslContext<? super B> dslContext) {
 		return new LuceneSearchSortContainerContextImpl(
 				original, factory,

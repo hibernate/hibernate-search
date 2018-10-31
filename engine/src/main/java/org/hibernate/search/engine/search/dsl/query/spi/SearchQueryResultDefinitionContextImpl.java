@@ -51,7 +51,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 	public SearchQueryWrappingDefinitionResultContext<SearchQuery<O>> asObjects() {
 		HitAggregator<LoadingHitCollector, List<O>> hitAggregator =
 				new ObjectHitAggregator<>( documentReferenceTransformer, objectLoader );
-		SearchQueryBuilder<O, C> builder = targetContext.getSearchQueryFactory()
+		SearchQueryBuilder<O, C> builder = targetContext.getSearchQueryBuilderFactory()
 				.asObjects( sessionContext, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
@@ -60,7 +60,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 	public <T> SearchQueryWrappingDefinitionResultContext<SearchQuery<T>> asReferences(Function<R, T> hitTransformer) {
 		HitAggregator<ReferenceHitCollector, List<T>> hitAggregator =
 				new ReferenceHitAggregator<>( hitTransformer.compose( documentReferenceTransformer ) );
-		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryFactory()
+		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryBuilderFactory()
 				.asReferences( sessionContext, hitAggregator );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}
@@ -72,7 +72,7 @@ public final class SearchQueryResultDefinitionContextImpl<R, O, C> implements Se
 				new ProjectionHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
 						projections.length );
 
-		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryFactory()
+		SearchQueryBuilder<T, C> builder = targetContext.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, hitAggregator, projections );
 		return new SearchQueryWrappingDefinitionResultContextImpl<>( targetContext, builder, Function.identity() );
 	}

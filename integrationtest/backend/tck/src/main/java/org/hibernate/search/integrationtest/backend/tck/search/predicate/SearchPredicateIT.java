@@ -23,14 +23,13 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -115,7 +114,7 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Function<? super SearchPredicateContainerContext, SearchPredicate> cachingContributor = c -> {
+		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -153,7 +152,7 @@ public class SearchPredicateIT {
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Function<? super SearchPredicateContainerContext, SearchPredicate> cachingContributor = c -> {
+		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingContributor = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -299,20 +298,20 @@ public class SearchPredicateIT {
 		}
 	}
 
-	private static class SupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
+	private static class SupportedExtension implements SearchPredicateFactoryContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
-				SearchPredicateFactory<C, B> factory) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateFactoryContext original,
+				SearchPredicateBuilderFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			return Optional.of( new MyExtendedContext( original ) );
 		}
 	}
 
-	private static class UnSupportedExtension implements SearchPredicateContainerContextExtension<MyExtendedContext> {
+	private static class UnSupportedExtension implements SearchPredicateFactoryContextExtension<MyExtendedContext> {
 		@Override
-		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateContainerContext original,
-				SearchPredicateFactory<C, B> factory) {
+		public <C, B> Optional<MyExtendedContext> extendOptional(SearchPredicateFactoryContext original,
+				SearchPredicateBuilderFactory<C, B> factory) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( factory ).isNotNull();
 			return Optional.empty();
@@ -320,9 +319,9 @@ public class SearchPredicateIT {
 	}
 
 	private static class MyExtendedContext {
-		private final SearchPredicateContainerContext delegate;
+		private final SearchPredicateFactoryContext delegate;
 
-		MyExtendedContext(SearchPredicateContainerContext delegate) {
+		MyExtendedContext(SearchPredicateFactoryContext delegate) {
 			this.delegate = delegate;
 		}
 

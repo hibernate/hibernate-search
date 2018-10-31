@@ -14,7 +14,7 @@ import org.apache.lucene.search.Query;
  * <p>
  * Used by Lucene-specific predicate contributors.
  *
- * @see SearchPredicateFactoryImpl#contribute(Object, Object)
+ * @see SearchPredicateBuilderFactoryImpl#contribute(Object, Object)
  * @see LuceneSearchPredicateBuilder
  */
 public interface LuceneSearchPredicateCollector {

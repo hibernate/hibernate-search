@@ -10,14 +10,14 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class DocumentReferenceProjectionContextImpl implements DocumentReferenceProjectionContext {
 
 	private DocumentReferenceSearchProjectionBuilder documentReferenceProjectionBuilder;
 
-	DocumentReferenceProjectionContextImpl(SearchProjectionFactory factory) {
+	DocumentReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.documentReferenceProjectionBuilder = factory.documentReference();
 	}
 

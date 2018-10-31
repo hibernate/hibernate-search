@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortFactory;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
@@ -20,12 +20,12 @@ public class ElasticsearchSearchSortContainerContextImpl
 		extends DelegatingSearchSortContainerContextImpl
 		implements ElasticsearchSearchSortContainerContext {
 
-	private final ElasticsearchSearchSortFactory factory;
+	private final ElasticsearchSearchSortBuilderFactory factory;
 
 	private final SearchSortDslContext<? super ElasticsearchSearchSortBuilder> dslContext;
 
 	public ElasticsearchSearchSortContainerContextImpl(SearchSortContainerContext delegate,
-			ElasticsearchSearchSortFactory factory,
+			ElasticsearchSearchSortBuilderFactory factory,
 			SearchSortDslContext<? super ElasticsearchSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.factory = factory;

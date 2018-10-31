@@ -10,14 +10,14 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 
 	private final MatchPredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	MatchPredicateContextImpl(SearchPredicateFactory<?, B> factory) {
+	MatchPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.commonState = new MatchPredicateFieldSetContextImpl.CommonState<>( factory );
 	}
 

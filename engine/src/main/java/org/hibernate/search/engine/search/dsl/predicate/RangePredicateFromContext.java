@@ -22,7 +22,7 @@ public interface RangePredicateFromContext {
 	 * was not null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
-	 * See <a href="SearchPredicateContainerContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to set the upper bound of the range.
 	 */

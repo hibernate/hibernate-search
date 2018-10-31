@@ -9,24 +9,24 @@ package org.hibernate.search.backend.elasticsearch;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContextExtension;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateContainerContext;
-import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateContainerContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.impl.ElasticsearchSearchSortContainerContextImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateFactory;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortFactory;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContextExtension;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
-import org.hibernate.search.engine.search.sort.spi.SearchSortFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -37,7 +37,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
  */
 public final class ElasticsearchExtension
-		implements SearchPredicateContainerContextExtension<ElasticsearchSearchPredicateContainerContext>,
+		implements SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		IndexSchemaFieldContextExtension<ElasticsearchIndexSchemaFieldContext> {
 
@@ -57,11 +57,11 @@ public final class ElasticsearchExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public <C, B> Optional<ElasticsearchSearchPredicateContainerContext> extendOptional(
-			SearchPredicateContainerContext original, SearchPredicateFactory<C, B> factory) {
-		if ( factory instanceof ElasticsearchSearchPredicateFactory ) {
-			return Optional.of( new ElasticsearchSearchPredicateContainerContextImpl(
-					original, (ElasticsearchSearchPredicateFactory) factory
+	public <C, B> Optional<ElasticsearchSearchPredicateFactoryContext> extendOptional(
+			SearchPredicateFactoryContext original, SearchPredicateBuilderFactory<C, B> factory) {
+		if ( factory instanceof ElasticsearchSearchPredicateBuilderFactory ) {
+			return Optional.of( new ElasticsearchSearchPredicateFactoryContextImpl(
+					original, (ElasticsearchSearchPredicateBuilderFactory) factory
 			) );
 		}
 		else {
@@ -74,10 +74,10 @@ public final class ElasticsearchExtension
 	 */
 	@Override
 	public <C, B> Optional<ElasticsearchSearchSortContainerContext> extendOptional(
-			SearchSortContainerContext original, SearchSortFactory<C, B> factory,
+			SearchSortContainerContext original, SearchSortBuilderFactory<C, B> factory,
 			SearchSortDslContext<? super B> dslContext) {
-		if ( factory instanceof ElasticsearchSearchSortFactory ) {
-			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortFactory) factory, dslContext ) );
+		if ( factory instanceof ElasticsearchSearchSortBuilderFactory ) {
+			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortBuilderFactory) factory, dslContext ) );
 		}
 		else {
 			return Optional.empty();
@@ -99,7 +99,7 @@ public final class ElasticsearchExtension
 
 	@SuppressWarnings("unchecked") // If the target is Elasticsearch, then we know B = ElasticsearchSearchSortBuilder
 	private <B> ElasticsearchSearchSortContainerContext extendUnsafe(
-			SearchSortContainerContext original, ElasticsearchSearchSortFactory factory,
+			SearchSortContainerContext original, ElasticsearchSearchSortBuilderFactory factory,
 			SearchSortDslContext<? super B> dslContext) {
 		return new ElasticsearchSearchSortContainerContextImpl(
 				original, factory,

@@ -14,17 +14,17 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
 class BooleanJunctionPredicateContextImpl<B>
 		extends AbstractSearchPredicateTerminalContext<B>
 		implements BooleanJunctionPredicateContext {
 
-	private final SearchPredicateContainerContext containerContext;
+	private final SearchPredicateFactoryContext factoryContext;
 
 	private final BooleanJunctionPredicateBuilder<B> builder;
 
@@ -35,9 +35,9 @@ class BooleanJunctionPredicateContextImpl<B>
 	private final OccurContext should;
 	private final OccurContext filter;
 
-	BooleanJunctionPredicateContextImpl(SearchPredicateFactory<?, B> factory, SearchPredicateContainerContext containerContext) {
+	BooleanJunctionPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
 		super( factory );
-		this.containerContext = containerContext;
+		this.factoryContext = factoryContext;
 		this.builder = factory.bool();
 		this.must = new OccurContext();
 		this.mustNot = new OccurContext();
@@ -78,28 +78,28 @@ class BooleanJunctionPredicateContextImpl<B>
 
 	@Override
 	public BooleanJunctionPredicateContext must(
-			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
 		must.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext mustNot(
-			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
 		mustNot.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext should(
-			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
 		should.addClause( clauseContributor );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext filter(
-			Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
 		filter.addClause( clauseContributor );
 		return this;
 	}
@@ -132,8 +132,8 @@ class BooleanJunctionPredicateContextImpl<B>
 		OccurContext() {
 		}
 
-		void addClause(Function<? super SearchPredicateContainerContext, SearchPredicate> clauseContributor) {
-			addClause( clauseContributor.apply( containerContext ) );
+		void addClause(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			addClause( clauseContributor.apply( factoryContext ) );
 		}
 
 		void addClause(SearchPredicate predicate) {

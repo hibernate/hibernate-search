@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping;
 
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateContainerContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionContainerContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -16,10 +16,10 @@ public interface PojoSearchTarget<T> {
 
 	SearchQueryResultDefinitionContext<PojoReference, T> query();
 
-	SearchPredicateContainerContext predicate();
+	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionContainerContext projection();
+	SearchProjectionFactoryContext projection();
 
 }
