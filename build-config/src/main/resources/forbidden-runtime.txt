@@ -33,3 +33,13 @@ org.hibernate.SharedSessionContract#getTransaction() @ Using this method is ofte
 # Use our Contracts class instead
 com.google.common.base.Preconditions @ Use our Contracts class instead
 java.util.Objects#requireNonNull(java.lang.Object, java.lang.String) @ Use our Contracts class instead
+
+################################################################################################################
+# We want all SearchExceptions to be internationalized
+@defaultMessage Use a method on the Log interface (JBoss Logger) to create SearchExceptions
+org.hibernate.search.util.SearchException#<init>(java.lang.String)
+org.hibernate.search.util.SearchException#<init>(java.lang.String, java.lang.Throwable)
+org.hibernate.search.util.SearchException#<init>(java.lang.Throwable)
+org.hibernate.search.util.SearchException#<init>(java.lang.String, java.lang.Throwable, org.hibernate.search.util.EventContext)
+org.hibernate.search.util.SearchException#<init>(java.lang.String, org.hibernate.search.util.EventContext)
+org.hibernate.search.util.SearchException#<init>(java.lang.Throwable, org.hibernate.search.util.EventContext)

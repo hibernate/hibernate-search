@@ -31,5 +31,31 @@
         <module>sharedresources</module>
     </modules>
 
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>de.thetaphi</groupId>
+                    <artifactId>forbiddenapis</artifactId>
+                    <!-- Override the executions defined in the parent module -->
+                    <executions>
+                        <execution>
+                            <id>verify-forbidden-apis</id>
+                            <!-- Do not use the main rules at all in integration tests, see below -->
+                            <phase>none</phase>
+                        </execution>
+                        <execution>
+                            <id>verify-forbidden-test-apis</id>
+                            <goals>
+                                <!-- Apply the test rules to all code in integration test utils, even to code from src/main -->
+                                <goal>check</goal>
+                                <goal>testCheck</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
 
