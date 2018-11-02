@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.JsonStringIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -94,7 +94,7 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public IndexSchemaFieldTypedContext<?, String> asJsonString(String mappingJsonString) {
+	public JsonStringIndexSchemaFieldTypedContext asJsonString(String mappingJsonString) {
 		return setDelegate( new JsonStringIndexSchemaFieldContextImpl( this, relativeFieldName, mappingJsonString ) );
 	}
 
