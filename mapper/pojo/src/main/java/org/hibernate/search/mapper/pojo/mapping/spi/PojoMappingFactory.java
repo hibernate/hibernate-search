@@ -8,9 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 
-public interface PojoMappingFactory<M extends PojoMapping> {
+public interface PojoMappingFactory<M> {
 
 	MappingImplementor<M> createMapping(ConfigurationPropertySource propertySource, PojoMappingDelegate mappingDelegate);
 

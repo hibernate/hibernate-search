@@ -42,9 +42,8 @@ public interface SearchProjectionFactoryContext {
 	 * <p>
 	 * The actual type of the object depends on the entry point
 	 * for your query: an {@link org.hibernate.search.engine.backend.index.IndexManager}
-	 * may return a Java representation of the document,
-	 * but a {@link org.hibernate.search.engine.common.SearchManager} will
-	 * return a Java representation of the mapped object.
+	 * will return a Java representation of the document,
+	 * but a mapper may return a Java representation of the mapped object.
 	 * <p>
 	 * As a general rule, a projection on {@link #object()} will result in the same value
 	 * which would have been returned by the query if not using projections

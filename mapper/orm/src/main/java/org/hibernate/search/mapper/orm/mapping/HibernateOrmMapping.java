@@ -8,17 +8,40 @@ package org.hibernate.search.mapper.orm.mapping;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 
-public interface HibernateOrmMapping extends PojoMapping {
+public interface HibernateOrmMapping {
 
 	HibernateOrmSearchManager createSearchManager(EntityManager entityManager);
 
 	HibernateOrmSearchManagerBuilder createSearchManagerWithOptions(EntityManager entityManager);
 
 	/**
-	 * @param entity an entity
+	 * @param type A Java type.
+	 * @return {@code true} if this type can be the subject of a work (i.e. it can be passed to
+	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
+	 * Workable types include both indexable types and contained entity types.
+	 */
+	boolean isWorkable(Class<?> type);
+
+	/**
+	 * @param type A Java type.
+	 * @return {@code true} if this type is indexable, {@code false} if it is not.
+	 */
+	boolean isIndexable(Class<?> type);
+
+	/**
+	 * @param type A Java type.
+	 * @return {@code true} if this type is searchable
+	 * (i.e. it can be passed to {@link org.hibernate.search.mapper.orm.jpa.FullTextEntityManager#search(Class)}),
+	 * {@code false} if it is not.
+	 */
+	boolean isSearchable(Class<?> type);
+
+	/**
+	 * @param entity An entity.
 	 * @return {@code true} if this entity can be the subject of a work (i.e. it can be passed to
 	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
 	 */

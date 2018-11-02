@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -66,7 +66,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 	@Test
 	public void index() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.setId( 1 );
 			entity1.setHomeLatitude( 1.1d );

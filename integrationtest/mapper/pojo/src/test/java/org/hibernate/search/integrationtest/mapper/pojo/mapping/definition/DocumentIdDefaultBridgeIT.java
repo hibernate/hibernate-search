@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.function.Function;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -119,7 +119,7 @@ public class DocumentIdDefaultBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			E entity1 = newEntityFunction.apply( identifierValue );
 
 			manager.getMainWorkPlan().add( entity1 );
@@ -131,7 +131,7 @@ public class DocumentIdDefaultBridgeIT {
 		backendMock.verifyExpectationsMet();
 
 		// Searching
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( INDEX_NAME ),
 					b -> { },

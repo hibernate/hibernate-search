@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -60,7 +60,7 @@ public class AnnotationMappingRoutingIT {
 
 	@Test
 	public void index() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
@@ -83,7 +83,7 @@ public class AnnotationMappingRoutingIT {
 
 	@Test
 	public void index_multiTenancy() {
-		try ( PojoSearchManager manager = mapping.createSearchManagerWithOptions()
+		try ( JavaBeanSearchManager manager = mapping.createSearchManagerWithOptions()
 				.tenantId( "myTenantId" )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -109,7 +109,7 @@ public class AnnotationMappingRoutingIT {
 
 	@Test
 	public void search() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()

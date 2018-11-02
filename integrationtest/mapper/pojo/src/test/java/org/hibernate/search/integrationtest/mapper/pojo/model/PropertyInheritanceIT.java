@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.model;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -59,7 +59,7 @@ public class PropertyInheritanceIT {
 
 	@Test
 	public void index() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setParentDeclaredProperty( "parent-declared-1" );

@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.util.impl.common.Closer;
 
-public abstract class PojoMappingImplementor<M extends PojoMapping> implements PojoMapping, MappingImplementor<M> {
+public abstract class PojoMappingImplementor<M> implements MappingImplementor<M> {
 
 	private final PojoMappingDelegate delegate;
 
@@ -39,21 +38,6 @@ public abstract class PojoMappingImplementor<M extends PojoMapping> implements P
 
 	protected final PojoMappingDelegate getDelegate() {
 		return delegate;
-	}
-
-	@Override
-	public boolean isWorkable(Class<?> type) {
-		return delegate.isWorkable( type );
-	}
-
-	@Override
-	public boolean isIndexable(Class<?> type) {
-		return delegate.isIndexable( type );
-	}
-
-	@Override
-	public boolean isSearchable(Class<?> type) {
-		return delegate.isSearchable( type );
 	}
 
 	public void onClose(CloseDelegate closeable) {

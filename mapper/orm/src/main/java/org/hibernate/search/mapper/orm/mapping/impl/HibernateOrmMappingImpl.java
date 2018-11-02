@@ -15,8 +15,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
@@ -47,6 +47,21 @@ public class HibernateOrmMappingImpl extends PojoMappingImplementor<HibernateOrm
 	@Override
 	public HibernateOrmSearchManagerBuilder createSearchManagerWithOptions(EntityManager entityManager) {
 		return createSearchManagerBuilder( entityManager );
+	}
+
+	@Override
+	public boolean isWorkable(Class<?> type) {
+		return getDelegate().isWorkable( type );
+	}
+
+	@Override
+	public boolean isIndexable(Class<?> type) {
+		return getDelegate().isIndexable( type );
+	}
+
+	@Override
+	public boolean isSearchable(Class<?> type) {
+		return getDelegate().isSearchable( type );
 	}
 
 	@Override

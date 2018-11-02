@@ -6,59 +6,25 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import java.util.Collection;
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManagerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 
 
 /**
  * @author Yoann Rodiere
  */
-public abstract class PojoSearchManagerImpl implements PojoSearchManager {
+public abstract class PojoSearchManagerImpl {
 
 	private final PojoMappingDelegate mappingDelegate;
 	private final PojoSessionContextImplementor sessionContext;
-	private PojoWorkPlan workPlan;
 
-	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManager> builder) {
+	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManagerImpl> builder) {
 		this.mappingDelegate = builder.mappingDelegate;
 		this.sessionContext = builder.buildSessionContext();
 	}
 
-	@Override
-	public PojoWorkPlan getMainWorkPlan() {
-		if ( workPlan == null ) {
-			workPlan = createWorkPlan();
-		}
-		return workPlan;
-	}
-
-	@Override
 	public PojoWorkPlan createWorkPlan() {
 		return mappingDelegate.createWorkPlan( sessionContext );
-	}
-
-	@Override
-	public void close() {
-		if ( workPlan != null ) {
-			CompletableFuture<?> future = workPlan.execute();
-			/*
-			 * TODO decide whether we want the sync/async setting to be scoped per index,
-			 * or per EntityManager/SearchManager, or both (with one scope overriding the other)
-			 * See also PostTransactionWorkQueueSynchronization#afterCompletion, InTransactionWorkQueueSynchronization#beforeCompletion
-			 */
-			future.join();
-		}
-	}
-
-	@Override
-	public <T> PojoSearchTarget<?> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		return null;
 	}
 
 	protected final PojoMappingDelegate getMappingDelegate() {
@@ -69,8 +35,7 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 		return sessionContext;
 	}
 
-	protected abstract static class AbstractBuilder<T extends PojoSearchManager>
-			implements PojoSearchManagerBuilder<T> {
+	protected abstract static class AbstractBuilder<T extends PojoSearchManagerImpl> {
 
 		private final PojoMappingDelegate mappingDelegate;
 
@@ -80,7 +45,6 @@ public abstract class PojoSearchManagerImpl implements PojoSearchManager {
 
 		protected abstract PojoSessionContextImplementor buildSessionContext();
 
-		@Override
 		public abstract T build();
 
 	}

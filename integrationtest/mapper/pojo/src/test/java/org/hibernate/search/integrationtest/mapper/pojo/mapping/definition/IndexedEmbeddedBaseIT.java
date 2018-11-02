@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.test.util.StartupStubBri
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -433,7 +433,7 @@ public class IndexedEmbeddedBaseIT {
 	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,
 			Function<Integer, E> newEntityFunction,
 			Consumer<StubDocumentNode.Builder> expectedDocumentContributor) {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			E entity1 = newEntityFunction.apply( 1 );
 
 			manager.getMainWorkPlan().add( entity1 );

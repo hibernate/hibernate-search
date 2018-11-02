@@ -14,7 +14,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;

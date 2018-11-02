@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
 
@@ -29,7 +29,7 @@ public class JavaBeanMappingImpl extends PojoMappingImplementor<JavaBeanMapping>
 	}
 
 	@Override
-	public PojoSearchManager createSearchManager() {
+	public JavaBeanSearchManager createSearchManager() {
 		return createSearchManagerBuilder().build();
 	}
 

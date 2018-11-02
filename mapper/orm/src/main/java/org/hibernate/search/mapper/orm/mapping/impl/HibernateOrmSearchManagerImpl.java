@@ -7,11 +7,12 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchTarget;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.search.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
@@ -30,13 +31,23 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 	}
 
 	@Override
+	public void close() {
+		// Nothing to do
+	}
+
+	@Override
+	public <T> HibernateOrmSearchTarget<T> search(Class<T> targetedType) {
+		return search( Collections.singleton( targetedType ) );
+	}
+
+	@Override
 	public <T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
 		PojoSearchTargetDelegate<T> searchTargetDelegate = getMappingDelegate()
 				.createPojoSearchTarget( targetedTypes, getSessionContext() );
 		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
-	static class Builder extends AbstractBuilder<HibernateOrmSearchManager>
+	static class Builder extends AbstractBuilder<HibernateOrmSearchManagerImpl>
 			implements HibernateOrmSearchManagerBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;
@@ -55,7 +66,7 @@ class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		}
 
 		@Override
-		public HibernateOrmSearchManager build() {
+		public HibernateOrmSearchManagerImpl build() {
 			return new HibernateOrmSearchManagerImpl( this );
 		}
 	}

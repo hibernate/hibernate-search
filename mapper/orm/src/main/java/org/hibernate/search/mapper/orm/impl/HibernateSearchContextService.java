@@ -21,13 +21,11 @@ import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
-import org.hibernate.search.engine.common.SearchManager;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.Service;
 
@@ -74,7 +72,7 @@ public class HibernateSearchContextService implements Service {
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
-	 * @return The {@link SearchManager} to use within the context of the given session.
+	 * @return The {@link HibernateOrmSearchManager} to use within the context of the given session.
 	 */
 	@SuppressWarnings("unchecked")
 	public HibernateOrmSearchManager getSearchManager(SessionImplementor sessionImplementor) {
@@ -99,7 +97,7 @@ public class HibernateSearchContextService implements Service {
 	 */
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor sessionImplementor) {
-		PojoSearchManager searchManager = getSearchManager( sessionImplementor );
+		HibernateOrmSearchManager searchManager = getSearchManager( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
 			TransientReference<Map<Transaction, PojoWorkPlan>> reference =
