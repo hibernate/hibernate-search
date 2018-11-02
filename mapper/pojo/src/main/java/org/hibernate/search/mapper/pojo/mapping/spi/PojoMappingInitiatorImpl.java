@@ -15,7 +15,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
@@ -25,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.Pro
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 public abstract class PojoMappingInitiatorImpl<M>
-		implements PojoMappingDefinitionContainerContext, MappingInitiator<PojoTypeMetadataContributor, M> {
+		implements MappingInitiator<PojoTypeMetadataContributor, M> {
 
 	private final PojoMappingFactory<M> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
@@ -53,14 +52,12 @@ public abstract class PojoMappingInitiatorImpl<M>
 		addConfigurationContributor( annotationMappingDefinition );
 	}
 
-	@Override
 	public ProgrammaticMappingDefinitionContext programmaticMapping() {
 		ProgrammaticMappingDefinitionContextImpl definition = new ProgrammaticMappingDefinitionContextImpl( introspector );
 		addConfigurationContributor( definition );
 		return definition;
 	}
 
-	@Override
 	public AnnotationMappingDefinitionContext annotationMapping() {
 		return annotationMappingDefinition;
 	}
