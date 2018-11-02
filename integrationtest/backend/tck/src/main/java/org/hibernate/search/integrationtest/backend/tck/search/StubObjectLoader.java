@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search;
 
-import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 
 /**
  * The only purpose of this class is to avoid unchecked cast warnings when creating mocks.

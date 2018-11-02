@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.query.spi;
 
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 
 /**
  * A loading hit collector that expects references in place of hits,
@@ -14,7 +15,7 @@ import org.hibernate.search.engine.search.DocumentReference;
  * (potentially in a batch).
  * <p>
  * Instances are usually provided by {@link HitAggregator#nextCollector()},
- * loading is usually performed by an {@link org.hibernate.search.engine.search.ObjectLoader}.
+ * loading is usually performed by an {@link ObjectLoader}.
  */
 public interface LoadingHitCollector {
 

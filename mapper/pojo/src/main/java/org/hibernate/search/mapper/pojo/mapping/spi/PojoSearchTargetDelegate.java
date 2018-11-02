@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 
 public interface PojoSearchTargetDelegate<T> extends PojoSearchTarget<PojoReference> {

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.util.AssertionFailure;
