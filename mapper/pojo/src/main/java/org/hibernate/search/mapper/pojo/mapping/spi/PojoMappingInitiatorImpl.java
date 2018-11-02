@@ -15,7 +15,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
 import org.hibernate.search.mapper.pojo.mapping.PojoMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -25,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-public abstract class PojoMappingInitiatorImpl<M extends PojoMapping>
+public abstract class PojoMappingInitiatorImpl<M>
 		implements PojoMappingDefinitionContainerContext, MappingInitiator<PojoTypeMetadataContributor, M> {
 
 	private final PojoMappingFactory<M> mappingFactory;

@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.javabean;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.mapper.pojo.mapping.PojoMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 
-public interface JavaBeanMapping extends PojoMapping {
+public interface JavaBeanMapping {
 
-	PojoSearchManager createSearchManager();
+	JavaBeanSearchManager createSearchManager();
 
 	JavaBeanSearchManagerBuilder createSearchManagerWithOptions();
 

@@ -4,26 +4,28 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.impl;
+package org.hibernate.search.mapper.javabean.search.impl;
 
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.HibernateOrmSearchTarget;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
+import org.hibernate.search.mapper.pojo.mapping.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
+public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
 
-	private final HibernateOrmSearchTarget<T> delegate;
+	private final PojoSearchTargetDelegate<?> delegate;
 
-	public FullTextSearchTargetImpl(HibernateOrmSearchTarget<T> delegate) {
+	public JavaBeanSearchTargetImpl(PojoSearchTargetDelegate<?> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<T> query() {
-		return delegate.jpaQuery();
+	public SearchQueryResultDefinitionContext<PojoReference, PojoReference> query() {
+		return delegate.query( ObjectLoader.identity() );
 	}
 
 	@Override

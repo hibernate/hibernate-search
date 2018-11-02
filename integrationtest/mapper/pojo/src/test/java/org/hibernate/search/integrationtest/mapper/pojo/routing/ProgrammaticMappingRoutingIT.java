@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -66,7 +66,7 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void index() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
@@ -89,7 +89,7 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void index_multiTenancy() {
-		try ( PojoSearchManager manager = mapping.createSearchManagerWithOptions()
+		try ( JavaBeanSearchManager manager = mapping.createSearchManagerWithOptions()
 				.tenantId( "myTenantId" )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -115,7 +115,7 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void search() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReferences()

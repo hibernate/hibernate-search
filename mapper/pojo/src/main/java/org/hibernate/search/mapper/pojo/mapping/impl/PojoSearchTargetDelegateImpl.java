@@ -25,14 +25,14 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionC
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.AssertionFailure;
 
-public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
+class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers;
 	private final PojoSessionContextImplementor sessionContext;
 	private IndexSearchTarget indexSearchTarget;
 
-	public PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
+	PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers,
 			PojoSessionContextImplementor sessionContext) {
 		this.typeManagers = typeManagers;
@@ -45,11 +45,6 @@ public class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate
 		return targetedTypeManagers.stream()
 				.map( PojoIndexedTypeManager::getIndexedJavaClass )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
-	}
-
-	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, PojoReference> query() {
-		return query( ObjectLoader.identity() );
 	}
 
 	@Override

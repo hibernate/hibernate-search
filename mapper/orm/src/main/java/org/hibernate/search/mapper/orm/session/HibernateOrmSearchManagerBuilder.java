@@ -4,15 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.common;
+package org.hibernate.search.mapper.orm.session;
 
-/**
- * @author Yoann Rodiere
- */
-public interface SearchManager extends AutoCloseable {
+public interface HibernateOrmSearchManagerBuilder {
 
-	@Override
-	default void close() {
-	}
+	// TODO other options (default query timeout, default query hints, ...)
+
+	HibernateOrmSearchManager build();
 
 }

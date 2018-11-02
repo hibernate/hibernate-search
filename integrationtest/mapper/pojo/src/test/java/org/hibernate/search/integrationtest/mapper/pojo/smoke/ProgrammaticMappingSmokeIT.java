@@ -23,11 +23,11 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeB
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.PojoSearchTarget;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -211,7 +211,7 @@ public class ProgrammaticMappingSmokeIT {
 
 	@Test
 	public void index() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -415,7 +415,7 @@ public class ProgrammaticMappingSmokeIT {
 
 	@Test
 	public void search() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
@@ -450,8 +450,8 @@ public class ProgrammaticMappingSmokeIT {
 
 	@Test
 	public void search_projection() {
-		try ( PojoSearchManager manager = mapping.createSearchManager() ) {
-			PojoSearchTarget<?> searchTarget = manager.search(
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+			JavaBeanSearchTarget searchTarget = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
