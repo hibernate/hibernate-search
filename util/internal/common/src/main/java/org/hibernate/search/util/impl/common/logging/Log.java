@@ -51,9 +51,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 1,
 			value = "'%1$s' must not be null or empty.")
-	IllegalArgumentException mustNotBeNullNorEmpty(String objectDescription);
+	IllegalArgumentException collectionMustNotBeNullNorEmpty(String objectDescription);
 
 	@Message(id = ID_OFFSET_2 + 2,
 			value = "'%1$s' must be positive or zero.")
 	IllegalArgumentException mustBePositiveOrZero(String objectDescription);
+
+	@Message(id = ID_OFFSET_2 + 3,
+			value = "'%1$s' must not be null or empty.")
+	IllegalArgumentException stringMustNotBeNullNorEmpty(String objectDescription);
 }

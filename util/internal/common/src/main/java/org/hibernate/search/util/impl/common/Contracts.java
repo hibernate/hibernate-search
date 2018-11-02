@@ -26,13 +26,19 @@ public final class Contracts {
 
 	public static void assertNotNullNorEmpty(Collection<?> object, String objectDescription) {
 		if ( object == null || object.isEmpty() ) {
-			throw log.mustNotBeNullNorEmpty( objectDescription );
+			throw log.collectionMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 
 	public static void assertPositiveOrZero(int number, String objectDescription) {
 		if ( number < 0 ) {
 			throw log.mustBePositiveOrZero( objectDescription );
+		}
+	}
+
+	public static void assertNotNullNorEmpty(String object, String objectDescription) {
+		if ( object == null || object.isEmpty() ) {
+			throw log.stringMustNotBeNullNorEmpty( objectDescription );
 		}
 	}
 }
