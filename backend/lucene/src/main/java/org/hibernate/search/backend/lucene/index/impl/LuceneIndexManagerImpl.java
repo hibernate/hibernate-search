@@ -12,8 +12,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
@@ -78,19 +78,19 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
-		return new LuceneIndexSearchTargetBuilder( searchBackendContext, mappingContext, this );
+	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
+		return new LuceneIndexSearchTargetContextBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
-		if ( ! (searchTargetBuilder instanceof LuceneIndexSearchTargetBuilder ) ) {
+	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
+		if ( ! (searchTargetBuilder instanceof LuceneIndexSearchTargetContextBuilder ) ) {
 			throw log.cannotMixLuceneSearchTargetWithOtherType(
 					searchTargetBuilder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		LuceneIndexSearchTargetBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetBuilder) searchTargetBuilder;
+		LuceneIndexSearchTargetContextBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetContextBuilder) searchTargetBuilder;
 		luceneSearchTargetBuilder.add( searchBackendContext, this );
 	}
 

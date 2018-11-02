@@ -25,9 +25,9 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 
 	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
-	IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext);
+	IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext);
 
-	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
+	void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder);
 
 	@Override
 	void close();

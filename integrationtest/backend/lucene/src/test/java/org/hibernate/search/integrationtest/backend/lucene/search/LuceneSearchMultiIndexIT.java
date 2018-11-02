@@ -14,11 +14,11 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -93,9 +93,9 @@ public class LuceneSearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported_for_sorting() {
-		IndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
+		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
 		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		IndexSearchTarget searchTarget = searchTargetBuilder.build();
+		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
 
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
@@ -136,7 +136,7 @@ public class LuceneSearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		IndexSearchTarget searchTarget = indexManager_1_1.createSearchTargetBuilder( mappingContext ).build();
+		MappedIndexSearchTarget searchTarget = indexManager_1_1.createSearchTargetBuilder( mappingContext ).build();
 		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )

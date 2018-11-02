@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-/**
- * @author Yoann Rodiere
- */
-public interface IndexSearchTargetBuilder {
+import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
-	IndexSearchTarget build();
+public interface IndexSearchTargetContextBuilder {
+
+	SearchTargetContext<?> build();
 
 }

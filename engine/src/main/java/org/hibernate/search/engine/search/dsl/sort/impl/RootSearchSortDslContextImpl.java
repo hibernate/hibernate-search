@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A DSL context used when building a {@link SearchSort} object,
- * either when calling {@link IndexSearchTarget#sort()} from a search target
+ * either when calling {@link MappedIndexSearchTarget#sort()} from a search target
  * or when calling {@link SearchQueryContext#sort(Consumer)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */

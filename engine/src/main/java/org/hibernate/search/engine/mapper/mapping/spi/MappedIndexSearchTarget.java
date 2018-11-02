@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.index.spi;
+package org.hibernate.search.engine.mapper.mapping.spi;
 
 import java.util.function.Function;
 
@@ -16,12 +16,10 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public interface IndexSearchTarget {
+public interface MappedIndexSearchTarget {
 
-	default SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(
-			SessionContextImplementor context) {
-		return query( context, Function.identity(), ObjectLoader.identity() );
-	}
+	SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(
+			SessionContextImplementor context);
 
 	<R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContextImplementor context,
 			Function<DocumentReference, R> documentReferenceTransformer,
