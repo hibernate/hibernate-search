@@ -21,7 +21,7 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;

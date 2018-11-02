@@ -9,10 +9,11 @@ package org.hibernate.search.mapper.orm.event.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
+import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 
 /**
  * This EventsHibernateSearchState is useful to hold for requests
- * onto the actual {@link org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping}
+ * onto the actual {@link HibernateOrmMapping}
  * until the initialization of Hibernate Search has been completed.
  *
  * @author Sanne Grinovero
