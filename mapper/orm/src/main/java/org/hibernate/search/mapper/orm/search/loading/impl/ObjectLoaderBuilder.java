@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.search.impl;
+package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +13,14 @@ import java.util.function.Function;
 
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 
 public class ObjectLoaderBuilder<O> {
 
 	private final Session session;
 	private final Set<Class<? extends O>> concreteIndexedClasses;
 
-	ObjectLoaderBuilder(Session session, Set<Class<? extends O>> concreteIndexedClasses) {
+	public ObjectLoaderBuilder(Session session, Set<Class<? extends O>> concreteIndexedClasses) {
 		this.session = session;
 		this.concreteIndexedClasses = concreteIndexedClasses;
 	}

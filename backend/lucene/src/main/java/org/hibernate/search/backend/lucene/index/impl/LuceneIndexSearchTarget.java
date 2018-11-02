@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContex
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.ObjectLoader;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
