@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import java.util.regex.Pattern;
 
+import org.hibernate.search.util.impl.common.Contracts;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -38,11 +40,14 @@ public class JsonObjectAccessorImpl extends TypingJsonAccessor<JsonObject>
 
 	@Override
 	public UnknownTypeJsonAccessor property(String propertyName) {
+		Contracts.assertNotNullNorEmpty( propertyName, "propertyName" );
 		return new ObjectPropertyJsonAccessor( this, propertyName );
 	}
 
 	@Override
 	public UnknownTypeJsonAccessor path(String dotSeparatedPath) {
+		Contracts.assertNotNullNorEmpty( dotSeparatedPath, "dotSeparatedPath" );
+
 		String[] components = DOT_REGEX.split( dotSeparatedPath );
 		String leaf = components[components.length - 1];
 
