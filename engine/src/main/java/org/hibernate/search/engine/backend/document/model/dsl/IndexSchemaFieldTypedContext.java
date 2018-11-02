@@ -13,8 +13,7 @@ import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueC
  * @param <S> The concrete type of this context.
  * @param <F> The type of field values.
  */
-public interface IndexSchemaFieldTypedContext<S extends IndexSchemaFieldTypedContext<? extends S, F>, F>
-		extends IndexSchemaFieldTerminalContext<F> {
+public interface IndexSchemaFieldTypedContext<S extends IndexSchemaFieldTypedContext<? extends S, F>, F> {
 
 	S dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
 
