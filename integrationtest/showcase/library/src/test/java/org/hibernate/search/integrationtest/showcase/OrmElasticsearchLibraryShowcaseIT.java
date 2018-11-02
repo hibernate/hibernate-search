@@ -134,11 +134,11 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	@Before
 	public void setup() {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "index.default.backend", "elasticsearchBackend_1" )
-				.applySetting( PREFIX + "backend.elasticsearchBackend_1.log.json_pretty_printing", true )
+				.applySetting( PREFIX + "backends.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
+				.applySetting( PREFIX + "indexes.default.backend", "elasticsearchBackend_1" )
+				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
-						PREFIX + "backend.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						PREFIX + "backends.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
 						new LibraryAnalysisConfigurer()
 				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );

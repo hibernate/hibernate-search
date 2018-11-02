@@ -44,7 +44,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.backendContext( BACKEND_NAME )
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
-								"Unable to convert configuration property 'backend." + BACKEND_NAME
+								"Unable to convert configuration property 'backends." + BACKEND_NAME
 										+ "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
@@ -348,7 +348,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	private void setup(String analysisConfigurer, Consumer<IndexModelBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withProperty(
-						"backend." + BACKEND_NAME + "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						"backends." + BACKEND_NAME + "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer
 				)
 				.withIndex(

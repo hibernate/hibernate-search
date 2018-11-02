@@ -24,7 +24,7 @@ import org.junit.Test;
 
 public class UnusedPropertiesIT {
 
-	private static final String DEFAULT_BACKEND_PROPERTY_KEY = SearchOrmSettings.PREFIX + "index.default.backend";
+	private static final String DEFAULT_BACKEND_PROPERTY_KEY = SearchOrmSettings.PREFIX + "indexes.default.backend";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -37,7 +37,7 @@ public class UnusedPropertiesIT {
 
 	@Test
 	public void checkDisabled_unusedProperty() {
-		String unusedPropertyKey = "hibernate.search.index.default.foo";
+		String unusedPropertyKey = "hibernate.search.indexes.default.foo";
 		log.expectMessageMissing(
 				"Some properties in the Hibernate Search configuration were not used"
 		);
@@ -50,7 +50,7 @@ public class UnusedPropertiesIT {
 
 	@Test
 	public void checkEnabledByDefault_unusedProperty() {
-		String unusedPropertyKey = "hibernate.search.index.default.foo";
+		String unusedPropertyKey = "hibernate.search.indexes.default.foo";
 		log.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used",
 				"[" + unusedPropertyKey + "]"

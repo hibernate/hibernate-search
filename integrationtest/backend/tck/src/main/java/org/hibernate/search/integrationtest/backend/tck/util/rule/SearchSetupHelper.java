@@ -76,13 +76,13 @@ public class SearchSetupHelper implements TestRule {
 	public SetupContext withConfiguration(String configurationId, String backendName) {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
 		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId, configurationId )
-				.withPrefix( "backend." + backendName );
+				.withPrefix( "backends." + backendName );
 
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
 
 		return new SetupContext( propertySource )
-				.withProperty( "index.default.backend", backendName );
+				.withProperty( "indexes.default.backend", backendName );
 	}
 
 	public class SetupContext {

@@ -23,8 +23,8 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 	public C withBackendMock(BackendMock backendMock) {
 		return createSetupContext()
-				.withPropertyRadical( "backend.stubBackend.type", StubBackendFactory.class.getName() )
-				.withPropertyRadical( "index.default.backend", backendMock.getBackendName() );
+				.withPropertyRadical( "backends.stubBackend.type", StubBackendFactory.class.getName() )
+				.withPropertyRadical( "indexes.default.backend", backendMock.getBackendName() );
 	}
 
 	@Override

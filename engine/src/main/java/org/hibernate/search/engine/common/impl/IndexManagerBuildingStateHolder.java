@@ -50,11 +50,11 @@ class IndexManagerBuildingStateHolder {
 			ConfigurationPropertySource propertySource) {
 		this.rootBuildContext = rootBuildContext;
 		this.propertySource = propertySource;
-		this.defaultIndexPropertySource = propertySource.withMask( "index.default" );
+		this.defaultIndexPropertySource = propertySource.withMask( "indexes.default" );
 	}
 
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
-		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "index." + indexName )
+		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName )
 				.withFallback( defaultIndexPropertySource );
 		// TODO more checks on the backend name (is non-null, non-empty)
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
@@ -93,7 +93,7 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	private BackendBuildingState<?> createBackend(String backendName) {
-		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backend." + backendName );
+		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
 		// TODO more checks on the backend type (non-null, non-empty)
 		String backendType = BACKEND_TYPE.get( backendPropertySource ).get();
 
