@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.search.impl;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;

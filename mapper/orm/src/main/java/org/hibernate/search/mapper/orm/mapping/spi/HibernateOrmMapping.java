@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.mapping;
+package org.hibernate.search.mapper.orm.mapping.spi;
 
 import javax.persistence.EntityManager;
 
-import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
 
 public interface HibernateOrmMapping {

@@ -13,7 +13,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
-import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 
 public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession {
 

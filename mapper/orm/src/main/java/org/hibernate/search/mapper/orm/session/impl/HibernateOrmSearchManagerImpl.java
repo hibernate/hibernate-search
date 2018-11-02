@@ -10,9 +10,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.search.HibernateOrmSearchTarget;
-import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.session.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;

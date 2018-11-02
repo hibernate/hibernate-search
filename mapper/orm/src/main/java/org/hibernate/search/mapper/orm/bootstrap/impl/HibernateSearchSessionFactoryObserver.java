@@ -23,7 +23,7 @@ import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
-import org.hibernate.search.mapper.orm.mapping.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;

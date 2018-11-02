@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.impl;
 
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
