@@ -8,7 +8,6 @@ package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -24,7 +23,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
-	IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext);
+	MappedIndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext);
 
-	void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder);
+	void addToSearchTarget(MappedIndexSearchTargetBuilder builder);
 }

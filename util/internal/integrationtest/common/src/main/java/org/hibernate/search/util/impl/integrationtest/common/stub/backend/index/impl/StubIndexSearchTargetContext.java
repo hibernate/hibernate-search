@@ -9,17 +9,9 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBase;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
-import org.hibernate.search.engine.search.dsl.query.spi.SearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
@@ -27,25 +19,18 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
 
-class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTargetContext<StubQueryElementCollector> {
+class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryElementCollector> {
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
 	private final StubSearchQueryBuilderFactory queryFactory;
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 
-	private StubIndexSearchTarget(Builder builder) {
+	private StubIndexSearchTargetContext(Builder builder) {
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
 		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
 		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, immutableIndexNames );
 		this.projectionFactory = new StubSearchProjectionBuilderFactory();
-	}
-
-	@Override
-	public <R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContextImplementor context,
-			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
-		return new SearchQueryResultDefinitionContextImpl<>( this, context,
-				documentReferenceTransformer, objectLoader );
 	}
 
 	@Override
@@ -68,12 +53,7 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 		return projectionFactory;
 	}
 
-	@Override
-	protected SearchTargetContext<?> getSearchTargetContext() {
-		return this;
-	}
-
-	static class Builder implements IndexSearchTargetBuilder {
+	static class Builder implements IndexSearchTargetContextBuilder {
 
 		private final StubBackend backend;
 		private final MappingContextImplementor mappingContext;
@@ -93,8 +73,8 @@ class StubIndexSearchTarget extends IndexSearchTargetBase implements SearchTarge
 		}
 
 		@Override
-		public IndexSearchTarget build() {
-			return new StubIndexSearchTarget( this );
+		public SearchTargetContext<?> build() {
+			return new StubIndexSearchTargetContext( this );
 		}
 	}
 }

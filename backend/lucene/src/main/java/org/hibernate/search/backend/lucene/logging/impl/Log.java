@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
@@ -232,13 +232,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 24,
 			value = "A search query cannot target both a Lucene index and other types of index."
 					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixLuceneSearchTargetWithOtherType(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixLuceneSearchTargetWithOtherType(IndexSearchTargetContextBuilder firstTarget,
 			LuceneIndexManager otherTarget, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 25,
 			value = "A search query cannot target multiple Lucene backends."
 					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixLuceneSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixLuceneSearchTargetWithOtherBackend(IndexSearchTargetContextBuilder firstTarget,
 			LuceneIndexManager otherTarget, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 27,

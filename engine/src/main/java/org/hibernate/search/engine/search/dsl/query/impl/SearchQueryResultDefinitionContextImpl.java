@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.query.spi;
+package org.hibernate.search.engine.search.dsl.query.impl;
 
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +16,6 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
-import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryWrappingDefinitionResultContextImpl;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ProjectionHitAggregator;

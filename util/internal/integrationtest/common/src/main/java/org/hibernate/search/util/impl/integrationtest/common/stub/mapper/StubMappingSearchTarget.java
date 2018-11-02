@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
@@ -18,14 +18,14 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
- * A wrapper around {@link IndexSearchTarget} providing some syntactic sugar,
+ * A wrapper around {@link MappedIndexSearchTarget} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
 public class StubMappingSearchTarget {
 
-	private final IndexSearchTarget indexSearchTarget;
+	private final MappedIndexSearchTarget indexSearchTarget;
 
-	StubMappingSearchTarget(IndexSearchTarget indexSearchTarget) {
+	StubMappingSearchTarget(MappedIndexSearchTarget indexSearchTarget) {
 		this.indexSearchTarget = indexSearchTarget;
 	}
 

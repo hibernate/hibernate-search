@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.SearchException;
@@ -63,13 +63,13 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
-		return new StubIndexSearchTarget.Builder( backend, mappingContext, name );
+	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
+		return new StubIndexSearchTargetContext.Builder( backend, mappingContext, name );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
-		((StubIndexSearchTarget.Builder)searchTargetBuilder).add( backend, name );
+	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
+		((StubIndexSearchTargetContext.Builder)searchTargetBuilder).add( backend, name );
 	}
 
 	@Override

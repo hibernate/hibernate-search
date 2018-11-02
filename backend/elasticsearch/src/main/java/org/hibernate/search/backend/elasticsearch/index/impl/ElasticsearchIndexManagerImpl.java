@@ -16,9 +16,9 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -72,19 +72,19 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
-		return new ElasticsearchIndexSearchTargetBuilder( searchBackendContext, mappingContext, this );
+	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
+		return new ElasticsearchIndexSearchTargetContextBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
-		if ( ! (searchTargetBuilder instanceof ElasticsearchIndexSearchTargetBuilder ) ) {
+	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
+		if ( ! (searchTargetBuilder instanceof ElasticsearchIndexSearchTargetContextBuilder ) ) {
 			throw log.cannotMixElasticsearchSearchTargetWithOtherType(
 					searchTargetBuilder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		ElasticsearchIndexSearchTargetBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetBuilder) searchTargetBuilder;
+		ElasticsearchIndexSearchTargetContextBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetContextBuilder) searchTargetBuilder;
 		esSearchTargetBuilder.add( searchBackendContext, this );
 	}
 

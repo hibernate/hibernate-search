@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 public class ElasticsearchSearchTargetContext
 		implements SearchTargetContext<ElasticsearchSearchQueryElementCollector> {
 
+	private final ElasticsearchSearchTargetModel searchTargetModel;
 	private final SearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final SearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
@@ -28,6 +29,7 @@ public class ElasticsearchSearchTargetContext
 			SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		ElasticsearchSearchContext searchContext = new ElasticsearchSearchContext( mappingContext );
+		this.searchTargetModel = searchTargetModel;
 		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactoryImpl(
@@ -35,6 +37,15 @@ public class ElasticsearchSearchTargetContext
 				searchTargetModel );
 		this.searchQueryFactory = new SearchQueryBuilderFactoryImpl( searchBackendContext, searchTargetModel,
 				this.searchProjectionFactory );
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder( getClass().getSimpleName() )
+				.append( "[" )
+				.append( "indexNames=" ).append( searchTargetModel.getHibernateSearchIndexNames() )
+				.append( "]" )
+				.toString();
 	}
 
 	@Override

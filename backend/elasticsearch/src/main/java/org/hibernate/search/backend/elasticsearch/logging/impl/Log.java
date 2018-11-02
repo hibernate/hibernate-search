@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
@@ -135,13 +135,13 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 2,
 			value = "A search query cannot target both an Elasticsearch index and other types of index."
 					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetContextBuilder firstTarget,
 			ElasticsearchIndexManager otherTarget, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 3,
 			value = "A search query cannot target multiple Elasticsearch backends."
 					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetBuilder firstTarget,
+	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetContextBuilder firstTarget,
 			ElasticsearchIndexManager otherTarget, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 4,

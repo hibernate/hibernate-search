@@ -9,7 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -34,12 +34,12 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
-		return implementor.createSearchTargetBuilder( mappingContext );
+	public MappedIndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
+		return new MappedIndexSearchTargetBuilderImpl( implementor, mappingContext );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetBuilder searchTargetBuilder) {
-		implementor.addToSearchTarget( searchTargetBuilder );
+	public void addToSearchTarget(MappedIndexSearchTargetBuilder builder) {
+		((MappedIndexSearchTargetBuilderImpl) builder).add( implementor );
 	}
 }

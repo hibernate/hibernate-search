@@ -11,13 +11,13 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -30,7 +30,7 @@ class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers;
 	private final PojoSessionContextImplementor sessionContext;
-	private IndexSearchTarget indexSearchTarget;
+	private MappedIndexSearchTarget indexSearchTarget;
 
 	PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers,
@@ -67,11 +67,11 @@ class PojoSearchTargetDelegateImpl<T> implements PojoSearchTargetDelegate<T> {
 		return getIndexSearchTarget().projection();
 	}
 
-	private IndexSearchTarget getIndexSearchTarget() {
+	private MappedIndexSearchTarget getIndexSearchTarget() {
 		PojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
 		if ( indexSearchTarget == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends T, ?>> iterator = targetedTypeManagers.iterator();
-			IndexSearchTargetBuilder builder = iterator.next().createSearchTargetBuilder( mappingContext );
+			MappedIndexSearchTargetBuilder builder = iterator.next().createSearchTargetBuilder( mappingContext );
 			while ( iterator.hasNext() ) {
 				iterator.next().addToSearchTarget( builder );
 			}
