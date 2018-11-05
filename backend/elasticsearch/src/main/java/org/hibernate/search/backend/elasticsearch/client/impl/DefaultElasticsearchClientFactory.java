@@ -11,12 +11,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.util.impl.common.SearchThreadFactory;
-
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.config.RequestConfig;
@@ -24,10 +18,15 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.nio.conn.NoopIOSessionStrategy;
 import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.sniff.ElasticsearchHostsSniffer;
-import org.elasticsearch.client.sniff.HostsSniffer;
+import org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
+import org.elasticsearch.client.sniff.NodesSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
+import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.util.impl.common.SearchThreadFactory;
 
 /**
  * @author Gunnar Morling
@@ -151,12 +150,12 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 			String scheme = DISCOVERY_SCHEME.get( propertySource );
 
 			// https discovery support
-			if ( scheme.equals( ElasticsearchHostsSniffer.Scheme.HTTPS.toString() ) ) {
-				HostsSniffer hostsSniffer = new ElasticsearchHostsSniffer(
+			if ( scheme.equals( ElasticsearchNodesSniffer.Scheme.HTTPS.toString() ) ) {
+				NodesSniffer hostsSniffer = new ElasticsearchNodesSniffer(
 						client,
-						ElasticsearchHostsSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec
-						ElasticsearchHostsSniffer.Scheme.HTTPS );
-				builder.setHostsSniffer( hostsSniffer );
+						ElasticsearchNodesSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec
+						ElasticsearchNodesSniffer.Scheme.HTTPS );
+				builder.setNodesSniffer( hostsSniffer );
 			}
 			return builder.build();
 		}
