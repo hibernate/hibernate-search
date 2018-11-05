@@ -11,8 +11,12 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A context allowing to create a projection.
+ *
+ * @param <R> The type of references, i.e. the type of objects returned for {@link #reference() reference projections}.
+ * @param <O> The type of loaded objects, i.e. the type of objects returned for
+ * {@link #object() object projections}.
  */
-public interface SearchProjectionFactoryContext {
+public interface SearchProjectionFactoryContext<R, O> {
 
 	/**
 	 * Project the match to a {@link DocumentReference}.
@@ -29,7 +33,7 @@ public interface SearchProjectionFactoryContext {
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	ReferenceProjectionContext reference();
+	ReferenceProjectionContext<R> reference();
 
 	/**
 	 * Project to an object representing the match.
@@ -41,7 +45,7 @@ public interface SearchProjectionFactoryContext {
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	ObjectProjectionContext object();
+	ObjectProjectionContext<O> object();
 
 	/**
 	 * Project to a field of the indexed document.

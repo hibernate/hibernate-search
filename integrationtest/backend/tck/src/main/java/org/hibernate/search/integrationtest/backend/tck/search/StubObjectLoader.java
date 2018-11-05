@@ -11,6 +11,6 @@ import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 /**
  * The only purpose of this class is to avoid unchecked cast warnings when creating mocks.
  */
-interface StubObjectLoader
+public interface StubObjectLoader
 		extends ObjectLoader<StubTransformedReference, StubLoadedObject> {
 }

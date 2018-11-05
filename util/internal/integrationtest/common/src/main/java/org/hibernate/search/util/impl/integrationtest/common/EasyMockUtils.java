@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.Normalizatio
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeReference;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,5 +63,26 @@ public final class EasyMockUtils {
 			}
 		} );
 		return normalizedExpected;
+	}
+
+	public static <T, C extends Collection<T>> C collectionAnyOrderMatcher(C expected) {
+		EasyMock.reportMatcher( new IArgumentMatcher() {
+			@Override
+			public boolean matches(Object argument) {
+				if ( !( argument instanceof Collection ) ) {
+					return false;
+				}
+
+				Collection<?> other = (Collection<?>) argument;
+				return other.size() == expected.size()
+						&& other.containsAll( expected ) && expected.containsAll( other );
+			}
+
+			@Override
+			public void appendTo(StringBuffer buffer) {
+				buffer.append( expected );
+			}
+		} );
+		return expected;
 	}
 }

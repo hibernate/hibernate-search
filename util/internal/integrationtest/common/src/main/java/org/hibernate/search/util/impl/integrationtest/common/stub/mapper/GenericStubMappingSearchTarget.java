@@ -45,7 +45,7 @@ public class GenericStubMappingSearchTarget<R, O> {
 		return indexSearchTarget.sort();
 	}
 
-	public SearchProjectionFactoryContext projection() {
+	public SearchProjectionFactoryContext<R, O> projection() {
 		return indexSearchTarget.projection();
 	}
 }

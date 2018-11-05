@@ -18,7 +18,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
-public class SearchProjectionFactoryContextImpl implements SearchProjectionFactoryContext {
+public class SearchProjectionFactoryContextImpl<R, O> implements SearchProjectionFactoryContext<R, O> {
 
 	private final SearchProjectionBuilderFactory factory;
 
@@ -44,13 +44,13 @@ public class SearchProjectionFactoryContextImpl implements SearchProjectionFacto
 	}
 
 	@Override
-	public ReferenceProjectionContext reference() {
-		return new ReferenceProjectionContextImpl( factory );
+	public ReferenceProjectionContext<R> reference() {
+		return new ReferenceProjectionContextImpl<>( factory );
 	}
 
 	@Override
-	public ObjectProjectionContext object() {
-		return new ObjectProjectionContextImpl( factory );
+	public ObjectProjectionContext<O> object() {
+		return new ObjectProjectionContextImpl<>( factory );
 	}
 
 	@Override

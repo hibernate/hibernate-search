@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface JavaBeanSearchTarget {
 
@@ -19,6 +20,6 @@ public interface JavaBeanSearchTarget {
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionFactoryContext projection();
+	SearchProjectionFactoryContext<PojoReference, PojoReference> projection();
 
 }

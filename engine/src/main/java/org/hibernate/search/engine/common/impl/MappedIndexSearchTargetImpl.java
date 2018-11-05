@@ -113,7 +113,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public SearchProjectionFactoryContext projection() {
-		return new SearchProjectionFactoryContextImpl( searchTargetContext.getSearchProjectionFactory() );
+	public SearchProjectionFactoryContext<R, O> projection() {
+		return new SearchProjectionFactoryContextImpl<>( searchTargetContext.getSearchProjectionFactory() );
 	}
 }

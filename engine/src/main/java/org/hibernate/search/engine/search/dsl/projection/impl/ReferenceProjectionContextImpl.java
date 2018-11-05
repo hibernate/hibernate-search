@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjecti
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class ReferenceProjectionContextImpl implements ReferenceProjectionContext {
+public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionContext<R> {
 
 	private ReferenceSearchProjectionBuilder referenceProjectionBuilder;
 
@@ -21,8 +21,15 @@ public class ReferenceProjectionContextImpl implements ReferenceProjectionContex
 	}
 
 	@Override
-	public SearchProjection<Object> toProjection() {
-		return referenceProjectionBuilder.build();
+	/*
+	 * The backend has no control over the type of loaded objects.
+	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
+	 * with generic type arguments that are consistent with the type of object loaders.
+	 * See comments in MappedIndexSearchTarget.
+	 */
+	@SuppressWarnings("unchecked")
+	public SearchProjection<R> toProjection() {
+		return (SearchProjection<R>) referenceProjectionBuilder.build();
 	}
 
 }

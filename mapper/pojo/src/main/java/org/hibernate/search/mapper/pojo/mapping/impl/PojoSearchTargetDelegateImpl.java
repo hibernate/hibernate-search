@@ -88,7 +88,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	}
 
 	@Override
-	public SearchProjectionFactoryContext projection() {
+	public SearchProjectionFactoryContext<PojoReference, O> projection() {
 		return getIndexSearchTarget().projection();
 	}
 

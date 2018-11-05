@@ -13,6 +13,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 /**
  * The only purpose of this class is to avoid unchecked cast warnings when creating mocks.
  */
-interface StubDocumentReferenceTransformer
+public interface StubDocumentReferenceTransformer
 		extends Function<DocumentReference, StubTransformedReference> {
 }
