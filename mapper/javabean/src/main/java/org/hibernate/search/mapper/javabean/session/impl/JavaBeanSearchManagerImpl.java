@@ -9,20 +9,21 @@ package org.hibernate.search.mapper.javabean.session.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
 import org.hibernate.search.mapper.javabean.search.impl.JavaBeanSearchTargetImpl;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContextImpl;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
+import org.hibernate.search.mapper.javabean.work.impl.JavaBeanWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
 
 public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements JavaBeanSearchManager {
-	private PojoWorkPlan workPlan;
+	private JavaBeanWorkPlanImpl workPlan;
 
 	private JavaBeanSearchManagerImpl(Builder builder) {
 		super( builder );
@@ -44,9 +45,9 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements 
 	}
 
 	@Override
-	public PojoWorkPlan getMainWorkPlan() {
+	public JavaBeanWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			workPlan = getDelegate().createWorkPlan();
+			workPlan = new JavaBeanWorkPlanImpl( getDelegate().createWorkPlan() );
 		}
 		return workPlan;
 	}

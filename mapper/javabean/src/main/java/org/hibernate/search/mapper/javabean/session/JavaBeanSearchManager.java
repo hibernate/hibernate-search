@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
 
 public interface JavaBeanSearchManager extends AutoCloseable {
 
@@ -24,9 +24,8 @@ public interface JavaBeanSearchManager extends AutoCloseable {
 	<T> JavaBeanSearchTarget search(Collection<? extends Class<? extends T>> targetedTypes);
 
 	/**
-	 * @return The main work plan for this manager. Calling {@link PojoWorkPlan#execute()}
-	 * is optional, as it will be executed upon closing this manager.
+	 * @return The main work plan for this manager. It will be executed upon closing this manager.
 	 */
-	PojoWorkPlan getMainWorkPlan();
+	JavaBeanWorkPlan getMainWorkPlan();
 
 }
