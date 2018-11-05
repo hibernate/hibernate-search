@@ -26,6 +26,6 @@ class MappedIndexSearchTargetBuilderImpl implements MappedIndexSearchTargetBuild
 
 	@Override
 	public MappedIndexSearchTarget build() {
-		return new MappedIndexSearchTargetImpl( delegate.build() );
+		return new MappedIndexSearchTargetImpl<>( delegate.build() );
 	}
 }

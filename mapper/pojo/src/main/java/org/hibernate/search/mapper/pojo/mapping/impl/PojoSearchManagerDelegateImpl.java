@@ -35,14 +35,14 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 	}
 
 	@Override
-	public <T> PojoSearchTargetDelegate<T> createPojoSearchTarget(
-			Collection<? extends Class<? extends T>> targetedTypes) {
+	public <E> PojoSearchTargetDelegate<E> createPojoSearchTarget(
+			Collection<? extends Class<? extends E>> targetedTypes) {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();
 		}
 
-		Set<PojoIndexedTypeManager<?, ? extends T, ?>> targetedTypeManagers = new LinkedHashSet<>();
-		for ( Class<? extends T> targetedType : targetedTypes ) {
+		Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers = new LinkedHashSet<>();
+		for ( Class<? extends E> targetedType : targetedTypes ) {
 			targetedTypeManagers.addAll(
 					indexedTypeManagers.getAllBySuperClass( targetedType )
 							.orElseThrow( () -> log.notIndexedType( targetedType ) )

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 /**
  * @author Yoann Rodiere
  */
-public interface HibernateOrmSearchQueryResultDefinitionContext<O> {
+public interface FullTextQueryResultDefinitionContext<O> {
 
 	// TODO add object loading options: ObjectLookupMethod, DatabaseRetrievalMethod, ...
 

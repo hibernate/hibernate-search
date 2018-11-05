@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
@@ -29,22 +28,24 @@ public class StubMappingSearchTarget {
 		this.indexSearchTarget = indexSearchTarget;
 	}
 
-	public SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query() {
-		return query( new StubSessionContext() );
+	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query() {
+		return query( Function.identity(), ObjectLoader.identity() );
 	}
 
-	public <R, O> SearchQueryResultDefinitionContext<R, O> query(
+	public <R, O> StubMappingQueryResultDefinitionContext<R, O> query(
 			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
 		return query( new StubSessionContext(), documentReferenceTransformer, objectLoader );
 	}
 
-	public SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(StubSessionContext sessionContext) {
-		return indexSearchTarget.query( sessionContext );
+	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query(StubSessionContext sessionContext) {
+		return query( sessionContext, Function.identity(), ObjectLoader.identity() );
 	}
 
-	public <R, O> SearchQueryResultDefinitionContext<R, O> query(StubSessionContext sessionContext,
+	public <R, O> StubMappingQueryResultDefinitionContext<R, O> query(StubSessionContext sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
-		return indexSearchTarget.query( sessionContext, documentReferenceTransformer, objectLoader );
+		return new StubMappingQueryResultDefinitionContext<>( indexSearchTarget, sessionContext,
+				documentReferenceTransformer, objectLoader
+		);
 	}
 
 	public SearchPredicateFactoryContext predicate() {

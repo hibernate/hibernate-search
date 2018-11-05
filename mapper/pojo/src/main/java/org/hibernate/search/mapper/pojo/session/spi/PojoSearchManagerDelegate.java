@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
 public interface PojoSearchManagerDelegate {
 
-	<T> PojoSearchTargetDelegate<T> createPojoSearchTarget(Collection<? extends Class<? extends T>> targetedTypes);
+	<E> PojoSearchTargetDelegate<E> createPojoSearchTarget(Collection<? extends Class<? extends E>> targetedTypes);
 
 	PojoWorkPlan createWorkPlan();
 

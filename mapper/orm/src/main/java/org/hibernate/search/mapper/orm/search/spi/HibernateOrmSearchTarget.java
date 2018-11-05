@@ -8,16 +8,12 @@ package org.hibernate.search.mapper.orm.search.spi;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
 
 public interface HibernateOrmSearchTarget<T> {
 
-	HibernateOrmSearchQueryResultDefinitionContext<T> jpaQuery();
-
-	SearchQueryResultDefinitionContext<PojoReference, T> query();
+	FullTextQueryResultDefinitionContext<T> jpaQuery();
 
 	SearchPredicateFactoryContext predicate();
 

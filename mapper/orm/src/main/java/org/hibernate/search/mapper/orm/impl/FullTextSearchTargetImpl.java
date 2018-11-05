@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.mapper.orm.impl;
 
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 
 class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
 
 	private final HibernateOrmSearchTarget<T> delegate;
 
-	public FullTextSearchTargetImpl(HibernateOrmSearchTarget<T> delegate) {
+	FullTextSearchTargetImpl(HibernateOrmSearchTarget<T> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<T> query() {
+	public FullTextQueryResultDefinitionContext<T> query() {
 		return delegate.jpaQuery();
 	}
 
