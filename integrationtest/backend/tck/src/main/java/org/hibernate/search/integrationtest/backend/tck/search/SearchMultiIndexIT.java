@@ -17,11 +17,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -30,8 +25,8 @@ import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -82,20 +77,17 @@ public class SearchMultiIndexIT {
 	// Backend 1 / Index 1
 
 	private IndexAccessors_1_1 indexAccessors_1_1;
-	private MappedIndexManager<?> indexManager_1_1;
+	private StubMappingIndexManager indexManager_1_1;
 
 	// Backend 1 / Index 2
 
 	private IndexAccessors_1_2 indexAccessors_1_2;
-	private MappedIndexManager<?> indexManager_1_2;
+	private StubMappingIndexManager indexManager_1_2;
 
 	// Backend 2 / Index 1
 
 	private IndexAccessors_2_1 indexAccessors_2_1;
-	private MappedIndexManager<?> indexManager_2_1;
-
-	private MappingContextImplementor mappingContext = new StubMappingContext();
-	private SessionContextImplementor sessionContext = new StubSessionContext();
+	private StubMappingIndexManager indexManager_2_1;
 
 	@Before
 	public void setup() {
@@ -103,12 +95,12 @@ public class SearchMultiIndexIT {
 				.withIndex(
 						"MappedType_1_1", INDEX_NAME_1_1,
 						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_1 = indexMapping.getIndexManager()
+						indexMapping -> this.indexManager_1_1 = indexMapping
 				)
 				.withIndex(
 						"MappedType_1_2", INDEX_NAME_1_2,
 						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_1_2 = indexMapping.getIndexManager()
+						indexMapping -> this.indexManager_1_2 = indexMapping
 				)
 				.setup();
 
@@ -116,7 +108,7 @@ public class SearchMultiIndexIT {
 				.withIndex(
 						"MappedType_2_1", INDEX_NAME_2_1,
 						ctx -> this.indexAccessors_2_1 = new IndexAccessors_2_1( ctx.getSchemaElement() ),
-						indexMapping -> this.indexManager_2_1 = indexMapping.getIndexManager()
+						indexMapping -> this.indexManager_2_1 = indexMapping
 				)
 				.setup();
 
@@ -125,11 +117,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_across_multiple_indexes() {
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
@@ -142,11 +132,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void sort_across_multiple_indexes() {
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "sortField" ).asc() )
@@ -158,7 +146,7 @@ public class SearchMultiIndexIT {
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 
-		query = searchTarget.query( sessionContext )
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "sortField" ).desc() )
@@ -173,11 +161,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void projection_across_multiple_indexes() {
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<List<?>> query = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "sortField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -191,12 +177,10 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported() {
-		// Predicate
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		// Predicate
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).toPredicate() )
 				.build();
@@ -211,7 +195,7 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		SearchQuery<List<?>> projectionQuery = searchTarget.query( sessionContext )
+		SearchQuery<List<?>> projectionQuery = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -225,11 +209,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void unknown_field_throws_exception() {
-		// Predicate
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
+		// Predicate
 		SubTest.expectException(
 				"predicate on unknown field with multiple targeted indexes",
 				() -> searchTarget.predicate().match().onField( "unknownField" )
@@ -264,7 +246,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on unknown field with multiple targeted indexes",
-				() -> searchTarget.query( sessionContext ).asProjections(
+				() -> searchTarget.query().asProjections(
 						searchTarget.projection().field( "unknownField", Object.class ).toProjection()
 				)
 		)
@@ -282,9 +264,7 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_with_incompatible_types_throws_exception() {
-		MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-		indexManager_1_2.addToSearchTarget( searchTargetBuilder );
-		MappedIndexSearchTarget searchTarget = searchTargetBuilder.build();
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SubTest.expectException(
 				"predicate on field with different type among the targeted indexes",
@@ -316,11 +296,7 @@ public class SearchMultiIndexIT {
 	public void search_across_backends_throws_exception() {
 		SubTest.expectException(
 				"search across multiple backends",
-				() -> {
-					MappedIndexSearchTargetBuilder searchTargetBuilder = indexManager_1_1.createSearchTargetBuilder( mappingContext );
-					indexManager_2_1.addToSearchTarget( searchTargetBuilder );
-					searchTargetBuilder.build();
-				}
+				() -> indexManager_1_1.createSearchTarget( indexManager_2_1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -331,7 +307,7 @@ public class SearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan( sessionContext );
+		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
 			indexAccessors_1_1.string.write( document, STRING_1 );
@@ -348,8 +324,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		MappedIndexSearchTarget searchTarget = indexManager_1_1.createSearchTargetBuilder( mappingContext ).build();
-		SearchQuery<DocumentReference> query = searchTarget.query( sessionContext )
+		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -357,7 +333,7 @@ public class SearchMultiIndexIT {
 
 		// Backend 1 / Index 2
 
-		workPlan = indexManager_1_2.createWorkPlan( sessionContext );
+		workPlan = indexManager_1_2.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
 			indexAccessors_1_2.string.write( document, STRING_1 );
@@ -367,8 +343,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_1_2.createSearchTargetBuilder( mappingContext ).build();
-		query = searchTarget.query( sessionContext )
+		searchTarget = indexManager_1_2.createSearchTarget();
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -376,7 +352,7 @@ public class SearchMultiIndexIT {
 
 		// Backend 2 / Index 1
 
-		workPlan = indexManager_2_1.createWorkPlan( sessionContext );
+		workPlan = indexManager_2_1.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
 			indexAccessors_2_1.string.write( document, STRING_1 );
@@ -387,8 +363,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_2_1.createSearchTargetBuilder( mappingContext ).build();
-		query = searchTarget.query( sessionContext )
+		searchTarget = indexManager_2_1.createSearchTarget();
+		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
