@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.IdentifierLoadAccess;
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -25,7 +24,6 @@ class SingleTypeByIdObjectLoader<O, T> implements ComposableObjectLoader<PojoRef
 	private final MutableObjectLoadingOptions loadingOptions;
 	private final Function<? super O, T> hitTransformer;
 
-	private IdentifierLoadAccess<O> singleAccess;
 	private MultiIdentifierLoadAccess<O> multiAccess;
 
 	public SingleTypeByIdObjectLoader(
@@ -68,13 +66,6 @@ class SingleTypeByIdObjectLoader<O, T> implements ComposableObjectLoader<PojoRef
 		}
 
 		return getMultiAccess().multiLoad( ids );
-	}
-
-	private IdentifierLoadAccess<O> getSingleAccess() {
-		if ( singleAccess == null ) {
-			singleAccess = session.byId( entityType );
-		}
-		return singleAccess;
 	}
 
 	private MultiIdentifierLoadAccess<O> getMultiAccess() {
