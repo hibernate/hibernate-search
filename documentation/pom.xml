@@ -40,7 +40,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>hibernate-search-orm</artifactId>
+            <artifactId>hibernate-search-mapper-orm</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
