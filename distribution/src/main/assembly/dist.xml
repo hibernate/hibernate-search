@@ -109,7 +109,7 @@
         <moduleSet>
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
-                <include>org.hibernate.search:hibernate-search-orm</include>
+                <include>org.hibernate.search:hibernate-search-mapper-orm</include>
             </includes>
             <binaries>
                 <outputDirectory>dist/mapper/orm</outputDirectory>
