@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -14,6 +16,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.search.DocumentReference;
 
 class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexManager<D> {
 
@@ -34,12 +37,16 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public MappedIndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext) {
-		return new MappedIndexSearchTargetBuilderImpl( implementor, mappingContext );
+	public <R, O> MappedIndexSearchTargetBuilder<R, O> createSearchTargetBuilder(MappingContextImplementor mappingContext,
+			Function<DocumentReference, R> documentReferenceTransformer) {
+		return new MappedIndexSearchTargetBuilderImpl<>(
+				implementor, mappingContext,
+				documentReferenceTransformer
+		);
 	}
 
 	@Override
-	public void addToSearchTarget(MappedIndexSearchTargetBuilder builder) {
-		((MappedIndexSearchTargetBuilderImpl) builder).add( implementor );
+	public void addToSearchTarget(MappedIndexSearchTargetBuilder<?, ?> builder) {
+		((MappedIndexSearchTargetBuilderImpl<?, ?>) builder).add( implementor );
 	}
 }

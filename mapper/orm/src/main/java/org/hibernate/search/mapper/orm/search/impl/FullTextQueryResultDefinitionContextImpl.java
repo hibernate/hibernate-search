@@ -21,12 +21,12 @@ import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
 class FullTextQueryResultDefinitionContextImpl<O>
 		implements FullTextQueryResultDefinitionContext<O> {
-	private final PojoSearchTargetDelegate<O> searchTargetDelegate;
+	private final PojoSearchTargetDelegate<O, O> searchTargetDelegate;
 	private final SessionImplementor sessionImplementor;
 	private final ObjectLoaderBuilder<O> objectLoaderBuilder;
 
 	FullTextQueryResultDefinitionContextImpl(
-			PojoSearchTargetDelegate<O> searchTargetDelegate,
+			PojoSearchTargetDelegate<O, O> searchTargetDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchTargetDelegate = searchTargetDelegate;
 		this.sessionImplementor = sessionImplementor;

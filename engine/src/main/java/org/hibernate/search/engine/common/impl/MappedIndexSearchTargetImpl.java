@@ -33,12 +33,15 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-class MappedIndexSearchTargetImpl<C> implements MappedIndexSearchTarget {
+class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R, O> {
 
 	private final SearchTargetContext<C> searchTargetContext;
+	private final Function<DocumentReference, R> documentReferenceTransformer;
 
-	MappedIndexSearchTargetImpl(SearchTargetContext<C> searchTargetContext) {
+	MappedIndexSearchTargetImpl(SearchTargetContext<C> searchTargetContext,
+			Function<DocumentReference, R> documentReferenceTransformer) {
 		this.searchTargetContext = searchTargetContext;
+		this.documentReferenceTransformer = documentReferenceTransformer;
 	}
 
 	@Override
@@ -51,14 +54,13 @@ class MappedIndexSearchTargetImpl<C> implements MappedIndexSearchTarget {
 	}
 
 	@Override
-	public <R, O, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
-			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<O>, Q> searchQueryWrapperFactory) {
-		HitAggregator<LoadingHitCollector, List<O>> hitAggregator =
+	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(SessionContextImplementor sessionContext,
+			ObjectLoader<R, T> objectLoader,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+		HitAggregator<LoadingHitCollector, List<T>> hitAggregator =
 				new ObjectHitAggregator<>( documentReferenceTransformer, objectLoader );
 
-		SearchQueryBuilder<O, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
+		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
 				.asObjects( sessionContext, hitAggregator );
 
 		return new SearchQueryResultContextImpl<>(
@@ -67,8 +69,7 @@ class MappedIndexSearchTargetImpl<C> implements MappedIndexSearchTarget {
 	}
 
 	@Override
-	public <R, T, Q> SearchQueryResultContext<Q> queryAsReferences(SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
+	public <T, Q> SearchQueryResultContext<Q> queryAsReferences(SessionContextImplementor sessionContext,
 			Function<R, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		HitAggregator<ReferenceHitCollector, List<T>> hitAggregator =
@@ -83,9 +84,8 @@ class MappedIndexSearchTargetImpl<C> implements MappedIndexSearchTarget {
 	}
 
 	@Override
-	public <R, O, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	public <T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader,
 			Function<List<?>, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,

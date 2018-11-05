@@ -14,19 +14,19 @@ import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public class HibernateOrmSearchTargetImpl<T> implements HibernateOrmSearchTarget<T> {
+public class HibernateOrmSearchTargetImpl<O> implements HibernateOrmSearchTarget<O> {
 
-	private final PojoSearchTargetDelegate<T> searchTargetDelegate;
+	private final PojoSearchTargetDelegate<O, O> searchTargetDelegate;
 	private final SessionImplementor sessionImplementor;
 
-	public HibernateOrmSearchTargetImpl(PojoSearchTargetDelegate<T> searchTargetDelegate,
+	public HibernateOrmSearchTargetImpl(PojoSearchTargetDelegate<O, O> searchTargetDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchTargetDelegate = searchTargetDelegate;
 		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
-	public FullTextQueryResultDefinitionContext<T> jpaQuery() {
+	public FullTextQueryResultDefinitionContext<O> jpaQuery() {
 		return new FullTextQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
