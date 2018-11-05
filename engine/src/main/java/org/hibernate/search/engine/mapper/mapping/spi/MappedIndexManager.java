@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.DocumentReference;
 
 /**
  * The object responsible for applying works and searches to a full-text index.
@@ -23,7 +26,8 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
-	MappedIndexSearchTargetBuilder createSearchTargetBuilder(MappingContextImplementor mappingContext);
+	<R, O> MappedIndexSearchTargetBuilder<R, O> createSearchTargetBuilder(MappingContextImplementor mappingContext,
+			Function<DocumentReference, R> documentReferenceTransformer);
 
-	void addToSearchTarget(MappedIndexSearchTargetBuilder builder);
+	void addToSearchTarget(MappedIndexSearchTargetBuilder<?, ?> builder);
 }

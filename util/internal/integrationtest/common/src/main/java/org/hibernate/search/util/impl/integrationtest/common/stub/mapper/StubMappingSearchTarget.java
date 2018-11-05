@@ -6,57 +6,29 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
  * A wrapper around {@link MappedIndexSearchTarget} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
+ * <p>
+ * This is a simpler version of {@link GenericStubMappingSearchTarget} that allows user to skip the generic parameters.
  */
-public class StubMappingSearchTarget {
+public class StubMappingSearchTarget extends GenericStubMappingSearchTarget<DocumentReference, DocumentReference> {
 
-	private final MappedIndexSearchTarget indexSearchTarget;
-
-	StubMappingSearchTarget(MappedIndexSearchTarget indexSearchTarget) {
-		this.indexSearchTarget = indexSearchTarget;
+	StubMappingSearchTarget(MappedIndexSearchTarget<DocumentReference, DocumentReference> indexSearchTarget) {
+		super( indexSearchTarget );
 	}
 
 	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query() {
-		return query( Function.identity(), ObjectLoader.identity() );
+		return query( ObjectLoader.identity() );
 	}
 
-	public <R, O> StubMappingQueryResultDefinitionContext<R, O> query(
-			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
-		return query( new StubSessionContext(), documentReferenceTransformer, objectLoader );
-	}
-
-	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query(StubSessionContext sessionContext) {
-		return query( sessionContext, Function.identity(), ObjectLoader.identity() );
-	}
-
-	public <R, O> StubMappingQueryResultDefinitionContext<R, O> query(StubSessionContext sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer, ObjectLoader<R, O> objectLoader) {
-		return new StubMappingQueryResultDefinitionContext<>( indexSearchTarget, sessionContext,
-				documentReferenceTransformer, objectLoader
-		);
-	}
-
-	public SearchPredicateFactoryContext predicate() {
-		return indexSearchTarget.predicate();
-	}
-
-	public SearchSortContainerContext sort() {
-		return indexSearchTarget.sort();
-	}
-
-	public SearchProjectionFactoryContext projection() {
-		return indexSearchTarget.projection();
+	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query(
+			StubSessionContext sessionContext) {
+		return query( sessionContext, ObjectLoader.identity() );
 	}
 }

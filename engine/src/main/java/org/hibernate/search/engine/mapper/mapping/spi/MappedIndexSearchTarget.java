@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -19,23 +18,30 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
-public interface MappedIndexSearchTarget {
+/**
+ * @param <R> The type of references, i.e. the type of hits returned by
+ * {@link #queryAsReferences(SessionContextImplementor, Function, Function) reference queries}
+ * when not using any hit transformer,
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
+ * @param <O> The type of loaded objects, i.e. the type of hits returned by
+ * {@link #queryAsLoadedObjects(SessionContextImplementor, ObjectLoader, Function) loaded object queries}
+ * when not using any hit transformer,
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
+ */
+public interface MappedIndexSearchTarget<R, O> {
 
-	<R, O, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
+	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
 			SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
-			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<O>, Q> searchQueryWrapperFactory);
+			ObjectLoader<R, T> objectLoader,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<R, T, Q> SearchQueryResultContext<Q> queryAsReferences(
+	<T, Q> SearchQueryResultContext<Q> queryAsReferences(
 			SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
 			Function<R, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<R, O, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
-			Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader,
 			Function<List<?>, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,

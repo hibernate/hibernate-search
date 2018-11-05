@@ -33,6 +33,7 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchTarget;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
@@ -108,21 +109,19 @@ public class SearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void references_referenceTransformer() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
 		StubTransformedReference emptyTransformedReference = new StubTransformedReference( emptyReference );
-
 		Function<DocumentReference, StubTransformedReference> referenceTransformerMock =
 				EasyMock.createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				EasyMock.createMock( StubObjectLoader.class );
 
-		SearchQuery<StubTransformedReference> referencesQuery = searchTarget.query(
-				referenceTransformerMock, objectLoaderMock
-		)
+		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
+				indexManager.createSearchTarget( referenceTransformerMock );
+
+		SearchQuery<StubTransformedReference> referencesQuery = searchTarget.query( objectLoaderMock )
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -138,8 +137,6 @@ public class SearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void objects_referencesTransformer_objectLoading() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -151,12 +148,6 @@ public class SearchResultLoadingOrTransformingIT {
 				EasyMock.createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				EasyMock.createMock( StubObjectLoader.class );
-
-		SearchQuery<StubLoadedObject> objectsQuery =
-				searchTarget.query( referenceTransformerMock, objectLoaderMock )
-						.asObjects()
-						.predicate( f -> f.matchAll().toPredicate() )
-						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference );
@@ -170,14 +161,21 @@ public class SearchResultLoadingOrTransformingIT {
 		) )
 				.andReturn( Arrays.asList( mainLoadedObject, emptyLoadedObject ) );
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+
+		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
+				indexManager.createSearchTarget( referenceTransformerMock );
+
+		SearchQuery<StubLoadedObject> objectsQuery = searchTarget.query( objectLoaderMock )
+				.asObjects()
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
 		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
+
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
 	}
 
 	@Test
 	public void projection_referencesTransformer_objectLoading() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -189,17 +187,6 @@ public class SearchResultLoadingOrTransformingIT {
 				EasyMock.createMock( StubDocumentReferenceTransformer.class );
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				EasyMock.createMock( StubObjectLoader.class );
-
-		SearchQuery<List<?>> projectionsQuery =
-				searchTarget.query( referenceTransformerMock, objectLoaderMock )
-						.asProjections(
-								searchTarget.projection().field( "string", String.class ).toProjection(),
-								searchTarget.projection().documentReference().toProjection(),
-								searchTarget.projection().reference().toProjection(),
-								searchTarget.projection().object().toProjection()
-						)
-						.predicate( f -> f.matchAll().toPredicate() )
-						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference )
@@ -215,10 +202,24 @@ public class SearchResultLoadingOrTransformingIT {
 		) )
 				.andReturn( Arrays.asList( mainLoadedObject, emptyLoadedObject ) );
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
+
+		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
+				indexManager.createSearchTarget( referenceTransformerMock );
+
+		SearchQuery<List<?>> projectionsQuery = searchTarget.query( objectLoaderMock )
+				.asProjections(
+						searchTarget.projection().field( "string", String.class ).toProjection(),
+						searchTarget.projection().documentReference().toProjection(),
+						searchTarget.projection().reference().toProjection(),
+						searchTarget.projection().object().toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
 		assertThat( projectionsQuery ).hasProjectionsHitsAnyOrder( b -> {
 			b.projection( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.projection( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
+
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
 	}
 
@@ -265,8 +266,6 @@ public class SearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void projections_hitTransformer_referencesTransformer_objectLoading() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
@@ -281,18 +280,6 @@ public class SearchResultLoadingOrTransformingIT {
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				EasyMock.createMock( StubObjectLoader.class );
 		Function<List<?>, StubTransformedHit> hitTransformerMock = EasyMock.createMock( StubHitTransformer.class );
-
-		SearchQuery<StubTransformedHit> query =
-				searchTarget.query( referenceTransformerMock, objectLoaderMock )
-						.asProjections(
-								hitTransformerMock,
-								searchTarget.projection().field( "string", String.class ).toProjection(),
-								searchTarget.projection().documentReference().toProjection(),
-								searchTarget.projection().reference().toProjection(),
-								searchTarget.projection().object().toProjection()
-						)
-						.predicate( f -> f.matchAll().toPredicate() )
-						.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference )
@@ -316,7 +303,22 @@ public class SearchResultLoadingOrTransformingIT {
 		) ) )
 				.andReturn( emptyTransformedHit );
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
+
+		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
+				indexManager.createSearchTarget( referenceTransformerMock );
+
+		SearchQuery<StubTransformedHit> query = searchTarget.query( objectLoaderMock )
+				.asProjections(
+						hitTransformerMock,
+						searchTarget.projection().field( "string", String.class ).toProjection(),
+						searchTarget.projection().documentReference().toProjection(),
+						searchTarget.projection().reference().toProjection(),
+						searchTarget.projection().object().toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
 	}
 

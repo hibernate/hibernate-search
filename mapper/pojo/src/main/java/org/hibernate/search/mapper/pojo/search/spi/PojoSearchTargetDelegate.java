@@ -19,19 +19,24 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public interface PojoSearchTargetDelegate<E> {
-
+/**
+ * @param <E> A common supertype of the targeted indexed types.
+ * @param <O> The type of loaded objects, i.e. the type of hits returned by
+ * {@link #queryAsLoadedObjects(ObjectLoader, Function) loaded object queries} when not using any hit transformer,
+ * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
+ */
+public interface PojoSearchTargetDelegate<E, O> {
 	Set<Class<? extends E>> getTargetedIndexedTypes();
 
-	<O, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
-			ObjectLoader<PojoReference, O> objectLoader,
-			Function<SearchQuery<O>, Q> searchQueryWrapperFactory);
+	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
+			ObjectLoader<PojoReference, T> objectLoader,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
 	<T, Q> SearchQueryResultContext<Q> queryAsReferences(
 			Function<PojoReference, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<O, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			ObjectLoader<PojoReference, O> objectLoader,
 			Function<List<?>, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,

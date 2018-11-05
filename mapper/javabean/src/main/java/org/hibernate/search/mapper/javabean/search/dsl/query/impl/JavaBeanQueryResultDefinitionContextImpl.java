@@ -18,9 +18,9 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
 public class JavaBeanQueryResultDefinitionContextImpl implements JavaBeanQueryResultDefinitionContext {
-	private final PojoSearchTargetDelegate<?> delegate;
+	private final PojoSearchTargetDelegate<?, PojoReference> delegate;
 
-	public JavaBeanQueryResultDefinitionContextImpl(PojoSearchTargetDelegate<?> delegate) {
+	public JavaBeanQueryResultDefinitionContextImpl(PojoSearchTargetDelegate<?, PojoReference> delegate) {
 		this.delegate = delegate;
 	}
 

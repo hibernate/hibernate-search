@@ -43,7 +43,7 @@ public class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 
 	@Override
 	public <T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTargetDelegate<T> searchTargetDelegate = getDelegate().createPojoSearchTarget( targetedTypes );
+		PojoSearchTargetDelegate<T, T> searchTargetDelegate = getDelegate().createPojoSearchTarget( targetedTypes );
 		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
