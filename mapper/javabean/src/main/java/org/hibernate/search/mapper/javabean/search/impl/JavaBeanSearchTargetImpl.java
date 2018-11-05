@@ -8,12 +8,11 @@ package org.hibernate.search.mapper.javabean.search.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
+import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.search.dsl.query.impl.JavaBeanQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
 
@@ -24,8 +23,8 @@ public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
 	}
 
 	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, PojoReference> query() {
-		return delegate.query( ObjectLoader.identity() );
+	public JavaBeanQueryResultDefinitionContext query() {
+		return new JavaBeanQueryResultDefinitionContextImpl( delegate );
 	}
 
 	@Override

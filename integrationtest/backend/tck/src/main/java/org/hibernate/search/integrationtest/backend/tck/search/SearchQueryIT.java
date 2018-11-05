@@ -9,6 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -184,15 +186,13 @@ public class SearchQueryIT {
 	}
 
 	@Test
-	public void asWrappedQuery() {
+	public void queryWrapper() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		QueryWrapper queryWrapper = searchTarget.query()
-				.asReferences()
-				.asWrappedQuery( q -> new QueryWrapper( q ) )
+				.asReferences( Function.identity(), QueryWrapper::new )
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
 				.build();
-
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
 	}
 

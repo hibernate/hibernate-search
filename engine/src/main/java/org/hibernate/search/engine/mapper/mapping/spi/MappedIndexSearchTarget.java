@@ -6,24 +6,40 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
+import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface MappedIndexSearchTarget {
 
-	SearchQueryResultDefinitionContext<DocumentReference, DocumentReference> query(
-			SessionContextImplementor context);
-
-	<R, O> SearchQueryResultDefinitionContext<R, O> query(SessionContextImplementor context,
+	<R, O, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
+			SessionContextImplementor sessionContext,
 			Function<DocumentReference, R> documentReferenceTransformer,
-			ObjectLoader<R, O> objectLoader);
+			ObjectLoader<R, O> objectLoader,
+			Function<SearchQuery<O>, Q> searchQueryWrapperFactory);
+
+	<R, T, Q> SearchQueryResultContext<Q> queryAsReferences(
+			SessionContextImplementor sessionContext,
+			Function<DocumentReference, R> documentReferenceTransformer,
+			Function<R, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
+
+	<R, O, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+			SessionContextImplementor sessionContext,
+			Function<DocumentReference, R> documentReferenceTransformer,
+			ObjectLoader<R, O> objectLoader,
+			Function<List<?>, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<?>... projections);
 
 	SearchPredicateFactoryContext predicate();
 

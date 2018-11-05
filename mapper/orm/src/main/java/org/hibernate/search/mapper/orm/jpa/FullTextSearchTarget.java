@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public interface FullTextSearchTarget<T> {
 
-	HibernateOrmSearchQueryResultDefinitionContext<T> query();
+	FullTextQueryResultDefinitionContext<T> query();
 
 	SearchPredicateFactoryContext predicate();
 

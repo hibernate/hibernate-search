@@ -13,13 +13,12 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
-public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
-		implements SearchQueryResultContext<Q>, SearchQueryWrappingDefinitionResultContext<Q> {
+public final class SearchQueryResultContextImpl<T, C, Q>
+		implements SearchQueryResultContext<Q> {
 
 	private final SearchTargetContext<C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
@@ -27,7 +26,7 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 
 	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
-	public SearchQueryWrappingDefinitionResultContextImpl(SearchTargetContext<C> targetContext,
+	public SearchQueryResultContextImpl(SearchTargetContext<C> targetContext,
 			SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.targetContext = targetContext;
@@ -36,18 +35,6 @@ public final class SearchQueryWrappingDefinitionResultContextImpl<T, C, Q>
 		this.searchPredicateCollector = new SearchQueryPredicateCollector<>(
 				targetContext.getSearchPredicateBuilderFactory()
 		);
-	}
-
-	private SearchQueryWrappingDefinitionResultContextImpl(
-			SearchQueryWrappingDefinitionResultContextImpl<T, C, ?> original,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
-		this( original.targetContext, original.searchQueryBuilder, searchQueryWrapperFactory );
-	}
-
-	@Override
-	public <R> SearchQueryResultContext<R> asWrappedQuery(Function<Q, R> wrapperFactory) {
-		return new SearchQueryWrappingDefinitionResultContextImpl<>( this,
-				searchQueryWrapperFactory.andThen( wrapperFactory ) );
 	}
 
 	@Override

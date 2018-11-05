@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.dsl.projection;
 
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
@@ -27,11 +26,6 @@ public interface SearchProjectionFactoryContext {
 	 * <p>
 	 * The actual type of the reference depends on the mapper used to create the query:
 	 * a POJO mapper may return a class/identifier couple, for example.
-	 * <p>
-	 * As a general rule, a projection on {@link #reference()} will result in the same value
-	 * which would have been returned by the query if not using projections
-	 * (i.e. if {@link SearchQueryResultDefinitionContext#asReferences()} was called instead of
-	 * {@link SearchQueryResultDefinitionContext#asProjections(org.hibernate.search.engine.search.SearchProjection...)}).
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */
@@ -44,11 +38,6 @@ public interface SearchProjectionFactoryContext {
 	 * for your query: an {@link org.hibernate.search.engine.backend.index.IndexManager}
 	 * will return a Java representation of the document,
 	 * but a mapper may return a Java representation of the mapped object.
-	 * <p>
-	 * As a general rule, a projection on {@link #object()} will result in the same value
-	 * which would have been returned by the query if not using projections
-	 * (i.e. if {@link SearchQueryResultDefinitionContext#asObjects()} was called instead of
-	 * {@link SearchQueryResultDefinitionContext#asProjections(org.hibernate.search.engine.search.SearchProjection...)}).
 	 *
 	 * @return A context allowing to define the projection more precisely.
 	 */

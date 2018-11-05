@@ -15,8 +15,8 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 /**
  * @author Yoann Rodiere
  */
-public interface HibernateOrmSearchQueryResultDefinitionContext<O>
-		extends org.hibernate.search.mapper.orm.jpa.HibernateOrmSearchQueryResultDefinitionContext<O> {
+public interface FullTextQueryResultDefinitionContext<O>
+		extends org.hibernate.search.mapper.orm.jpa.FullTextQueryResultDefinitionContext<O> {
 
 	@Override
 	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntities() {

@@ -8,14 +8,10 @@ package org.hibernate.search.mapper.orm.search.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.mapper.orm.hibernate.HibernateOrmSearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
-import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 public class HibernateOrmSearchTargetImpl<T> implements HibernateOrmSearchTarget<T> {
@@ -30,18 +26,8 @@ public class HibernateOrmSearchTargetImpl<T> implements HibernateOrmSearchTarget
 	}
 
 	@Override
-	public HibernateOrmSearchQueryResultDefinitionContext<T> jpaQuery() {
-		return new HibernateOrmSearchQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
-	}
-
-	@Override
-	public SearchQueryResultDefinitionContext<PojoReference, T> query() {
-		ObjectLoaderBuilder<T> objectLoaderBuilder = new ObjectLoaderBuilder<>(
-				sessionImplementor,
-				searchTargetDelegate.getTargetedIndexedTypes()
-		);
-		MutableObjectLoadingOptions mutableObjectLoadingOptions = new MutableObjectLoadingOptions();
-		return searchTargetDelegate.query( objectLoaderBuilder.build( mutableObjectLoadingOptions ) );
+	public FullTextQueryResultDefinitionContext<T> jpaQuery() {
+		return new FullTextQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
 	@Override

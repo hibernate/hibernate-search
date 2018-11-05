@@ -10,6 +10,6 @@ public interface FullTextSearchTarget<T>
 		extends org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget<T> {
 
 	@Override
-	HibernateOrmSearchQueryResultDefinitionContext<T> query();
+	FullTextQueryResultDefinitionContext<T> query();
 
 }

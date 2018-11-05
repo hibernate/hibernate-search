@@ -13,7 +13,6 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateFactoryContextImpl;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryWrappingDefinitionResultContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -21,7 +20,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * Collect a search predicate to later add it to a search query.
  * <p>
- * This class is essentially a bridge transferring information from {@link SearchQueryWrappingDefinitionResultContext}
+ * This class is essentially a bridge transferring information from {@link SearchQueryResultContextImpl}
  * to {@link SearchQueryBuilder#getQueryElementCollector()}.
  */
 class SearchQueryPredicateCollector<C, B> {

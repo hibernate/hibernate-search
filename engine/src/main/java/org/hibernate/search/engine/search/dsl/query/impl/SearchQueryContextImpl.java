@@ -18,10 +18,7 @@ import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
-/**
- * @author Yoann Rodiere
- */
-final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
+public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
@@ -29,7 +26,7 @@ final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 
 	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
 
-	SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+	public SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector) {
 		this.searchQueryBuilder = searchQueryBuilder;
