@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,6 +21,14 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.ContentType;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
+import org.elasticsearch.client.ResponseListener;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
@@ -31,13 +40,6 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.ContentType;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.ResponseException;
-import org.elasticsearch.client.ResponseListener;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.sniff.Sniffer;
 
 /**
  * @author Yoann Rodiere
@@ -94,14 +96,14 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 		throw log.clientUnwrappingWithUnkownType( clientClass, RestClient.class );
 	}
 
-	private CompletableFuture<Response> send(ElasticsearchRequest request) {
+	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
 		Gson gson = gsonProvider.getGson();
 
 		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
 
 		HttpEntity entity;
 		try {
-			entity = ElasticsearchClientUtils.toEntity( gson, request );
+			entity = ElasticsearchClientUtils.toEntity( gson, elasticsearchRequest );
 		}
 		catch (IOException | RuntimeException e) {
 			completableFuture.completeExceptionally( e );
@@ -109,10 +111,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 		}
 
 		restClient.performRequestAsync(
-				request.getMethod(),
-				request.getPath(),
-				request.getParameters(),
-				entity,
+				toRequest( elasticsearchRequest, entity ),
 				new ResponseListener() {
 					@Override
 					public void onSuccess(Response response) {
@@ -152,6 +151,18 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 		completableFuture.thenRun( () -> timeout.cancel( false ) );
 
 		return completableFuture;
+	}
+
+	private static Request toRequest(ElasticsearchRequest elasticsearchRequest, HttpEntity entity) {
+		Request request = new Request( elasticsearchRequest.getMethod(), elasticsearchRequest.getPath() );
+
+		for ( Entry<String, String> parameter : elasticsearchRequest.getParameters().entrySet() ) {
+			request.addParameter( parameter.getKey(), parameter.getValue() );
+		}
+
+		request.setEntity( entity );
+
+		return request;
 	}
 
 	private ElasticsearchResponse convertResponse(ElasticsearchRequest request, Response response) {
