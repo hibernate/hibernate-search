@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.jpa;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface FullTextSearchTarget<T> {
 
@@ -18,6 +19,6 @@ public interface FullTextSearchTarget<T> {
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionFactoryContext projection();
+	SearchProjectionFactoryContext<PojoReference, T> projection();
 
 }

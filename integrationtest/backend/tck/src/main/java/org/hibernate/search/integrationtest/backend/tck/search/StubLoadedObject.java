@@ -8,10 +8,10 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 
 import org.hibernate.search.engine.search.DocumentReference;
 
-class StubLoadedObject {
+public class StubLoadedObject {
 	private final DocumentReference documentReference;
 
-	StubLoadedObject(DocumentReference documentReference) {
+	public StubLoadedObject(DocumentReference documentReference) {
 		this.documentReference = documentReference;
 	}
 

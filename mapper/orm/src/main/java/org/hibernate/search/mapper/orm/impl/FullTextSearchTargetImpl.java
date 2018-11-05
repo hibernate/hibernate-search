@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
 
@@ -37,7 +38,7 @@ class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext projection() {
+	public SearchProjectionFactoryContext<PojoReference, T> projection() {
 		return delegate.projection();
 	}
 }

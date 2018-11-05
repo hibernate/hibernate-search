@@ -10,6 +10,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -41,7 +42,7 @@ public class HibernateOrmSearchTargetImpl<O> implements HibernateOrmSearchTarget
 	}
 
 	@Override
-	public SearchProjectionFactoryContext projection() {
+	public SearchProjectionFactoryContext<PojoReference, O> projection() {
 		return searchTargetDelegate.projection();
 	}
 }

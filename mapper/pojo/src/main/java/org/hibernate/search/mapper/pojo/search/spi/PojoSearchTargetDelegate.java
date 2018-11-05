@@ -46,6 +46,6 @@ public interface PojoSearchTargetDelegate<E, O> {
 
 	SearchSortContainerContext sort();
 
-	SearchProjectionFactoryContext projection();
+	SearchProjectionFactoryContext<PojoReference, O> projection();
 
 }

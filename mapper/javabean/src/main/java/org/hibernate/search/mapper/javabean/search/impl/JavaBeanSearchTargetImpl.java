@@ -39,7 +39,7 @@ public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
 	}
 
 	@Override
-	public SearchProjectionFactoryContext projection() {
+	public SearchProjectionFactoryContext<PojoReference, PojoReference> projection() {
 		return delegate.projection();
 	}
 }
