@@ -263,7 +263,7 @@
         <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
-        <version.com.buschmais.jqassistant.plugin>1.3.0</version.com.buschmais.jqassistant.plugin>
+        <version.com.buschmais.jqassistant.plugin>1.5.0</version.com.buschmais.jqassistant.plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
