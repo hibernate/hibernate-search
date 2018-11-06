@@ -9,6 +9,7 @@ package org.hibernate.search.test.configuration.integration;
 import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
+import static org.easymock.EasyMock.newCapture;
 import static org.easymock.EasyMock.startsWith;
 
 import java.util.Collections;
@@ -98,7 +99,7 @@ public class HibernateSearchIntegratorTest extends UnitilsJUnit4 {
 
 	@SuppressWarnings("unchecked")
 	private void assertObserverCalledAndEventListenersRegistered() {
-		Capture<SessionFactoryObserver> capturedSessionFactoryObserver = new Capture<SessionFactoryObserver>();
+		Capture<SessionFactoryObserver> capturedSessionFactoryObserver = newCapture();
 		mockSessionFactoryImplementor.addObserver(
 				EasyMock.and(
 						EasyMock.capture( capturedSessionFactoryObserver ),
