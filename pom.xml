@@ -2150,7 +2150,7 @@
         <profile>
             <id>elasticsearch-6.0</id>
             <properties>
-                <test.elasticsearch.mavenPlugin.version>6.6</test.elasticsearch.mavenPlugin.version>
+                <test.elasticsearch.mavenPlugin.version>6.8</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>6.4.2</test.elasticsearch.host.version>
             </properties>
             <build>
