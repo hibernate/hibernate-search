@@ -2104,7 +2104,7 @@
                 </property>
             </activation>
             <properties>
-                <version.elasticsearch.plugin>5.7</version.elasticsearch.plugin>
+                <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
             </properties>
             <build>
@@ -2113,7 +2113,7 @@
                         <plugin>
                             <groupId>com.github.alexcojocaru</groupId>
                             <artifactId>elasticsearch-maven-plugin</artifactId>
-                            <version>${version.elasticsearch.plugin}</version>
+                            <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
                                 <skip>${test.elasticsearch.host.provided}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
