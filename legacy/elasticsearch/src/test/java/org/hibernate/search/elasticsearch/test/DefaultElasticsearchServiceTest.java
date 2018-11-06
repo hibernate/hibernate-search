@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.getCurrentArguments;
+import static org.easymock.EasyMock.newCapture;
 import static org.easymock.EasyMock.replay;
 
 import java.util.Properties;
@@ -62,7 +63,7 @@ public class DefaultElasticsearchServiceTest {
 	@Test
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void propertyMasking() throws Exception {
-		Capture<Properties> propertiesCapture = new Capture<>();
+		Capture<Properties> propertiesCapture = newCapture();
 
 		expect( contextMock.getServiceManager() ).andReturn( serviceManagerMock ).anyTimes();
 		expect( serviceManagerMock.requestReference( anyObject() ) ).andAnswer(
