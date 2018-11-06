@@ -48,7 +48,7 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 	@SuppressWarnings("unchecked") // The cast is checked using reflection
 	public final <T> PojoModelElementAccessor<T> createAccessor(Class<T> requestedType) {
 		if ( !isAssignableTo( requestedType ) ) {
-			log.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
+			throw log.incompatibleRequestedType( getModelPathTypeNode().toUnboundPath(), requestedType );
 		}
 		return (PojoModelElementAccessor<T>) createAccessor();
 	}

@@ -95,7 +95,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 						.createGenericTypeModel( getGetterGenericReturnType() );
 			}
 			catch (RuntimeException e) {
-				log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
 			}
 		}
 		return typeModel;
@@ -108,7 +108,7 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 				handle = introspector.createPropertyHandle( getName(), descriptor.getReadMethod() );
 			}
 			catch (IllegalAccessException | RuntimeException e) {
-				log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
+				throw log.errorRetrievingPropertyTypeModel( getName(), parentTypeModel, e );
 			}
 		}
 		return handle;
