@@ -9,6 +9,7 @@ package org.hibernate.search.elasticsearch.processor.impl;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.newCapture;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
@@ -56,7 +57,7 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Test
 	public void singleError() {
-		Capture<ErrorContext> capture = new Capture<>();
+		Capture<ErrorContext> capture = newCapture();
 
 		replay();
 		DefaultContextualErrorHandler handler =
@@ -101,7 +102,7 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Test
 	public void nonWorkError() {
-		Capture<ErrorContext> capture = new Capture<>();
+		Capture<ErrorContext> capture = newCapture();
 
 		replay();
 		DefaultContextualErrorHandler handler =
@@ -138,7 +139,7 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Test
 	public void multipleErrors_works() {
-		Capture<ErrorContext> capture = new Capture<>();
+		Capture<ErrorContext> capture = newCapture();
 
 		replay();
 		DefaultContextualErrorHandler handler =
@@ -172,7 +173,7 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Test
 	public void multipleErrors_workAndNotWork() {
-		Capture<ErrorContext> capture = new Capture<>();
+		Capture<ErrorContext> capture = newCapture();
 
 		replay();
 		DefaultContextualErrorHandler handler =
