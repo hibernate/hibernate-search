@@ -72,6 +72,11 @@ public final class JavaBeanMappingBuilder {
 		return this;
 	}
 
+	public JavaBeanMappingBuilder setImplicitProvidedId(boolean multiTenancyEnabled) {
+		mappingInitiator.setImplicitProvidedId( multiTenancyEnabled );
+		return this;
+	}
+
 	public JavaBeanMappingBuilder setAnnotatedTypeDiscoveryEnabled(boolean annotatedTypeDiscoveryEnabled) {
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( annotatedTypeDiscoveryEnabled );
 		return this;
