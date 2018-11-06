@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -495,6 +496,7 @@ public class AutomaticIndexingBridgeIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2496")
 	public void indirectValueUpdate_propertyBridge() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			IndexedEntity entity1 = new IndexedEntity();
