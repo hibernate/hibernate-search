@@ -114,9 +114,9 @@ public class DocumentIdBaseIT {
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassWithParameters() {
 		@Indexed
 		class IndexedEntity {
-			Enum<FieldBaseIT.EnumForEnumSuperClassTest> id;
+			Enum<EnumForEnumSuperClassTest> id;
 			@DocumentId
-			public Enum<FieldBaseIT.EnumForEnumSuperClassTest> getId() {
+			public Enum<EnumForEnumSuperClassTest> getId() {
 				return id;
 			}
 		}
@@ -130,7 +130,7 @@ public class DocumentIdBaseIT {
 						.pathContext( ".id" )
 						.failure(
 								"Unable to find a default identifier bridge implementation for type 'java.lang.Enum<"
-										+ FieldBaseIT.EnumForEnumSuperClassTest.class.getName() + ">'"
+										+ EnumForEnumSuperClassTest.class.getName() + ">'"
 						)
 						.build()
 				);
