@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import static org.easymock.EasyMock.newCapture;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -155,7 +156,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
 
 		StubNestedContextBuilder nestedContextBuilderMock = createStrictMock( StubNestedContextBuilder.class );
-		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = new Capture<>();
+		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = newCapture();
 
 		Object expectedReturn;
 		Optional<Object> actualReturn;
@@ -523,7 +524,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	private IndexSchemaNestingContext checkCompositeIncluded(String expectedPrefixedName,
 			IndexSchemaNestingContext context, String relativeFieldName) {
-		Capture<IndexSchemaNestingContext> nestedContextCapture = new Capture<>();
+		Capture<IndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
 		EasyMock.expect( compositeFactoryIfIncludedMock.apply(
@@ -544,7 +545,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	private void checkCompositeExcluded(String expectedPrefixedName, IndexSchemaNestingContext context,
 			String relativeFieldName, boolean recurse) {
-		Capture<IndexSchemaNestingContext> nestedContextCapture = new Capture<>();
+		Capture<IndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
 		EasyMock.expect( compositeFactoryIfExcludedMock.apply(
@@ -565,7 +566,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	private IndexSchemaNestingContextImpl checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
 			IndexSchemaNestingContextImpl context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
-		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = new Capture<>();
+		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
 		nestedContextBuilderMock.appendObject( expectedObjectName );
