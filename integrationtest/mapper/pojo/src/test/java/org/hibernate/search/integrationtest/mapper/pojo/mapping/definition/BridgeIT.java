@@ -12,7 +12,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
+import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
@@ -21,8 +26,11 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReferen
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -105,6 +113,54 @@ public class BridgeIT {
 	@Target(ElementType.TYPE)
 	@TypeBridgeMapping(bridge = @TypeBridgeReference(name = "foo"), builder = @TypeBridgeAnnotationBuilderReference(name = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping {
+	}
+
+	@Test
+	public void typeBridgeMapping_error_incompatibleRequestedType() {
+		@Indexed
+		@IncompatibleTypeRequestingTypeBridgeAnnotation
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.failure(
+								"Requested incompatible type for '.stringProperty<no value extractors>'",
+								"'" + Integer.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target(ElementType.TYPE)
+	@TypeBridgeMapping(bridge = @TypeBridgeReference(type = IncompatibleTypeRequestingTypeBridge.class))
+	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
+	}
+
+	public static class IncompatibleTypeRequestingTypeBridge implements TypeBridge {
+		@Override
+		public void bind(TypeBridgeBindingContext context) {
+			context.getBridgedElement().property( "stringProperty" ).createAccessor( Integer.class );
+		}
+
+		@Override
+		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
 	}
 
 	@Test
@@ -212,4 +268,52 @@ public class BridgeIT {
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
 	}
 
+	@Test
+	public void propertyBridgeMapping_error_incompatibleRequestedType() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IncompatibleTypeRequestingPropertyBridgeAnnotation
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".stringProperty" )
+						.failure(
+								"Requested incompatible type for '.stringProperty<no value extractors>'",
+								"'" + Integer.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD, ElementType.FIELD})
+	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(type = IncompatibleTypeRequestingPropertyBridge.class))
+	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
+	}
+
+	public static class IncompatibleTypeRequestingPropertyBridge implements PropertyBridge {
+		@Override
+		public void bind(PropertyBridgeBindingContext context) {
+			context.getBridgedElement().createAccessor( Integer.class );
+		}
+
+		@Override
+		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
+			throw new UnsupportedOperationException( "This should not be called" );
+		}
+	}
 }
