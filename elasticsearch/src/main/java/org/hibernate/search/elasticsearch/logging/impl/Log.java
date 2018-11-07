@@ -516,4 +516,11 @@ public interface Log extends BaseHibernateSearchLogger {
 	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 95,
+			value = "Invalid bridge for field '%2$s' on entity '%1$s'."
+					+ " Boolean field bridge must implement TwoWayStringBridge"
+					+ " when used in the Elasticsearch integration."
+	)
+	SearchException booleanBridgeMustImplementTwoWayStringBridge(IndexedTypeIdentifier typeIdentifier, String staticAbsolutePath);
 }

@@ -23,8 +23,9 @@ import org.hibernate.search.backend.PurgeAllLuceneWork;
 import org.hibernate.search.backend.UpdateLuceneWork;
 import org.hibernate.search.backend.spi.DeleteByQueryLuceneWork;
 import org.hibernate.search.bridge.FieldBridge;
-import org.hibernate.search.bridge.TwoWayFieldBridge;
+import org.hibernate.search.bridge.TwoWayStringBridge;
 import org.hibernate.search.bridge.spi.NullMarker;
+import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.gson.impl.JsonElementType;
@@ -320,7 +321,18 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 					ExtendedFieldType type = FieldHelper.getType( documentFieldMetadata );
 					if ( ExtendedFieldType.BOOLEAN.equals( type ) ) {
 						FieldBridge fieldBridge = documentFieldMetadata.getFieldBridge();
-						Boolean value = (Boolean) ( (TwoWayFieldBridge) fieldBridge ).get( field.name(), document );
+						/*
+						 * Use the adaptor utils in case there's a null-encoding bridge wrapping the actual bridge;
+						 * this null-encoding bridge wrapper may not implement TwoWayStringBridge.
+						 */
+						TwoWayStringBridge twoWayStringBridge = BridgeAdaptorUtils.unwrapAdaptorOnly( fieldBridge, TwoWayStringBridge.class );
+						if ( twoWayStringBridge == null ) {
+							throw LOG.booleanBridgeMustImplementTwoWayStringBridge(
+									indexBinding.getDocumentBuilder().getTypeIdentifier(), accessor.getStaticAbsolutePath()
+							);
+						}
+
+						Boolean value = (Boolean) twoWayStringBridge.stringToObject( field.stringValue() );
 
 						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
 					}
