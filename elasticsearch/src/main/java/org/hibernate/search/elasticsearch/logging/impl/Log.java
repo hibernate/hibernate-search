@@ -521,4 +521,11 @@ public interface Log extends BaseHibernateSearchLogger {
 			value = "Attempt to unwrap the Elasticsearch low-level client to %1$s,"
 					+ " but the client can only be unwrapped to %2$s." )
 	SearchException clientUnwrappingWithUnknownType(Class<?> requestedClass, Class<?> actualClass);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 95,
+			value = "Invalid bridge for field '%2$s' on entity '%1$s'."
+					+ " Boolean field bridge must implement TwoWayStringBridge"
+					+ " when used in the Elasticsearch integration."
+	)
+	SearchException booleanBridgeMustImplementTwoWayStringBridge(IndexedTypeIdentifier typeIdentifier, String staticAbsolutePath);
 }
