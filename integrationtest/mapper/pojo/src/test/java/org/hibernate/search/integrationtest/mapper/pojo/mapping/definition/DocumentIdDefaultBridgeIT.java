@@ -85,6 +85,50 @@ public class DocumentIdDefaultBridgeIT {
 	}
 
 	@Test
+	public void boxedLong() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Long id;
+			@DocumentId
+			public Long getId() {
+				return id;
+			}
+		}
+		doTestBridge(
+				IndexedEntity.class,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					return entity;
+				},
+				73L,
+				"73"
+		);
+	}
+
+	@Test
+	public void primitiveLong() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			long id;
+			@DocumentId
+			public long getId() {
+				return id;
+			}
+		}
+		doTestBridge(
+				IndexedEntity.class,
+				id -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					return entity;
+				},
+				9L,
+				"9"
+		);
+	}
+
+	@Test
 	public void myEnum() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {

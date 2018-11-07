@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Date;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -120,6 +121,110 @@ public class FieldDefaultBridgeIT {
 	}
 
 	@Test
+	public void boxedLong() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Long myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Long getMyProperty() {
+				return myProperty;
+			}
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Long.class,
+				39L
+		);
+	}
+
+	@Test
+	public void primitiveLong() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			long myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public long getMyProperty() {
+				return myProperty;
+			}
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Long.class,
+				7L
+		);
+	}
+
+	@Test
+	public void boxedBoolean() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Boolean myProperty;
+			@DocumentId
+			public Integer getId() { return id; }
+			@GenericField
+			public Boolean getMyProperty() { return myProperty; }
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Boolean.class,
+				true
+		);
+	}
+
+	@Test
+	public void primitiveBoolean() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			boolean myProperty;
+			@DocumentId
+			public Integer getId() { return id; }
+			@GenericField
+			public boolean getMyProperty() { return myProperty; }
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Boolean.class,
+				true
+		);
+	}
+
+	@Test
 	public void localDate() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
@@ -144,6 +249,34 @@ public class FieldDefaultBridgeIT {
 				},
 				LocalDate.class,
 				LocalDate.of( 2017, Month.NOVEMBER, 6 )
+		);
+	}
+
+	@Test
+	public void utilDate() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Date myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Date getMyProperty() {
+				return myProperty;
+			}
+		}
+		doTestPassThroughBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Date.class,
+				new Date( 739739739L )
 		);
 	}
 
