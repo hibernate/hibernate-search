@@ -406,4 +406,10 @@ public interface Log extends org.hibernate.search.util.logging.impl.Log {
 			)
 	void usingPasswordOverHttp(String serverUris);
 
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 95,
+			value = "Invalid bridge for field '%2$s' on entity '%1$s'."
+					+ " Boolean field bridge must implement TwoWayStringBridge"
+					+ " when used in the Elasticsearch integration."
+	)
+	SearchException booleanBridgeMustImplementTwoWayStringBridge(@FormatWith(ClassFormatter.class) Class<?> entityType, String staticAbsolutePath);
 }
