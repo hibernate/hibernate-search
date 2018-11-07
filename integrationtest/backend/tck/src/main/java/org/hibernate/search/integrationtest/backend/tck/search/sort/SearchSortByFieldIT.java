@@ -479,6 +479,10 @@ public class SearchSortByFieldIT {
 						Integer.MIN_VALUE, 2, 4, Integer.MAX_VALUE
 				)
 						.map( root, prefix + "integer", additionalConfiguration ),
+				ByTypeFieldModel.mapper( Long.class, 1L, 3L, 5L,
+						Long.MIN_VALUE, 2L, 4L, Long.MAX_VALUE
+				)
+						.map( root, prefix + "long", additionalConfiguration ),
 				ByTypeFieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),

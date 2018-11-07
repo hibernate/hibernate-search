@@ -720,6 +720,10 @@ public class RangeSearchPredicateIT {
 							10, 19
 					)
 							.map( root, prefix + "integer", additionalConfiguration ),
+					ByTypeFieldModel.mapper( Long.class, 3L, 13L, 25L,
+							10L, 19L
+					)
+							.map( root, prefix + "long", additionalConfiguration ),
 					ByTypeFieldModel.mapper(
 							LocalDate.class,
 							LocalDate.of( 2003, 6, 3 ),

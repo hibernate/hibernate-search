@@ -45,6 +45,11 @@ class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 	}
 
 	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Long> asLong() {
+		return as( Long.class );
+	}
+
+	@Override
 	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
 	}

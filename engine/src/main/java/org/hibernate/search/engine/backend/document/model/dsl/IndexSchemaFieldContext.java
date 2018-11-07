@@ -22,6 +22,8 @@ public interface IndexSchemaFieldContext {
 
 	StandardIndexSchemaFieldTypedContext<?, Integer> asInteger();
 
+	StandardIndexSchemaFieldTypedContext<?, Long> asLong();
+
 	StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate();
 
 	StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint();

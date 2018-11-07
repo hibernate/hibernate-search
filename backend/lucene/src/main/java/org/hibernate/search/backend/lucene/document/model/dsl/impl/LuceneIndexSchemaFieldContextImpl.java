@@ -20,6 +20,7 @@ import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchema
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLongIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
@@ -62,6 +63,9 @@ class LuceneIndexSchemaFieldContextImpl
 		else if ( Integer.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asInteger();
 		}
+		else if ( Long.class.equals( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asLong();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
@@ -82,6 +86,11 @@ class LuceneIndexSchemaFieldContextImpl
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Integer> asInteger() {
 		return setDelegate( new LuceneIntegerIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Long> asLong() {
+		return setDelegate( new LuceneLongIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
