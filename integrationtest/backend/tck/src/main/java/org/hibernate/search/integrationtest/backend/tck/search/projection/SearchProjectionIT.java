@@ -670,6 +670,8 @@ public class SearchProjectionIT {
 						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
 				FieldModel.mapper( Integer.class, 1, 3, 5 )
 						.map( root, prefix + "integer", additionalConfiguration ),
+				FieldModel.mapper( Long.class, 1L, 3L, 5L )
+						.map( root, prefix + "long", additionalConfiguration ),
 				FieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),

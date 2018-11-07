@@ -11,6 +11,7 @@ import java.time.LocalDate;
 
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.JsonStringIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLongIndexSchemaFieldContextImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -61,6 +62,9 @@ class ElasticsearchIndexSchemaFieldContextImpl
 		else if ( Integer.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asInteger();
 		}
+		else if ( Long.class.equals( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asLong();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
@@ -81,6 +85,11 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Integer> asInteger() {
 		return setDelegate( new ElasticsearchIntegerIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Long> asLong() {
+		return setDelegate( new ElasticsearchLongIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override

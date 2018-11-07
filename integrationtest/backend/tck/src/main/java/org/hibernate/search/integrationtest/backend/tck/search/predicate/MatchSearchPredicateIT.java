@@ -469,6 +469,8 @@ public class MatchSearchPredicateIT {
 							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
 					ByTypeFieldModel.mapper( Integer.class, 42, 67 )
 							.map( root, prefix + "integer", additionalConfiguration ),
+					ByTypeFieldModel.mapper( Long.class, 7L, 39L )
+							.map( root, prefix + "long", additionalConfiguration ),
 					ByTypeFieldModel.mapper(
 							LocalDate.class,
 							LocalDate.of( 1980, 10, 11 ),
