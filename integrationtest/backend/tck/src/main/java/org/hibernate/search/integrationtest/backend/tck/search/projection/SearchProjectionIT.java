@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
@@ -43,7 +43,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchTarget;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
@@ -114,11 +113,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( fieldModel.document1Value.indexedValue );
-				b.projection( fieldModel.document2Value.indexedValue );
-				b.projection( fieldModel.document3Value.indexedValue );
-				b.projection( null ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( fieldModel.document1Value.indexedValue );
+				b.list( fieldModel.document2Value.indexedValue );
+				b.list( fieldModel.document3Value.indexedValue );
+				b.list( null ); // Empty document
 			} );
 		}
 	}
@@ -135,11 +134,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( fieldModel.document1Value.indexedValue );
-				b.projection( fieldModel.document2Value.indexedValue );
-				b.projection( fieldModel.document3Value.indexedValue );
-				b.projection( null ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( fieldModel.document1Value.indexedValue );
+				b.list( fieldModel.document2Value.indexedValue );
+				b.list( fieldModel.document3Value.indexedValue );
+				b.list( null ); // Empty document
 			} );
 		}
 	}
@@ -154,11 +153,11 @@ public class SearchProjectionIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( indexMapping.string1Field.document1Value.indexedValue );
-			b.projection( indexMapping.string1Field.document2Value.indexedValue );
-			b.projection( indexMapping.string1Field.document3Value.indexedValue );
-			b.projection( null ); // Empty document
+		assertThat( query ).hasListHitsAnyOrder( b -> {
+			b.list( indexMapping.string1Field.document1Value.indexedValue );
+			b.list( indexMapping.string1Field.document2Value.indexedValue );
+			b.list( indexMapping.string1Field.document3Value.indexedValue );
+			b.list( null ); // Empty document
 		} );
 	}
 
@@ -197,11 +196,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( new ValueWrapper<>( fieldModel.document1Value.indexedValue ) );
-				b.projection( new ValueWrapper<>( fieldModel.document2Value.indexedValue ) );
-				b.projection( new ValueWrapper<>( fieldModel.document3Value.indexedValue ) );
-				b.projection( new ValueWrapper<>( null ) ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( new ValueWrapper<>( fieldModel.document1Value.indexedValue ) );
+				b.list( new ValueWrapper<>( fieldModel.document2Value.indexedValue ) );
+				b.list( new ValueWrapper<>( fieldModel.document3Value.indexedValue ) );
+				b.list( new ValueWrapper<>( null ) ); // Empty document
 			} );
 		}
 	}
@@ -233,11 +232,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( fieldModel.document1Value.indexedValue );
-				b.projection( fieldModel.document2Value.indexedValue );
-				b.projection( fieldModel.document3Value.indexedValue );
-				b.projection( null ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( fieldModel.document1Value.indexedValue );
+				b.list( fieldModel.document2Value.indexedValue );
+				b.list( fieldModel.document3Value.indexedValue );
+				b.list( null ); // Empty document
 			} );
 		}
 	}
@@ -271,11 +270,11 @@ public class SearchProjectionIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( document1Reference, document1Reference, document1Reference );
-			b.projection( document2Reference, document2Reference, document2Reference );
-			b.projection( document3Reference, document3Reference, document3Reference );
-			b.projection( emptyReference, emptyReference, emptyReference );
+		assertThat( query ).hasListHitsAnyOrder( b -> {
+			b.list( document1Reference, document1Reference, document1Reference );
+			b.list( document2Reference, document2Reference, document2Reference );
+			b.list( document3Reference, document3Reference, document3Reference );
+			b.list( emptyReference, emptyReference, emptyReference );
 		} );
 	}
 
@@ -351,11 +350,11 @@ public class SearchProjectionIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( document1Reference, document1TransformedReference, document1LoadedObject );
-			b.projection( document2Reference, document2TransformedReference, document2LoadedObject );
-			b.projection( document3Reference, document3TransformedReference, document3LoadedObject );
-			b.projection( emptyReference, emptyTransformedReference, emptyLoadedObject );
+		assertThat( query ).hasListHitsAnyOrder( b -> {
+			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
+			b.list( document2Reference, document2TransformedReference, document2LoadedObject );
+			b.list( document3Reference, document3TransformedReference, document3LoadedObject );
+			b.list( emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
 
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
@@ -401,23 +400,23 @@ public class SearchProjectionIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection(
+		assertThat( query ).hasListHitsAnyOrder( b -> {
+			b.list(
 					indexMapping.string1Field.document1Value.indexedValue,
 					reference( INDEX_NAME, DOCUMENT_1 ),
 					indexMapping.string2Field.document1Value.indexedValue
 			);
-			b.projection(
+			b.list(
 					indexMapping.string1Field.document2Value.indexedValue,
 					reference( INDEX_NAME, DOCUMENT_2 ),
 					indexMapping.string2Field.document2Value.indexedValue
 			);
-			b.projection(
+			b.list(
 					indexMapping.string1Field.document3Value.indexedValue,
 					reference( INDEX_NAME, DOCUMENT_3 ),
 					indexMapping.string2Field.document3Value.indexedValue
 			);
-			b.projection(
+			b.list(
 					null,
 					reference( INDEX_NAME, EMPTY ),
 					null
@@ -438,11 +437,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( fieldModel.document1Value.indexedValue );
-				b.projection( fieldModel.document2Value.indexedValue );
-				b.projection( fieldModel.document3Value.indexedValue );
-				b.projection( null ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( fieldModel.document1Value.indexedValue );
+				b.list( fieldModel.document2Value.indexedValue );
+				b.list( fieldModel.document3Value.indexedValue );
+				b.list( null ); // Empty document
 			} );
 		}
 	}
@@ -463,11 +462,11 @@ public class SearchProjectionIT {
 					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( fieldModel.document1Value );
-				b.projection( fieldModel.document2Value );
-				b.projection( fieldModel.document3Value );
-				b.projection( null ); // Empty document
+			assertThat( query ).hasListHitsAnyOrder( b -> {
+				b.list( fieldModel.document1Value );
+				b.list( fieldModel.document2Value );
+				b.list( fieldModel.document3Value );
+				b.list( null ); // Empty document
 			} );
 		}
 	}
@@ -609,8 +608,8 @@ public class SearchProjectionIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	private static class IndexMapping {

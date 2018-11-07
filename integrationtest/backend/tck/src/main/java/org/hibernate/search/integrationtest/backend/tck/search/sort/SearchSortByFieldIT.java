@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
@@ -41,7 +41,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Assume;
 import org.junit.Before;
@@ -97,24 +96,24 @@ public class SearchSortByFieldIT {
 
 			// Default order
 			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
 			// Explicit order with onMissingValue().sortLast()
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
 
 			// Explicit order with onMissingValue().sortFirst()
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 			// Explicit order with onMissingValue().use( ... )
 			if (
@@ -122,17 +121,17 @@ public class SearchSortByFieldIT {
 					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between1And2Value ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.between2And3Value ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.after3Value ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 			}
 		}
 	}
@@ -149,20 +148,20 @@ public class SearchSortByFieldIT {
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.between1And2Value ) ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.between2And3Value ) ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.after3Value ) ) );
-				DocumentReferencesSearchResultAssert.assertThat( query )
-						.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 			}
 		}
 	}
@@ -174,24 +173,24 @@ public class SearchSortByFieldIT {
 			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			query = simpleQuery( b -> b.byField( fieldPath ).onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortLast() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().sortFirst() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 			query = simpleQuery( b -> b.byField( fieldPath ).desc().onMissingValue().sortFirst() );
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 		}
 	}
 
@@ -203,29 +202,29 @@ public class SearchSortByFieldIT {
 				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc().onMissingValue().sortFirst()
 				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = simpleQuery( b -> b
 				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc().onMissingValue().sortFirst()
 				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		query = simpleQuery( b -> b
 				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).asc().onMissingValue().sortFirst()
 				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).desc()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_2, DOCUMENT_1, DOCUMENT_3 );
 
 		query = simpleQuery( b -> b
 				.byField( indexMapping.identicalForFirstTwo.relativeFieldName ).desc().onMissingValue().sortFirst()
 				.then().byField( indexMapping.identicalForLastTwo.relativeFieldName ).asc()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -407,7 +406,7 @@ public class SearchSortByFieldIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
 	private static class IndexMapping {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.analysis;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
@@ -16,13 +17,13 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -100,13 +101,13 @@ public class AnalysisCustomIT {
 
 		// We only expect exact matches
 		assertMatchQuery( "word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 		assertMatchQuery( "WORD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
 		assertMatchQuery( "wôrd" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
 		assertMatchQuery( "word word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
 	}
 
 	@Test
@@ -123,15 +124,15 @@ public class AnalysisCustomIT {
 
 		// We expect case-insensitive matches
 		assertMatchQuery( "word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
 		assertMatchQuery( "WORD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
 		assertMatchQuery( "Word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" );
 		assertMatchQuery( "WÔRD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
 		assertMatchQuery( "WorD Word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
 	}
 
 	@Test
@@ -148,13 +149,13 @@ public class AnalysisCustomIT {
 
 		// We only expect exact matches
 		assertMatchQuery( "word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 		assertMatchQuery( "WORD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "2" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" );
 		assertMatchQuery( "wôrd" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
 		assertMatchQuery( "word word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "4" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "4" );
 	}
 
 	@Test
@@ -171,17 +172,17 @@ public class AnalysisCustomIT {
 
 		// We expect case-insensitive, word-sensitive matches
 		assertMatchQuery( "word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
 		assertMatchQuery( "WORD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
 		assertMatchQuery( "Word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
 		assertMatchQuery( "WÔRD" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "3" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "3" );
 		assertMatchQuery( "WorD Word" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4", "5" );
 		assertMatchQuery( "word wôrd" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
 	}
 
 	@Test
@@ -197,20 +198,20 @@ public class AnalysisCustomIT {
 		} );
 
 		assertMatchQuery( "word1" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
 		assertMatchQuery( "word2" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "3", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3", "5" );
 		assertMatchQuery( "word3" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "3" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3" );
 		assertMatchQuery( "stopword" )
 				.hasNoHits();
 		assertMatchQuery( "word1 stopword" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "4" );
 		assertMatchQuery( "word1,word2" )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "4", "5" );
 	}
 
-	private DocumentReferencesSearchResultAssert<DocumentReference> assertMatchQuery(String valueToMatch) {
+	private SearchResultAssert<DocumentReference> assertMatchQuery(String valueToMatch) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
@@ -218,7 +219,7 @@ public class AnalysisCustomIT {
 				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ).toPredicate() )
 				.build();
 
-		return DocumentReferencesSearchResultAssert.assertThat( query );
+		return assertThat( query );
 	}
 
 	private void setupWithAnalyzer(AnalysisDefinitions analysisDefinition) {
@@ -265,8 +266,8 @@ public class AnalysisCustomIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( c -> {
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( c -> {
 					for ( String documentId : documentIds ) {
 						c.doc( INDEX_NAME, documentId );
 					}

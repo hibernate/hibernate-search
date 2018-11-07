@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -110,7 +110,7 @@ public class NestedSearchPredicateIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
 	}
 
@@ -151,7 +151,7 @@ public class NestedSearchPredicateIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
 				.hasHitCount( 2 );
 	}
 
@@ -185,7 +185,7 @@ public class NestedSearchPredicateIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
 				.hasHitCount( 1 );
 	}
 
@@ -232,7 +232,7 @@ public class NestedSearchPredicateIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
 	}
 
@@ -359,7 +359,7 @@ public class NestedSearchPredicateIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder(
+				.hasDocRefHitsAnyOrder(
 						INDEX_NAME,
 						DOCUMENT_1, DOCUMENT_2, "neverMatching", "empty"
 				);

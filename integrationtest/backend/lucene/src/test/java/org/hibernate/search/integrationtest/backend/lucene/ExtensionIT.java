@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -47,7 +47,6 @@ import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Before;
 import org.junit.Rule;
@@ -108,7 +107,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
 	}
 
@@ -133,7 +132,7 @@ public class ExtensionIT {
 				.predicate( booleanPredicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
 	}
 
@@ -153,7 +152,7 @@ public class ExtensionIT {
 								.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
 				)
 				.build();
-		assertThat( query ).hasReferencesHitsExactOrder(
+		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
@@ -173,7 +172,7 @@ public class ExtensionIT {
 						)
 				)
 				.build();
-		assertThat( query ).hasReferencesHitsExactOrder(
+		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
 		);
@@ -207,7 +206,7 @@ public class ExtensionIT {
 				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
 		SearchSort sort = searchTarget.sort()
 				.extension( LuceneExtension.get() ).fromLuceneSort( new Sort(
@@ -224,7 +223,7 @@ public class ExtensionIT {
 				.sort( c -> c.by( sort ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -279,7 +278,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
 	}
 
 	@Test
@@ -291,8 +290,8 @@ public class ExtensionIT {
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
 
-		ProjectionsSearchResultAssert.assertThat( query ).hasProjectionsHitsAnyOrder( c -> {
-			c.projection( 37 );
+		assertThat( query ).hasListHitsAnyOrder( c -> {
+			c.list( 37 );
 		} );
 	}
 
@@ -310,7 +309,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
 		SubTest.expectException(
@@ -341,7 +340,7 @@ public class ExtensionIT {
 				.build();
 
 		assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
@@ -456,7 +455,7 @@ public class ExtensionIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder(
+		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);

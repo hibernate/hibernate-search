@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.function.Consumer;
@@ -99,7 +99,7 @@ public class LuceneSearchSortIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

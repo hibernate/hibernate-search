@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -105,7 +105,7 @@ public class ExtensionIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
 	}
 
@@ -145,7 +145,7 @@ public class ExtensionIT {
 				.predicate( booleanPredicate )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
 	}
 
@@ -168,7 +168,7 @@ public class ExtensionIT {
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				)
 				.build();
-		assertThat( query ).hasReferencesHitsExactOrder(
+		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -187,7 +187,7 @@ public class ExtensionIT {
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				)
 				.build();
-		assertThat( query ).hasReferencesHitsExactOrder(
+		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
 		);
@@ -218,7 +218,7 @@ public class ExtensionIT {
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'desc'}" )
@@ -240,7 +240,7 @@ public class ExtensionIT {
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
 
 	@Test
@@ -360,7 +360,7 @@ public class ExtensionIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder(
+		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
 		);

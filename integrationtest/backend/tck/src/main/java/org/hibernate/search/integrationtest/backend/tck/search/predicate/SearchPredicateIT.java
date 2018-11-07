@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.Optional;
@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
@@ -73,8 +72,8 @@ public class SearchPredicateIT {
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -88,8 +87,8 @@ public class SearchPredicateIT {
 				.predicate( predicate )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -101,8 +100,8 @@ public class SearchPredicateIT {
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -129,8 +128,8 @@ public class SearchPredicateIT {
 				.predicate( cachingContributor )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
@@ -139,8 +138,8 @@ public class SearchPredicateIT {
 				.predicate( cachingContributor )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	@Test
@@ -167,8 +166,8 @@ public class SearchPredicateIT {
 				.predicate( f -> f.bool().must( cachingContributor ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
@@ -181,8 +180,8 @@ public class SearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -197,8 +196,8 @@ public class SearchPredicateIT {
 						.extendedPredicate( "string", STRING_1 )
 				)
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both supported
 		query = searchTarget.query()
@@ -216,8 +215,8 @@ public class SearchPredicateIT {
 						.orElseFail()
 				)
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query()
@@ -236,8 +235,8 @@ public class SearchPredicateIT {
 						)
 				)
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query()
@@ -256,8 +255,8 @@ public class SearchPredicateIT {
 						)
 				)
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	private void initData() {
@@ -278,7 +277,7 @@ public class SearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
 
 	private static <T, R> Function<T, R> shouldNotBeCalled() {

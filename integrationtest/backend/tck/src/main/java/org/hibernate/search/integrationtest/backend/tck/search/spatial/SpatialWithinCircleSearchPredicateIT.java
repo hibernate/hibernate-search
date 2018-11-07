@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -14,7 +16,6 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
@@ -44,8 +45,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -56,8 +57,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -68,8 +69,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -80,8 +81,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -92,8 +93,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -135,8 +136,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -154,8 +155,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
@@ -173,8 +174,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -185,8 +186,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		// onField().orFields(...)
 
@@ -199,8 +200,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -211,8 +212,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -223,8 +224,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		// onFields(...)
 
@@ -237,8 +238,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -249,8 +250,8 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test

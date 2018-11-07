@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -18,7 +19,6 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
@@ -61,16 +61,16 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -81,8 +81,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -93,8 +93,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -109,8 +109,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, ADDITIONAL_POINT_1_ID, ADDITIONAL_POINT_2_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, ADDITIONAL_POINT_1_ID, ADDITIONAL_POINT_2_ID );
 	}
 
 	@Test
@@ -143,8 +143,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -156,8 +156,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
@@ -171,16 +171,16 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_2_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// onField().orFields(...)
 
@@ -192,8 +192,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -203,8 +203,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -214,8 +214,8 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// onFields(...)
 
@@ -224,16 +224,16 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_1_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -284,7 +284,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
 				ADDITIONAL_POINT_2_ID );
 	}
 

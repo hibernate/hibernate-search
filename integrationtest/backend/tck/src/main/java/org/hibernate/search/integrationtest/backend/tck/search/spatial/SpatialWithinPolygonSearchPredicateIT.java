@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
@@ -62,16 +63,16 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test
@@ -104,8 +105,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -117,8 +118,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
 	}
 
 	@Test
@@ -132,16 +133,16 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_2_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// onField().orFields(...)
 
@@ -153,8 +154,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -164,8 +165,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -175,8 +176,8 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
 		// onFields(...)
 
@@ -185,16 +186,16 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 	}
 
 	@Test

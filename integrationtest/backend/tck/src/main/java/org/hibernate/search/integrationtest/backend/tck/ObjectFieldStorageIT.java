@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
@@ -131,7 +131,7 @@ public class ObjectFieldStorageIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
@@ -147,7 +147,7 @@ public class ObjectFieldStorageIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 	}
 
@@ -171,7 +171,7 @@ public class ObjectFieldStorageIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
@@ -193,7 +193,7 @@ public class ObjectFieldStorageIT {
 				)
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 	}
 
@@ -329,7 +329,7 @@ public class ObjectFieldStorageIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder(
+				.hasDocRefHitsAnyOrder(
 						INDEX_NAME,
 						EXPECTED_NESTED_MATCH_ID, EXPECTED_NON_NESTED_MATCH_ID, "neverMatching", "empty"
 				);

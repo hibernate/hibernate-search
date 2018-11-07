@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common;
 
-import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeProjection;
+import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeList;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalizeReference;
 
 import java.util.Arrays;
@@ -49,12 +49,12 @@ public final class EasyMockUtils {
 	}
 
 	public static List<?> projectionMatcher(List<?> expected) {
-		List<?> normalizedExpected = normalizeProjection( expected );
+		List<?> normalizedExpected = normalizeList( expected );
 		EasyMock.reportMatcher( new IArgumentMatcher() {
 			@Override
 			public boolean matches(Object argument) {
 				return argument instanceof List
-						&& Objects.equals( normalizedExpected, normalizeProjection( (List<?>) argument ) );
+						&& Objects.equals( normalizedExpected, normalizeList( (List<?>) argument ) );
 			}
 
 			@Override

@@ -31,7 +31,7 @@ public final class NormalizationUtils {
 		return other == null ? null : reference( other.getIndexName(), other.getId() );
 	}
 
-	public static List<?> normalizeProjection(List<?> other) {
+	public static List<?> normalizeList(List<?> other) {
 		return other.stream()
 				.map( projectionItem -> {
 					if ( projectionItem instanceof DocumentReference ) {

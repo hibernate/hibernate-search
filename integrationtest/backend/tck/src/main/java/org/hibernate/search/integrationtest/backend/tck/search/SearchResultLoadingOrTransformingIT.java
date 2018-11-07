@@ -9,8 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
@@ -92,7 +90,7 @@ public class SearchResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -104,7 +102,7 @@ public class SearchResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -215,9 +213,9 @@ public class SearchResultLoadingOrTransformingIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( projectionsQuery ).hasProjectionsHitsAnyOrder( b -> {
-			b.projection( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
-			b.projection( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
+		assertThat( projectionsQuery ).hasListHitsAnyOrder( b -> {
+			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
+			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
 		} );
 
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
@@ -353,7 +351,7 @@ public class SearchResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

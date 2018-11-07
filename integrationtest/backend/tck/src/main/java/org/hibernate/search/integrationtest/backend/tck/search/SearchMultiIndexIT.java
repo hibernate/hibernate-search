@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -23,8 +23,6 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -124,7 +122,7 @@ public class SearchMultiIndexIT {
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( c -> {
+		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
@@ -140,7 +138,7 @@ public class SearchMultiIndexIT {
 				.sort( c -> c.byField( "sortField" ).asc() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
+		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
@@ -152,7 +150,7 @@ public class SearchMultiIndexIT {
 				.sort( c -> c.byField( "sortField" ).desc() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
+		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2 );
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -168,10 +166,10 @@ public class SearchMultiIndexIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		ProjectionsSearchResultAssert.assertThat( query ).hasProjectionsHitsAnyOrder( c -> {
-			c.projection( SORT_FIELD_1_1_1 );
-			c.projection( SORT_FIELD_1_1_2 );
-			c.projection( SORT_FIELD_1_2_1 );
+		assertThat( query ).hasListHitsAnyOrder( c -> {
+			c.list( SORT_FIELD_1_1_1 );
+			c.list( SORT_FIELD_1_1_2 );
+			c.list( SORT_FIELD_1_2_1 );
 		} );
 	}
 
@@ -185,7 +183,7 @@ public class SearchMultiIndexIT {
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 
 		// Sort
 
@@ -200,10 +198,10 @@ public class SearchMultiIndexIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		ProjectionsSearchResultAssert.assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( c -> {
-			c.projection( ADDITIONAL_FIELD_1_1_1 );
-			c.projection( ADDITIONAL_FIELD_1_1_2 );
-			c.projection( null );
+		assertThat( projectionQuery ).hasListHitsAnyOrder( c -> {
+			c.list( ADDITIONAL_FIELD_1_1_1 );
+			c.list( ADDITIONAL_FIELD_1_1_2 );
+			c.list( null );
 		} );
 	}
 
@@ -329,7 +327,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
 
@@ -348,7 +346,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 
 		// Backend 2 / Index 1
 
@@ -368,7 +366,7 @@ public class SearchMultiIndexIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}
 
 	private static class IndexAccessors_1_1 {

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -19,7 +19,6 @@ import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexI
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
@@ -94,7 +93,7 @@ public class LuceneSearchMultiIndexIT {
 				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
+		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
@@ -105,7 +104,7 @@ public class LuceneSearchMultiIndexIT {
 				.sort( c -> c.byField( "additionalField" ).desc().onMissingValue().sortLast() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsExactOrder( c -> {
+		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
@@ -132,7 +131,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
 
@@ -149,7 +148,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}
 
 	private static class IndexAccessors_1_1 {

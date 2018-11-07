@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.ProjectionsSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -94,7 +93,7 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections(
@@ -103,7 +102,7 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
 	@Test
@@ -122,7 +121,7 @@ public class MultiTenancyIT {
 						.toPredicate()
 				)
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections(
@@ -136,7 +135,7 @@ public class MultiTenancyIT {
 						.toPredicate()
 				)
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
 	@Test
@@ -149,7 +148,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections(
@@ -158,9 +157,9 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );
-				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
+		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
+				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
@@ -168,7 +167,7 @@ public class MultiTenancyIT {
 		workPlan.execute().join();
 
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections(
 						searchTarget.projection().field( "string", String.class ).toProjection(),
@@ -176,8 +175,8 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
+		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
 		query = searchTarget.query( tenant1SessionContext )
@@ -185,7 +184,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -198,7 +197,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( checkQuery )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			indexAccessors.string.write( document, UPDATED_STRING );
@@ -220,7 +219,7 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ).toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asProjections(
@@ -234,7 +233,7 @@ public class MultiTenancyIT {
 						.toPredicate()
 				)
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( UPDATED_STRING, INTEGER_VALUE_4 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		// The tenant 1 has not been updated.
 
@@ -268,7 +267,7 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asProjections(
@@ -282,7 +281,7 @@ public class MultiTenancyIT {
 						.toPredicate()
 				)
 				.build();
-		assertThat( query ).hasProjectionsHitsAnyOrder( b -> b.projection( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 	}
 
 	@Test
@@ -324,7 +323,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -414,7 +413,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
 
 	@Test
@@ -518,7 +517,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
 				.asProjections(
@@ -527,9 +526,9 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( STRING_VALUE_1, INTEGER_VALUE_1 );
-				b.projection( STRING_VALUE_2, INTEGER_VALUE_2 );
+		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+				b.list( STRING_VALUE_1, INTEGER_VALUE_1 );
+				b.list( STRING_VALUE_2, INTEGER_VALUE_2 );
 		} );
 
 		query = searchTarget.query( tenant2SessionContext )
@@ -537,7 +536,7 @@ public class MultiTenancyIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjections(
@@ -546,9 +545,9 @@ public class MultiTenancyIT {
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( projectionQuery ).hasProjectionsHitsAnyOrder( b -> {
-				b.projection( STRING_VALUE_1, INTEGER_VALUE_3 );
-				b.projection( STRING_VALUE_2, INTEGER_VALUE_4 );
+		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
+				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
+				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 	}
 

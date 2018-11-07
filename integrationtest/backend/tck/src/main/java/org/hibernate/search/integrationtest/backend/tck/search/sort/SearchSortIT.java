@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
@@ -37,8 +37,6 @@ import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAna
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
@@ -106,13 +104,13 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
 		SearchResult<DocumentReference> firstCallResult = query.execute();
 		assertThat( firstCallResult ).fromQuery( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();
 
 		for ( int i = 0; i < INDEX_ORDER_CHECKS; ++i ) {
 			// Rebuild the query to bypass any cache in the query object
 			query = simpleQuery( b -> b.byIndexOrder() );
-			SearchResultAssert.assertThat( query ).hasHitsExactOrder( firstCallHits );
+			assertThat( query ).hasHitsExactOrder( firstCallHits );
 		}
 	}
 
@@ -135,24 +133,24 @@ public class SearchSortIT {
 				.predicate( predicate )
 				.sort( c -> c.byScore() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.sort( c -> c.byScore().desc() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( predicate )
 				.sort( c -> c.byScore().asc() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
@@ -169,16 +167,16 @@ public class SearchSortIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortAsc )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortAsc ) )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		SearchSort sortDesc = searchTarget.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
@@ -189,16 +187,16 @@ public class SearchSortIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortDesc )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortDesc ) )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -220,29 +218,29 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query;
 
 		query = simpleQuery( cachingContributor );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = simpleQuery( cachingContributor );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	@Test
 	public void byDistance_asc() {
 		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ) );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).asc() );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 	}
 
 	@Test
@@ -255,12 +253,12 @@ public class SearchSortIT {
 		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 
 		query = simpleQuery( b -> b.byDistance( "geoPoint", 45.757864, 4.834496 ).desc() );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 	}
 
 	@Test
@@ -282,13 +280,13 @@ public class SearchSortIT {
 		query = simpleQuery( c -> c
 				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast().toSort()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast().toSort()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Conditional extensions with orElse - two, both supported
 		query = simpleQuery( b -> b
@@ -303,8 +301,8 @@ public class SearchSortIT {
 						)
 						.orElseFail()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -317,8 +315,8 @@ public class SearchSortIT {
 						)
 						.orElseFail()
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Conditional extensions with orElse - two, second supported
 		query = simpleQuery( b -> b
@@ -333,8 +331,8 @@ public class SearchSortIT {
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -347,8 +345,8 @@ public class SearchSortIT {
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = simpleQuery( b -> b
@@ -365,8 +363,8 @@ public class SearchSortIT {
 								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
 						)
 		);
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
 				.extension()
 						.ifSupported(
@@ -383,8 +381,8 @@ public class SearchSortIT {
 		);
 
 		// Conditional extensions without orElse - one, unsupported
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 		query = simpleQuery( b -> {
 			b.extension()
 					.ifSupported(
@@ -393,8 +391,8 @@ public class SearchSortIT {
 					);
 			b.byField( "string" ).onMissingValue().sortLast().toSort();
 		} );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> {
 			b.extension()
 					.ifSupported(
@@ -403,8 +401,8 @@ public class SearchSortIT {
 					);
 			b.byField( "string" ).desc().onMissingValue().sortLast().toSort();
 		} );
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	private void initData() {
@@ -471,7 +469,7 @@ public class SearchSortIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
 	private static class IndexAccessors {

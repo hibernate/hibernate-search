@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.LocalDate;
@@ -33,7 +33,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -81,8 +80,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
@@ -99,8 +98,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 		}
 	}
 
@@ -119,8 +118,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 			// explicit inclusion
 
@@ -129,8 +128,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 			// explicit exclusion
 
@@ -139,8 +138,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 		}
 	}
 
@@ -157,8 +156,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -175,8 +174,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -195,8 +194,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit inclusion
 
@@ -205,8 +204,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion
 
@@ -215,8 +214,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		}
 	}
 
@@ -234,8 +233,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 		}
 	}
 
@@ -253,8 +252,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 		}
 	}
 
@@ -275,8 +274,8 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ).toPredicate() )
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit inclusion
 
@@ -289,8 +288,8 @@ public class RangeSearchPredicateIT {
 					)
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 			// explicit exclusion for the from clause
 
@@ -303,8 +302,8 @@ public class RangeSearchPredicateIT {
 					)
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
 			// explicit exclusion for the to clause
 
@@ -317,8 +316,8 @@ public class RangeSearchPredicateIT {
 					)
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 			// explicit exclusion for both clauses
 
@@ -331,8 +330,8 @@ public class RangeSearchPredicateIT {
 					)
 					.build();
 
-			DocumentReferencesSearchResultAssert.assertThat( query )
-					.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 		}
 	}
 
@@ -374,8 +373,8 @@ public class RangeSearchPredicateIT {
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -391,8 +390,8 @@ public class RangeSearchPredicateIT {
 				.sort( c -> c.byScore() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 	}
 
 	@Test
@@ -410,8 +409,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -422,8 +421,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		// onField().orFields(...)
 
@@ -436,8 +435,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -448,8 +447,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -460,8 +459,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		// onFields(...)
 
@@ -473,8 +472,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -484,8 +483,8 @@ public class RangeSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	@Test
@@ -674,7 +673,7 @@ public class RangeSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 	}
 
 	private static class IndexMapping {

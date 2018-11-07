@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -18,7 +19,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -65,8 +65,8 @@ public class MatchAllSearchPredicateIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -78,16 +78,16 @@ public class MatchAllSearchPredicateIT {
 				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ).toPredicate() ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 		query = searchTarget.query()
 				.asReferences()
 				.predicate( f -> f.matchAll().except( searchPredicate ).toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 	}
 
 	@Test
@@ -103,8 +103,8 @@ public class MatchAllSearchPredicateIT {
 				)
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
 		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).toPredicate();
 		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
@@ -114,8 +114,8 @@ public class MatchAllSearchPredicateIT {
 				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ).toPredicate() )
 				.build();
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
-				.hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
 	private void initData() {
@@ -138,7 +138,7 @@ public class MatchAllSearchPredicateIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexAccessors {

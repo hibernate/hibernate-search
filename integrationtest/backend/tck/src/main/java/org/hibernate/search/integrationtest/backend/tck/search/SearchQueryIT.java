@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.function.Function;
@@ -21,7 +22,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.DocumentReferencesSearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,9 +74,9 @@ public class SearchQueryIT {
 				.build();
 		query.setFirstResult( 1L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -86,9 +86,9 @@ public class SearchQueryIT {
 		query.setFirstResult( 1L );
 		query.setMaxResults( 1L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -97,9 +97,9 @@ public class SearchQueryIT {
 				.build();
 		query.setMaxResults( 2L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -109,9 +109,9 @@ public class SearchQueryIT {
 		query.setFirstResult( null );
 		query.setMaxResults( null );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -125,23 +125,23 @@ public class SearchQueryIT {
 				.build();
 		query.setFirstResult( 1L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query.setFirstResult( 1L );
 		query.setMaxResults( 1L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query.setFirstResult( null );
 		query.setMaxResults( 2L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = searchTarget.query()
 				.asReferences()
@@ -151,9 +151,9 @@ public class SearchQueryIT {
 		query.setFirstResult( null );
 		query.setMaxResults( null );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
-				.hasReferencesHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class SearchQueryIT {
 				.build();
 		query.setMaxResults( 0L );
 
-		DocumentReferencesSearchResultAssert.assertThat( query )
+		assertThat( query )
 				.hasHitCount( 3 )
 				.hasNoHits();
 	}
@@ -216,7 +216,7 @@ public class SearchQueryIT {
 				.asReferences()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
-		DocumentReferencesSearchResultAssert.assertThat( query ).hasReferencesHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexAccessors {
