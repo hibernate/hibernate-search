@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -48,11 +50,15 @@ public final class BridgeResolver {
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );
 
 		addIdentifierBridgeForExactRawType( Integer.class, ignored -> new DefaultIntegerIdentifierBridge() );
+		addIdentifierBridgeForExactRawType( Long.class, ignored -> new DefaultLongIdentifierBridge() );
 		addIdentifierBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumIdentifierBridge<>() );
 
 		addValueBridgeForExactRawType( Integer.class, ignored -> new PassThroughValueBridge<>( Integer.class ) );
+		addValueBridgeForExactRawType( Long.class, ignored -> new PassThroughValueBridge<>( Long.class ) );
+		addValueBridgeForExactRawType( Boolean.class, ignored -> new PassThroughValueBridge<>( Boolean.class ) );
 		addValueBridgeForExactRawType( String.class, ignored -> new PassThroughValueBridge<>( String.class ) );
 		addValueBridgeForExactRawType( LocalDate.class, ignored -> new PassThroughValueBridge<>( LocalDate.class ) );
+		addValueBridgeForExactRawType( Date.class, ignored -> new PassThroughValueBridge<>( Date.class ) );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumValueBridge<>() );
 	}
 
