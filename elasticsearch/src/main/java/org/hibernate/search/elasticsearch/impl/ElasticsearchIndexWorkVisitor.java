@@ -361,7 +361,7 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						Number numericValue = field.numericValue();
 
 						if ( numericValue != null ) {
-							accessor.add( root, numericValue != null ? new JsonPrimitive( numericValue ) : null );
+							accessor.add( root, new JsonPrimitive( numericValue ) );
 						}
 						else {
 							String stringValue = field.stringValue();
