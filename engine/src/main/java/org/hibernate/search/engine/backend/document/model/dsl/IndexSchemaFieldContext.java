@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -25,6 +26,8 @@ public interface IndexSchemaFieldContext {
 	StandardIndexSchemaFieldTypedContext<?, Long> asLong();
 
 	StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate();
+
+	StandardIndexSchemaFieldTypedContext<?, Date> asUtilDate();
 
 	StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint();
 

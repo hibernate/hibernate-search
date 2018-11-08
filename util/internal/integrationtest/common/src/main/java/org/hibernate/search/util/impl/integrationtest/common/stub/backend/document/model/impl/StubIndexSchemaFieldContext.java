@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
@@ -52,6 +53,11 @@ class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Date> asUtilDate() {
+		return as( Date.class );
 	}
 
 	@Override
