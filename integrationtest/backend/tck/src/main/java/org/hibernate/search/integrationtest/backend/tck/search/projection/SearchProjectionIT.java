@@ -59,6 +59,7 @@ import org.assertj.core.api.Assertions;
 import org.easymock.EasyMock;
 
 public class SearchProjectionIT {
+
 	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "1";
@@ -105,19 +106,20 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			SearchQuery<List<?>> query;
-			String fieldPath = fieldModel.relativeFieldName;
-			Class<?> fieldType = fieldModel.type;
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
 
-			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( fieldModel.document1Value.indexedValue );
-				b.list( fieldModel.document2Value.indexedValue );
-				b.list( fieldModel.document3Value.indexedValue );
-				b.list( null ); // Empty document
+				assertThat(
+						searchTarget.query()
+								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.predicate( f -> f.matchAll().toPredicate() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
 			} );
 		}
 	}
@@ -127,19 +129,19 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			SearchQuery<List<?>> query;
+			SearchQuery<Object> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
 					.asProjections( searchTarget.projection().field( fieldPath ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( fieldModel.document1Value.indexedValue );
-				b.list( fieldModel.document2Value.indexedValue );
-				b.list( fieldModel.document3Value.indexedValue );
-				b.list( null ); // Empty document
-			} );
+			assertThat( query ).hasHitsAnyOrder(
+					fieldModel.document1Value.indexedValue,
+					fieldModel.document2Value.indexedValue,
+					fieldModel.document3Value.indexedValue,
+					null // Empty document
+			);
 		}
 	}
 
@@ -147,18 +149,18 @@ public class SearchProjectionIT {
 	public void field_single_validSuperClass() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		SearchQuery<CharSequence> query = searchTarget.query()
 				.asProjections( searchTarget.projection()
 						.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( query ).hasListHitsAnyOrder( b -> {
-			b.list( indexMapping.string1Field.document1Value.indexedValue );
-			b.list( indexMapping.string1Field.document2Value.indexedValue );
-			b.list( indexMapping.string1Field.document3Value.indexedValue );
-			b.list( null ); // Empty document
-		} );
+		assertThat( query ).hasHitsAnyOrder(
+				indexMapping.string1Field.document1Value.indexedValue,
+				indexMapping.string1Field.document2Value.indexedValue,
+				indexMapping.string1Field.document3Value.indexedValue,
+				null // Empty document
+		);
 	}
 
 	@Test
@@ -189,19 +191,19 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
-			SearchQuery<List<?>> query;
+			SearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
 					.asProjections( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( new ValueWrapper<>( fieldModel.document1Value.indexedValue ) );
-				b.list( new ValueWrapper<>( fieldModel.document2Value.indexedValue ) );
-				b.list( new ValueWrapper<>( fieldModel.document3Value.indexedValue ) );
-				b.list( new ValueWrapper<>( null ) ); // Empty document
-			} );
+			assertThat( query ).hasHitsAnyOrder(
+				new ValueWrapper<>( fieldModel.document1Value.indexedValue ),
+				new ValueWrapper<>( fieldModel.document2Value.indexedValue ),
+				new ValueWrapper<>( fieldModel.document3Value.indexedValue ),
+				new ValueWrapper<>( null )
+			);
 		}
 	}
 
@@ -224,19 +226,20 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			SearchQuery<List<?>> query;
-			String fieldPath = fieldModel.relativeFieldName;
-			Class<?> fieldType = fieldModel.type;
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
 
-			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( fieldModel.document1Value.indexedValue );
-				b.list( fieldModel.document2Value.indexedValue );
-				b.list( fieldModel.document3Value.indexedValue );
-				b.list( null ); // Empty document
+				assertThat(
+						searchTarget.query()
+								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.predicate( f -> f.matchAll().toPredicate() )
+								.build()
+				).hasHitsAnyOrder(
+					model.document1Value.indexedValue,
+					model.document2Value.indexedValue,
+					model.document3Value.indexedValue,
+					null // Empty document
+				);
 			} );
 		}
 	}
@@ -364,17 +367,17 @@ public class SearchProjectionIT {
 	public void score() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		SearchQuery<Float> query = searchTarget.query()
 				.asProjections( searchTarget.projection().score().toProjection() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ).toPredicate() )
 				.sort( c -> c.byScore().desc() )
 				.build();
 
-		SearchResult<List<?>> result = query.execute();
-		Assertions.assertThat( result.getHitCount() ).isEqualTo( 2 );
+		SearchResult<Float> result = query.execute();
+		assertThat( result ).hasHitCount( 2 );
 
-		Float score1 = (Float) result.getHits().get( 0 ).get( 0 );
-		Float score2 = (Float) result.getHits().get( 1 ).get( 0 );
+		Float score1 = result.getHits().get( 0 );
+		Float score2 = result.getHits().get( 1 );
 
 		Assertions.assertThat( score1 ).isNotNull();
 		Assertions.assertThat( score2 ).isNotNull();
@@ -429,19 +432,21 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
-			SearchQuery<List<?>> query;
-			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
-			Class<?> fieldType = fieldModel.type;
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + model.relativeFieldName;
 
-			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( fieldModel.document1Value.indexedValue );
-				b.list( fieldModel.document2Value.indexedValue );
-				b.list( fieldModel.document3Value.indexedValue );
-				b.list( null ); // Empty document
+				assertThat(
+						searchTarget.query()
+								.asProjections(
+										searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.predicate( f -> f.matchAll().toPredicate() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
 			} );
 		}
 	}
@@ -454,19 +459,20 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
-			SearchQuery<List<?>> query;
-			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
-			Class<?> fieldType = fieldModel.type;
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
 
-			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath, fieldType ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-			assertThat( query ).hasListHitsAnyOrder( b -> {
-				b.list( fieldModel.document1Value );
-				b.list( fieldModel.document2Value );
-				b.list( fieldModel.document3Value );
-				b.list( null ); // Empty document
+				assertThat(
+						searchTarget.query()
+								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.predicate( f -> f.matchAll().toPredicate() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
 			} );
 		}
 	}
@@ -492,10 +498,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( "unknownField" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
-				.asProjections( searchTarget.projection().field( "unknownField", Object.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
-				.build();
+		searchTarget.projection().field( "unknownField", Object.class );
 	}
 
 	@Test
@@ -507,10 +510,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( "nestedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
-				.asProjections( searchTarget.projection().field( "nestedObject", Object.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
-				.build();
+		searchTarget.projection().field( "nestedObject", Object.class );
 	}
 
 	@Test
@@ -522,10 +522,7 @@ public class SearchProjectionIT {
 		thrown.expectMessage( "flattenedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
-				.asProjections( searchTarget.projection().field( "flattenedObject", Object.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
-				.build();
+		searchTarget.projection().field( "flattenedObject", Object.class );
 	}
 
 	@Test

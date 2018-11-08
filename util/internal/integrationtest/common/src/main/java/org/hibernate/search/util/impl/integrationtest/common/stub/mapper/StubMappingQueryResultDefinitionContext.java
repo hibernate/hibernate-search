@@ -56,6 +56,27 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		);
 	}
 
+	public <P> SearchQueryResultContext<SearchQuery<P>> asProjections(SearchProjection<P> projection) {
+		return asProjections( Function.identity(), projection );
+	}
+
+	public <P, T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<P, T> hitTransformer,
+			SearchProjection<P> projection) {
+		return asProjections(
+				hitTransformer, Function.identity(),
+				projection
+		);
+	}
+
+	public <P, T, Q> SearchQueryResultContext<Q> asProjections(Function<P, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<P> projection) {
+		return indexSearchTarget.queryAsProjections(
+				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				projection
+		);
+	}
+
 	public SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}

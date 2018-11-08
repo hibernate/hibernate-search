@@ -24,9 +24,10 @@ import org.hibernate.search.engine.search.dsl.projection.impl.SearchProjectionFa
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchTargetSortRootContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.query.impl.MultipleProjectionsHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
-import org.hibernate.search.engine.search.query.impl.ProjectionHitAggregator;
 import org.hibernate.search.engine.search.query.impl.ReferenceHitAggregator;
+import org.hibernate.search.engine.search.query.impl.SingleProjectionHitAggregator;
 import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
@@ -84,6 +85,26 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
+	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjections(SessionContextImplementor sessionContext,
+			ObjectLoader<R, O> objectLoader, Function<P, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<P> projection) {
+		// The cast is safe as long as the projection actually results in objects of type P
+		@SuppressWarnings("unchecked")
+		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
+				new SingleProjectionHitAggregator<>(
+						documentReferenceTransformer, objectLoader,
+						(Function<Object, T>) hitTransformer
+				);
+
+		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
+				.asProjections( sessionContext, hitAggregator, projection );
+
+		return new SearchQueryResultContextImpl<>(
+				searchTargetContext, builder, searchQueryWrapperFactory
+		);
+	}
+
+	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
@@ -91,7 +112,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
-				new ProjectionHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
+				new MultipleProjectionsHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
 						projections.length );
 
 		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()

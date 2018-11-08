@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import org.apache.lucene.document.Field.Store;
@@ -285,14 +284,12 @@ public class ExtensionIT {
 	public void projection_nativeField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		SearchQuery<Integer> query = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "nativeField", Integer.class ).toProjection() )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
 
-		assertThat( query ).hasListHitsAnyOrder( c -> {
-			c.list( 37 );
-		} );
+		assertThat( query ).hasHitsAnyOrder( 37 );
 	}
 
 	@Test
@@ -315,7 +312,7 @@ public class ExtensionIT {
 		SubTest.expectException(
 				"projection on native field not supporting projections",
 				() -> {
-						SearchQuery<List<?>> projectionQuery = searchTarget.query()
+						SearchQuery<Integer> projectionQuery = searchTarget.query()
 								.asProjections( searchTarget.projection().field( "nativeField_unsupportedProjection", Integer.class ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build();

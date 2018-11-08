@@ -9,8 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.util.List;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -161,16 +159,16 @@ public class SearchMultiIndexIT {
 	public void projection_across_multiple_indexes() {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		SearchQuery<String> query = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "sortField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( query ).hasListHitsAnyOrder( c -> {
-			c.list( SORT_FIELD_1_1_1 );
-			c.list( SORT_FIELD_1_1_2 );
-			c.list( SORT_FIELD_1_2_1 );
-		} );
+		assertThat( query ).hasHitsAnyOrder(
+				SORT_FIELD_1_1_1,
+				SORT_FIELD_1_1_2,
+				SORT_FIELD_1_2_1
+		);
 	}
 
 	@Test
@@ -193,16 +191,16 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		SearchQuery<List<?>> projectionQuery = searchTarget.query()
+		SearchQuery<String> projectionQuery = searchTarget.query()
 				.asProjections( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( projectionQuery ).hasListHitsAnyOrder( c -> {
-			c.list( ADDITIONAL_FIELD_1_1_1 );
-			c.list( ADDITIONAL_FIELD_1_1_2 );
-			c.list( null );
-		} );
+		assertThat( projectionQuery ).hasHitsAnyOrder(
+			ADDITIONAL_FIELD_1_1_1,
+			ADDITIONAL_FIELD_1_1_2,
+			null
+		);
 	}
 
 	@Test

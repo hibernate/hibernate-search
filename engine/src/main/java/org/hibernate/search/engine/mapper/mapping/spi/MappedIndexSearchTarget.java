@@ -46,14 +46,27 @@ public interface MappedIndexSearchTarget<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObjects(...).
 	 */
+	<P, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+			SessionContextImplementor sessionContext,
+			ObjectLoader<R, O> objectLoader,
+			Function<P, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<P> projection);
+
+	SearchPredicateFactoryContext predicate();
+
+	/*
+	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
+	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
+	 * will be wrong.
+	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObjects(...).
+	 */
 	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<List<?>, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
-
-	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 

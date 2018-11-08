@@ -16,21 +16,36 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 
 /**
- * A util allowing to run blocks of code ("sub-tests"), expecting them to throw an exception.
+ * A util allowing to run blocks of code as "sub-tests".
  * <p>
- * Useful in particular when expecting an exception for each execution of a loop,
- * in which case {@link org.junit.rules.ExpectedException} or {@link Test#expected()} cannot be used.
- * <p>
- * By default any thrown exception will be accepted; if you want to run additional checks on the thrown exception,
- * use {@link #assertThrown()}.
+ * This class is useful when looping over several executions of the same set of assertions:
+ * <ul>
+ *     <li>
+ *         When executing code that both produces and consumes instances of a different generic type T
+ *         for each execution of a loop,
+ *         you usually cannot write type-safe code easily, because of limitations and how generics work,
+ *         but you can with {@link #expectSuccess(Object, ParameterizedSubTest)}.
+ *     </li>
+ *     <li>
+ *         When expecting an exception for each execution of a loop,
+ *         you cannot use {@link org.junit.rules.ExpectedException} or {@link Test#expected()},
+ *         but you can use {@link #expectException(String, Runnable)}.
+ *         By default any thrown exception will be accepted; if you want to run additional checks on the thrown exception,
+ *         use {@link ExceptionThrowingSubTest#assertThrown()}.
+ *     </li>
+ * </ul>
  */
 public class SubTest {
 
-	public static SubTest expectException(Runnable runnable) {
+	public static <T> void expectSuccess(T parameter, ParameterizedSubTest<T> subTest) {
+		subTest.test( parameter );
+	}
+
+	public static ExceptionThrowingSubTest expectException(Runnable runnable) {
 		return expectException( runnable.toString(), runnable );
 	}
 
-	public static SubTest expectException(String description, Runnable runnable) {
+	public static ExceptionThrowingSubTest expectException(String description, Runnable runnable) {
 		return expectException(
 				description,
 				() -> {
@@ -40,33 +55,43 @@ public class SubTest {
 		);
 	}
 
-	public static SubTest expectException(Callable<?> callable) {
+	public static ExceptionThrowingSubTest expectException(Callable<?> callable) {
 		return expectException( callable.toString(), callable );
 	}
 
-	public static SubTest expectException(String description, Callable<?> callable) {
+	public static ExceptionThrowingSubTest expectException(String description, Callable<?> callable) {
 		try {
 			callable.call();
 			fail( "'" + description + "' should have thrown an exception" );
 			throw new IllegalStateException( "This should never happen" );
 		}
 		catch (Exception e) {
-			return new SubTest( "Exception thrown by '" + description + "'", e );
+			return new ExceptionThrowingSubTest( "Exception thrown by '" + description + "'", e );
 		}
 	}
 
-	private final String description;
-
-	private final Throwable thrown;
-
-	private SubTest(String description, Throwable thrown) {
-		this.description = description;
-		this.thrown = thrown;
+	private SubTest() {
 	}
 
-	public AbstractThrowableAssert<?, Throwable> assertThrown() {
-		return new ThrowableAssert( thrown )
-				.as( description );
+	public static final class ExceptionThrowingSubTest {
+		private final String description;
+
+		private final Throwable thrown;
+
+		private ExceptionThrowingSubTest(String description, Throwable thrown) {
+			this.description = description;
+			this.thrown = thrown;
+		}
+
+		public AbstractThrowableAssert<?, Throwable> assertThrown() {
+			return new ThrowableAssert( thrown )
+					.as( description );
+		}
+	}
+
+	@FunctionalInterface
+	public interface ParameterizedSubTest<T> {
+		void test(T param);
 	}
 
 }
