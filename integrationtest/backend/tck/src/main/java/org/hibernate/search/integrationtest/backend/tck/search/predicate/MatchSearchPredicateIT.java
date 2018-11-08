@@ -473,6 +473,8 @@ public class MatchSearchPredicateIT {
 							.map( root, prefix + "integer", additionalConfiguration ),
 					ByTypeFieldModel.mapper( Long.class, 7L, 39L )
 							.map( root, prefix + "long", additionalConfiguration ),
+					ByTypeFieldModel.mapper( Boolean.class, false, true )
+							.map( root, prefix + "boolean", additionalConfiguration ),
 					ByTypeFieldModel.mapper(
 							LocalDate.class,
 							LocalDate.of( 1980, 10, 11 ),

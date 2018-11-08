@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 
 public final class IntegerFieldPredicateBuilderFactory
-		extends AbstractStandardLuceneFieldPredicateBuilderFactory<StandardFieldConverter<Integer>> {
+		extends AbstractStandardLuceneFieldPredicateBuilderFactory<LuceneFieldConverter<?, Integer>> {
 
-	public IntegerFieldPredicateBuilderFactory(StandardFieldConverter<Integer> converter) {
+	public IntegerFieldPredicateBuilderFactory(LuceneFieldConverter<?, Integer> converter) {
 		super( converter );
 	}
 
