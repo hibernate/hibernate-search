@@ -61,28 +61,28 @@ public class SearchResultAssert<T> {
 
 	@SafeVarargs
 	@SuppressWarnings("unchecked")
-	public final SearchResultAssert<T> hasHitsExactOrder(T firstHist, T... otherHits) {
-		return hasHitsExactOrder( CollectionHelper.asList( firstHist, otherHits ) );
+	public final SearchResultAssert<T> hasHitsExactOrder(T... hits) {
+		Assertions.<T>assertThat( actual.getHits() )
+				.as( "Hits of " + queryDescription )
+				.containsExactly( hits );
+		return this;
 	}
 
 	@SafeVarargs
 	@SuppressWarnings("unchecked")
-	public final SearchResultAssert<T> hasHitsAnyOrder(T firstHist, T... otherHits) {
-		return hasHitsAnyOrder( CollectionHelper.asList( firstHist, otherHits ) );
+	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
+		Assertions.<T>assertThat( actual.getHits() )
+				.as( "Hits of " + queryDescription )
+				.containsOnly( hits );
+		return this;
 	}
 
 	public final SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
-		Assertions.<T>assertThat( actual.getHits() )
-				.as( "Hits of " + queryDescription )
-				.containsExactly( (T[]) hits.toArray() );
-		return this;
+		return hasHitsExactOrder( (T[]) hits.toArray() );
 	}
 
 	public final SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
-		Assertions.<T>assertThat( actual.getHits() )
-				.as( "Hits of " + queryDescription )
-				.containsOnly( (T[]) hits.toArray() );
-		return this;
+		return hasHitsAnyOrder( (T[]) hits.toArray() );
 	}
 
 	public SearchResultAssert<T> hasDocRefHitsExactOrder(String indexName, String firstId, String... otherIds) {
