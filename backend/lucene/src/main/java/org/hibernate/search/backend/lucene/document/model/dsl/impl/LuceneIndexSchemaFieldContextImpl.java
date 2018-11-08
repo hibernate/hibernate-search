@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDate;
+import java.util.Date;
 
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
@@ -22,6 +23,7 @@ import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSche
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLongIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneUtilDateIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
@@ -69,6 +71,9 @@ class LuceneIndexSchemaFieldContextImpl
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
+		else if ( Date.class.equals( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asUtilDate();
+		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asGeoPoint();
 		}
@@ -96,6 +101,11 @@ class LuceneIndexSchemaFieldContextImpl
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return setDelegate( new LuceneLocalDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Date> asUtilDate() {
+		return setDelegate( new LuceneUtilDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override
