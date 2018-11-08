@@ -145,7 +145,7 @@ public class DocumentIdDefaultBridgeIT {
 
 			SearchQuery<PojoReference> query = manager.search( entityType )
 					.query()
-					.asReferences()
+					.asReference()
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 

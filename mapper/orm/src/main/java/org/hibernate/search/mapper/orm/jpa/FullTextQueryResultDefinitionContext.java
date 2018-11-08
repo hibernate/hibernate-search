@@ -19,21 +19,21 @@ public interface FullTextQueryResultDefinitionContext<O> {
 
 	// TODO add object loading options: ObjectLookupMethod, DatabaseRetrievalMethod, ...
 
-	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntities() {
-		return asEntities( Function.identity() );
+	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntity() {
+		return asEntity( Function.identity() );
 	}
 
-	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjections(SearchProjection<P> projection) {
-		return asProjections( Function.identity(), projection );
+	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjection(SearchProjection<P> projection) {
+		return asProjection( Function.identity(), projection );
 	}
 
 	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}
 
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntities(Function<O, T> hitTransformer);
+	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntity(Function<O, T> hitTransformer);
 
-	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
 			Function<P, T> hitTransformer,
 			SearchProjection<P> projection);
 

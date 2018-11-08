@@ -19,13 +19,13 @@ public interface FullTextQueryResultDefinitionContext<O>
 		extends org.hibernate.search.mapper.orm.jpa.FullTextQueryResultDefinitionContext<O> {
 
 	@Override
-	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntities() {
-		return asEntities( Function.identity() );
+	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntity() {
+		return asEntity( Function.identity() );
 	}
 
 	@Override
-	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjections(SearchProjection<P> projection) {
-		return asProjections( Function.identity(), projection );
+	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjection(SearchProjection<P> projection) {
+		return asProjection( Function.identity(), projection );
 	}
 
 	@Override
@@ -34,10 +34,10 @@ public interface FullTextQueryResultDefinitionContext<O>
 	}
 
 	@Override
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntities(Function<O, T> hitTransformer);
+	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntity(Function<O, T> hitTransformer);
 
 	@Override
-	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
 			Function<P, T> hitTransformer,
 			SearchProjection<P> projection);
 

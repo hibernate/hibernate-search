@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * A hit extractor used when search results are expected to contain document references, potentially transformed.
  *
- * @see SearchQueryBuilderFactory#asReferences(SessionContextImplementor, HitAggregator)
+ * @see SearchQueryBuilderFactory#asReference(SessionContextImplementor, HitAggregator)
  */
 public class ReferenceHitExtractor implements HitExtractor<ReferenceHitCollector> {
 

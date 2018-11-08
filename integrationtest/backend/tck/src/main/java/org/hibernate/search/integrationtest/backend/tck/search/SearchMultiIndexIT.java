@@ -116,7 +116,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
@@ -131,7 +131,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "sortField" ).asc() )
 				.build();
@@ -143,7 +143,7 @@ public class SearchMultiIndexIT {
 		} );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "sortField" ).desc() )
 				.build();
@@ -160,7 +160,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SearchQuery<String> query = searchTarget.query()
-				.asProjections( searchTarget.projection().field( "sortField", String.class ).toProjection() )
+				.asProjection( searchTarget.projection().field( "sortField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -177,7 +177,7 @@ public class SearchMultiIndexIT {
 
 		// Predicate
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).toPredicate() )
 				.build();
 
@@ -192,7 +192,7 @@ public class SearchMultiIndexIT {
 		// Projection
 
 		SearchQuery<String> projectionQuery = searchTarget.query()
-				.asProjections( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
+				.asProjection( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -242,7 +242,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on unknown field with multiple targeted indexes",
-				() -> searchTarget.query().asProjections(
+				() -> searchTarget.query().asProjection(
 						searchTarget.projection().field( "unknownField", Object.class ).toProjection()
 				)
 		)
@@ -322,7 +322,7 @@ public class SearchMultiIndexIT {
 
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
@@ -341,7 +341,7 @@ public class SearchMultiIndexIT {
 
 		searchTarget = indexManager_1_2.createSearchTarget();
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
@@ -361,7 +361,7 @@ public class SearchMultiIndexIT {
 
 		searchTarget = indexManager_2_1.createSearchTarget();
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );

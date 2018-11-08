@@ -30,13 +30,13 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObjects(SessionContextImplementor sessionContext,
+	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObject(SessionContextImplementor sessionContext,
 			HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.OBJECTS, hitAggregator );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReferences(SessionContextImplementor sessionContext,
+	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
 			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return new StubSearchQueryBuilder<>( backend, indexNames, StubSearchWork.ResultType.REFERENCES, hitAggregator );
 	}

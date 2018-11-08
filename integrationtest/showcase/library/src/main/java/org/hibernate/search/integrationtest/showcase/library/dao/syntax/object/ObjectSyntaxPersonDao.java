@@ -30,7 +30,7 @@ class ObjectSyntaxPersonDao extends PersonDao {
 		FullTextSearchTarget<Person> target = entityManager.search( Person.class );
 
 		FullTextQuery<Person> query = target.query()
-				.asEntities()
+				.asEntity()
 				.predicate(
 						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).toPredicate()
 				)
@@ -53,7 +53,7 @@ class ObjectSyntaxPersonDao extends PersonDao {
 		FullTextSearchTarget<Person> target = entityManager.search( Person.class );
 
 		FullTextQuery<Person> query = target.query()
-				.asEntities()
+				.asEntity()
 				.predicate(
 						target.predicate().matchAll().toPredicate()
 				)

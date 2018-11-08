@@ -64,7 +64,7 @@ public class LuceneSearchSortIT {
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
 				.build();
@@ -96,7 +96,7 @@ public class LuceneSearchSortIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );

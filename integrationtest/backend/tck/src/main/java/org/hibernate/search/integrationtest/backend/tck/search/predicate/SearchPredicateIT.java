@@ -68,7 +68,7 @@ public class SearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
@@ -83,7 +83,7 @@ public class SearchPredicateIT {
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.build();
 
@@ -96,7 +96,7 @@ public class SearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
 				.build();
 
@@ -124,7 +124,7 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).hasValue( null );
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( cachingContributor )
 				.build();
 
@@ -134,7 +134,7 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( cachingContributor )
 				.build();
 
@@ -162,7 +162,7 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).hasValue( null );
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool().must( cachingContributor ).toPredicate() )
 				.build();
 
@@ -172,7 +172,7 @@ public class SearchPredicateIT {
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( cachingContributor )
 						.should( f.match().onField( "string" ).matching( STRING_2 ) )
@@ -191,7 +191,7 @@ public class SearchPredicateIT {
 
 		// Mandatory extension
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
 				)
@@ -201,7 +201,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both supported
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
@@ -220,7 +220,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
@@ -240,7 +240,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( root -> root.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
@@ -274,7 +274,7 @@ public class SearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );

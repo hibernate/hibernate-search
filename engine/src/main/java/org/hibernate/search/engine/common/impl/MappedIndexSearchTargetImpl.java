@@ -55,14 +55,14 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(SessionContextImplementor sessionContext,
+	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		HitAggregator<LoadingHitCollector, List<T>> hitAggregator =
 				new ObjectHitAggregator<>( documentReferenceTransformer, objectLoader );
 
 		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asObjects( sessionContext, hitAggregator );
+				.asObject( sessionContext, hitAggregator );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
@@ -70,14 +70,14 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsReferences(SessionContextImplementor sessionContext,
+	public <T, Q> SearchQueryResultContext<Q> queryAsReference(SessionContextImplementor sessionContext,
 			Function<R, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		HitAggregator<ReferenceHitCollector, List<T>> hitAggregator =
 				new ReferenceHitAggregator<>( hitTransformer.compose( documentReferenceTransformer ) );
 
 		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asReferences( sessionContext, hitAggregator );
+				.asReference( sessionContext, hitAggregator );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
@@ -85,7 +85,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjections(SessionContextImplementor sessionContext,
+	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjection(SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader, Function<P, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<P> projection) {
 		// The cast is safe as long as the projection actually results in objects of type P

@@ -22,21 +22,21 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 /**
  * @param <E> A common supertype of the targeted indexed types.
  * @param <O> The type of loaded objects, i.e. the type of hits returned by
- * {@link #queryAsLoadedObjects(ObjectLoader, Function) loaded object queries} when not using any hit transformer,
+ * {@link #queryAsLoadedObject(ObjectLoader, Function) loaded object queries} when not using any hit transformer,
  * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
  */
 public interface PojoSearchTargetDelegate<E, O> {
 	Set<Class<? extends E>> getTargetedIndexedTypes();
 
-	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
+	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
 			ObjectLoader<PojoReference, T> objectLoader,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<T, Q> SearchQueryResultContext<Q> queryAsReferences(
+	<T, Q> SearchQueryResultContext<Q> queryAsReference(
 			Function<PojoReference, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<P, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	<P, T, Q> SearchQueryResultContext<Q> queryAsProjection(
 			ObjectLoader<PojoReference, O> objectLoader,
 			Function<P, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,

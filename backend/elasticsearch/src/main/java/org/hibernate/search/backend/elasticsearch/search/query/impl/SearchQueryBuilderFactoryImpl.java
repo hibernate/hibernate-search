@@ -40,7 +40,7 @@ class SearchQueryBuilderFactoryImpl
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObjects(
+	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObject(
 			SessionContextImplementor sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return createSearchQueryBuilder(
 				sessionContext, searchBackendContext.getObjectHitExtractor(), hitAggregator
@@ -48,7 +48,7 @@ class SearchQueryBuilderFactoryImpl
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReferences(
+	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReference(
 			SessionContextImplementor sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return createSearchQueryBuilder(
 				sessionContext, searchBackendContext.getReferenceHitExtractor(), hitAggregator

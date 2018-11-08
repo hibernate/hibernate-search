@@ -302,7 +302,7 @@ public class ProgrammaticMappingSmokeIT {
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.query()
-					.asEntities()
+					.asEntity()
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			query.setFirstResult( 3 );
@@ -342,7 +342,7 @@ public class ProgrammaticMappingSmokeIT {
 
 			FullTextQuery<String> query = searchTarget
 					.query()
-					.asProjections(
+					.asProjection(
 							searchTarget.projection().field( "myTextField", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll().toPredicate() )

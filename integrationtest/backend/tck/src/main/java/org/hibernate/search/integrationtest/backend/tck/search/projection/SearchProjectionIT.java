@@ -111,7 +111,7 @@ public class SearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -133,7 +133,7 @@ public class SearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath ).toProjection() )
+					.asProjection( searchTarget.projection().field( fieldPath ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
@@ -150,7 +150,7 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<CharSequence> query = searchTarget.query()
-				.asProjections( searchTarget.projection()
+				.asProjection( searchTarget.projection()
 						.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -195,7 +195,7 @@ public class SearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
+					.asProjection( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
@@ -231,7 +231,7 @@ public class SearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -368,7 +368,7 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Float> query = searchTarget.query()
-				.asProjections( searchTarget.projection().score().toProjection() )
+				.asProjection( searchTarget.projection().score().toProjection() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ).toPredicate() )
 				.sort( c -> c.byScore().desc() )
 				.build();
@@ -437,7 +437,7 @@ public class SearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjections(
+								.asProjection(
 										searchTarget.projection().field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
@@ -464,7 +464,7 @@ public class SearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjections( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -602,7 +602,7 @@ public class SearchProjectionIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )

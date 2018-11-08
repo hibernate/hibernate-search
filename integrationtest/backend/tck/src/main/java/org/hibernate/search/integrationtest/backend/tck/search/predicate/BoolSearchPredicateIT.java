@@ -85,7 +85,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
@@ -96,7 +96,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -107,7 +107,7 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasNoHits();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -124,7 +124,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
 						.toPredicate()
@@ -142,7 +142,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate(	f -> f.bool().must( predicate ).toPredicate() )
 				.build();
 
@@ -155,7 +155,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
@@ -166,7 +166,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
@@ -183,7 +183,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
 						.should( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate() )
@@ -203,7 +203,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate2 = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE3 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( predicate1 )
 						.should( predicate2 )
@@ -220,7 +220,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.toPredicate()
@@ -231,7 +231,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -248,7 +248,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate() )
 						.toPredicate()
@@ -266,7 +266,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE2 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( predicate )
 						.toPredicate()
@@ -282,7 +282,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -300,7 +300,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -311,7 +311,7 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasNoHits();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
@@ -328,7 +328,7 @@ public class BoolSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.bool()
 										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -342,7 +342,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.bool()
 								.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -366,7 +366,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -380,7 +380,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -402,7 +402,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -416,7 +416,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -438,7 +438,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -453,7 +453,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -473,7 +473,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 1 )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -487,7 +487,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( 1 )
@@ -502,7 +502,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -517,7 +517,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require all "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -536,7 +536,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -550,7 +550,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( -1 )
@@ -565,7 +565,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -585,7 +585,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 50 )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -599,7 +599,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( 50 )
@@ -614,7 +614,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 70 ) // The minimum should be rounded down to 2
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -629,7 +629,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require all "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( 100 )
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -648,7 +648,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( -50 )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -662,7 +662,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( -50 )
@@ -677,7 +677,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.minimumShouldMatchPercent( -40 ) // The minimum should be rounded up to 2
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
@@ -701,7 +701,7 @@ public class BoolSearchPredicateIT {
 
 		// 0 "should" clause: expect the constraints to be ignored
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -713,7 +713,7 @@ public class BoolSearchPredicateIT {
 
 		// 1 "should" clause: expect to require all "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -725,7 +725,7 @@ public class BoolSearchPredicateIT {
 
 		// 2 "should" clauses: expect to require all "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -738,7 +738,7 @@ public class BoolSearchPredicateIT {
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -752,7 +752,7 @@ public class BoolSearchPredicateIT {
 
 		// 4 "should" clauses: expect to require 3 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -767,7 +767,7 @@ public class BoolSearchPredicateIT {
 
 		// 5 "should" clauses: expect to require 3 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -783,7 +783,7 @@ public class BoolSearchPredicateIT {
 
 		// 6 "should" clauses: expect to require 4 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -811,7 +811,7 @@ public class BoolSearchPredicateIT {
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -823,7 +823,7 @@ public class BoolSearchPredicateIT {
 
 		// 2 "should" clauses: expect to require 1 "should" clause to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -836,7 +836,7 @@ public class BoolSearchPredicateIT {
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
@@ -922,7 +922,7 @@ public class BoolSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );

@@ -37,7 +37,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
 				fullTextSession.search( Book.class ).query()
-				.asEntities()
+				.asEntity()
 				// TODO allow to bypass the bridge in the DSL
 				.predicate( f -> f.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).toPredicate() )
 				.build();
@@ -48,7 +48,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
-				.asEntities()
+				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
@@ -76,7 +76,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 			List<LibraryService> libraryServices,
 			int offset, int limit) {
 		FullTextQuery<Document<?>> query = entityManager.search( DOCUMENT_CLASS ).query()
-				.asEntities()
+				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {

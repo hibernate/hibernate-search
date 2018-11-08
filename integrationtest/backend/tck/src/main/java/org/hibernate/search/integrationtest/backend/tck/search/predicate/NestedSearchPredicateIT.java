@@ -76,7 +76,7 @@ public class NestedSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
@@ -119,7 +119,7 @@ public class NestedSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
 						.must( f.nested().onObjectField( "nestedObject.nestedObject" )
@@ -160,7 +160,7 @@ public class NestedSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match()
@@ -220,7 +220,7 @@ public class NestedSearchPredicateIT {
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
@@ -355,7 +355,7 @@ public class NestedSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )

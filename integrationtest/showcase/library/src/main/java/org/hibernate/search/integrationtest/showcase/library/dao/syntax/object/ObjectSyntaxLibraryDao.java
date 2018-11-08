@@ -30,7 +30,7 @@ class ObjectSyntaxLibraryDao extends LibraryDao {
 		FullTextSearchTarget<Library> target = entityManager.search( Library.class );
 
 		FullTextQuery<Library> query = target.query()
-				.asEntities()
+				.asEntity()
 				.predicate(
 						target.predicate().match().onField( "name" ).matching( terms ).toPredicate()
 				)

@@ -20,22 +20,22 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * @param <R> The type of references, i.e. the type of hits returned by
- * {@link #queryAsReferences(SessionContextImplementor, Function, Function) reference queries}
+ * {@link #queryAsReference(SessionContextImplementor, Function, Function) reference queries}
  * when not using any hit transformer,
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
  * @param <O> The type of loaded objects, i.e. the type of hits returned by
- * {@link #queryAsLoadedObjects(SessionContextImplementor, ObjectLoader, Function) loaded object queries}
+ * {@link #queryAsLoadedObject(SessionContextImplementor, ObjectLoader, Function) loaded object queries}
  * when not using any hit transformer,
  * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
  */
 public interface MappedIndexSearchTarget<R, O> {
 
-	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObjects(
+	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<T, Q> SearchQueryResultContext<Q> queryAsReferences(
+	<T, Q> SearchQueryResultContext<Q> queryAsReference(
 			SessionContextImplementor sessionContext,
 			Function<R, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
@@ -44,9 +44,9 @@ public interface MappedIndexSearchTarget<R, O> {
 	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
 	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
 	 * will be wrong.
-	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObjects(...).
+	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<P, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	<P, T, Q> SearchQueryResultContext<Q> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
 			Function<P, T> hitTransformer,
@@ -59,7 +59,7 @@ public interface MappedIndexSearchTarget<R, O> {
 	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
 	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
 	 * will be wrong.
-	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObjects(...).
+	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
 	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,

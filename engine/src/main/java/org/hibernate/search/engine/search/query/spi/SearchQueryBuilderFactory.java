@@ -21,10 +21,10 @@ import org.hibernate.search.engine.search.SearchProjection;
  */
 public interface SearchQueryBuilderFactory<C> {
 
-	<O> SearchQueryBuilder<O, C> asObjects(SessionContextImplementor sessionContext,
+	<O> SearchQueryBuilder<O, C> asObject(SessionContextImplementor sessionContext,
 			HitAggregator<LoadingHitCollector, List<O>> hitAggregator);
 
-	<T> SearchQueryBuilder<T, C> asReferences(SessionContextImplementor sessionContext,
+	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,
 			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator);
 
 	<T> SearchQueryBuilder<T, C> asProjections(SessionContextImplementor sessionContext,

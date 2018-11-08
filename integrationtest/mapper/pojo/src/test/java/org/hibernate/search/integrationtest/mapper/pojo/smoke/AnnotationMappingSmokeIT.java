@@ -364,7 +364,7 @@ public class AnnotationMappingSmokeIT {
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.query()
-					.asReferences()
+					.asReference()
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			query.setFirstResult( 3L );
@@ -402,7 +402,7 @@ public class AnnotationMappingSmokeIT {
 
 			SearchQuery<String> query = searchTarget
 					.query()
-					.asProjections(
+					.asProjection(
 							searchTarget.projection().field( "myTextField", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll().toPredicate() )

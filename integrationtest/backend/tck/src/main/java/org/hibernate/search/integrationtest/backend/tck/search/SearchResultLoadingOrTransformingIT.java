@@ -86,7 +86,7 @@ public class SearchResultLoadingOrTransformingIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -98,7 +98,7 @@ public class SearchResultLoadingOrTransformingIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asObjects()
+				.asObject()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -120,7 +120,7 @@ public class SearchResultLoadingOrTransformingIT {
 				indexManager.createSearchTarget( referenceTransformerMock );
 
 		SearchQuery<StubTransformedReference> referencesQuery = searchTarget.query( objectLoaderMock )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -164,7 +164,7 @@ public class SearchResultLoadingOrTransformingIT {
 				indexManager.createSearchTarget( referenceTransformerMock );
 
 		SearchQuery<StubLoadedObject> objectsQuery = searchTarget.query( objectLoaderMock )
-				.asObjects()
+				.asObject()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
@@ -347,7 +347,7 @@ public class SearchResultLoadingOrTransformingIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )

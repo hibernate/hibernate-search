@@ -43,13 +43,13 @@ class SearchQueryBuilderFactoryImpl
 	}
 
 	@Override
-	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObjects(
+	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObject(
 			SessionContextImplementor sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
 		return createSearchQueryBuilder( sessionContext, ObjectHitExtractor.get(), hitAggregator );
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReferences(
+	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReference(
 			SessionContextImplementor sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
 		return createSearchQueryBuilder( sessionContext, ReferenceHitExtractor.get(), hitAggregator );
 	}

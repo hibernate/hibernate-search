@@ -34,28 +34,28 @@ class FullTextQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public SearchQueryResultContext<? extends FullTextQuery<O>> asEntities() {
+	public SearchQueryResultContext<? extends FullTextQuery<O>> asEntity() {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
-		return searchTargetDelegate.queryAsLoadedObjects(
+		return searchTargetDelegate.queryAsLoadedObject(
 				objectLoaderBuilder.build( loadingOptions ),
 				q -> new FullTextQueryImpl<>( q, sessionImplementor, loadingOptions )
 		);
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntities(Function<O, T> hitTransformer) {
+	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntity(Function<O, T> hitTransformer) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
-		return searchTargetDelegate.queryAsLoadedObjects(
+		return searchTargetDelegate.queryAsLoadedObject(
 				objectLoaderBuilder.build( loadingOptions, hitTransformer ),
 				q -> new FullTextQueryImpl<>( q, sessionImplementor, loadingOptions )
 		);
 	}
 
 	@Override
-	public <P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+	public <P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
 			Function<P, T> hitTransformer, SearchProjection<P> projection) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
-		return searchTargetDelegate.queryAsProjections(
+		return searchTargetDelegate.queryAsProjection(
 				objectLoaderBuilder.build( loadingOptions ),
 				hitTransformer,
 				q -> new FullTextQueryImpl<>( q, sessionImplementor, loadingOptions ),

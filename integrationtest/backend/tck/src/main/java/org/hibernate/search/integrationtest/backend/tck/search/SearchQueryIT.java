@@ -68,7 +68,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -79,7 +79,7 @@ public class SearchQueryIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -91,7 +91,7 @@ public class SearchQueryIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -102,7 +102,7 @@ public class SearchQueryIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -119,7 +119,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -144,7 +144,7 @@ public class SearchQueryIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -162,7 +162,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
@@ -178,7 +178,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
 				.build();
 
@@ -190,7 +190,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		QueryWrapper queryWrapper = searchTarget.query()
-				.asReferences( Function.identity(), QueryWrapper::new )
+				.asReference( Function.identity(), QueryWrapper::new )
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
 				.build();
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
@@ -213,7 +213,7 @@ public class SearchQueryIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );

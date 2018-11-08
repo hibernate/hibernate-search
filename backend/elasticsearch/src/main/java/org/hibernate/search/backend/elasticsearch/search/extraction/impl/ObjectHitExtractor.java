@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 /**
  * A hit extractor used when search results are expected to contain loaded objects.
  *
- * @see SearchQueryBuilderFactory#asObjects(SessionContextImplementor, HitAggregator)
+ * @see SearchQueryBuilderFactory#asObject(SessionContextImplementor, HitAggregator)
  */
 public class ObjectHitExtractor implements HitExtractor<LoadingHitCollector> {
 

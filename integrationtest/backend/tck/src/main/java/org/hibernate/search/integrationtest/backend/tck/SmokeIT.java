@@ -61,7 +61,7 @@ public class SmokeIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -69,7 +69,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -77,7 +77,7 @@ public class SmokeIT {
 				.hasHitCount( 3 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -85,7 +85,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -93,7 +93,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -106,7 +106,7 @@ public class SmokeIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -114,7 +114,7 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -122,7 +122,7 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -130,7 +130,7 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.range().onField( "localDate" )
 						.from( LocalDate.of( 2018, 1, 2 ) )
 						.to( LocalDate.of( 2018, 2, 23 ) )
@@ -142,7 +142,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -155,7 +155,7 @@ public class SmokeIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "integer" ).matching( 1 ) )
 						.should( f.match().onField( "integer" ).matching( 2 ) )
@@ -167,7 +167,7 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.filter( f.match().onField( "integer" ).matching( 1 ) )
@@ -179,7 +179,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.mustNot( f.match().onField( "integer" ).matching( 2 ) )
@@ -197,7 +197,7 @@ public class SmokeIT {
 
 		// Without nested storage, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
 						.must( f.match().onField( "flattenedObject.integer" ).matching( 101 ) )
@@ -210,7 +210,7 @@ public class SmokeIT {
 
 		// With nested storage, we expect direct queries to never match
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
 				.build();
 		assertThat( query )
@@ -219,7 +219,7 @@ public class SmokeIT {
 
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_2" ) )
@@ -234,7 +234,7 @@ public class SmokeIT {
 
 		// ... but predicates should still be able to match on the same object
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_1" ) )
@@ -254,7 +254,7 @@ public class SmokeIT {
 
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.build();
 		assertThat( query )
@@ -263,7 +263,7 @@ public class SmokeIT {
 
 		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.build();
 		assertThat( query )
@@ -275,7 +275,7 @@ public class SmokeIT {
 				.should( f -> f.match().onField( "integer" ).matching( 2 ).toPredicate() )
 				.toPredicate();
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.build();
 		assertThat( query )
@@ -348,7 +348,7 @@ public class SmokeIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )

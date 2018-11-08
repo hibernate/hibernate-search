@@ -82,7 +82,7 @@ public class SearchSortByFieldIT {
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
 				.build();
@@ -258,7 +258,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
@@ -279,7 +279,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
@@ -300,7 +300,7 @@ public class SearchSortByFieldIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
@@ -403,7 +403,7 @@ public class SearchSortByFieldIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );

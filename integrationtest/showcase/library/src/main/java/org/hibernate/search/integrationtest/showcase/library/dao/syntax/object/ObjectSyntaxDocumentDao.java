@@ -41,7 +41,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 				fullTextSession.search( Book.class );
 
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query = target.query()
-				.asEntities()
+				.asEntity()
 				.predicate(
 						// TODO allow to bypass the bridge in the DSL
 						target.predicate().match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).toPredicate()
@@ -71,7 +71,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 		);
 
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
-				.asEntities()
+				.asEntity()
 				.predicate( booleanBuilder.toPredicate() )
 				.sort( target.sort().byField( "title_sort" ).toSort() )
 				.build();
@@ -142,7 +142,7 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 		}
 
 		FullTextQuery<Document<?>> query = target.query()
-				.asEntities()
+				.asEntity()
 				.predicate( booleanBuilder.toPredicate() )
 				// TODO facets (tag, medium, library in particular)
 				.sort( target.sort().byScore().toSort() )

@@ -75,7 +75,7 @@ public class ProvidedIdIT {
 
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
-					.asReferences()
+					.asReference()
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 

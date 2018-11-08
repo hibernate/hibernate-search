@@ -37,7 +37,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1_500 )
@@ -49,7 +49,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
@@ -61,7 +61,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
@@ -73,7 +73,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
@@ -85,7 +85,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1.5, DistanceUnit.KILOMETERS )
@@ -121,7 +121,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within()
 								.onField( "geoPoint" )
@@ -140,7 +140,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within()
 								.onField( "geoPoint" ).boostedTo( 42 )
@@ -166,7 +166,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onField(...).orField(...)
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_GARIBALDI, 400 )
@@ -178,7 +178,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_HOTEL_DE_VILLE_1, 500 )
@@ -192,7 +192,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onField().orFields(...)
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
@@ -204,7 +204,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_1, 1_500 )
@@ -216,7 +216,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_2, 400 )
@@ -230,7 +230,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 		// onFields(...)
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_GARIBALDI, 400 )
@@ -242,7 +242,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE_2, 500 )

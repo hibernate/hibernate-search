@@ -78,7 +78,7 @@ public class ExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'match': {'string': 'text 1'}}" )
@@ -141,7 +141,7 @@ public class ExtensionIT {
 		} );
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( booleanPredicate )
 				.build();
 		assertThat( query )
@@ -154,7 +154,7 @@ public class ExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
@@ -174,7 +174,7 @@ public class ExtensionIT {
 		);
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
@@ -213,7 +213,7 @@ public class ExtensionIT {
 				.toSort();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.build();
@@ -235,7 +235,7 @@ public class ExtensionIT {
 				.toSort();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.build();
@@ -357,7 +357,7 @@ public class ExtensionIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder(

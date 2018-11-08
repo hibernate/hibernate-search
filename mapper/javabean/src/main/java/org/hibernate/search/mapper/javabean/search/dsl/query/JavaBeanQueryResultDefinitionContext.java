@@ -16,13 +16,13 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface JavaBeanQueryResultDefinitionContext {
 
-	SearchQueryResultContext<SearchQuery<PojoReference>> asReferences();
+	SearchQueryResultContext<SearchQuery<PojoReference>> asReference();
 
-	<T> SearchQueryResultContext<SearchQuery<T>> asReferences(Function<PojoReference, T> hitTransformer);
+	<T> SearchQueryResultContext<SearchQuery<T>> asReference(Function<PojoReference, T> hitTransformer);
 
-	<P> SearchQueryResultContext<SearchQuery<P>> asProjections(SearchProjection<P> projection);
+	<P> SearchQueryResultContext<SearchQuery<P>> asProjection(SearchProjection<P> projection);
 
-	<P, T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<P, T> hitTransformer,
+	<P, T> SearchQueryResultContext<SearchQuery<T>> asProjection(Function<P, T> hitTransformer,
 			SearchProjection<P> projection);
 
 	SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);

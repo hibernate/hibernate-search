@@ -144,7 +144,7 @@ public class MultiTenancyIT {
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -180,7 +180,7 @@ public class MultiTenancyIT {
 		} );
 
 		query = searchTarget.query( tenant1SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -193,7 +193,7 @@ public class MultiTenancyIT {
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( checkQuery )
@@ -319,7 +319,7 @@ public class MultiTenancyIT {
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -409,7 +409,7 @@ public class MultiTenancyIT {
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -513,7 +513,7 @@ public class MultiTenancyIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )
@@ -532,7 +532,7 @@ public class MultiTenancyIT {
 		} );
 
 		query = searchTarget.query( tenant2SessionContext )
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query )

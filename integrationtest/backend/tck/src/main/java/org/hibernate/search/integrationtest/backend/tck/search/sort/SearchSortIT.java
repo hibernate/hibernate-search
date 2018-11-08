@@ -88,7 +88,7 @@ public class SearchSortIT {
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortContributor )
 				.build();
@@ -129,7 +129,7 @@ public class SearchSortIT {
 				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore() )
 				.build();
@@ -137,7 +137,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().desc() )
 				.build();
@@ -145,7 +145,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().asc() )
 				.build();
@@ -163,7 +163,7 @@ public class SearchSortIT {
 				.toSort();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortAsc )
 				.build();
@@ -171,7 +171,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortAsc ) )
 				.build();
@@ -183,7 +183,7 @@ public class SearchSortIT {
 				.toSort();
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( sortDesc )
 				.build();
@@ -191,7 +191,7 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.by( sortDesc ) )
 				.build();
@@ -466,7 +466,7 @@ public class SearchSortIT {
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
-				.asReferences()
+				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
