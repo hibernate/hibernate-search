@@ -392,8 +392,52 @@ public class AnnotationMappingSmokeIT {
 		}
 	}
 
+
 	@Test
-	public void search_projection() {
+	public void search_singleElementProjection() {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+			JavaBeanSearchTarget searchTarget = manager.search(
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			);
+
+			SearchQuery<String> query = searchTarget
+					.query()
+					.asProjections(
+							searchTarget.projection().field( "myTextField", String.class ).toProjection()
+					)
+					.predicate( f -> f.matchAll().toPredicate() )
+					.build();
+			query.setFirstResult( 3L );
+			query.setMaxResults( 2L );
+
+			backendMock.expectSearchProjections(
+					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					b -> b
+							.firstResultIndex( 3L )
+							.maxResultsCount( 2L ),
+					StubSearchWorkBehavior.of(
+							2L,
+							c -> {
+								c.collectProjection( "text1" );
+							},
+							c -> {
+								c.collectProjection( null );
+							}
+					)
+			);
+
+			assertThat( query )
+					.hasHitsExactOrder(
+							"text1",
+							null
+					)
+					.hasHitCount( 2L );
+			backendMock.verifyExpectationsMet();
+		}
+	}
+
+	@Test
+	public void search_multipleElementsProjection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			JavaBeanSearchTarget searchTarget = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
@@ -410,14 +454,10 @@ public class AnnotationMappingSmokeIT {
 					)
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			query.setFirstResult( 3L );
-			query.setMaxResults( 2L );
 
 			backendMock.expectSearchProjections(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
 							c -> {

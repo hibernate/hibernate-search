@@ -334,7 +334,52 @@ public class AnnotationMappingSmokeIT {
 	}
 
 	@Test
-	public void search_projection() {
+	public void search_singleElementProjection() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			FullTextSession ftSession = Search.getFullTextSession( session );
+
+			FullTextSearchTarget<?> searchTarget = ftSession.search(
+					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
+			);
+
+			FullTextQuery<String> query = searchTarget
+					.query()
+					.asProjections(
+							searchTarget.projection().field( "myTextField", String.class ).toProjection()
+					)
+					.predicate( f -> f.matchAll().toPredicate() )
+					.build();
+			query.setFirstResult( 3 );
+			query.setMaxResults( 2 );
+
+			backendMock.expectSearchProjections(
+					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					b -> b
+							.firstResultIndex( 3L )
+							.maxResultsCount( 2L ),
+					StubSearchWorkBehavior.of(
+							2L,
+							c -> {
+								c.collectProjection( "text1" );
+							},
+							c -> {
+								c.collectProjection( null );
+							}
+					)
+			);
+
+			List<String> result = query.list();
+			backendMock.verifyExpectationsMet();
+			Assertions.assertThat( result )
+					.containsExactly(
+							"text1",
+							null
+					);
+		} );
+	}
+
+	@Test
+	public void search_multipleElementsProjection() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
@@ -354,14 +399,10 @@ public class AnnotationMappingSmokeIT {
 					)
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
-			query.setFirstResult( 3 );
-			query.setMaxResults( 2 );
 
 			backendMock.expectSearchProjections(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
 							c -> {

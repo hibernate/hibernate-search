@@ -36,6 +36,12 @@ public interface PojoSearchTargetDelegate<E, O> {
 			Function<PojoReference, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
+	<P, T, Q> SearchQueryResultContext<Q> queryAsProjections(
+			ObjectLoader<PojoReference, O> objectLoader,
+			Function<P, T> hitTransformer,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<P> projection);
+
 	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
 			ObjectLoader<PojoReference, O> objectLoader,
 			Function<List<?>, T> hitTransformer,

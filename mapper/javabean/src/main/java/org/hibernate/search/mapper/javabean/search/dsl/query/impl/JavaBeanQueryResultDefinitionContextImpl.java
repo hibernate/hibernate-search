@@ -35,6 +35,19 @@ public class JavaBeanQueryResultDefinitionContextImpl implements JavaBeanQueryRe
 	}
 
 	@Override
+	public <P> SearchQueryResultContext<SearchQuery<P>> asProjections(SearchProjection<P> projection) {
+		return asProjections( Function.identity(), projection );
+	}
+
+	@Override
+	public <P, T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<P, T> hitTransformer,
+			SearchProjection<P> projection) {
+		return delegate.queryAsProjections(
+				ObjectLoader.identity(), hitTransformer, Function.identity(), projection
+		);
+	}
+
+	@Override
 	public SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}

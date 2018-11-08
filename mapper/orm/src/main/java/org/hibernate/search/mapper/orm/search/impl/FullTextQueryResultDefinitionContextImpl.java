@@ -52,6 +52,18 @@ class FullTextQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
+	public <P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+			Function<P, T> hitTransformer, SearchProjection<P> projection) {
+		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
+		return searchTargetDelegate.queryAsProjections(
+				objectLoaderBuilder.build( loadingOptions ),
+				hitTransformer,
+				q -> new FullTextQueryImpl<>( q, sessionImplementor, loadingOptions ),
+				projection
+		);
+	}
+
+	@Override
 	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
 			Function<List<?>, T> hitTransformer, SearchProjection<?>... projections) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();

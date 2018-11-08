@@ -20,6 +20,11 @@ public interface JavaBeanQueryResultDefinitionContext {
 
 	<T> SearchQueryResultContext<SearchQuery<T>> asReferences(Function<PojoReference, T> hitTransformer);
 
+	<P> SearchQueryResultContext<SearchQuery<P>> asProjections(SearchProjection<P> projection);
+
+	<P, T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<P, T> hitTransformer,
+			SearchProjection<P> projection);
+
 	SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 
 	<T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<List<?>, T> hitTransformer,

@@ -68,6 +68,16 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	}
 
 	@Override
+	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
+			Function<P, T> hitTransformer, Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<P> projection) {
+		return getIndexSearchTarget().queryAsProjections(
+				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				projection
+		);
+	}
+
+	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
 			Function<List<?>, T> hitTransformer, Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {

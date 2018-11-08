@@ -23,11 +23,19 @@ public interface FullTextQueryResultDefinitionContext<O> {
 		return asEntities( Function.identity() );
 	}
 
+	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjections(SearchProjection<P> projection) {
+		return asProjections( Function.identity(), projection );
+	}
+
 	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}
 
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntities(Function<O, T> hitTransformer);
+
+	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+			Function<P, T> hitTransformer,
+			SearchProjection<P> projection);
 
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
 			Function<List<?>, T> hitTransformer,

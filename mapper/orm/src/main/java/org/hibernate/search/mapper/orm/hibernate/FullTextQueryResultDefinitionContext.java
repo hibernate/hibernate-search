@@ -24,12 +24,22 @@ public interface FullTextQueryResultDefinitionContext<O>
 	}
 
 	@Override
+	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjections(SearchProjection<P> projection) {
+		return asProjections( Function.identity(), projection );
+	}
+
+	@Override
 	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
 		return asProjections( Function.identity(), projections );
 	}
 
 	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntities(Function<O, T> hitTransformer);
+
+	@Override
+	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
+			Function<P, T> hitTransformer,
+			SearchProjection<P> projection);
 
 	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
