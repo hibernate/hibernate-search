@@ -59,13 +59,15 @@ public class SearchResultAssert<T> {
 		return this;
 	}
 
+	@SafeVarargs
 	@SuppressWarnings("unchecked")
-	public SearchResultAssert<T> hasHitsExactOrder(T firstHist, T... otherHits) {
+	public final SearchResultAssert<T> hasHitsExactOrder(T firstHist, T... otherHits) {
 		return hasHitsExactOrder( CollectionHelper.asList( firstHist, otherHits ) );
 	}
 
+	@SafeVarargs
 	@SuppressWarnings("unchecked")
-	public SearchResultAssert<T> hasHitsAnyOrder(T firstHist, T... otherHits) {
+	public final SearchResultAssert<T> hasHitsAnyOrder(T firstHist, T... otherHits) {
 		return hasHitsAnyOrder( CollectionHelper.asList( firstHist, otherHits ) );
 	}
 
