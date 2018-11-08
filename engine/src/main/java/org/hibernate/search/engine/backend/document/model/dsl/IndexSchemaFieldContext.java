@@ -25,6 +25,8 @@ public interface IndexSchemaFieldContext {
 
 	StandardIndexSchemaFieldTypedContext<?, Long> asLong();
 
+	StandardIndexSchemaFieldTypedContext<?, Boolean> asBoolean();
+
 	StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate();
 
 	StandardIndexSchemaFieldTypedContext<?, Date> asUtilDate();

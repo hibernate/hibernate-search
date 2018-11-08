@@ -51,6 +51,11 @@ class StubIndexSchemaFieldContext implements IndexSchemaFieldContext {
 	}
 
 	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Boolean> asBoolean() {
+		return as( Boolean.class );
+	}
+
+	@Override
 	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
 	}

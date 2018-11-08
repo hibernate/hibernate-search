@@ -12,6 +12,7 @@ import java.util.Date;
 
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.JsonStringIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchBooleanIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchUtilDateIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLongIndexSchemaFieldContextImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
@@ -67,6 +68,9 @@ class ElasticsearchIndexSchemaFieldContextImpl
 		else if ( Long.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLong();
 		}
+		else if ( Boolean.class.equals( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asBoolean();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
@@ -95,6 +99,11 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Long> asLong() {
 		return setDelegate( new ElasticsearchLongIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+	}
+
+	@Override
+	public StandardIndexSchemaFieldTypedContext<?, Boolean> asBoolean() {
+		return setDelegate( new ElasticsearchBooleanIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override

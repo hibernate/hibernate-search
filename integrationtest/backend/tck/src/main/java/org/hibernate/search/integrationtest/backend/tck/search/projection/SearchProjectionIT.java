@@ -674,6 +674,8 @@ public class SearchProjectionIT {
 						.map( root, prefix + "integer", additionalConfiguration ),
 				FieldModel.mapper( Long.class, 1L, 3L, 5L )
 						.map( root, prefix + "long", additionalConfiguration ),
+				FieldModel.mapper( Boolean.class, false, true, false )
+						.map( root, prefix + "boolean", additionalConfiguration ),
 				FieldModel.mapper(
 						LocalDate.class,
 						LocalDate.of( 2018, 2, 1 ),
