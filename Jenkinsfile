@@ -10,7 +10,7 @@ import groovy.transform.Field
 /*
  * See https://github.com/hibernate/hibernate-jenkins-pipeline-helpers
  */
-@Library('hibernate-jenkins-pipeline-helpers@1.0')
+@Library('hibernate-jenkins-pipeline-helpers@1.1')
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 import org.hibernate.jenkins.pipeline.helpers.alternative.AlternativeMultiMap
 import org.hibernate.jenkins.pipeline.helpers.version.Version
@@ -63,6 +63,15 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  *
  * In the first case, the name of a Maven settings file must be provided in the job configuration file
  * (see below).
+ *
+ * #### Gitter (optional)
+ *
+ * You need to enable the Jenkins integration in your Gitter room first:
+ * see https://gitlab.com/gitlab-org/gitter/webapp/blob/master/docs/integrations.md
+ *
+ * Then you will also need to configure *global* secret text credentials containing the Gitter webhook URL,
+ * and list the ID of these credentials in the job configuration file
+ * (see https://github.com/hibernate/hibernate-jenkins-pipeline-helpers#job-configuration-file).
  *
  * ### Job configuration
  *
@@ -163,15 +172,9 @@ stage('Configure') {
 			]
 	])
 
-	// Load the configuration specific to each job set up in Jenkins
-	def jobConfigurationFromNode
-	node(QUICK_USE_NODE_PATTERN) {
-		jobConfigurationFromNode = helper.loadYamlConfiguration('job-configuration.yaml')
-		echo "Job configuration: $jobConfigurationFromNode"
-	}
-
 	helper.configure {
-		file jobConfigurationFromNode
+		configurationNodePattern QUICK_USE_NODE_PATTERN
+		file 'job-configuration.yaml'
 		jdk {
 			defaultTool environments.content.jdk.default.tool
 		}
@@ -188,12 +191,9 @@ stage('Configure') {
 							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
 							snapshotDependencies()
 					]
-							+ helper.configuration.tracking.trackedAsString ? [
-									// Rebuild when tracked jobs are rebuilt
-									upstream(helper.configuration.tracking.trackedAsString)
-							]
-							: []
+							+ helper.generateUpstreamTriggers()
 			),
+			helper.generateNotificationProperty(),
 			parameters([
 					choice(
 							name: 'INTEGRATION_TESTS',
