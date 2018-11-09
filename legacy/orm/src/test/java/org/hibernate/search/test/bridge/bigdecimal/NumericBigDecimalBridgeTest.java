@@ -70,8 +70,8 @@ public class NumericBigDecimalBridgeTest extends SearchTestBase {
 				.get();
 
 		Query rootQuery = queryBuilder.bool()
-				.must( queryBuilder.range().onField( "price" ).above( 10000l ).createQuery() )
-				.must( queryBuilder.range().onField( "price" ).below( 20000l ).createQuery() )
+				.must( queryBuilder.range().onField( "price" ).above( 10000L ).createQuery() )
+				.must( queryBuilder.range().onField( "price" ).below( 20000L ).createQuery() )
 				.createQuery();
 
 		@SuppressWarnings( "unchecked" )

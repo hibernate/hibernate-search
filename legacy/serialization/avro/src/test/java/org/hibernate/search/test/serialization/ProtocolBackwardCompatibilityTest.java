@@ -135,7 +135,7 @@ public class ProtocolBackwardCompatibilityTest {
 		works.add( new OptimizeLuceneWork( remoteTypeId ) ); //class won't be send over
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
-		works.add( new DeleteLuceneWork( 123l, "123", remoteTypeId ) );
+		works.add( new DeleteLuceneWork( 123L, "123", remoteTypeId ) );
 		works.add( new DeleteLuceneWork( "Sissi", "Sissi", remoteTypeId ) );
 		works.add(
 				new DeleteLuceneWork(
@@ -152,7 +152,7 @@ public class ProtocolBackwardCompatibilityTest {
 		doc.add( numField );
 		numField = new FloatField( "float", 2.3f, Store.NO );
 		doc.add( numField );
-		numField = new LongField( "long", 23l, Store.NO );
+		numField = new LongField( "long", 23L, Store.NO );
 		doc.add( numField );
 
 		Map<String, String> analyzers = new HashMap<>();

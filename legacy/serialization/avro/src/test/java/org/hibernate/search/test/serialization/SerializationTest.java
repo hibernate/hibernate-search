@@ -104,7 +104,7 @@ public class SerializationTest {
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
 		works.add( new PurgeAllLuceneWork( remoteTypeId ) );
 		works.add( new DeleteByQueryLuceneWork( remoteTypeId, new SingularTermDeletionQuery( "key", "value" ) ) );
-		works.add( new DeleteLuceneWork( 123l, "123", remoteTypeId ) );
+		works.add( new DeleteLuceneWork( 123L, "123", remoteTypeId ) );
 		works.add( new DeleteLuceneWork( "Sissi", "Sissi", remoteTypeId ) );
 		works.add(
 				new DeleteLuceneWork(
@@ -187,7 +187,7 @@ public class SerializationTest {
 		doc.add( numField );
 		numField = new FloatField( "float", 2.3f, Store.NO );
 		doc.add( numField );
-		numField = new LongField( "long", 23l, Store.NO );
+		numField = new LongField( "long", 23L, Store.NO );
 		doc.add( numField );
 		return doc;
 	}

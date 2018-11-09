@@ -64,7 +64,7 @@ public class FreshReadersProvidedTest {
 
 		{ // Store guest "Thorin Oakenshield" in the index
 			Guest lastDwarf = new Guest();
-			lastDwarf.id = 13l;
+			lastDwarf.id = 13L;
 			lastDwarf.name = "Thorin Oakenshield";
 			helper.add( lastDwarf );
 		}
@@ -87,7 +87,7 @@ public class FreshReadersProvidedTest {
 
 		{ // Store guest "Balin"
 			Guest balin = new Guest();
-			balin.id = 7l;
+			balin.id = 7L;
 			balin.name = "Balin";
 			helper.add( balin );
 		}

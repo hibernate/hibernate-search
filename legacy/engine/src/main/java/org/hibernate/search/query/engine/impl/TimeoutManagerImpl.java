@@ -62,7 +62,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			final long currentTime = System.nanoTime();
 			if ( isTimedOut( currentTime ) ) {
 				//0 means no limit so we return the lowest possible value
-				return 0l;
+				return 0L;
 			}
 			long left = timeout - ( currentTime - start);
 			long result;
@@ -74,7 +74,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			}
 			if ( result <= 0 ) {
 				//0 means no limit so we return the lowest possible value
-				return 0l;
+				return 0L;
 			}
 			else {
 				return result;

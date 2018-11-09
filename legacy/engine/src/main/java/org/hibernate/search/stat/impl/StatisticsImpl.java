@@ -289,7 +289,7 @@ public class StatisticsImpl implements Statistics, StatisticsImplementor {
 		DirectoryBasedIndexManager directoryBasedIndexManager = (DirectoryBasedIndexManager) indexManager;
 		Directory directory = directoryBasedIndexManager.getDirectoryProvider().getDirectory();
 
-		long totalSize = 0l;
+		long totalSize = 0L;
 		try {
 			for ( String fileName : directory.listAll() ) {
 				try {

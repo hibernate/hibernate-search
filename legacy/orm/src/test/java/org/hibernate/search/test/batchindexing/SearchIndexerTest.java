@@ -187,7 +187,7 @@ public class SearchIndexerTest {
 			ExtendedIssueEntity issue = new ExtendedIssueEntity();
 			issue.jiraCode = "HSEARCH-977";
 			issue.jiraDescription = "MassIndexer freezes when there is an indexed 'id' filed, which is not document's id";
-			issue.id = 1l;
+			issue.id = 1L;
 			fullTextSession.persist( issue );
 			transaction.commit();
 			fullTextSession.close();
@@ -222,7 +222,7 @@ public class SearchIndexerTest {
 			assertEquals(
 					1,
 					countResults(
-							NumericRangeQuery.newLongRange( "id", 1l, 1l, true, true ), ftsb, ExtendedIssueEntity.class
+							NumericRangeQuery.newLongRange( "id", 1L, 1L, true, true ), ftsb, ExtendedIssueEntity.class
 					)
 			);
 		}

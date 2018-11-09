@@ -70,7 +70,7 @@ public final class FieldSelectorLeakingReaderProvider extends NotSharedReaderPro
 		//we just need to satisfy the constructor
 		return new FieldInfo( fieldName, 0, false, true, false,
 				IndexOptions.DOCS, DocValuesType.SORTED,
-				1l, Collections.<String,String>emptyMap() );
+				1L, Collections.<String,String>emptyMap() );
 	}
 
 	public static void assertFieldSelectorDisabled() {

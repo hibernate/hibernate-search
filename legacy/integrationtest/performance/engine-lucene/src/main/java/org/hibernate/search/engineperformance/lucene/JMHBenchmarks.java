@@ -34,7 +34,7 @@ public class JMHBenchmarks {
 	public void simpleIndexing(QueryEngineHolder eh) {
 		Worker worker = eh.si.getWorker();
 		BookEntity book = new BookEntity();
-		book.setId( 1l );
+		book.setId( 1L );
 		book.setText( "Some very long text should be stored here. No, I mean long as in a book." );
 		book.setTitle( "Naaa" );
 

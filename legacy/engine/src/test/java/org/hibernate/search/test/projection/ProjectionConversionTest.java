@@ -61,18 +61,18 @@ public class ProjectionConversionTest {
 	@Before
 	public void storeTestData() {
 		ExampleEntity entity = new ExampleEntity();
-		entity.id = 1l;
+		entity.id = 1L;
 		entity.someInteger = 5;
-		entity.longEncodedAsText = 20l;
+		entity.longEncodedAsText = 20L;
 		entity.unstoredField = "unstoredField";
 		entity.customBridgedKeyword = "lowercase-keyword";
 		entity.customOneWayBridgedKeyword = "lowercase-keyword";
 		entity.customTwoWayBridgedKeywordWithMetadataOverride = "lowercase-keyword";
 
 		ExampleEntity embedded = new ExampleEntity();
-		embedded.id = 2l;
+		embedded.id = 2L;
 		embedded.someInteger = 6;
-		embedded.longEncodedAsText = 21l;
+		embedded.longEncodedAsText = 21L;
 		embedded.unstoredField = "unstoredFieldEmbedded";
 		embedded.customBridgedKeyword = "another-lowercase-keyword";
 		embedded.customOneWayBridgedKeyword = "another-lowercase-keyword";
@@ -80,7 +80,7 @@ public class ProjectionConversionTest {
 
 		ConflictingMappedType second = new ConflictingMappedType();
 		second.id = "a string";
-		second.customBridgedKeyword = 17l;
+		second.customBridgedKeyword = 17L;
 
 		entity.embedded = embedded;
 		entity.second = second;
@@ -90,17 +90,17 @@ public class ProjectionConversionTest {
 
 	@Test
 	public void projectingExplicitId() {
-		projectionTestHelper( ProjectionConstants.ID, Long.valueOf( 1l ) );
+		projectionTestHelper( ProjectionConstants.ID, Long.valueOf( 1L ) );
 	}
 
 	@Test
 	public void projectingIdByPropertyName() {
-		projectionTestHelper( "id", Long.valueOf( 1l ) );
+		projectionTestHelper( "id", Long.valueOf( 1L ) );
 	}
 
 	@Test
 	public void projectingIdOnOverloadedMapping() {
-		projectionTestHelper( "stringTypedId", Long.valueOf( 1l ) );
+		projectionTestHelper( "stringTypedId", Long.valueOf( 1L ) );
 	}
 
 	@Test
@@ -145,12 +145,12 @@ public class ProjectionConversionTest {
 
 	@Test
 	public void projectingEmbeddedIdByPropertyName() {
-		projectionTestHelper( "embedded.id", Long.valueOf( 2l ) );
+		projectionTestHelper( "embedded.id", Long.valueOf( 2L ) );
 	}
 
 	@Test
 	public void projectingEmbeddedIdOnOverloadedMapping() {
-		projectionTestHelper( "embedded.stringTypedId", Long.valueOf( 2l ) );
+		projectionTestHelper( "embedded.stringTypedId", Long.valueOf( 2L ) );
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class ProjectionConversionTest {
 
 	@Test
 	public void projectingOnConflictingMappingEmbeddedField() {
-		projectionTestHelper( "second.customBridgedKeyword", Long.valueOf( 17l ) );
+		projectionTestHelper( "second.customBridgedKeyword", Long.valueOf( 17L ) );
 	}
 
 	@Test

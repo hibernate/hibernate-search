@@ -50,7 +50,7 @@ public class BasicNRTFunctionalityTest extends SearchTestBase {
 	 */
 	@Test
 	public void testEntityResurrection() {
-		final Long id = 5l;
+		final Long id = 5L;
 		Session session = getSessionFactory().openSession();
 		session.getTransaction().begin();
 

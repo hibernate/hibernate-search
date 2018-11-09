@@ -257,7 +257,7 @@ public class NumericFieldTest {
 		helper.add( score1 );
 
 		ScoreBoard scoreboard = new ScoreBoard();
-		scoreboard.id = 1l;
+		scoreboard.id = 1L;
 		scoreboard.scores.add( score1 );
 		helper.add( scoreboard );
 	}

@@ -100,6 +100,7 @@
         <module name="MutableException"/>
         <module name="CovariantEquals" />
         <module name="EqualsAvoidNull" />
+        <module name="UpperEll"/>
 
         <!-- <module name="DeclarationOrder" /> -->
         <!-- not checking for Constructor here: -->

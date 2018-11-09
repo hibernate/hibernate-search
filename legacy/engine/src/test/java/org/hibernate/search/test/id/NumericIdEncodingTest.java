@@ -36,13 +36,13 @@ public class NumericIdEncodingTest {
 	@Test
 	public void testNumericIdRangeQuery() {
 		helper.index(
-				new Staff( 1l, "One" ),
-				new Staff( 2l, "Two" ),
-				new Staff( 3l, "Three" ),
-				new Staff( 4l, "Four" )
+				new Staff( 1L, "One" ),
+				new Staff( 2L, "Two" ),
+				new Staff( 3L, "Three" ),
+				new Staff( 4L, "Four" )
 		);
 
-		NumericRangeQuery<Long> smallRangeQuery = NumericRangeQuery.newLongRange( "id", 1l, 3l, false, false );
+		NumericRangeQuery<Long> smallRangeQuery = NumericRangeQuery.newLongRange( "id", 1L, 3L, false, false );
 		expectedProjections( smallRangeQuery, "Two" );
 
 		NumericRangeQuery<Long> universeRangeQuery = NumericRangeQuery.newLongRange( "id", null, null, false, false );

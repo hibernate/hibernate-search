@@ -63,7 +63,7 @@ class AddWorkExecutor implements LuceneWorkExecutor {
 			);
 		}
 		if ( monitor != null ) {
-			monitor.documentsAdded( 1l );
+			monitor.documentsAdded( 1L );
 		}
 	}
 

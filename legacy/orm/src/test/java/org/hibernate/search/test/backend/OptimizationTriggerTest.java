@@ -48,7 +48,7 @@ public class OptimizationTriggerTest extends SearchTestBase {
 
 		Session session = openSession();
 		//check that optimization is triggered periodically as configured
-		long optimizationsPerformed = 0l;
+		long optimizationsPerformed = 0L;
 		for ( int i = 0; i < 20; i++ ) {
 			Clock c = new Clock( i, "hwd" + i );
 			Transaction transaction = session.beginTransaction();

@@ -125,7 +125,7 @@ public class GsonStreamedEncodingTest {
 	public void testDigestToTriggerLengthComputation() {
 		final List<JsonObject> list = produceLargeBulkJSON();
 		try ( GsonHttpEntity entity = new GsonHttpEntity( gson, list ) ) {
-			assertEquals( -1l, entity.getContentLength() );
+			assertEquals( -1L, entity.getContentLength() );
 		}
 		catch (IOException e) {
 			throw new RuntimeException( "We're mocking IO operations, this should not happen?", e );
@@ -142,7 +142,7 @@ public class GsonStreamedEncodingTest {
 			};
 			DigestOutputStream digestStream = new DigestOutputStream( discardingStream, digest );
 			entity.writeTo( digestStream );
-			assertNotEquals( -1l, entity.getContentLength() );
+			assertNotEquals( -1L, entity.getContentLength() );
 			final byte[] content = produceContentWithCustomEncoder( entity );
 			assertEquals( content.length, entity.getContentLength() );
 		}

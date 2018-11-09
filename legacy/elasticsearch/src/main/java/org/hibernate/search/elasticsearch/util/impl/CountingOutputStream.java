@@ -12,7 +12,7 @@ import java.io.OutputStream;
 
 final class CountingOutputStream extends FilterOutputStream {
 
-	private long bytesWritten = 0l;
+	private long bytesWritten = 0L;
 
 	public CountingOutputStream(OutputStream out) {
 		super( out );

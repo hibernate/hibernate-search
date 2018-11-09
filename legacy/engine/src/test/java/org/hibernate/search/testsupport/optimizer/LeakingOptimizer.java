@@ -41,7 +41,7 @@ public class LeakingOptimizer implements OptimizerStrategy {
 	}
 
 	public static void reset() {
-		totalOperations.set( 0l );
+		totalOperations.set( 0L );
 	}
 
 }

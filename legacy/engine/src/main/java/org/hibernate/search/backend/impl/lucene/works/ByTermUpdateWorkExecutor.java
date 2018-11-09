@@ -88,7 +88,7 @@ public final class ByTermUpdateWorkExecutor extends UpdateWorkExecutor {
 			throw new SearchException( message, e );
 		}
 		if ( monitor != null ) {
-			monitor.documentsAdded( 1l );
+			monitor.documentsAdded( 1L );
 		}
 	}
 

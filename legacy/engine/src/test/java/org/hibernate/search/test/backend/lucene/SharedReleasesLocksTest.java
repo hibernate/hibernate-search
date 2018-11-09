@@ -49,9 +49,9 @@ public class SharedReleasesLocksTest {
 	name = "SharedReleasesLocksTest")
 	public void testPropertiesIndexing() throws IOException {
 		//The first write operation is going to fail, simulating a lock acquisition timeout:
-		writeABook( 1l, "lock contention" );
+		writeABook( 1L, "lock contention" );
 		//The second write will be successful:
-		writeABook( 2l, "no contention" );
+		writeABook( 2L, "no contention" );
 		//Now verify the index lock was properly released, not having the backend counters fooled by the initial failure:
 		IndexManager indexManager = sfHolder.getSearchFactory().getIndexManagerHolder().getIndexManager( "books" );
 		DirectoryBasedIndexManager dbim = (DirectoryBasedIndexManager) indexManager;

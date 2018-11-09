@@ -119,7 +119,7 @@ public class ConcurrentServiceTest {
 		works.add( new OptimizeLuceneWork( type ) ); //won't be send over
 		works.add( new PurgeAllLuceneWork( type ) );
 		works.add( new PurgeAllLuceneWork( type ) );
-		works.add( new DeleteLuceneWork( 123l, "123", type ) );
+		works.add( new DeleteLuceneWork( 123L, "123", type ) );
 		works.add( new DeleteLuceneWork( "Foo", "Bar", type ) );
 		works.add( new AddLuceneWork( 125, "125", type, new Document() ) );
 		return works;

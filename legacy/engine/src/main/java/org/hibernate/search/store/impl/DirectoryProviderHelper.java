@@ -209,7 +209,7 @@ public final class DirectoryProviderHelper {
 		if ( value != null ) {
 			log.deprecatedConfigurationPropertyIsIgnored( COPY_BUFFER_SIZE_PROP_NAME );
 		}
-		return 0l;
+		return 0L;
 	}
 
 	private enum FSDirectoryType {

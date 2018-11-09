@@ -63,7 +63,7 @@ public class BridgeTest extends SearchTestBase {
 		cloud.setFloat1( null );
 		cloud.setFloat2( 2.1f );
 		cloud.setLong1( null );
-		cloud.setLong2( 2l );
+		cloud.setLong2( 2L );
 		cloud.setString( null );
 		cloud.setType( CloudType.DOG );
 		cloud.setChar1( null );
@@ -89,7 +89,7 @@ public class BridgeTest extends SearchTestBase {
 				.add( NumericRangeQuery.newDoubleRange( "double2", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
 				.add( NumericRangeQuery.newFloatRange( "float2", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
 				.add( NumericRangeQuery.newIntRange( "integerv2", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long2", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newLongRange( "long2", 2L, 3L, true, true ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( "type", "dog" ) ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( "storm", "false" ) ), BooleanClause.Occur.MUST )
 				.build();
@@ -101,7 +101,7 @@ public class BridgeTest extends SearchTestBase {
 				.add( NumericRangeQuery.newDoubleRange( "double1", 2.1, 2.1, true, true ), BooleanClause.Occur.MUST )
 				.add( NumericRangeQuery.newFloatRange( "float1", 2.1f, 2.1f, true, true ), BooleanClause.Occur.MUST )
 				.add( NumericRangeQuery.newIntRange( "integerv1", 2, 3, true, true ), BooleanClause.Occur.MUST )
-				.add( NumericRangeQuery.newLongRange( "long1", 2l, 3l, true, true ), BooleanClause.Occur.MUST )
+				.add( NumericRangeQuery.newLongRange( "long1", 2L, 3L, true, true ), BooleanClause.Occur.MUST )
 				.build();
 
 		result = session.createFullTextQuery( booleanQuery ).list();

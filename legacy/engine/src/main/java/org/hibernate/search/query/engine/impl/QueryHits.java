@@ -509,7 +509,7 @@ public class QueryHits {
 		if ( timeoutManager.getType() == TimeoutManager.Type.LIMIT ) {
 			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
 			if ( timeoutLeft != null ) {
-				if ( timeoutLeft == 0l ) {
+				if ( timeoutLeft == 0L ) {
 					if ( timeoutManager.isTimedOut() ) {
 						timeoutManager.forceTimedOut();
 						timeoutAt0 = true;
