@@ -15,7 +15,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
 
 public abstract class StubBackendBehavior {
 
@@ -46,7 +46,7 @@ public abstract class StubBackendBehavior {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-				HitAggregator<?, List<T>> hitAggregator) {
+				StubHitExtractor<?, List<T>> hitExtractor) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
 					+ indexNames + "': " + work );
 		}
@@ -82,5 +82,5 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> executeWorks(String indexName, List<StubIndexWork> works);
 
 	public abstract <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-			HitAggregator<?, List<T>> hitAggregator);
+			StubHitExtractor<?, List<T>> hitExtractor);
 }

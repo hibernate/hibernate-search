@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection;
+package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -17,32 +17,34 @@ import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBu
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	@SuppressWarnings("rawtypes")
-	private static final StubSearchProjection PROJECTION = new StubSearchProjection<>();
+	private final StubSearchTargetModel targetModel;
+
+	public StubSearchProjectionBuilderFactory(StubSearchTargetModel targetModel) {
+		this.targetModel = targetModel;
+	}
 
 	@Override
 	public DocumentReferenceSearchProjectionBuilder documentReference() {
 		return new DocumentReferenceSearchProjectionBuilder() {
-
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<DocumentReference> build() {
-				return (SearchProjection<DocumentReference>) PROJECTION;
+				return StubDefaultSearchProjection.get();
 			}
 		};
 	}
 
 	@Override
 	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
+		StubFieldConverter<?> converter = targetModel.getFieldConverter( absoluteFieldPath );
 		return new FieldSearchProjectionBuilder<T>() {
-
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<T> build() {
-				return (SearchProjection<T>) PROJECTION;
+				return new StubFieldSearchProjection<>( clazz, converter );
 			}
 		};
 	}
@@ -50,11 +52,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	@Override
 	public ObjectSearchProjectionBuilder object() {
 		return new ObjectSearchProjectionBuilder() {
-
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<Object> build() {
-				return (SearchProjection<Object>) PROJECTION;
+				return StubObjectSearchProjection.get();
 			}
 		};
 	}
@@ -62,11 +62,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	@Override
 	public ReferenceSearchProjectionBuilder reference() {
 		return new ReferenceSearchProjectionBuilder() {
-
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<Object> build() {
-				return (SearchProjection<Object>) PROJECTION;
+				return StubReferenceSearchProjection.get();
 			}
 		};
 	}
@@ -74,11 +72,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	@Override
 	public ScoreSearchProjectionBuilder score() {
 		return new ScoreSearchProjectionBuilder() {
-
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<Float> build() {
-				return (SearchProjection<Float>) PROJECTION;
+				return StubDefaultSearchProjection.get();
 			}
 		};
 	}
@@ -86,16 +82,14 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	@Override
 	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return new DistanceToFieldSearchProjectionBuilder() {
-
 			@Override
 			public DistanceToFieldSearchProjectionBuilder unit(DistanceUnit unit) {
 				return this;
 			}
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public SearchProjection<Double> build() {
-				return (SearchProjection<Double>) PROJECTION;
+				return StubDefaultSearchProjection.get();
 			}
 		};
 	}

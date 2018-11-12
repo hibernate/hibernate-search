@@ -11,22 +11,23 @@ import java.util.function.Function;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
 
 public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQueryElementCollector> {
 
 	private final StubBackend backend;
-	private final List<String> indexNames;
+	private final StubSearchTargetModel searchTargetModel;
 	private final StubSearchWork.Builder workBuilder;
-	private final HitAggregator<?, List<T>> hitAggregator;
+	private final StubHitExtractor<?, List<T>> hitExtractor;
 
-	public StubSearchQueryBuilder(StubBackend backend, List<String> indexNames, StubSearchWork.ResultType resultType,
-			HitAggregator<?, List<T>> hitAggregator) {
+	public StubSearchQueryBuilder(StubBackend backend, StubSearchTargetModel searchTargetModel,
+			StubSearchWork.ResultType resultType, StubHitExtractor<?, List<T>> hitExtractor) {
 		this.backend = backend;
-		this.indexNames = indexNames;
+		this.searchTargetModel = searchTargetModel;
 		this.workBuilder = StubSearchWork.builder( resultType );
-		this.hitAggregator = hitAggregator;
+		this.hitExtractor = hitExtractor;
 	}
 
 	@Override
@@ -41,7 +42,9 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 
 	@Override
 	public <Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
-		StubSearchQuery<T> searchQuery = new StubSearchQuery<>( backend, indexNames, workBuilder, hitAggregator );
+		StubSearchQuery<T> searchQuery = new StubSearchQuery<>(
+				backend, searchTargetModel.getIndexNames(), workBuilder, hitExtractor
+		);
 		return searchQueryWrapperFactory.apply( searchQuery );
 	}
 }

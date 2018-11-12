@@ -11,21 +11,21 @@ import java.util.List;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
 
 final class StubSearchQuery<T> implements SearchQuery<T> {
 
 	private final StubBackend backend;
 	private final List<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
-	private final HitAggregator<?, List<T>> hitAggregator;
+	private final StubHitExtractor<?, List<T>> hitExtractor;
 
 	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
-			HitAggregator<?, List<T>> hitAggregator) {
+			StubHitExtractor<?, List<T>> hitExtractor) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;
-		this.hitAggregator = hitAggregator;
+		this.hitExtractor = hitExtractor;
 	}
 
 	@Override
@@ -45,7 +45,9 @@ final class StubSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		return backend.getBehavior().executeSearchWork( indexNames, workBuilder.build(), hitAggregator );
+		return backend.getBehavior().executeSearchWork(
+				indexNames, workBuilder.build(), hitExtractor
+		);
 	}
 
 }

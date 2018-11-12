@@ -67,9 +67,7 @@ public class ProvidedIdIT {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							c -> {
-								c.collectReference( StubBackendUtils.reference( INDEX_NAME, "42" ) );
-							}
+							StubBackendUtils.reference( INDEX_NAME, "42" )
 					)
 			);
 

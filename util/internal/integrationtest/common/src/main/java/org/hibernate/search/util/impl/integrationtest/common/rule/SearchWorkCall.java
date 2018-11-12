@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,20 +19,20 @@ class SearchWorkCall<T> {
 
 	private final List<String> indexNames;
 	private final StubSearchWork work;
-	private final HitAggregator<?, List<T>> hitAggregator;
+	private final StubHitExtractor<?, List<T>> hitExtractor;
 	private final StubSearchWorkBehavior<?> behavior;
 
-	SearchWorkCall(List<String> indexNames, StubSearchWork work, HitAggregator<?, List<T>> hitAggregator) {
+	SearchWorkCall(List<String> indexNames, StubSearchWork work, StubHitExtractor<?, List<T>> hitExtractor) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.hitAggregator = hitAggregator;
+		this.hitExtractor = hitExtractor;
 		this.behavior = null;
 	}
 
 	SearchWorkCall(List<String> indexNames, StubSearchWork work, StubSearchWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.hitAggregator = null;
+		this.hitExtractor = null;
 		this.behavior = behavior;
 	}
 
@@ -48,8 +48,8 @@ class SearchWorkCall<T> {
 		 * that the hit collector has the correct type. We can cast safely.
 		 */
 		long totalHitCount = behavior.getTotalHitCount();
-		behavior.contribute( (HitAggregator) actualCall.hitAggregator );
-		List<U> hits = actualCall.hitAggregator.build();
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		List<U> hits = (List<U>) ((StubHitExtractor) actualCall.hitExtractor).extract( behavior.getRawHits() );
 		return new SearchResultImpl<>( totalHitCount, hits );
 	}
 

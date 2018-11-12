@@ -28,6 +28,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 
 	private final StubBackend backend;
 	private final String name;
+	private final StubIndexSchemaNode rootSchemaNode;
 
 	private boolean closed = false;
 
@@ -35,6 +36,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+		this.rootSchemaNode = rootSchemaNode;
 		backend.getBehavior().pushSchema( name, rootSchemaNode );
 	}
 
@@ -64,12 +66,12 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 
 	@Override
 	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
-		return new StubIndexSearchTargetContext.Builder( backend, mappingContext, name );
+		return new StubIndexSearchTargetContext.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
 
 	@Override
 	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
-		((StubIndexSearchTargetContext.Builder)searchTargetBuilder).add( backend, name );
+		((StubIndexSearchTargetContext.Builder)searchTargetBuilder).add( backend, name, rootSchemaNode );
 	}
 
 	@Override

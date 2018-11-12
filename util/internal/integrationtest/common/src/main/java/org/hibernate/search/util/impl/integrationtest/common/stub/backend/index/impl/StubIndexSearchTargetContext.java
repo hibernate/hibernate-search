@@ -14,9 +14,11 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBui
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.StubSearchProjectionBuilderFactory;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
 
 class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryElementCollector> {
@@ -26,11 +28,14 @@ class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryEleme
 	private final StubSearchProjectionBuilderFactory projectionFactory;
 
 	private StubIndexSearchTargetContext(Builder builder) {
+		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
+		List<StubIndexSchemaNode> immutableRootSchemaNodes =
+				Collections.unmodifiableList( new ArrayList<>( builder.rootSchemaNodes ) );
+		StubSearchTargetModel targetModel = new StubSearchTargetModel( immutableIndexNames, immutableRootSchemaNodes );
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
-		List<String> immutableIndexNames = Collections.unmodifiableList( new ArrayList<>( builder.indexNames ) );
-		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, immutableIndexNames );
-		this.projectionFactory = new StubSearchProjectionBuilderFactory();
+		this.projectionFactory = new StubSearchProjectionBuilderFactory( targetModel );
+		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, targetModel );
 	}
 
 	@Override
@@ -58,18 +63,21 @@ class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryEleme
 		private final StubBackend backend;
 		private final MappingContextImplementor mappingContext;
 		private final List<String> indexNames = new ArrayList<>();
+		private final List<StubIndexSchemaNode> rootSchemaNodes = new ArrayList<>();
 
-		Builder(StubBackend backend, MappingContextImplementor mappingContext, String indexName) {
+		Builder(StubBackend backend, MappingContextImplementor mappingContext, String indexName, StubIndexSchemaNode rootSchemaNode) {
 			this.backend = backend;
 			this.mappingContext = mappingContext;
 			this.indexNames.add( indexName );
+			this.rootSchemaNodes.add( rootSchemaNode );
 		}
 
-		void add(StubBackend backend, String indexName) {
+		void add(StubBackend backend, String indexName, StubIndexSchemaNode rootSchemaNode) {
 			if ( !this.backend.equals( backend ) ) {
 				throw new IllegalStateException( "Attempt to run a search query across two distinct backends; this is not possible." );
 			}
 			indexNames.add( indexName );
+			rootSchemaNodes.add( rootSchemaNode );
 		}
 
 		@Override

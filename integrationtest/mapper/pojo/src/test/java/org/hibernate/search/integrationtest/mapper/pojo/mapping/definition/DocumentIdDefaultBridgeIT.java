@@ -181,9 +181,7 @@ public class DocumentIdDefaultBridgeIT {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							c -> {
-								c.collectReference( StubBackendUtils.reference( INDEX_NAME, identifierAsString ) );
-							}
+							StubBackendUtils.reference( INDEX_NAME, identifierAsString )
 					)
 			);
 

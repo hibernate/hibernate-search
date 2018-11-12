@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaCon
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode> {
 
@@ -37,11 +38,23 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
 	}
 
+	/*
+	 * The following properties are purposely ignored when comparing two nodes,
+	 * to make it easier to define nodes that should be matched.
+	 */
+	private final StubFieldConverter<?> converter;
+
 	private StubIndexSchemaNode(Builder builder) {
 		super( builder );
+		this.converter = builder.converter;
+	}
+
+	public StubFieldConverter<?> getConverter() {
+		return converter;
 	}
 
 	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaContext {
+		private StubFieldConverter<?> converter;
 
 		private Builder(Builder parent, String relativeFieldName, Type type) {
 			super( parent, relativeFieldName );
@@ -115,6 +128,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder sortable(Sortable sortable) {
 			attribute( "sortable", sortable );
+			return this;
+		}
+
+		public Builder converter(StubFieldConverter<?> converter) {
+			this.converter = converter;
 			return this;
 		}
 

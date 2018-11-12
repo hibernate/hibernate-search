@@ -14,17 +14,20 @@ import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchem
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIndexSchemaFieldTypedContext<? extends S, F>, F>
 		implements StandardIndexSchemaFieldTypedContext<S, F> {
 
 	private IndexSchemaFieldDefinitionHelper<F> helper;
 	protected final StubIndexSchemaNode.Builder builder;
+	private final Class<F> inputType;
 	private final boolean included;
 
 	StubStandardIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( builder, inputType );
 		this.builder = builder;
+		this.inputType = inputType;
 		this.included = included;
 		builder.inputType( inputType );
 	}
@@ -32,14 +35,14 @@ abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIn
 	abstract S thisAsS();
 
 	@Override
-	public S dslConverter(
-			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+	public S dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+		helper.dslConverter( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
-	public S projectionConverter(
-			FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+	public S projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+		helper.projectionConverter( fromIndexConverter );
 		return thisAsS();
 	}
 
@@ -64,6 +67,7 @@ abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIn
 		else {
 			helper.initialize( new StubExcludedIndexFieldAccessor<>( builder.getAbsolutePath(), builder.getRelativeName() ) );
 		}
+		builder.converter( new StubFieldConverter<>( inputType, helper.createUserIndexFieldConverter() ) );
 		return accessor;
 	}
 

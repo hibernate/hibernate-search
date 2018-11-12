@@ -4,10 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection;
+package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query;
 
-import org.hibernate.search.engine.search.SearchProjection;
+import java.util.List;
 
-class StubSearchProjection<T> implements SearchProjection<T> {
+/**
+ * The interface used to define stubbed hits.
+ */
+public interface StubHitExtractor<H, T> {
+
+	T extract(List<H> hits);
 
 }

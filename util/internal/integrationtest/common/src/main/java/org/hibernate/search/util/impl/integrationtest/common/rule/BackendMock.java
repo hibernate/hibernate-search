@@ -15,16 +15,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -105,17 +103,17 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<ReferenceHitCollector> behavior) {
+			StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.REFERENCES, behavior );
 	}
 
 	public BackendMock expectSearchObjects(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<LoadingHitCollector> behavior) {
+			StubSearchWorkBehavior<DocumentReference> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.OBJECTS, behavior );
 	}
 
 	public BackendMock expectSearchProjections(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
-			StubSearchWorkBehavior<ProjectionHitCollector> behavior) {
+			StubSearchWorkBehavior<List<?>> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
 	}
 
@@ -282,8 +280,8 @@ public class BackendMock implements TestRule {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-				HitAggregator<?, List<T>> hitAggregator) {
-			return searchCalls.verify( new SearchWorkCall<>( indexNames, work, hitAggregator ), SearchWorkCall::<T>verify );
+				StubHitExtractor<?, List<T>> hitExtractor) {
+			return searchCalls.verify( new SearchWorkCall<>( indexNames, work, hitExtractor ), SearchWorkCall::<T>verify );
 		}
 	}
 

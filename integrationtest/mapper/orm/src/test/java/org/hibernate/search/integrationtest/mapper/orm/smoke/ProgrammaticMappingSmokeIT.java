@@ -315,8 +315,8 @@ public class ProgrammaticMappingSmokeIT {
 							.maxResultsCount( 2L ),
 					StubSearchWorkBehavior.of(
 							6L,
-							c -> c.collectForLoading( reference( IndexedEntity.INDEX, "0" ) ),
-							c -> c.collectForLoading( reference( YetAnotherIndexedEntity.INDEX, "1" ) )
+							reference( IndexedEntity.INDEX, "0" ),
+							reference( YetAnotherIndexedEntity.INDEX, "1" )
 					)
 			);
 
@@ -357,12 +357,8 @@ public class ProgrammaticMappingSmokeIT {
 							.maxResultsCount( 2L ),
 					StubSearchWorkBehavior.of(
 							2L,
-							c -> {
-								c.collectProjection( "text1" );
-							},
-							c -> {
-								c.collectProjection( null );
-							}
+							Arrays.asList( "text1" ),
+							Arrays.asList( (Object) null )
 					)
 			);
 
@@ -390,7 +386,7 @@ public class ProgrammaticMappingSmokeIT {
 					.asProjections(
 							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
 							searchTarget.projection().reference().toProjection(),
-							searchTarget.projection().field( "myLocalDateField", String.class ).toProjection(),
+							searchTarget.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
 							searchTarget.projection().documentReference().toProjection(),
 							searchTarget.projection().object().toProjection(),
 							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
@@ -403,22 +399,22 @@ public class ProgrammaticMappingSmokeIT {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							c -> {
-								c.collectProjection( "text1" );
-								c.collectReference( reference( IndexedEntity.INDEX, "0" ) );
-								c.collectProjection( LocalDate.of( 2017, 11, 1 ) );
-								c.collectProjection( reference( IndexedEntity.INDEX, "0" ) );
-								c.collectForLoading( reference( IndexedEntity.INDEX, "0" ) );
-								c.collectProjection( "text2" );
-							},
-							c -> {
-								c.collectProjection( null );
-								c.collectReference( reference( YetAnotherIndexedEntity.INDEX, "1" ) );
-								c.collectProjection( LocalDate.of( 2017, 11, 2 ) );
-								c.collectProjection( reference( YetAnotherIndexedEntity.INDEX, "1" ) );
-								c.collectForLoading( reference( YetAnotherIndexedEntity.INDEX, "1" ) );
-								c.collectProjection( null );
-							}
+							Arrays.asList(
+									"text1",
+									reference( IndexedEntity.INDEX, "0" ),
+									LocalDate.of( 2017, 11, 1 ),
+									reference( IndexedEntity.INDEX, "0" ),
+									reference( IndexedEntity.INDEX, "0" ),
+									"text2"
+							),
+							Arrays.asList(
+									null,
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									LocalDate.of( 2017, 11, 2 ),
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									reference( YetAnotherIndexedEntity.INDEX, "1" ),
+									null
+							)
 					)
 			);
 

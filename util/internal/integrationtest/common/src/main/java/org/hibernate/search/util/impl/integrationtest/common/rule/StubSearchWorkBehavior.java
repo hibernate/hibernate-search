@@ -6,41 +6,34 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.List;
 
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
-
-public interface StubSearchWorkBehavior<C> {
+public interface StubSearchWorkBehavior<H> {
 
 	/**
-	 * @return The total hit count (which may be larger than the number of hits pushed to the aggregator)
+	 * @return The total hit count (which may be larger than the number of hits)
 	 */
 	long getTotalHitCount();
 
-	/**
-	 * @param hitAggregator The hit aggregator to push results to.
-	 */
-	void contribute(HitAggregator<C, ?> hitAggregator);
+	List<H> getRawHits();
 
-	static <C> StubSearchWorkBehavior<C> empty() {
-		return of( 0L, c -> { } );
+	static <H> StubSearchWorkBehavior<H> empty() {
+		return of( 0L );
 	}
 
 	@SafeVarargs
-	static <C> StubSearchWorkBehavior<C> of(long totalHitCount, Consumer<C>... hitContributors) {
-		return new StubSearchWorkBehavior<C>() {
+	static <H> StubSearchWorkBehavior<H> of(long totalHitCount, H... rawHits) {
+		List<H> rawHitsAsList = Arrays.asList( rawHits );
+		return new StubSearchWorkBehavior<H>() {
 			@Override
 			public long getTotalHitCount() {
 				return totalHitCount;
 			}
 
 			@Override
-			public void contribute(HitAggregator<C, ?> hitAggregator) {
-				hitAggregator.init( hitContributors.length );
-				for ( Consumer<C> hitContributor : hitContributors ) {
-					C collector = hitAggregator.nextCollector();
-					hitContributor.accept( collector );
-				}
+			public List<H> getRawHits() {
+				return rawHitsAsList;
 			}
 		};
 	}
