@@ -12,7 +12,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -30,7 +30,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	private final Set<ReaderProvider> readerProviders;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
-	private final HitExtractor<?> hitExtractor;
+	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final SearchResultExtractor<T> searchResultExtractor;
 
 	private Long firstResultIndex = 0L;
@@ -38,14 +38,15 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	public LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
-			Query luceneQuery, Sort luceneSort, HitExtractor<?> hitExtractor, SearchResultExtractor<T> searchResultExtractor) {
+			Query luceneQuery, Sort luceneSort,
+			LuceneCollectorProvider luceneCollectorProvider, SearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
 		this.readerProviders = readerProviders;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.hitExtractor = hitExtractor;
+		this.luceneCollectorProvider = luceneCollectorProvider;
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
@@ -76,7 +77,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 				readerProviders,
 				luceneQuery, luceneSort,
 				firstResultIndex, maxResultsCount,
-				hitExtractor, searchResultExtractor ) );
+				luceneCollectorProvider, searchResultExtractor ) );
 		return queryOrchestrator.submit( work ).join();
 	}
 }
