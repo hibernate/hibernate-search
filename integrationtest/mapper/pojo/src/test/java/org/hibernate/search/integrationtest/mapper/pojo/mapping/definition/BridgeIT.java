@@ -13,7 +13,10 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -31,21 +34,152 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
+import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class BridgeIT {
 
+	private static final String INDEX_NAME = "IndexName";
+
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
+
+	/**
+	 * Basic test checking that a "normal" custom type bridge will work as expected.
+	 */
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
+	public void typeBridge() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class )
+						.bridge( buildContext -> new TypeBridge() {
+							private PojoModelElementAccessor<String> pojoPropertyAccessor;
+							private IndexFieldAccessor<String> indexFieldAccessor;
+
+							@Override
+							public void bind(TypeBridgeBindingContext context) {
+								pojoPropertyAccessor = context.getBridgedElement()
+										.property( "stringProperty" )
+										.createAccessor( String.class );
+								indexFieldAccessor = context.getIndexSchemaElement().field( "someField" ).asString()
+										.analyzer( "myAnalyzer" )
+										.createAccessor();
+							}
+
+							@Override
+							public void write(DocumentElement target, PojoElement source,
+									TypeBridgeWriteContext context) {
+								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
+							}
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			entity.stringProperty = "some string";
+			manager.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
+
+	/**
+	 * Basic test checking that a "normal" custom property bridge will work as expected.
+	 */
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-2055", "HSEARCH-2641"})
+	public void propertyBridge() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			String stringProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			public String getStringProperty() {
+				return stringProperty;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b ->
+				b.field( "someField", String.class, b2 -> {
+					b2.analyzerName( "myAnalyzer" ); // For HSEARCH-2641
+				} )
+		);
+
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
+				b -> b.programmaticMapping().type( IndexedEntity.class )
+						.property( "stringProperty" ).bridge( buildContext -> new PropertyBridge() {
+							private PojoModelElementAccessor<String> pojoPropertyAccessor;
+							private IndexFieldAccessor<String> indexFieldAccessor;
+
+							@Override
+							public void bind(PropertyBridgeBindingContext context) {
+								pojoPropertyAccessor = context.getBridgedElement()
+										.createAccessor( String.class );
+								indexFieldAccessor = context.getIndexSchemaElement().field( "someField" ).asString()
+										.analyzer( "myAnalyzer" )
+										.createAccessor();
+							}
+
+							@Override
+							public void write(DocumentElement target, PojoElement source,
+									PropertyBridgeWriteContext context) {
+								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
+							}
+						} )
+		)
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+			IndexedEntity entity = new IndexedEntity();
+			entity.id = 1;
+			entity.stringProperty = "some string";
+			manager.getMainWorkPlan().add( entity );
+
+			backendMock.expectWorks( INDEX_NAME )
+					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
+					.preparedThenExecuted();
+		}
+		backendMock.verifyExpectationsMet();
+	}
 
 	@Test
 	public void typeBridgeMapping_error_missingBridgeReference() {
