@@ -10,15 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 
-public interface HitExtractor<C> {
-
-	/**
-	 * Contribute to the Lucene collectors, making sure that the information required by this extractor are collected.
-	 *
-	 * @param luceneCollectorBuilder the Lucene collector builder.
-	 */
-	default void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-	}
+public interface HitExtractor<C> extends LuceneCollectorProvider {
 
 	/**
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of

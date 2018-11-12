@@ -13,7 +13,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
@@ -35,7 +35,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	private final long firstResultIndex;
 	private final Long maxResultsCount;
 
-	private final HitExtractor<?> hitExtractor;
+	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final SearchResultExtractor<T> searchResultExtractor;
 
 	public LuceneSearcher(Set<String> indexNames,
@@ -44,7 +44,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 			Sort luceneSort,
 			Long firstResultIndex,
 			Long maxResultsCount,
-			HitExtractor<?> hitExtractor,
+			LuceneCollectorProvider luceneCollectorProvider,
 			SearchResultExtractor<T> searchResultExtractor) {
 		this.indexNames = indexNames;
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
@@ -52,7 +52,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.luceneSort = luceneSort;
 		this.firstResultIndex = firstResultIndex == null ? 0L : firstResultIndex.longValue();
 		this.maxResultsCount = maxResultsCount;
-		this.hitExtractor = hitExtractor;
+		this.luceneCollectorProvider = luceneCollectorProvider;
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
@@ -60,7 +60,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
 
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs() );
-		hitExtractor.contributeCollectors( luceneCollectorsBuilder );
+		luceneCollectorProvider.contributeCollectors( luceneCollectorsBuilder );
 		LuceneCollectors luceneCollectors = luceneCollectorsBuilder.build();
 
 		indexSearcher.search( luceneQuery, luceneCollectors.getCompositeCollector() );
