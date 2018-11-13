@@ -29,6 +29,54 @@ public class IndexedIT {
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
 	@Test
+	public void implicitIndexName() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		backendMock.expectSchema( IndexedEntity.class.getName(), b -> b
+				.field( "text", String.class )
+		);
+		setupHelper.withBackendMock( backendMock )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void explicitIndexName() {
+		@Indexed(index = "explicitIndexName")
+		class IndexedEntity {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		backendMock.expectSchema( "explicitIndexName", b -> b
+				.field( "text", String.class )
+		);
+		setupHelper.withBackendMock( backendMock )
+				.setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
 	public void error_indexedWithoutEntityMetadata() {
 		@Indexed
 		class IndexedWithoutEntityMetadata {
