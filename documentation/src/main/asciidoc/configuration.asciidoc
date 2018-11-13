@@ -1,0 +1,19 @@
+[[configuration]]
+== Configuration
+// Search 5 anchors backward compatibility
+[[search-configuration]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+NOTE: We will need to re-organize the documentation about configuration.
+Main problems:
+
+* Property keys are specific to the mapper: in ORM they start with hibernate.search.,
+but not in Infinispan. I guess we could just use the ORM keys and live with this.
+* The source used for configuration properties is specific to the mapper
+* In this section we used to document configuration properties that are completely specific to ORM,
+or completely specific to Lucene. Maybe move that to the specific sections for ORM and Lucene?
+* Yet some configuration principles are relevant for every mapper/backend, such as the hibernate.search.indexes.my_index
+hibernate.search.backends.my_backend property structure.
+////

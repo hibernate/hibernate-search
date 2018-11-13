@@ -1,0 +1,6 @@
+[[mapper-pojo]]
+== Mapping Java entities to the index structure
+// Search 5 anchors backward compatibility
+[[search-mapping]]
+
+include::todo-placeholder.asciidoc[]

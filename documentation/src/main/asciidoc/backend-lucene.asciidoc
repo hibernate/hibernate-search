@@ -1,4 +1,4 @@
-[[preface]]
-== Preface
+[[backend-lucene]]
+== Lucene backend
 
 include::todo-placeholder.asciidoc[]

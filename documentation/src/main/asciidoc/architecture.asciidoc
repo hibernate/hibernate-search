@@ -1,0 +1,6 @@
+[[architecture]]
+== Architecture
+// Search 5 anchors backward compatibility
+[[search-architecture]]
+
+include::todo-placeholder.asciidoc[]

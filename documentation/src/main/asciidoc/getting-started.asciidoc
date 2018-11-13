@@ -1,7 +1,7 @@
 [[getting-started]]
 == Getting started
 
-TODO
+include::todo-placeholder.asciidoc[]
 
 .Book and Author entities BEFORE adding Hibernate Search specific annotations
 ====

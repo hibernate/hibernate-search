@@ -1,0 +1,6 @@
+[[backend-elasticsearch]]
+== Elasticsearch backend
+// Search 5 anchors backward compatibility
+[[elasticsearch-integration]]
+
+include::todo-placeholder.asciidoc[]

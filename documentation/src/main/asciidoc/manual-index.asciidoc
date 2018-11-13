@@ -1,0 +1,6 @@
+[[manual-index-changes]]
+== Manual index changes
+
+include::todo-placeholder.asciidoc[]
+
+// NOTE: We may want to make this section a sub-section of mapper-orm.
