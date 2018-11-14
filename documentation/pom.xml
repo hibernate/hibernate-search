@@ -183,7 +183,7 @@
                     <sourceDocumentName>index.asciidoc</sourceDocumentName>
                     <attributes>
                         <sourcedir>${asciidoctor.examples-source-dir}</sourcedir>
-                        <resourcesdir>${asciidoctor.examples-resource-dir}</resourcesdir>
+                        <resourcesdir>${asciidoctor.examples-resources-dir}</resourcesdir>
                         <docinfodir>${asciidoctor.aggregated-resources-dir}/docinfo/noorm-documentation</docinfodir>
                         <icons>font</icons>
                         <tabsize>4</tabsize>
