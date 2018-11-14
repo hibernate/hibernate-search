@@ -338,6 +338,9 @@
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
         <maven.min.version>3.2.3</maven.min.version>
 
+        <!-- Whether javadoc problems (errors, warnings) should fail the build) -->
+        <failOnJavadocError>true</failOnJavadocError>
+
         <!-- Can be overridden by subprojects if dependency convergence cannot be achieved -->
         <enforcer.dependencyconvergence.skip>false</enforcer.dependencyconvergence.skip>
 
@@ -1171,8 +1174,8 @@
                         <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
                         <quiet>true</quiet>
                         <verbose>false</verbose>
-                        <failOnWarnings>${failOnJavaDocError}</failOnWarnings>
-                        <failOnError>${failOnJavaDocError}</failOnError>
+                        <failOnWarnings>true</failOnWarnings>
+                        <failOnError>true</failOnError>
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
@@ -1705,9 +1708,6 @@
 
         <profile>
             <id>dist</id>
-            <properties>
-                <failOnJavaDocError>true</failOnJavaDocError>
-            </properties>
             <modules>
                 <module>distribution</module>
             </modules>
