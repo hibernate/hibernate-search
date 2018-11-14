@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.gettingstarted.model.before;
+package org.hibernate.search.documentation.gettingstarted.withouthsearch;
 
-// tag::book-entity-before-hsearch-gettingstarted[]
+// tag::include[]
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,14 +24,31 @@ public class Book {
 
 	private String title;
 
-	private String subtitle;
-
 	@ManyToMany
-	private Set<Author> authors = new HashSet<Author>();
+	private Set<Author> authors = new HashSet<>();
 
 	public Book() {
 	}
 
+	// Getters and setters
 	// ...
+
+	// tag::getters-setters[]
+	public Integer getId() {
+		return id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public Set<Author> getAuthors() {
+		return authors;
+	}
+	// end::getters-setters[]
 }
-// end::book-entity-before-hsearch-gettingstarted[]
+// end::include[]

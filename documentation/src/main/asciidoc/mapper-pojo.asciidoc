@@ -4,3 +4,44 @@
 [[search-mapping]]
 
 include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a description of how to:
+ * define a mapping using annotations.
+ * define a mapping programmatically.
+////
+
+[[mapper-pojo-field]]
+=== Direct field mapping
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of each @*Field annotation.
+////
+
+[[mapper-pojo-bridge]]
+=== Bridges
+// Search 5 anchors backward compatibility
+[[search-mapping-bridge]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of how to define and use bridges.
+////
+
+[[mapper-pojo-indexedembedded]]
+=== Indexed-embedded
+// Search 5 anchors backward compatibility
+[[search-mapping-associated]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of @IndexedEmbedded
+////

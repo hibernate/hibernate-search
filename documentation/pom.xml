@@ -46,8 +46,19 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-backend-lucene</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
+            <classifier>build-resources</classifier>
+            <type>zip</type>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -55,10 +66,53 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+            Leave this dependency here, not in a utils module, so that we don't need to recompile
+            the utils to re-run the tests with a different database.
+         -->
+        <dependency>
+            <groupId>${jdbc.driver.groupId}</groupId>
+            <artifactId>${jdbc.driver.artifactId}</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <!-- Inherit execution unpack-shared-test-build-resources -->
+            </plugin>
+            <plugin>
+                <groupId>com.github.alexcojocaru</groupId>
+                <artifactId>elasticsearch-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>it</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -190,6 +244,7 @@
 
                         <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
+                        <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                     </attributes>
                 </configuration>
             </plugin>

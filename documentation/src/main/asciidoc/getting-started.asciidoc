@@ -1,37 +1,474 @@
 [[getting-started]]
 == Getting started
 
-include::todo-placeholder.asciidoc[]
+This section will guide you through the initial steps required
+to integrate Hibernate Search into your application.
+
+[WARNING]
+====
+Hibernate Search {hibernateSearchVersion} is a *technology preview* and is *not ready for production*.
+
+Use it to have a sneak peak at the APIs, make suggestions or warn us of what you consider blocking early so we can fix it,
+but *do not* use it to address business needs!
+
+Read <<getting-started-preview-status>> for more information.
+====
+
+[[getting-started-preview-status]]
+=== Preview status
+
+Hibernate Search {hibernateSearchVersion} is a technology preview.
+While the core of Hibernate Search 6 is there, there are still a lot of limitations:
+
+* Features are partially implemented or simply missing.
+For example, you cannot index a `Double` property yet,
+you cannot configure custom Lucene directories,
+you cannot ignore bridges in the predicate DSL,
+and so on.
+* APIs are not considered stable yet.
+* The low-level parts of Hibernate Search 5 that made its efficiency haven't been
+ported to Hibernate Search 6 yet.
+This results in obvious performance bottlenecks,
+such as all the indexing works from a multi-threaded application being executed
+one after another and without any form of batching.
+
+The exact features that are currently implemented and expected to work will be documented
+as new Alpha versions are released, but to sum up, here is what you can start to play with:
+
+* ORM integration:
+** Mapping of entities using either annotation mapping or programmatic mapping.
+However, we do not offer all the options that were available in Search 5 (yet),
+and we do not support all the data types (yet).
+** Automatic indexing of ORM entities as they are persisted within a transaction
+(enabled automatically if Hibernate Search is in your classpath and the entity is mapped).
+** Search for ORM entities using their Hibernate Search index,
+and retrieving managed entities as results.
+However, we do not offer many options regarding how the entities are retrieved and initialized (yet).
+** Custom, user-defined type bridges, property bridges or value bridges.
+However, the API to retrieve information from POJOs is currently quite cumbersome:
+we know it and will work on a lighter API
+(see https://hibernate.atlassian.net/browse/HSEARCH-3297[HSEARCH-3297],
+https://hibernate.atlassian.net/browse/HSEARCH-3298[HSEARCH-3298]).
+* Search DSL
+** All the predicates listed in `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext`.
+However, we do not offer all the options that were available in Search 5 (yet).
+** All the sorts listed in `org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext`.
+However, we do not offer all the options that were available in Search 5 (yet).
+** All the projections listed in `org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext`.
+However, we do not offer all the options that were available in Search 5 (yet).
+
+Here are the most interesting new features:
+
+* Changes on indexed-embedded entities trigger reindexing of the "embedding" entity automatically,
+and annotating the inverse side of the association with `@ContainedIn` is no longer needed in most cases.
+A mapping error will be reported when the inverse side of the association cannot be resolved.
+* "nested" fields and predicates, similar to the feature with the same name in Elasticsearch.
+See `org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded.storage`
+and `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext.nested()`.
+* Injection of native predicates (`org.apache.lucene.search.Query`, JSON for Elasticsearch)
+within DSL-created predicates.
+This is not new for the Lucene integration, but it is for the Elasticsearch integration.
+See `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext.extension(SearchPredicateFactoryContextExtension<T>)`
+`org.hibernate.search.backend.elasticsearch.ElasticsearchExtension.get()` and
+`org.hibernate.search.backend.lucene.LuceneExtension.get()`.
+
+=== Compatibility
+
+.Compatibility
+
+[cols="h,1", stripes=none]
+|===============
+|Java Runtime
+|Java *8* or greater.
+|Hibernate ORM (for the ORM mapper)
+|Hibernate ORM *{hibernateVersion}*.
+|JPA (for the ORM mapper)
+|JPA *{jpaVersion}*.
+|===============
+
+=== Migration notes
+
+If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
+make sure to check out the http://hibernate.org/search/documentation/migrate/[migration guide].
+
+[WARNING]
+====
+**To Hibernate Search 5 users**
+
+If you pull our artifacts from a Maven repository and you come from Hibernate Search 5,
+be aware that just bumping the version number will not be enough.
+
+In particular, the group IDs changed from `org.hibernate` to `org.hibernate.search`,
+most of the artifact IDs changed to reflect the new mapper/backend design,
+and the Lucene integration now requires an explicit dependency instead of being available by default.
+Read <<gettingstarted-dependencies>> for more information.
+
+Additionally, be aware that a lot of APIs changed, some only because of a package change,
+others because of more fundamental changes
+(like moving away from using Lucene types in Hibernate Search APIs).
+====
+
+[[gettingstarted-dependencies]]
+=== Dependencies
+
+The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository].
+
+If you do not want to, or cannot, fetch the JARs from a Maven repository,
+you can get them from the
+link:http://sourceforge.net/projects/hibernate/files/hibernate-search/{hibernateSearchVersion}/[distribution bundle hosted at Sourceforge].
+
+In order to use Hibernate Search, you will need at least two direct dependencies:
+
+* a dependency to the "mapper", which extracts data from your domain model and maps it to indexable documents;
+* and a dependency to the "backend", which allows to index and search these documents.
+
+Below are the most common setups and matching dependencies for a quick start;
+read <<architecture>> for more information.
+
+Hibernate ORM + Lucene::
+Allows indexing of ORM entities in a single application node,
+storing the index on the local filesystem.
++
+If you get Hibernate Search from Maven, use these dependencies:
++
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-lucene</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
++
+If you get Hibernate Search from the distribution bundle,
+copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/lucene`,
+and their respective `lib` subdirectories.
+Hibernate ORM + Elasticsearch::
+Allows indexing of ORM entities on multiple application nodes,
+storing the index on a remote Elasticsearch cluster (to be configured separately).
++
+If you get Hibernate Search from Maven, use these dependencies:
++
+[source, XML, subs="+attributes"]
+----
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-mapper-orm</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+<dependency>
+   <groupId>org.hibernate.search</groupId>
+   <artifactId>hibernate-search-backend-elasticsearch</artifactId>
+   <version>{hibernateSearchVersion}</version>
+</dependency>
+----
++
+If you get Hibernate Search from the distribution bundle,
+copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/elasticsearch`,
+and their respective `lib` subdirectories.
+
+=== Configuration
+
+Once you have added all required dependencies to your application you have to add a couple of
+properties to your Hibernate ORM configuration file.
+
+[TIP]
+====
+In case you are a Hibernate ORM new timer we recommend you start link:http://hibernate.org/quick-start.html[there]
+to implement entity persistence in your application,
+and only then come back here to add Hibernate Search indexing.
+====
+
+The properties are sourced from Hibernate ORM,
+so they can be added to any file from which Hibernate ORM takes its configuration:
+
+* A `hibernate.properties` file in your classpath.
+* The `hibernate.cfg.xml` file in your classpath, if using Hibernate ORM native bootstrapping.
+* The `persistence.xml` file in your classpath, if using Hibernate ORM JPA bootstrapping.
+
+The minimal working configuration is short, but depends on your setup:
+
+.Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Lucene" setup
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene]
+----
+<1> Define a backend named "myBackend" relying on Lucene technology.
+<2> Define the storage for that backend as a local filesystem directory.
+<3> The backend will store indexes in the current working directory by default.
+If you want to store the indexes elsewhere,
+uncomment this line and set the value of the property.
+<4> Make sure to use the backend we just defined for all indexes.
+====
+
+.Hibernate Search properties in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
+====
+[source, XML, indent=0]
+----
+include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch]
+----
+<1> Define a backend named "myBackend" relying on Elasticsearch technology.
+<2> The backend will attempt to connect to http://localhost:9200 by default.
+If you want to connect to another URL, uncomment these lines
+and set the value for the "host" property,
+and optionally the username and password.
+<3> Make sure to use the backend we just defined for all indexes.
+====
+
+=== Mapping
+
+Let's assume that your application contains the Hibernate ORM managed classes `Book` and `Author`
+and you want to index them in order to search the books contained in your database.
 
 .Book and Author entities BEFORE adding Hibernate Search specific annotations
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/gettingstarted/model/before/Book.java[tags=book-entity-before-hsearch-gettingstarted]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withouthsearch/Book.java[tags=include;!getters-setters]
 ----
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/gettingstarted/model/before/Author.java[tags=author-entity-before-hsearch-gettingstarted]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withouthsearch/Author.java[tags=include;!getters-setters]
 ----
 ====
+
+To make these entities searchable, you will need to map them to an index structure.
+The mapping can be defined using annotations, or using a programmatic API;
+this getting started guide will show you a simple annotation mapping.
+For more details, refer to <<mapper-pojo>>.
+
+Below is an example of how the model above can be mapped.
 
 .Book and Author entities AFTER adding Hibernate Search specific annotations
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/gettingstarted/model/after/Book.java[tags=book-entity-after-hsearch-gettingstarted]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/Book.java[tags=include;!getters-setters]
 ----
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/gettingstarted/model/after/Author.java[tags=author-entity-after-hsearch-gettingstarted]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/Author.java[tags=include;!getters-setters]
 ----
+<1> `@Indexed` marks `Book` as indexed, i.e. an index will be created for that entity, and that index will be kept up to date.
+<2> By default, the JPA `@Id` is used to generate a document identifier.
+<3> `@GenericField` maps a property to an index field with the same name and type.
+As such, the field is indexed in a way that only allows exact matches;
+full-text matches will be discussed in a moment.
+<4> `@IndexedEmbedded` allows to "embed" the indexed form of associated objects (entities or embeddables)
+into the indexed form of the embedding entity.
+Here, the `Author` class defines a single indexed field, `name`.
+Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
+will add a single `authors.name` field to the `Book` index.
+This field will be populated automatically based on the content of the `authors` property,
+and the books will be reindexed automatically whenever the `name` property of their author changes.
+See <<mapper-pojo-indexedembedded>> for more information.
+<5> Entities that are only `@IndexedEmbedded` in other entities,
+but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
 ====
 
-.GeoPolygon
+This is a very simple example, but is enough to get started.
+Just remember that Hibernate Search allows more complex mappings:
+
+* Other `@*Field` annotations exist, some of them allowing full-text search,
+some of them allowing finer-grained configuration for field of a certain type.
+You can find out more about `@*Field` annotations in <<mapper-pojo-field>>.
+* Properties, or even types, can be mapped with finer-grained control using "bridges".
+See <<mapper-pojo-bridge>> for more information.
+
+=== Indexing
+
+Hibernate Search will transparently index every entity persisted,
+updated or removed through Hibernate ORM.
+Thus this code would transparently populate your index:
+
+.Using Hibernate ORM to persist data, and implicitly indexing it through Hibernate Search
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/gettingstarted/example/GeoPolygonTest.java[tags=geopolygon-spatial-hsearch-gettingstarted]
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=indexing]
 ----
 ====
 
+However, keep in mind that data already present in your database when you add the Hibernate Search integration
+is unknown to Hibernate Search, and thus has to be indexed through a batch process.
+
+IMPORTANT: The mass indexer is not yet available in Hibernate Search {hibernateSearchVersion}.
+We will add an example here when it is implemented.
+See https://hibernate.atlassian.net/browse/HSEARCH-3268[HSEARCH-3268].
+
+=== Searching
+
+Once the data is indexed, you can perform search queries.
+
+The following code will prepare a search query targeting the index for the `Book` entity,
+filtering the results so that at least one field among `title` and `authors.name`
+matches the string `Refactoring: Improving the Design of Existing Code` *exactly*.
+
+.Using Hibernate Search to query the indexes
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
+----
+<1> Get the Hibernate Search-specific version of the `EntityManager`, called `FullTextEntityManager`.
+<2> Create a "search target", representing the indexed types that will be queried.
+<3> Use the "search target" to start creating the query.
+<4> Define the results expected from the query; here we expect managed Hibernate ORM entities,
+but other options are available.
+<5> Define that only documents matching the given predicate should be returned.
+The predicate is created using the same search target as the query.
+<6> Build the query.
+<7> Fetch the results.
+====
+
+If this first example looks too verbose to you, you can use an alternative, lambda-based syntax
+that spares you the declaration of a variable for the search target:
+
+.Using Hibernate Search to query the indexes - lambda syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-lambdas]
+----
+====
+
+=== Analysis
+
+Exact matches are well and good, but obviously not what you would expect from a full-text search engine.
+
+For non-exact matches, you will need to configure *analysis*.
+
+==== Concept
+
+In the Lucene world (Lucene, Elasticsearch, Solr, ...),
+non-exact matches can be achieved by applying what is called an "analyzer"
+to *both* documents (when indexing) and search terms (when querying).
+
+The analyzer will perform three steps, delegated to the following components, in the following order:
+
+. Character filter: transforms the input text: replaces, adds or removes characters.
+This step is rarely used, generally text is transformed in the third step.
+. Tokenizer: splits the text into several words, called "tokens".
+. Token filter: transforms the tokens: replaces, add or removes characters in a token,
+derives new tokens from the existing ones, removes tokens based on some condition, ...
+
+In order to perform non-exact matches, you will need to either pick a pre-defined analyzer,
+or define your own by combining character filters, a tokenizer, and token filters.
+
+The following section will give a reasonable example of a general-purpose analyzer.
+For more advanced use cases, refer to the <<analysis>> section.
+
+==== Configuration
+
+Once you know what analysis is and which analyzer you want to apply,
+you will need to define it, or at least give it a name in Hibernate Search.
+This is done though analysis configurers, which are defined per backend:
+
+. First, you need to implement an analysis configurer, a Java class that implements a backend-specific interface:
+`LuceneAnalysisConfigurer` or `ElasticsearchAnalysisConfigurer`.
+. Second, you need to alter the configuration of your backend to actually use your analysis configurer.
+
+As an example, let's assume that one of your indexed `Book` entities has the title
+"Refactoring: Improving the Design of Existing Code",
+and you want to get hits for any of the following search terms:
+"Refactor", "refactors", "refactored" and "refactoring".
+One way to achieve this is to use an analyzer with the following components:
+
+* A "standard" tokenizer, which splits words at whitespaces, punctuation characters and hyphens.
+It is a good general purpose tokenizer.
+* A "lowercase" filter, which converts every character to lowercase.
+* A "snowball" filter, which applies language-specific https://en.wikipedia.org/wiki/Stemming[stemming].
+
+The examples below show how to define an analyzer with these components, depending on the backend you picked.
+
+.Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Lucene" setup
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/MyLuceneAnalysisConfigurer.java[tags=include]
+----
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_lucene-analysis]
+----
+<1> Define a custom analyzer named "myAnalyzer".
+<2> Set the tokenizer to a standard tokenizer. You need to pass factory classes to refer to components.
+<3> Set the token filters. Token filters are applied in the order they are given.
+<4> Set the value of a parameter for the last added char filter/tokenizer/token filter.
+<5> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+====
+
+.Analysis configurer implementation and configuration in `persistence.xml` for a "Hibernate ORM + Elasticsearch" setup
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configuration-orm_elasticsearch-analysis]
+----
+<1> Define a custom analyzer named "myAnalyzer".
+<2> Set the tokenizer to a standard tokenizer.
+<3> Set the token filters. Token filters are applied in the order they are given.
+<4> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
+must be defined separately and given a name.
+<5> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
+<6> Assign the configurer to the backend "myBackend" in the Hibernate Search configuration (here in `persistence.xml`).
+====
+
+Once analysis is configured, the mapping must be adapted to assign the relevant analyzer to each field:
+
+.Book and Author entities after adding Hibernate Search specific annotations
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/Book.java[tags=include;!getters-setters]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/Author.java[tags=include;!getters-setters]
+----
+<1> Replace the `@GenericField` annotation with `@FullTextField`,
+and set the `analyzer` parameter to the name of the custom analyzer configured earlier.
+====
+
+That's it! Now, once the entities will be reindexed, you will be able to search for the terms
+"Refactor", "refactors", "refactored" or "refactoring",
+and the book with the title "Refactoring: Improving the Design of Existing Code"
+will show up in the results.
+
+[IMPORTANT]
+====
+Mapping changes are not auto-magically applied to already-indexed data.
+Unless you know what you are doing, you should remember to reindex your data
+after you changed the Hibernate Search mapping of your entities.
+====
+
+.Using Hibernate Search to query the indexes after analysis was configured
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withanalysis/GettingStartedWithAnalysisIT.java[tags=searching]
+----
+====
+
+=== What's next
+
+The above paragraphs helped you getting an overview of Hibernate Search.
+The next step after this tutorial is to get more familiar
+with the overall architecture of Hibernate Search (<<architecture>>)
+and explore the basic features in more detail.
+
+Two topics which were only briefly touched in this tutorial
+were analysis configuration (<<analysis>>) and bridges (<<mapper-pojo-bridge>>).
+Both are important features required for more fine-grained indexing.
+
+Other features that you will probably want to use include
+<<search-dsl-sort,sorts>> and <<search-dsl-projection,projections>>

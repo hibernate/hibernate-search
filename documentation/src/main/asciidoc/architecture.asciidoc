@@ -4,3 +4,9 @@
 [[search-architecture]]
 
 include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a description of each artifact,
+its Maven coordinates, and the corresponding path in the distribution bundle
+////

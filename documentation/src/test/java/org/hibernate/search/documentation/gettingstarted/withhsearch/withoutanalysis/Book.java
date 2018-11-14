@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.gettingstarted.model.after;
+package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
 
-// tag::book-entity-after-hsearch-gettingstarted[]
+// tag::include[]
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,32 +15,47 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 @Entity
-@Indexed
+@Indexed // <1>
 public class Book {
 
-	@Id
+	@Id // <2>
 	@GeneratedValue
 	private Integer id;
 
-	@GenericField(projectable = Projectable.NO)
+	@GenericField // <3>
 	private String title;
 
-	@GenericField(projectable = Projectable.NO)
-	private String subtitle;
-
-	@IndexedEmbedded
 	@ManyToMany
-	private Set<Author> authors = new HashSet<Author>();
+	@IndexedEmbedded // <4>
+	private Set<Author> authors = new HashSet<>();
 
 	public Book() {
 	}
 
+	// Getters and setters
 	// ...
+
+	// tag::getters-setters[]
+	public Integer getId() {
+		return id;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public Set<Author> getAuthors() {
+		return authors;
+	}
+	// end::getters-setters[]
 }
-// end::book-entity-after-hsearch-gettingstarted[]
+// end::include[]

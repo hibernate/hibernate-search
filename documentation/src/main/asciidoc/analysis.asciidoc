@@ -1,0 +1,35 @@
+[[analysis]]
+== Analysis
+// Search 5 anchors backward compatibility
+[[analyzer]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed explanation of analysis, how it works and how to configure it in HSearch.
+////
+
+To know which character filters, tokenizers and token filters are available,
+refer to the documentation specific to each backend:
+
+* For Lucene, either browse the Lucene JavaDoc or read the corresponding section on the
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki].
+* For Elasticsearch, have a look at the online documentation.
+If you want to use a built-in analyzer and not create your own:
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[analyzers];
+if you want to define your own analyzer:
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html[character filters],
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html[tokenizers],
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html[token filters].
+
+[NOTE]
+====
+Why the reference to the Apache Solr wiki for Lucene?
+
+The analyzer factory framework was originally created in the Apache Solr project.
+Most of these implementations have been moved to Apache Lucene, but the
+documentation for these additional analyzers can still be found in the Solr Wiki. You might find
+other documentation referring to the "Solr Analyzer Framework"; just remember you don't need to
+depend on Apache Solr anymore: the required classes are part of the core Lucene distribution.
+====

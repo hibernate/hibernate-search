@@ -20,6 +20,8 @@ include::configuration.asciidoc[]
 
 include::mapper-pojo.asciidoc[]
 
+include::analysis.asciidoc[]
+
 include::search-dsl.asciidoc[]
 
 include::manual-index.asciidoc[]

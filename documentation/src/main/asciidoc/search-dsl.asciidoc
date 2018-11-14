@@ -4,3 +4,27 @@
 [[search-query]]
 
 include::todo-placeholder.asciidoc[]
+
+[[search-dsl-sort]]
+=== Sort
+// Search 5 anchors backward compatibility
+[[query-sorting]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of what sorts are and how to use them.
+////
+
+[[search-dsl-projection]]
+=== Projection
+// Search 5 anchors backward compatibility
+[[projections]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of what projections are and how to use them.
+////
