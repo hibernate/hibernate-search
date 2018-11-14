@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 public class StringFieldSortBuilder extends AbstractFieldSortBuilderImpl {
 
 	StringFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<String, ?> converter) {
+			String absoluteFieldPath, LuceneFieldConverter<?, String> converter) {
 		super( searchContext, absoluteFieldPath, converter, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}
 

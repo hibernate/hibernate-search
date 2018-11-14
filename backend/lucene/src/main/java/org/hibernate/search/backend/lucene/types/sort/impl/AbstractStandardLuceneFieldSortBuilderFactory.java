@@ -16,15 +16,15 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractStandardLuceneFieldSortBuilderFactory<F> implements LuceneFieldSortBuilderFactory {
+abstract class AbstractStandardLuceneFieldSortBuilderFactory<T> implements LuceneFieldSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean sortable;
 
-	protected final LuceneFieldConverter<F, ?> converter;
+	protected final LuceneFieldConverter<?, T> converter;
 
-	protected AbstractStandardLuceneFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<F, ?> converter) {
+	protected AbstractStandardLuceneFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<?, T> converter) {
 		this.sortable = sortable;
 		this.converter = converter;
 	}

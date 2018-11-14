@@ -16,7 +16,7 @@ import org.apache.lucene.search.SortField;
 public class LongFieldSortBuilder extends AbstractFieldSortBuilderImpl {
 
 	LongFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<Long, ?> converter) {
+			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
 		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
 	}
 

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class IntegerFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<Integer> {
 
-	public IntegerFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<Integer, ?> converter) {
+	public IntegerFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<?, Integer> converter) {
 		super( sortable, converter );
 	}
 
@@ -22,6 +22,6 @@ public class IntegerFieldSortBuilderFactory extends AbstractStandardLuceneFieldS
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new IntegerFieldSortBuilder( searchContext, absoluteFieldPath, (LuceneFieldConverter<?, Integer>) converter );
+		return new IntegerFieldSortBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }
