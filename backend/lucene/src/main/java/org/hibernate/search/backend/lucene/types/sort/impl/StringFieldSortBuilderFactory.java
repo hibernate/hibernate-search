@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class StringFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<String> {
 
-	public StringFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<String, ?> converter) {
+	public StringFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<?, String> converter) {
 		super( sortable, converter );
 	}
 
