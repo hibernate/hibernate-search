@@ -1171,6 +1171,7 @@
                         <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
                         <quiet>true</quiet>
                         <verbose>false</verbose>
+                        <failOnWarnings>${failOnJavaDocError}</failOnWarnings>
                         <failOnError>${failOnJavaDocError}</failOnError>
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
