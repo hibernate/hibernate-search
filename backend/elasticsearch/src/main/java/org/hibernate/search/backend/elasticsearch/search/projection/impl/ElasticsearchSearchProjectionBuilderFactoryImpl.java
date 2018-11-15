@@ -56,12 +56,12 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	}
 
 	@Override
-	public ObjectSearchProjectionBuilder object() {
+	public <O> ObjectSearchProjectionBuilder<O> object() {
 		return searchProjectionBackendContext.getObjectProjectionBuilder();
 	}
 
 	@Override
-	public ReferenceSearchProjectionBuilder reference() {
+	public <R> ReferenceSearchProjectionBuilder<R> reference() {
 		return searchProjectionBackendContext.getReferenceProjectionBuilder();
 	}
 
@@ -77,11 +77,11 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
-	public ElasticsearchSearchProjection<?> toImplementation(SearchProjection<?> projection) {
+	public <T> ElasticsearchSearchProjection<T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
-		return (ElasticsearchSearchProjection<?>) projection;
+		return (ElasticsearchSearchProjection<T>) projection;
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

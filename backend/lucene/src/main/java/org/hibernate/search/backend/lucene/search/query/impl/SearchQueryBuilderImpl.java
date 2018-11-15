@@ -6,27 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.util.List;
 import java.util.function.Function;
 
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-
-class SearchQueryBuilderImpl<C, T>
-		implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
+class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
@@ -36,8 +33,8 @@ class SearchQueryBuilderImpl<C, T>
 	private final SessionContextImplementor sessionContext;
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final HitExtractor<? super C> hitExtractor;
-	private final HitAggregator<C, List<T>> hitAggregator;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final LuceneSearchProjection<T> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
 	SearchQueryBuilderImpl(
@@ -47,8 +44,8 @@ class SearchQueryBuilderImpl<C, T>
 			LuceneSearchTargetModel searchTargetModel,
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator) {
+			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LuceneSearchProjection<T> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -58,8 +55,8 @@ class SearchQueryBuilderImpl<C, T>
 
 		this.elementCollector = new LuceneSearchQueryElementCollector();
 		this.storedFieldVisitor = storedFieldVisitor;
-		this.hitExtractor = hitExtractor;
-		this.hitAggregator = hitAggregator;
+		this.projectionHitMapper = projectionHitMapper;
+		this.rootProjection = rootProjection;
 	}
 
 	@Override
@@ -78,7 +75,7 @@ class SearchQueryBuilderImpl<C, T>
 				new SearchProjectionExecutionContext( sessionContext );
 
 		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>(
-				storedFieldVisitor, hitExtractor, hitAggregator, projectionExecutionContext
+				storedFieldVisitor, rootProjection, projectionHitMapper, projectionExecutionContext
 		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
@@ -89,7 +86,7 @@ class SearchQueryBuilderImpl<C, T>
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),
 				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
-				hitExtractor, searchResultExtractor );
+				rootProjection, searchResultExtractor );
 	}
 
 	@Override

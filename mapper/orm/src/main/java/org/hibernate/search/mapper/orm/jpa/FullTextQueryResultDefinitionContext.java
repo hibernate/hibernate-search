@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.jpa;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -19,26 +18,9 @@ public interface FullTextQueryResultDefinitionContext<O> {
 
 	// TODO add object loading options: ObjectLookupMethod, DatabaseRetrievalMethod, ...
 
-	default SearchQueryResultContext<? extends FullTextQuery<O>> asEntity() {
-		return asEntity( Function.identity() );
-	}
+	SearchQueryResultContext<? extends FullTextQuery<O>> asEntity();
 
-	default <P> SearchQueryResultContext<? extends FullTextQuery<P>> asProjection(SearchProjection<P> projection) {
-		return asProjection( Function.identity(), projection );
-	}
+	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(SearchProjection<T> projection);
 
-	default SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
-		return asProjections( Function.identity(), projections );
-	}
-
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asEntity(Function<O, T> hitTransformer);
-
-	<P, T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
-			Function<P, T> hitTransformer,
-			SearchProjection<P> projection);
-
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjections(
-			Function<List<?>, T> hitTransformer,
-			SearchProjection<?>... projections);
-
+	SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 }

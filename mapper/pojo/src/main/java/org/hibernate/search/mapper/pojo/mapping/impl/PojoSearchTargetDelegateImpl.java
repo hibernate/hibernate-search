@@ -60,29 +60,29 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsReference(Function<PojoReference, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public <Q> SearchQueryResultContext<Q> queryAsReference(
+			Function<SearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
 		return getIndexSearchTarget().queryAsReference(
-				sessionContext, hitTransformer, searchQueryWrapperFactory
+				sessionContext, searchQueryWrapperFactory
 		);
 	}
 
 	@Override
-	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
-			Function<P, T> hitTransformer, Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchProjection<P> projection) {
+	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			SearchProjection<T> projection) {
 		return getIndexSearchTarget().queryAsProjection(
-				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projection
 		);
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
-			Function<List<?>, T> hitTransformer, Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+	public <Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
+			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return getIndexSearchTarget().queryAsProjections(
-				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projections
 		);
 	}

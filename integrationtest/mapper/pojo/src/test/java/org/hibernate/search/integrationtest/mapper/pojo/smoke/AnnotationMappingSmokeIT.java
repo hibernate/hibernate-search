@@ -410,15 +410,15 @@ public class AnnotationMappingSmokeIT {
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
 
-			backendMock.expectSearchProjections(
+			backendMock.expectSearchProjection(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
 							.firstResultIndex( 3L )
 							.maxResultsCount( 2L ),
 					StubSearchWorkBehavior.of(
 							2L,
-							Arrays.asList( "text1" ),
-							Arrays.asList( (Object) null )
+							"text1",
+							(Object) null
 					)
 			);
 

@@ -8,10 +8,13 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 public interface StubSearchProjection<T> extends SearchProjection<T> {
 
-	void extract(ProjectionHitCollector collector, Object projectionFromIndex, FromIndexFieldValueConvertContext context);
+	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
+			FromIndexFieldValueConvertContext context);
 
+	T transform(LoadingResult<?> loadingResult, Object extractedData);
 }

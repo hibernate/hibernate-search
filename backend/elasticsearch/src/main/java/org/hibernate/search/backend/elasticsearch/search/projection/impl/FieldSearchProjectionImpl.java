@@ -12,7 +12,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -49,11 +50,17 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit,
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
 		FromIndexFieldValueConvertContext context = searchProjectionExecutionContext.getFromIndexFieldValueConvertContext();
-		collector.collectProjection( converter.convertFromProjection( fieldValue, context ) );
+		return converter.convertFromProjection( fieldValue, context );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (T) extractedData;
 	}
 
 	@Override

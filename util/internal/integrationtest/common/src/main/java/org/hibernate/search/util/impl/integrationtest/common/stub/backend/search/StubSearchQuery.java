@@ -8,24 +8,31 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
 final class StubSearchQuery<T> implements SearchQuery<T> {
 
 	private final StubBackend backend;
 	private final List<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
-	private final StubHitExtractor<?, List<T>> hitExtractor;
+	private final FromIndexFieldValueConvertContext convertContext;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final StubSearchProjection<T> rootProjection;
 
 	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
-			StubHitExtractor<?, List<T>> hitExtractor) {
+			FromIndexFieldValueConvertContext convertContext,
+			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;
 		this.workBuilder = workBuilder;
-		this.hitExtractor = hitExtractor;
+		this.convertContext = convertContext;
+		this.projectionHitMapper = projectionHitMapper;
+		this.rootProjection = rootProjection;
 	}
 
 	@Override
@@ -46,7 +53,7 @@ final class StubSearchQuery<T> implements SearchQuery<T> {
 	@Override
 	public SearchResult<T> execute() {
 		return backend.getBehavior().executeSearchWork(
-				indexNames, workBuilder.build(), hitExtractor
+				indexNames, workBuilder.build(), convertContext, projectionHitMapper, rootProjection
 		);
 	}
 

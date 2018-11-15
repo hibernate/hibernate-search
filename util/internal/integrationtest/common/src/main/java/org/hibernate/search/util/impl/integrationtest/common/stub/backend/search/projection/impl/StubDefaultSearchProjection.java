@@ -7,7 +7,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 class StubDefaultSearchProjection<T> implements StubSearchProjection<T> {
 
@@ -23,8 +24,14 @@ class StubDefaultSearchProjection<T> implements StubSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Object projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			FromIndexFieldValueConvertContext context) {
-		collector.collectProjection( projectionFromIndex );
+		return projectionFromIndex;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (T) extractedData;
 	}
 }

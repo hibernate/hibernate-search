@@ -7,17 +7,16 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 public class SearchBackendContext {
 	private final EventContext eventContext;
@@ -46,15 +45,15 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	<C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
+	<T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
 			LuceneSearchTargetModel searchTargetModel,
 			SessionContextImplementor sessionContext,
-			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator) {
+			ProjectionHitMapper<?, ?> projectionHitMapper,
+			LuceneSearchProjection<T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		Set<String> storedFields = new HashSet<>();
-		hitExtractor.contributeFields( storedFields );
+		rootProjection.contributeFields( storedFields );
 
 		return new SearchQueryBuilderImpl<>(
 				workFactory,
@@ -63,8 +62,8 @@ public class SearchBackendContext {
 				searchTargetModel,
 				sessionContext,
 				new ReusableDocumentStoredFieldVisitor( storedFields ),
-				hitExtractor,
-				hitAggregator
+				projectionHitMapper,
+				rootProjection
 		);
 	}
 }

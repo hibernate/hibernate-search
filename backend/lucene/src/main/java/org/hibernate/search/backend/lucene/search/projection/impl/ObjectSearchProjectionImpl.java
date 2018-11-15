@@ -8,16 +8,19 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.ObjectHitExtractor;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {
+public class ObjectSearchProjectionImpl<O> implements LuceneSearchProjection<O> {
 
+	@SuppressWarnings("rawtypes")
 	private static final ObjectSearchProjectionImpl INSTANCE = new ObjectSearchProjectionImpl();
 
-	static ObjectSearchProjectionImpl get() {
+	@SuppressWarnings("unchecked")
+	public static <T> ObjectSearchProjectionImpl<T> get() {
 		return INSTANCE;
 	}
 
@@ -26,18 +29,24 @@ class ObjectSearchProjectionImpl implements LuceneSearchProjection<Object> {
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		ObjectHitExtractor.get().contributeCollectors( luceneCollectorBuilder );
+		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		ObjectHitExtractor.get().contributeFields( absoluteFieldPaths );
+		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		ObjectHitExtractor.get().extract( collector, documentResult, context );
+		return mapper.planLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (O) loadingResult.getLoaded( extractedData );
 	}
 
 	@Override

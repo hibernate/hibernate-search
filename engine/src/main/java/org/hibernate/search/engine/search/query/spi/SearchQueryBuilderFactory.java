@@ -22,12 +22,15 @@ import org.hibernate.search.engine.search.SearchProjection;
 public interface SearchQueryBuilderFactory<C> {
 
 	<O> SearchQueryBuilder<O, C> asObject(SessionContextImplementor sessionContext,
-			HitAggregator<LoadingHitCollector, List<O>> hitAggregator);
+			ProjectionHitMapper<?, O> projectionHitMapper);
 
 	<T> SearchQueryBuilder<T, C> asReference(SessionContextImplementor sessionContext,
-			HitAggregator<ReferenceHitCollector, List<T>> hitAggregator);
+			ProjectionHitMapper<?, ?> projectionHitMapper);
 
-	<T> SearchQueryBuilder<T, C> asProjections(SessionContextImplementor sessionContext,
-			HitAggregator<ProjectionHitCollector, List<T>> hitAggregator, SearchProjection<?>... projection);
+	<T> SearchQueryBuilder<T, C> asProjection(SessionContextImplementor sessionContext,
+			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<T> projection);
+
+	SearchQueryBuilder<List<?>, C> asProjections(SessionContextImplementor sessionContext,
+			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<?>... projections);
 
 }

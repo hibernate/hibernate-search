@@ -6,28 +6,35 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
-import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
 public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQueryElementCollector> {
 
 	private final StubBackend backend;
 	private final StubSearchTargetModel searchTargetModel;
 	private final StubSearchWork.Builder workBuilder;
-	private final StubHitExtractor<?, List<T>> hitExtractor;
+	private final FromIndexFieldValueConvertContext convertContext;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final StubSearchProjection<T> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubSearchTargetModel searchTargetModel,
-			StubSearchWork.ResultType resultType, StubHitExtractor<?, List<T>> hitExtractor) {
+			StubSearchWork.ResultType resultType,
+			FromIndexFieldValueConvertContext convertContext,
+			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.searchTargetModel = searchTargetModel;
 		this.workBuilder = StubSearchWork.builder( resultType );
-		this.hitExtractor = hitExtractor;
+		this.convertContext = convertContext;
+		this.projectionHitMapper = projectionHitMapper;
+		this.rootProjection = rootProjection;
 	}
 
 	@Override
@@ -43,8 +50,10 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	@Override
 	public <Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
 		StubSearchQuery<T> searchQuery = new StubSearchQuery<>(
-				backend, searchTargetModel.getIndexNames(), workBuilder, hitExtractor
+				backend, searchTargetModel.getIndexNames(), workBuilder, convertContext,
+				projectionHitMapper, rootProjection
 		);
+
 		return searchQueryWrapperFactory.apply( searchQuery );
 	}
 }

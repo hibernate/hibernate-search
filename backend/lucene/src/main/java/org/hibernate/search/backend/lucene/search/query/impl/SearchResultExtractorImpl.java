@@ -7,36 +7,37 @@
 package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
-import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
+class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final HitExtractor<? super C> hitExtractor;
-	private final HitAggregator<C, List<T>> hitAggregator;
+	private final LuceneSearchProjection<T> rootProjection;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 
 	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
 
 	SearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator,
+			LuceneSearchProjection<T> rootProjection,
+			ProjectionHitMapper<?, ?> projectionHitMapper,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		this.storedFieldVisitor = storedFieldVisitor;
-		this.hitExtractor = hitExtractor;
-		this.hitAggregator = hitAggregator;
+		this.rootProjection = rootProjection;
+		this.projectionHitMapper = projectionHitMapper;
 		this.searchProjectionExecutionContext = searchProjectionExecutionContext;
 	}
 
@@ -58,22 +59,28 @@ class SearchResultExtractorImpl<C, T> implements SearchResultExtractor<T> {
 		};
 	}
 
+	@SuppressWarnings("unchecked")
 	private List<T> extractHits(IndexSearcher indexSearcher, TopDocs topDocs) throws IOException {
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
 
-		hitAggregator.init( topDocs.scoreDocs.length );
+		List<Object> hits = new ArrayList<>( topDocs.scoreDocs.length );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
 			Document document = storedFieldVisitor.getDocumentAndReset();
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
-			C hitCollector = hitAggregator.nextCollector();
-			hitExtractor.extract( hitCollector, luceneResult, searchProjectionExecutionContext );
+			hits.add( rootProjection.extract( projectionHitMapper, luceneResult, searchProjectionExecutionContext ) );
 		}
 
-		return Collections.unmodifiableList( hitAggregator.build() );
+		LoadingResult<?> loadingResult = projectionHitMapper.load();
+
+		for ( int i = 0; i < hits.size(); i++ ) {
+			hits.set( i, rootProjection.transform( loadingResult, hits.get( i ) ) );
+		}
+
+		return Collections.unmodifiableList( (List<T>) hits );
 	}
 }

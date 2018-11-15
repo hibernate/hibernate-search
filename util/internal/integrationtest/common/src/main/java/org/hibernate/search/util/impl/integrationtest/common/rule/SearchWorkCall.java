@@ -6,33 +6,49 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
 class SearchWorkCall<T> {
 
 	private final List<String> indexNames;
 	private final StubSearchWork work;
-	private final StubHitExtractor<?, List<T>> hitExtractor;
+	private final FromIndexFieldValueConvertContext convertContext;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 
-	SearchWorkCall(List<String> indexNames, StubSearchWork work, StubHitExtractor<?, List<T>> hitExtractor) {
+	SearchWorkCall(List<String> indexNames,
+			StubSearchWork work,
+			FromIndexFieldValueConvertContext convertContext,
+			ProjectionHitMapper<?, ?> projectionHitMapper,
+			StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.hitExtractor = hitExtractor;
+		this.convertContext = convertContext;
+		this.projectionHitMapper = projectionHitMapper;
+		this.rootProjection = rootProjection;
 		this.behavior = null;
 	}
 
-	SearchWorkCall(List<String> indexNames, StubSearchWork work, StubSearchWorkBehavior<?> behavior) {
+	SearchWorkCall(List<String> indexNames,
+			StubSearchWork work,
+			StubSearchWorkBehavior<?> behavior) {
 		this.indexNames = indexNames;
 		this.work = work;
-		this.hitExtractor = null;
+		this.convertContext = null;
+		this.projectionHitMapper = null;
+		this.rootProjection = null;
 		this.behavior = behavior;
 	}
 
@@ -43,14 +59,33 @@ class SearchWorkCall<T> {
 		StubSearchWorkAssert.assertThat( actualCall.work )
 				.as( "Search work on indexes " + indexNames + " did not match: " )
 				.matches( work );
-		/*
-		 * Checking the result type in the work assertion above guarantees
-		 * that the hit collector has the correct type. We can cast safely.
-		 */
+
 		long totalHitCount = behavior.getTotalHitCount();
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		List<U> hits = (List<U>) ((StubHitExtractor) actualCall.hitExtractor).extract( behavior.getRawHits() );
-		return new SearchResultImpl<>( totalHitCount, hits );
+
+		return new SearchResultImpl<>( totalHitCount, getResults( actualCall.convertContext,
+				actualCall.projectionHitMapper, actualCall.rootProjection, behavior.getRawHits() ) );
+	}
+
+	private static <U> List<U> getResults(FromIndexFieldValueConvertContext actualConvertContext,
+			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
+			StubSearchProjection<U> actualRootProjection,
+			List<?> rawHits) {
+		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
+
+		for ( Object rawHit : rawHits ) {
+			extractedElements.add(
+					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualConvertContext ) );
+		}
+
+		LoadingResult<?> loadingResult = actualProjectionHitMapper.load();
+
+		List<U> results = new ArrayList<>( rawHits.size() );
+
+		for ( Object extractedElement : extractedElements ) {
+			results.add( (U) actualRootProjection.transform( loadingResult, extractedElement ) );
+		}
+
+		return results;
 	}
 
 	@Override
@@ -59,6 +94,7 @@ class SearchWorkCall<T> {
 	}
 
 	private static final class SearchResultImpl<T> implements SearchResult<T> {
+
 		private final long totalHitCount;
 		private final List<T> hits;
 
@@ -71,6 +107,7 @@ class SearchWorkCall<T> {
 		public long getHitCount() {
 			return totalHitCount;
 		}
+
 		@Override
 		public List<T> getHits() {
 			return hits;

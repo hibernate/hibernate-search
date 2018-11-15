@@ -13,7 +13,8 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T> {
 
@@ -46,11 +47,17 @@ class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
 		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
 		FromIndexFieldValueConvertContext convertContext = context.getFromIndexFieldValueConvertContext();
-		collector.collectProjection( converter.convertFromProjection( rawValue, convertContext ) );
+		return converter.convertFromProjection( rawValue, convertContext );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (T) extractedData;
 	}
 
 	@Override

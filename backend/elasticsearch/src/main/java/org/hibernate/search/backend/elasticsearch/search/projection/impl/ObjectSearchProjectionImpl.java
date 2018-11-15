@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-class ObjectSearchProjectionImpl implements ElasticsearchSearchProjection<Object> {
+public class ObjectSearchProjectionImpl<O> implements ElasticsearchSearchProjection<O> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	ObjectSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+	public ObjectSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 
@@ -25,8 +25,15 @@ class ObjectSearchProjectionImpl implements ElasticsearchSearchProjection<Object
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		collector.collectForLoading( helper.extractDocumentReference( hit ) );
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+		return projectionHitMapper.planLoading( helper.extractDocumentReference( hit ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (O) loadingResult.getLoaded( extractedData );
 	}
 
 	@Override

@@ -9,17 +9,16 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.CompositeHitExtractor;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.CompositeSearchProjectionImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
@@ -41,49 +40,54 @@ class SearchQueryBuilderFactoryImpl
 
 	@Override
 	public <O> SearchQueryBuilder<O, ElasticsearchSearchQueryElementCollector> asObject(
-			SessionContextImplementor sessionContext, HitAggregator<LoadingHitCollector, List<O>> hitAggregator) {
+			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
 		return createSearchQueryBuilder(
-				sessionContext, searchBackendContext.getObjectHitExtractor(), hitAggregator
+				sessionContext, projectionHitMapper,
+				new ObjectSearchProjectionImpl<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asReference(
-			SessionContextImplementor sessionContext, HitAggregator<ReferenceHitCollector, List<T>> hitAggregator) {
+			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper) {
 		return createSearchQueryBuilder(
-				sessionContext, searchBackendContext.getReferenceHitExtractor(), hitAggregator
+				sessionContext, projectionHitMapper,
+				new ReferenceSearchProjectionImpl<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
 	@Override
-	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjections(
-			SessionContextImplementor sessionContext, HitAggregator<ProjectionHitCollector, List<T>> hitAggregator,
+	public <T> SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> asProjection(
+			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			SearchProjection<T> projection) {
+		return createSearchQueryBuilder( sessionContext, projectionHitMapper,
+				searchProjectionFactory.toImplementation( projection ) );
+	}
+
+	@Override
+	public SearchQueryBuilder<List<?>, ElasticsearchSearchQueryElementCollector> asProjections(
+			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
 			SearchProjection<?>... projections) {
-		HitExtractor<? super ProjectionHitCollector> hitExtractor = createProjectionHitExtractor( projections );
-
-		return createSearchQueryBuilder( sessionContext, hitExtractor, hitAggregator );
+		return createSearchQueryBuilder( sessionContext, projectionHitMapper, createRootProjection( projections ) );
 	}
 
-	private HitExtractor<? super ProjectionHitCollector> createProjectionHitExtractor(
-			SearchProjection<?>[] projections) {
-		if ( projections.length == 1 ) {
-			return searchProjectionFactory.toImplementation( projections[0] );
-		}
+	private ElasticsearchSearchProjection<List<?>> createRootProjection(SearchProjection<?>[] projections) {
+		List<ElasticsearchSearchProjection<?>> children = new ArrayList<>( projections.length );
 
-		List<HitExtractor<? super ProjectionHitCollector>> extractors = new ArrayList<>( projections.length );
 		for ( int i = 0; i < projections.length; ++i ) {
-			extractors.add( searchProjectionFactory.toImplementation( projections[i] ) );
+			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
 		}
 
-		return new CompositeHitExtractor<>( extractors );
+		return new CompositeSearchProjectionImpl( children );
 	}
 
-	private <C, T> SearchQueryBuilderImpl<C, T> createSearchQueryBuilder(
-			SessionContextImplementor sessionContext, HitExtractor<? super C> hitExtractor, HitAggregator<C, List<T>> hitAggregator) {
+	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
+			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
+			ElasticsearchSearchProjection<T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchTargetModel.getElasticsearchIndexNames(),
 				sessionContext,
-				hitExtractor, hitAggregator
+				projectionHitMapper, rootProjection
 		);
 	}
 }

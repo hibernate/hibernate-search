@@ -52,12 +52,12 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 	}
 
 	@Override
-	public ObjectSearchProjectionBuilder object() {
+	public <O> ObjectSearchProjectionBuilder<O> object() {
 		return ObjectSearchProjectionBuilderImpl.get();
 	}
 
 	@Override
-	public ReferenceSearchProjectionBuilder reference() {
+	public <R> ReferenceSearchProjectionBuilder<R> reference() {
 		return ReferenceSearchProjectionBuilderImpl.get();
 	}
 
@@ -73,11 +73,11 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
-	public LuceneSearchProjection<?> toImplementation(SearchProjection<?> projection) {
+	public <T> LuceneSearchProjection<T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
-		return (LuceneSearchProjection<?>) projection;
+		return (LuceneSearchProjection<T>) projection;
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

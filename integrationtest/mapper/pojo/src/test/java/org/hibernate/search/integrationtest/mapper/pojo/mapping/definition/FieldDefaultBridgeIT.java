@@ -12,10 +12,8 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Date;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
+import java.util.Date;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.search.SearchQuery;
@@ -28,7 +26,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -391,26 +388,26 @@ public class FieldDefaultBridgeIT {
 		// Searching
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			JavaBeanSearchTarget searchTarget = manager.search( entityType );
-			SearchQuery<List<?>> query = searchTarget.query()
-					.asProjections( searchTarget.projection().field( "myProperty" ).toProjection() )
+			SearchQuery<P> query = searchTarget.query()
+					.asProjection( searchTarget.projection().field( "myProperty", propertyType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 
-			backendMock.expectSearchProjections(
+			backendMock.expectSearchProjection(
 					Collections.singletonList( INDEX_NAME ),
 					b -> {
 					},
 					StubSearchWorkBehavior.of(
 							2L,
-							Arrays.asList( indexedFieldValue ),
-							Arrays.asList( indexedFieldValue )
+							indexedFieldValue,
+							indexedFieldValue
 					)
 			);
 
 			assertThat( query )
 					.hasHitsExactOrder(
-							Collections.singletonList( propertyValue ),
-							Collections.singletonList( propertyValue )
+							propertyValue,
+							propertyValue
 					);
 		}
 	}

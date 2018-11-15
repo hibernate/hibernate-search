@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.javabean.search.dsl.query;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -18,15 +17,7 @@ public interface JavaBeanQueryResultDefinitionContext {
 
 	SearchQueryResultContext<SearchQuery<PojoReference>> asReference();
 
-	<T> SearchQueryResultContext<SearchQuery<T>> asReference(Function<PojoReference, T> hitTransformer);
-
-	<P> SearchQueryResultContext<SearchQuery<P>> asProjection(SearchProjection<P> projection);
-
-	<P, T> SearchQueryResultContext<SearchQuery<T>> asProjection(Function<P, T> hitTransformer,
-			SearchProjection<P> projection);
+	<T> SearchQueryResultContext<SearchQuery<T>> asProjection(SearchProjection<T> projection);
 
 	SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
-
-	<T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<List<?>, T> hitTransformer,
-			SearchProjection<?>... projections);
 }

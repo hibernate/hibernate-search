@@ -11,7 +11,8 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -42,9 +43,14 @@ class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Doub
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		collector.collectProjection( unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) ) );
+		return unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) );
+	}
+
+	@Override
+	public Double transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (Double) extractedData;
 	}
 
 	@Override

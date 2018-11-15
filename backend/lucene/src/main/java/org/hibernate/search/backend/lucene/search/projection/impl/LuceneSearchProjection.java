@@ -6,10 +6,44 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.HitExtractor;
+import java.util.Set;
+
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public interface LuceneSearchProjection<T> extends SearchProjection<T>, HitExtractor<ProjectionHitCollector> {
+public interface LuceneSearchProjection<T> extends SearchProjection<T>, LuceneCollectorProvider {
 
+	/**
+	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
+	 * other fields e.g. if the stored fields have different names.
+	 *
+	 * @param absoluteFieldPaths The set of absolute field paths contributed.
+	 */
+	void contributeFields(Set<String> absoluteFieldPaths);
+
+	/**
+	 * Perform hit extraction.
+	 *
+	 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
+	 * @param luceneResult A wrapper on top of the Lucene document extracted from the index.
+	 * @param searchProjectionExecutionContext An execution context for the search projections.
+	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
+	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object)}.
+	 */
+	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
+			SearchProjectionExecutionContext context);
+
+	/**
+	 * Transform the extracted data to the actual projection result.
+	 *
+	 * @param loadingResult Container containing all the entities that have been loaded by the
+	 * {@link ProjectionHitMapper}.
+	 * @param extractedData The extracted data to transform, coming from the
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExecutionContext)} method.
+	 * @return The final result considered as a hit.
+	 */
+	T transform(LoadingResult<?> loadingResult, Object extractedData);
 }

@@ -14,24 +14,19 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryResultContextImpl;
-import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.SearchPredicateFactoryContextImpl;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.impl.SearchProjectionFactoryContextImpl;
+import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
+import org.hibernate.search.engine.search.dsl.query.impl.SearchQueryResultContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.impl.SearchTargetSortRootContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.engine.search.query.impl.MultipleProjectionsHitAggregator;
-import org.hibernate.search.engine.search.query.impl.ObjectHitAggregator;
-import org.hibernate.search.engine.search.query.impl.ReferenceHitAggregator;
-import org.hibernate.search.engine.search.query.impl.SingleProjectionHitAggregator;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
-import org.hibernate.search.engine.search.query.spi.LoadingHitCollector;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
-import org.hibernate.search.engine.search.query.spi.ReferenceHitCollector;
+import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.query.impl.ProjectionHitMapperImpl;
+import org.hibernate.search.engine.search.query.impl.ReferenceHitMapperImpl;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R, O> {
@@ -58,11 +53,11 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
-		HitAggregator<LoadingHitCollector, List<T>> hitAggregator =
-				new ObjectHitAggregator<>( documentReferenceTransformer, objectLoader );
+		ProjectionHitMapper<R, T> projectionHitMapper =
+				new ProjectionHitMapperImpl<>( documentReferenceTransformer, objectLoader );
 
 		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asObject( sessionContext, hitAggregator );
+				.asObject( sessionContext, projectionHitMapper );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
@@ -70,14 +65,12 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsReference(SessionContextImplementor sessionContext,
-			Function<R, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
-		HitAggregator<ReferenceHitCollector, List<T>> hitAggregator =
-				new ReferenceHitAggregator<>( hitTransformer.compose( documentReferenceTransformer ) );
+	public <Q> SearchQueryResultContext<Q> queryAsReference(SessionContextImplementor sessionContext,
+			Function<SearchQuery<R>, Q> searchQueryWrapperFactory) {
+		ProjectionHitMapper<R, Void> referenceHitMapper = new ReferenceHitMapperImpl<>( documentReferenceTransformer );
 
-		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asReference( sessionContext, hitAggregator );
+		SearchQueryBuilder<R, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
+				.asReference( sessionContext, referenceHitMapper );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
@@ -85,19 +78,14 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <P, T, Q> SearchQueryResultContext<Q> queryAsProjection(SessionContextImplementor sessionContext,
-			ObjectLoader<R, O> objectLoader, Function<P, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<P> projection) {
-		// The cast is safe as long as the projection actually results in objects of type P
-		@SuppressWarnings("unchecked")
-		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
-				new SingleProjectionHitAggregator<>(
-						documentReferenceTransformer, objectLoader,
-						(Function<Object, T>) hitTransformer
-				);
+	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(SessionContextImplementor sessionContext,
+			ObjectLoader<R, O> objectLoader,
+			Function<SearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<T> projection) {
+		ProjectionHitMapper<R, O> projectionHitMapper =
+				new ProjectionHitMapperImpl<>( documentReferenceTransformer, objectLoader );
 
 		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asProjections( sessionContext, hitAggregator, projection );
+				.asProjection( sessionContext, projectionHitMapper, projection );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
@@ -105,18 +93,16 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	}
 
 	@Override
-	public <T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	public <Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<List<?>, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
-		HitAggregator<ProjectionHitCollector, List<T>> hitAggregator =
-				new MultipleProjectionsHitAggregator<>( documentReferenceTransformer, objectLoader, hitTransformer,
-						projections.length );
+		ProjectionHitMapper<R, O> projectionHitMapper =
+				new ProjectionHitMapperImpl<>( documentReferenceTransformer, objectLoader );
 
-		SearchQueryBuilder<T, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
-				.asProjections( sessionContext, hitAggregator, projections );
+		SearchQueryBuilder<List<?>, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
+				.asProjections( sessionContext, projectionHitMapper, projections );
 
 		return new SearchQueryResultContextImpl<>(
 				searchTargetContext, builder, searchQueryWrapperFactory
