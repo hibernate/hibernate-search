@@ -10,11 +10,13 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
 
 
-public class ObjectSearchProjectionBuilderImpl implements ObjectSearchProjectionBuilder {
+public class ObjectSearchProjectionBuilderImpl<O> implements ObjectSearchProjectionBuilder<O> {
 
+	@SuppressWarnings("rawtypes")
 	private static final ObjectSearchProjectionBuilderImpl INSTANCE = new ObjectSearchProjectionBuilderImpl();
 
-	public static ObjectSearchProjectionBuilderImpl get() {
+	@SuppressWarnings("unchecked")
+	public static <T> ObjectSearchProjectionBuilderImpl<T> get() {
 		return INSTANCE;
 	}
 
@@ -22,7 +24,7 @@ public class ObjectSearchProjectionBuilderImpl implements ObjectSearchProjection
 	}
 
 	@Override
-	public SearchProjection<Object> build() {
+	public SearchProjection<O> build() {
 		return ObjectSearchProjectionImpl.get();
 	}
 }

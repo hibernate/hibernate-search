@@ -7,27 +7,26 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.HitExtractor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.HitAggregator;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class SearchQueryBuilderImpl<C, T>
+class SearchQueryBuilderImpl<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchWorkFactory workFactory;
@@ -39,8 +38,8 @@ class SearchQueryBuilderImpl<C, T>
 	private final Set<String> routingKeys;
 
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
-	private final HitExtractor<? super C> hitExtractor;
-	private final HitAggregator<C, List<T>> hitAggregator;
+	private final ProjectionHitMapper<?, ?> projectionHitMapper;
+	private final ElasticsearchSearchProjection<T> rootProjection;
 
 	SearchQueryBuilderImpl(
 			ElasticsearchWorkFactory workFactory,
@@ -48,8 +47,8 @@ class SearchQueryBuilderImpl<C, T>
 			MultiTenancyStrategy multiTenancyStrategy,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
-			HitExtractor<? super C> hitExtractor,
-			HitAggregator<C, List<T>> hitAggregator) {
+			ProjectionHitMapper<?, ?> projectionHitMapper,
+			ElasticsearchSearchProjection<T> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -59,8 +58,8 @@ class SearchQueryBuilderImpl<C, T>
 		this.routingKeys = new HashSet<>();
 
 		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
-		this.hitExtractor = hitExtractor;
-		this.hitAggregator = hitAggregator;
+		this.projectionHitMapper = projectionHitMapper;
+		this.rootProjection = rootProjection;
 	}
 
 	@Override
@@ -89,10 +88,10 @@ class SearchQueryBuilderImpl<C, T>
 		SearchProjectionExecutionContext searchProjectionExecutionContext = elementCollector
 				.toSearchProjectionExecutionContext( sessionContext );
 
-		hitExtractor.contributeRequest( payload, searchProjectionExecutionContext );
+		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
 		SearchResultExtractor<T> searchResultExtractor =
-				new SearchResultExtractorImpl<>( hitExtractor, hitAggregator, searchProjectionExecutionContext );
+				new SearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
 		return new ElasticsearchSearchQuery<>(
 				workFactory, queryOrchestrator,

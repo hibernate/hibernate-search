@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-class ReferenceSearchProjectionImpl implements ElasticsearchSearchProjection<Object> {
+public class ReferenceSearchProjectionImpl<R> implements ElasticsearchSearchProjection<R> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	ReferenceSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+	public ReferenceSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 
@@ -25,8 +25,15 @@ class ReferenceSearchProjectionImpl implements ElasticsearchSearchProjection<Obj
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		collector.collectReference( helper.extractDocumentReference( hit ) );
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+		return projectionHitMapper.convertReference( helper.extractDocumentReference( hit ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public R transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (R) extractedData;
 	}
 
 	@Override

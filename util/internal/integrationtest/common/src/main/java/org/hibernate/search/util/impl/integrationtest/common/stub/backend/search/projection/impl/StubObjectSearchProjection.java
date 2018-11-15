@@ -8,15 +8,16 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class StubObjectSearchProjection<T> implements StubSearchProjection<T> {
+public class StubObjectSearchProjection<T> implements StubSearchProjection<T> {
 
 	@SuppressWarnings("rawtypes")
 	private static final StubSearchProjection INSTANCE = new StubObjectSearchProjection();
 
 	@SuppressWarnings("unchecked")
-	static <T> StubObjectSearchProjection<T> get() {
+	public static <T> StubObjectSearchProjection<T> get() {
 		return (StubObjectSearchProjection<T>) INSTANCE;
 	}
 
@@ -24,8 +25,14 @@ class StubObjectSearchProjection<T> implements StubSearchProjection<T> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, Object projectionFromIndex,
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			FromIndexFieldValueConvertContext context) {
-		collector.collectForLoading( (DocumentReference) projectionFromIndex );
+		return projectionHitMapper.planLoading( (DocumentReference) projectionFromIndex );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (T) loadingResult.getLoaded( extractedData );
 	}
 }

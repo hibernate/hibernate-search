@@ -12,7 +12,8 @@ import java.util.regex.Pattern;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -54,7 +55,8 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		Optional<Double> distance;
 
 		Integer distanceSortIndex = searchProjectionExecutionContext.getDistanceSortIndex( absoluteFieldPath, center );
@@ -82,8 +84,13 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 			}
 		}
 
-		collector.collectProjection( distance.isPresent() && Double.isFinite( distance.get() ) ?
-				unit.fromMeters( distance.get() ) : null );
+		return distance.isPresent() && Double.isFinite( distance.get() ) ?
+				unit.fromMeters( distance.get() ) : null;
+	}
+
+	@Override
+	public Double transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (Double) extractedData;
 	}
 
 	@Override

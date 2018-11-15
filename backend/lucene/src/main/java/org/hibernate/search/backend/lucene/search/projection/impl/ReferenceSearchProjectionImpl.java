@@ -8,16 +8,19 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.ReferenceHitExtractor;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class ReferenceSearchProjectionImpl implements LuceneSearchProjection<Object> {
+public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<R> {
 
+	@SuppressWarnings("rawtypes")
 	private static final ReferenceSearchProjectionImpl INSTANCE = new ReferenceSearchProjectionImpl();
 
-	static ReferenceSearchProjectionImpl get() {
+	@SuppressWarnings("unchecked")
+	public static <T> ReferenceSearchProjectionImpl<T> get() {
 		return INSTANCE;
 	}
 
@@ -26,18 +29,24 @@ class ReferenceSearchProjectionImpl implements LuceneSearchProjection<Object> {
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		ReferenceHitExtractor.get().contributeCollectors( luceneCollectorBuilder );
+		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		ReferenceHitExtractor.get().contributeFields( absoluteFieldPaths );
+		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		ReferenceHitExtractor.get().extract( collector, documentResult, context );
+		return mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public R transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (R) extractedData;
 	}
 
 	@Override

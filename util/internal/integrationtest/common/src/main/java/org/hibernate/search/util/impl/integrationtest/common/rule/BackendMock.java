@@ -15,15 +15,16 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.query.StubHitExtractor;
-
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -114,6 +115,11 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSearchProjections(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
 			StubSearchWorkBehavior<List<?>> behavior) {
+		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
+	}
+
+	public BackendMock expectSearchProjection(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
+			StubSearchWorkBehavior<?> behavior) {
 		return expectSearch( indexNames, contributor, StubSearchWork.ResultType.PROJECTIONS, behavior );
 	}
 
@@ -280,8 +286,11 @@ public class BackendMock implements TestRule {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-				StubHitExtractor<?, List<T>> hitExtractor) {
-			return searchCalls.verify( new SearchWorkCall<>( indexNames, work, hitExtractor ), SearchWorkCall::<T>verify );
+				FromIndexFieldValueConvertContext convertContext,
+				ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
+			return searchCalls.verify(
+					new SearchWorkCall<>( indexNames, work, convertContext, projectionHitMapper, rootProjection ),
+					SearchWorkCall::<T>verify );
 		}
 	}
 

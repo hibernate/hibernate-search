@@ -20,8 +20,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 
 /**
  * @param <R> The type of references, i.e. the type of hits returned by
- * {@link #queryAsReference(SessionContextImplementor, Function, Function) reference queries}
- * when not using any hit transformer,
+ * {@link #queryAsReference(SessionContextImplementor, Function) reference queries},
  * or the type of objects returned for {@link SearchProjectionFactoryContext#reference() reference projections}.
  * @param <O> The type of loaded objects, i.e. the type of hits returned by
  * {@link #queryAsLoadedObject(SessionContextImplementor, ObjectLoader, Function) loaded object queries}
@@ -35,10 +34,9 @@ public interface MappedIndexSearchTarget<R, O> {
 			ObjectLoader<R, T> objectLoader,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
 
-	<T, Q> SearchQueryResultContext<Q> queryAsReference(
+	<Q> SearchQueryResultContext<Q> queryAsReference(
 			SessionContextImplementor sessionContext,
-			Function<R, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
+			Function<SearchQuery<R>, Q> searchQueryWrapperFactory);
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
@@ -46,12 +44,11 @@ public interface MappedIndexSearchTarget<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<P, T, Q> SearchQueryResultContext<Q> queryAsProjection(
+	<T, Q> SearchQueryResultContext<Q> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<P, T> hitTransformer,
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchProjection<P> projection);
+			SearchProjection<T> projection);
 
 	SearchPredicateFactoryContext predicate();
 
@@ -61,11 +58,10 @@ public interface MappedIndexSearchTarget<R, O> {
 	 * will be wrong.
 	 * In particular, we cannot accept an ObjectLoader<R, T> like we do in queryAsLoadedObject(...).
 	 */
-	<T, Q> SearchQueryResultContext<Q> queryAsProjections(
+	<Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<List<?>, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
 
 	SearchSortContainerContext sort();

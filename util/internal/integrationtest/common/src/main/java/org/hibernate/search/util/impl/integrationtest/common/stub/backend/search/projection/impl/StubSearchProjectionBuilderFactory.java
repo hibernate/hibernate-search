@@ -50,20 +50,20 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public ObjectSearchProjectionBuilder object() {
-		return new ObjectSearchProjectionBuilder() {
+	public <O> ObjectSearchProjectionBuilder<O> object() {
+		return new ObjectSearchProjectionBuilder<O>() {
 			@Override
-			public SearchProjection<Object> build() {
+			public SearchProjection<O> build() {
 				return StubObjectSearchProjection.get();
 			}
 		};
 	}
 
 	@Override
-	public ReferenceSearchProjectionBuilder reference() {
-		return new ReferenceSearchProjectionBuilder() {
+	public <R> ReferenceSearchProjectionBuilder<R> reference() {
+		return new ReferenceSearchProjectionBuilder<R>() {
 			@Override
-			public SearchProjection<Object> build() {
+			public SearchProjection<R> build() {
 				return StubReferenceSearchProjection.get();
 			}
 		};

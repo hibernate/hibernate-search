@@ -6,15 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.extraction.impl.DocumentReferenceExtractorHelper;
-
 public class SearchProjectionBackendContext {
 
 	private final DocumentReferenceSearchProjectionBuilderImpl documentReferenceProjectionBuilder;
+	@SuppressWarnings("rawtypes")
 	private final ObjectSearchProjectionBuilderImpl objectProjectionBuilder;
+	@SuppressWarnings("rawtypes")
 	private final ReferenceSearchProjectionBuilderImpl referenceProjectionBuilder;
 	private final ScoreSearchProjectionBuilderImpl scoreProjectionBuilder;
 
+	@SuppressWarnings("rawtypes")
 	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper) {
 		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
 		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
@@ -26,11 +27,13 @@ public class SearchProjectionBackendContext {
 		return documentReferenceProjectionBuilder;
 	}
 
-	ObjectSearchProjectionBuilderImpl getObjectProjectionBuilder() {
+	@SuppressWarnings("unchecked")
+	<O> ObjectSearchProjectionBuilderImpl<O> getObjectProjectionBuilder() {
 		return objectProjectionBuilder;
 	}
 
-	ReferenceSearchProjectionBuilderImpl getReferenceProjectionBuilder() {
+	@SuppressWarnings("unchecked")
+	<R> ReferenceSearchProjectionBuilderImpl<R> getReferenceProjectionBuilder() {
 		return referenceProjectionBuilder;
 	}
 

@@ -20,9 +20,9 @@ public interface SearchProjectionBuilderFactory {
 
 	<T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz);
 
-	ObjectSearchProjectionBuilder object();
+	<O> ObjectSearchProjectionBuilder<O> object();
 
-	ReferenceSearchProjectionBuilder reference();
+	<R> ReferenceSearchProjectionBuilder<R> reference();
 
 	ScoreSearchProjectionBuilder score();
 

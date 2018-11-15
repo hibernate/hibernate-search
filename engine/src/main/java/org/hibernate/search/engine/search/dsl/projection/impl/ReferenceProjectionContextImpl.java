@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionContext<R> {
 
-	private ReferenceSearchProjectionBuilder referenceProjectionBuilder;
+	private ReferenceSearchProjectionBuilder<R> referenceProjectionBuilder;
 
 	ReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.referenceProjectionBuilder = factory.reference();
@@ -27,9 +27,8 @@ public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionCon
 	 * with generic type arguments that are consistent with the type of object loaders.
 	 * See comments in MappedIndexSearchTarget.
 	 */
-	@SuppressWarnings("unchecked")
 	public SearchProjection<R> toProjection() {
-		return (SearchProjection<R>) referenceProjectionBuilder.build();
+		return referenceProjectionBuilder.build();
 	}
 
 }

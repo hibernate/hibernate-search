@@ -10,7 +10,8 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.engine.search.query.spi.ProjectionHitCollector;
+import org.hibernate.search.engine.search.query.spi.LoadingResult;
+import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
 
@@ -34,9 +35,14 @@ class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
 	}
 
 	@Override
-	public void extract(ProjectionHitCollector collector, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		collector.collectProjection( documentResult.getScore() );
+		return documentResult.getScore();
+	}
+
+	@Override
+	public Float transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (Float) extractedData;
 	}
 
 	@Override

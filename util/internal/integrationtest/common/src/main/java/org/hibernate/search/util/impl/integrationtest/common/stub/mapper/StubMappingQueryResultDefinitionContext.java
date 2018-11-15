@@ -44,15 +44,10 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		return asReference( Function.identity() );
 	}
 
-	public <T> SearchQueryResultContext<SearchQuery<T>> asReference(Function<R, T> hitTransformer) {
-		return asReference( hitTransformer, Function.identity() );
-	}
-
-	public <T, Q> SearchQueryResultContext<Q> asReference(
-			Function<R, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public <Q> SearchQueryResultContext<Q> asReference(
+			Function<SearchQuery<R>, Q> searchQueryWrapperFactory) {
 		return indexSearchTarget.queryAsReference(
-				sessionContext, hitTransformer, searchQueryWrapperFactory
+				sessionContext, searchQueryWrapperFactory
 		);
 	}
 
@@ -60,19 +55,11 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		return asProjection( Function.identity(), projection );
 	}
 
-	public <P, T> SearchQueryResultContext<SearchQuery<T>> asProjection(Function<P, T> hitTransformer,
-			SearchProjection<P> projection) {
-		return asProjection(
-				hitTransformer, Function.identity(),
-				projection
-		);
-	}
-
-	public <P, T, Q> SearchQueryResultContext<Q> asProjection(Function<P, T> hitTransformer,
+	public <T, Q> SearchQueryResultContext<Q> asProjection(
 			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
-			SearchProjection<P> projection) {
+			SearchProjection<T> projection) {
 		return indexSearchTarget.queryAsProjection(
-				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projection
 		);
 	}
@@ -81,19 +68,11 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 		return asProjections( Function.identity(), projections );
 	}
 
-	public <T> SearchQueryResultContext<SearchQuery<T>> asProjections(Function<List<?>, T> hitTransformer,
-			SearchProjection<?>... projections) {
-		return asProjections(
-				hitTransformer, Function.identity(),
-				projections
-		);
-	}
-
-	public <T, Q> SearchQueryResultContext<Q> asProjections(Function<List<?>, T> hitTransformer,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+	public <Q> SearchQueryResultContext<Q> asProjections(
+			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return indexSearchTarget.queryAsProjections(
-				sessionContext, objectLoader, hitTransformer, searchQueryWrapperFactory,
+				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projections
 		);
 	}
