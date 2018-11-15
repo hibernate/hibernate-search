@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -20,8 +21,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
+import org.hibernate.search.integrationtest.backend.tck.search.sort.SearchSortByFieldIT;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
@@ -32,9 +37,12 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Implements {@link org.hibernate.search.integrationtest.backend.tck.search.sort.SearchSortByFieldIT} for a {@link Boolean} field type
+ * Tests sorting and ranging behaviour querying a boolean type field
+ *
+ * @see SearchSortByFieldIT
+ * @see RangeSearchPredicateIT
  */
-public class BooleanSearchSortByFieldIT {
+public class BooleanSortAndRangeQueryIT {
 
 	public static final String INDEX_NAME = "myIndexName";
 	public static final String FIELD_PATH = "boolean";
@@ -67,7 +75,7 @@ public class BooleanSearchSortByFieldIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private SearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
 				.asReference()
@@ -76,23 +84,61 @@ public class BooleanSearchSortByFieldIT {
 				.build();
 	}
 
+	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicate> sortPredicate) {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		return searchTarget.query()
+				.asReference()
+				.predicate( sortPredicate )
+				.build();
+	}
+
 	@Test
-	public void byField() {
+	public void sortByFieldQuery() {
 		// Default order
-		SearchQuery<DocumentReference> query = simpleQuery( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() );
+		SearchQuery<DocumentReference> query = sortQuery( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
 
 		// Explicit order with onMissingValue().sortLast()
-		query = simpleQuery( c -> c.byField( FIELD_PATH ).asc().onMissingValue().sortLast() );
+		query = sortQuery( c -> c.byField( FIELD_PATH ).asc().onMissingValue().sortLast() );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE, null );
-		query = simpleQuery( b -> b.byField( FIELD_PATH ).desc().onMissingValue().sortLast() );
+		query = sortQuery( b -> b.byField( FIELD_PATH ).desc().onMissingValue().sortLast() );
 		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE, null );
 
 		// Explicit order with onMissingValue().sortFirst()
-		query = simpleQuery( c -> c.byField( FIELD_PATH ).asc().onMissingValue().sortFirst() );
+		query = sortQuery( c -> c.byField( FIELD_PATH ).asc().onMissingValue().sortFirst() );
 		assertHasHitsWithBooleanProperties( query, null, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
-		query = simpleQuery( b -> b.byField( FIELD_PATH ).desc().onMissingValue().sortFirst() );
+		query = sortQuery( b -> b.byField( FIELD_PATH ).desc().onMissingValue().sortFirst() );
 		assertHasHitsWithBooleanProperties( query, null, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE, Boolean.FALSE );
+	}
+
+	@Test
+	public void rangeQueryAbove() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).above( Boolean.TRUE ).toPredicate() );
+		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE );
+	}
+
+	@Test
+	public void rangeQueryBelow() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).below( Boolean.FALSE ).toPredicate() );
+		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
+	}
+
+	@Test
+	public void rangeQueryFromTo() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.FALSE ).toPredicate() );
+		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
+	}
+
+	@Test
+	public void rangeFromToSortByFieldQuery() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ).toPredicate() )
+				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
+				.build();
+
+		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
 	}
 
 	private void assertHasHitsWithBooleanProperties(SearchQuery<DocumentReference> query, Boolean... expectedPropertyValues) {
