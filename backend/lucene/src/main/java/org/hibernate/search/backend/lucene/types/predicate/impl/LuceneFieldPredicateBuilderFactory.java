@@ -16,7 +16,20 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 
 /**
- * @author Guillaume Smet
+ * A field-scoped factory for search predicate builders.
+ * <p>
+ * allowing fine-grained control over the type of predicate created for each field.
+ * <p>
+ * For example, a match predicate on an {@link Integer} field
+ * will not have its {@link MatchPredicateBuilder#value(Object)} method
+ * accept the same arguments as a match predicate on a {@link java.time.LocalDate} field;
+ * having a separate {@link LuceneFieldPredicateBuilderFactory} for those two fields
+ * allows to implement the different behavior.
+ * <p>
+ * Similarly, and perhaps more importantly,
+ * having a per-field factory allows us to throw detailed exceptions
+ * when users try to create a predicate that just cannot work on a particular field
+ * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
 public interface LuceneFieldPredicateBuilderFactory {
 

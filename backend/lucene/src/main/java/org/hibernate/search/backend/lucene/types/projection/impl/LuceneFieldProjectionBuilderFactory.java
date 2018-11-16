@@ -13,6 +13,16 @@ import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchPr
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+/**
+ * A field-scoped factory for search projection builders.
+ * <p>
+ * Implementations are created and stored for each field at bootstrap,
+ * allowing fine-grained control over the type of projection created for each field.
+ * <p>
+ * Having a per-field factory allows us to throw detailed exceptions
+ * when users try to create a projection that just cannot work on a particular field
+ * (either because it has the wrong type, or it's not configured in a way that allows it).
+ */
 public interface LuceneFieldProjectionBuilderFactory {
 
 	<U> FieldSearchProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
