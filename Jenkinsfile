@@ -172,8 +172,7 @@ stage('Configure') {
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 					new JdkITEnvironment(version: '10', tool: 'Oracle JDK 10.0.1', status: ITEnvironmentStatus.SUPPORTED),
-					// TODO HSEARCH-3238 (and maybe more) to support JDK11 builds
-					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.EXPERIMENTAL)
+					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.SUPPORTED)
 			],
 			database: [
 					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
