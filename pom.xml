@@ -2091,18 +2091,12 @@
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
 
-                 mvn clean test -Pelasticsearch-6.0 -Dtest.elasticsearch.version=6.0.0
+                 mvn clean test -Pelasticsearch-5.6 -Dtest.elasticsearch.version=5.6.0
           -->
 
-        <!-- Elasticsearch 5.6+ test environment (default) -->
+        <!-- Elasticsearch 5.6+ test environment -->
         <profile>
             <id>elasticsearch-5.6</id>
-            <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
-                <property>
-                    <name>!test.elasticsearch.host.version</name>
-                </property>
-            </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
@@ -2146,9 +2140,15 @@
             </build>
         </profile>
 
-        <!-- Elasticsearch 6.0+ test environment -->
+        <!-- Elasticsearch 6.0+ test environment (default) -->
         <profile>
             <id>elasticsearch-6.0</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.version</name>
+                </property>
+            </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>6.8</test.elasticsearch.mavenPlugin.version>
                 <test.elasticsearch.host.version>6.5.0</test.elasticsearch.host.version>
