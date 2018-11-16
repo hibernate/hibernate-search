@@ -13,6 +13,22 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+/**
+ * A field-scoped factory for search sort builders.
+ * <p>
+ * allowing fine-grained control over the type of sort created for each field.
+ * <p>
+ * For example, a sort on an {@link Integer} field
+ * will not have its {@link FieldSortBuilder#missingAs(Object)} method
+ * accept the same arguments as a sort on a {@link java.time.LocalDate} field;
+ * having a separate {@link ElasticsearchFieldSortBuilderFactory} for those two fields
+ * allows to implement the different behavior.
+ * <p>
+ * Similarly, and perhaps more importantly,
+ * having a per-field factory allows us to throw detailed exceptions
+ * when users try to create a sort that just cannot work on a particular field
+ * (either because it has the wrong type, or it's not configured in a way that allows it).
+ */
 public interface ElasticsearchFieldSortBuilderFactory {
 
 	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
