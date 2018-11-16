@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -497,16 +496,16 @@ public class SearchSortByFieldIT {
 				)
 						.map( root, prefix + "localDate", additionalConfiguration ),
 				ByTypeFieldModel.mapper(
-						Date.class,
-						Date.from( Instant.parse( "2018-02-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-03-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-04-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-01-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-02-15T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-03-15T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-05-01T10:15:30.00Z" ) )
+						Instant.class,
+						Instant.parse( "2018-02-01T10:15:30.00Z" ),
+						Instant.parse( "2018-03-01T10:15:30.00Z" ),
+						Instant.parse( "2018-04-01T10:15:30.00Z" ),
+						Instant.parse( "2018-01-01T10:15:30.00Z" ),
+						Instant.parse( "2018-02-15T10:15:30.00Z" ),
+						Instant.parse( "2018-03-15T10:15:30.00Z" ),
+						Instant.parse( "2018-05-01T10:15:30.00Z" )
 				)
-						.map( root, prefix + "utilDate", additionalConfiguration )
+						.map( root, prefix + "instant", additionalConfiguration )
 		);
 	}
 

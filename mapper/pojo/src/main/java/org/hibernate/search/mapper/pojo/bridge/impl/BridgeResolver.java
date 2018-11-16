@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -58,7 +60,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Boolean.class, ignored -> new PassThroughValueBridge<>( Boolean.class ) );
 		addValueBridgeForExactRawType( String.class, ignored -> new PassThroughValueBridge<>( String.class ) );
 		addValueBridgeForExactRawType( LocalDate.class, ignored -> new PassThroughValueBridge<>( LocalDate.class ) );
-		addValueBridgeForExactRawType( Date.class, ignored -> new PassThroughValueBridge<>( Date.class ) );
+		addValueBridgeForExactRawType( Instant.class, ignored -> new PassThroughValueBridge<>( Instant.class ) );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumValueBridge<>() );
 	}
 

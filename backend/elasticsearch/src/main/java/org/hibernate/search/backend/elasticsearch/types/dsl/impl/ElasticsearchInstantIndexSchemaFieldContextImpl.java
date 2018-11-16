@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.util.Date;
+import java.time.Instant;
+import java.util.Arrays;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -15,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.UtilDateFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.InstantFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
@@ -25,29 +26,29 @@ import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefiniti
 
 import com.google.gson.JsonElement;
 
-public class ElasticsearchUtilDateIndexSchemaFieldContextImpl
-		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchUtilDateIndexSchemaFieldContextImpl, Date> {
+public class ElasticsearchInstantIndexSchemaFieldContextImpl
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchInstantIndexSchemaFieldContextImpl, Instant> {
 
 	private final String relativeFieldName;
 
-	public ElasticsearchUtilDateIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, Date.class, DataType.DATE );
+	public ElasticsearchInstantIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, Instant.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Date> helper,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Instant> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		StandardFieldConverter<Date> converter = new StandardFieldConverter<>(
+		StandardFieldConverter<Instant> converter = new StandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				UtilDateFieldCodec.INSTANCE
+				InstantFieldCodec.INSTANCE
 		);
 
-		ElasticsearchIndexSchemaFieldNode<Date> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, UtilDateFieldCodec.INSTANCE,
+		ElasticsearchIndexSchemaFieldNode<Instant> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, converter, InstantFieldCodec.INSTANCE,
 				new StandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
@@ -55,6 +56,7 @@ public class ElasticsearchUtilDateIndexSchemaFieldContextImpl
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
+		mapping.setFormat( Arrays.asList( "epoch_millis" ) );
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
 		collector.collect( absoluteFieldPath, node );
@@ -63,7 +65,7 @@ public class ElasticsearchUtilDateIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected ElasticsearchUtilDateIndexSchemaFieldContextImpl thisAsS() {
+	protected ElasticsearchInstantIndexSchemaFieldContextImpl thisAsS() {
 		return this;
 	}
 }

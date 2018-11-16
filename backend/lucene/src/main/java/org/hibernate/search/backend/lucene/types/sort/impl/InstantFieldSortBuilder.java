@@ -13,9 +13,9 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 import org.apache.lucene.search.SortField;
 
-public class UtilDateFieldSortBuilder extends AbstractFieldSortBuilderImpl {
+public class InstantFieldSortBuilder extends AbstractFieldSortBuilderImpl {
 
-	UtilDateFieldSortBuilder(LuceneSearchContext searchContext,
+	InstantFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
 		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
 	}

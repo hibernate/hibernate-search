@@ -9,9 +9,9 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.Date;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -261,17 +261,17 @@ public class FieldDefaultBridgeIT {
 	}
 
 	@Test
-	public void utilDate() {
+	public void instant() {
 		@Indexed(index = INDEX_NAME)
 		class IndexedEntity {
 			Integer id;
-			Date myProperty;
+			Instant myProperty;
 			@DocumentId
 			public Integer getId() {
 				return id;
 			}
 			@GenericField
-			public Date getMyProperty() {
+			public Instant getMyProperty() {
 				return myProperty;
 			}
 		}
@@ -283,8 +283,8 @@ public class FieldDefaultBridgeIT {
 					entity.myProperty = propertyValue;
 					return entity;
 				},
-				Date.class,
-				new Date( 739739739L )
+				Instant.class,
+				Instant.parse( "1970-01-09T13:28:59.00Z" )
 		);
 	}
 

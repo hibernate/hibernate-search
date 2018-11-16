@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -482,11 +481,11 @@ public class MatchSearchPredicateIT {
 					)
 							.map( root, prefix + "localDate", additionalConfiguration ),
 					ByTypeFieldModel.mapper(
-							Date.class,
-							Date.from( Instant.parse( "1980-10-11T10:15:30.00Z" ) ),
-							Date.from( Instant.parse( "1984-10-07T10:15:30.00Z" ) )
+							Instant.class,
+							Instant.parse( "1980-10-11T10:15:30.00Z" ),
+							Instant.parse( "1984-10-07T10:15:30.00Z" )
 					)
-							.map( root, prefix + "utilDate", additionalConfiguration )
+							.map( root, prefix + "instant", additionalConfiguration )
 			);
 		}
 	}

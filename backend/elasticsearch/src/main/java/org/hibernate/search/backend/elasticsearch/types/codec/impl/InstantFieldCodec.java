@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
@@ -14,32 +14,28 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-/**
- * Encode and decode a {@link Date} to a json form.
- * Using a long number representing a milliseconds-since-the-epoch.
- */
-public class UtilDateFieldCodec implements ElasticsearchFieldCodec<Date> {
+public class InstantFieldCodec implements ElasticsearchFieldCodec<Instant> {
 
-	public static final UtilDateFieldCodec INSTANCE = new UtilDateFieldCodec();
+	public static final InstantFieldCodec INSTANCE = new InstantFieldCodec();
 
-	private UtilDateFieldCodec() {
+	private InstantFieldCodec() {
 	}
 
 	@Override
-	public JsonElement encode(Date value) {
+	public JsonElement encode(Instant value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return new JsonPrimitive( value.getTime() );
+		return new JsonPrimitive( value.toEpochMilli() );
 	}
 
 	@Override
-	public Date decode(JsonElement element) {
+	public Instant decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
 		Long time = JsonElementTypes.LONG.fromElement( element );
-		return new Date( time );
+		return Instant.ofEpochMilli( time );
 	}
 
 	@Override

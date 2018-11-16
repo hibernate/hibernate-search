@@ -14,7 +14,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -684,12 +683,12 @@ public class SearchProjectionIT {
 				)
 						.map( root, prefix + "localDate", additionalConfiguration ),
 				FieldModel.mapper(
-						Date.class,
-						Date.from( Instant.parse( "2018-02-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-03-01T10:15:30.00Z" ) ),
-						Date.from( Instant.parse( "2018-04-01T10:15:30.00Z" ) )
+						Instant.class,
+						Instant.parse( "2018-02-01T10:15:30.00Z" ),
+						Instant.parse( "2018-03-01T10:15:30.00Z" ),
+						Instant.parse( "2018-04-01T10:15:30.00Z" )
 				)
-						.map( root, prefix + "utilDate", additionalConfiguration ),
+						.map( root, prefix + "instant", additionalConfiguration ),
 				FieldModel.mapper(
 						GeoPoint.class,
 						GeoPoint.of( 40, 70 ),

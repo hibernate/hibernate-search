@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
@@ -16,24 +16,24 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class UtilDateFieldCodec implements LuceneFieldCodec<Date> {
+public final class InstantFieldCodec implements LuceneFieldCodec<Instant> {
 
 	private final boolean projectable;
 
 	private final boolean sortable;
 
-	public UtilDateFieldCodec(boolean projectable, boolean sortable) {
+	public InstantFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Date value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Instant value) {
 		if ( value == null ) {
 			return;
 		}
 
-		long time = value.getTime();
+		long time = value.toEpochMilli();
 		if ( projectable ) {
 			documentBuilder.addField( new StoredField( absoluteFieldPath, time ) );
 		}
@@ -46,7 +46,7 @@ public final class UtilDateFieldCodec implements LuceneFieldCodec<Date> {
 	}
 
 	@Override
-	public Date decode(Document document, String absoluteFieldPath) {
+	public Instant decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -54,7 +54,7 @@ public final class UtilDateFieldCodec implements LuceneFieldCodec<Date> {
 		}
 
 		Long time = (Long) field.numericValue();
-		return new Date( time );
+		return Instant.ofEpochMilli( time );
 	}
 
 	@Override
@@ -62,11 +62,11 @@ public final class UtilDateFieldCodec implements LuceneFieldCodec<Date> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( UtilDateFieldCodec.class != obj.getClass() ) {
+		if ( InstantFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		UtilDateFieldCodec other = (UtilDateFieldCodec) obj;
+		InstantFieldCodec other = (InstantFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );

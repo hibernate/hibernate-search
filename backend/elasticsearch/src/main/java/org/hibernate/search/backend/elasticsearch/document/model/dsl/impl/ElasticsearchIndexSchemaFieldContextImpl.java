@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Date;
 
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.JsonStringIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchBooleanIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchUtilDateIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchInstantIndexSchemaFieldContextImpl;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLongIndexSchemaFieldContextImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
@@ -74,8 +74,8 @@ class ElasticsearchIndexSchemaFieldContextImpl
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asLocalDate();
 		}
-		else if ( Date.class.equals( inputType ) ) {
-			return (StandardIndexSchemaFieldTypedContext<?, F>) asUtilDate();
+		else if ( Instant.class.equals( inputType ) ) {
+			return (StandardIndexSchemaFieldTypedContext<?, F>) asInstant();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexSchemaFieldTypedContext<?, F>) asGeoPoint();
@@ -112,8 +112,8 @@ class ElasticsearchIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<?, Date> asUtilDate() {
-		return setDelegate( new ElasticsearchUtilDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+	public StandardIndexSchemaFieldTypedContext<?, Instant> asInstant() {
+		return setDelegate( new ElasticsearchInstantIndexSchemaFieldContextImpl( this, relativeFieldName ) );
 	}
 
 	@Override

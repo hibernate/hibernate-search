@@ -9,16 +9,16 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.UtilDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.InstantFieldConverter;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 
-class UtilDateRangePredicateBuilder extends AbstractRangePredicateBuilder<Long> {
+class InstantRangePredicateBuilder extends AbstractRangePredicateBuilder<Long> {
 
-	UtilDateRangePredicateBuilder(
+	InstantRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, UtilDateFieldConverter converter) {
+			String absoluteFieldPath, InstantFieldConverter converter) {
 		super( searchContext, absoluteFieldPath, converter );
 	}
 

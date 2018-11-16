@@ -6,24 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
-public final class UtilDateFieldConverter extends AbstractFieldConverter<Date, Long> {
+public final class InstantFieldConverter extends AbstractFieldConverter<Instant, Long> {
 
-	public UtilDateFieldConverter(UserIndexFieldConverter<Date> userConverter) {
+	public InstantFieldConverter(UserIndexFieldConverter<Instant> userConverter) {
 		super( userConverter );
 	}
 
 	@Override
 	public Long convertFromDsl(Object value,
 			ToIndexFieldValueConvertContext context) {
-		Date rawValue = userConverter.convertFromDsl( value, context );
+		Instant rawValue = userConverter.convertFromDsl( value, context );
 		if ( value == null ) {
 			return null;
 		}
-		return rawValue.getTime();
+		return rawValue.toEpochMilli();
 	}
 }

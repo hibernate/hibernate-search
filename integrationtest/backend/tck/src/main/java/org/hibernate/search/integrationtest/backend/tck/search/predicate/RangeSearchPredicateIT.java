@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -735,14 +734,14 @@ public class RangeSearchPredicateIT {
 					)
 							.map( root, prefix + "localDate", additionalConfiguration ),
 					ByTypeFieldModel.mapper(
-							Date.class,
-							Date.from( Instant.parse( "2003-06-03T10:15:30.00Z" ) ),
-							Date.from( Instant.parse( "2013-06-03T10:15:30.00Z" ) ),
-							Date.from( Instant.parse( "2025-06-03T10:15:30.00Z" ) ),
-							Date.from( Instant.parse( "2010-06-08T10:15:30.00Z" ) ),
-							Date.from( Instant.parse( "2019-04-18T10:15:30.00Z" ) )
+							Instant.class,
+							Instant.parse( "2003-06-03T10:15:30.00Z" ),
+							Instant.parse( "2013-06-03T10:15:30.00Z" ),
+							Instant.parse( "2025-06-03T10:15:30.00Z" ),
+							Instant.parse( "2010-06-08T10:15:30.00Z" ),
+							Instant.parse( "2019-04-18T10:15:30.00Z" )
 					)
-							.map( root, prefix + "utilDate", additionalConfiguration )
+							.map( root, prefix + "instant", additionalConfiguration )
 			);
 		}
 	}

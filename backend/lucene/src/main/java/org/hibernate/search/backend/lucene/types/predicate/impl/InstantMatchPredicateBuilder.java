@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
@@ -14,13 +14,13 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.UtilDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.InstantFieldConverter;
 
-class UtilDateMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Date, Long> {
+class InstantMatchPredicateBuilder extends AbstractMatchPredicateBuilder<Instant, Long> {
 
-	UtilDateMatchPredicateBuilder(
+	InstantMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, UtilDateFieldConverter converter) {
+			String absoluteFieldPath, InstantFieldConverter converter) {
 		super( searchContext, absoluteFieldPath, converter );
 	}
 

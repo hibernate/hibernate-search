@@ -8,12 +8,12 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.types.converter.impl.UtilDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.InstantFieldConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-public class UtilDateFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<Long> {
+public class InstantFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<Long> {
 
-	public UtilDateFieldSortBuilderFactory(boolean sortable, UtilDateFieldConverter converter) {
+	public InstantFieldSortBuilderFactory(boolean sortable, InstantFieldConverter converter) {
 		super( sortable, converter );
 	}
 
@@ -22,6 +22,6 @@ public class UtilDateFieldSortBuilderFactory extends AbstractStandardLuceneField
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new UtilDateFieldSortBuilder( searchContext, absoluteFieldPath, converter );
+		return new InstantFieldSortBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }
