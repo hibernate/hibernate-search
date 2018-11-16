@@ -195,10 +195,9 @@ stage('Configure') {
 
 	properties([
 			pipelineTriggers(
+					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
-							issueCommentTrigger('.*test this please.*'),
-							// Normally we don't have snapshot dependencies, so this doesn't matter, but some branches do
-							snapshotDependencies()
+							issueCommentTrigger('.*test this please.*')
 					]
 							+ helper.generateUpstreamTriggers()
 			),
