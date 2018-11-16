@@ -101,8 +101,8 @@ You may redefine the version to use by specifying the right profile and using th
 
 The following profiles are available:
 
- * `elasticsearch-5.6` for 5.6.x and later 5.x (the default)
- * `elasticsearch-6.0` for 6.x
+ * `elasticsearch-5.6` for 5.6.x and later 5.x
+ * `elasticsearch-6.0` for 6.x (the default)
 
 A list of available versions for `test.elasticsearch.host.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
@@ -152,6 +152,11 @@ as well as any other technology Hibernate Search integrates with.
 Also includes performance tests.
 * `legacy`: Legacy code from Search 5. This code is not part of the distributed JARs.
 Parts of it will progressively be re-integrated into the main (Search 6+) code base.
+Note that tests in this directory are disabled by default
+(they are only enabled when the properties `surefire.legacy.skip` and `failsafe.legacy.skip`
+are set to `false`).
+When enabled, Elasticsearch integration test in this directory 
+are executed against Elasticsearch 5.6 by default (instead of 6.0).
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
 and do the work of converting between user entities and documents to be indexed.
   * `javabean`: An experimental (not published) mapper for Java Beans without Hibernate ORM.
