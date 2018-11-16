@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredi
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -69,6 +70,11 @@ public class SearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateB
 	@Override
 	public MatchAllPredicateBuilder<LuceneSearchPredicateBuilder> matchAll() {
 		return new MatchAllPredicateBuilderImpl();
+	}
+
+	@Override
+	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
+		return new MatchIdPredicateBuilderImpl();
 	}
 
 	@Override

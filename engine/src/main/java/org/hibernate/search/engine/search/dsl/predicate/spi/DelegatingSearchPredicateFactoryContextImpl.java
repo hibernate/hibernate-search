@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
@@ -35,6 +36,11 @@ public class DelegatingSearchPredicateFactoryContextImpl implements SearchPredic
 	@Override
 	public MatchAllPredicateContext matchAll() {
 		return delegate.matchAll();
+	}
+
+	@Override
+	public MatchIdPredicateContext id() {
+		return delegate.id();
 	}
 
 	@Override

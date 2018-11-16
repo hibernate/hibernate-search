@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -76,6 +77,11 @@ public class SearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPre
 	@Override
 	public MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> matchAll() {
 		return new MatchAllPredicateBuilderImpl();
+	}
+
+	@Override
+	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
+		return new MatchIdPredicateBuilderImpl( searchContext );
 	}
 
 	@Override

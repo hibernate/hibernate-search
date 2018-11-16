@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 
 public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredicateBuilder>,
 		BooleanJunctionPredicateBuilder<StubPredicateBuilder>,
+		MatchIdPredicateBuilder<StubPredicateBuilder>,
 		MatchPredicateBuilder<StubPredicateBuilder>,
 		RangePredicateBuilder<StubPredicateBuilder>,
 		NestedPredicateBuilder<StubPredicateBuilder>,
