@@ -12,6 +12,7 @@ import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
@@ -33,6 +34,11 @@ public class SearchPredicateFactoryContextImpl<B> implements SearchPredicateFact
 	@Override
 	public MatchAllPredicateContext matchAll() {
 		return new MatchAllPredicateContextImpl<>( factory, this );
+	}
+
+	@Override
+	public MatchIdPredicateContext id() {
+		return new MatchIdPredicateContextImpl<>( factory, this );
 	}
 
 	@Override

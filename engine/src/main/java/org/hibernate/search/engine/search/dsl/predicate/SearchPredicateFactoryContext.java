@@ -63,6 +63,8 @@ public interface SearchPredicateFactoryContext {
 	 */
 	MatchAllPredicateContext matchAll();
 
+	MatchIdPredicateContext id();
+
 	/**
 	 * Match documents if they match a combination of boolean clauses.
 	 *

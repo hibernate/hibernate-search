@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
@@ -35,6 +36,11 @@ public class StubSearchPredicateBuilderFactory
 	public void contribute(StubQueryElementCollector collector, StubPredicateBuilder builder) {
 		builder.simulateBuild();
 		collector.simulateCollectCall();
+	}
+
+	@Override
+	public MatchIdPredicateBuilder<StubPredicateBuilder> id() {
+		return new StubPredicateBuilder();
 	}
 
 	@Override
