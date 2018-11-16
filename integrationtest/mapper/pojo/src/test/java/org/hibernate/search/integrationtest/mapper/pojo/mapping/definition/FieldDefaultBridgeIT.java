@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Date;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -285,6 +286,35 @@ public class FieldDefaultBridgeIT {
 				},
 				Instant.class,
 				Instant.parse( "1970-01-09T13:28:59.00Z" )
+		);
+	}
+
+	@Test
+	public void javaUtilDate() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Date myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Date getMyProperty() {
+				return myProperty;
+			}
+		}
+		Instant instant = Instant.parse( "1970-01-09T13:28:59.00Z" );
+		doTestBridge(
+				IndexedEntity.class,
+				(id, propertyValue) -> {
+					IndexedEntity entity = new IndexedEntity();
+					entity.id = id;
+					entity.myProperty = propertyValue;
+					return entity;
+				},
+				Date.class, Instant.class,
+				Date.from( instant ), instant
 		);
 	}
 

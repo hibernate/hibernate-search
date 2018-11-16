@@ -61,6 +61,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( String.class, ignored -> new PassThroughValueBridge<>( String.class ) );
 		addValueBridgeForExactRawType( LocalDate.class, ignored -> new PassThroughValueBridge<>( LocalDate.class ) );
 		addValueBridgeForExactRawType( Instant.class, ignored -> new PassThroughValueBridge<>( Instant.class ) );
+		addValueBridgeForExactRawType( Date.class, ignored -> new DefaultJavaUtilDateValueBridge() );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumValueBridge<>() );
 	}
 
