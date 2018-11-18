@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+import java.util.Collection;
+
 /**
  * The context used when defining a match on an identifier.
  */
@@ -16,8 +18,23 @@ public interface MatchIdPredicateContext extends SearchPredicateTerminalContext 
 	 * <p>
 	 * If used multiple times, it will target any of the specified values.
 	 * <p>
+	 * @see #matchingAny(Collection)
 	 * @param value the value of the id we want to match.
 	 * @return {@code this} for method chaining.
 	 */
 	MatchIdPredicateContext matching(Object value);
+
+	/**
+	 * Target the identifiers matching any of the values in a collection.
+	 * <p>
+	 * @param values the collection of identifiers to match.
+	 * @return {@code this} for method chaining.
+	 */
+	default MatchIdPredicateContext matchingAny(Collection<Object> values) {
+		MatchIdPredicateContext context = null;
+		for ( Object value : values ) {
+			context = matching( value );
+		}
+		return context;
+	}
 }
