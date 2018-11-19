@@ -20,8 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
-
 public class GettingStartedWithoutHibernateSearchIT {
 
 	private EntityManagerFactory entityManagerFactory;
@@ -63,7 +61,7 @@ public class GettingStartedWithoutHibernateSearchIT {
 
 			List<Book> result = query.getResultList();
 
-			Assertions.assertThat( result ).extracting( "id" )
+			assertThat( result ).extracting( "id" )
 					.containsOnly( bookIdHolder.get() );
 		} );
 	}
