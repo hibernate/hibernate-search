@@ -71,6 +71,12 @@ This is not new for the Lucene integration, but it is for the Elasticsearch inte
 See `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext.extension(SearchPredicateFactoryContextExtension<T>)`
 `org.hibernate.search.backend.elasticsearch.ElasticsearchExtension.get()` and
 `org.hibernate.search.backend.lucene.LuceneExtension.get()`.
+* Bridges benefit from several improvements:
+** Custom (user-defined) bridge annotations, allowing to pass type-safe parameters, and not just strings.
+** Better support for dirty checking optimization in bridges (in `TypeBridge` in particular),
+by allowing bridges to declare what parts of the entity they use.
+** Predicates on non-String fields will work without having to bypass bridges (`.ignoreFieldBridge()`) like in Search 5.
+** And more!
 
 [[getting-started-compatibility]]
 === Compatibility
