@@ -32,7 +32,6 @@
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
                     ${arquillian.wildfly.jvm.args}
-                    -Dee8.preview.mode=true
                 </property>
                 <!--
                     To debug the Arquillian managed application server,
@@ -54,7 +53,6 @@
                     -Djava.net.preferIPv4Stack=true
                     -Djgroups.bind_addr=127.0.0.1
                     ${arquillian.wildfly.jvm.args}
-                    -Dee8.preview.mode=true
                 </property>
                 <property name="managementPort">19990</property>
             </configuration>
