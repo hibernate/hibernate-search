@@ -10,7 +10,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
 

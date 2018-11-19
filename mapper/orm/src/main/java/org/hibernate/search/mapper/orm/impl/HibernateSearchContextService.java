@@ -25,7 +25,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.service.Service;
 
