@@ -72,6 +72,7 @@ See `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCont
 `org.hibernate.search.backend.elasticsearch.ElasticsearchExtension.get()` and
 `org.hibernate.search.backend.lucene.LuceneExtension.get()`.
 
+[[getting-started-compatibility]]
 === Compatibility
 
 .Compatibility
@@ -86,6 +87,7 @@ See `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCont
 |JPA *{jpaVersion}*.
 |===============
 
+[[getting-started-migrating]]
 === Migration notes
 
 If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
@@ -172,6 +174,7 @@ If you get Hibernate Search from the distribution bundle,
 copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/elasticsearch`,
 and their respective `lib` subdirectories.
 
+[[getting-started-configuration]]
 === Configuration
 
 Once you have added all required dependencies to your application you have to add a couple of
@@ -221,6 +224,7 @@ and optionally the username and password.
 <3> Make sure to use the backend we just defined for all indexes.
 ====
 
+[[getting-started-mapping]]
 === Mapping
 
 Let's assume that your application contains the Hibernate ORM managed classes `Book` and `Author`
@@ -281,6 +285,7 @@ You can find out more about `@*Field` annotations in <<mapper-pojo-field>>.
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
 See <<mapper-pojo-bridge>> for more information.
 
+[[getting-started-indexing]]
 === Indexing
 
 Hibernate Search will transparently index every entity persisted,
@@ -302,6 +307,7 @@ IMPORTANT: The mass indexer is not yet available in Hibernate Search {hibernateS
 We will add an example here when it is implemented.
 See https://hibernate.atlassian.net/browse/HSEARCH-3268[HSEARCH-3268].
 
+[[getting-started-searching]]
 === Searching
 
 Once the data is indexed, you can perform search queries.
@@ -338,6 +344,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 ====
 
+[[getting-started-analysis]]
 === Analysis
 
 Exact matches are well and good, but obviously not what you would expect from a full-text search engine.
