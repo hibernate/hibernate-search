@@ -4,8 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
+package org.hibernate.search.util.function;
 
-public interface StubCompositeSearchProjection<T> extends StubSearchProjection<T> {
+@FunctionalInterface
+public interface TriFunction<T, U, V, R> {
 
+	R apply(T t, U u, V v);
 }

@@ -6,6 +6,12 @@
  */
 package org.hibernate.search.engine.search.dsl.projection.impl;
 
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.FieldProjectionContext;
@@ -15,6 +21,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
@@ -63,5 +70,43 @@ public class SearchProjectionFactoryContextImpl<R, O> implements SearchProjectio
 		Contracts.assertNotNull( center, "center" );
 
 		return new DistanceToFieldProjectionContextImpl( factory, absoluteFieldPath, center );
+	}
+
+	@Override
+	public <T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer,
+			SearchProjection<?>... projections) {
+		Contracts.assertNotNull( transformer, "transformer" );
+		Contracts.assertNotNullNorEmpty( projections, "projections" );
+
+		return new CompositeProjectionContextImpl<>( factory, transformer, projections );
+	}
+
+	@Override
+	public <P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
+		Contracts.assertNotNull( transformer, "transformer" );
+		Contracts.assertNotNull( projection, "projection" );
+
+		return new CompositeProjectionContextImpl<>( factory, transformer, projection );
+	}
+
+	@Override
+	public <P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
+		Contracts.assertNotNull( transformer, "transformer" );
+		Contracts.assertNotNull( projection1, "projection1" );
+		Contracts.assertNotNull( projection2, "projection2" );
+
+		return new CompositeProjectionContextImpl<>( factory, transformer, projection1, projection2 );
+	}
+
+	@Override
+	public <P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
+		Contracts.assertNotNull( transformer, "transformer" );
+		Contracts.assertNotNull( projection1, "projection1" );
+		Contracts.assertNotNull( projection2, "projection2" );
+		Contracts.assertNotNull( projection3, "projection3" );
+
+		return new CompositeProjectionContextImpl<>( factory, transformer, projection1, projection2, projection3 );
 	}
 }

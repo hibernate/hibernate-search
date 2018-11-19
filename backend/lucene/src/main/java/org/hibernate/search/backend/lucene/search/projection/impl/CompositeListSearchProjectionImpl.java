@@ -9,17 +9,22 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeSearchProjectionImpl implements LuceneSearchProjection<List<?>> {
+public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<T> {
+
+	private final Function<List<?>, T> transformer;
 
 	private final List<LuceneSearchProjection<?>> children;
 
-	public CompositeSearchProjectionImpl(List<LuceneSearchProjection<?>> children) {
+	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
+			List<LuceneSearchProjection<?>> children) {
+		this.transformer = transformer;
 		this.children = children;
 	}
 
@@ -51,14 +56,14 @@ public class CompositeSearchProjectionImpl implements LuceneSearchProjection<Lis
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<?> transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
 		List<Object> extractedElements = (List<Object>) extractedData;
 
 		for ( int i = 0; i < extractedElements.size(); i++ ) {
 			extractedElements.set( i, children.get( i ).transform( loadingResult, extractedElements.get( i ) ) );
 		}
 
-		return extractedElements;
+		return transformer.apply( extractedElements );
 	}
 
 	@Override

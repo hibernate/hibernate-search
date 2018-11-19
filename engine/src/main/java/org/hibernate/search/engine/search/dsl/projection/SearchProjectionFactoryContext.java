@@ -6,8 +6,14 @@
  */
 package org.hibernate.search.engine.search.dsl.projection;
 
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.function.TriFunction;
 
 /**
  * A context allowing to create a projection.
@@ -78,4 +84,38 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
+
+	default CompositeProjectionContext<List<?>> composite(SearchProjection<?>... projections) {
+		return composite( Function.identity(), projections );
+	}
+
+	/**
+	 * Creates a composite projection i.e. a projection composed of other projections.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+
+	/**
+	 * Creates a composite projection i.e. a projection composed of other projections.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+
+	/**
+	 * Creates a composite projection i.e. a projection composed of other projections.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
+
+	/**
+	 * Creates a composite projection i.e. a projection composed of other projections.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 }

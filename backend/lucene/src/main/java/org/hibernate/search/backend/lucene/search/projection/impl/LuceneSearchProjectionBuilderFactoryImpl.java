@@ -7,6 +7,10 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -14,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeCompo
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
@@ -24,6 +29,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectionBuilderFactory {
@@ -71,6 +77,45 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
+	}
+
+	@Override
+	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
+			SearchProjection<?>... projections) {
+		List<LuceneSearchProjection<?>> typedProjections = new ArrayList<>( projections.length );
+		for ( SearchProjection<?> projection : projections ) {
+			typedProjections.add( toImplementation( projection ) );
+		}
+
+		return new CompositeSearchProjectionBuilderImpl<>(
+				new CompositeListSearchProjectionImpl<>( transformer, typedProjections )
+		);
+	}
+
+	@Override
+	public <P, T> CompositeSearchProjectionBuilder<T> composite(Function<P, T> transformer,
+			SearchProjection<P> projection) {
+		return new CompositeSearchProjectionBuilderImpl<>(
+				new CompositeFunctionSearchProjectionImpl<>( transformer, toImplementation( projection ) )
+		);
+	}
+
+	@Override
+	public <P1, P2, T> CompositeSearchProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
+		return new CompositeSearchProjectionBuilderImpl<>(
+				new CompositeBiFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+						toImplementation( projection2 ) )
+		);
+	}
+
+	@Override
+	public <P1, P2, P3, T> CompositeSearchProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
+		return new CompositeSearchProjectionBuilderImpl<>(
+				new CompositeTriFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+						toImplementation( projection2 ), toImplementation( projection3 ) )
+		);
 	}
 
 	public <T> LuceneSearchProjection<T> toImplementation(SearchProjection<T> projection) {

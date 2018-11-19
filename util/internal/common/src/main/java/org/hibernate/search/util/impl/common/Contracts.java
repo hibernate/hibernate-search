@@ -30,6 +30,12 @@ public final class Contracts {
 		}
 	}
 
+	public static void assertNotNullNorEmpty(Object[] object, String objectDescription) {
+		if ( object == null || object.length == 0 ) {
+			throw log.arrayMustNotBeNullNorEmpty( objectDescription );
+		}
+	}
+
 	public static void assertPositiveOrZero(int number, String objectDescription) {
 		if ( number < 0 ) {
 			throw log.mustBePositiveOrZero( objectDescription );
