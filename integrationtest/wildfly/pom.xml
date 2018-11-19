@@ -42,15 +42,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- We override the version of ShrinkWrap Maven Resolver from Arquillian BOM:
-             this section must be declared before the Arquillian bom import -->
-            <dependency>
-                <groupId>org.jboss.shrinkwrap.resolver</groupId>
-                <artifactId>shrinkwrap-resolver-bom</artifactId>
-                <version>${version.org.jboss.shrinkwrap.resolver}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- Imports compatible versions for each Arquillian module -->
             <dependency>
                 <groupId>org.jboss.arquillian</groupId>
