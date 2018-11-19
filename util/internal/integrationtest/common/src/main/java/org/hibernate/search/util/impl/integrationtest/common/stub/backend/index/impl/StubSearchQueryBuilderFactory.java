@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -19,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeListSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubObjectSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubReferenceSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
@@ -84,6 +85,6 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			children.add( (StubSearchProjection<?>) projections[i] );
 		}
 
-		return new StubCompositeSearchProjection<>( children );
+		return new StubCompositeListSearchProjection<>( Function.identity(), children );
 	}
 }

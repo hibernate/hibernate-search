@@ -8,17 +8,22 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class CompositeSearchProjectionImpl implements ElasticsearchSearchProjection<List<?>> {
+public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<T> {
+
+	private final Function<List<?>, T> transformer;
 
 	private final List<ElasticsearchSearchProjection<?>> children;
 
-	public CompositeSearchProjectionImpl(List<ElasticsearchSearchProjection<?>> children) {
+	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
+			List<ElasticsearchSearchProjection<?>> children) {
+		this.transformer = transformer;
 		this.children = children;
 	}
 
@@ -44,14 +49,14 @@ public class CompositeSearchProjectionImpl implements ElasticsearchSearchProject
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<?> transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
 		List<Object> extractedElements = (List<Object>) extractedData;
 
 		for ( int i = 0; i < extractedElements.size(); i++ ) {
 			extractedElements.set( i, children.get( i ).transform( loadingResult, extractedElements.get( i ) ) );
 		}
 
-		return extractedElements;
+		return transformer.apply( extractedElements );
 	}
 
 	@Override

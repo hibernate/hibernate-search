@@ -8,10 +8,11 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
-import org.hibernate.search.backend.lucene.search.projection.impl.CompositeSearchProjectionImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.CompositeListSearchProjectionImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.ObjectSearchProjectionImpl;
@@ -73,7 +74,7 @@ class SearchQueryBuilderFactoryImpl
 			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
 		}
 
-		return new CompositeSearchProjectionImpl( children );
+		return new CompositeListSearchProjectionImpl<>( Function.identity(), children );
 	}
 
 	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(

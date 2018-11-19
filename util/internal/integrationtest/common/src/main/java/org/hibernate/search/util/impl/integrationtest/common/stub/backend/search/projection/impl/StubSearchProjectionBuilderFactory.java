@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
@@ -17,6 +24,8 @@ import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBu
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
@@ -92,5 +101,66 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 				return StubDefaultSearchProjection.get();
 			}
 		};
+	}
+
+	@Override
+	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
+			SearchProjection<?>... projections) {
+		return new CompositeSearchProjectionBuilder<T>() {
+			@Override
+			public SearchProjection<T> build() {
+				return new StubCompositeListSearchProjection<>( transformer,
+						Arrays.stream( projections ).map( p -> toImplementation( p ) ).collect( Collectors.toList() ) );
+			}
+
+			private <U> StubSearchProjection<U> toImplementation(SearchProjection<U> projection) {
+				if ( !( projection instanceof StubSearchProjection ) ) {
+					throw new AssertionFailure( "Projection " + projection + " must be a StubSearchProjection" );
+				}
+				return (StubSearchProjection<U>) projection;
+			}
+		};
+	}
+
+	@Override
+	public <P, T> CompositeSearchProjectionBuilder<T> composite(Function<P, T> transformer,
+			SearchProjection<P> projection) {
+		return new CompositeSearchProjectionBuilder<T>() {
+			@Override
+			public SearchProjection<T> build() {
+				return new StubCompositeFunctionSearchProjection<>( transformer, toImplementation( projection ) );
+			}
+		};
+	}
+
+	@Override
+	public <P1, P2, T> CompositeSearchProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
+		return new CompositeSearchProjectionBuilder<T>() {
+			@Override
+			public SearchProjection<T> build() {
+				return new StubCompositeBiFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
+						toImplementation( projection2 ) );
+			}
+		};
+	}
+
+	@Override
+	public <P1, P2, P3, T> CompositeSearchProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
+		return new CompositeSearchProjectionBuilder<T>() {
+			@Override
+			public SearchProjection<T> build() {
+				return new StubCompositeTriFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
+						toImplementation( projection2 ), toImplementation( projection3 ) );
+			}
+		};
+	}
+
+	private <U> StubSearchProjection<U> toImplementation(SearchProjection<U> projection) {
+		if ( !( projection instanceof StubSearchProjection ) ) {
+			throw new AssertionFailure( "Projection " + projection + " must be a StubSearchProjection" );
+		}
+		return (StubSearchProjection<U>) projection;
 	}
 }

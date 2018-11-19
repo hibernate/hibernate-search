@@ -8,10 +8,11 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.CompositeSearchProjectionImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.CompositeListSearchProjectionImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionImpl;
@@ -78,7 +79,7 @@ class SearchQueryBuilderFactoryImpl
 			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
 		}
 
-		return new CompositeSearchProjectionImpl( children );
+		return new CompositeListSearchProjectionImpl<>( Function.identity(), children );
 	}
 
 	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
