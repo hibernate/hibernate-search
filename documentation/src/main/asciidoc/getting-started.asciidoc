@@ -11,72 +11,9 @@ Hibernate Search {hibernateSearchVersion} is a *technology preview* and is *not 
 Use it to have a sneak peak at the APIs, make suggestions or warn us of what you consider blocking early so we can fix it,
 but *do not* use it to address business needs!
 
-Read <<getting-started-preview-status>> for more information.
+Read http://hibernate.org/search/releases/6.0/#preview-status[the dedicated page on our website]
+for more detailed and up-to-date information.
 ====
-
-[[getting-started-preview-status]]
-=== Preview status
-
-Hibernate Search {hibernateSearchVersion} is a technology preview.
-While the core of Hibernate Search 6 is there, there are still a lot of limitations:
-
-* Features are partially implemented or simply missing.
-For example, you cannot index a `Double` property yet,
-you cannot configure custom Lucene directories,
-you cannot ignore bridges in the predicate DSL,
-and so on.
-* APIs are not considered stable yet.
-* The low-level parts of Hibernate Search 5 that made its efficiency haven't been
-ported to Hibernate Search 6 yet.
-This results in obvious performance bottlenecks,
-such as all the indexing works from a multi-threaded application being executed
-one after another and without any form of batching.
-
-The exact features that are currently implemented and expected to work will be documented
-as new Alpha versions are released, but to sum up, here is what you can start to play with:
-
-* ORM integration:
-** Mapping of entities using either annotation mapping or programmatic mapping.
-However, we do not offer all the options that were available in Search 5 (yet),
-and we do not support all the data types (yet).
-** Automatic indexing of ORM entities as they are persisted within a transaction
-(enabled automatically if Hibernate Search is in your classpath and the entity is mapped).
-** Search for ORM entities using their Hibernate Search index,
-and retrieving managed entities as results.
-However, we do not offer many options regarding how the entities are retrieved and initialized (yet).
-** Custom, user-defined type bridges, property bridges or value bridges.
-However, the API to retrieve information from POJOs is currently quite cumbersome:
-we know it and will work on a lighter API
-(see https://hibernate.atlassian.net/browse/HSEARCH-3297[HSEARCH-3297],
-https://hibernate.atlassian.net/browse/HSEARCH-3298[HSEARCH-3298]).
-* Search DSL
-** All the predicates listed in `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext`.
-However, we do not offer all the options that were available in Search 5 (yet).
-** All the sorts listed in `org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext`.
-However, we do not offer all the options that were available in Search 5 (yet).
-** All the projections listed in `org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext`.
-However, we do not offer all the options that were available in Search 5 (yet).
-
-Here are the most interesting new features:
-
-* Changes on indexed-embedded entities trigger reindexing of the "embedding" entity automatically,
-and annotating the inverse side of the association with `@ContainedIn` is no longer needed in most cases.
-A mapping error will be reported when the inverse side of the association cannot be resolved.
-* "nested" fields and predicates, similar to the feature with the same name in Elasticsearch.
-See `org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded.storage`
-and `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext.nested()`.
-* Injection of native predicates (`org.apache.lucene.search.Query`, JSON for Elasticsearch)
-within DSL-created predicates.
-This is not new for the Lucene integration, but it is for the Elasticsearch integration.
-See `org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext.extension(SearchPredicateFactoryContextExtension<T>)`
-`org.hibernate.search.backend.elasticsearch.ElasticsearchExtension.get()` and
-`org.hibernate.search.backend.lucene.LuceneExtension.get()`.
-* Bridges benefit from several improvements:
-** Custom (user-defined) bridge annotations, allowing to pass type-safe parameters, and not just strings.
-** Better support for dirty checking optimization in bridges (in `TypeBridge` in particular),
-by allowing bridges to declare what parts of the entity they use.
-** Predicates on non-String fields will work without having to bypass bridges (`.ignoreFieldBridge()`) like in Search 5.
-** And more!
 
 [[getting-started-compatibility]]
 === Compatibility
