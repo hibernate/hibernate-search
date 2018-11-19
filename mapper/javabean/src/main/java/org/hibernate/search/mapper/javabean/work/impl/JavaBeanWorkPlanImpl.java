@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.work.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public class JavaBeanWorkPlanImpl implements JavaBeanWorkPlan {
 

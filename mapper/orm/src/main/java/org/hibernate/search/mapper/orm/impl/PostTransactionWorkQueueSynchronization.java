@@ -13,7 +13,7 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Collection;
 
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.session.spi;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
-import org.hibernate.search.mapper.pojo.mapping.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmSearchManager extends AutoCloseable {
 
