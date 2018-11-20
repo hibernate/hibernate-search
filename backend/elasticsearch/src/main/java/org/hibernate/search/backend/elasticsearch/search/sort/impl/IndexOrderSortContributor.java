@@ -12,13 +12,13 @@ class IndexOrderSortContributor implements ElasticsearchSearchSortBuilder {
 
 	public static final IndexOrderSortContributor INSTANCE = new IndexOrderSortContributor();
 
-	private static final JsonPrimitive UID_SORT_KEYWORD_JSON = new JsonPrimitive( "_uid" );
+	private static final JsonPrimitive DOC_SORT_KEYWORD_JSON = new JsonPrimitive( "_doc" );
 
 	private IndexOrderSortContributor() {
 	}
 
 	@Override
 	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		collector.collectSort( UID_SORT_KEYWORD_JSON );
+		collector.collectSort( DOC_SORT_KEYWORD_JSON );
 	}
 }
