@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-public interface CompositeSearchProjection<T> extends ElasticsearchSearchProjection<T> {
+public interface CompositeSearchProjection<E, T> extends ElasticsearchSearchProjection<E, T> {
 
 }

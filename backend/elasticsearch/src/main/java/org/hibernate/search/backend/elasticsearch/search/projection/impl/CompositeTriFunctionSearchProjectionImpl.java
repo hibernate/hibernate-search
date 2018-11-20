@@ -6,25 +6,27 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
+
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.function.TriFunction;
 
 import com.google.gson.JsonObject;
 
-public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements CompositeSearchProjection<T> {
+public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements CompositeSearchProjection<Object[], T> {
 
 	private final TriFunction<P1, P2, P3, T> transformer;
 
-	private final ElasticsearchSearchProjection<P1> projection1;
+	private final ElasticsearchSearchProjection<?, P1> projection1;
 
-	private final ElasticsearchSearchProjection<P2> projection2;
+	private final ElasticsearchSearchProjection<?, P2> projection2;
 
-	private final ElasticsearchSearchProjection<P3> projection3;
+	private final ElasticsearchSearchProjection<?, P3> projection3;
 
 	public CompositeTriFunctionSearchProjectionImpl(TriFunction<P1, P2, P3, T> transformer,
-			ElasticsearchSearchProjection<P1> projection1, ElasticsearchSearchProjection<P2> projection2,
-			ElasticsearchSearchProjection<P3> projection3) {
+			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2,
+			ElasticsearchSearchProjection<?, P3> projection3) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -40,7 +42,7 @@ public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements 
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ),
@@ -50,13 +52,11 @@ public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements 
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		Object[] extractedElements = (Object[]) extractedData;
-
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
 		return transformer.apply(
-				projection1.transform( loadingResult, extractedElements[0] ),
-				projection2.transform( loadingResult, extractedElements[1] ),
-				projection3.transform( loadingResult, extractedElements[2] )
+				transformUnsafe( projection1, loadingResult, extractedData[0] ),
+				transformUnsafe( projection2, loadingResult, extractedData[1] ),
+				transformUnsafe( projection3, loadingResult, extractedData[2] )
 		);
 	}
 

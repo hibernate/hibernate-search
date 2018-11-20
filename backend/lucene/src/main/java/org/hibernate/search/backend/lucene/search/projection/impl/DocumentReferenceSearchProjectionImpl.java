@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference> {
+class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference, DocumentReference> {
 
 	private static final DocumentReferenceSearchProjectionImpl INSTANCE = new DocumentReferenceSearchProjectionImpl();
 
@@ -37,14 +37,14 @@ class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<Do
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
 		return DocumentReferenceExtractorHelper.extractDocumentReference( documentResult );
 	}
 
 	@Override
-	public DocumentReference transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (DocumentReference) extractedData;
+	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData) {
+		return extractedData;
 	}
 
 	@Override

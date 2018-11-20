@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
+
 import java.util.Set;
 import java.util.function.BiFunction;
 
@@ -14,16 +16,16 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements CompositeSearchProjection<T> {
+public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements CompositeSearchProjection<Object[], T> {
 
 	private final BiFunction<P1, P2, T> transformer;
 
-	private final LuceneSearchProjection<P1> projection1;
+	private final LuceneSearchProjection<?, P1> projection1;
 
-	private final LuceneSearchProjection<P2> projection2;
+	private final LuceneSearchProjection<?, P2> projection2;
 
 	public CompositeBiFunctionSearchProjectionImpl(BiFunction<P1, P2, T> transformer,
-			LuceneSearchProjection<P1> projection1, LuceneSearchProjection<P2> projection2) {
+			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -42,7 +44,7 @@ public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements Compo
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
+	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
 			SearchProjectionExecutionContext context) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, luceneResult, context ),
@@ -51,12 +53,10 @@ public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements Compo
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		Object[] extractedElements = (Object[]) extractedData;
-
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
 		return transformer.apply(
-				projection1.transform( loadingResult, extractedElements[0] ),
-				projection2.transform( loadingResult, extractedElements[1] )
+				transformUnsafe( projection1, loadingResult, extractedData[0] ),
+				transformUnsafe( projection2, loadingResult, extractedData[1] )
 		);
 	}
 

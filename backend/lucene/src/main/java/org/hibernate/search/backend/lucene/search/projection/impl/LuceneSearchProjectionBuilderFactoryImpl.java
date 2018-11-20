@@ -82,7 +82,7 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 	@Override
 	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
-		List<LuceneSearchProjection<?>> typedProjections = new ArrayList<>( projections.length );
+		List<LuceneSearchProjection<?, ?>> typedProjections = new ArrayList<>( projections.length );
 		for ( SearchProjection<?> projection : projections ) {
 			typedProjections.add( toImplementation( projection ) );
 		}
@@ -118,11 +118,12 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 		);
 	}
 
-	public <T> LuceneSearchProjection<T> toImplementation(SearchProjection<T> projection) {
+	@SuppressWarnings("unchecked")
+	public <T> LuceneSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof LuceneSearchProjection ) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherProjections( projection );
 		}
-		return (LuceneSearchProjection<T>) projection;
+		return (LuceneSearchProjection<?, T>) projection;
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

@@ -39,7 +39,7 @@ class SearchQueryBuilderImpl<T>
 
 	private final ElasticsearchSearchQueryElementCollector elementCollector;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
-	private final ElasticsearchSearchProjection<T> rootProjection;
+	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	SearchQueryBuilderImpl(
 			ElasticsearchWorkFactory workFactory,
@@ -48,7 +48,7 @@ class SearchQueryBuilderImpl<T>
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			ElasticsearchSearchProjection<T> rootProjection) {
+			ElasticsearchSearchProjection<?, T> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;

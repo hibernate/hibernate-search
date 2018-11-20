@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,14 +27,14 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final LuceneSearchProjection<T> rootProjection;
+	private final LuceneSearchProjection<?, T> rootProjection;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 
 	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
 
 	SearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
-			LuceneSearchProjection<T> rootProjection,
+			LuceneSearchProjection<?, T> rootProjection,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		this.storedFieldVisitor = storedFieldVisitor;
@@ -78,7 +80,7 @@ class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 		LoadingResult<?> loadingResult = projectionHitMapper.load();
 
 		for ( int i = 0; i < hits.size(); i++ ) {
-			hits.set( i, rootProjection.transform( loadingResult, hits.get( i ) ) );
+			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );
 		}
 
 		return Collections.unmodifiableList( (List<T>) hits );

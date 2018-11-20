@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
+class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float, Float> {
 
 	private static final ScoreSearchProjectionImpl INSTANCE = new ScoreSearchProjectionImpl();
 
@@ -35,14 +35,14 @@ class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float> {
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public Float extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
 		return documentResult.getScore();
 	}
 
 	@Override
-	public Float transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (Float) extractedData;
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData) {
+		return extractedData;
 	}
 
 	@Override

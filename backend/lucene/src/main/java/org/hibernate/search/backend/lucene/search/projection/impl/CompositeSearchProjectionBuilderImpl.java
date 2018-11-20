@@ -12,9 +12,9 @@ import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjecti
 
 class CompositeSearchProjectionBuilderImpl<T> implements CompositeSearchProjectionBuilder<T> {
 
-	private final CompositeSearchProjection<T> projection;
+	private final CompositeSearchProjection<?, T> projection;
 
-	CompositeSearchProjectionBuilderImpl(CompositeSearchProjection<T> projection) {
+	CompositeSearchProjectionBuilderImpl(CompositeSearchProjection<?, T> projection) {
 		this.projection = projection;
 	}
 

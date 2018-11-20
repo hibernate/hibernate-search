@@ -86,7 +86,7 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	@Override
 	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
-		List<ElasticsearchSearchProjection<?>> typedProjections = new ArrayList<>( projections.length );
+		List<ElasticsearchSearchProjection<?, ?>> typedProjections = new ArrayList<>( projections.length );
 		for ( SearchProjection<?> projection : projections ) {
 			typedProjections.add( toImplementation( projection ) );
 		}
@@ -122,11 +122,12 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 		);
 	}
 
-	public <T> ElasticsearchSearchProjection<T> toImplementation(SearchProjection<T> projection) {
+	@SuppressWarnings("unchecked")
+	public <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
 			throw log.cannotMixElasticsearchSearchQueryWithOtherProjections( projection );
 		}
-		return (ElasticsearchSearchProjection<T>) projection;
+		return (ElasticsearchSearchProjection<?, T>) projection;
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

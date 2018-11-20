@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+
+import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
+
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
@@ -14,19 +17,19 @@ import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.function.TriFunction;
 
-public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements CompositeSearchProjection<T> {
+public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements CompositeSearchProjection<Object[], T> {
 
 	private final TriFunction<P1, P2, P3, T> transformer;
 
-	private final LuceneSearchProjection<P1> projection1;
+	private final LuceneSearchProjection<?, P1> projection1;
 
-	private final LuceneSearchProjection<P2> projection2;
+	private final LuceneSearchProjection<?, P2> projection2;
 
-	private final LuceneSearchProjection<P3> projection3;
+	private final LuceneSearchProjection<?, P3> projection3;
 
 	public CompositeTriFunctionSearchProjectionImpl(TriFunction<P1, P2, P3, T> transformer,
-			LuceneSearchProjection<P1> projection1, LuceneSearchProjection<P2> projection2,
-			LuceneSearchProjection<P3> projection3) {
+			LuceneSearchProjection<?, P1> projection1, LuceneSearchProjection<?, P2> projection2,
+			LuceneSearchProjection<?, P3> projection3) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -48,7 +51,7 @@ public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements 
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
+	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
 			SearchProjectionExecutionContext context) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, luceneResult, context ),
@@ -58,13 +61,11 @@ public class CompositeTriFunctionSearchProjectionImpl<P1, P2, P3, T> implements 
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		Object[] extractedElements = (Object[]) extractedData;
-
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
 		return transformer.apply(
-				projection1.transform( loadingResult, extractedElements[0] ),
-				projection2.transform( loadingResult, extractedElements[1] ),
-				projection3.transform( loadingResult, extractedElements[2] )
+				transformUnsafe( projection1, loadingResult, extractedData[0] ),
+				transformUnsafe( projection2, loadingResult, extractedData[1] ),
+				transformUnsafe( projection3, loadingResult, extractedData[2] )
 		);
 	}
 

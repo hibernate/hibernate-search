@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-public interface CompositeSearchProjection<T> extends LuceneSearchProjection<T> {
+public interface CompositeSearchProjection<E, T> extends LuceneSearchProjection<E, T> {
 
 }

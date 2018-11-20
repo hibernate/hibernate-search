@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public interface LuceneSearchProjection<T> extends SearchProjection<T>, LuceneCollectorProvider {
+public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, LuceneCollectorProvider {
 
 	/**
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
@@ -33,7 +33,7 @@ public interface LuceneSearchProjection<T> extends SearchProjection<T>, LuceneCo
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
 	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object)}.
 	 */
-	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
+	E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
 			SearchProjectionExecutionContext context);
 
 	/**
@@ -45,5 +45,16 @@ public interface LuceneSearchProjection<T> extends SearchProjection<T>, LuceneCo
 	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExecutionContext)} method.
 	 * @return The final result considered as a hit.
 	 */
-	T transform(LoadingResult<?> loadingResult, Object extractedData);
+	T transform(LoadingResult<?> loadingResult, E extractedData);
+
+	/**
+	 * Transform the extracted data and cast it to the right type.
+	 * <p>
+	 * This should be used with care as it's unsafe.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <Z> Z transformUnsafe(LuceneSearchProjection<?, Z> projection, LoadingResult<?> loadingResult,
+			Object extractedData) {
+		return (Z) ( (LuceneSearchProjection) projection ).transform( loadingResult, extractedData );
+	}
 }

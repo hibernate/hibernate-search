@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
+import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -16,54 +18,51 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<T> {
+public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<List<Object>, T> {
 
 	private final Function<List<?>, T> transformer;
 
-	private final List<LuceneSearchProjection<?>> children;
+	private final List<LuceneSearchProjection<?, ?>> children;
 
 	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
-			List<LuceneSearchProjection<?>> children) {
+			List<LuceneSearchProjection<?, ?>> children) {
 		this.transformer = transformer;
 		this.children = children;
 	}
 
 	@Override
 	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		for ( LuceneSearchProjection<?> child : children ) {
+		for ( LuceneSearchProjection<?, ?> child : children ) {
 			child.contributeCollectors( luceneCollectorBuilder );
 		}
 	}
 
 	@Override
 	public void contributeFields(Set<String> absoluteFieldPaths) {
-		for ( LuceneSearchProjection<?> child : children ) {
+		for ( LuceneSearchProjection<?, ?> child : children ) {
 			child.contributeFields( absoluteFieldPaths );
 		}
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public List<Object> extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
 		List<Object> extractedData = new ArrayList<>( children.size() );
 
-		for ( LuceneSearchProjection<?> child : children ) {
+		for ( LuceneSearchProjection<?, ?> child : children ) {
 			extractedData.add( child.extract( mapper, documentResult, context ) );
 		}
 
 		return extractedData;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		List<Object> extractedElements = (List<Object>) extractedData;
-
-		for ( int i = 0; i < extractedElements.size(); i++ ) {
-			extractedElements.set( i, children.get( i ).transform( loadingResult, extractedElements.get( i ) ) );
+	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData) {
+		for ( int i = 0; i < extractedData.size(); i++ ) {
+			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ) ) );
 		}
 
-		return transformer.apply( extractedElements );
+		return transformer.apply( extractedData );
 	}
 
 	@Override

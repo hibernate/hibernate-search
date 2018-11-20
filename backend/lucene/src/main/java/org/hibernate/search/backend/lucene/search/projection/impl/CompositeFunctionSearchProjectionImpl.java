@@ -14,14 +14,14 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeFunctionSearchProjectionImpl<P, T> implements CompositeSearchProjection<T> {
+public class CompositeFunctionSearchProjectionImpl<E, P, T> implements CompositeSearchProjection<E, T> {
 
 	private final Function<P, T> transformer;
 
-	private final LuceneSearchProjection<P> projection;
+	private final LuceneSearchProjection<E, P> projection;
 
 	public CompositeFunctionSearchProjectionImpl(Function<P, T> transformer,
-			LuceneSearchProjection<P> projection) {
+			LuceneSearchProjection<E, P> projection) {
 		this.transformer = transformer;
 		this.projection = projection;
 	}
@@ -37,13 +37,13 @@ public class CompositeFunctionSearchProjectionImpl<P, T> implements CompositeSea
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
+	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
 			SearchProjectionExecutionContext context) {
 		return projection.extract( projectionHitMapper, luceneResult, context );
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public T transform(LoadingResult<?> loadingResult, E extractedData) {
 		return transformer.apply( projection.transform( loadingResult, extractedData ) );
 	}
 

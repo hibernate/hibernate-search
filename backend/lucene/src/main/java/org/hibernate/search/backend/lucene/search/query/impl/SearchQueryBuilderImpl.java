@@ -34,7 +34,7 @@ class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQue
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
-	private final LuceneSearchProjection<T> rootProjection;
+	private final LuceneSearchProjection<?, T> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
 	SearchQueryBuilderImpl(
@@ -45,7 +45,7 @@ class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQue
 			SessionContextImplementor sessionContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			LuceneSearchProjection<T> rootProjection) {
+			LuceneSearchProjection<?, T> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;

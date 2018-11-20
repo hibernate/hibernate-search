@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,13 +37,13 @@ public class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 			HITS_ACCESSOR.property( "total" ).asLong();
 
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
-	private final ElasticsearchSearchProjection<T> rootProjection;
+	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
 
 	public SearchResultExtractorImpl(
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			ElasticsearchSearchProjection<T> rootProjection,
+			ElasticsearchSearchProjection<?, T> rootProjection,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		this.projectionHitMapper = projectionHitMapper;
 		this.rootProjection = rootProjection;
@@ -83,7 +85,7 @@ public class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 		LoadingResult<?> loadingResult = projectionHitMapper.load();
 
 		for ( int i = 0; i < hits.size(); i++ ) {
-			hits.set( i, rootProjection.transform( loadingResult, hits.get( i ) ) );
+			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );
 		}
 
 		return Collections.unmodifiableList( (List<T>) hits );
