@@ -1544,7 +1544,7 @@ You just need to select it by setting the following property in your `persistenc
 ====
 [source]
 [subs="verbatim,attributes"]
-jboss.as.jpa.providerModule=org.hibernate:{hibernateShortVersion}
+jboss.as.jpa.providerModule=org.hibernate.orm:{hibernateShortVersion}
 ====
 
 Then select the updated version of Hibernate Search by setting this other property:
