@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
+
 import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
@@ -13,16 +15,16 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements CompositeSearchProjection<T> {
+public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements CompositeSearchProjection<Object[], T> {
 
 	private final BiFunction<P1, P2, T> transformer;
 
-	private final ElasticsearchSearchProjection<P1> projection1;
+	private final ElasticsearchSearchProjection<?, P1> projection1;
 
-	private final ElasticsearchSearchProjection<P2> projection2;
+	private final ElasticsearchSearchProjection<?, P2> projection2;
 
 	public CompositeBiFunctionSearchProjectionImpl(BiFunction<P1, P2, T> transformer,
-			ElasticsearchSearchProjection<P1> projection1, ElasticsearchSearchProjection<P2> projection2) {
+			ElasticsearchSearchProjection<?, P1> projection1, ElasticsearchSearchProjection<?, P2> projection2) {
 		this.transformer = transformer;
 		this.projection1 = projection1;
 		this.projection2 = projection2;
@@ -36,7 +38,7 @@ public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements Compo
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ),
@@ -45,12 +47,10 @@ public class CompositeBiFunctionSearchProjectionImpl<P1, P2, T> implements Compo
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		Object[] extractedElements = (Object[]) extractedData;
-
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
 		return transformer.apply(
-				projection1.transform( loadingResult, extractedElements[0] ),
-				projection2.transform( loadingResult, extractedElements[1] )
+				transformUnsafe( projection1, loadingResult, extractedData[0] ),
+				transformUnsafe( projection2, loadingResult, extractedData[1] )
 		);
 	}
 

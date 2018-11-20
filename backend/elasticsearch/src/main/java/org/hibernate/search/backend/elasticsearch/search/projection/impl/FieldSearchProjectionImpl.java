@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
+class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T, T> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -49,18 +49,18 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public T extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
 		FromIndexFieldValueConvertContext context = searchProjectionExecutionContext.getFromIndexFieldValueConvertContext();
-		return converter.convertFromProjection( fieldValue, context );
+		return (T) converter.convertFromProjection( fieldValue, context );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (T) extractedData;
+	public T transform(LoadingResult<?> loadingResult, T extractedData) {
+		return extractedData;
 	}
 
 	@Override

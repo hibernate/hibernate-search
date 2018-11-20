@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class ObjectSearchProjectionImpl<O> implements LuceneSearchProjection<O> {
+public class ObjectSearchProjectionImpl<O> implements LuceneSearchProjection<Object, O> {
 
 	@SuppressWarnings("rawtypes")
 	private static final ObjectSearchProjectionImpl INSTANCE = new ObjectSearchProjectionImpl();

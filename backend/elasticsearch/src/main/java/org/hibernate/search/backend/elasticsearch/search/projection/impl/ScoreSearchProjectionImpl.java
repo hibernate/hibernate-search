@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> {
+class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float, Float> {
 
 	private static final JsonAccessor<Boolean> TRACK_SCORES_ACCESSOR = JsonAccessor.root().property( "track_scores" )
 			.asBoolean();
@@ -26,13 +26,14 @@ class ScoreSearchProjectionImpl implements ElasticsearchSearchProjection<Float> 
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		return hit.get( "_score" ).getAsFloat();
 	}
 
 	@Override
-	public Float transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (Float) extractedData;
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData) {
+		return extractedData;
 	}
 
 	@Override

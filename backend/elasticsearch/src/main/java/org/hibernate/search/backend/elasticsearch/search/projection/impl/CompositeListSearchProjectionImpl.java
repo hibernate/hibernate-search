@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -15,14 +17,14 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<T> {
+public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<List<Object>, T> {
 
 	private final Function<List<?>, T> transformer;
 
-	private final List<ElasticsearchSearchProjection<?>> children;
+	private final List<ElasticsearchSearchProjection<?, ?>> children;
 
 	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
-			List<ElasticsearchSearchProjection<?>> children) {
+			List<ElasticsearchSearchProjection<?, ?>> children) {
 		this.transformer = transformer;
 		this.children = children;
 	}
@@ -30,33 +32,31 @@ public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProj
 	@Override
 	public void contributeRequest(JsonObject requestBody,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		for ( ElasticsearchSearchProjection<?> child : children ) {
+		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
 			child.contributeRequest( requestBody, searchProjectionExecutionContext );
 		}
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public List<Object> extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		List<Object> extractedData = new ArrayList<>( children.size() );
 
-		for ( ElasticsearchSearchProjection<?> child : children ) {
-			extractedData.add( child.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ) );
+		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
+			extractedData
+					.add( child.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ) );
 		}
 
 		return extractedData;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object extractedData) {
-		List<Object> extractedElements = (List<Object>) extractedData;
-
-		for ( int i = 0; i < extractedElements.size(); i++ ) {
-			extractedElements.set( i, children.get( i ).transform( loadingResult, extractedElements.get( i ) ) );
+	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData) {
+		for ( int i = 0; i < extractedData.size(); i++ ) {
+			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ) ) );
 		}
 
-		return transformer.apply( extractedElements );
+		return transformer.apply( extractedData );
 	}
 
 	@Override

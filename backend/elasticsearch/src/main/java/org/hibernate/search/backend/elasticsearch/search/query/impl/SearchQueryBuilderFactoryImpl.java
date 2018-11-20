@@ -72,8 +72,8 @@ class SearchQueryBuilderFactoryImpl
 		return createSearchQueryBuilder( sessionContext, projectionHitMapper, createRootProjection( projections ) );
 	}
 
-	private ElasticsearchSearchProjection<List<?>> createRootProjection(SearchProjection<?>[] projections) {
-		List<ElasticsearchSearchProjection<?>> children = new ArrayList<>( projections.length );
+	private ElasticsearchSearchProjection<?, List<?>> createRootProjection(SearchProjection<?>[] projections) {
+		List<ElasticsearchSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
 		for ( int i = 0; i < projections.length; ++i ) {
 			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
@@ -84,7 +84,7 @@ class SearchQueryBuilderFactoryImpl
 
 	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
-			ElasticsearchSearchProjection<T> rootProjection) {
+			ElasticsearchSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchTargetModel.getElasticsearchIndexNames(),
 				sessionContext,

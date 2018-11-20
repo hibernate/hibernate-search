@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<R> {
+public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<R, R> {
 
 	@SuppressWarnings("rawtypes")
 	private static final ReferenceSearchProjectionImpl INSTANCE = new ReferenceSearchProjectionImpl();
@@ -37,16 +37,16 @@ public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<
 		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
-	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
-		return mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public R transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (R) extractedData;
+	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+			SearchProjectionExecutionContext context) {
+		return (R) mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+	}
+
+	@Override
+	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+		return extractedData;
 	}
 
 	@Override

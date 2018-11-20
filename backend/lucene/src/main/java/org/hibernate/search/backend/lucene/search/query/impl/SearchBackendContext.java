@@ -49,7 +49,7 @@ public class SearchBackendContext {
 			LuceneSearchTargetModel searchTargetModel,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
-			LuceneSearchProjection<T> rootProjection) {
+			LuceneSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		Set<String> storedFields = new HashSet<>();

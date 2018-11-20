@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public interface ElasticsearchSearchProjection<T> extends SearchProjection<T> {
+public interface ElasticsearchSearchProjection<E, T> extends SearchProjection<T> {
 
 	/**
 	 * Contribute to the request, making sure that the requirements for this projection are met.
@@ -32,7 +32,7 @@ public interface ElasticsearchSearchProjection<T> extends SearchProjection<T> {
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
 	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object)}.
 	 */
-	Object extract(ProjectionHitMapper<?, ?> projectionHitMapper,
+	E extract(ProjectionHitMapper<?, ?> projectionHitMapper,
 			JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext);
 
@@ -45,5 +45,16 @@ public interface ElasticsearchSearchProjection<T> extends SearchProjection<T> {
 	 * {@link #extract(ProjectionHitMapper, JsonObject, JsonObject, SearchProjectionExecutionContext)} method.
 	 * @return The final result considered as a hit.
 	 */
-	T transform(LoadingResult<?> loadingResult, Object extractedData);
+	T transform(LoadingResult<?> loadingResult, E extractedData);
+
+	/**
+	 * Transform the extracted data and cast it to the right type.
+	 * <p>
+	 * This should be used with care as it's unsafe.
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	static <Z> Z transformUnsafe(ElasticsearchSearchProjection<?, Z> projection, LoadingResult<?> loadingResult,
+			Object extractedData) {
+		return (Z) ( (ElasticsearchSearchProjection) projection ).transform( loadingResult, extractedData );
+	}
 }

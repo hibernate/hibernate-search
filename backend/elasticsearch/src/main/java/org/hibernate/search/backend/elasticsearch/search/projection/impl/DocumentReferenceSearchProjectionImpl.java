@@ -12,7 +12,8 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-class DocumentReferenceSearchProjectionImpl implements ElasticsearchSearchProjection<DocumentReference> {
+class DocumentReferenceSearchProjectionImpl
+		implements ElasticsearchSearchProjection<DocumentReference, DocumentReference> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
@@ -26,14 +27,14 @@ class DocumentReferenceSearchProjectionImpl implements ElasticsearchSearchProjec
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		return helper.extractDocumentReference( hit );
 	}
 
 	@Override
-	public DocumentReference transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (DocumentReference) extractedData;
+	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData) {
+		return extractedData;
 	}
 
 	@Override
