@@ -1925,6 +1925,27 @@
                                                 <ignore></ignore>
                                             </action>
                                         </pluginExecution>
+                                        <pluginExecution>
+                                            <pluginExecutionFilter>
+                                                <groupId>
+                                                    org.asciidoctor
+                                                </groupId>
+                                                <artifactId>
+                                                    asciidoctor-maven-plugin
+                                                </artifactId>
+                                                <versionRange>
+                                                    [1.5.6,)
+                                                </versionRange>
+                                                <goals>
+                                                    <goal>
+                                                        process-asciidoc
+                                                    </goal>
+                                                </goals>
+                                            </pluginExecutionFilter>
+                                            <action>
+                                                <ignore></ignore>
+                                            </action>
+                                        </pluginExecution>
                                     </pluginExecutions>
                                 </lifecycleMappingMetadata>
                             </configuration>
