@@ -369,7 +369,7 @@ stage('Default build') {
 			sh """ \
 					mvn clean install \
 					-Pdist -Pcoverage -Pjqassistant \
-					${enableDefaultEnvIT ? '' : '-DskipITs'} \
+					${enableDefaultEnvIT ? '' : '-DskipTests'} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
