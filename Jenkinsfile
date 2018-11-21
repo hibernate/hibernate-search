@@ -292,6 +292,12 @@ deploySnapshot=$deploySnapshot"""
 							" This parameter must be set when RELEASE_VERSION is set."
 			)
 		}
+		if (!params.RELEASE_DRY_RUN && !helper.configuration.file?.deployment?.maven?.settingsId) {
+			throw new IllegalArgumentException(
+					"Missing deployment configuration in job configuration file." +
+							" Cannot deploy artifacts during the release."
+			)
+		}
 	}
 
 	if (params.RELEASE_DEVELOPMENT_VERSION) {
@@ -386,7 +392,7 @@ stage('Deploy') {
 	else if (performRelease) {
 		echo "Performing full release for version ${releaseVersion.toString()}"
 		node(NODE_PATTERN_BASE) {
-			helper.withMavenWorkspace {
+			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
 				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
 
