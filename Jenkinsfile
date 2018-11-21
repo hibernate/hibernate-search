@@ -157,7 +157,6 @@ stage('Configure') {
 					// This should not include every JDK; in particular let's not care too much about EOL'd JDKs like version 9
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkITEnvironment(version: '8', tool: 'Oracle JDK 8', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
-					new JdkITEnvironment(version: '10', tool: 'Oracle JDK 10.0.1', status: ITEnvironmentStatus.SUPPORTED),
 					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.SUPPORTED)
 			],
 			database: [
