@@ -1,6 +1,26 @@
 Hibernate Search Changelog
 ==========================
 
+5.10.5.Final (21-11-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3407 Boolean fields in embedded collections are not indexed properly when using Elasticsearch
+
+** Task
+    * HSEARCH-3436 Fix the release process in Jenkinsfile
+    * HSEARCH-3431 Upgrade to Hibernate ORM 5.3.7.Final
+    * HSEARCH-3428 Get back to the default, virtualized infrastructure for Travis builds
+    * HSEARCH-3411 Add gitter room notification for Jenkins builds
+    * HSEARCH-3400 Use org.hibernate.search.jpa.Search in the documentation when we call getFullTextEntityManager
+    * HSEARCH-3396 Allow to use snapshot artifacts in OSGi integration tests
+    * HSEARCH-3394 Upgrade HCANN to 5.0.5.Final
+    * HSEARCH-3380 Find a way to add JAXB modules to the OSGi feature in OSGi integration tests
+    * HSEARCH-3379 Reference the Hibernate ORM feature from the OSGi tests
+    * HSEARCH-3377 Upgrade EasyMock to a version compatible with JDK10
+    * HSEARCH-3365 Backport Jenkinsfile to older, still maintained branches
+    * HSEARCH-3151 Upgrade to Apache Karaf 4.2.1 to be able to test in JDK10, hopefully JDK11
+
 5.10.4.Final (10-09-2018)
 -------------------------
 
