@@ -309,7 +309,7 @@ stage('Default build') {
 			sh """ \
 					mvn clean install \
 					-Pdocs,docbook,dist \
-					${enableDefaultEnvIT ? '' : '-DskipITs'} \
+					${enableDefaultEnvIT ? '' : '-DskipTests'} \
 			"""
 
 			dir(helper.configuration.maven.localRepositoryPath) {
