@@ -62,7 +62,7 @@ public class GettingStartedWithoutHibernateSearchIT {
 			List<Book> result = query.getResultList();
 
 			assertThat( result ).extracting( "id" )
-					.containsOnly( bookIdHolder.get() );
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 	}
 

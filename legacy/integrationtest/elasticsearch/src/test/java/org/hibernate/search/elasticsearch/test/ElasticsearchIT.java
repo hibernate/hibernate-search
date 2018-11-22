@@ -164,7 +164,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly(
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder(
 				"Latest in ORM",
 				"ORM for dummies",
 				"High-performance ORM",
@@ -183,7 +183,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'range' : { 'wordCount' : { 'gte' : 8, 'lt' : 10 } } } }" );
 		List<?> result = session.createFullTextQuery( query ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder( "Latest in ORM", "ORM for beginners" );
 		tx.commit();
 		s.close();
 	}
@@ -200,7 +200,7 @@ public class ElasticsearchIT extends SearchTestBase {
 				.setSort( new Sort( new SortField( "id", SortField.Type.STRING ) ) )
 				.list();
 
-		assertThat( result ).extracting( "firstName" ).containsOnly( "Klaus" );
+		assertThat( result ).extracting( "firstName" ).containsExactlyInAnyOrder( "Klaus" );
 		tx.commit();
 		s.close();
 	}
@@ -344,7 +344,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'title' : 'findings' } } }" );
 		List<?> result = session.createFullTextQuery( query, MasterThesis.class, BachelorThesis.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly( "Great findings", "Latest findings" );
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder( "Great findings", "Latest findings" );
 		tx.commit();
 		s.close();
 	}
@@ -358,7 +358,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromJson( "{ 'query': { 'match' : { 'abstract' : 'Hibernate' } } }" );
 		List<?> result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly( "Very important research on Hibernate", "Some research" );
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder( "Very important research on Hibernate", "Some research" );
 		tx.commit();
 		s.close();
 	}
@@ -376,7 +376,7 @@ public class ElasticsearchIT extends SearchTestBase {
 				.setSort( new Sort( new SortField( "id", SortField.Type.STRING, false ) ) )
 				.list();
 
-		assertThat( result ).extracting( "title" ).containsOnly( "Latest in ORM", "High-performance ORM" );
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder( "Latest in ORM", "High-performance ORM" );
 		tx.commit();
 		s.close();
 	}
@@ -530,7 +530,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "abstract:Hibernate" );
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly(
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder(
 				"Latest in ORM",
 				"ORM for dummies",
 				"High-performance ORM",
@@ -540,7 +540,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromQueryString( "abstract:important OR title:important" );
 		result = session.createFullTextQuery( query, ResearchPaper.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly(
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder(
 				"Very important research on Hibernate",
 				"Some research"
 		);
@@ -548,7 +548,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromQueryString( "wordCount:[8 TO 10}" );
 		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly( "Latest in ORM", "ORM for beginners" );
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder( "Latest in ORM", "ORM for beginners" );
 
 		tx.commit();
 		s.close();
@@ -624,7 +624,7 @@ public class ElasticsearchIT extends SearchTestBase {
 
 		List<?> result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly(
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder(
 				"ORM for dummies",
 				"ORM for beginners"
 		);
@@ -632,7 +632,7 @@ public class ElasticsearchIT extends SearchTestBase {
 		query = ElasticsearchQueries.fromQueryString( "_id:1 OR _id:3" );
 		result = session.createFullTextQuery( query, ScientificArticle.class ).list();
 
-		assertThat( result ).extracting( "title" ).containsOnly(
+		assertThat( result ).extracting( "title" ).containsExactlyInAnyOrder(
 				"ORM for dummies",
 				"ORM for beginners"
 		);

@@ -99,7 +99,7 @@ public class ObjectLoadingCrossHierarchyTest extends SearchTestBase {
 		assertThat( results )
 				.extracting( "name" )
 				.describedAs( "Can load results originating from different id spaces, using different id types and names" )
-				.containsOnly(
+				.containsExactlyInAnyOrder(
 				"Southern Florida College of Golf",
 				"Wogharts",
 				"St. Lucie Community College",

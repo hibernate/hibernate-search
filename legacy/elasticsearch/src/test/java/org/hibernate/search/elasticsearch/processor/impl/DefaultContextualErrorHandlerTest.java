@@ -84,7 +84,7 @@ public class DefaultContextualErrorHandlerTest {
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
 		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork1 );
-		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork1, luceneWork2, luceneWork3 );
+		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( luceneWork1, luceneWork2, luceneWork3 );
 	}
 
 	@Test
@@ -134,7 +134,7 @@ public class DefaultContextualErrorHandlerTest {
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
 		assertThat( errorContext.getOperationAtFault() ).isNull();
-		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork1, luceneWork2, luceneWork3 );
+		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( luceneWork1, luceneWork2, luceneWork3 );
 	}
 
 	@Test
@@ -166,9 +166,9 @@ public class DefaultContextualErrorHandlerTest {
 		verify();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
-		assertThat( throwable1.getSuppressed() ).containsOnly( throwable2 );
+		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( errorContext.getOperationAtFault() ).isIn( luceneWork1, luceneWork2 );
-		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork1, luceneWork2, luceneWork3 );
+		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( luceneWork1, luceneWork2, luceneWork3 );
 	}
 
 	@Test
@@ -205,9 +205,9 @@ public class DefaultContextualErrorHandlerTest {
 		verify();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
-		assertThat( throwable1.getSuppressed() ).containsOnly( throwable2 );
+		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( errorContext.getOperationAtFault() ).isSameAs( luceneWork1 );
-		assertThat( errorContext.getFailingOperations() ).containsOnly( luceneWork1, luceneWork2, luceneWork3 );
+		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( luceneWork1, luceneWork2, luceneWork3 );
 	}
 
 	private void reset() {

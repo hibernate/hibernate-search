@@ -85,19 +85,19 @@ public class ElasticsearchNullValueIT extends SearchTestBase {
 
 		QueryDescriptor query = ElasticsearchQueries.fromQueryString( "firstName:&lt;NULL&gt;" );
 		List<?> result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded String" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded String" ).containsExactlyInAnyOrder( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "dateOfBirth:1970-01-01" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Date" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Date" ).containsExactlyInAnyOrder( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "active:false" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Boolean" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Boolean" ).containsExactlyInAnyOrder( 2L );
 
 		query = ElasticsearchQueries.fromQueryString( "driveWidth:\\-1" );
 		result = session.createFullTextQuery( query, GolfPlayer.class ).list();
-		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Integer" ).containsOnly( 2L );
+		assertThat( result ).extracting( "id" ).describedAs( "Querying null-encoded Integer" ).containsExactlyInAnyOrder( 2L );
 
 		tx.commit();
 		s.close();

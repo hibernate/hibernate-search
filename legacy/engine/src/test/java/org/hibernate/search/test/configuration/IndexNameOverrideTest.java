@@ -49,7 +49,7 @@ public class IndexNameOverrideTest {
 				)
 				.extracting( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
-				.containsOnly( NoAnnotationIndexNameOverrideEntity.class.getName() );
+				.containsExactlyInAnyOrder( NoAnnotationIndexNameOverrideEntity.class.getName() );
 
 		NoAnnotationIndexNameOverrideEntity entity = new NoAnnotationIndexNameOverrideEntity();
 		entity.id = 1L;
@@ -69,7 +69,7 @@ public class IndexNameOverrideTest {
 				)
 				.extracting( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )
-				.containsOnly( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
+				.containsExactlyInAnyOrder( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
 
 		IndexedAnnotationIndexNameOverriddeEntity entity = new IndexedAnnotationIndexNameOverriddeEntity();
 		entity.id = 1L;
@@ -98,7 +98,7 @@ public class IndexNameOverrideTest {
 				)
 				.extracting( "indexName" )
 				.as( "Index names for entity " + NoAnnotationIndexNameOverrideEntity.class )
-				.containsOnly( NoAnnotationIndexNameOverrideEntity.class.getName() );
+				.containsExactlyInAnyOrder( NoAnnotationIndexNameOverrideEntity.class.getName() );
 
 		NoAnnotationIndexNameOverrideEntity entity = new NoAnnotationIndexNameOverrideEntity();
 		entity.id = 1L;
@@ -127,7 +127,7 @@ public class IndexNameOverrideTest {
 				)
 				.extracting( "indexName" )
 				.as( "Index names for entity " + IndexedAnnotationIndexNameOverriddeEntity.class )
-				.containsOnly( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
+				.containsExactlyInAnyOrder( INDEXED_ANNOTATION_OVERRIDDEN_INDEX_NAME );
 
 		IndexedAnnotationIndexNameOverriddeEntity entity = new IndexedAnnotationIndexNameOverriddeEntity();
 		entity.id = 1L;

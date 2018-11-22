@@ -262,7 +262,7 @@ public class SortTest extends SearchTestBase {
 		List<Book> result = hibQuery.list();
 
 		assertNotNull( result );
-		assertThat( result ).extracting( "id" ).containsOnly( 1, 2, 3, 10 );
+		assertThat( result ).extracting( "id" ).containsExactlyInAnyOrder( 1, 2, 3, 10 );
 
 		tx.commit();
 	}

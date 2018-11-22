@@ -299,14 +299,14 @@ public class OrmElasticsearchLibraryShowcaseIT {
 			List<Book> books = dao.searchByMedium(
 					"java", BookMedium.DEMATERIALIZED, 0, 10
 			);
-			assertThat( books ).containsOnly(
+			assertThat( books ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
 			);
 
 			books = dao.searchByMedium(
 					"java", BookMedium.HARDCOPY, 0, 10
 			);
-			assertThat( books ).containsOnly(
+			assertThat( books ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Book.class, INDONESIAN_ECONOMY_ID )
 			);
@@ -392,7 +392,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					Collections.singletonList( LibraryService.DISABLED_ACCESS ),
 					0, 10
 			);
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Video.class, JAVA_DANCING_ID ),
 					session.get( Book.class, INDONESIAN_ECONOMY_ID )
@@ -404,7 +404,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					Collections.singletonList( LibraryService.READING_ROOMS ),
 					0, 10
 			);
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Video.class, JAVA_DANCING_ID ),
 					session.get( Book.class, INDONESIAN_ECONOMY_ID )
@@ -421,7 +421,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 			 * which is present in a library with disabled access and in a library with reading rooms,
 			 * but not in a library with both.
 			 */
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Video.class, JAVA_DANCING_ID )
 			);
@@ -441,7 +441,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					null,
 					0, 10
 			);
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Video.class, JAVA_DANCING_ID ),
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Book.class, INDONESIAN_ECONOMY_ID ),
@@ -454,7 +454,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					null,
 					0, 10
 			);
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID ),
 					session.get( Book.class, ART_OF_COMPUTER_PROG_ID )
 			);
@@ -465,7 +465,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 					null,
 					0, 10
 			);
-			assertThat( documents ).containsOnly(
+			assertThat( documents ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
 			);
 		} );

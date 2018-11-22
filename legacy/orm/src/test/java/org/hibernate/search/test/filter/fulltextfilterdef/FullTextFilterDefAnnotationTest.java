@@ -53,9 +53,9 @@ public class FullTextFilterDefAnnotationTest {
 	}
 
 	@Test
-	public void shouldContainsOnlyTheDefinedFilters() throws Exception {
+	public void shouldcontainsExactlyInAnyOrderTheDefinedFilters() throws Exception {
 		Map<String, FilterDef> filterDefinitions = ( (SearchFactoryState) sfHolder.getSearchFactory() ).getFilterDefinitions();
-		assertThat( filterDefinitions.keySet() ).containsOnly( "package-filter", "class-filter" );
+		assertThat( filterDefinitions.keySet() ).containsExactlyInAnyOrder( "package-filter", "class-filter" );
 	}
 
 	@Test

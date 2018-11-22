@@ -93,7 +93,7 @@ public class GettingStartedWithAnalysisIT {
 			// end::searching[]
 
 			assertThat( result ).extracting( "id" )
-					.containsOnly( bookIdHolder.get() );
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
 		// Also test the other terms mentioned in the getting started guide
@@ -112,7 +112,7 @@ public class GettingStartedWithAnalysisIT {
 				List<Book> result = query.getResultList();
 				assertThat( result ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
-						.containsOnly( bookIdHolder.get() );
+						.containsExactlyInAnyOrder( bookIdHolder.get() );
 			}
 		} );
 	}

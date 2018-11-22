@@ -50,24 +50,24 @@ public class SpringInjectionIT {
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
 		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity2 = new EntityWithSpringAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity2.getId() );
 
 		dao.delete( entity );
 		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
 		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
 		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity2.getId() );
 	}
 
 	@Test
@@ -82,24 +82,24 @@ public class SpringInjectionIT {
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
 		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).isEmpty();
 
 		EntityWithSpringAwareBridges entity2 = new EntityWithSpringAwareBridges();
 		entity2.setInternationalizedValue( InternationalizedValue.GOODBYE );
 		dao.create( entity2 );
-		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsOnly( entity.getId() );
-		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hello" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "hallo" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity2.getId() );
 
 		dao.delete( entity );
 		assertThat( search.apply( "bonjour" ) ).extracting( "id" ).isEmpty();
 		assertThat( search.apply( "hello" ) ).extracting( "id" ).isEmpty();
 		assertThat( search.apply( "hallo" ) ).extracting( "id" ).isEmpty();
-		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsOnly( entity2.getId() );
+		assertThat( search.apply( "au revoir" ) ).extracting( "id" ).containsExactlyInAnyOrder( entity2.getId() );
 	}
 
 	@Test
@@ -111,6 +111,6 @@ public class SpringInjectionIT {
 		EntityWithSpringAwareBridges entity = new EntityWithSpringAwareBridges();
 		entity.setInternationalizedValue( InternationalizedValue.HELLO );
 		dao.create( entity );
-		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).extracting( "id" ).containsOnly( entity.getId() );
+		assertThat( search.apply( NonSpringBridge.PREFIX + InternationalizedValue.HELLO.name() ) ).extracting( "id" ).containsExactlyInAnyOrder( entity.getId() );
 	}
 }
