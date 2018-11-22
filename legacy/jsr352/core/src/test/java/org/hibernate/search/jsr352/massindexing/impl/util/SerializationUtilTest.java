@@ -144,12 +144,12 @@ public class SerializationUtilTest {
 		 * methods #equals and #hashCode, so the equality-by-value is actually equality-by-reference.
 		 * Enable the following lines to see what happens.
 		 */
-//		assertThat( actualCriteria ).containsOnly( criterion1, criterion2 );
+//		assertThat( actualCriteria ).containsExactlyInAnyOrder( criterion1, criterion2 );
 
 		Set<String> actualCriteriaAsStrings = actualCriteria.stream()
 				.map( Object::toString )
 				.collect( Collectors.toSet() );
-		assertThat( actualCriteriaAsStrings ).containsOnly( criterion1.toString(), criterion2.toString() );
+		assertThat( actualCriteriaAsStrings ).containsExactlyInAnyOrder( criterion1.toString(), criterion2.toString() );
 	}
 
 }

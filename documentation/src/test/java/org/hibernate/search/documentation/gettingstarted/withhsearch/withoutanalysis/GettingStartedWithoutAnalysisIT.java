@@ -100,7 +100,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// end::searching-objects[]
 
 			assertThat( result ).extracting( "id" )
-					.containsOnly( bookIdHolder.get() );
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
@@ -122,7 +122,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// end::searching-lambdas[]
 
 			assertThat( result ).extracting( "id" )
-					.containsOnly( bookIdHolder.get() );
+					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 	}
 

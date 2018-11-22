@@ -156,7 +156,7 @@ public class DeleteByQueryMultiTenancyIT extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<HockeyPlayer> result = session.createFullTextQuery( query, HockeyPlayer.class ).list();
 
-		assertThat( result ).extracting( "name" ).containsOnly( "Hergesheimer", "Brand" );
+		assertThat( result ).extracting( "name" ).containsExactlyInAnyOrder( "Hergesheimer", "Brand" );
 
 		tx.commit();
 
@@ -179,7 +179,7 @@ public class DeleteByQueryMultiTenancyIT extends SearchTestBase {
 		assertThat( result )
 			.describedAs( "Running delete-by-query for other tenant should not affect entities of this entity" )
 			.extracting( "name" )
-			.containsOnly( "Metz", "Plenty" );
+			.containsExactlyInAnyOrder( "Metz", "Plenty" );
 
 		tx.commit();
 		s.close();

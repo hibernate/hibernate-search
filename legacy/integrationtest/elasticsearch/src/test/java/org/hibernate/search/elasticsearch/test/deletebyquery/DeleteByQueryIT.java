@@ -102,7 +102,7 @@ public class DeleteByQueryIT extends SearchTestBase {
 		@SuppressWarnings("unchecked")
 		List<HockeyPlayer> result = session.createFullTextQuery( query, HockeyPlayer.class ).list();
 
-		assertThat( result ).extracting( "name" ).containsOnly( "Hergesheimer", "Brand" );
+		assertThat( result ).extracting( "name" ).containsExactlyInAnyOrder( "Hergesheimer", "Brand" );
 
 		tx.commit();
 		s.close();

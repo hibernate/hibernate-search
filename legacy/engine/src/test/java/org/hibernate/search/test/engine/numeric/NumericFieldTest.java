@@ -177,7 +177,7 @@ public class NumericFieldTest {
 				.getIndexedFields();
 
 		assertThat( fields ).extracting( "name" )
-				.containsOnly( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2" );
+				.containsExactlyInAnyOrder( "rating", "ratingNumericPrecision1", "ratingNumericPrecision2" );
 
 		for ( FieldDescriptor field : fields ) {
 			if ( "ratingNumericPrecision1".equals( field.getName() ) ) {

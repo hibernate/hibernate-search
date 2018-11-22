@@ -73,7 +73,7 @@ public class SearchResultAssert<T> {
 	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
 		Assertions.<T>assertThat( actual.getHits() )
 				.as( "Hits of " + queryDescription )
-				.containsOnly( hits );
+				.containsExactlyInAnyOrder( hits );
 		return this;
 	}
 
@@ -111,7 +111,7 @@ public class SearchResultAssert<T> {
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualDocumentReferencesHits() )
 				.as( "Hits of " + queryDescription )
-				.containsOnly( context.getExpectedHits() );
+				.containsExactlyInAnyOrder( context.getExpectedHits() );
 		return this;
 	}
 
@@ -129,7 +129,7 @@ public class SearchResultAssert<T> {
 		expectation.accept( context );
 		Assertions.assertThat( getNormalizedActualListHits() )
 				.as( "Hits of " + queryDescription )
-				.containsOnly( context.getExpectedHits() );
+				.containsExactlyInAnyOrder( context.getExpectedHits() );
 		return this;
 	}
 

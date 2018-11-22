@@ -73,10 +73,10 @@ public class AnalyzerDefAnnotationTest {
 		IndexManagerType indexManagerType = factory.getIndexBindings().get( Sample.class ).getIndexManagerType();
 		Map<String, AnalyzerReference> analyzerReferences =
 				factory.getIntegration( indexManagerType ).getAnalyzerRegistry().getNamedAnalyzerReferences();
-		assertThat( analyzerReferences.keySet() ).containsOnly( "package-analyzer", "class-analyzer" );
+		assertThat( analyzerReferences.keySet() ).containsExactlyInAnyOrder( "package-analyzer", "class-analyzer" );
 		Map<String, AnalyzerReference> normalizerReferences =
 				factory.getIntegration( indexManagerType ).getNormalizerRegistry().getNamedNormalizerReferences();
-		assertThat( normalizerReferences.keySet() ).containsOnly( "package-normalizer", "class-normalizer" );
+		assertThat( normalizerReferences.keySet() ).containsExactlyInAnyOrder( "package-normalizer", "class-normalizer" );
 	}
 
 	@Test

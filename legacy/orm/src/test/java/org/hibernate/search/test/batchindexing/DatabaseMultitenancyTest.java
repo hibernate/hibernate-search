@@ -91,21 +91,21 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 	public void shouldOnlyFindMetamecModels() throws Exception {
 		List<Clock> list = searchAll( METAMEC_TID );
 		assertThat( list ).isNotEmpty();
-		assertThat( list ).containsOnly( METAMEC_MODELS );
+		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
 	public void shouldOnlyFindGeochronModels() throws Exception {
 		List<Clock> list = searchAll( GEOCHRON_TID );
 		assertThat( list ).isNotEmpty();
-		assertThat( list ).containsOnly( GEOCHRON_MODELS );
+		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
 	public void shouldMatchOnlyElementsFromOneTenant() throws Exception {
 		List<Clock> list = searchModel( "model", GEOCHRON_TID );
 		assertThat( list ).isNotEmpty();
-		assertThat( list ).containsOnly( GEOCHRON_MODELS );
+		assertThat( list ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		assertThat( listg ).isEmpty();
 		List<Clock> listm = searchAll( METAMEC_TID );
 		assertThat( listm ).isNotEmpty();
-		assertThat( listm ).containsOnly( METAMEC_MODELS );
+		assertThat( listm ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 
 		List<Clock> listg = searchAll( GEOCHRON_TID );
 		assertThat( listg ).isNotEmpty();
-		assertThat( listg ).containsOnly( GEOCHRON_MODELS );
+		assertThat( listg ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 		List<Clock> listm = searchAll( METAMEC_TID );
 		assertThat( listm ).isEmpty();
 	}
@@ -137,7 +137,7 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		purgeAll( Clock.class, GEOCHRON_TID );
 
 		List<Clock> list = searchAll( METAMEC_TID );
-		assertThat( list ).containsOnly( METAMEC_MODELS );
+		assertThat( list ).containsExactlyInAnyOrder( METAMEC_MODELS );
 	}
 
 	@Test
@@ -146,10 +146,10 @@ public class DatabaseMultitenancyTest extends SearchTestBase {
 		rebuildIndexWithMassIndexer( Clock.class, GEOCHRON_TID );
 
 		List<Clock> metamecList = searchAll( METAMEC_TID );
-		assertThat( metamecList ).containsOnly( METAMEC_MODELS );
+		assertThat( metamecList ).containsExactlyInAnyOrder( METAMEC_MODELS );
 
 		List<Clock> geochronList = searchAll( GEOCHRON_TID );
-		assertThat( geochronList ).containsOnly( GEOCHRON_MODELS );
+		assertThat( geochronList ).containsExactlyInAnyOrder( GEOCHRON_MODELS );
 	}
 
 	@Test

@@ -70,10 +70,10 @@ public class TypeMetadataTest {
 		TypeMetadata metadata = metadataProvider.getTypeMetadataFor( Bar.class, LuceneEmbeddedIndexManagerType.INSTANCE );
 
 		Set<SortableFieldMetadata> fieldMetadata = metadata.getPropertyMetadataForProperty( "name" ).getSortableFieldMetadata();
-		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsOnly( "name" );
+		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsExactlyInAnyOrder( "name" );
 
 		fieldMetadata = metadata.getPropertyMetadataForProperty( "age" ).getSortableFieldMetadata();
-		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsOnly( "ageForStringSorting", "ageForIntSorting" );
+		assertThat( fieldMetadata ).extracting( "absoluteName" ).containsExactlyInAnyOrder( "ageForStringSorting", "ageForIntSorting" );
 	}
 
 	@Indexed

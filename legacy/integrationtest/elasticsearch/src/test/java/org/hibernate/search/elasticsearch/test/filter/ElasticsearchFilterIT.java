@@ -44,13 +44,13 @@ public class ElasticsearchFilterIT extends SearchTestBase {
 		FullTextQuery ftQuery = fullTextSession.createFullTextQuery( ElasticsearchQueries.fromJson( "{ 'query': { 'match_all': {} } }" ), Driver.class );
 		ftQuery.enableFullTextFilter( "bestDriver" );
 
-		assertThat( ftQuery.list() ).extracting( "name" ).containsOnly( "Liz", "Emmanuel" );
+		assertThat( ftQuery.list() ).extracting( "name" ).containsExactlyInAnyOrder( "Liz", "Emmanuel" );
 
 		TermQuery termQuery = new TermQuery( new Term( "name", "liz" ) );
 		Filter termFilter = new QueryWrapperFilter( termQuery );
 		ftQuery.setFilter( termFilter );
 
-		assertThat( ftQuery.list() ).extracting( "name" ).containsOnly( "Liz" );
+		assertThat( ftQuery.list() ).extracting( "name" ).containsExactlyInAnyOrder( "Liz" );
 
 		tx.commit();
 		s.close();
@@ -66,7 +66,7 @@ public class ElasticsearchFilterIT extends SearchTestBase {
 		ftQuery.enableFullTextFilter( "namedDriver" )
 				.setParameter( "name", "liz" );
 
-		assertThat( ftQuery.list() ).extracting( "name" ).containsOnly( "Liz" );
+		assertThat( ftQuery.list() ).extracting( "name" ).containsExactlyInAnyOrder( "Liz" );
 
 		tx.commit();
 		s.close();
@@ -85,7 +85,7 @@ public class ElasticsearchFilterIT extends SearchTestBase {
 				.setParameter( "field", "teacher" )
 				.setParameter( "value", "andre" );
 
-		assertThat( ftQuery.list() ).extracting( "name" ).containsOnly( "Emmanuel" );
+		assertThat( ftQuery.list() ).extracting( "name" ).containsExactlyInAnyOrder( "Emmanuel" );
 
 		tx.commit();
 		s.close();

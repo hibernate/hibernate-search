@@ -315,13 +315,13 @@ public class SearchITHelper {
 		@SafeVarargs
 		public final AssertHSQueryContext matchesUnorderedIds(Serializable ... expectedIds) {
 			Object[] objectArray = Arrays.stream( expectedIds ).toArray();
-			asResultIds().containsOnly( objectArray );
+			asResultIds().containsExactlyInAnyOrder( objectArray );
 			return this;
 		}
 
 		public final AssertHSQueryContext matchesUnorderedIds(int[] expectedIds) {
 			Object[] objectArray = Arrays.stream( expectedIds ).mapToObj( i -> i ).toArray();
-			asResultIds().containsOnly( objectArray );
+			asResultIds().containsExactlyInAnyOrder( objectArray );
 			return this;
 		}
 
@@ -348,7 +348,7 @@ public class SearchITHelper {
 			Object[] objectArray = Arrays.stream( expectedProjections )
 					.map( Arrays::asList ) // Take advantage of List.equals
 					.toArray();
-			asResultProjectionsAsLists().containsOnly( objectArray );
+			asResultProjectionsAsLists().containsExactlyInAnyOrder( objectArray );
 			return this;
 		}
 
@@ -357,7 +357,7 @@ public class SearchITHelper {
 			Object[] objectArray = Arrays.stream( expectedSingleElementProjections )
 					.map( p -> Arrays.asList( p ) ) // Take advantage of List.equals
 					.toArray();
-			asResultProjectionsAsLists().containsOnly( objectArray );
+			asResultProjectionsAsLists().containsExactlyInAnyOrder( objectArray );
 			return this;
 		}
 
