@@ -248,6 +248,9 @@ public class FieldSearchProjectionIT {
 		searchTarget.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
 	}
 
+	/**
+	 * Test that mentioning the same projection twice works as expected.
+	 */
 	@Test
 	public void duplicated() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
@@ -258,14 +261,17 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjections(
+										searchTarget.projection().field( fieldPath, model.type ).toProjection(),
+										searchTarget.projection().field( fieldPath, model.type ).toProjection()
+								)
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
-					model.document1Value.indexedValue,
-					model.document2Value.indexedValue,
-					model.document3Value.indexedValue,
-					null // Empty document
+						Arrays.asList( model.document1Value.indexedValue, model.document1Value.indexedValue ),
+						Arrays.asList( model.document2Value.indexedValue, model.document2Value.indexedValue ),
+						Arrays.asList( model.document3Value.indexedValue, model.document3Value.indexedValue ),
+						Arrays.asList( null, null ) // Empty document
 				);
 			} );
 		}
