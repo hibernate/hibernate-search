@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTy
 public final class ValueWrapper<T> {
 	public static <T> ToIndexFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
 		return new ToIndexFieldValueConverter<ValueWrapper<T>, T>() {
+
 			@Override
 			public T convert(ValueWrapper<T> value, ToIndexFieldValueConvertContext context) {
 				return value.getValue();
@@ -42,7 +43,6 @@ public final class ValueWrapper<T> {
 
 	public static <T> FromIndexFieldValueConverter<T, ValueWrapper<T>> fromIndexFieldConverter() {
 		return new FromIndexFieldValueConverter<T, ValueWrapper<T>>() {
-
 			@Override
 			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
 				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
