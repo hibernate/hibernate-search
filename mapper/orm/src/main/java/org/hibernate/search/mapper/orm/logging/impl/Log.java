@@ -7,6 +7,9 @@
 
 package org.hibernate.search.mapper.orm.logging.impl;
 
+import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.util.Collection;
 import java.util.Set;
 
@@ -19,6 +22,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
+import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -32,8 +36,16 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX)
+		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
+		@ValidIdRange(min = 36, max = 36),
+		@ValidIdRange(min = 62, max = 62),
+		@ValidIdRange(min = 65, max = 65),
+		@ValidIdRange(min = 116, max = 116),
+		@ValidIdRange(min = 183, max = 183),
+		@ValidIdRange(min = 211, max = 212),
+		@ValidIdRange(min = 276, max = 276),
+		@ValidIdRange(min = 348, max = 349)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5. See the Lucene logger for examples.
 })
 public interface Log extends BasicLogger {
@@ -43,6 +55,45 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_1 + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")
+	void cannotGuessTransactionStatus(@Cause Exception e);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET_1 + 62, value = "Batch indexing was interrupted")
+	void interruptedBatchIndexing();
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET_1 + 65, value = "Error while rolling back transaction after %1$s")
+	void errorRollingBackTransaction(String message, @Cause Exception e1);
+
+	/*
+	 * This is not an exception factory nor a logging statement.
+	 * The returned string is passed to the ErrorHandler,
+	 * which is not necessarily using a logger but we still
+	 * want to internationalize the message.
+	 */
+	@Message(id = ID_OFFSET_1 + 116, value = "Unexpected error during MassIndexer operation")
+	String massIndexerUnexpectedErrorMessage();
+
+	@Message(id = ID_OFFSET_1 + 183, value = "Unable to index instance of type %s while batch indexing: %s")
+	String massIndexerUnableToIndexInstance(String clazz, String value);
+
+	@Message(id = ID_OFFSET_1 + 211, value = "An exception occurred while the MassIndexer was fetching the primary identifiers list")
+	String massIndexerExceptionWhileFetchingIds();
+
+	@Message(id = ID_OFFSET_1 + 212, value = "An exception occurred while the MassIndexer was transforming identifiers to Lucene Documents")
+	String massIndexerExceptionWhileTransformingIds();
+
+	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
+	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);
+
+	@Message(id = ID_OFFSET_1 + 348, value = "Some of the specified entity types ('%s') are not configured, nor is any of their subclasses." )
+	IllegalArgumentException someTargetedEntityTypesNotConfigured(String targetedEntities);
+
+	@Message(id = ID_OFFSET_1 + 349, value = "Some of the specified entity types ('%s') are not indexed, nor is any of their subclasses." )
+	IllegalArgumentException someTargetedEntityTypesNotIndexed(String targetedEntities);
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
@@ -106,5 +157,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 13, value = "Interrupted on batch Indexing; index will be left in unknown state!")
+	SearchException interruptedBatchIndexingException(@Cause Exception cause);
 
 }

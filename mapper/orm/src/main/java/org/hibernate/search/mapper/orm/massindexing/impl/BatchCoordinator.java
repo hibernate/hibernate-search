@@ -1,0 +1,168 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.mapper.orm.massindexing.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+
+import org.hibernate.CacheMode;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Executors;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+import java.lang.invoke.MethodHandles;
+
+/**
+ * Makes sure that several different BatchIndexingWorkspace(s)
+ * can be started concurrently, sharing the same batch-backend
+ * and IndexWriters.
+ *
+ * @author Sanne Grinovero
+ */
+public class BatchCoordinator extends ErrorHandledRunnable {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
+	private final SessionFactoryImplementor sessionFactory;
+	private final HibernateOrmMapping mapping;
+
+	//TODO: use the workPlan to handle optimize tasks
+
+	private final int typesToIndexInParallel;
+	private final int documentBuilderThreads;
+	private final CacheMode cacheMode;
+	private final int objectLoadingBatchSize;
+	private final boolean optimizeAtEnd;
+	private final boolean purgeAtStart;
+	private final boolean optimizeAfterPurge;
+	private final CountDownLatch endAllSignal;
+	private final long objectsLimit;
+	private final int idFetchSize;
+	private final Integer transactionTimeout;
+	private final String tenantId;
+	private final List<Future<?>> indexingTasks = new ArrayList<>();
+
+	public BatchCoordinator(Set<Class<?>> rootEntities,
+							SessionFactoryImplementor sessionFactory,
+							HibernateOrmMapping mapping,
+							int typesToIndexInParallel,
+							int documentBuilderThreads,
+							CacheMode cacheMode,
+							int objectLoadingBatchSize,
+							long objectsLimit,
+							boolean optimizeAtEnd,
+							boolean purgeAtStart,
+							boolean optimizeAfterPurge,
+							int idFetchSize,
+							Integer transactionTimeout,
+							String tenantId) {
+		this.idFetchSize = idFetchSize;
+		this.transactionTimeout = transactionTimeout;
+		this.tenantId = tenantId;
+		this.rootEntities = rootEntities;
+		this.sessionFactory = sessionFactory;
+		this.mapping = mapping;
+		this.typesToIndexInParallel = typesToIndexInParallel;
+		this.documentBuilderThreads = documentBuilderThreads;
+		this.cacheMode = cacheMode;
+		this.objectLoadingBatchSize = objectLoadingBatchSize;
+		this.optimizeAtEnd = optimizeAtEnd;
+		this.purgeAtStart = purgeAtStart;
+		this.optimizeAfterPurge = optimizeAfterPurge;
+		this.objectsLimit = objectsLimit;
+		this.endAllSignal = new CountDownLatch( rootEntities.size() );
+	}
+
+	@Override
+	public void runWithErrorHandler() {
+		if ( indexingTasks.size() > 0 ) {
+			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused - indexingTasks should be empty" );
+		}
+
+		try {
+			beforeBatch(); // purgeAll and pre-optimize activities
+			doBatchWork();
+			afterBatch();
+		}
+		catch (InterruptedException e) {
+			log.interruptedBatchIndexing();
+			// on thread interruption cancel each pending task - thread executing the task must be interrupted
+			for ( Future<?> task : indexingTasks ) {
+				if ( !task.isDone() ) {
+					task.cancel( true );
+				}
+			}
+			// try afterBatch stuff - indexation realized before interruption will be commited - index should be in a
+			// coherent state (not corrupted)
+			afterBatchOnInterruption();
+
+			// restore interruption signal:
+			Thread.currentThread().interrupt();
+		}
+		finally {
+			//TODO: Implement a monitor, then close it here
+		}
+	}
+
+	/**
+	 * Will spawn a thread for each type in rootEntities, they will all re-join
+	 * on endAllSignal when finished.
+	 *
+	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
+	 */
+	private void doBatchWork() throws InterruptedException {
+		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
+		for ( Class<?> type : rootEntities ) {
+			indexingTasks.add( executor.submit( new BatchIndexingWorkspace( sessionFactory, mapping, type, documentBuilderThreads, cacheMode,
+					objectLoadingBatchSize, endAllSignal, objectsLimit, idFetchSize, transactionTimeout, tenantId
+			) ) );
+
+		}
+		executor.shutdown();
+		endAllSignal.await(); //waits for the executor to finish
+	}
+
+	/**
+	 * Operations to do after all subthreads finished their work on index
+	 */
+	private void afterBatch() {
+		if ( this.optimizeAtEnd ) {
+			//TODO: batchWorkPlan.optimize( rootEntities );
+		}
+		//TODO: batchWorkPlan.flush( rootEntities );
+	}
+
+	/**
+	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
+	 */
+	private void afterBatchOnInterruption() {
+		//TODO: batchWorkPlan.flush( rootEntities );
+	}
+
+	/**
+	 * Optional operations to do before the multiple-threads start indexing
+	 */
+	private void beforeBatch() {
+		if ( this.purgeAtStart ) {
+			//TODO: purgeAll for affected entities
+			for ( Class<?> type : rootEntities ) {
+				//needs do be in-sync work to make sure we wait for the end of it.
+			}
+			if ( this.optimizeAfterPurge ) {
+				//TODO: batchWorkPlan.optimize( rootEntities );
+			}
+		}
+	}
+
+}
