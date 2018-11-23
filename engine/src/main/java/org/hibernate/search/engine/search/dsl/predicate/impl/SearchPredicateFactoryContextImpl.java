@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
