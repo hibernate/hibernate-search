@@ -2076,6 +2076,7 @@
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
                         <version>${version.com.buschmais.jqassistant.plugin}</version>
+                        <extensions>true</extensions>
                         <executions>
                             <execution>
                                 <goals>
