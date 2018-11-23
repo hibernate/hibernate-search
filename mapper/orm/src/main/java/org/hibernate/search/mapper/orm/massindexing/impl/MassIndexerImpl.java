@@ -54,7 +54,7 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	private String tenantIdentifier;
 	private Integer idLoadingTransactionTimeout;
 
-	protected MassIndexerImpl(SessionFactoryImplementor sessionFactory, Class<?>... entities) {
+	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, Class<?>... entities) {
 		this.sessionFactory = sessionFactory;
 		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
 		this.rootEntities = toRootEntities( mapping, entities );
