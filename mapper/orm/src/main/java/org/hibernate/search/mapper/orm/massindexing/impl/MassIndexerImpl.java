@@ -15,7 +15,6 @@ import java.util.concurrent.Future;
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexerWithTenant;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
@@ -31,12 +30,13 @@ import org.hibernate.search.util.impl.common.StringHelper;
  *
  * @author Sanne Grinovero
  */
-public class MassIndexerImpl implements MassIndexerWithTenant {
+public class MassIndexerImpl implements MassIndexer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmMapping mapping;
 	private final SessionFactoryImplementor sessionFactory;
+	private final String tenantIdentifier;
 
 	protected final Set<Class<?>> rootEntities;
 
@@ -51,12 +51,12 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	private boolean optimizeAfterPurge = true;
 	//TODO: restore the MassIndexerProgressMonitor
 	private int idFetchSize = 100; //reasonable default as we only load IDs
-	private String tenantIdentifier;
 	private Integer idLoadingTransactionTimeout;
 
-	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, Class<?>... entities) {
+	public MassIndexerImpl(SessionFactoryImplementor sessionFactory, String tenantIdentifier, Class<?>... entities) {
 		this.sessionFactory = sessionFactory;
 		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
+		this.tenantIdentifier = tenantIdentifier;
 		this.rootEntities = toRootEntities( mapping, entities );
 		//TODO: restore the MassIndexerProgressMonitor. Using a JMXRegistrar or a SimpleIndexingProgressMonitor
 	}
@@ -176,12 +176,6 @@ public class MassIndexerImpl implements MassIndexerWithTenant {
 	@Override
 	public MassIndexer transactionTimeout(int timeoutInSeconds) {
 		this.idLoadingTransactionTimeout = timeoutInSeconds;
-		return this;
-	}
-
-	@Override
-	public MassIndexerWithTenant tenantIdentifier(String tenantIdentifier) {
-		this.tenantIdentifier = tenantIdentifier;
 		return this;
 	}
 

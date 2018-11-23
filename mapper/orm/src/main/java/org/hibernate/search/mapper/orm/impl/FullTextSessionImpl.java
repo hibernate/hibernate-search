@@ -11,7 +11,6 @@ import java.util.Collection;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexerWithTenant;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
@@ -57,11 +56,7 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 			types = new Class<?>[] { Object.class };
 		}
 
-		MassIndexer massIndexer = new MassIndexerImpl( getFactory(), types );
-		if ( massIndexer instanceof MassIndexerWithTenant ) {
-			( (MassIndexerWithTenant) massIndexer ).tenantIdentifier( getTenantIdentifier() );
-		}
-		return massIndexer;
+		return new MassIndexerImpl( getFactory(), getTenantIdentifier(), types );
 	}
 
 	private HibernateOrmSearchManager getSearchManager() {
