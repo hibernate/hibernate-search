@@ -11,12 +11,11 @@ import java.util.Collection;
 import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.massindexing.impl.DefaultMassIndexerFactory;
-import org.hibernate.search.mapper.orm.massindexing.MassIndexerFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexerWithTenant;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
+import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 
 public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession {
@@ -53,8 +52,12 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		MassIndexerFactory massIndexerFactory = createMassIndexerFactory();
-		MassIndexer massIndexer = massIndexerFactory.createMassIndexer( getFactory(), types );
+		if ( types.length == 0 ) {
+			// by default reindex all entities
+			types = new Class<?>[] { Object.class };
+		}
+
+		MassIndexer massIndexer = new MassIndexerImpl( getFactory(), types );
 		if ( massIndexer instanceof MassIndexerWithTenant ) {
 			( (MassIndexerWithTenant) massIndexer ).tenantIdentifier( getTenantIdentifier() );
 		}
@@ -68,10 +71,5 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 			searchManager = contextService.getSearchManager( delegate );
 		}
 		return searchManager;
-	}
-
-	private MassIndexerFactory createMassIndexerFactory() {
-		// TODO: Need to handle custom (user defined) massIndexerFactory
-		return new DefaultMassIndexerFactory();
 	}
 }
