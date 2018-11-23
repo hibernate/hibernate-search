@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.document.converter.runtime.spi;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
-import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 public class FromIndexFieldValueConvertContextImpl implements FromIndexFieldValueConvertContext {

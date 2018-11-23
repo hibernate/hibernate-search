@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.sort.impl;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;

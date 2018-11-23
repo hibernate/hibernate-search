@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
-import org.hibernate.search.engine.common.dsl.impl.DslExtensionState;
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContextExtension;
