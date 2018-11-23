@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.spi;
 
+import java.util.Set;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
@@ -46,5 +47,13 @@ public interface HibernateOrmMapping {
 	 * {@link PojoWorkPlan#add(Object)} for instance), {@code false} if it cannot.
 	 */
 	boolean isWorkable(Object entity);
+
+	/**
+	 * Given a set of target entity, return the set of configured subtypes that are indexed.
+	 *
+	 * @param entityType the target set
+	 * @return the set of configured subtypes that are indexed
+	 */
+	<E> Set<Class<? extends E>> getIndexedTypesPolymorphic(Class<E> entityType);
 
 }
