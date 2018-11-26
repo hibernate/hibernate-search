@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.GeoPointFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.GeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.GeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -51,7 +51,7 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 
 		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, GeoPointFieldCodec.INSTANCE,
-				GeoPointFieldPredicateBuilderFactory.INSTANCE,
+				ElasticsearchGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new GeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new GeoPointFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);

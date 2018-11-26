@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class MatchAllPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor MATCH_ALL = JsonAccessor.root().property( "match_all" ).asObject();

@@ -16,7 +16,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractSearchPredicateBuilder
+public abstract class AbstractElasticsearchSearchPredicateBuilder
 		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
 				ElasticsearchSearchPredicateBuilder {
 

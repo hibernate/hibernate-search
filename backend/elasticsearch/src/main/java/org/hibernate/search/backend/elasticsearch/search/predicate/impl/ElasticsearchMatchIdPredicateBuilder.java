@@ -37,14 +37,14 @@ import com.google.gson.JsonObject;
  *
  * @author Davide D'Alto
  */
-public class MatchIdPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor IDS = JsonAccessor.root().property( "ids" ).asObject();
 	private static final JsonAccessor<JsonElement> VALUES = JsonAccessor.root().property( "values" );
 	private List<String> values = new ArrayList<>();
 
-	public MatchIdPredicateBuilderImpl(ElasticsearchSearchContext searchContext) {
+	public ElasticsearchMatchIdPredicateBuilder(ElasticsearchSearchContext searchContext) {
 	}
 
 	@Override

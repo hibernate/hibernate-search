@@ -10,9 +10,9 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchMatchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.MatchPredicateBuilderImpl;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.RangePredicateBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -22,13 +22,13 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+public class ElasticsearchStandardFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchFieldConverter converter;
 
-	public StandardFieldPredicateBuilderFactory(ElasticsearchFieldConverter converter) {
+	public ElasticsearchStandardFieldPredicateBuilderFactory(ElasticsearchFieldConverter converter) {
 		this.converter = converter;
 	}
 
@@ -37,20 +37,20 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		StandardFieldPredicateBuilderFactory castedOther = (StandardFieldPredicateBuilderFactory) other;
+		ElasticsearchStandardFieldPredicateBuilderFactory castedOther = (ElasticsearchStandardFieldPredicateBuilderFactory) other;
 		return converter.isConvertDslToIndexCompatibleWith( castedOther.converter );
 	}
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
-		return new MatchPredicateBuilderImpl( searchContext, absoluteFieldPath, converter );
+		return new ElasticsearchMatchPredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
-		return new RangePredicateBuilderImpl( searchContext, absoluteFieldPath, converter );
+		return new ElasticsearchRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override

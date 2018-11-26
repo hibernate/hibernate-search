@@ -36,7 +36,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 // TODO have one version of the factory per Elasticsearch dialect, if necessary
-public class SearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
+public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -49,7 +49,7 @@ public class SearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPre
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	public SearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
+	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
@@ -76,17 +76,17 @@ public class SearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPre
 
 	@Override
 	public MatchAllPredicateBuilder<ElasticsearchSearchPredicateBuilder> matchAll() {
-		return new MatchAllPredicateBuilderImpl();
+		return new ElasticsearchMatchAllPredicateBuilder();
 	}
 
 	@Override
 	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
-		return new MatchIdPredicateBuilderImpl( searchContext );
+		return new ElasticsearchMatchIdPredicateBuilder( searchContext );
 	}
 
 	@Override
 	public BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> bool() {
-		return new BooleanJunctionPredicateBuilderImpl();
+		return new ElasticsearchBooleanJunctionPredicateBuilder();
 	}
 
 	@Override
@@ -130,12 +130,12 @@ public class SearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPre
 	@Override
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		searchTargetModel.checkNestedField( absoluteFieldPath );
-		return new NestedPredicateBuilderImpl( absoluteFieldPath );
+		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public ElasticsearchSearchPredicateBuilder fromJsonString(String jsonString) {
-		return new UserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
+		return new ElasticsearchUserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private static class PredicateBuilderFactoryRetrievalStrategy

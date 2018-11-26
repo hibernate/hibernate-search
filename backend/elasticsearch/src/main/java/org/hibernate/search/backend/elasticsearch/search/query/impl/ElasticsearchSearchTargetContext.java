@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.SearchPredicateBuilderFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.SearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -19,7 +19,7 @@ public class ElasticsearchSearchTargetContext
 		implements SearchTargetContext<ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
-	private final SearchPredicateBuilderFactoryImpl searchPredicateFactory;
+	private final ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final SearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final ElasticsearchSearchProjectionBuilderFactoryImpl searchProjectionFactory;
@@ -30,7 +30,7 @@ public class ElasticsearchSearchTargetContext
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		ElasticsearchSearchContext searchContext = new ElasticsearchSearchContext( mappingContext );
 		this.searchTargetModel = searchTargetModel;
-		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactoryImpl(
 				searchBackendContext.getSearchProjectionBackendContext(),
@@ -49,7 +49,7 @@ public class ElasticsearchSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
+	public ElasticsearchSearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
 		return searchPredicateFactory;
 	}
 

@@ -14,7 +14,7 @@ import com.google.gson.JsonObject;
  * <p>
  * Used by Elasticsearch-specific predicate contributors.
  *
- * @see SearchPredicateBuilderFactoryImpl#contribute(Object, Object)
+ * @see ElasticsearchSearchPredicateBuilderFactoryImpl#contribute(Object, Object)
  * @see ElasticsearchSearchPredicateBuilder
  */
 public interface ElasticsearchSearchPredicateCollector {
