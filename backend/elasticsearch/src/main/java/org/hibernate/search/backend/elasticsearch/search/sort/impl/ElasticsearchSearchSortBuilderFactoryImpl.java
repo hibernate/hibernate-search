@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
  * @author Yoann Rodiere
  */
 // TODO have one version of the factory per dialect, if necessary
-public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuilderFactory {
+public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -47,7 +47,7 @@ public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuil
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	public SearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
+	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
@@ -79,7 +79,7 @@ public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuil
 
 	@Override
 	public ScoreSortBuilder<ElasticsearchSearchSortBuilder> score() {
-		return new ScoreSortBuilderImpl();
+		return new ElasticsearchScoreSortBuilder();
 	}
 
 	@Override
@@ -98,12 +98,12 @@ public class SearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuil
 
 	@Override
 	public ElasticsearchSearchSortBuilder indexOrder() {
-		return IndexOrderSortContributor.INSTANCE;
+		return ElasticsearchIndexOrderSortBuilder.INSTANCE;
 	}
 
 	@Override
 	public ElasticsearchSearchSortBuilder fromJsonString(String jsonString) {
-		return new UserProvidedJsonSortContributor( GSON.fromJson( jsonString, JsonObject.class ) );
+		return new ElasticsearchUserProvidedJsonSortBuilder( GSON.fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private static class SortBuilderFactoryRetrievalStrategy

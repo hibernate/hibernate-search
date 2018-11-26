@@ -28,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.LocalDateFiel
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -73,7 +73,7 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 

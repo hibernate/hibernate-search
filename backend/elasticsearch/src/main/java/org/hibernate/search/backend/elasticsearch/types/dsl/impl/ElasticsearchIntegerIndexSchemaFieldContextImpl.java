@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.IntegerFieldC
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 
 import com.google.gson.JsonElement;
 
@@ -51,7 +51,7 @@ public class ElasticsearchIntegerIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, IntegerFieldCodec.INSTANCE,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 

@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.InstantFieldC
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -50,7 +50,7 @@ public class ElasticsearchInstantIndexSchemaFieldContextImpl
 		ElasticsearchIndexSchemaFieldNode<Instant> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, InstantFieldCodec.INSTANCE,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
-				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 

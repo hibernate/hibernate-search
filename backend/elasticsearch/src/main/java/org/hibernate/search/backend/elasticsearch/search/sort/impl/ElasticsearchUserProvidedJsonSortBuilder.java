@@ -9,11 +9,11 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import com.google.gson.JsonObject;
 
 
-class UserProvidedJsonSortContributor implements ElasticsearchSearchSortBuilder {
+class ElasticsearchUserProvidedJsonSortBuilder implements ElasticsearchSearchSortBuilder {
 
 	private final JsonObject json;
 
-	UserProvidedJsonSortContributor(JsonObject json) {
+	ElasticsearchUserProvidedJsonSortBuilder(JsonObject json) {
 		this.json = json;
 	}
 

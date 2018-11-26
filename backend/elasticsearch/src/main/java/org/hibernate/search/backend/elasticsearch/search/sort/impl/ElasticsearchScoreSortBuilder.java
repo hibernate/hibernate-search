@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ScoreSortBuilderImpl extends AbstractSearchSortBuilder
+class ElasticsearchScoreSortBuilder extends AbstractElasticsearchSearchSortBuilder
 		implements ScoreSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final String SCORE_SORT_KEYWORD = "_score";
