@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.BooleanFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.BooleanFieldConverter;
-import org.hibernate.search.backend.lucene.types.predicate.impl.IntegerFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneIntegerFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.IntegerFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
@@ -48,7 +48,7 @@ public class LuceneBooleanIndexSchemaFieldContextImpl
 				getRelativeFieldName(),
 				converter,
 				codec,
-				new IntegerFieldPredicateBuilderFactory( converter ),
+				new LuceneIntegerFieldPredicateBuilderFactory( converter ),
 				new IntegerFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);

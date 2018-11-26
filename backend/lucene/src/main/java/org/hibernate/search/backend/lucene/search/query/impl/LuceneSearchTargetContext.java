@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
-import org.hibernate.search.backend.lucene.search.predicate.impl.SearchPredicateBuilderFactoryImpl;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -22,7 +22,7 @@ public class LuceneSearchTargetContext
 		implements SearchTargetContext<LuceneSearchQueryElementCollector> {
 
 	private final LuceneSearchTargetModel searchTargetModel;
-	private final SearchPredicateBuilderFactoryImpl searchPredicateFactory;
+	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final SearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory;
@@ -32,7 +32,7 @@ public class LuceneSearchTargetContext
 			LuceneSearchTargetModel searchTargetModel) {
 		LuceneSearchContext searchContext = new LuceneSearchContext( mappingContext );
 		this.searchTargetModel = searchTargetModel;
-		this.searchPredicateFactory = new SearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactoryImpl( searchTargetModel );
 		this.searchQueryFactory = new SearchQueryBuilderFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
@@ -48,7 +48,7 @@ public class LuceneSearchTargetContext
 	}
 
 	@Override
-	public SearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
+	public LuceneSearchPredicateBuilderFactoryImpl getSearchPredicateBuilderFactory() {
 		return searchPredicateFactory;
 	}
 

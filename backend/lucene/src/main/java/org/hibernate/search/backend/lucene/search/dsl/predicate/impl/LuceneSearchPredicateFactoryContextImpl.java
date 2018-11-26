@@ -29,6 +29,6 @@ public class LuceneSearchPredicateFactoryContextImpl
 
 	@Override
 	public SearchPredicateTerminalContext fromLuceneQuery(Query luceneQuery) {
-		return new LuceneQueryPredicateContextImpl( factory, luceneQuery );
+		return new LuceneQueryPredicateContext( factory, luceneQuery );
 	}
 }
