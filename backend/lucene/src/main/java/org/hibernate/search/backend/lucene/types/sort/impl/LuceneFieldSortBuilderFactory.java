@@ -42,7 +42,7 @@ public interface LuceneFieldSortBuilderFactory {
 	 * Determine whether another sort builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see LuceneFieldConverter#isDslCompatibleWith(LuceneFieldConverter)
+	 * @see LuceneFieldConverter#isConvertFromDslCompatibleWith(LuceneFieldConverter)
 	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldSortBuilderFactory}, never {@code null}.

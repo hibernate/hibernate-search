@@ -22,7 +22,7 @@ public class StubFieldConverter<F> {
 		return userConverter.convertFromProjection( type.cast( projection ), context );
 	}
 
-	public boolean isDslCompatibleWith(StubFieldConverter<?> other) {
-		return userConverter.isDslCompatibleWith( other.userConverter );
+	public boolean isConvertFromProjectionCompatibleWith(StubFieldConverter<?> other) {
+		return userConverter.isConvertFromProjectionCompatibleWith( other.userConverter );
 	}
 }

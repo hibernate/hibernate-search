@@ -34,7 +34,7 @@ public interface LuceneFieldProjectionBuilderFactory {
 	 * Determine whether another projection builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see LuceneFieldConverter#isDslCompatibleWith(LuceneFieldConverter)
+	 * @see LuceneFieldConverter#isConvertFromProjectionCompatibleWith(LuceneFieldConverter)
 	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldPredicateBuilderFactory}, never {@code null}.

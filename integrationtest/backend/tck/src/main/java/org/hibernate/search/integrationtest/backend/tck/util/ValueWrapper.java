@@ -32,6 +32,11 @@ public final class ValueWrapper<T> {
 			public T convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
 				return ( (ValueWrapper<T>) value ).getValue();
 			}
+
+			@Override
+			public boolean isCompatibleWith(ToIndexFieldValueConverter<?, ?> other) {
+				return other != null && getClass().equals( other.getClass() );
+			}
 		};
 	}
 
@@ -46,7 +51,12 @@ public final class ValueWrapper<T> {
 			@Override
 			public ValueWrapper<T> convert(T indexedValue,
 					FromIndexFieldValueConvertContext context) {
-				return new ValueWrapper<T>( indexedValue );
+				return new ValueWrapper<>( indexedValue );
+			}
+
+			@Override
+			public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+				return other != null && getClass().equals( other.getClass() );
 			}
 		};
 	}

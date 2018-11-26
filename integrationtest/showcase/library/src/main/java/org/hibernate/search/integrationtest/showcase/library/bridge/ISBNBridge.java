@@ -17,14 +17,11 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
-	private static final ISBNFromIndexFieldValueConverter FROM_INDEX_FIELD_VALUE_CONVERTER =
-			new ISBNFromIndexFieldValueConverter();
-
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
 		return context.getIndexSchemaFieldContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
-				.projectionConverter( FROM_INDEX_FIELD_VALUE_CONVERTER );
+				.projectionConverter( ISBNFromIndexFieldValueConverter.INSTANCE );
 	}
 
 	@Override
@@ -45,6 +42,9 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 
 	private static class ISBNFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, ISBN> {
 
+		private static final ISBNFromIndexFieldValueConverter INSTANCE =
+				new ISBNFromIndexFieldValueConverter();
+
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
 			return superTypeCandidate.isAssignableFrom( ISBN.class );
@@ -53,6 +53,11 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 		@Override
 		public ISBN convert(String indexedValue, FromIndexFieldValueConvertContext context) {
 			return indexedValue == null ? null : new ISBN( indexedValue );
+		}
+
+		@Override
+		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+			return INSTANCE.equals( other );
 		}
 	}
 }

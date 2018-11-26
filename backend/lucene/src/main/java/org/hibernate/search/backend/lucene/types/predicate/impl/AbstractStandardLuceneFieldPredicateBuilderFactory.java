@@ -37,7 +37,7 @@ abstract class AbstractStandardLuceneFieldPredicateBuilderFactory<C extends Luce
 		}
 		AbstractStandardLuceneFieldPredicateBuilderFactory<?> castedOther =
 				(AbstractStandardLuceneFieldPredicateBuilderFactory<?>) other;
-		return converter.isDslCompatibleWith( castedOther.converter );
+		return converter.isConvertFromDslCompatibleWith( castedOther.converter );
 	}
 
 	@Override

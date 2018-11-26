@@ -64,7 +64,7 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 		GeoPointFieldProjectionBuilderFactory other = (GeoPointFieldProjectionBuilderFactory) obj;
 
 		return projectable == other.projectable &&
-				converter.isDslCompatibleWith( other.converter );
+				converter.isConvertFromProjectionCompatibleWith( other.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

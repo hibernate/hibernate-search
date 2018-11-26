@@ -41,12 +41,22 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldConverter other) {
+	public boolean isConvertFromDslCompatibleWith(ElasticsearchFieldConverter other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
-		return userConverter.isDslCompatibleWith( castedOther.userConverter )
+		return userConverter.isConvertFromDslCompatibleWith( castedOther.userConverter )
+				&& codec.isCompatibleWith( castedOther.codec );
+	}
+
+	@Override
+	public boolean isConvertFromProjectionCompatibleWith(ElasticsearchFieldConverter other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
+		return userConverter.isConvertFromProjectionCompatibleWith( castedOther.userConverter )
 				&& codec.isCompatibleWith( castedOther.codec );
 	}
 

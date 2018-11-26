@@ -27,7 +27,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString()
-				.projectionConverter( new DefaultEnumFromIndexFieldValueConverter() );
+				.projectionConverter( new DefaultEnumFromIndexFieldValueConverter<>( enumType ) );
 	}
 
 	@Override
@@ -50,7 +50,14 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		return enumType.equals( castedOther.enumType );
 	}
 
-	private class DefaultEnumFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, V> {
+	private static class DefaultEnumFromIndexFieldValueConverter<V extends Enum<V>>
+			implements FromIndexFieldValueConverter<String, V> {
+
+		private final Class<V> enumType;
+
+		private DefaultEnumFromIndexFieldValueConverter(Class<V> enumType) {
+			this.enumType = enumType;
+		}
 
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
@@ -60,6 +67,15 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		@Override
 		public V convert(String indexedValue, FromIndexFieldValueConvertContext context) {
 			return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
+		}
+
+		@Override
+		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+			if ( !getClass().equals( other.getClass() ) ) {
+				return false;
+			}
+			DefaultEnumFromIndexFieldValueConverter<?> castedOther = (DefaultEnumFromIndexFieldValueConverter<?>) other;
+			return enumType.equals( castedOther.enumType );
 		}
 	}
 
