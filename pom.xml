@@ -2061,21 +2061,36 @@
             </build>
         </profile>
 
-        <profile>
-            <id>jqassistant</id>
-            <!--
-            To run the analysis on the engine module and launch a Neo4j server accessible at http://localhost:7474/, run:
-                mvn -pl engine jqassistant:scan jqassistant:server -Pjqassistant
+        <!--
+            A profile executing jqassistant scanning and analysis for all relevant modules.
+            Our rules are in jqassistant/rules.xml.
             To run the analysis on the engine module:
                 mvn clean install -pl engine -Pjqassistant -DskipTests=true
-            Our rules are in jqassistant/rules.xml.
-            -->
+            To launch a Neo4j server accessible at http://localhost:7474/ based on the previous analysis,
+            use the jqassistant-debug profile (see below):
+                mvn jqassistant:server -pl reports -Pjqassistant-debug
+        -->
+        <profile>
+            <id>jqassistant</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.buschmais.jqassistant</groupId>
                         <artifactId>jqassistant-maven-plugin</artifactId>
                         <version>${version.com.buschmais.jqassistant.plugin}</version>
+                        <!--
+                            HSEARCH-3437: ALWAYS use extensions, otherwise the build of each module uses
+                            a different classloader to load classes,
+                            and we end up with some executions using a different definition of internal classes,
+                            and it wreaks havoc in the context shared between the executions.
+                            In particular it messes up the "executedModules" map,
+                            because keys that should be equal no longer are due to their class not being equal.
+                            In short: don't change this without extensive testing.
+
+                            An unfortunate side-effect is that commands such as
+                                mvn jqassistant:server -Pjqassistant -pl reports
+                            will not work anymore, so we need to use a different profile for that (see jqassistant-debug).
+                         -->
                         <extensions>true</extensions>
                         <executions>
                             <execution>
@@ -2084,12 +2099,37 @@
                                     <goal>analyze</goal>
                                 </goals>
                                 <configuration>
+                                    <!-- Necessary when using extensions (see above) -->
                                     <storeLifecycle>MODULE</storeLifecycle>
                                     <warnOnSeverity>INFO</warnOnSeverity>
                                     <failOnSeverity>MAJOR</failOnSeverity>
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!--
+            A profile for debugging the jqassistant rules.
+            This is only necessary because we have to use extensions in the jqassistant profile (above),
+            and extensions seem to mess with explicit use of the jqassistant:server goal,
+            which doesn't work anymore.
+            So this profile just enables jqassistant, but without extensions.
+        -->
+        <profile>
+            <id>jqassistant-server</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.buschmais.jqassistant</groupId>
+                        <artifactId>jqassistant-maven-plugin</artifactId>
+                        <version>${version.com.buschmais.jqassistant.plugin}</version>
+                        <!--
+                             Do NOT enable extensions.
+                         -->
+                        <extensions>false</extensions>
                     </plugin>
                 </plugins>
             </build>
