@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
-public class FieldSearchProjectionBuilderImpl<F, T> implements FieldSearchProjectionBuilder<T> {
+public class FieldSearchProjectionBuilderImpl<F, T> implements FieldProjectionBuilder<T> {
 
 	private final String absoluteFieldPath;
 

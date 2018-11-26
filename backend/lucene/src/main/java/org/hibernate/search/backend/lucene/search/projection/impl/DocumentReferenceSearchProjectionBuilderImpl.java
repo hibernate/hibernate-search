@@ -8,10 +8,10 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 
-public class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceSearchProjectionBuilder {
+public class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceProjectionBuilder {
 
 	private static final DocumentReferenceSearchProjectionBuilderImpl INSTANCE = new DocumentReferenceSearchProjectionBuilderImpl();
 

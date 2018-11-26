@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 
-public class FieldSearchProjectionBuilderImpl<T> implements FieldSearchProjectionBuilder<T> {
+public class FieldSearchProjectionBuilderImpl<T> implements FieldProjectionBuilder<T> {
 
 	private final String absoluteFieldPath;
 

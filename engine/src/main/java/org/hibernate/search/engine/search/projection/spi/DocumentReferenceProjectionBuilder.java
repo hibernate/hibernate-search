@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-public interface CompositeSearchProjectionBuilder<T> extends SearchProjectionBuilder<T> {
+import org.hibernate.search.engine.search.DocumentReference;
+
+public interface DocumentReferenceProjectionBuilder extends SearchProjectionBuilder<DocumentReference> {
 
 }

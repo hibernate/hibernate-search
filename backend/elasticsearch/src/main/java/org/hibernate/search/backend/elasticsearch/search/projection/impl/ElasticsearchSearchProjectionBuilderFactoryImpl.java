@@ -18,13 +18,13 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
@@ -50,41 +50,41 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	}
 
 	@Override
-	public DocumentReferenceSearchProjectionBuilder documentReference() {
+	public DocumentReferenceProjectionBuilder documentReference() {
 		return searchProjectionBackendContext.getDocumentReferenceProjectionBuilder();
 	}
 
 	@Override
-	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType) {
+	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType );
 	}
 
 	@Override
-	public <O> ObjectSearchProjectionBuilder<O> object() {
+	public <O> ObjectProjectionBuilder<O> object() {
 		return searchProjectionBackendContext.getObjectProjectionBuilder();
 	}
 
 	@Override
-	public <R> ReferenceSearchProjectionBuilder<R> reference() {
+	public <R> ReferenceProjectionBuilder<R> reference() {
 		return searchProjectionBackendContext.getReferenceProjectionBuilder();
 	}
 
 	@Override
-	public ScoreSearchProjectionBuilder score() {
+	public ScoreProjectionBuilder score() {
 		return searchProjectionBackendContext.getScoreProjectionBuilder();
 	}
 
 	@Override
-	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
 	@Override
-	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
+	public <T> CompositeProjectionBuilder<T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
 		List<ElasticsearchSearchProjection<?, ?>> typedProjections = new ArrayList<>( projections.length );
 		for ( SearchProjection<?> projection : projections ) {
@@ -97,7 +97,7 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	}
 
 	@Override
-	public <P, T> CompositeSearchProjectionBuilder<T> composite(Function<P, T> transformer,
+	public <P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer,
 			SearchProjection<P> projection) {
 		return new CompositeSearchProjectionBuilderImpl<>(
 				new CompositeFunctionSearchProjectionImpl<>( transformer, toImplementation( projection ) )
@@ -105,7 +105,7 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	}
 
 	@Override
-	public <P1, P2, T> CompositeSearchProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return new CompositeSearchProjectionBuilderImpl<>(
 				new CompositeBiFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
@@ -114,7 +114,7 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeSearchProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return new CompositeSearchProjectionBuilderImpl<>(
 				new CompositeTriFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),

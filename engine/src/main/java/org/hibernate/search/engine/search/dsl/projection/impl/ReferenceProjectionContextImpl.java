@@ -8,13 +8,13 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionContext;
-import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionContext<R> {
 
-	private ReferenceSearchProjectionBuilder<R> referenceProjectionBuilder;
+	private ReferenceProjectionBuilder<R> referenceProjectionBuilder;
 
 	ReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.referenceProjectionBuilder = factory.reference();

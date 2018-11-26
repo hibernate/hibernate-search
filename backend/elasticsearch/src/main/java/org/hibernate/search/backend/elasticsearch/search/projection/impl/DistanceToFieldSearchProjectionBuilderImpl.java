@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFieldSearchProjectionBuilder {
+public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFieldProjectionBuilder {
 
 	private final String absoluteFieldPath;
 
@@ -26,7 +26,7 @@ public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFie
 	}
 
 	@Override
-	public DistanceToFieldSearchProjectionBuilder unit(DistanceUnit unit) {
+	public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
 		this.unit = unit;
 		return this;
 	}

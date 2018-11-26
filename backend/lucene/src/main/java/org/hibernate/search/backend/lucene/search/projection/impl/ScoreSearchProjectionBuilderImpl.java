@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
-public class ScoreSearchProjectionBuilderImpl implements ScoreSearchProjectionBuilder {
+public class ScoreSearchProjectionBuilderImpl implements ScoreProjectionBuilder {
 
 	private static final ScoreSearchProjectionBuilderImpl INSTANCE = new ScoreSearchProjectionBuilderImpl();
 

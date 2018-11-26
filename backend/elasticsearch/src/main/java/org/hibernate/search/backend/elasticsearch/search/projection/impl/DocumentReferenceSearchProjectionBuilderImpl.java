@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 
-class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceSearchProjectionBuilder {
+class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceProjectionBuilder {
 
 	private final DocumentReferenceSearchProjectionImpl projection;
 

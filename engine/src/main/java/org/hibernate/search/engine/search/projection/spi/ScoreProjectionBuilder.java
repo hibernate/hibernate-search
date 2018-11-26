@@ -6,6 +6,6 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-public interface FieldSearchProjectionBuilder<T> extends SearchProjectionBuilder<T> {
+public interface ScoreProjectionBuilder extends SearchProjectionBuilder<Float> {
 
 }

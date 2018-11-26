@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
-class ScoreSearchProjectionBuilderImpl implements ScoreSearchProjectionBuilder {
+class ScoreSearchProjectionBuilderImpl implements ScoreProjectionBuilder {
 
 	private final ScoreSearchProjectionImpl projection;
 

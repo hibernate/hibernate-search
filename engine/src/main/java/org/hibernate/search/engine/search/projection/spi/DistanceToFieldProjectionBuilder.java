@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.engine.search.projection.spi;
 
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.spatial.DistanceUnit;
 
-public interface DocumentReferenceSearchProjectionBuilder extends SearchProjectionBuilder<DocumentReference> {
+public interface DistanceToFieldProjectionBuilder extends SearchProjectionBuilder<Double> {
+
+	DistanceToFieldProjectionBuilder unit(DistanceUnit unit);
 
 }

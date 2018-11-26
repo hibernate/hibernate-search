@@ -14,13 +14,13 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.ScoreSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -38,8 +38,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public DocumentReferenceSearchProjectionBuilder documentReference() {
-		return new DocumentReferenceSearchProjectionBuilder() {
+	public DocumentReferenceProjectionBuilder documentReference() {
+		return new DocumentReferenceProjectionBuilder() {
 			@Override
 			public SearchProjection<DocumentReference> build() {
 				return StubDefaultSearchProjection.get();
@@ -48,9 +48,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
+	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz) {
 		StubFieldConverter<?> converter = targetModel.getFieldConverter( absoluteFieldPath );
-		return new FieldSearchProjectionBuilder<T>() {
+		return new FieldProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
 				return new StubFieldSearchProjection<>( clazz, converter );
@@ -59,8 +59,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <O> ObjectSearchProjectionBuilder<O> object() {
-		return new ObjectSearchProjectionBuilder<O>() {
+	public <O> ObjectProjectionBuilder<O> object() {
+		return new ObjectProjectionBuilder<O>() {
 			@Override
 			public SearchProjection<O> build() {
 				return StubObjectSearchProjection.get();
@@ -69,8 +69,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <R> ReferenceSearchProjectionBuilder<R> reference() {
-		return new ReferenceSearchProjectionBuilder<R>() {
+	public <R> ReferenceProjectionBuilder<R> reference() {
+		return new ReferenceProjectionBuilder<R>() {
 			@Override
 			public SearchProjection<R> build() {
 				return StubReferenceSearchProjection.get();
@@ -79,8 +79,8 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public ScoreSearchProjectionBuilder score() {
-		return new ScoreSearchProjectionBuilder() {
+	public ScoreProjectionBuilder score() {
+		return new ScoreProjectionBuilder() {
 			@Override
 			public SearchProjection<Float> build() {
 				return StubDefaultSearchProjection.get();
@@ -89,10 +89,10 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return new DistanceToFieldSearchProjectionBuilder() {
+	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
+		return new DistanceToFieldProjectionBuilder() {
 			@Override
-			public DistanceToFieldSearchProjectionBuilder unit(DistanceUnit unit) {
+			public DistanceToFieldProjectionBuilder unit(DistanceUnit unit) {
 				return this;
 			}
 
@@ -104,9 +104,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer,
+	public <T> CompositeProjectionBuilder<T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
-		return new CompositeSearchProjectionBuilder<T>() {
+		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
 				return new StubCompositeListSearchProjection<>( transformer,
@@ -123,9 +123,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <P, T> CompositeSearchProjectionBuilder<T> composite(Function<P, T> transformer,
+	public <P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer,
 			SearchProjection<P> projection) {
-		return new CompositeSearchProjectionBuilder<T>() {
+		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
 				return new StubCompositeFunctionSearchProjection<>( transformer, toImplementation( projection ) );
@@ -134,9 +134,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <P1, P2, T> CompositeSearchProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new CompositeSearchProjectionBuilder<T>() {
+		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
 				return new StubCompositeBiFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
@@ -146,9 +146,9 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeSearchProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new CompositeSearchProjectionBuilder<T>() {
+		return new CompositeProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {
 				return new StubCompositeTriFunctionSearchProjection<>( transformer, toImplementation( projection1 ),
