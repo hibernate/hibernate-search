@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.DistanceSortBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchDistanceSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -18,13 +18,13 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBuilderFactory {
+public class ElasticsearchGeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean sortable;
 
-	public GeoPointFieldSortBuilderFactory(boolean sortable) {
+	public ElasticsearchGeoPointFieldSortBuilderFactory(boolean sortable) {
 		this.sortable = sortable;
 	}
 
@@ -42,7 +42,7 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 			GeoPoint center) {
 		checkSortable( absoluteFieldPath, sortable );
 
-		return new DistanceSortBuilderImpl( absoluteFieldPath, center );
+		return new ElasticsearchDistanceSortBuilder( absoluteFieldPath, center );
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class GeoPointFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 			return false;
 		}
 
-		GeoPointFieldSortBuilderFactory other = (GeoPointFieldSortBuilderFactory) obj;
+		ElasticsearchGeoPointFieldSortBuilderFactory other = (ElasticsearchGeoPointFieldSortBuilderFactory) obj;
 
 		return other.sortable == this.sortable;
 	}

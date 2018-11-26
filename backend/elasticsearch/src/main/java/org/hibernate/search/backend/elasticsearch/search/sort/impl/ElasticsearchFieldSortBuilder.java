@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class FieldSortBuilderImpl extends AbstractSearchSortBuilder
+public class ElasticsearchFieldSortBuilder extends AbstractElasticsearchSearchSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -34,7 +34,7 @@ public class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
-	public FieldSortBuilderImpl(ElasticsearchSearchContext searchContext,
+	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;

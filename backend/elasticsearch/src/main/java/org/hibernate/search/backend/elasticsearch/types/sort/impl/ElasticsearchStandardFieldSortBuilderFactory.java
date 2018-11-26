@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchFieldSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.FieldSortBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBuilderFactory {
+public class ElasticsearchStandardFieldSortBuilderFactory implements ElasticsearchFieldSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -27,7 +27,7 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 
 	private final ElasticsearchFieldConverter converter;
 
-	public StandardFieldSortBuilderFactory(boolean sortable, ElasticsearchFieldConverter converter) {
+	public ElasticsearchStandardFieldSortBuilderFactory(boolean sortable, ElasticsearchFieldConverter converter) {
 		this.sortable = sortable;
 		this.converter = converter;
 	}
@@ -38,7 +38,7 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 			String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath, sortable );
 
-		return new FieldSortBuilderImpl( searchContext, absoluteFieldPath, converter );
+		return new ElasticsearchFieldSortBuilder( searchContext, absoluteFieldPath, converter );
 	}
 
 	@Override
@@ -54,11 +54,11 @@ public class StandardFieldSortBuilderFactory implements ElasticsearchFieldSortBu
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj.getClass() != StandardFieldSortBuilderFactory.class ) {
+		if ( obj.getClass() != ElasticsearchStandardFieldSortBuilderFactory.class ) {
 			return false;
 		}
 
-		StandardFieldSortBuilderFactory other = (StandardFieldSortBuilderFactory) obj;
+		ElasticsearchStandardFieldSortBuilderFactory other = (ElasticsearchStandardFieldSortBuilderFactory) obj;
 
 		return sortable == other.sortable &&
 				converter.isConvertDslToIndexCompatibleWith( other.converter );

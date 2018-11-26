@@ -19,7 +19,7 @@ import com.google.gson.JsonElement;
  * <p>
  * Used by Elasticsearch-specific sort contributors.
  *
- * @see SearchSortBuilderFactoryImpl#contribute(Object, List)
+ * @see ElasticsearchSearchSortBuilderFactoryImpl#contribute(Object, List)
  * @see ElasticsearchSearchSortBuilder
  */
 public interface ElasticsearchSearchSortCollector {

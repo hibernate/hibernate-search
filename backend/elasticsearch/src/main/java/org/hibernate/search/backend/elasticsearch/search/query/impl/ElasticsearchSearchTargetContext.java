@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.SearchSortBuilderFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
@@ -20,7 +20,7 @@ public class ElasticsearchSearchTargetContext
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 	private final ElasticsearchSearchPredicateBuilderFactoryImpl searchPredicateFactory;
-	private final SearchSortBuilderFactoryImpl searchSortFactory;
+	private final ElasticsearchSearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final ElasticsearchSearchProjectionBuilderFactoryImpl searchProjectionFactory;
 
@@ -31,7 +31,7 @@ public class ElasticsearchSearchTargetContext
 		ElasticsearchSearchContext searchContext = new ElasticsearchSearchContext( mappingContext );
 		this.searchTargetModel = searchTargetModel;
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
-		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactoryImpl(
 				searchBackendContext.getSearchProjectionBackendContext(),
 				searchTargetModel );
@@ -54,7 +54,7 @@ public class ElasticsearchSearchTargetContext
 	}
 
 	@Override
-	public SearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
+	public ElasticsearchSearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
 		return searchSortFactory;
 	}
 

@@ -8,13 +8,13 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import com.google.gson.JsonPrimitive;
 
-class IndexOrderSortContributor implements ElasticsearchSearchSortBuilder {
+class ElasticsearchIndexOrderSortBuilder implements ElasticsearchSearchSortBuilder {
 
-	public static final IndexOrderSortContributor INSTANCE = new IndexOrderSortContributor();
+	public static final ElasticsearchIndexOrderSortBuilder INSTANCE = new ElasticsearchIndexOrderSortBuilder();
 
 	private static final JsonPrimitive DOC_SORT_KEYWORD_JSON = new JsonPrimitive( "_doc" );
 
-	private IndexOrderSortContributor() {
+	private ElasticsearchIndexOrderSortBuilder() {
 	}
 
 	@Override
