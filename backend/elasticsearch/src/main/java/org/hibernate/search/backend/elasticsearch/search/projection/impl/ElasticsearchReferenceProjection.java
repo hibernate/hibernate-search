@@ -11,11 +11,11 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class ObjectSearchProjectionImpl<O> implements ElasticsearchSearchProjection<Object, O> {
+public class ElasticsearchReferenceProjection<R> implements ElasticsearchSearchProjection<R, R> {
 
 	private final DocumentReferenceExtractorHelper helper;
 
-	public ObjectSearchProjectionImpl(DocumentReferenceExtractorHelper helper) {
+	public ElasticsearchReferenceProjection(DocumentReferenceExtractorHelper helper) {
 		this.helper = helper;
 	}
 
@@ -24,16 +24,16 @@ public class ObjectSearchProjectionImpl<O> implements ElasticsearchSearchProject
 		helper.contributeRequest( requestBody );
 	}
 
-	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		return projectionHitMapper.planLoading( helper.extractDocumentReference( hit ) );
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (O) loadingResult.getLoaded( extractedData );
+	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+		return (R) projectionHitMapper.convertReference( helper.extractDocumentReference( hit ) );
+	}
+
+	@Override
+	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+		return extractedData;
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 	public void projection_script() {
 		ElasticsearchSearchQueryElementCollector elementCollector = new ElasticsearchSearchQueryElementCollector();
 
-		DistanceToFieldSearchProjectionImpl projection = new DistanceToFieldSearchProjectionImpl( FIELD,
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();
@@ -51,7 +51,7 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 		elementCollector.collectSort( new JsonObject() );
 		elementCollector.collectDistanceSort( new JsonObject(), FIELD, LOCATION );
 
-		DistanceToFieldSearchProjectionImpl projection = new DistanceToFieldSearchProjectionImpl( FIELD,
+		ElasticsearchDistanceToFieldProjection projection = new ElasticsearchDistanceToFieldProjection( FIELD,
 				LOCATION, DistanceUnit.METERS );
 
 		JsonObject requestBody = new JsonObject();

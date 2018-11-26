@@ -11,19 +11,19 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 
-public class FieldSearchProjectionBuilderImpl<T> implements FieldProjectionBuilder<T> {
+public class ElasticsearchFieldProjectionBuilder<T> implements FieldProjectionBuilder<T> {
 
 	private final String absoluteFieldPath;
 
 	private final ElasticsearchFieldConverter converter;
 
-	public FieldSearchProjectionBuilderImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	public ElasticsearchFieldProjectionBuilder(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 	}
 
 	@Override
 	public SearchProjection<T> build() {
-		return new FieldSearchProjectionImpl<>( absoluteFieldPath, converter );
+		return new ElasticsearchFieldProjection<>( absoluteFieldPath, converter );
 	}
 }

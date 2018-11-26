@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class StandardFieldProjectionBuilderFactory implements ElasticsearchFieldProjectionBuilderFactory {
+public class ElasticsearchStandardFieldProjectionBuilderFactory implements ElasticsearchFieldProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -25,7 +25,7 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 
 	private final ElasticsearchFieldConverter converter;
 
-	public StandardFieldProjectionBuilderFactory(boolean projectable, ElasticsearchFieldConverter converter) {
+	public ElasticsearchStandardFieldProjectionBuilderFactory(boolean projectable, ElasticsearchFieldConverter converter) {
 		this.projectable = projectable;
 		this.converter = converter;
 	}
@@ -40,7 +40,7 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, converter );
+		return new ElasticsearchFieldProjectionBuilder<>( absoluteFieldPath, converter );
 	}
 
 	@Override
@@ -56,11 +56,11 @@ public class StandardFieldProjectionBuilderFactory implements ElasticsearchField
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj.getClass() != StandardFieldProjectionBuilderFactory.class ) {
+		if ( obj.getClass() != ElasticsearchStandardFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 
-		StandardFieldProjectionBuilderFactory other = (StandardFieldProjectionBuilderFactory) obj;
+		ElasticsearchStandardFieldProjectionBuilderFactory other = (ElasticsearchStandardFieldProjectionBuilderFactory) obj;
 
 		return projectable == other.projectable &&
 				converter.isConvertIndexToProjectionCompatibleWith( other.converter );

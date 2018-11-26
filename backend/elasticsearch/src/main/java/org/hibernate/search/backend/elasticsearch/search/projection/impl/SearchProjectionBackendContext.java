@@ -8,36 +8,36 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 public class SearchProjectionBackendContext {
 
-	private final DocumentReferenceSearchProjectionBuilderImpl documentReferenceProjectionBuilder;
+	private final ElasticsearchDocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 	@SuppressWarnings("rawtypes")
-	private final ObjectSearchProjectionBuilderImpl objectProjectionBuilder;
+	private final ElasticsearchObjectProjectionBuilder objectProjectionBuilder;
 	@SuppressWarnings("rawtypes")
-	private final ReferenceSearchProjectionBuilderImpl referenceProjectionBuilder;
-	private final ScoreSearchProjectionBuilderImpl scoreProjectionBuilder;
+	private final ElasticsearchReferenceProjectionBuilder referenceProjectionBuilder;
+	private final ElasticsearchScoreProjectionBuilder scoreProjectionBuilder;
 
 	@SuppressWarnings("rawtypes")
 	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper) {
-		this.documentReferenceProjectionBuilder = new DocumentReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.objectProjectionBuilder = new ObjectSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.referenceProjectionBuilder = new ReferenceSearchProjectionBuilderImpl( documentReferenceExtractorHelper );
-		this.scoreProjectionBuilder = new ScoreSearchProjectionBuilderImpl();
+		this.documentReferenceProjectionBuilder = new ElasticsearchDocumentReferenceProjectionBuilder( documentReferenceExtractorHelper );
+		this.objectProjectionBuilder = new ElasticsearchObjectProjectionBuilder( documentReferenceExtractorHelper );
+		this.referenceProjectionBuilder = new ElasticsearchReferenceProjectionBuilder( documentReferenceExtractorHelper );
+		this.scoreProjectionBuilder = new ElasticsearchScoreProjectionBuilder();
 	}
 
-	DocumentReferenceSearchProjectionBuilderImpl getDocumentReferenceProjectionBuilder() {
+	ElasticsearchDocumentReferenceProjectionBuilder getDocumentReferenceProjectionBuilder() {
 		return documentReferenceProjectionBuilder;
 	}
 
 	@SuppressWarnings("unchecked")
-	<O> ObjectSearchProjectionBuilderImpl<O> getObjectProjectionBuilder() {
+	<O> ElasticsearchObjectProjectionBuilder<O> getObjectProjectionBuilder() {
 		return objectProjectionBuilder;
 	}
 
 	@SuppressWarnings("unchecked")
-	<R> ReferenceSearchProjectionBuilderImpl<R> getReferenceProjectionBuilder() {
+	<R> ElasticsearchReferenceProjectionBuilder<R> getReferenceProjectionBuilder() {
 		return referenceProjectionBuilder;
 	}
 
-	ScoreSearchProjectionBuilderImpl getScoreProjectionBuilder() {
+	ElasticsearchScoreProjectionBuilder getScoreProjectionBuilder() {
 		return scoreProjectionBuilder;
 	}
 }

@@ -12,11 +12,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.CompositeListSearchProjectionImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ObjectSearchProjectionImpl;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ReferenceSearchProjectionImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchObjectProjection;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchReferenceProjection;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -30,10 +30,10 @@ class SearchQueryBuilderFactoryImpl
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	private final ElasticsearchSearchProjectionBuilderFactoryImpl searchProjectionFactory;
+	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
 	SearchQueryBuilderFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel,
-			ElasticsearchSearchProjectionBuilderFactoryImpl searchProjectionFactory) {
+			ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
 		this.searchProjectionFactory = searchProjectionFactory;
@@ -44,7 +44,7 @@ class SearchQueryBuilderFactoryImpl
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
 		return createSearchQueryBuilder(
 				sessionContext, projectionHitMapper,
-				new ObjectSearchProjectionImpl<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchObjectProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
@@ -53,7 +53,7 @@ class SearchQueryBuilderFactoryImpl
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper) {
 		return createSearchQueryBuilder(
 				sessionContext, projectionHitMapper,
-				new ReferenceSearchProjectionImpl<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchReferenceProjection<>( searchBackendContext.getDocumentReferenceExtractorHelper() )
 		);
 	}
 
@@ -79,7 +79,7 @@ class SearchQueryBuilderFactoryImpl
 			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
 		}
 
-		return new CompositeListSearchProjectionImpl<>( Function.identity(), children );
+		return new ElasticsearchCompositeListProjection<>( Function.identity(), children );
 	}
 
 	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(

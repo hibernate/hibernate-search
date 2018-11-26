@@ -20,7 +20,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T, T> {
+class ElasticsearchFieldProjection<T> implements ElasticsearchSearchProjection<T, T> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -29,7 +29,7 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T, T
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 	private final ElasticsearchFieldConverter converter;
 
-	FieldSearchProjectionImpl(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	ElasticsearchFieldProjection(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
 		this.converter = converter;

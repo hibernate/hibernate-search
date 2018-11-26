@@ -20,7 +20,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjection<Double, Double> {
+class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProjection<Double, Double> {
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
@@ -36,7 +36,7 @@ class DistanceToFieldSearchProjectionImpl implements ElasticsearchSearchProjecti
 
 	private final String scriptFieldName;
 
-	DistanceToFieldSearchProjectionImpl(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	ElasticsearchDistanceToFieldProjection(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 		this.unit = unit;
