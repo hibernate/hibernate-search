@@ -28,12 +28,21 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
+	public boolean isConvertFromDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
-		return userConverter.isDslCompatibleWith( castedOther.userConverter );
+		return userConverter.isConvertFromDslCompatibleWith( castedOther.userConverter );
+	}
+
+	@Override
+	public boolean isConvertFromProjectionCompatibleWith(LuceneFieldConverter<?, ?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
+		return userConverter.isConvertFromProjectionCompatibleWith( castedOther.userConverter );
 	}
 
 	@Override

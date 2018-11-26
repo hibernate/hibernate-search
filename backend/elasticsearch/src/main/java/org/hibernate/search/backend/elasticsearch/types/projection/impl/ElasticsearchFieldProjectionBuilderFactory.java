@@ -32,7 +32,7 @@ public interface ElasticsearchFieldProjectionBuilderFactory {
 	 * Determine whether another projection builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see ElasticsearchFieldConverter#isDslCompatibleWith(ElasticsearchFieldConverter)
+	 * @see ElasticsearchFieldConverter#isConvertFromDslCompatibleWith(ElasticsearchFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldProjectionBuilderFactory}, never {@code null}.
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.

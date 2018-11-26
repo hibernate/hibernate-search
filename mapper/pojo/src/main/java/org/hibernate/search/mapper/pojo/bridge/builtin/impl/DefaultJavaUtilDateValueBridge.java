@@ -60,6 +60,11 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 		public Date convert(Instant value, FromIndexFieldValueConvertContext context) {
 			return value == null ? null : Date.from( value );
 		}
+
+		@Override
+		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+			return INSTANCE.equals( other );
+		}
 	}
 
 }

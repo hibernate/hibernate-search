@@ -35,8 +35,8 @@ public final class StringFieldConverter extends AbstractFieldConverter<String, S
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
-		if ( !super.isDslCompatibleWith( other ) ) {
+	public boolean isConvertFromDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
+		if ( !super.isConvertFromDslCompatibleWith( other ) ) {
 			return false;
 		}
 

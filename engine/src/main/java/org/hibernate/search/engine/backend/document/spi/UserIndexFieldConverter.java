@@ -56,24 +56,51 @@ public final class UserIndexFieldConverter<F> {
 	}
 
 	/**
-	 * Determine whether another converter is DSL-compatible with this one,
-	 * i.e. its {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is guaranteed
-	 * to always return the same value as this converter's when given the same input.
+	 * Determine whether another converter's {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)}
+	 * method is compatible with this one's,
+	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
 	 * <p>
-	 * Note: this method is separate from {@link #equals(Object)} because it might return true for two different objects,
-	 * e.g. two objects that implement {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} differently.
+	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
+	 * e.g. two objects that implement {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} in a compatible way.
 	 *
 	 * @param other Another {@link UserIndexFieldConverter}.
-	 * @return {@code true} if the given converter is DSL-compatible.
+	 * @return {@code true} if the given converter's
+	 * {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	public boolean isDslCompatibleWith(UserIndexFieldConverter<?> other) {
+	public boolean isConvertFromDslCompatibleWith(UserIndexFieldConverter<?> other) {
 		if ( other == null ) {
 			return false;
 		}
 		return dslToIndexConverter.isCompatibleWith( other.dslToIndexConverter );
 	}
 
+	/**
+	 * Determine whether another converter's {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)}
+	 * method is compatible with this one's,
+	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
+	 * <p>
+	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
+	 * e.g. two objects that implement {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} in a compatible way.
+	 *
+	 * @param other Another {@link UserIndexFieldConverter}.
+	 * @return {@code true} if the given converter's
+	 * {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@code false} otherwise, or when in doubt.
+	 */
+	public boolean isConvertFromProjectionCompatibleWith(UserIndexFieldConverter<?> other) {
+		if ( other == null ) {
+			return false;
+		}
+		if ( projectionFromIndexConverter == null || other.projectionFromIndexConverter == null ) {
+			// If one projection converter is null, then both must be null in order to be compatible
+			return projectionFromIndexConverter == null && other.projectionFromIndexConverter == null;
+		}
+
+		return projectionFromIndexConverter.isCompatibleWith( other.projectionFromIndexConverter );
+	}
 
 	/**
 	 * Determine whether the given projection type is compatible with this converter.

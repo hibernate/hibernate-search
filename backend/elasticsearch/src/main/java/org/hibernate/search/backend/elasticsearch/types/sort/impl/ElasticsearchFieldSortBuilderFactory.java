@@ -41,7 +41,7 @@ public interface ElasticsearchFieldSortBuilderFactory {
 	 * Determine whether another sort builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see ElasticsearchFieldConverter#isDslCompatibleWith(ElasticsearchFieldConverter)
+	 * @see ElasticsearchFieldConverter#isConvertFromDslCompatibleWith(ElasticsearchFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldSortBuilderFactory}, never {@code null}.
 	 * @return {@code true} if the given sort builder factory is DSL-compatible.

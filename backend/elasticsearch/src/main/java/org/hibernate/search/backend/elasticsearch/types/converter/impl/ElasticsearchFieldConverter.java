@@ -36,21 +36,36 @@ public interface ElasticsearchFieldConverter {
 	Object convertFromProjection(JsonElement value, FromIndexFieldValueConvertContext context);
 
 	/**
-	 * Determine whether another converter is DSL-compatible with this one.
-	 *
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isDslCompatibleWith(UserIndexFieldConverter)
+	 * Determine whether another converter's {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)}
+	 * method is compatible with this one's.
+	 * <p>
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromDslCompatibleWith(UserIndexFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldConverter}, never {@code null}.
-	 * @return {@code true} if the given converter is DSL-compatible.
+	 * @return {@code true} if the given converter's
+	 * {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldConverter other);
+	boolean isConvertFromDslCompatibleWith(ElasticsearchFieldConverter other);
+
+	/**
+	 * Determine whether another converter's {@link #convertFromProjection(JsonElement, FromIndexFieldValueConvertContext)}
+	 * method is compatible with this one's.
+	 * <p>
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromProjectionCompatibleWith(UserIndexFieldConverter)
+	 *
+	 * @param other Another {@link ElasticsearchFieldConverter}, never {@code null}.
+	 * @return {@code true} if the given converter's
+	 * {@link #convertFromProjection(JsonElement, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@code false} otherwise, or when in doubt.
+	 */
+	boolean isConvertFromProjectionCompatibleWith(ElasticsearchFieldConverter other);
 
 	/**
 	 * Determine whether the given projection type is compatible with this converter.
 	 *
 	 * @param projectionType The projection type.
-	 * @return {@code true} if the given projection type is compatible. {@code false} otherwise
+	 * @return {@code true} if the given projection type is compatible. {@code false} otherwise.
 	 */
 	boolean isProjectionCompatibleWith(Class<?> projectionType);
 }

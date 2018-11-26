@@ -37,4 +37,15 @@ public interface FromIndexFieldValueConverter<F, V> {
 	 */
 	V convert(F value, FromIndexFieldValueConvertContext context);
 
+	/**
+	 * @param other Another {@link ToIndexFieldValueConverter}, never {@code null}.
+	 * @return {@code true} if the given object behaves exactly the same as this object,
+	 * i.e. its {@link #isConvertedTypeAssignableTo(Class)} and {@link #convert(Object, FromIndexFieldValueConvertContext)}
+	 * methods are guaranteed to always return the same value as this object's
+	 * when given the same input. {@code false} otherwise, or when in doubt.
+	 */
+	default boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+		return equals( other );
+	}
+
 }
