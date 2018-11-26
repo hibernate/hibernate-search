@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 
 
-class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceSearchProjectionBuilder<R> {
+class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceProjectionBuilder<R> {
 
 	private final ReferenceSearchProjectionImpl<R> projection;
 

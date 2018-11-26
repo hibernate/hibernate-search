@@ -12,14 +12,14 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
-import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.function.TriFunction;
 
 
 public class CompositeProjectionContextImpl<T> implements CompositeProjectionContext<T> {
 
-	private CompositeSearchProjectionBuilder<T> compositeProjectionBuilder;
+	private CompositeProjectionBuilder<T> compositeProjectionBuilder;
 
 	public CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
 			Function<List<?>, T> transformer,

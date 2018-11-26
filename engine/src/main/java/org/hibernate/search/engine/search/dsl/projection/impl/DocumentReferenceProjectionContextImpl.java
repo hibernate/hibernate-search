@@ -9,13 +9,13 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.DocumentReferenceProjectionContext;
-import org.hibernate.search.engine.search.projection.spi.DocumentReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
 public class DocumentReferenceProjectionContextImpl implements DocumentReferenceProjectionContext {
 
-	private DocumentReferenceSearchProjectionBuilder documentReferenceProjectionBuilder;
+	private DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
 	DocumentReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.documentReferenceProjectionBuilder = factory.documentReference();

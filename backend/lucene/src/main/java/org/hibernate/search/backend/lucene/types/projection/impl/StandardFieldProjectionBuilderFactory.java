@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchPro
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 	}
 
 	@Override
-	public <U> FieldSearchProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	public <U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
 			Class<U> expectedType) {
 		checkProjectable( absoluteFieldPath, projectable );
 
@@ -49,7 +49,7 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 	}
 
 	@Override
-	public DistanceToFieldSearchProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
 			GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

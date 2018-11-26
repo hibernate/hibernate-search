@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.CompositeSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 
-class CompositeSearchProjectionBuilderImpl<T> implements CompositeSearchProjectionBuilder<T> {
+class CompositeSearchProjectionBuilderImpl<T> implements CompositeProjectionBuilder<T> {
 
 	private final CompositeSearchProjection<?, T> projection;
 

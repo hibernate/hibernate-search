@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ObjectSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
 
 
-public class ObjectSearchProjectionBuilderImpl<O> implements ObjectSearchProjectionBuilder<O> {
+public class ObjectSearchProjectionBuilderImpl<O> implements ObjectProjectionBuilder<O> {
 
 	@SuppressWarnings("rawtypes")
 	private static final ObjectSearchProjectionBuilderImpl INSTANCE = new ObjectSearchProjectionBuilderImpl();

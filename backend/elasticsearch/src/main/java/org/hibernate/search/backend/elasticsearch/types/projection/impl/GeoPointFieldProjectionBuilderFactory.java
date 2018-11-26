@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Distanc
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.FieldSearchProjectionBuilderImpl;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.search.projection.spi.DistanceToFieldSearchProjectionBuilder;
-import org.hibernate.search.engine.search.projection.spi.FieldSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -32,7 +32,7 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 	}
 
 	@Override
-	public <T> FieldSearchProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
 			Class<T> expectedType) {
 		checkProjectable( absoluteFieldPath, projectable );
 
@@ -45,7 +45,7 @@ public class GeoPointFieldProjectionBuilderFactory implements ElasticsearchField
 	}
 
 	@Override
-	public DistanceToFieldSearchProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
+	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
 			GeoPoint center) {
 		checkProjectable( absoluteFieldPath, projectable );
 

@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ReferenceSearchProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 
 
-public class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceSearchProjectionBuilder<R> {
+public class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceProjectionBuilder<R> {
 
 	@SuppressWarnings("rawtypes")
 	private static final ReferenceSearchProjectionBuilderImpl INSTANCE = new ReferenceSearchProjectionBuilderImpl();

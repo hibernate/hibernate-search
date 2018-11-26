@@ -22,25 +22,25 @@ import org.hibernate.search.util.function.TriFunction;
  */
 public interface SearchProjectionBuilderFactory {
 
-	DocumentReferenceSearchProjectionBuilder documentReference();
+	DocumentReferenceProjectionBuilder documentReference();
 
-	<T> FieldSearchProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz);
+	<T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz);
 
-	<O> ObjectSearchProjectionBuilder<O> object();
+	<O> ObjectProjectionBuilder<O> object();
 
-	<R> ReferenceSearchProjectionBuilder<R> reference();
+	<R> ReferenceProjectionBuilder<R> reference();
 
-	ScoreSearchProjectionBuilder score();
+	ScoreProjectionBuilder score();
 
-	DistanceToFieldSearchProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center);
 
-	<T> CompositeSearchProjectionBuilder<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+	<T> CompositeProjectionBuilder<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
 
-	<P, T> CompositeSearchProjectionBuilder<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+	<P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
 
-	<P1, P2, T> CompositeSearchProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
+	<P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
-	<P1, P2, P3, T> CompositeSearchProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	<P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 }
