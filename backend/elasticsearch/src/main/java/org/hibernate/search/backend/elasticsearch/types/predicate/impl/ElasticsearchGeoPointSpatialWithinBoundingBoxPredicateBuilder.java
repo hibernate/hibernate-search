@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -17,7 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
 
-class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPredicateBuilder
+class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
@@ -30,7 +30,7 @@ class GeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractSearchPre
 
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
-	GeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec<GeoPoint> codec) {
+	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 	}

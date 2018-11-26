@@ -15,7 +15,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonAccessor<String> PATH = JsonAccessor.root().property( "path" ).asString();
@@ -25,7 +25,7 @@ class NestedPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 
 	private ElasticsearchSearchPredicateBuilder nestedBuilder;
 
-	NestedPredicateBuilderImpl(String absoluteFieldPath) {
+	ElasticsearchNestedPredicateBuilder(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 

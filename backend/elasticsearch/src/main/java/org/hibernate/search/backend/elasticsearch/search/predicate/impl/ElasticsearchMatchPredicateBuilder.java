@@ -23,7 +23,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+public class ElasticsearchMatchPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -37,7 +37,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	private final String absoluteFieldPath;
 	private final ElasticsearchFieldConverter converter;
 
-	public MatchPredicateBuilderImpl(ElasticsearchSearchContext searchContext,
+	public ElasticsearchMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;

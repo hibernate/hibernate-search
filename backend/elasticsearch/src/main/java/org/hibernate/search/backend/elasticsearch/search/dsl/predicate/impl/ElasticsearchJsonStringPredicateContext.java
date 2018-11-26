@@ -11,12 +11,12 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 
-final class JsonStringPredicateContextImpl
+final class ElasticsearchJsonStringPredicateContext
 		extends AbstractSearchPredicateTerminalContext<ElasticsearchSearchPredicateBuilder>
 		implements SearchPredicateTerminalContext {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
-	JsonStringPredicateContextImpl(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
+	ElasticsearchJsonStringPredicateContext(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
 		super( factory );
 		this.builder = factory.fromJsonString( jsonString );
 	}

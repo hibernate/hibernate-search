@@ -24,7 +24,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class BooleanJunctionPredicateBuilderImpl extends AbstractSearchPredicateBuilder
+class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements BooleanJunctionPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

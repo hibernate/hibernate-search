@@ -20,15 +20,15 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
 
-	public static final GeoPointFieldPredicateBuilderFactory INSTANCE = new GeoPointFieldPredicateBuilderFactory();
+	public static final ElasticsearchGeoPointFieldPredicateBuilderFactory INSTANCE = new ElasticsearchGeoPointFieldPredicateBuilderFactory();
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final GeoPointFieldCodec CODEC = GeoPointFieldCodec.INSTANCE;
 
-	private GeoPointFieldPredicateBuilderFactory() {
+	private ElasticsearchGeoPointFieldPredicateBuilderFactory() {
 	}
 
 	@Override
@@ -55,18 +55,18 @@ public class GeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldP
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
-		return new GeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
 			String absoluteFieldPath) {
-		return new GeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
 			String absoluteFieldPath) {
-		return new GeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, CODEC );
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, CODEC );
 	}
 }

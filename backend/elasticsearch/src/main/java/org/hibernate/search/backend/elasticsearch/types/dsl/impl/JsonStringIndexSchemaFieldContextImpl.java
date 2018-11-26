@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.JsonStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -84,7 +84,7 @@ public class JsonStringIndexSchemaFieldContextImpl implements JsonStringIndexSch
 
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, CODEC,
-				new StandardFieldPredicateBuilderFactory( converter ),
+				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( true, converter ),
 				new StandardFieldProjectionBuilderFactory( true, converter )
 		);

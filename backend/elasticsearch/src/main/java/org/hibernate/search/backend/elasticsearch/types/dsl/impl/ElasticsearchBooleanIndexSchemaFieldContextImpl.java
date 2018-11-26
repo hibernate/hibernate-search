@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.BooleanFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.StandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.StandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.StandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -46,7 +46,7 @@ public class ElasticsearchBooleanIndexSchemaFieldContextImpl
 
 		ElasticsearchIndexSchemaFieldNode<Boolean> node = new ElasticsearchIndexSchemaFieldNode<>(
 				parentNode, converter, BooleanFieldCodec.INSTANCE,
-				new StandardFieldPredicateBuilderFactory( converter ),
+				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
 				new StandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
