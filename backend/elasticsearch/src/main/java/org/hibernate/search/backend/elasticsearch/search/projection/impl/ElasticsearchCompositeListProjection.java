@@ -17,13 +17,13 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonObject;
 
-public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<List<Object>, T> {
+public class ElasticsearchCompositeListProjection<T> implements ElasticsearchCompositeProjection<List<Object>, T> {
 
 	private final Function<List<?>, T> transformer;
 
 	private final List<ElasticsearchSearchProjection<?, ?>> children;
 
-	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
+	public ElasticsearchCompositeListProjection(Function<List<?>, T> transformer,
 			List<ElasticsearchSearchProjection<?, ?>> children) {
 		this.transformer = transformer;
 		this.children = children;

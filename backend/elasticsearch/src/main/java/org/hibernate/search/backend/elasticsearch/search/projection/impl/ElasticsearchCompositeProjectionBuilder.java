@@ -10,11 +10,11 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 
 
-class CompositeSearchProjectionBuilderImpl<T> implements CompositeProjectionBuilder<T> {
+class ElasticsearchCompositeProjectionBuilder<T> implements CompositeProjectionBuilder<T> {
 
-	private final CompositeSearchProjection<?, T> projection;
+	private final ElasticsearchCompositeProjection<?, T> projection;
 
-	CompositeSearchProjectionBuilderImpl(CompositeSearchProjection<?, T> projection) {
+	ElasticsearchCompositeProjectionBuilder(ElasticsearchCompositeProjection<?, T> projection) {
 		this.projection = projection;
 	}
 

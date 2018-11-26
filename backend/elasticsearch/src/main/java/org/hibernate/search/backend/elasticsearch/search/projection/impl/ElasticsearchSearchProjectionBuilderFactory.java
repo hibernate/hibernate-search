@@ -32,7 +32,7 @@ import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchProjectionBuilderFactory {
+public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,7 +43,7 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 
 	private final ElasticsearchSearchTargetModel searchTargetModel;
 
-	public ElasticsearchSearchProjectionBuilderFactoryImpl(SearchProjectionBackendContext searchProjectionBackendContext,
+	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
 		this.searchProjectionBackendContext = searchProjectionBackendContext;
 		this.searchTargetModel = searchTargetModel;
@@ -91,24 +91,24 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 			typedProjections.add( toImplementation( projection ) );
 		}
 
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeListSearchProjectionImpl<>( transformer, typedProjections )
+		return new ElasticsearchCompositeProjectionBuilder<>(
+				new ElasticsearchCompositeListProjection<>( transformer, typedProjections )
 		);
 	}
 
 	@Override
 	public <P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer,
 			SearchProjection<P> projection) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeFunctionSearchProjectionImpl<>( transformer, toImplementation( projection ) )
+		return new ElasticsearchCompositeProjectionBuilder<>(
+				new ElasticsearchCompositeFunctionProjection<>( transformer, toImplementation( projection ) )
 		);
 	}
 
 	@Override
 	public <P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeBiFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+		return new ElasticsearchCompositeProjectionBuilder<>(
+				new ElasticsearchCompositeBiFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -116,8 +116,8 @@ public class ElasticsearchSearchProjectionBuilderFactoryImpl implements SearchPr
 	@Override
 	public <P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeTriFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+		return new ElasticsearchCompositeProjectionBuilder<>(
+				new ElasticsearchCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}

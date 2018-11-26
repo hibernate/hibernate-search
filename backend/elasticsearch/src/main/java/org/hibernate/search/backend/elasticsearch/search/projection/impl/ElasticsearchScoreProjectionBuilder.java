@@ -7,19 +7,19 @@
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
-class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceProjectionBuilder<R> {
+class ElasticsearchScoreProjectionBuilder implements ScoreProjectionBuilder {
 
-	private final ReferenceSearchProjectionImpl<R> projection;
+	private final ElasticsearchScoreProjection projection;
 
-	ReferenceSearchProjectionBuilderImpl(DocumentReferenceExtractorHelper helper) {
-		this.projection = new ReferenceSearchProjectionImpl<>( helper );
+	ElasticsearchScoreProjectionBuilder() {
+		this.projection = new ElasticsearchScoreProjection();
 	}
 
 	@Override
-	public SearchProjection<R> build() {
+	public SearchProjection<Float> build() {
 		return projection;
 	}
 }
