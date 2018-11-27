@@ -80,6 +80,6 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 			throw log.usingDifferentSessionFactories( expectedSessionFactory, givenSessionFactory );
 		}
 
-		return new HibernateOrmSearchManagerImpl.Builder( getDelegate(), mappingContext, sessionImplementor );
+		return new HibernateOrmSearchManagerImpl.HibernateOrmSearchManagerBuilderImpl( getDelegate(), mappingContext, sessionImplementor );
 	}
 }

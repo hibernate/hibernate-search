@@ -13,13 +13,13 @@ import java.util.Set;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
-class ConfigurationServicePropertySource implements ConfigurationPropertySource {
+class HibernateOrmConfigurationServicePropertySource implements ConfigurationPropertySource {
 
 	private static final ConfigurationService.Converter<Object> OBJECT_CONVERTER = value -> value;
 
 	private final ConfigurationService configurationService;
 
-	ConfigurationServicePropertySource(ConfigurationService configurationService) {
+	HibernateOrmConfigurationServicePropertySource(ConfigurationService configurationService) {
 		this.configurationService = configurationService;
 	}
 

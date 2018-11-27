@@ -33,7 +33,7 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 	private final ConfigurationPropertySource delegate;
 
 	public HibernateOrmConfigurationPropertySource(ConfigurationService configurationService) {
-		ConfigurationServicePropertySource serviceSource = new ConfigurationServicePropertySource( configurationService );
+		HibernateOrmConfigurationServicePropertySource serviceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
 		ConfigurationPropertySource maskedSource = serviceSource.withMask( "hibernate.search" );
 
 		if ( ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( maskedSource ) ) {

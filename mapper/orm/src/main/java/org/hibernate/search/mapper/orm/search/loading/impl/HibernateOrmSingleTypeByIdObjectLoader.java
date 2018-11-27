@@ -18,7 +18,7 @@ import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class SingleTypeByIdObjectLoader<O, T> implements ComposableObjectLoader<PojoReference, T> {
+class HibernateOrmSingleTypeByIdObjectLoader<O, T> implements HibernateOrmComposableObjectLoader<PojoReference, T> {
 	private final Session session;
 	private final Class<O> entityType;
 	private final MutableObjectLoadingOptions loadingOptions;
@@ -26,7 +26,7 @@ class SingleTypeByIdObjectLoader<O, T> implements ComposableObjectLoader<PojoRef
 
 	private MultiIdentifierLoadAccess<O> multiAccess;
 
-	public SingleTypeByIdObjectLoader(
+	public HibernateOrmSingleTypeByIdObjectLoader(
 			Session session,
 			Class<O> entityType,
 			MutableObjectLoadingOptions loadingOptions,

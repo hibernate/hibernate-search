@@ -40,12 +40,12 @@ public class ObjectLoaderBuilder<O> {
 		}
 	}
 
-	private <T> ComposableObjectLoader<PojoReference, T> buildForSingleType(
+	private <T> HibernateOrmComposableObjectLoader<PojoReference, T> buildForSingleType(
 			MutableObjectLoadingOptions mutableLoadingOptions, Class<? extends O> concreteIndexedType,
 			Function<? super O, T> hitTransformer) {
 		// TODO Add support for entities whose document ID is not the entity ID (natural ID, or other)
 		// TODO Add support for other types of database retrieval and object lookup? See HSearch 5: org.hibernate.search.engine.query.hibernate.impl.ObjectLoaderBuilder#getObjectInitializer
-		return new SingleTypeByIdObjectLoader<>( session, concreteIndexedType, mutableLoadingOptions, hitTransformer );
+		return new HibernateOrmSingleTypeByIdObjectLoader<>( session, concreteIndexedType, mutableLoadingOptions, hitTransformer );
 	}
 
 	private <T> ObjectLoader<PojoReference, T> buildForMultipleTypes(
@@ -54,14 +54,14 @@ public class ObjectLoaderBuilder<O> {
 		 * TODO Group together entity types from a same hierarchy, so as to optimize loads
 		 * (one query per entity hierarchy, and not one query per index).
 		 */
-		Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegateByConcreteType =
+		Map<Class<? extends O>, HibernateOrmComposableObjectLoader<PojoReference, ? extends T>> delegateByConcreteType =
 				new HashMap<>( concreteIndexedClasses.size() );
 		for ( Class<? extends O> concreteIndexedClass : concreteIndexedClasses ) {
-			ComposableObjectLoader<PojoReference, T> delegate =
+			HibernateOrmComposableObjectLoader<PojoReference, T> delegate =
 					buildForSingleType( mutableLoadingOptions, concreteIndexedClass, hitTransformer );
 			delegateByConcreteType.put( concreteIndexedClass, delegate );
 		}
-		return new ByTypeObjectLoader<>( delegateByConcreteType );
+		return new HibernateOrmByTypeObjectLoader<>( delegateByConcreteType );
 	}
 
 }
