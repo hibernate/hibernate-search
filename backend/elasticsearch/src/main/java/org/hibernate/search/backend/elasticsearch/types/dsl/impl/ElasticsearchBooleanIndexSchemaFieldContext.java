@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.BooleanFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBooleanFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -23,12 +23,12 @@ import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefiniti
 
 import com.google.gson.JsonElement;
 
-public class ElasticsearchBooleanIndexSchemaFieldContextImpl
-		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchBooleanIndexSchemaFieldContextImpl, Boolean> {
+public class ElasticsearchBooleanIndexSchemaFieldContext
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchBooleanIndexSchemaFieldContext, Boolean> {
 
 	private final String relativeFieldName;
 
-	public ElasticsearchBooleanIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchBooleanIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, Boolean.class, DataType.BOOLEAN );
 		this.relativeFieldName = relativeFieldName;
 	}
@@ -39,13 +39,13 @@ public class ElasticsearchBooleanIndexSchemaFieldContextImpl
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		StandardFieldConverter<Boolean> converter = new StandardFieldConverter<>(
+		ElasticsearchStandardFieldConverter<Boolean> converter = new ElasticsearchStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				BooleanFieldCodec.INSTANCE
+				ElasticsearchBooleanFieldCodec.INSTANCE
 		);
 
 		ElasticsearchIndexSchemaFieldNode<Boolean> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, BooleanFieldCodec.INSTANCE,
+				parentNode, converter, ElasticsearchBooleanFieldCodec.INSTANCE,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
 				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
@@ -61,7 +61,7 @@ public class ElasticsearchBooleanIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected ElasticsearchBooleanIndexSchemaFieldContextImpl thisAsS() {
+	protected ElasticsearchBooleanIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

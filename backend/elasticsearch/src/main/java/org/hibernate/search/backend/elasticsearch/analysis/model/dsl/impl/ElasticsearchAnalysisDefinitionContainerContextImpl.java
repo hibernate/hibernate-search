@@ -41,8 +41,8 @@ public class ElasticsearchAnalysisDefinitionContainerContextImpl
 
 			@Override
 			public ElasticsearchTypedAnalysisComponentDefinitionContext type(String type) {
-				ElasticsearchTypedAnalyzerDefinitionContextImpl context =
-						new ElasticsearchTypedAnalyzerDefinitionContextImpl( name, type );
+				ElasticsearchTypedAnalyzerDefinitionContext context =
+						new ElasticsearchTypedAnalyzerDefinitionContext( name, type );
 				children.add( context );
 				return context;
 			}
@@ -64,21 +64,21 @@ public class ElasticsearchAnalysisDefinitionContainerContextImpl
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext tokenizer(String name) {
-		ElasticsearchTokenizerDefinitionContextImpl context = new ElasticsearchTokenizerDefinitionContextImpl( name );
+		ElasticsearchTokenizerDefinitionContext context = new ElasticsearchTokenizerDefinitionContext( name );
 		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext charFilter(String name) {
-		ElasticsearchCharFilterDefinitionContextImpl context = new ElasticsearchCharFilterDefinitionContextImpl( name );
+		ElasticsearchCharFilterDefinitionContext context = new ElasticsearchCharFilterDefinitionContext( name );
 		children.add( context );
 		return context;
 	}
 
 	@Override
 	public ElasticsearchAnalysisComponentDefinitionContext tokenFilter(String name) {
-		ElasticsearchTokenFilterDefinitionContextImpl context = new ElasticsearchTokenFilterDefinitionContextImpl( name );
+		ElasticsearchTokenFilterDefinitionContext context = new ElasticsearchTokenFilterDefinitionContext( name );
 		children.add( context );
 		return context;
 	}

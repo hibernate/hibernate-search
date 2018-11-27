@@ -12,14 +12,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class BooleanFieldCodec implements ElasticsearchFieldCodec<Boolean> {
-	public static final BooleanFieldCodec INSTANCE = new BooleanFieldCodec();
+public class ElasticsearchStringFieldCodec implements ElasticsearchFieldCodec<String> {
+	// Must be a singleton so that equals() works as required by the interface
+	public static final ElasticsearchStringFieldCodec INSTANCE = new ElasticsearchStringFieldCodec();
 
-	private BooleanFieldCodec() {
+	private ElasticsearchStringFieldCodec() {
 	}
 
 	@Override
-	public JsonElement encode(Boolean value) {
+	public JsonElement encode(String value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
@@ -27,11 +28,11 @@ public class BooleanFieldCodec implements ElasticsearchFieldCodec<Boolean> {
 	}
 
 	@Override
-	public Boolean decode(JsonElement element) {
+	public String decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		return JsonElementTypes.BOOLEAN.fromElement( element );
+		return JsonElementTypes.STRING.fromElement( element );
 	}
 
 	@Override

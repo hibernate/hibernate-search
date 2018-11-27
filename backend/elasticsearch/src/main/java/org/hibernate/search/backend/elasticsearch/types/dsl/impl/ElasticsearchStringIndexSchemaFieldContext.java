@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.StringFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -34,9 +34,9 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchStringIndexSchemaFieldContextImpl
-		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContextImpl, String>
-		implements StringIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContextImpl> {
+public class ElasticsearchStringIndexSchemaFieldContext
+		extends AbstractElasticsearchStandardIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContext, String>
+		implements StringIndexSchemaFieldTypedContext<ElasticsearchStringIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -46,31 +46,31 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public ElasticsearchStringIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchStringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	public ElasticsearchStringIndexSchemaFieldContextImpl analyzer(String analyzerName) {
+	public ElasticsearchStringIndexSchemaFieldContext analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		return this;
 	}
 
 	@Override
-	public ElasticsearchStringIndexSchemaFieldContextImpl normalizer(String normalizerName) {
+	public ElasticsearchStringIndexSchemaFieldContext normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		return this;
 	}
 
 	@Override
-	public ElasticsearchStringIndexSchemaFieldContextImpl projectable(Projectable projectable) {
+	public ElasticsearchStringIndexSchemaFieldContext projectable(Projectable projectable) {
 		this.projectable = projectable;
 		return this;
 	}
 
 	@Override
-	public ElasticsearchStringIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public ElasticsearchStringIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -105,12 +105,12 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 
 		mapping.setStore( resolvedProjectable );
 
-		StandardFieldConverter<String> converter = new StandardFieldConverter<>(
+		ElasticsearchStandardFieldConverter<String> converter = new ElasticsearchStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				StringFieldCodec.INSTANCE
+				ElasticsearchStringFieldCodec.INSTANCE
 		);
 		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, StringFieldCodec.INSTANCE,
+				parentNode, converter, ElasticsearchStringFieldCodec.INSTANCE,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
 				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
@@ -126,7 +126,7 @@ public class ElasticsearchStringIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected ElasticsearchStringIndexSchemaFieldContextImpl thisAsS() {
+	protected ElasticsearchStringIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

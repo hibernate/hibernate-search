@@ -18,18 +18,18 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 
-public class GeoPointFieldCodec implements ElasticsearchFieldCodec<GeoPoint> {
+public class ElasticsearchGeoPointFieldCodec implements ElasticsearchFieldCodec<GeoPoint> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Must be a singleton so that equals() works as required by the interface
-	public static final GeoPointFieldCodec INSTANCE = new GeoPointFieldCodec();
+	public static final ElasticsearchGeoPointFieldCodec INSTANCE = new ElasticsearchGeoPointFieldCodec();
 
 	private static final JsonAccessor<Double> LATITUDE_ACCESSOR =
 			JsonAccessor.root().property( "lat" ).asDouble();
 	private static final JsonAccessor<Double> LONGITUDE_ACCESSOR =
 			JsonAccessor.root().property( "lon" ).asDouble();
 
-	private GeoPointFieldCodec() {
+	private ElasticsearchGeoPointFieldCodec() {
 	}
 
 	@Override

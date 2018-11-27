@@ -6,33 +6,29 @@
  */
 package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
-
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
-import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.TokenizerDefinition;
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.AnalyzerDefinition;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
 
-/**
- * @author Yoann Rodiere
- */
-public class ElasticsearchTokenizerDefinitionContextImpl
-		extends ElasticsearchAnalysisComponentDefinitionContextImpl<TokenizerDefinition> {
+public class ElasticsearchTypedAnalyzerDefinitionContext
+		extends AbstractElasticsearchAnalysisComponentDefinitionContext<AnalyzerDefinition> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	ElasticsearchTokenizerDefinitionContextImpl(String name) {
-		super( name, new TokenizerDefinition() );
+	public ElasticsearchTypedAnalyzerDefinitionContext(String name, String type) {
+		super( name, new AnalyzerDefinition() );
+		type( type );
 	}
 
 	@Override
 	public void contribute(ElasticsearchAnalysisDefinitionCollector collector) {
 		if ( StringHelper.isEmpty( definition.getType() ) ) {
-			throw log.invalidElasticsearchTokenizerDefinition( name );
+			throw log.invalidElasticsearchTypedAnalyzerDefinition( name );
 		}
 		collector.collect( name, definition );
 	}
-
 }
