@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import org.apache.lucene.search.SortField;
 
 
-class UserProvidedLuceneSortFieldSortBuilder implements LuceneSearchSortBuilder {
+class LuceneUserProvidedLuceneSortFieldSortBuilder implements LuceneSearchSortBuilder {
 
 	private final SortField luceneSortField;
 
-	UserProvidedLuceneSortFieldSortBuilder(SortField luceneSortField) {
+	LuceneUserProvidedLuceneSortFieldSortBuilder(SortField luceneSortField) {
 		this.luceneSortField = luceneSortField;
 	}
 

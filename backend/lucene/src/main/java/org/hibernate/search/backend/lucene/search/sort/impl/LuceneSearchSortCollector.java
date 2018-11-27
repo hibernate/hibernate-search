@@ -16,7 +16,7 @@ import org.apache.lucene.search.SortField;
  * <p>
  * Used by Lucene-specific sort contributors.
  *
- * @see SearchSortBuilderFactoryImpl#contribute(Object, List)
+ * @see LuceneSearchSortBuilderFactoryImpl#contribute(Object, List)
  * @see LuceneSearchSortBuilder
  */
 public interface LuceneSearchSortCollector {

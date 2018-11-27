@@ -11,7 +11,7 @@ import org.apache.lucene.search.SortField.Type;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
-class ScoreSortBuilderImpl extends AbstractSearchSortBuilder
+class LuceneScoreSortBuilder extends AbstractLuceneSearchSortBuilder
 		implements ScoreSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final SortField FIELD_SCORE_ASC = new SortField( null, Type.SCORE, true );

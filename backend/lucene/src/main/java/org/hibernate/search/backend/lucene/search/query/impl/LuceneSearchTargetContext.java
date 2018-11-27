@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.backend.lucene.search.sort.impl.SearchSortBuilderFactoryImpl;
+import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
 
@@ -23,7 +23,7 @@ public class LuceneSearchTargetContext
 
 	private final LuceneSearchTargetModel searchTargetModel;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
-	private final SearchSortBuilderFactoryImpl searchSortFactory;
+	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory;
 
@@ -33,7 +33,7 @@ public class LuceneSearchTargetContext
 		LuceneSearchContext searchContext = new LuceneSearchContext( mappingContext );
 		this.searchTargetModel = searchTargetModel;
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
-		this.searchSortFactory = new SearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
+		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactoryImpl( searchTargetModel );
 		this.searchQueryFactory = new SearchQueryBuilderFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
@@ -53,7 +53,7 @@ public class LuceneSearchTargetContext
 	}
 
 	@Override
-	public SearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
+	public LuceneSearchSortBuilderFactoryImpl getSearchSortBuilderFactory() {
 		return searchSortFactory;
 	}
 

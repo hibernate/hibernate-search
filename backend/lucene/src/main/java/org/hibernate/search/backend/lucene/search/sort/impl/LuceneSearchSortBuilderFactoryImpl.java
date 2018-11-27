@@ -30,7 +30,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFactory {
+public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -40,7 +40,7 @@ public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFact
 	private final LuceneSearchContext searchContext;
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	public SearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
+	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
 			LuceneSearchTargetModel searchTargetModel) {
 		this.searchContext = searchContext;
 		this.searchTargetModel = searchTargetModel;
@@ -68,7 +68,7 @@ public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFact
 
 	@Override
 	public ScoreSortBuilder<LuceneSearchSortBuilder> score() {
-		return new ScoreSortBuilderImpl();
+		return new LuceneScoreSortBuilder();
 	}
 
 	@Override
@@ -87,17 +87,17 @@ public class SearchSortBuilderFactoryImpl implements LuceneSearchSortBuilderFact
 
 	@Override
 	public LuceneSearchSortBuilder indexOrder() {
-		return IndexOrderSortBuilder.INSTANCE;
+		return LuceneIndexOrderSortBuilder.INSTANCE;
 	}
 
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSortField(SortField luceneSortField) {
-		return new UserProvidedLuceneSortFieldSortBuilder( luceneSortField );
+		return new LuceneUserProvidedLuceneSortFieldSortBuilder( luceneSortField );
 	}
 
 	@Override
 	public LuceneSearchSortBuilder fromLuceneSort(Sort luceneSort) {
-		return new UserProvidedLuceneSortSortBuilder( luceneSort );
+		return new LuceneUserProvidedLuceneSortSortBuilder( luceneSort );
 	}
 
 	private static class SortBuilderFactoryRetrievalStrategy

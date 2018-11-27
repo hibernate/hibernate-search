@@ -23,7 +23,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneStringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.StringFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStringFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -111,7 +111,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new LuceneStringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
-				new StringFieldSortBuilderFactory( resolvedSortable, converter ),
+				new LuceneStringFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 

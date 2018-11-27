@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.InstantFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.InstantFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneInstantFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.InstantFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneInstantFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -51,7 +51,7 @@ public class LuceneInstantIndexSchemaFieldContextImpl
 				converter,
 				codec,
 				new LuceneInstantFieldPredicateBuilderFactory( converter ),
-				new InstantFieldSortBuilderFactory( resolvedSortable, converter ),
+				new LuceneInstantFieldSortBuilderFactory( resolvedSortable, converter ),
 				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 

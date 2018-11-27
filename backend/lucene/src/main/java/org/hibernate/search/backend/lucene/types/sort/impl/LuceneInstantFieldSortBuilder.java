@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LocalDateFieldSortBuilder extends AbstractFieldSortBuilderImpl {
+import org.apache.lucene.search.SortField;
 
-	LocalDateFieldSortBuilder(LuceneSearchContext searchContext,
+public class LuceneInstantFieldSortBuilder extends AbstractLuceneFieldSortBuilder {
+
+	LuceneInstantFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
 		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
 	}

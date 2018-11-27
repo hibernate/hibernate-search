@@ -13,17 +13,16 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortColl
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class IntegerFieldSortBuilder extends AbstractFieldSortBuilderImpl {
+public class LuceneStringFieldSortBuilder extends AbstractLuceneFieldSortBuilder {
 
-	IntegerFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, Integer> converter) {
-		super( searchContext, absoluteFieldPath, converter, Integer.MIN_VALUE, Integer.MAX_VALUE );
+	LuceneStringFieldSortBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, String> converter) {
+		super( searchContext, absoluteFieldPath, converter, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.INT,
-				order == SortOrder.DESC );
+		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.STRING, order == SortOrder.DESC );
 		setEffectiveMissingValue( sortField, missingValue, order );
 
 		collector.collectSortField( sortField );

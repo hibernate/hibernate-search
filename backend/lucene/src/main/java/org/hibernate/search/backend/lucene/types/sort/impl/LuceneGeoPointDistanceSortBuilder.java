@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.document.LatLonDocValuesField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class GeoPointDistanceSortBuilder extends AbstractSearchSortBuilder
+public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortBuilder
 		implements DistanceSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -28,7 +28,7 @@ public class GeoPointDistanceSortBuilder extends AbstractSearchSortBuilder
 
 	private final GeoPoint location;
 
-	GeoPointDistanceSortBuilder(String absoluteFieldPath, GeoPoint location) {
+	LuceneGeoPointDistanceSortBuilder(String absoluteFieldPath, GeoPoint location) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.location = location;
 	}
