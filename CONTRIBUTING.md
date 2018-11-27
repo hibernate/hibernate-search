@@ -64,6 +64,52 @@ You can very quickly check that you have respected the formatting rules by runni
 mvn checkstyle:check
 ```
 
+## Naming and architecture rules
+
+Some rules are not checked by Checkstyle, but will only be checked automatically when you submit a PR.
+You will spare yourself some back-and-forth by complying with them from the start.
+
+Naming rules are the easiest. All classes/interfaces should be named according to this pattern:
+
+```
+[Abstract][<module-specific keyword>][<some meaningful name>][Impl]
+```
+
+* An `Abstract` prefix **must** be used for abstract classes.
+* An `Impl` suffix **must only** be used for non-abstract classes
+that are the only implementation of an interface defined in Hibernate Search,
+with the part of the name before `Impl` being the name of the interface.
+* A module-specific keyword should be used whenever a type extends or implements a type from another module.
+The exact keyword differs depending on the module, but is generally fairly obvious:
+  * `Elasticsearch` for the Elasticsearch backend
+  * `Lucene` for the Lucene backend
+  * `Pojo` for the Pojo mapper
+  * `HibernateOrm` for the Hibernate ORM mapper
+  * etc.
+
+For example:
+ 
+* If you add a non-abstract class in the Lucene backend that implements an interface defined in the engine module,
+it should be named `Lucene<something>`
+* If you add a class in the Lucene backend that is the only implementation of an interface that is also in the Lucene backend,
+it should be named `<name of the interface>Impl`.
+* If you add a class in the Lucene backend that is one of multiple implementations of an interface that is also in the Lucene backend,
+its name should not have an `Impl` suffix and should meaningfully describe what is specific to this implementation.
+
+Architecture rules are a bit more complex;
+feel free to ignore them, submit your PR and let the reviewer guide you.
+
+* Types whose package contains an "spi" component (`*.spi.*`) are considered SPI.
+* Types whose package contains an "impl" component (`*.impl.*`) are considered internal.
+* All other types are considered API.
+* API types **must not** expose SPI or internal types, be it through inheritance, public or protected fields,
+or the return type or parameter type of public or protected methods.
+* SPI types **must not** expose internal types, be it through inheritance, public or protected fields,
+or the return type or parameter type of public or protected methods.
+* Types from a given module A **must not** depend on a internal type defined in another module B.
+There are exceptions, for example if module B is purely internal (named `hibernate-search-*-internal-*`),
+like `hibernate-search-util-interal-common`.
+
 ## Commit
 
 * Make commits of logical units.
