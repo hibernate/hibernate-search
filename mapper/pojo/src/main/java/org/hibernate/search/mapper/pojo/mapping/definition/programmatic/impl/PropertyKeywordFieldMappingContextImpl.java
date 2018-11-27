@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class PropertyKeywordFieldMappingContextImpl
-		extends PropertySortableFieldMappingContextImpl<PropertyKeywordFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
+		extends AbstractPropertySortableFieldMappingContext<PropertyKeywordFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
 		implements PropertyKeywordFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

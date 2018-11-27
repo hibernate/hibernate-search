@@ -15,11 +15,11 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 /**
  * @author Yoann Rodiere
  */
-public class MarkerMappingContributor implements PojoPropertyMetadataContributor {
+class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 
 	private final MarkerBuilder markerBuilder;
 
-	public MarkerMappingContributor(MarkerBuilder markerBuilder) {
+	MarkerMappingContributor(MarkerBuilder markerBuilder) {
 		this.markerBuilder = markerBuilder;
 	}
 

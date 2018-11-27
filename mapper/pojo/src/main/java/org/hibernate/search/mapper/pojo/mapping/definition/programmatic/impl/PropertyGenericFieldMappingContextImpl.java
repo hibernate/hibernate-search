@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 
 
 class PropertyGenericFieldMappingContextImpl
-		extends PropertySortableFieldMappingContextImpl<PropertyGenericFieldMappingContext, StandardIndexSchemaFieldTypedContext<?, ?>>
+		extends AbstractPropertySortableFieldMappingContext<PropertyGenericFieldMappingContext, StandardIndexSchemaFieldTypedContext<?, ?>>
 		implements PropertyGenericFieldMappingContext {
 
 	PropertyGenericFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {

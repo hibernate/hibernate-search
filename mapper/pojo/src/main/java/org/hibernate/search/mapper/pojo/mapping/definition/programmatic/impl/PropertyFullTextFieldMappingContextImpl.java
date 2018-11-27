@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class PropertyFullTextFieldMappingContextImpl
-		extends PropertyFieldMappingContextImpl<PropertyFullTextFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
+		extends AbstractPropertyFieldMappingContext<PropertyFullTextFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
 		implements PropertyFullTextFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
