@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -63,7 +63,7 @@ public class IndexingBackendContext {
 	}
 
 	ElasticsearchWorkOrchestrator createWorkPlanOrchestrator() {
-		return new StubElasticsearchWorkOrchestrator( client );
+		return new ElasticsearchStubWorkOrchestrator( client );
 	}
 
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(

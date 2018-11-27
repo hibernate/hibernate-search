@@ -24,11 +24,11 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
+public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
 	private final GsonProvider gsonProvider;
 
-	public StubElasticsearchWorkFactory(GsonProvider gsonProvider) {
+	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider) {
 		this.gsonProvider = gsonProvider;
 	}
 
@@ -36,7 +36,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 	public ElasticsearchWork<?> dropIndexIfExists(URLEncodedString indexName) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.delete()
 				.pathComponent( indexName );
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( indexName )
 				.body( payload );
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		if ( routingKey != null ) {
 			builder.param( "_routing", routingKey );
 		}
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
@@ -85,7 +85,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		if ( routingKey != null ) {
 			builder.param( "_routing", routingKey );
 		}
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		if ( routingKey != null ) {
 			builder.param( "_routing", routingKey );
 		}
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
@@ -107,11 +107,11 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._FLUSH );
-		ElasticsearchWork<?> flushWork = new StubElasticsearchWork<>( builder.build() );
+		ElasticsearchWork<?> flushWork = new ElasticsearchStubWork<>( builder.build() );
 		builder = ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._REFRESH );
-		ElasticsearchWork<Object> refreshWork = new StubElasticsearchWork<>( builder.build() );
+		ElasticsearchWork<Object> refreshWork = new ElasticsearchStubWork<>( builder.build() );
 		return context -> flushWork.execute( context )
 					.thenCompose( ignored -> refreshWork.execute( context ) );
 	}
@@ -121,12 +121,12 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._FORCEMERGE );
-		return new StubElasticsearchWork<>( builder.build() );
+		return new ElasticsearchStubWork<>( builder.build() );
 	}
 
 	@Override
 	public <T> ElasticsearchWork<SearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
-			JsonObject payload, SearchResultExtractor<T> searchResultExtractor,
+			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.multiValuedPathComponent( indexNames )
@@ -151,7 +151,7 @@ public class StubElasticsearchWorkFactory implements ElasticsearchWorkFactory {
 		}
 		*/
 
-		return new StubElasticsearchWork<>( builder.build(), searchResultExtractor::extract );
+		return new ElasticsearchStubWork<>( builder.build(), searchResultExtractor::extract );
 	}
 
 }

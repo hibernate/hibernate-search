@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
-class SearchQueryBuilderFactoryImpl
+class ElasticsearchSearchQueryBuilderFactory
 		implements SearchQueryBuilderFactory<ElasticsearchSearchQueryElementCollector> {
 
 	private final SearchBackendContext searchBackendContext;
@@ -32,7 +32,7 @@ class SearchQueryBuilderFactoryImpl
 
 	private final ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory;
 
-	SearchQueryBuilderFactoryImpl(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel,
+	ElasticsearchSearchQueryBuilderFactory(SearchBackendContext searchBackendContext, ElasticsearchSearchTargetModel searchTargetModel,
 			ElasticsearchSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
@@ -82,7 +82,7 @@ class SearchQueryBuilderFactoryImpl
 		return new ElasticsearchCompositeListProjection<>( Function.identity(), children );
 	}
 
-	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
+	private <T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class SearchQueryBuilderImpl<T>
+class ElasticsearchSearchQueryBuilder<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchWorkFactory workFactory;
@@ -41,7 +41,7 @@ class SearchQueryBuilderImpl<T>
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
-	SearchQueryBuilderImpl(
+	ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -90,8 +90,8 @@ class SearchQueryBuilderImpl<T>
 
 		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
-		SearchResultExtractor<T> searchResultExtractor =
-				new SearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
+		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
+				new ElasticsearchSearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
 		return new ElasticsearchSearchQuery<>(
 				workFactory, queryOrchestrator,

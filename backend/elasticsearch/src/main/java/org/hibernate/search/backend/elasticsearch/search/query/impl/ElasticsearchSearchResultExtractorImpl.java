@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
-import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -25,7 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
+public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchSearchResultExtractor<T> {
 
 	private static final JsonObjectAccessor HITS_ACCESSOR =
 			JsonAccessor.root().property( "hits" ).asObject();
@@ -41,7 +41,7 @@ public class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 
 	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
 
-	public SearchResultExtractorImpl(
+	public ElasticsearchSearchResultExtractorImpl(
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {

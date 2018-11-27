@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.SearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -29,7 +29,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private final Set<URLEncodedString> indexNames;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
-	private final SearchResultExtractor<T> searchResultExtractor;
+	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
 
 	private Long firstResultIndex;
 	private Long maxResultsCount;
@@ -37,7 +37,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	public ElasticsearchSearchQuery(ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames, Set<String> routingKeys,
-			JsonObject payload, SearchResultExtractor<T> searchResultExtractor) {
+			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;

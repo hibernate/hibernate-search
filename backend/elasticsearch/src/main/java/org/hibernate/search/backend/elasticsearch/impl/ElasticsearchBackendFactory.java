@@ -31,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.Discriminato
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategyImpl;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.StubElasticsearchWorkFactory;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchStubWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -83,7 +83,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
 			client.init( dialectSpecificGsonProvider );
 
-			ElasticsearchWorkFactory workFactory = new StubElasticsearchWorkFactory( dialectSpecificGsonProvider );
+			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );

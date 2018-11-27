@@ -19,15 +19,15 @@ import org.hibernate.search.util.impl.common.Futures;
  *
  * @author Yoann Rodiere
  */
-public class StubElasticsearchWorkOrchestrator implements ElasticsearchWorkOrchestrator {
+public class ElasticsearchStubWorkOrchestrator implements ElasticsearchWorkOrchestrator {
 
-	private final StubElasticsearchWorkExecutionContext context;
+	private final ElasticsearchStubWorkExecutionContext context;
 
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
 
-	public StubElasticsearchWorkOrchestrator(ElasticsearchClient client) {
-		this.context = new StubElasticsearchWorkExecutionContext( client );
+	public ElasticsearchStubWorkOrchestrator(ElasticsearchClient client) {
+		this.context = new ElasticsearchStubWorkExecutionContext( client );
 	}
 
 	@Override
