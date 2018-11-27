@@ -107,8 +107,8 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 		 * also add a discoverer for new types (e.g. types encountered in an @IndexedEmbedded).
 		 */
 		if ( annotatedTypeDiscoveryEnabled ) {
-			AnnotationTypeMetadataDiscoverer discoverer =
-					new AnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
+			PojoAnnotationTypeMetadataDiscoverer discoverer =
+					new PojoAnnotationTypeMetadataDiscoverer( contributorFactory, alreadyContributedTypes );
 			collector.collectDiscoverer( discoverer );
 		}
 	}
@@ -117,11 +117,11 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 	 * A type metadata discoverer that will provide annotation-based metadata
 	 * for types that were not explicitly requested .
 	 */
-	private static class AnnotationTypeMetadataDiscoverer implements TypeMetadataDiscoverer<PojoTypeMetadataContributor> {
+	private static class PojoAnnotationTypeMetadataDiscoverer implements TypeMetadataDiscoverer<PojoTypeMetadataContributor> {
 		private final AnnotationPojoTypeMetadataContributorFactory contributorFactory;
 		private final Set<PojoRawTypeModel<?>> alreadyContributedTypes;
 
-		AnnotationTypeMetadataDiscoverer(AnnotationPojoTypeMetadataContributorFactory contributorFactory,
+		PojoAnnotationTypeMetadataDiscoverer(AnnotationPojoTypeMetadataContributorFactory contributorFactory,
 				Set<PojoRawTypeModel<?>> alreadyContributedTypes) {
 			this.contributorFactory = contributorFactory;
 			this.alreadyContributedTypes = alreadyContributedTypes;

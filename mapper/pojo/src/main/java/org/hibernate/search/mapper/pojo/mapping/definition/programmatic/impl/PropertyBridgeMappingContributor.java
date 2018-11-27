@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 /**
  * @author Yoann Rodiere
  */
-public class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributor {
+class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributor {
 
 	private final BridgeBuilder<? extends PropertyBridge> bridgeBuilder;
 

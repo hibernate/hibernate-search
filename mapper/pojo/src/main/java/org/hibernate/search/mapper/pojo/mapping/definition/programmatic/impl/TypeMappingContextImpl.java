@@ -112,7 +112,7 @@ public class TypeMappingContextImpl
 	public PropertyMappingContext property(String propertyName) {
 		PojoPropertyModel<?> propertyModel = typeModel.getProperty( propertyName );
 		PropertyHandle propertyHandle = propertyModel.getHandle();
-		PropertyMappingContextImpl child = new PropertyMappingContextImpl( this, propertyHandle );
+		InitialPropertyMappingContext child = new InitialPropertyMappingContext( this, propertyHandle );
 		children.add( child );
 		return child;
 	}

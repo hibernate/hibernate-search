@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
-public class PropertyMappingContextImpl
+public class InitialPropertyMappingContext
 		implements PropertyMappingContext, PojoTypeMetadataContributor {
 
 	private final TypeMappingContext parent;
@@ -38,7 +38,7 @@ public class PropertyMappingContextImpl
 	private final ErrorCollectingPojoPropertyMetadataContributor children =
 			new ErrorCollectingPojoPropertyMetadataContributor();
 
-	PropertyMappingContextImpl(TypeMappingContext parent, PropertyHandle propertyHandle) {
+	InitialPropertyMappingContext(TypeMappingContext parent, PropertyHandle propertyHandle) {
 		this.parent = parent;
 		this.propertyHandle = propertyHandle;
 	}

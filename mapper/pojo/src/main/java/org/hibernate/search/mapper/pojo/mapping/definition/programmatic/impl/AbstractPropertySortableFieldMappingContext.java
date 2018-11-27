@@ -14,11 +14,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertySortableFieldMappingContext;
 
 
-abstract class PropertySortableFieldMappingContextImpl<S extends PropertySortableFieldMappingContext<?>, C extends StandardIndexSchemaFieldTypedContext<?, ?>>
-		extends PropertyFieldMappingContextImpl<S, C>
+abstract class AbstractPropertySortableFieldMappingContext<S extends PropertySortableFieldMappingContext<?>, C extends StandardIndexSchemaFieldTypedContext<?, ?>>
+		extends AbstractPropertyFieldMappingContext<S, C>
 		implements PropertySortableFieldMappingContext<S> {
 
-	PropertySortableFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName,
+	AbstractPropertySortableFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
 			Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
 		super( parent, relativeFieldName, contextConverter );
 	}
