@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Double, Double> {
+class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, Double> {
 
 	private final String absoluteFieldPath;
 
@@ -26,7 +26,7 @@ class DistanceToFieldSearchProjectionImpl implements LuceneSearchProjection<Doub
 
 	private DistanceCollector distanceCollector;
 
-	DistanceToFieldSearchProjectionImpl(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
+	LuceneDistanceToFieldProjection(String absoluteFieldPath, GeoPoint center, DistanceUnit unit) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 		this.unit = unit;

@@ -11,19 +11,19 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
 
 
-public class DocumentReferenceSearchProjectionBuilderImpl implements DocumentReferenceProjectionBuilder {
+public class LuceneDocumentReferenceProjectionBuilder implements DocumentReferenceProjectionBuilder {
 
-	private static final DocumentReferenceSearchProjectionBuilderImpl INSTANCE = new DocumentReferenceSearchProjectionBuilderImpl();
+	private static final LuceneDocumentReferenceProjectionBuilder INSTANCE = new LuceneDocumentReferenceProjectionBuilder();
 
-	public static DocumentReferenceSearchProjectionBuilderImpl get() {
+	public static LuceneDocumentReferenceProjectionBuilder get() {
 		return INSTANCE;
 	}
 
-	private DocumentReferenceSearchProjectionBuilderImpl() {
+	private LuceneDocumentReferenceProjectionBuilder() {
 	}
 
 	@Override
 	public SearchProjection<DocumentReference> build() {
-		return DocumentReferenceSearchProjectionImpl.get();
+		return LuceneDocumentReferenceProjection.get();
 	}
 }

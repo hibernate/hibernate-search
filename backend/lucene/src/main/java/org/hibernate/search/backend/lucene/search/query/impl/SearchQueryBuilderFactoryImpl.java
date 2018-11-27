@@ -12,11 +12,11 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
-import org.hibernate.search.backend.lucene.search.projection.impl.CompositeListSearchProjectionImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneCompositeListProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.ObjectSearchProjectionImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.ReferenceSearchProjectionImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneObjectProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneReferenceProjection;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -30,11 +30,11 @@ class SearchQueryBuilderFactoryImpl
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	private final LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory;
+	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
 	SearchQueryBuilderFactoryImpl(SearchBackendContext searchBackendContext,
 			LuceneSearchTargetModel searchTargetModel,
-			LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory) {
+			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
 		this.searchTargetModel = searchTargetModel;
 		this.searchProjectionFactory = searchProjectionFactory;
@@ -43,13 +43,13 @@ class SearchQueryBuilderFactoryImpl
 	@Override
 	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObject(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, ObjectSearchProjectionImpl.<O>get() );
+		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneObjectProjection.<O>get() );
 	}
 
 	@Override
 	public <T> SearchQueryBuilder<T, LuceneSearchQueryElementCollector> asReference(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, ReferenceSearchProjectionImpl.get() );
+		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneReferenceProjection.get() );
 	}
 
 	@Override
@@ -74,7 +74,7 @@ class SearchQueryBuilderFactoryImpl
 			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
 		}
 
-		return new CompositeListSearchProjectionImpl<>( Function.identity(), children );
+		return new LuceneCompositeListProjection<>( Function.identity(), children );
 	}
 
 	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(

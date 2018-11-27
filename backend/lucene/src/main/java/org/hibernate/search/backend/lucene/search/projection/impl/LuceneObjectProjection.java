@@ -9,21 +9,22 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<DocumentReference, DocumentReference> {
+public class LuceneObjectProjection<O> implements LuceneSearchProjection<Object, O> {
 
-	private static final DocumentReferenceSearchProjectionImpl INSTANCE = new DocumentReferenceSearchProjectionImpl();
+	@SuppressWarnings("rawtypes")
+	private static final LuceneObjectProjection INSTANCE = new LuceneObjectProjection();
 
-	static DocumentReferenceSearchProjectionImpl get() {
+	@SuppressWarnings("unchecked")
+	public static <T> LuceneObjectProjection<T> get() {
 		return INSTANCE;
 	}
 
-	private DocumentReferenceSearchProjectionImpl() {
+	private LuceneObjectProjection() {
 	}
 
 	@Override
@@ -37,14 +38,15 @@ class DocumentReferenceSearchProjectionImpl implements LuceneSearchProjection<Do
 	}
 
 	@Override
-	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		return DocumentReferenceExtractorHelper.extractDocumentReference( documentResult );
+		return mapper.planLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData) {
-		return extractedData;
+	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
+		return (O) loadingResult.getLoaded( extractedData );
 	}
 
 	@Override

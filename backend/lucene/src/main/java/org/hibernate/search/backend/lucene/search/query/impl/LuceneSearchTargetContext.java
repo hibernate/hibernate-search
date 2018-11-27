@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactoryImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
@@ -25,7 +25,7 @@ public class LuceneSearchTargetContext
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final SearchQueryBuilderFactoryImpl searchQueryFactory;
-	private final LuceneSearchProjectionBuilderFactoryImpl searchProjectionFactory;
+	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
 	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext,
@@ -34,7 +34,7 @@ public class LuceneSearchTargetContext
 		this.searchTargetModel = searchTargetModel;
 		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
-		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactoryImpl( searchTargetModel );
+		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchTargetModel );
 		this.searchQueryFactory = new SearchQueryBuilderFactoryImpl( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
 	}
 
@@ -63,7 +63,7 @@ public class LuceneSearchTargetContext
 	}
 
 	@Override
-	public LuceneSearchProjectionBuilderFactoryImpl getSearchProjectionFactory() {
+	public LuceneSearchProjectionBuilderFactory getSearchProjectionFactory() {
 		return searchProjectionFactory;
 	}
 }

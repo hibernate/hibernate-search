@@ -10,21 +10,21 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 
 
-public class ReferenceSearchProjectionBuilderImpl<R> implements ReferenceProjectionBuilder<R> {
+public class LuceneReferenceProjectionBuilder<R> implements ReferenceProjectionBuilder<R> {
 
 	@SuppressWarnings("rawtypes")
-	private static final ReferenceSearchProjectionBuilderImpl INSTANCE = new ReferenceSearchProjectionBuilderImpl();
+	private static final LuceneReferenceProjectionBuilder INSTANCE = new LuceneReferenceProjectionBuilder();
 
 	@SuppressWarnings("unchecked")
-	public static <T> ReferenceSearchProjectionBuilderImpl<T> get() {
+	public static <T> LuceneReferenceProjectionBuilder<T> get() {
 		return INSTANCE;
 	}
 
-	private ReferenceSearchProjectionBuilderImpl() {
+	private LuceneReferenceProjectionBuilder() {
 	}
 
 	@Override
 	public SearchProjection<R> build() {
-		return ReferenceSearchProjectionImpl.get();
+		return LuceneReferenceProjection.get();
 	}
 }

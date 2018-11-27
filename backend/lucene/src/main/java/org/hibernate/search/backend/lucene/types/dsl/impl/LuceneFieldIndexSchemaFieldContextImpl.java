@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
@@ -84,7 +84,7 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 				codec,
 				null,
 				null,
-				new StandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec, converter )
+				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

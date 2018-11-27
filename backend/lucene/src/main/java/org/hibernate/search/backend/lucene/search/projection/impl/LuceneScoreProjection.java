@@ -13,15 +13,15 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class ScoreSearchProjectionImpl implements LuceneSearchProjection<Float, Float> {
+class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 
-	private static final ScoreSearchProjectionImpl INSTANCE = new ScoreSearchProjectionImpl();
+	private static final LuceneScoreProjection INSTANCE = new LuceneScoreProjection();
 
-	static ScoreSearchProjectionImpl get() {
+	static LuceneScoreProjection get() {
 		return INSTANCE;
 	}
 
-	private ScoreSearchProjectionImpl() {
+	private LuceneScoreProjection() {
 	}
 
 	@Override

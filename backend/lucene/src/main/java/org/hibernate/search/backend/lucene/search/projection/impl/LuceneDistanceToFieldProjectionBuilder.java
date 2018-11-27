@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjecti
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFieldProjectionBuilder {
+public class LuceneDistanceToFieldProjectionBuilder implements DistanceToFieldProjectionBuilder {
 
 	private final String absoluteFieldPath;
 
@@ -19,7 +19,7 @@ public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFie
 
 	private DistanceUnit unit = DistanceUnit.METERS;
 
-	public DistanceToFieldSearchProjectionBuilderImpl(String absoluteFieldPath, GeoPoint center) {
+	public LuceneDistanceToFieldProjectionBuilder(String absoluteFieldPath, GeoPoint center) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.center = center;
 	}
@@ -32,6 +32,6 @@ public class DistanceToFieldSearchProjectionBuilderImpl implements DistanceToFie
 
 	@Override
 	public SearchProjection<Double> build() {
-		return new DistanceToFieldSearchProjectionImpl( absoluteFieldPath, center, unit );
+		return new LuceneDistanceToFieldProjection( absoluteFieldPath, center, unit );
 	}
 }

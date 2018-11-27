@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexF
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T, T> {
+class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 
 	private final String absoluteFieldPath;
 
@@ -24,7 +24,7 @@ class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T, T> {
 
 	private final LuceneFieldConverter<F, ?> converter;
 
-	FieldSearchProjectionImpl(String absoluteFieldPath, LuceneFieldCodec<F> codec,
+	LuceneFieldProjection(String absoluteFieldPath, LuceneFieldCodec<F> codec,
 			LuceneFieldConverter<F, ?> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;

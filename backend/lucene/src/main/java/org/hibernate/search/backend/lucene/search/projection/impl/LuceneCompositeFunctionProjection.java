@@ -14,13 +14,13 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeFunctionSearchProjectionImpl<E, P, T> implements CompositeSearchProjection<E, T> {
+public class LuceneCompositeFunctionProjection<E, P, T> implements LuceneCompositeProjection<E, T> {
 
 	private final Function<P, T> transformer;
 
 	private final LuceneSearchProjection<E, P> projection;
 
-	public CompositeFunctionSearchProjectionImpl(Function<P, T> transformer,
+	public LuceneCompositeFunctionProjection(Function<P, T> transformer,
 			LuceneSearchProjection<E, P> projection) {
 		this.transformer = transformer;
 		this.projection = projection;

@@ -32,7 +32,7 @@ import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectionBuilderFactory {
+public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -41,13 +41,13 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 
 	private final LuceneSearchTargetModel searchTargetModel;
 
-	public LuceneSearchProjectionBuilderFactoryImpl(LuceneSearchTargetModel searchTargetModel) {
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchTargetModel searchTargetModel) {
 		this.searchTargetModel = searchTargetModel;
 	}
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return DocumentReferenceSearchProjectionBuilderImpl.get();
+		return LuceneDocumentReferenceProjectionBuilder.get();
 	}
 
 	@Override
@@ -59,17 +59,17 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 
 	@Override
 	public <O> ObjectProjectionBuilder<O> object() {
-		return ObjectSearchProjectionBuilderImpl.get();
+		return LuceneObjectProjectionBuilder.get();
 	}
 
 	@Override
 	public <R> ReferenceProjectionBuilder<R> reference() {
-		return ReferenceSearchProjectionBuilderImpl.get();
+		return LuceneReferenceProjectionBuilder.get();
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return ScoreSearchProjectionBuilderImpl.get();
+		return LuceneScoreProjectionBuilder.get();
 	}
 
 	@Override
@@ -87,24 +87,24 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 			typedProjections.add( toImplementation( projection ) );
 		}
 
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeListSearchProjectionImpl<>( transformer, typedProjections )
+		return new LuceneCompositeProjectionBuilder<>(
+				new LuceneCompositeListProjection<>( transformer, typedProjections )
 		);
 	}
 
 	@Override
 	public <P, T> CompositeProjectionBuilder<T> composite(Function<P, T> transformer,
 			SearchProjection<P> projection) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeFunctionSearchProjectionImpl<>( transformer, toImplementation( projection ) )
+		return new LuceneCompositeProjectionBuilder<>(
+				new LuceneCompositeFunctionProjection<>( transformer, toImplementation( projection ) )
 		);
 	}
 
 	@Override
 	public <P1, P2, T> CompositeProjectionBuilder<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeBiFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+		return new LuceneCompositeProjectionBuilder<>(
+				new LuceneCompositeBiFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ) )
 		);
 	}
@@ -112,8 +112,8 @@ public class LuceneSearchProjectionBuilderFactoryImpl implements SearchProjectio
 	@Override
 	public <P1, P2, P3, T> CompositeProjectionBuilder<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
-		return new CompositeSearchProjectionBuilderImpl<>(
-				new CompositeTriFunctionSearchProjectionImpl<>( transformer, toImplementation( projection1 ),
+		return new LuceneCompositeProjectionBuilder<>(
+				new LuceneCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
 	}

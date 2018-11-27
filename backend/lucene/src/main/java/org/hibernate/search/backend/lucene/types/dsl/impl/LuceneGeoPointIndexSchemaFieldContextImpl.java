@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.GeoPointFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -56,7 +56,7 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 				codec,
 				LuceneGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new GeoPointFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneGeoPointFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
