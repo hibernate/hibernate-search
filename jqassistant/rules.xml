@@ -7,26 +7,9 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
 
-    <concept id="my-rules:ApiTypes">
+    <concept id="my-rules:Spi">
         <description>
-            Contributes the :Api and :Public labels to API types
-        </description>
-        <cypher><![CDATA[
-            MATCH
-                (type:Type)
-            WHERE
-                NOT (type.fqn =~ ".*\\.impl\\..*")
-                AND NOT (type.fqn =~ ".*\\.spi\\..*")
-            SET
-                type:Api, type:Public
-            RETURN
-                type
-        ]]></cypher>
-    </concept>
-
-    <concept id="my-rules:SpiTypes">
-        <description>
-            Contributes the :Spi and :Public labels to SPI types
+            Contributes the :Spi label to SPI types
         </description>
         <cypher><![CDATA[
             MATCH
@@ -40,7 +23,7 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:ImplTypes">
+    <concept id="my-rules:Impl">
         <description>
             Contributes the :Impl label to implementation types
         </description>
@@ -56,50 +39,86 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:NonTestArtifacts">
+    <concept id="my-rules:Test">
         <description>
-            Contributes the :NonTest label to :Maven:Artifact nodes that are not supposed to contain any test type.
+            Contributes the :Test label to :Type nodes that exist for test purposes only.
         </description>
         <cypher><![CDATA[
             MATCH
-                (artifact:Maven:Artifact)
+                (type:Type)<-[:CONTAINS]-(artifact:Maven:Artifact)
             WHERE
-               NOT artifact.type = "test-jar"
-               AND NOT artifact.name =~ "hibernate-search-integrationtest-.*"
+                artifact.type = "test-jar"
+                OR artifact.name =~ "hibernate-search-integrationtest-.*"
+                OR artifact.name =~ "hibernate-search-util-internal-test.*"
+                OR artifact.name =~ "hibernate-search-util-internal-integrationtest.*"
             SET
-                artifact:NonTest
+                type:Test
             RETURN
                 artifact
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:PublicArtifacts">
+    <concept id="my-rules:Api">
+        <requiresConcept refId="my-rules:Test" />
+        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="my-rules:Impl" />
         <description>
-            Contributes the :Public label to :Maven:Artifact nodes that may be publicly exposed.
+            Contributes the :Api label to API types
         </description>
         <cypher><![CDATA[
             MATCH
-                (artifact:Maven:Artifact)
+                (type:Type)
             WHERE
-                NOT (
-                   artifact.name =~ "hibernate-search-.*"
-                   AND (
-                       artifact.type = "test-jar"
-                       OR artifact.name =~ ".*-integrationtest-.*"
-                       OR artifact.name =~ ".*-internal-.*"
-                   )
-                )
+                NOT type:Test
+                AND NOT type:Impl
+                AND NOT type:Spi
             SET
-                artifact:Public
+                type:Api, type:Public
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:HibernateSearch">
+        <description>
+            Contributes the :HibernateSearch label to :Maven:Artifact and :Type nodes from Hibernate Search.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)<-[:CONTAINS]-(artifact:Maven:Artifact)
+            WHERE
+                artifact.name =~ "hibernate-search-.*"
+            SET
+                artifact:HibernateSearch,
+                type:HibernateSearch
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:InternalArtifacts">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            Contributes the :Internal label to strictly internal :Maven:Artifact nodes.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (artifact:Maven:Artifact:HibernateSearch)
+            WHERE
+                artifact.type = "test-jar"
+                OR artifact.name =~ ".*-integrationtest-.*"
+                OR artifact.name =~ ".*-internal-.*"
+            SET
+                artifact:Internal
             RETURN
                 artifact
         ]]></cypher>
     </concept>
 
     <constraint id="my-rules:PublicTypesMayNotExtendInternalTypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
-        <requiresConcept refId="my-rules:ImplTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="my-rules:Impl" />
         <description>API/SPI types must not extend/implement internal types.</description>
         <cypher><![CDATA[
             MATCH
@@ -110,9 +129,9 @@
     </constraint>
 
     <constraint id="my-rules:PublicMethodsMayNotExposeInternalTypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
-        <requiresConcept refId="my-rules:ImplTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="my-rules:Impl" />
         <description>API/SPI methods must not expose internal types.</description>
         <cypher><![CDATA[
             // return values
@@ -135,9 +154,9 @@
     </constraint>
 
     <constraint id="my-rules:PublicFieldsMayNotExposeInternalTypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
-        <requiresConcept refId="my-rules:ImplTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="my-rules:Impl" />
         <description>API/SPI fields must not expose internal types.</description>
         <cypher><![CDATA[
             MATCH
@@ -150,8 +169,8 @@
     </constraint>
 
     <constraint id="my-rules:APITypesMayNotExtendSPITypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
         <description>API types must not extend/implement SPI types.</description>
         <cypher><![CDATA[
             MATCH
@@ -162,8 +181,8 @@
     </constraint>
 
     <constraint id="my-rules:APIMethodsMayNotExposeSPITypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
         <description>API methods must not expose SPI types.</description>
         <cypher><![CDATA[
             // return values
@@ -190,8 +209,8 @@
     </constraint>
 
     <constraint id="my-rules:APIFieldsMayNotExposeSPITypes">
-        <requiresConcept refId="my-rules:ApiTypes" />
-        <requiresConcept refId="my-rules:SpiTypes" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
         <description>API fields must not expose SPI types.</description>
         <cypher><![CDATA[
             MATCH
@@ -204,21 +223,23 @@
     </constraint>
 
     <constraint id="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules">
-        <requiresConcept refId="my-rules:NonTestArtifacts" />
-        <requiresConcept refId="my-rules:PublicArtifacts" />
-        <requiresConcept refId="my-rules:ImplTypes" />
+        <requiresConcept refId="my-rules:InternalArtifacts" />
+        <requiresConcept refId="my-rules:Test" />
+        <requiresConcept refId="my-rules:Impl" />
         <description>
             Types must not depend on implementation types from other modules.
             SPIs must be used for such dependencies.
-            Exceptions are allowed only when the dependency type is in a non-public module,
-            or the depending type is in a test module.
+            Exceptions are allowed only when the dependency type is in an internal module,
+            or the depending type is a test type.
         </description>
         <cypher><![CDATA[
-            MATCH (artifact1:Maven:Artifact:NonTest)-[:CONTAINS]->(type1:Type)
-                -[:DEPENDS_ON]->
-                (type2:Type:Impl)<-[:CONTAINS]-(artifact2:Maven:Artifact:Public)
+            MATCH (artifact1:Maven:Artifact)-[:CONTAINS]->(type1:Type)-[:DEPENDS_ON]->
+                (type2:Type:Impl)<-[:CONTAINS]-(artifact2:Maven:Artifact)
             WHERE
                 artifact1 <> artifact2
+                // Exceptions
+                AND NOT type1:Test
+                AND NOT artifact2:Internal
             RETURN
                 artifact1, type1, artifact2, type2
         ]]></cypher>
