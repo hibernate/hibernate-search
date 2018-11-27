@@ -11,25 +11,25 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.LongFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLongFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLongFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLongFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-public class LuceneLongIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneLongIndexSchemaFieldContextImpl, Long> {
+public class LuceneLongIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneLongIndexSchemaFieldContext, Long> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneLongIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneLongIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, Long.class );
 	}
 
 	@Override
-	public LuceneLongIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneLongIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -40,8 +40,8 @@ public class LuceneLongIndexSchemaFieldContextImpl
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		StandardFieldConverter<Long> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
-		LongFieldCodec codec = new LongFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneStandardFieldConverter<Long> converter = new LuceneStandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		LuceneLongFieldCodec codec = new LuceneLongFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<Long> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -59,7 +59,7 @@ public class LuceneLongIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneLongIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneLongIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

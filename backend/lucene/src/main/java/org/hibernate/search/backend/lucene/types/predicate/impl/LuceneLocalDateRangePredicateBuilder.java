@@ -12,13 +12,13 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneLocalDateFieldConverter;
 
 class LuceneLocalDateRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<Long> {
 
 	LuceneLocalDateRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LocalDateFieldConverter converter) {
+			String absoluteFieldPath, LuceneLocalDateFieldConverter converter) {
 		super( searchContext, absoluteFieldPath, converter );
 	}
 

@@ -6,22 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
+import java.time.Instant;
+
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
-public final class BooleanFieldConverter extends AbstractFieldConverter<Boolean, Integer> {
+public final class LuceneInstantFieldConverter extends AbstractLuceneFieldConverter<Instant, Long> {
 
-	public BooleanFieldConverter(UserIndexFieldConverter<Boolean> userConverter) {
+	public LuceneInstantFieldConverter(UserIndexFieldConverter<Instant> userConverter) {
 		super( userConverter );
 	}
 
 	@Override
-	public Integer convertDslToIndex(Object value,
+	public Long convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		Boolean rawValue = userConverter.convertDslToIndex( value, context );
+		Instant rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;
 		}
-		return ( rawValue ) ? 1 : 0;
+		return rawValue.toEpochMilli();
 	}
 }

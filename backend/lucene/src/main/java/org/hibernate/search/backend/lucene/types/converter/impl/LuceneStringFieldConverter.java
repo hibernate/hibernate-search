@@ -14,11 +14,11 @@ import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFie
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
-public final class StringFieldConverter extends AbstractFieldConverter<String, String> {
+public final class LuceneStringFieldConverter extends AbstractLuceneFieldConverter<String, String> {
 
 	private final Analyzer analyzerOrNormalizer;
 
-	public StringFieldConverter(UserIndexFieldConverter<String> userConverter, Analyzer analyzerOrNormalizer) {
+	public LuceneStringFieldConverter(UserIndexFieldConverter<String> userConverter, Analyzer analyzerOrNormalizer) {
 		super( userConverter );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
@@ -40,7 +40,7 @@ public final class StringFieldConverter extends AbstractFieldConverter<String, S
 			return false;
 		}
 
-		StringFieldConverter castedOther = (StringFieldConverter) other;
+		LuceneStringFieldConverter castedOther = (LuceneStringFieldConverter) other;
 		return Objects.equals( analyzerOrNormalizer, castedOther.analyzerOrNormalizer );
 	}
 

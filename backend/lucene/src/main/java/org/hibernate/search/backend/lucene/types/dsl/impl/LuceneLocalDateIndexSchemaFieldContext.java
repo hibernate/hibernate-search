@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.LocalDateFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LocalDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneLocalDateFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLocalDateFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLocalDateFieldSortBuilderFactory;
@@ -24,17 +24,17 @@ import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefiniti
 /**
  * @author Guillaume Smet
  */
-public class LuceneLocalDateIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneLocalDateIndexSchemaFieldContextImpl, LocalDate> {
+public class LuceneLocalDateIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneLocalDateIndexSchemaFieldContext, LocalDate> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneLocalDateIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneLocalDateIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, LocalDate.class );
 	}
 
 	@Override
-	public LuceneLocalDateIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneLocalDateIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -45,8 +45,8 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		LocalDateFieldConverter converter = new LocalDateFieldConverter( helper.createUserIndexFieldConverter() );
-		LocalDateFieldCodec codec = new LocalDateFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneLocalDateFieldConverter converter = new LuceneLocalDateFieldConverter( helper.createUserIndexFieldConverter() );
+		LuceneLocalDateFieldCodec codec = new LuceneLocalDateFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -64,7 +64,7 @@ public class LuceneLocalDateIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneLocalDateIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneLocalDateIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

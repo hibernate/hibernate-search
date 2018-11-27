@@ -11,8 +11,8 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.GeoPointFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
@@ -23,17 +23,17 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 /**
  * @author Guillaume Smet
  */
-public class LuceneGeoPointIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneGeoPointIndexSchemaFieldContextImpl, GeoPoint> {
+public class LuceneGeoPointIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneGeoPointIndexSchemaFieldContext, GeoPoint> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneGeoPointIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneGeoPointIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, GeoPoint.class );
 	}
 
 	@Override
-	public LuceneGeoPointIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneGeoPointIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -44,9 +44,9 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
+		LuceneStandardFieldConverter<GeoPoint> converter = new LuceneStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter() );
-		GeoPointFieldCodec codec = new GeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
+		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
 				resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
@@ -65,7 +65,7 @@ public class LuceneGeoPointIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneGeoPointIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneGeoPointIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

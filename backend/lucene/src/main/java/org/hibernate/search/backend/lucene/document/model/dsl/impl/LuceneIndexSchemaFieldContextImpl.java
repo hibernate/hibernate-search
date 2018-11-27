@@ -17,14 +17,14 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneBooleanIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLongIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContextImpl;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneInstantIndexSchemaFieldContextImpl;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneBooleanIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLongIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneInstantIndexSchemaFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
@@ -89,37 +89,37 @@ class LuceneIndexSchemaFieldContextImpl
 
 	@Override
 	public StringIndexSchemaFieldTypedContext<?> asString() {
-		return setDelegate( new LuceneStringIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneStringIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Integer> asInteger() {
-		return setDelegate( new LuceneIntegerIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneIntegerIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Long> asLong() {
-		return setDelegate( new LuceneLongIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneLongIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Boolean> asBoolean() {
-		return setDelegate( new LuceneBooleanIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneBooleanIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, LocalDate> asLocalDate() {
-		return setDelegate( new LuceneLocalDateIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneLocalDateIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, Instant> asInstant() {
-		return setDelegate( new LuceneInstantIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneInstantIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
 	public StandardIndexSchemaFieldTypedContext<?, GeoPoint> asGeoPoint() {
-		return setDelegate( new LuceneGeoPointIndexSchemaFieldContextImpl( this, relativeFieldName ) );
+		return setDelegate( new LuceneGeoPointIndexSchemaFieldContext( this, relativeFieldName ) );
 	}
 
 	@Override
@@ -133,7 +133,7 @@ class LuceneIndexSchemaFieldContextImpl
 	public <F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return setDelegate( new LuceneFieldIndexSchemaFieldContextImpl<>(
+		return setDelegate( new LuceneFieldIndexSchemaFieldContext<>(
 				this, relativeFieldName, indexFieldType, fieldContributor, fieldValueExtractor
 		) );
 	}

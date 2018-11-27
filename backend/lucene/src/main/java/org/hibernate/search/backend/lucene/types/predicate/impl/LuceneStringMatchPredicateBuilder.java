@@ -15,17 +15,17 @@ import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
 
 class LuceneStringMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<String, String> {
 
-	private final StringFieldConverter converter;
+	private final LuceneStringFieldConverter converter;
 
 	private final QueryBuilder queryBuilder;
 
 	LuceneStringMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, StringFieldConverter converter, QueryBuilder queryBuilder) {
+			String absoluteFieldPath, LuceneStringFieldConverter converter, QueryBuilder queryBuilder) {
 		super( searchContext, absoluteFieldPath, converter );
 		this.converter = converter;
 		this.queryBuilder = queryBuilder;

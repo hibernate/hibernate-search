@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.LuceneAnalysisDefinitionContainerContextImpl;
+import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.InitialLuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
@@ -173,8 +173,8 @@ public class LuceneBackendFactory implements BackendFactory {
 								buildContext.getServiceManager().getClassResolver(),
 								buildContext.getServiceManager().getResourceResolver()
 						);
-						LuceneAnalysisDefinitionContainerContextImpl collector
-								= new LuceneAnalysisDefinitionContainerContextImpl( analysisComponentFactory );
+						InitialLuceneAnalysisDefinitionContainerContext collector
+								= new InitialLuceneAnalysisDefinitionContainerContext( analysisComponentFactory );
 						configurer.configure( collector );
 						return new LuceneAnalysisDefinitionRegistry( collector );
 					} )

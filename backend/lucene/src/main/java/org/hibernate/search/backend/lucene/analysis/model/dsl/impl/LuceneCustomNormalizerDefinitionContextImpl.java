@@ -26,32 +26,32 @@ import org.apache.lucene.analysis.util.TokenFilterFactory;
  * @author Yoann Rodiere
  */
 public class LuceneCustomNormalizerDefinitionContextImpl
-		extends DelegatingAnalysisDefinitionContainerContextImpl
+		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneCustomNormalizerDefinitionContext, LuceneAnalyzerBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
-	private final List<LuceneCharFilterDefinitionContextImpl> charFilters = new ArrayList<>();
+	private final List<LuceneCharFilterDefinitionContext> charFilters = new ArrayList<>();
 
-	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
+	private final List<LuceneTokenFilterDefinitionContext> tokenFilters = new ArrayList<>();
 
-	LuceneCustomNormalizerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
+	LuceneCustomNormalizerDefinitionContextImpl(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
 		super( parentContext );
 		this.name = name;
 	}
 
 	@Override
 	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		LuceneCharFilterDefinitionContextImpl filter = new LuceneCharFilterDefinitionContextImpl( this, factory );
+		LuceneCharFilterDefinitionContext filter = new LuceneCharFilterDefinitionContext( this, factory );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
 	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		LuceneTokenFilterDefinitionContextImpl filter = new LuceneTokenFilterDefinitionContextImpl( this, factory );
+		LuceneTokenFilterDefinitionContext filter = new LuceneTokenFilterDefinitionContext( this, factory );
 		tokenFilters.add( filter );
 		return filter;
 	}

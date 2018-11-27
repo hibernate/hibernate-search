@@ -28,7 +28,7 @@ import org.apache.lucene.analysis.util.TokenizerFactory;
  * @author Yoann Rodiere
  */
 public class LuceneCustomAnalyzerDefinitionContextImpl
-		extends DelegatingAnalysisDefinitionContainerContextImpl
+		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneCustomAnalyzerDefinitionContext, LuceneAnalyzerDefinitionWithTokenizerContext,
 		LuceneAnalyzerBuilder {
 
@@ -36,15 +36,15 @@ public class LuceneCustomAnalyzerDefinitionContextImpl
 
 	private final String name;
 
-	private final LuceneTokenizerDefinitionContextImpl tokenizer;
+	private final LuceneTokenizerDefinitionContext tokenizer;
 
-	private final List<LuceneCharFilterDefinitionContextImpl> charFilters = new ArrayList<>();
+	private final List<LuceneCharFilterDefinitionContext> charFilters = new ArrayList<>();
 
-	private final List<LuceneTokenFilterDefinitionContextImpl> tokenFilters = new ArrayList<>();
+	private final List<LuceneTokenFilterDefinitionContext> tokenFilters = new ArrayList<>();
 
-	LuceneCustomAnalyzerDefinitionContextImpl(LuceneAnalysisDefinitionContainerContextImpl parentContext, String name) {
+	LuceneCustomAnalyzerDefinitionContextImpl(InitialLuceneAnalysisDefinitionContainerContext parentContext, String name) {
 		super( parentContext );
-		this.tokenizer = new LuceneTokenizerDefinitionContextImpl( this );
+		this.tokenizer = new LuceneTokenizerDefinitionContext( this );
 		this.name = name;
 	}
 
@@ -62,14 +62,14 @@ public class LuceneCustomAnalyzerDefinitionContextImpl
 
 	@Override
 	public LuceneAnalysisComponentDefinitionContext charFilter(Class<? extends CharFilterFactory> factory) {
-		LuceneCharFilterDefinitionContextImpl filter = new LuceneCharFilterDefinitionContextImpl( this, factory );
+		LuceneCharFilterDefinitionContext filter = new LuceneCharFilterDefinitionContext( this, factory );
 		charFilters.add( filter );
 		return filter;
 	}
 
 	@Override
 	public LuceneAnalysisComponentDefinitionContext tokenFilter(Class<? extends TokenFilterFactory> factory) {
-		LuceneTokenFilterDefinitionContextImpl filter = new LuceneTokenFilterDefinitionContextImpl( this, factory );
+		LuceneTokenFilterDefinitionContext filter = new LuceneTokenFilterDefinitionContext( this, factory );
 		tokenFilters.add( filter );
 		return filter;
 	}

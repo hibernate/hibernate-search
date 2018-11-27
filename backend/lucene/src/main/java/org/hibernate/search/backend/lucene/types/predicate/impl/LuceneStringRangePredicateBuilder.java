@@ -12,15 +12,15 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
 
 class LuceneStringRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<String> {
 
-	private final StringFieldConverter stringConverter;
+	private final LuceneStringFieldConverter stringConverter;
 
 	LuceneStringRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, StringFieldConverter stringConverter) {
+			String absoluteFieldPath, LuceneStringFieldConverter stringConverter) {
 		super( searchContext, absoluteFieldPath, stringConverter );
 		this.stringConverter = stringConverter;
 	}

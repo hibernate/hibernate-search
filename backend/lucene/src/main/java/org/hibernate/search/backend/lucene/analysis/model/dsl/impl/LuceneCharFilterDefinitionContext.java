@@ -11,26 +11,26 @@ import java.io.IOException;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalysisDefinitionContext;
 
-import org.apache.lucene.analysis.util.TokenFilterFactory;
+import org.apache.lucene.analysis.util.CharFilterFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
-public class LuceneTokenFilterDefinitionContextImpl
-		extends LuceneAnalysisComponentDefinitionContextImpl<TokenFilterFactory> {
+public class LuceneCharFilterDefinitionContext
+		extends AbstractLuceneAnalysisComponentDefinitionContext<CharFilterFactory> {
 
-	private final Class<? extends TokenFilterFactory> factoryClass;
+	private final Class<? extends CharFilterFactory> factoryClass;
 
-	LuceneTokenFilterDefinitionContextImpl(LuceneCustomAnalysisDefinitionContext parentContext,
-			Class<? extends TokenFilterFactory> factoryClass) {
+	LuceneCharFilterDefinitionContext(LuceneCustomAnalysisDefinitionContext parentContext,
+			Class<? extends CharFilterFactory> factoryClass) {
 		super( parentContext );
 		this.factoryClass = factoryClass;
 	}
 
 	@Override
-	public TokenFilterFactory build(LuceneAnalysisComponentFactory factory) throws IOException {
-		return factory.createTokenFilterFactory( factoryClass, params );
+	public CharFilterFactory build(LuceneAnalysisComponentFactory factory) throws IOException {
+		return factory.createCharFilterFactory( factoryClass, params );
 	}
 
 }

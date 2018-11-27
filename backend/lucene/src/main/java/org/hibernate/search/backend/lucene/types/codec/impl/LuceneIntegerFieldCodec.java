@@ -6,53 +6,50 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class BooleanFieldCodec implements LuceneFieldCodec<Boolean> {
+public final class LuceneIntegerFieldCodec implements LuceneFieldCodec<Integer> {
 
 	private final boolean projectable;
 
 	private final boolean sortable;
 
-	public BooleanFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneIntegerFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Boolean value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Integer value) {
 		if ( value == null ) {
 			return;
 		}
-		Integer intValue = ( value ) ? 1 : 0;
 
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, intValue ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, value ) );
 		}
 
 		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, intValue.longValue() ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
 		}
 
-		documentBuilder.addField( new IntPoint( absoluteFieldPath, intValue ) );
+		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );
 	}
 
 	@Override
-	public Boolean decode(Document document, String absoluteFieldPath) {
+	public Integer decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;
 		}
 
-		Integer intValue = (Integer) field.numericValue();
-		return ( intValue > 0 );
+		return (Integer) field.numericValue();
 	}
 
 	@Override
@@ -60,11 +57,11 @@ public final class BooleanFieldCodec implements LuceneFieldCodec<Boolean> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( BooleanFieldCodec.class != obj.getClass() ) {
+		if ( LuceneIntegerFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		BooleanFieldCodec other = (BooleanFieldCodec) obj;
+		LuceneIntegerFieldCodec other = (LuceneIntegerFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );

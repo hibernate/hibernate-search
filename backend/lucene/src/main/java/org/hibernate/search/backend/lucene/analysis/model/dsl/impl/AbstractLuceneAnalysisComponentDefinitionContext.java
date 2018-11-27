@@ -19,8 +19,8 @@ import org.apache.lucene.analysis.util.CharFilterFactory;
 import org.apache.lucene.analysis.util.TokenFilterFactory;
 
 
-abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
-		extends DelegatingAnalysisDefinitionContainerContextImpl
+abstract class AbstractLuceneAnalysisComponentDefinitionContext<T>
+		extends DelegatingAnalysisDefinitionContainerContext
 		implements LuceneAnalysisComponentDefinitionContext, LuceneAnalysisComponentBuilder<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -29,7 +29,7 @@ abstract class LuceneAnalysisComponentDefinitionContextImpl<T>
 
 	final Map<String, String> params = new LinkedHashMap<>();
 
-	LuceneAnalysisComponentDefinitionContextImpl(LuceneCustomAnalysisDefinitionContext parentContext) {
+	AbstractLuceneAnalysisComponentDefinitionContext(LuceneCustomAnalysisDefinitionContext parentContext) {
 		super( parentContext );
 		this.parentContext = parentContext;
 	}

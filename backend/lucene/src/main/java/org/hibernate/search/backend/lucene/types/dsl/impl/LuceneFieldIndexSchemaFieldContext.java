@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
@@ -27,7 +27,7 @@ import org.hibernate.search.util.AssertionFailure;
 /**
  * @author Guillaume Smet
  */
-public class LuceneFieldIndexSchemaFieldContextImpl<F>
+public class LuceneFieldIndexSchemaFieldContext<F>
 		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
 
 	private static final ToIndexFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
@@ -57,7 +57,7 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	public LuceneFieldIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName,
+	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType,
@@ -74,7 +74,7 @@ public class LuceneFieldIndexSchemaFieldContextImpl<F>
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		StandardFieldConverter<F> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		LuceneStandardFieldConverter<F> converter = new LuceneStandardFieldConverter<>( helper.createUserIndexFieldConverter() );
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
 
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(

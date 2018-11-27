@@ -11,39 +11,42 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.BooleanFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.BooleanFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneIntegerFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneIntegerFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-public class LuceneBooleanIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneBooleanIndexSchemaFieldContextImpl, Boolean> {
+/**
+ * @author Guillaume Smet
+ */
+public class LuceneIntegerIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneIntegerIndexSchemaFieldContext, Integer> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneBooleanIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Boolean.class );
+	public LuceneIntegerIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, Integer.class );
 	}
 
 	@Override
-	public LuceneBooleanIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneIntegerIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Boolean> helper, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		BooleanFieldConverter converter = new BooleanFieldConverter( helper.createUserIndexFieldConverter() );
-		BooleanFieldCodec codec = new BooleanFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneStandardFieldConverter<Integer> converter = new LuceneStandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		LuceneIntegerFieldCodec codec = new LuceneIntegerFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Boolean> schemaNode = new LuceneIndexSchemaFieldNode<>(
+		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
 				converter,
@@ -59,7 +62,7 @@ public class LuceneBooleanIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneBooleanIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneIntegerIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

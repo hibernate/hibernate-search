@@ -14,13 +14,13 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.InstantFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneInstantFieldConverter;
 
 class LuceneInstantMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<Instant, Long> {
 
 	LuceneInstantMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, InstantFieldConverter converter) {
+			String absoluteFieldPath, LuceneInstantFieldConverter converter) {
 		super( searchContext, absoluteFieldPath, converter );
 	}
 

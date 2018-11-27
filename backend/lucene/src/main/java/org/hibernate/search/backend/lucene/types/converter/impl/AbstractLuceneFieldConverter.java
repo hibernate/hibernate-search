@@ -9,11 +9,11 @@ package org.hibernate.search.backend.lucene.types.converter.impl;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
-abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T> {
+abstract class AbstractLuceneFieldConverter<F, T> implements LuceneFieldConverter<F, T> {
 
 	final UserIndexFieldConverter<F> userConverter;
 
-	AbstractFieldConverter(UserIndexFieldConverter<F> userConverter) {
+	AbstractLuceneFieldConverter(UserIndexFieldConverter<F> userConverter) {
 		this.userConverter = userConverter;
 	}
 
@@ -32,7 +32,7 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
+		AbstractLuceneFieldConverter<?, ?> castedOther = (AbstractLuceneFieldConverter<?, ?>) other;
 		return userConverter.isConvertDslToIndexCompatibleWith( castedOther.userConverter );
 	}
 
@@ -41,7 +41,7 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
+		AbstractLuceneFieldConverter<?, ?> castedOther = (AbstractLuceneFieldConverter<?, ?>) other;
 		return userConverter.isConvertIndexToProjectionCompatibleWith( castedOther.userConverter );
 	}
 
