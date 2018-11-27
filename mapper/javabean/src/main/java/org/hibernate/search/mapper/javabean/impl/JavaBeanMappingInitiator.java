@@ -11,11 +11,11 @@ import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingFactory;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
 
-public class JavaBeanMappingInitiatorImpl extends PojoMappingInitiatorImpl<JavaBeanMapping> {
+public class JavaBeanMappingInitiator extends PojoMappingInitiatorImpl<JavaBeanMapping> {
 
 	private final JavaBeanTypeConfigurationContributor typeConfigurationContributor;
 
-	public JavaBeanMappingInitiatorImpl(JavaBeanBootstrapIntrospector introspector) {
+	public JavaBeanMappingInitiator(JavaBeanBootstrapIntrospector introspector) {
 		super(
 				new JavaBeanMappingFactory(),
 				introspector

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -17,11 +17,11 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
 
 public class JavaBeanMappingImpl extends PojoMappingImplementor<JavaBeanMapping> implements CloseableJavaBeanMapping {
 
-	private final JavaBeanMappingContextImpl mappingContext;
+	private final JavaBeanMappingContext mappingContext;
 
 	JavaBeanMappingImpl(PojoMappingDelegate mappingDelegate) {
 		super( mappingDelegate );
-		this.mappingContext = new JavaBeanMappingContextImpl();
+		this.mappingContext = new JavaBeanMappingContext();
 	}
 
 	@Override
@@ -40,6 +40,6 @@ public class JavaBeanMappingImpl extends PojoMappingImplementor<JavaBeanMapping>
 	}
 
 	private JavaBeanSearchManagerBuilder createSearchManagerBuilder() {
-		return new JavaBeanSearchManagerImpl.Builder( getDelegate(), mappingContext );
+		return new JavaBeanSearchManagerImpl.JavaBeanSearchManagerBuilderImpl( getDelegate(), mappingContext );
 	}
 }
