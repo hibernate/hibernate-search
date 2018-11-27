@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.DefaultElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
@@ -70,7 +70,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
-		ElasticsearchClientFactory clientFactory = new DefaultElasticsearchClientFactory();
+		ElasticsearchClientFactory clientFactory = new ElasticsearchClientFactoryImpl();
 
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );

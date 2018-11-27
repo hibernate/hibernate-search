@@ -44,7 +44,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchClient implements ElasticsearchClientImplementor {
+public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -61,7 +61,7 @@ public class DefaultElasticsearchClient implements ElasticsearchClientImplemento
 
 	private volatile GsonProvider gsonProvider;
 
-	public DefaultElasticsearchClient(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit,
+	public ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit,
 			GsonProvider initialGsonProvider) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;

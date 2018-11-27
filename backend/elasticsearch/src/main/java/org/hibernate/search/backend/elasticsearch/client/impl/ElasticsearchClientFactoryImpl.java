@@ -32,7 +32,7 @@ import org.hibernate.search.util.impl.common.SearchThreadFactory;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchClientFactory implements ElasticsearchClientFactory {
+public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
 	private static final ConfigurationProperty<List<String>> HOST =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.HOST )
@@ -120,7 +120,7 @@ public class DefaultElasticsearchClientFactory implements ElasticsearchClientFac
 		RestClient restClient = createClient( propertySource, requestTimeoutMs );
 		Sniffer sniffer = createSniffer( restClient, propertySource );
 
-		return new DefaultElasticsearchClient( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS, initialGsonProvider );
+		return new ElasticsearchClientImpl( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS, initialGsonProvider );
 	}
 
 	private RestClient createClient(ConfigurationPropertySource propertySource, int maxRetryTimeoutMillis) {

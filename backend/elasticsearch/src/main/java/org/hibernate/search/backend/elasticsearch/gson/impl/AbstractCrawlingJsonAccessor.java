@@ -19,10 +19,10 @@ import com.google.gson.JsonObject;
  *
  * @author Yoann Rodiere
  */
-abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAccessor<P, JsonElement>
+abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends AbstractNonRootJsonAccessor<P, JsonElement>
 		implements UnknownTypeJsonAccessor {
 
-	public CrawlingJsonAccessor(JsonCompositeAccessor<P> parentAccessor) {
+	public AbstractCrawlingJsonAccessor(JsonCompositeAccessor<P> parentAccessor) {
 		super( parentAccessor );
 	}
 
@@ -89,32 +89,32 @@ abstract class CrawlingJsonAccessor<P extends JsonElement> extends NonRootJsonAc
 
 	@Override
 	public JsonAccessor<String> asString() {
-		return new JsonStringAccessorImpl( this );
+		return new JsonStringAccessor( this );
 	}
 
 	@Override
 	public JsonAccessor<Boolean> asBoolean() {
-		return new JsonBooleanAccessorImpl( this );
+		return new JsonBooleanAccessor( this );
 	}
 
 	@Override
 	public JsonAccessor<Integer> asInteger() {
-		return new JsonIntegerAccessorImpl( this );
+		return new JsonIntegerAccessor( this );
 	}
 
 	@Override
 	public JsonAccessor<Long> asLong() {
-		return new JsonLongAccessorImpl( this );
+		return new JsonLongAccessor( this );
 	}
 
 	@Override
 	public JsonAccessor<Float> asFloat() {
-		return new JsonFloatAccessorImpl( this );
+		return new JsonFloatAccessor( this );
 	}
 
 	@Override
 	public JsonAccessor<Double> asDouble() {
-		return new JsonDoubleAccessorImpl( this );
+		return new JsonDoubleAccessor( this );
 	}
 
 	@Override

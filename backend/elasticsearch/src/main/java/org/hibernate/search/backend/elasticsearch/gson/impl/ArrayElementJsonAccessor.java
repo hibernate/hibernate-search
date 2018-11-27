@@ -13,7 +13,7 @@ import com.google.gson.JsonNull;
 /**
  * @author Yoann Rodiere
  */
-class ArrayElementJsonAccessor extends CrawlingJsonAccessor<JsonArray> {
+class ArrayElementJsonAccessor extends AbstractCrawlingJsonAccessor<JsonArray> {
 	private final int index;
 
 	public ArrayElementJsonAccessor(JsonCompositeAccessor<JsonArray> parentAccessor, int index) {

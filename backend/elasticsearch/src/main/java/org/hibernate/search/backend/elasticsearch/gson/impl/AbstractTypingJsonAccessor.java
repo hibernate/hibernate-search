@@ -20,9 +20,9 @@ import com.google.gson.JsonObject;
  *
  * @author Yoann Rodiere
  */
-abstract class TypingJsonAccessor<T> extends NonRootJsonAccessor<JsonElement, T> {
+abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor<JsonElement, T> {
 
-	public TypingJsonAccessor(JsonAccessor<JsonElement> parentAccessor) {
+	public AbstractTypingJsonAccessor(JsonAccessor<JsonElement> parentAccessor) {
 		super( parentAccessor );
 	}
 
