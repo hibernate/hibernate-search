@@ -27,7 +27,7 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 	public StandardIndexSchemaFieldTypedContext<?, Instant> bind(ValueBridgeBindingContext<Date> context) {
 		return context.getIndexSchemaFieldContext().asInstant()
-				.projectionConverter( DefaultDateFromIndexFieldValueConverter.INSTANCE );
+				.projectionConverter( PojoDefaultDateFromIndexFieldValueConverter.INSTANCE );
 	}
 
 	@Override
@@ -48,8 +48,8 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 		return true;
 	}
 
-	private static class DefaultDateFromIndexFieldValueConverter implements FromIndexFieldValueConverter<Instant, Date> {
-		private static final DefaultDateFromIndexFieldValueConverter INSTANCE = new DefaultDateFromIndexFieldValueConverter();
+	private static class PojoDefaultDateFromIndexFieldValueConverter implements FromIndexFieldValueConverter<Instant, Date> {
+		private static final PojoDefaultDateFromIndexFieldValueConverter INSTANCE = new PojoDefaultDateFromIndexFieldValueConverter();
 
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {

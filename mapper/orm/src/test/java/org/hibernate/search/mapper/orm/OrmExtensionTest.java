@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
 
@@ -47,7 +47,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		assertThat( toDocumentContext.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 
-		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new BridgeSessionContextImpl( sessionContext );
+		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( fromDocumentContext.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
@@ -56,7 +56,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void routingKeyBridge() {
-		RoutingKeyBridgeToRoutingKeyContext context = new BridgeSessionContextImpl( sessionContext );
+		RoutingKeyBridgeToRoutingKeyContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
@@ -65,7 +65,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void typeBridge() {
-		TypeBridgeWriteContext context = new BridgeSessionContextImpl( sessionContext );
+		TypeBridgeWriteContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
@@ -74,7 +74,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void propertyBridge() {
-		PropertyBridgeWriteContext context = new BridgeSessionContextImpl( sessionContext );
+		PropertyBridgeWriteContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );

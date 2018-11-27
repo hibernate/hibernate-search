@@ -16,11 +16,11 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
 
-final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements ToIndexFieldValueConverter<V, F> {
+final class PojoValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements ToIndexFieldValueConverter<V, F> {
 
 	private final ValueBridge<U, F> bridge;
 
-	ValueBridgeToIndexFieldValueConverter(ValueBridge<U, F> bridge) {
+	PojoValueBridgeToIndexFieldValueConverter(ValueBridge<U, F> bridge) {
 		this.bridge = bridge;
 	}
 
@@ -31,12 +31,12 @@ final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements 
 
 	@Override
 	public F convert(V value, ToIndexFieldValueConvertContext context) {
-		return bridge.toIndexedValue( value, context.extension( ToValueBridgeContextExtension.INSTANCE ) );
+		return bridge.toIndexedValue( value, context.extension( PojoValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
 	public F convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
-		return bridge.toIndexedValue( bridge.cast( value ), context.extension( ToValueBridgeContextExtension.INSTANCE ) );
+		return bridge.toIndexedValue( bridge.cast( value ), context.extension( PojoValueBridgeContextExtension.INSTANCE ) );
 	}
 
 	@Override
@@ -44,14 +44,14 @@ final class ValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements 
 		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		ValueBridgeToIndexFieldValueConverter<?, ?, ?> castedOther =
-				(ValueBridgeToIndexFieldValueConverter<?, ?, ?>) other;
+		PojoValueBridgeToIndexFieldValueConverter<?, ?, ?> castedOther =
+				(PojoValueBridgeToIndexFieldValueConverter<?, ?, ?>) other;
 		return bridge.isCompatibleWith( castedOther.bridge );
 	}
 
-	private static class ToValueBridgeContextExtension
+	private static class PojoValueBridgeContextExtension
 			implements ToIndexFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext> {
-		private static final ToValueBridgeContextExtension INSTANCE = new ToValueBridgeContextExtension();
+		private static final PojoValueBridgeContextExtension INSTANCE = new PojoValueBridgeContextExtension();
 
 		@Override
 		public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToIndexFieldValueConvertContext original,

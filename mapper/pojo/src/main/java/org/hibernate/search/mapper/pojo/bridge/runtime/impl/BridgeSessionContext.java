@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExt
  * since the only feature provided by each interface is an access to the extension.
  * This might change in the future, though, which is why the interfaces themselves are split.
  */
-public final class BridgeSessionContextImpl
+public final class BridgeSessionContext
 		implements IdentifierBridgeFromDocumentIdentifierContext,
 				RoutingKeyBridgeToRoutingKeyContext,
 				TypeBridgeWriteContext,
@@ -32,7 +32,7 @@ public final class BridgeSessionContextImpl
 
 	private final SessionContextImplementor sessionContext;
 
-	public BridgeSessionContextImpl(SessionContextImplementor sessionContext) {
+	public BridgeSessionContext(SessionContextImplementor sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

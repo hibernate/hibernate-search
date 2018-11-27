@@ -27,7 +27,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString()
-				.projectionConverter( new DefaultEnumFromIndexFieldValueConverter<>( enumType ) );
+				.projectionConverter( new PojoDefaultEnumFromIndexFieldValueConverter( enumType ) );
 	}
 
 	@Override
@@ -50,12 +50,12 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		return enumType.equals( castedOther.enumType );
 	}
 
-	private static class DefaultEnumFromIndexFieldValueConverter<V extends Enum<V>>
+	private static class PojoDefaultEnumFromIndexFieldValueConverter<V extends Enum<V>>
 			implements FromIndexFieldValueConverter<String, V> {
 
 		private final Class<V> enumType;
 
-		private DefaultEnumFromIndexFieldValueConverter(Class<V> enumType) {
+		private PojoDefaultEnumFromIndexFieldValueConverter(Class<V> enumType) {
 			this.enumType = enumType;
 		}
 
@@ -74,7 +74,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 			if ( !getClass().equals( other.getClass() ) ) {
 				return false;
 			}
-			DefaultEnumFromIndexFieldValueConverter<?> castedOther = (DefaultEnumFromIndexFieldValueConverter<?>) other;
+			PojoDefaultEnumFromIndexFieldValueConverter<?> castedOther = (PojoDefaultEnumFromIndexFieldValueConverter<?>) other;
 			return enumType.equals( castedOther.enumType );
 		}
 	}

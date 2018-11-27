@@ -8,9 +8,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.spatial;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
@@ -61,34 +59,34 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 					ProgrammaticMappingDefinitionContext mappingDefinition = builder.programmaticMapping();
 					mappingDefinition.type( GeoPointOnTypeEntity.class )
 							.indexed( GeoPointOnTypeEntity.INDEX )
-							.bridge( new GeoPointBridge.Builder()
+							.bridge( GeoPointBridgeBuilder.forType()
 									.fieldName( "homeLocation" )
 									.markerSet( "home" )
 									.projectable( Projectable.YES )
 							)
 							.bridge(
-									new GeoPointBridge.Builder()
+							GeoPointBridgeBuilder.forType()
 											.fieldName( "workLocation" )
 											.markerSet( "work" )
 							)
 							.property( "id" )
 									.documentId()
 							.property( "homeLatitude" )
-									.marker( new LatitudeMarker.Builder().markerSet( "home" ) )
+									.marker( GeoPointBridgeBuilder.latitude().markerSet( "home" ) )
 							.property( "homeLongitude" )
-									.marker( new LongitudeMarker.Builder().markerSet( "home" ) )
+									.marker( GeoPointBridgeBuilder.longitude().markerSet( "home" ) )
 							.property( "workLatitude" )
-									.marker( new LatitudeMarker.Builder().markerSet( "work" ) )
+									.marker( GeoPointBridgeBuilder.latitude().markerSet( "work" ) )
 							.property( "workLongitude" )
-									.marker( new LongitudeMarker.Builder().markerSet( "work" ) );
+									.marker( GeoPointBridgeBuilder.longitude().markerSet( "work" ) );
 
 					mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
 							.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
 							.property( "id" )
 									.documentId()
 							.property( "coord" )
-									.bridge( new GeoPointBridge.Builder() )
-									.bridge( new GeoPointBridge.Builder()
+									.bridge( GeoPointBridgeBuilder.forProperty() )
+									.bridge( GeoPointBridgeBuilder.forProperty()
 											.fieldName( "location" )
 											.projectable( Projectable.NO )
 									);
@@ -98,16 +96,16 @@ public class ProgrammaticMappingGeoPointBridgeIT {
 							.property( "id" )
 									.documentId()
 							.property( "coord" )
-									.bridge( new GeoPointBridge.Builder() )
-									.bridge( new GeoPointBridge.Builder()
+									.bridge( GeoPointBridgeBuilder.forProperty() )
+									.bridge( GeoPointBridgeBuilder.forProperty()
 											.fieldName( "location" )
 									);
 
 					mappingDefinition.type( CustomCoordinates.class )
 							.property( "lat" )
-									.marker( new LatitudeMarker.Builder() )
+									.marker( GeoPointBridgeBuilder.latitude() )
 							.property( "lon" )
-									.marker( new LongitudeMarker.Builder() );
+									.marker( GeoPointBridgeBuilder.longitude() );
 				} )
 				.setup();
 

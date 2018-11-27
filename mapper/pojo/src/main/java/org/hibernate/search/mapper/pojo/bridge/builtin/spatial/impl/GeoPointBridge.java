@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.builtin.spatial;
+package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Objects;
@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -38,7 +39,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static class Builder implements
+	public static class Builder implements GeoPointBridgeBuilder<GeoPointBridge>,
 			AnnotationBridgeBuilder<GeoPointBridge, org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge> {
 
 		private String fieldName;
@@ -53,16 +54,19 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			projectable( annotation.projectable() );
 		}
 
+		@Override
 		public Builder fieldName(String fieldName) {
 			this.fieldName = fieldName;
 			return this;
 		}
 
+		@Override
 		public Builder projectable(Projectable projectable) {
 			this.projectable = projectable;
 			return this;
 		}
 
+		@Override
 		public Builder markerSet(String markerSet) {
 			this.markerSet = markerSet;
 			return this;
@@ -72,7 +76,6 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		public GeoPointBridge build(BridgeBuildContext buildContext) {
 			return new GeoPointBridge( fieldName, projectable, markerSet );
 		}
-
 	}
 
 	private final String fieldName;
@@ -82,8 +85,8 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private IndexFieldAccessor<GeoPoint> fieldAccessor;
 	private Function<PojoElement, GeoPoint> coordinatesExtractor;
 
-	/*
-	 * Private constructor, use the Builder instead.
+	/**
+	 * Private constructor, use {@link GeoPointBridgeBuilder#forType()} or {@link GeoPointBridgeBuilder#forProperty()} instead.
 	 */
 	private GeoPointBridge(String fieldName, Projectable projectable, String markerSet) {
 		this.fieldName = fieldName;
