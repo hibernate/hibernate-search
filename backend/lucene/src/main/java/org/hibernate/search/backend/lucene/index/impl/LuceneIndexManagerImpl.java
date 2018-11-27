@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneIndexWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -61,8 +61,8 @@ class LuceneIndexManagerImpl
 		this.indexName = indexName;
 		this.model = model;
 
-		this.workPlanOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
-		this.streamOrchestrator = new StubLuceneIndexWorkOrchestrator( indexWriter );
+		this.workPlanOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
+		this.streamOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
 		this.indexWriter = indexWriter;
 	}
 

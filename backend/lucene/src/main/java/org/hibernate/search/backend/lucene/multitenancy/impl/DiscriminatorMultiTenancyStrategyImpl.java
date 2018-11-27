@@ -12,8 +12,8 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.backend.lucene.work.impl.QueryBasedDeleteEntryLuceneWork;
-import org.hibernate.search.backend.lucene.work.impl.QueryBasedUpdateEntryLuceneWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -42,13 +42,13 @@ public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrate
 	}
 
 	@Override
-	public QueryBasedUpdateEntryLuceneWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		return new QueryBasedUpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
+	public LuceneQueryBasedUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
+		return new LuceneQueryBasedUpdateEntryWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
-	public QueryBasedDeleteEntryLuceneWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
-		return new QueryBasedDeleteEntryLuceneWork( indexName, tenantId, id );
+	public LuceneQueryBasedDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
+		return new LuceneQueryBasedDeleteEntryWork( indexName, tenantId, id );
 	}
 
 	@Override

@@ -10,40 +10,34 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
-import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
-public class ExecuteQueryLuceneWork<T> implements LuceneQueryWork<SearchResult<T>> {
+public class LuceneCommitIndexWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneSearcher<T> searcher;
-
-	public ExecuteQueryLuceneWork(LuceneSearcher<T> searcher) {
-		this.searcher = searcher;
+	public LuceneCommitIndexWork(String indexName) {
+		super( "commitIndex", indexName );
 	}
 
 	@Override
-	public CompletableFuture<SearchResult<T>> execute(LuceneQueryWorkExecutionContext context) {
+	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> CompletableFuture.completedFuture( executeQuery( searcher ) ) );
+		return Futures.create( () -> commitIndex( context.getIndexWriter() ) );
 	}
 
-	private SearchResult<T> executeQuery(LuceneSearcher<T> searcher) {
+	private CompletableFuture<Long> commitIndex(IndexWriter indexWriter) {
 		try {
-			return searcher.execute();
+			return CompletableFuture.completedFuture( indexWriter.commit() );
 		}
 		catch (IOException e) {
-			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQuery(), searcher.getEventContext(), e );
-		}
-		finally {
-			searcher.close();
+			throw log.unableToCommitIndex( getEventContext(), e );
 		}
 	}
 
@@ -51,7 +45,8 @@ public class ExecuteQueryLuceneWork<T> implements LuceneQueryWork<SearchResult<T
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "searcher=" ).append( searcher )
+				.append( "type=" ).append( workType )
+				.append( ", indexName=" ).append( indexName )
 				.append( "]" );
 		return sb.toString();
 	}

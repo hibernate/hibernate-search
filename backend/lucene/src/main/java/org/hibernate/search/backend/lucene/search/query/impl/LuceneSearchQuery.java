@@ -31,7 +31,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final SearchResultExtractor<T> searchResultExtractor;
+	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
 	private Long firstResultIndex = 0L;
 	private Long maxResultsCount;
@@ -39,7 +39,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	public LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			Query luceneQuery, Sort luceneSort,
-			LuceneCollectorProvider luceneCollectorProvider, SearchResultExtractor<T> searchResultExtractor) {
+			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;

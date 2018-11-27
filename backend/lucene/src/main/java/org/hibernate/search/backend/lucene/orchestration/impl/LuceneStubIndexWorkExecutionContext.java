@@ -12,11 +12,11 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWorkExecutionCon
 /**
  * @author Guillaume Smet
  */
-public class StubLuceneIndexWorkExecutionContext implements LuceneIndexWorkExecutionContext {
+public class LuceneStubIndexWorkExecutionContext implements LuceneIndexWorkExecutionContext {
 
 	private final IndexWriter indexWriter;
 
-	public StubLuceneIndexWorkExecutionContext(IndexWriter indexWriter) {
+	public LuceneStubIndexWorkExecutionContext(IndexWriter indexWriter) {
 		this.indexWriter = indexWriter;
 	}
 

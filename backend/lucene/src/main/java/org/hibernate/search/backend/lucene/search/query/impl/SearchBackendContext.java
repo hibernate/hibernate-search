@@ -45,7 +45,7 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	<T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
+	<T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
 			LuceneSearchTargetModel searchTargetModel,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
@@ -55,7 +55,7 @@ public class SearchBackendContext {
 		Set<String> storedFields = new HashSet<>();
 		rootProjection.contributeFields( storedFields );
 
-		return new SearchQueryBuilderImpl<>(
+		return new LuceneSearchQueryBuilder<>(
 				workFactory,
 				orchestrator,
 				multiTenancyStrategy,

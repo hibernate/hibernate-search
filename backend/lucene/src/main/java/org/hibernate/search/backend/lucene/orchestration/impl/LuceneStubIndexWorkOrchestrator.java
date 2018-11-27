@@ -9,7 +9,8 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
+import org.apache.lucene.index.IndexWriter;
+import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.util.impl.common.Futures;
 
 
@@ -17,15 +18,15 @@ import org.hibernate.search.util.impl.common.Futures;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class StubLuceneQueryWorkOrchestrator implements LuceneQueryWorkOrchestrator {
+public class LuceneStubIndexWorkOrchestrator implements LuceneIndexWorkOrchestrator {
 
-	private final StubLuceneQueryWorkExecutionContext context;
+	private final LuceneStubIndexWorkExecutionContext context;
 
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
 
-	public StubLuceneQueryWorkOrchestrator() {
-		this.context = new StubLuceneQueryWorkExecutionContext();
+	public LuceneStubIndexWorkOrchestrator(IndexWriter indexWriter) {
+		this.context = new LuceneStubIndexWorkExecutionContext( indexWriter );
 	}
 
 	@Override
@@ -34,7 +35,7 @@ public class StubLuceneQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 	}
 
 	@Override
-	public synchronized <T> CompletableFuture<T> submit(LuceneQueryWork<T> work) {
+	public synchronized <T> CompletableFuture<T> submit(LuceneIndexWork<T> work) {
 		CompletableFuture<T> future = latestFuture.thenCompose( Futures.safeComposer(
 				ignored -> work.execute( context )
 		) );
@@ -44,9 +45,9 @@ public class StubLuceneQueryWorkOrchestrator implements LuceneQueryWorkOrchestra
 	}
 
 	@Override
-	public synchronized CompletableFuture<?> submit(List<LuceneQueryWork<?>> works) {
+	public synchronized CompletableFuture<?> submit(List<LuceneIndexWork<?>> works) {
 		CompletableFuture<?> future = latestFuture;
-		for ( LuceneQueryWork<?> work : works ) {
+		for ( LuceneIndexWork<?> work : works ) {
 			future = future.thenCompose( Futures.safeComposer(
 					ignored -> work.execute( context )
 			) );

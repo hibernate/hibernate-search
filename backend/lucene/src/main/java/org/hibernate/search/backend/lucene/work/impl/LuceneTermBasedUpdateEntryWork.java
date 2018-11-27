@@ -9,21 +9,21 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 /**
  * @author Guillaume Smet
  */
-public class QueryBasedUpdateEntryLuceneWork extends AbstractUpdateEntryLuceneWork {
+public class LuceneTermBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
 
-	public QueryBasedUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
+	public LuceneTermBasedUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
 		super( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
 	protected long doUpdateEntry(IndexWriter indexWriter, String tenantId, String id, LuceneIndexEntry indexEntry) throws IOException {
-		indexWriter.deleteDocuments( LuceneQueries.discriminatorMultiTenancyDeleteDocumentQuery( tenantId, id ) );
-		return indexWriter.addDocuments( indexEntry );
+		return indexWriter.updateDocuments( new Term( LuceneFields.idFieldName(), id ), indexEntry );
 	}
 }

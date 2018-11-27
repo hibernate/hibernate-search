@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 
-class SearchQueryBuilderFactoryImpl
+class LuceneSearchQueryBuilderFactory
 		implements SearchQueryBuilderFactory<LuceneSearchQueryElementCollector> {
 
 	private final SearchBackendContext searchBackendContext;
@@ -32,7 +32,7 @@ class SearchQueryBuilderFactoryImpl
 
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
-	SearchQueryBuilderFactoryImpl(SearchBackendContext searchBackendContext,
+	LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
 			LuceneSearchTargetModel searchTargetModel,
 			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
@@ -77,7 +77,7 @@ class SearchQueryBuilderFactoryImpl
 		return new LuceneCompositeListProjection<>( Function.identity(), children );
 	}
 
-	private <T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
+	private <T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
 			LuceneSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(

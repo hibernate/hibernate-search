@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
-class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
+class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQueryElementCollector> {
 
 	private final LuceneWorkFactory workFactory;
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
@@ -37,7 +37,7 @@ class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQue
 	private final LuceneSearchProjection<?, T> rootProjection;
 	private final LuceneSearchQueryElementCollector elementCollector;
 
-	SearchQueryBuilderImpl(
+	LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
 			LuceneQueryWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -74,7 +74,7 @@ class SearchQueryBuilderImpl<T> implements SearchQueryBuilder<T, LuceneSearchQue
 		SearchProjectionExecutionContext projectionExecutionContext =
 				new SearchProjectionExecutionContext( sessionContext );
 
-		SearchResultExtractor<T> searchResultExtractor = new SearchResultExtractorImpl<>(
+		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
 				storedFieldVisitor, rootProjection, projectionHitMapper, projectionExecutionContext
 		);
 

@@ -14,17 +14,17 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
 /**
  * @author Guillaume Smet
  */
-public class StubLuceneWorkFactory implements LuceneWorkFactory {
+public class LuceneStubWorkFactory implements LuceneWorkFactory {
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	public StubLuceneWorkFactory(MultiTenancyStrategy multiTenancyStrategy) {
+	public LuceneStubWorkFactory(MultiTenancyStrategy multiTenancyStrategy) {
 		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
 	@Override
 	public LuceneIndexWork<?> add(String indexName, String tenantId, String id, String routingKey, LuceneIndexEntry indexEntry) {
-		return new AddEntryLuceneWork( indexName, tenantId, id, indexEntry );
+		return new LuceneAddEntryWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
@@ -40,21 +40,21 @@ public class StubLuceneWorkFactory implements LuceneWorkFactory {
 
 	@Override
 	public LuceneIndexWork<?> flush(String indexName) {
-		return new FlushIndexLuceneWork( indexName );
+		return new LuceneFlushIndexWork( indexName );
 	}
 
 	@Override
 	public LuceneIndexWork<?> commit(String indexName) {
-		return new CommitIndexLuceneWork( indexName );
+		return new LuceneCommitIndexWork( indexName );
 	}
 
 	@Override
 	public LuceneIndexWork<?> optimize(String indexName) {
-		return new OptimizeIndexLuceneWork( indexName );
+		return new LuceneOptimizeIndexWork( indexName );
 	}
 
 	@Override
-	public <T> ExecuteQueryLuceneWork<T> search(LuceneSearcher<T> luceneSearcher) {
-		return new ExecuteQueryLuceneWork<T>( luceneSearcher );
+	public <T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher) {
+		return new LuceneExecuteQueryWork<T>( luceneSearcher );
 	}
 }

@@ -18,11 +18,11 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class FlushIndexLuceneWork extends AbstractLuceneWork<Void> {
+public class LuceneFlushIndexWork extends AbstractLuceneWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public FlushIndexLuceneWork(String indexName) {
+	public LuceneFlushIndexWork(String indexName) {
 		super( "flushIndex", indexName );
 	}
 

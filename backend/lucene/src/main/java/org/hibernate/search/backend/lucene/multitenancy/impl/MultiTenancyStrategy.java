@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.work.impl.AbstractDeleteEntryLuceneWork;
-import org.hibernate.search.backend.lucene.work.impl.AbstractUpdateEntryLuceneWork;
+import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteEntryWork;
+import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneUpdateEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.util.EventContext;
 
@@ -60,7 +60,7 @@ public interface MultiTenancyStrategy {
 	 * @param indexEntry The index entry.
 	 * @return The update {@link LuceneIndexWork}.
 	 */
-	AbstractUpdateEntryLuceneWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry);
+	AbstractLuceneUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry);
 
 	/**
 	 * Creates the according delete {@link LuceneIndexWork}.
@@ -70,5 +70,5 @@ public interface MultiTenancyStrategy {
 	 * @param id The document id.
 	 * @return The delete {@link LuceneIndexWork}.
 	 */
-	AbstractDeleteEntryLuceneWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id);
+	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id);
 }
