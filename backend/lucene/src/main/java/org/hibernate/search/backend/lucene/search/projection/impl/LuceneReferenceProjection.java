@@ -14,17 +14,17 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class ObjectSearchProjectionImpl<O> implements LuceneSearchProjection<Object, O> {
+public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R> {
 
 	@SuppressWarnings("rawtypes")
-	private static final ObjectSearchProjectionImpl INSTANCE = new ObjectSearchProjectionImpl();
+	private static final LuceneReferenceProjection INSTANCE = new LuceneReferenceProjection();
 
 	@SuppressWarnings("unchecked")
-	public static <T> ObjectSearchProjectionImpl<T> get() {
+	public static <T> LuceneReferenceProjection<T> get() {
 		return INSTANCE;
 	}
 
-	private ObjectSearchProjectionImpl() {
+	private LuceneReferenceProjection() {
 	}
 
 	@Override
@@ -37,16 +37,16 @@ public class ObjectSearchProjectionImpl<O> implements LuceneSearchProjection<Obj
 		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
-	@Override
-	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
-		return mapper.planLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
-		return (O) loadingResult.getLoaded( extractedData );
+	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+			SearchProjectionExecutionContext context) {
+		return (R) mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+	}
+
+	@Override
+	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+		return extractedData;
 	}
 
 	@Override

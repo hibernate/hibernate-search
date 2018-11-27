@@ -9,8 +9,7 @@ package org.hibernate.search.backend.lucene.types.projection.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.projection.impl.DistanceToFieldSearchProjectionBuilderImpl;
-import org.hibernate.search.backend.lucene.search.projection.impl.FieldSearchProjectionBuilderImpl;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjectionBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -19,7 +18,7 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProjectionBuilderFactory {
+public class LuceneStandardFieldProjectionBuilderFactory<T> implements LuceneFieldProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -29,7 +28,7 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 	private final LuceneFieldConverter<T, ?> converter;
 
-	public GeoPointFieldProjectionBuilderFactory(boolean projectable, LuceneFieldCodec<T> codec,
+	public LuceneStandardFieldProjectionBuilderFactory(boolean projectable, LuceneFieldCodec<T> codec,
 			LuceneFieldConverter<T, ?> converter) {
 		this.projectable = projectable;
 		this.codec = codec;
@@ -46,15 +45,15 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return new FieldSearchProjectionBuilderImpl<>( absoluteFieldPath, codec, converter );
+		return new LuceneFieldProjectionBuilder<>( absoluteFieldPath, codec, converter );
 	}
 
 	@Override
 	public DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath,
 			GeoPoint center) {
-		checkProjectable( absoluteFieldPath, projectable );
-
-		return new DistanceToFieldSearchProjectionBuilderImpl( absoluteFieldPath, center );
+		throw log.distanceOperationsNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
 	}
 
 	@Override
@@ -62,11 +61,11 @@ public class GeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj.getClass() != GeoPointFieldProjectionBuilderFactory.class ) {
+		if ( obj.getClass() != LuceneStandardFieldProjectionBuilderFactory.class ) {
 			return false;
 		}
 
-		GeoPointFieldProjectionBuilderFactory<?> other = (GeoPointFieldProjectionBuilderFactory<?>) obj;
+		LuceneStandardFieldProjectionBuilderFactory<?> other = (LuceneStandardFieldProjectionBuilderFactory<?>) obj;
 
 		return projectable == other.projectable &&
 				codec.isCompatibleWith( other.codec ) &&

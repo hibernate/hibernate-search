@@ -9,22 +9,21 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
+import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<R, R> {
+class LuceneDocumentReferenceProjection implements LuceneSearchProjection<DocumentReference, DocumentReference> {
 
-	@SuppressWarnings("rawtypes")
-	private static final ReferenceSearchProjectionImpl INSTANCE = new ReferenceSearchProjectionImpl();
+	private static final LuceneDocumentReferenceProjection INSTANCE = new LuceneDocumentReferenceProjection();
 
-	@SuppressWarnings("unchecked")
-	public static <T> ReferenceSearchProjectionImpl<T> get() {
+	static LuceneDocumentReferenceProjection get() {
 		return INSTANCE;
 	}
 
-	private ReferenceSearchProjectionImpl() {
+	private LuceneDocumentReferenceProjection() {
 	}
 
 	@Override
@@ -37,15 +36,14 @@ public class ReferenceSearchProjectionImpl<R> implements LuceneSearchProjection<
 		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
-		return (R) mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+		return DocumentReferenceExtractorHelper.extractDocumentReference( documentResult );
 	}
 
 	@Override
-	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+	public DocumentReference transform(LoadingResult<?> loadingResult, DocumentReference extractedData) {
 		return extractedData;
 	}
 

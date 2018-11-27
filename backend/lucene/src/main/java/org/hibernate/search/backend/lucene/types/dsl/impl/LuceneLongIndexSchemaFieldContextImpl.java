@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.LongFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLongFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.lucene.types.projection.impl.StandardFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLongFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -50,7 +50,7 @@ public class LuceneLongIndexSchemaFieldContextImpl
 				codec,
 				new LuceneLongFieldPredicateBuilderFactory( converter ),
 				new LuceneLongFieldSortBuilderFactory( resolvedSortable, converter ),
-				new StandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -10,19 +10,19 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 
 
-public class ScoreSearchProjectionBuilderImpl implements ScoreProjectionBuilder {
+public class LuceneScoreProjectionBuilder implements ScoreProjectionBuilder {
 
-	private static final ScoreSearchProjectionBuilderImpl INSTANCE = new ScoreSearchProjectionBuilderImpl();
+	private static final LuceneScoreProjectionBuilder INSTANCE = new LuceneScoreProjectionBuilder();
 
-	public static ScoreSearchProjectionBuilderImpl get() {
+	public static LuceneScoreProjectionBuilder get() {
 		return INSTANCE;
 	}
 
-	private ScoreSearchProjectionBuilderImpl() {
+	private LuceneScoreProjectionBuilder() {
 	}
 
 	@Override
 	public SearchProjection<Float> build() {
-		return ScoreSearchProjectionImpl.get();
+		return LuceneScoreProjection.get();
 	}
 }

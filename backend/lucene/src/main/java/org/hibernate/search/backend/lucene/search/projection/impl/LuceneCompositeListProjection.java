@@ -18,13 +18,13 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-public class CompositeListSearchProjectionImpl<T> implements CompositeSearchProjection<List<Object>, T> {
+public class LuceneCompositeListProjection<T> implements LuceneCompositeProjection<List<Object>, T> {
 
 	private final Function<List<?>, T> transformer;
 
 	private final List<LuceneSearchProjection<?, ?>> children;
 
-	public CompositeListSearchProjectionImpl(Function<List<?>, T> transformer,
+	public LuceneCompositeListProjection(Function<List<?>, T> transformer,
 			List<LuceneSearchProjection<?, ?>> children) {
 		this.transformer = transformer;
 		this.children = children;
