@@ -7,6 +7,52 @@
   -->
 <jqa:jqassistant-rules xmlns:jqa="http://www.buschmais.com/jqassistant/core/analysis/rules/schema/v1.0">
 
+    <concept id="my-rules:TypeMetadata">
+        <description>
+            Contributes additional metadata to the :Type nodes.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            SET
+                type.nameWithoutContainingTypeName = SPLIT(type.name, "$")[-1]
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:Anonymous">
+        <description>
+            Contributes the :Anonymous label to anonymous types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                type.name =~ ".*\\$[0-9]+$"
+            SET
+                type:Anonymous
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:Generated">
+        <description>
+            Contributes the :Generated label to generated types
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (type:Type)
+            WHERE
+                type.name =~ ".*_\\$(logger|bundle)$"
+            SET
+                type:Generated
+            RETURN
+                type
+        ]]></cypher>
+    </concept>
+
     <concept id="my-rules:Spi">
         <description>
             Contributes the :Spi label to SPI types
@@ -110,6 +156,30 @@
                 OR artifact.name =~ ".*-internal-.*"
             SET
                 artifact:Internal
+            RETURN
+                artifact
+        ]]></cypher>
+    </concept>
+
+    <concept id="my-rules:ArtifactMetadata">
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            Contributes additional metadata to the :Maven:Artifact:HibernateSearch nodes.
+        </description>
+        <cypher><![CDATA[
+            MATCH
+                (artifact:Maven:Artifact:HibernateSearch)
+            SET
+                // Assign a keyword to each module
+                artifact.moduleSpecificKeyword =
+                    CASE artifact.name
+                        WHEN 'hibernate-search-backend-lucene' THEN 'Lucene'
+                        WHEN 'hibernate-search-backend-elasticsearch' THEN 'Elasticsearch'
+                        WHEN 'hibernate-search-mapper-pojo' THEN 'Pojo'
+                        WHEN 'hibernate-search-mapper-javabean' THEN 'JavaBean'
+                        WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
+                        ELSE 'UNKNOWN-TYPE-NAMING-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'
+                    END
             RETURN
                 artifact
         ]]></cypher>
@@ -245,6 +315,70 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:TypesShouldUseImplSuffixWithRestraint">
+        <requiresConcept refId="my-rules:TypeMetadata" />
+        <requiresConcept refId="my-rules:Test" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            The 'Impl' suffix should only be used when naming classes that are the only implementation
+            for a given Hibernate Search interface (excluding its own subclasses).
+            Whenever multiple implementations exist, a more meaningful name should be given to the implementation.
+        </description>
+        <cypher><![CDATA[
+            // Hibernate Search classes named "<prefix>Impl"
+            MATCH (implementingTypeEndingWithImpl:Class:HibernateSearch)
+            WHERE
+                implementingTypeEndingWithImpl.nameWithoutContainingTypeName =~ ".*Impl$"
+            // The interface they implement, named "<prefix>" (if any)
+            OPTIONAL MATCH (implementingTypeEndingWithImpl)-[:IMPLEMENTS|EXTENDS *]->(implementedType:Interface:HibernateSearch)
+            WHERE
+                implementingTypeEndingWithImpl.nameWithoutContainingTypeName = (implementedType.nameWithoutContainingTypeName + "Impl")
+            // All the implementing types that do not extend implementingTypeEndingWithImpl
+            OPTIONAL MATCH (topLevelImplementingType:Class)-[:IMPLEMENTS|EXTENDS *]->(implementedType)
+            WHERE
+                NOT topLevelImplementingType:Test // Ignore stubs
+                AND NOT (topLevelImplementingType)-[:EXTENDS *]->(implementingTypeEndingWithImpl)
+            WITH implementingTypeEndingWithImpl, implementedType, count(distinct topLevelImplementingType) AS topLevelImplementingTypeCount
+            WHERE
+                implementedType IS NULL OR topLevelImplementingTypeCount > 1
+            RETURN implementingTypeEndingWithImpl, implementedType
+        ]]></cypher>
+    </constraint>
+
+    <constraint id="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName">
+        <requiresConcept refId="my-rules:TypeMetadata" />
+        <requiresConcept refId="my-rules:Anonymous" />
+        <requiresConcept refId="my-rules:Generated" />
+        <requiresConcept refId="my-rules:Test" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="my-rules:ArtifactMetadata" />
+        <description>
+            Types extending/implementing a Hibernate Search type from another module must have a module-specific keyword in their name,
+            either at the very start or just after "Abstract".
+            This allows to more easily understand which module a given type comes from.
+            Exceptions are allowed when:
+            - the misnamed type is an anonymous type, a generated type or a test type;
+            - or the implemented type is in a util module,
+            in which case the implemented interface may just be a detail.
+        </description>
+        <cypher><![CDATA[
+            MATCH (misnamedTypeArtifact:Maven:Artifact)-[:CONTAINS]->(misnamedType:Type)
+                    -[:IMPLEMENTS|EXTENDS *]->
+                    (externalParentType:Type:HibernateSearch)<-[:CONTAINS]-(externalParentTypeArtifact:Maven:Artifact)
+            WHERE
+                misnamedTypeArtifact <> externalParentTypeArtifact
+                // Abstract<Keyword><something> or <Keyword><something>
+                // Ignore the containing type for inner/nested types
+                AND NOT misnamedType.nameWithoutContainingTypeName =~ ("^(Abstract)?\\Q" + misnamedTypeArtifact.moduleSpecificKeyword + "\\E.*")
+                // Exceptions
+                AND NOT misnamedType:Anonymous
+                AND NOT misnamedType:Generated
+                AND NOT misnamedType:Test
+                AND NOT externalParentTypeArtifact.name STARTS WITH "hibernate-search-util-"
+            RETURN misnamedTypeArtifact.moduleSpecificKeyword, misnamedType, externalParentType
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -253,6 +387,8 @@
         <includeConstraint refId="my-rules:APIMethodsMayNotExposeSPITypes" />
         <includeConstraint refId="my-rules:APIFieldsMayNotExposeSPITypes" />
         <includeConstraint refId="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules" />
+        <includeConstraint refId="my-rules:TypesShouldUseImplSuffixWithRestraint" />
+        <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
     </group>
 
 </jqa:jqassistant-rules>
