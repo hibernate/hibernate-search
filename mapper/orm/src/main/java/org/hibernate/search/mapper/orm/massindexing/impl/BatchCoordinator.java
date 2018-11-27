@@ -17,6 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Executors;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -36,6 +37,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
 	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmMapping mapping;
+	private final PojoMappingWorkExecutor mappingWorkExecutor;
 
 	//TODO: use the workPlan to handle optimize tasks
 
@@ -73,6 +75,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		this.rootEntities = rootEntities;
 		this.sessionFactory = sessionFactory;
 		this.mapping = mapping;
+		this.mappingWorkExecutor = mapping.createMappingWorkExecutor();
 		this.typesToIndexInParallel = typesToIndexInParallel;
 		this.documentBuilderThreads = documentBuilderThreads;
 		this.cacheMode = cacheMode;
@@ -138,16 +141,16 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void afterBatch() {
 		if ( this.optimizeAtEnd ) {
-			//TODO: batchWorkPlan.optimize( rootEntities );
+			mappingWorkExecutor.optimize( rootEntities ).join();
 		}
-		//TODO: batchWorkPlan.flush( rootEntities );
+		mappingWorkExecutor.flush( rootEntities ).join();
 	}
 
 	/**
 	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
 	 */
 	private void afterBatchOnInterruption() {
-		//TODO: batchWorkPlan.flush( rootEntities );
+		mappingWorkExecutor.flush( rootEntities ).join();
 	}
 
 	/**
@@ -155,12 +158,9 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
-			//TODO: purgeAll for affected entities
-			for ( Class<?> type : rootEntities ) {
-				//needs do be in-sync work to make sure we wait for the end of it.
-			}
+			mappingWorkExecutor.purge( rootEntities ).join();
 			if ( this.optimizeAfterPurge ) {
-				//TODO: batchWorkPlan.optimize( rootEntities );
+				mappingWorkExecutor.optimize( rootEntities ).join();
 			}
 		}
 	}
