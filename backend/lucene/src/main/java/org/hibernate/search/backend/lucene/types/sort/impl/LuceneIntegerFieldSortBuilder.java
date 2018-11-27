@@ -6,23 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import org.apache.lucene.search.SortField;
+
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-import org.apache.lucene.search.SortField;
+public class LuceneIntegerFieldSortBuilder extends AbstractLuceneFieldSortBuilder {
 
-public class LongFieldSortBuilder extends AbstractFieldSortBuilderImpl {
-
-	LongFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
-		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
+	LuceneIntegerFieldSortBuilder(LuceneSearchContext searchContext,
+			String absoluteFieldPath, LuceneFieldConverter<?, Integer> converter) {
+		super( searchContext, absoluteFieldPath, converter, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.LONG,
+		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.INT,
 				order == SortOrder.DESC );
 		setEffectiveMissingValue( sortField, missingValue, order );
 

@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.AbstractSearchSortBuilder;
+import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
+abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBuilder
 		implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -36,7 +36,7 @@ abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
 
 	private Object sortMissingValueLastPlaceholder;
 
-	protected AbstractFieldSortBuilderImpl(
+	protected AbstractLuceneFieldSortBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath, LuceneFieldConverter<?, ?> converter,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {

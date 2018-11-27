@@ -8,11 +8,11 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.apache.lucene.search.SortField;
 
-class IndexOrderSortBuilder implements LuceneSearchSortBuilder {
+class LuceneIndexOrderSortBuilder implements LuceneSearchSortBuilder {
 
-	public static final IndexOrderSortBuilder INSTANCE = new IndexOrderSortBuilder();
+	public static final LuceneIndexOrderSortBuilder INSTANCE = new LuceneIndexOrderSortBuilder();
 
-	private IndexOrderSortBuilder() {
+	private LuceneIndexOrderSortBuilder() {
 	}
 
 	@Override

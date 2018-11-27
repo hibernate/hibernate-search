@@ -11,9 +11,9 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-public class LocalDateFieldSortBuilderFactory extends AbstractStandardLuceneFieldSortBuilderFactory<Long> {
+public class LuceneLongFieldSortBuilderFactory extends AbstractLuceneStandardFieldSortBuilderFactory<Long> {
 
-	public LocalDateFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<?, Long> converter) {
+	public LuceneLongFieldSortBuilderFactory(boolean sortable, LuceneFieldConverter<?, Long> converter) {
 		super( sortable, converter );
 	}
 
@@ -22,6 +22,6 @@ public class LocalDateFieldSortBuilderFactory extends AbstractStandardLuceneFiel
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new LocalDateFieldSortBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneLongFieldSortBuilder( searchContext, absoluteFieldPath, converter );
 	}
 }
