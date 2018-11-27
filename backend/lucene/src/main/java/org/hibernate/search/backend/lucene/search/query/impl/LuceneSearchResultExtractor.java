@@ -12,7 +12,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.engine.search.SearchResult;
 
-public interface SearchResultExtractor<T> {
+public interface LuceneSearchResultExtractor<T> {
 
 	SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs) throws IOException;
 

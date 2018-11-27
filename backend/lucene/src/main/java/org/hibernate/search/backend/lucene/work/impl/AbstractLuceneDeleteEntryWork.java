@@ -18,28 +18,36 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class CommitIndexLuceneWork extends AbstractLuceneWork<Long> {
+public abstract class AbstractLuceneDeleteEntryWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public CommitIndexLuceneWork(String indexName) {
-		super( "commitIndex", indexName );
+	private final String tenantId;
+
+	private final String id;
+
+	public AbstractLuceneDeleteEntryWork(String indexName, String tenantId, String id) {
+		super( "deleteEntry", indexName );
+		this.tenantId = tenantId;
+		this.id = id;
 	}
 
 	@Override
 	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> commitIndex( context.getIndexWriter() ) );
+		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
 	}
 
-	private CompletableFuture<Long> commitIndex(IndexWriter indexWriter) {
+	private Long deleteDocuments(IndexWriter indexWriter) {
 		try {
-			return CompletableFuture.completedFuture( indexWriter.commit() );
+			return doDeleteDocuments( indexWriter, tenantId, id );
 		}
 		catch (IOException e) {
-			throw log.unableToCommitIndex( getEventContext(), e );
+			throw log.unableToDeleteEntryFromIndex( tenantId, id, getEventContext(), e );
 		}
 	}
+
+	protected abstract long doDeleteDocuments(IndexWriter indexWriter, String tenantId, String id) throws IOException;
 
 	@Override
 	public String toString() {
@@ -47,6 +55,7 @@ public class CommitIndexLuceneWork extends AbstractLuceneWork<Long> {
 				.append( "[" )
 				.append( "type=" ).append( workType )
 				.append( ", indexName=" ).append( indexName )
+				.append( ", id=" ).append( id )
 				.append( "]" );
 		return sb.toString();
 	}

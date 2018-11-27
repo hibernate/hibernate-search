@@ -12,8 +12,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.work.impl.TermBasedDeleteEntryLuceneWork;
-import org.hibernate.search.backend.lucene.work.impl.TermBasedUpdateEntryLuceneWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedDeleteEntryWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedUpdateEntryWork;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -37,13 +37,13 @@ public class NoMultiTenancyStrategyImpl implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public TermBasedUpdateEntryLuceneWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
-		return new TermBasedUpdateEntryLuceneWork( indexName, tenantId, id, indexEntry );
+	public LuceneTermBasedUpdateEntryWork createUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
+		return new LuceneTermBasedUpdateEntryWork( indexName, tenantId, id, indexEntry );
 	}
 
 	@Override
-	public TermBasedDeleteEntryLuceneWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
-		return new TermBasedDeleteEntryLuceneWork( indexName, tenantId, id );
+	public LuceneTermBasedDeleteEntryWork createDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
+		return new LuceneTermBasedDeleteEntryWork( indexName, tenantId, id );
 	}
 
 	@Override

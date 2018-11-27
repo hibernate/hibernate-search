@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractUpdateEntryLuceneWork extends AbstractLuceneWork<Long> {
+public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -29,7 +29,7 @@ public abstract class AbstractUpdateEntryLuceneWork extends AbstractLuceneWork<L
 
 	private final LuceneIndexEntry indexEntry;
 
-	protected AbstractUpdateEntryLuceneWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
+	protected AbstractLuceneUpdateEntryWork(String indexName, String tenantId, String id, LuceneIndexEntry indexEntry) {
 		super( "updateEntry", indexName );
 		this.tenantId = tenantId;
 		this.id = id;

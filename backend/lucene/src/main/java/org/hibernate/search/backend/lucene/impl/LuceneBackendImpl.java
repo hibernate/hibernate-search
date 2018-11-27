@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.StubLuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -59,7 +59,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		this.queryOrchestrator = new StubLuceneQueryWorkOrchestrator();
+		this.queryOrchestrator = new LuceneStubQueryWorkOrchestrator();
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.eventContext = EventContexts.fromBackendName( name );

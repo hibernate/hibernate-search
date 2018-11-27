@@ -15,9 +15,9 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 /**
  * @author Guillaume Smet
  */
-public class TermBasedDeleteEntryLuceneWork extends AbstractDeleteEntryLuceneWork {
+public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {
 
-	public TermBasedDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
+	public LuceneTermBasedDeleteEntryWork(String indexName, String tenantId, String id) {
 		super( indexName, tenantId, id );
 	}
 

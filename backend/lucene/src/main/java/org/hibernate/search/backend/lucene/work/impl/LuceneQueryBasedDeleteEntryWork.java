@@ -14,9 +14,9 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 /**
  * @author Guillaume Smet
  */
-public class QueryBasedDeleteEntryLuceneWork extends AbstractDeleteEntryLuceneWork {
+public class LuceneQueryBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {
 
-	public QueryBasedDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
+	public LuceneQueryBasedDeleteEntryWork(String indexName, String tenantId, String id) {
 		super( indexName, tenantId, id );
 	}
 

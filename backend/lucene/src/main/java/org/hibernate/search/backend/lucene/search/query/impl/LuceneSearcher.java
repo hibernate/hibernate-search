@@ -36,7 +36,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	private final Long maxResultsCount;
 
 	private final LuceneCollectorProvider luceneCollectorProvider;
-	private final SearchResultExtractor<T> searchResultExtractor;
+	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
 	public LuceneSearcher(Set<String> indexNames,
 			Set<ReaderProvider> readerProviders,
@@ -45,7 +45,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 			Long firstResultIndex,
 			Long maxResultsCount,
 			LuceneCollectorProvider luceneCollectorProvider,
-			SearchResultExtractor<T> searchResultExtractor) {
+			LuceneSearchResultExtractor<T> searchResultExtractor) {
 		this.indexNames = indexNames;
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
 		this.luceneQuery = luceneQuery;

@@ -18,36 +18,29 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public abstract class AbstractDeleteEntryLuceneWork extends AbstractLuceneWork<Long> {
+public class LuceneOptimizeIndexWork extends AbstractLuceneWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String tenantId;
-
-	private final String id;
-
-	public AbstractDeleteEntryLuceneWork(String indexName, String tenantId, String id) {
-		super( "deleteEntry", indexName );
-		this.tenantId = tenantId;
-		this.id = id;
+	public LuceneOptimizeIndexWork(String indexName) {
+		super( "optimizeIndex", indexName );
 	}
 
 	@Override
 	public CompletableFuture<Long> execute(LuceneIndexWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
-		return Futures.create( () -> CompletableFuture.completedFuture( deleteDocuments( context.getIndexWriter() ) ) );
+		return Futures.create( () -> commitIndex( context.getIndexWriter() ) );
 	}
 
-	private Long deleteDocuments(IndexWriter indexWriter) {
+	private CompletableFuture<Long> commitIndex(IndexWriter indexWriter) {
 		try {
-			return doDeleteDocuments( indexWriter, tenantId, id );
+			indexWriter.forceMerge( 1 );
+			return CompletableFuture.completedFuture( indexWriter.commit() );
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteEntryFromIndex( tenantId, id, getEventContext(), e );
+			throw log.unableToCommitIndex( getEventContext(), e );
 		}
 	}
-
-	protected abstract long doDeleteDocuments(IndexWriter indexWriter, String tenantId, String id) throws IOException;
 
 	@Override
 	public String toString() {
@@ -55,7 +48,6 @@ public abstract class AbstractDeleteEntryLuceneWork extends AbstractLuceneWork<L
 				.append( "[" )
 				.append( "type=" ).append( workType )
 				.append( ", indexName=" ).append( indexName )
-				.append( ", id=" ).append( id )
 				.append( "]" );
 		return sb.toString();
 	}

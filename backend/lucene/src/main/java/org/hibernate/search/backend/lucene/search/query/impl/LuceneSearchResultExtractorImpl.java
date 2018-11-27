@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
+class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<T> {
 
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, T> rootProjection;
@@ -32,7 +32,7 @@ class SearchResultExtractorImpl<T> implements SearchResultExtractor<T> {
 
 	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
 
-	SearchResultExtractorImpl(
+	LuceneSearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, T> rootProjection,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
