@@ -22,7 +22,7 @@ import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Query;
 
-public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
+public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

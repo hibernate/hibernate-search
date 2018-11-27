@@ -22,9 +22,9 @@ import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration
 import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategyImpl;
+import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategyImpl;
+import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.work.impl.LuceneStubWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -140,9 +140,9 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		switch ( multiTenancyStrategyConfiguration ) {
 			case NONE:
-				return new NoMultiTenancyStrategyImpl();
+				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:
-				return new DiscriminatorMultiTenancyStrategyImpl();
+				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'. %2$s",
