@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
  * An object responsible for resolving the set of entities that should be reindexed when a given entity changes.
@@ -20,12 +19,7 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * @param <T> The type of entities this object is able to handle.
  * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public abstract class PojoImplicitReindexingResolver<T, S> implements ToStringTreeAppendable {
-
-	@Override
-	public String toString() {
-		return new ToStringTreeBuilder().value( this ).toString();
-	}
+public interface PojoImplicitReindexingResolver<T, S> extends ToStringTreeAppendable {
 
 	/**
 	 * @param dirtinessState A set of dirty paths.
@@ -33,7 +27,7 @@ public abstract class PojoImplicitReindexingResolver<T, S> implements ToStringTr
 	 * @return {@code true} if the given dirty paths would require to reindex an entity
 	 * of the type handled by this resolver, {@code false} if no reindexing is required.
 	 */
-	public abstract boolean requiresSelfReindexing(S dirtinessState);
+	boolean requiresSelfReindexing(S dirtinessState);
 
 	/**
 	 * Add all entities that should be reindexed to {@code collector},
@@ -44,10 +38,10 @@ public abstract class PojoImplicitReindexingResolver<T, S> implements ToStringTr
 	 * @param dirtinessState The set of dirty paths in the given entity.
 	 * {@code null} can be passed to mean "no information", in which case all paths are considered dirty.
 	 */
-	public abstract void resolveEntitiesToReindex(PojoReindexingCollector collector,
+	void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState);
 
-	public static <T, D> PojoImplicitReindexingResolver<T, D> noOp() {
+	static <T, D> PojoImplicitReindexingResolver<T, D> noOp() {
 		return NoOpPojoImplicitReindexingResolver.get();
 	}
 
