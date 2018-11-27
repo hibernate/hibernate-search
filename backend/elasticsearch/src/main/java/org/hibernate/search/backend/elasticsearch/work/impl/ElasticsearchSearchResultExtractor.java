@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.SearchResult;
 
 import com.google.gson.JsonObject;
 
-public interface SearchResultExtractor<T> {
+public interface ElasticsearchSearchResultExtractor<T> {
 
 	SearchResult<T> extract(JsonObject responseBody);
 

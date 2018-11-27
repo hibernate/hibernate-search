@@ -12,11 +12,11 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 /**
  * @author Yoann Rodiere
  */
-public class StubElasticsearchWorkExecutionContext implements ElasticsearchWorkExecutionContext {
+public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkExecutionContext {
 
 	private final ElasticsearchClient client;
 
-	public StubElasticsearchWorkExecutionContext(ElasticsearchClient client) {
+	public ElasticsearchStubWorkExecutionContext(ElasticsearchClient client) {
 		this.client = client;
 	}
 

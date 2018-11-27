@@ -17,17 +17,17 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class StubElasticsearchWork<T> implements ElasticsearchWork<T> {
+public class ElasticsearchStubWork<T> implements ElasticsearchWork<T> {
 
 	private final ElasticsearchRequest request;
 
 	private final Function<JsonObject, T> resultFunction;
 
-	public StubElasticsearchWork(ElasticsearchRequest request) {
+	public ElasticsearchStubWork(ElasticsearchRequest request) {
 		this( request, ignored -> null );
 	}
 
-	public StubElasticsearchWork(ElasticsearchRequest request, Function<JsonObject, T> resultFunction) {
+	public ElasticsearchStubWork(ElasticsearchRequest request, Function<JsonObject, T> resultFunction) {
 		this.request = request;
 		this.resultFunction = resultFunction;
 	}

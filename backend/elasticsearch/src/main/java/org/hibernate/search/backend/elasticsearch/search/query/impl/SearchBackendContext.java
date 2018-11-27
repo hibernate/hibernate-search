@@ -65,13 +65,13 @@ public class SearchBackendContext {
 		return searchProjectionBackendContext;
 	}
 
-	<T> SearchQueryBuilderImpl<T> createSearchQueryBuilder(
+	<T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
-		return new SearchQueryBuilderImpl<>(
+		return new ElasticsearchSearchQueryBuilder<>(
 				workFactory, orchestrator, multiTenancyStrategy,
 				indexNames, sessionContext, projectionHitMapper, rootProjection
 		);

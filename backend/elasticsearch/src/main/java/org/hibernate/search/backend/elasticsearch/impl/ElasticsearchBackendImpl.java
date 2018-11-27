@@ -25,7 +25,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.StubElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -69,8 +69,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.name = name;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.streamOrchestrator = new StubElasticsearchWorkOrchestrator( client );
-		this.queryOrchestrator = new StubElasticsearchWorkOrchestrator( client );
+		this.streamOrchestrator = new ElasticsearchStubWorkOrchestrator( client );
+		this.queryOrchestrator = new ElasticsearchStubWorkOrchestrator( client );
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
