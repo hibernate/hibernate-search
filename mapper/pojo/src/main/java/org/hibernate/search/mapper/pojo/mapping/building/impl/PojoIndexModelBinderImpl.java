@@ -231,7 +231,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		// Then register the bridge itself as a converter to use in the DSL
 		typedFieldContext.dslConverter(
-				new ValueBridgeToIndexFieldValueConverter<>( bridge )
+				new PojoValueBridgeToIndexFieldValueConverter<>( bridge )
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)

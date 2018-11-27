@@ -11,9 +11,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridge;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LongitudeMarker;
+import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
@@ -31,7 +29,7 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 		ProgrammaticMappingDefinitionContext mapping = context.programmaticMapping();
 
 		mapping.type( Library.class ).indexed( Library.INDEX )
-				.bridge( new GeoPointBridge.Builder().fieldName( "location" ) )
+				.bridge( GeoPointBridgeBuilder.forType().fieldName( "location" ) )
 				.property( "id" ).documentId()
 				.property( "name" )
 						.fullTextField().analyzer( LibraryAnalysisConfigurer.ANALYZER_DEFAULT )
@@ -40,8 +38,8 @@ public class ProgrammaticMappingConfigurer implements HibernateOrmSearchMappingC
 								.sortable( Sortable.YES )
 				.property( "collectionSize" )
 						.genericField().sortable( Sortable.YES )
-				.property( "latitude" ).marker( new LatitudeMarker.Builder() )
-				.property( "longitude" ).marker( new LongitudeMarker.Builder() )
+				.property( "latitude" ).marker( GeoPointBridgeBuilder.latitude() )
+				.property( "longitude" ).marker( GeoPointBridgeBuilder.longitude() )
 				.property( "services" )
 						.genericField();
 
