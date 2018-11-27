@@ -14,6 +14,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldCo
  */
 public interface ElasticsearchIndexSchemaFieldContext extends IndexSchemaFieldContext {
 
-	JsonStringIndexSchemaFieldTypedContext asJsonString(String mappingJsonString);
+	ElasticsearchJsonStringIndexSchemaFieldTypedContext asJsonString(String mappingJsonString);
 
 }

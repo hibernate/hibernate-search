@@ -6,16 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.time.format.SignStyle;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -24,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.LocalDateFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchInstantFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -34,44 +26,29 @@ import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefiniti
 
 import com.google.gson.JsonElement;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
-public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
-		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchLocalDateIndexSchemaFieldContextImpl, LocalDate> {
-
-	private static final LocalDateFieldCodec DEFAULT_CODEC = new LocalDateFieldCodec(
-					new DateTimeFormatterBuilder()
-							.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
-							.appendLiteral( '-' )
-							.appendValue( MONTH_OF_YEAR, 2 )
-							.appendLiteral( '-' )
-							.appendValue( DAY_OF_MONTH, 2 )
-							.toFormatter( Locale.ROOT )
-							.withResolverStyle( ResolverStyle.STRICT )
-			);
+public class ElasticsearchInstantIndexSchemaFieldContext
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchInstantIndexSchemaFieldContext, Instant> {
 
 	private final String relativeFieldName;
-	private final LocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	public ElasticsearchLocalDateIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, LocalDate.class, DataType.DATE );
+	public ElasticsearchInstantIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, Instant.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<LocalDate> helper,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Instant> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		StandardFieldConverter<LocalDate> converter = new StandardFieldConverter<>(
+		ElasticsearchStandardFieldConverter<Instant> converter = new ElasticsearchStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				codec
+				ElasticsearchInstantFieldCodec.INSTANCE
 		);
-		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, codec,
+
+		ElasticsearchIndexSchemaFieldNode<Instant> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, converter, ElasticsearchInstantFieldCodec.INSTANCE,
 				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
 				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
@@ -79,17 +56,16 @@ public class ElasticsearchLocalDateIndexSchemaFieldContextImpl
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
 		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
+		mapping.setFormat( Arrays.asList( "epoch_millis" ) );
 
 		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-
 		collector.collect( absoluteFieldPath, node );
 
 		return mapping;
 	}
 
 	@Override
-	protected ElasticsearchLocalDateIndexSchemaFieldContextImpl thisAsS() {
+	protected ElasticsearchInstantIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

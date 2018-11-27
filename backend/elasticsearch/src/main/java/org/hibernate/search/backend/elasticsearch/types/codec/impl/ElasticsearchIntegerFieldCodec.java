@@ -12,15 +12,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class StringFieldCodec implements ElasticsearchFieldCodec<String> {
+public class ElasticsearchIntegerFieldCodec implements ElasticsearchFieldCodec<Integer> {
 	// Must be a singleton so that equals() works as required by the interface
-	public static final StringFieldCodec INSTANCE = new StringFieldCodec();
+	public static final ElasticsearchIntegerFieldCodec INSTANCE = new ElasticsearchIntegerFieldCodec();
 
-	private StringFieldCodec() {
+	private ElasticsearchIntegerFieldCodec() {
 	}
 
 	@Override
-	public JsonElement encode(String value) {
+	public JsonElement encode(Integer value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
@@ -28,11 +28,11 @@ public class StringFieldCodec implements ElasticsearchFieldCodec<String> {
 	}
 
 	@Override
-	public String decode(JsonElement element) {
+	public Integer decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		return JsonElementTypes.STRING.fromElement( element );
+		return JsonElementTypes.INTEGER.fromElement( element );
 	}
 
 	@Override

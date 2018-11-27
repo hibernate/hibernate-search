@@ -12,10 +12,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class LongFieldCodec implements ElasticsearchFieldCodec<Long> {
-	public static final LongFieldCodec INSTANCE = new LongFieldCodec();
+public class ElasticsearchLongFieldCodec implements ElasticsearchFieldCodec<Long> {
+	public static final ElasticsearchLongFieldCodec INSTANCE = new ElasticsearchLongFieldCodec();
 
-	private LongFieldCodec() {
+	private ElasticsearchLongFieldCodec() {
 	}
 
 	@Override

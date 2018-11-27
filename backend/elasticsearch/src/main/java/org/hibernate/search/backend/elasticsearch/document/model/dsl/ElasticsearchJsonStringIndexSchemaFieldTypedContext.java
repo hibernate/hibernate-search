@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 
-public interface JsonStringIndexSchemaFieldTypedContext
-		extends IndexSchemaFieldTypedContext<JsonStringIndexSchemaFieldTypedContext, String>,
+public interface ElasticsearchJsonStringIndexSchemaFieldTypedContext
+		extends IndexSchemaFieldTypedContext<ElasticsearchJsonStringIndexSchemaFieldTypedContext, String>,
 		IndexSchemaFieldTerminalContext<String> {
 
 }

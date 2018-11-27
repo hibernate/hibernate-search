@@ -13,47 +13,42 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.GeoPointFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLongFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
-public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
-		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchGeoPointIndexSchemaFieldContextImpl, GeoPoint> {
+public class ElasticsearchLongIndexSchemaFieldContext
+		extends AbstractElasticsearchScalarFieldTypedContext<ElasticsearchLongIndexSchemaFieldContext, Long> {
 
 	private final String relativeFieldName;
 
-	public ElasticsearchGeoPointIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, GeoPoint.class, DataType.GEO_POINT );
+	public ElasticsearchLongIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, Long.class, DataType.LONG );
 		this.relativeFieldName = relativeFieldName;
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<GeoPoint> helper,
+	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Long> helper,
 			ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		StandardFieldConverter<GeoPoint> converter = new StandardFieldConverter<>(
+		ElasticsearchStandardFieldConverter<Long> converter = new ElasticsearchStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
-				GeoPointFieldCodec.INSTANCE
+				ElasticsearchLongFieldCodec.INSTANCE
 		);
 
-		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, GeoPointFieldCodec.INSTANCE,
-				ElasticsearchGeoPointFieldPredicateBuilderFactory.INSTANCE,
-				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, converter )
+		ElasticsearchIndexSchemaFieldNode<Long> node = new ElasticsearchIndexSchemaFieldNode<>(
+				parentNode, converter, ElasticsearchLongFieldCodec.INSTANCE,
+				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
+				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
@@ -66,7 +61,7 @@ public class ElasticsearchGeoPointIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected ElasticsearchGeoPointIndexSchemaFieldContextImpl thisAsS() {
+	protected ElasticsearchLongIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

@@ -13,12 +13,12 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 
 import com.google.gson.JsonElement;
 
-public final class StandardFieldConverter<F> implements ElasticsearchFieldConverter {
+public final class ElasticsearchStandardFieldConverter<F> implements ElasticsearchFieldConverter {
 
 	private final UserIndexFieldConverter<F> userConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
-	public StandardFieldConverter(UserIndexFieldConverter<F> userConverter, ElasticsearchFieldCodec<F> codec) {
+	public ElasticsearchStandardFieldConverter(UserIndexFieldConverter<F> userConverter, ElasticsearchFieldCodec<F> codec) {
 		this.userConverter = userConverter;
 		this.codec = codec;
 	}
@@ -45,7 +45,7 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
+		ElasticsearchStandardFieldConverter<?> castedOther = (ElasticsearchStandardFieldConverter<?>) other;
 		return userConverter.isConvertDslToIndexCompatibleWith( castedOther.userConverter )
 				&& codec.isCompatibleWith( castedOther.codec );
 	}
@@ -55,7 +55,7 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
+		ElasticsearchStandardFieldConverter<?> castedOther = (ElasticsearchStandardFieldConverter<?>) other;
 		return userConverter.isConvertIndexToProjectionCompatibleWith( castedOther.userConverter )
 				&& codec.isCompatibleWith( castedOther.codec );
 	}

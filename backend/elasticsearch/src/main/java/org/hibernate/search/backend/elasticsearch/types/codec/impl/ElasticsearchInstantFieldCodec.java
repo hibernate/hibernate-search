@@ -6,33 +6,36 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
+import java.time.Instant;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class IntegerFieldCodec implements ElasticsearchFieldCodec<Integer> {
-	// Must be a singleton so that equals() works as required by the interface
-	public static final IntegerFieldCodec INSTANCE = new IntegerFieldCodec();
+public class ElasticsearchInstantFieldCodec implements ElasticsearchFieldCodec<Instant> {
 
-	private IntegerFieldCodec() {
+	public static final ElasticsearchInstantFieldCodec INSTANCE = new ElasticsearchInstantFieldCodec();
+
+	private ElasticsearchInstantFieldCodec() {
 	}
 
 	@Override
-	public JsonElement encode(Integer value) {
+	public JsonElement encode(Instant value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return new JsonPrimitive( value );
+		return new JsonPrimitive( value.toEpochMilli() );
 	}
 
 	@Override
-	public Integer decode(JsonElement element) {
+	public Instant decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		return JsonElementTypes.INTEGER.fromElement( element );
+		Long time = JsonElementTypes.LONG.fromElement( element );
+		return Instant.ofEpochMilli( time );
 	}
 
 	@Override

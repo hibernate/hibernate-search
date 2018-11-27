@@ -24,7 +24,7 @@ import com.google.gson.JsonPrimitive;
 /**
  * @author Yoann Rodiere
  */
-public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D extends AnalysisDefinition>
+public abstract class AbstractElasticsearchAnalysisComponentDefinitionContext<D extends AnalysisDefinition>
 		implements ElasticsearchTypedAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisComponentDefinitionContext,
 		ElasticsearchAnalysisDefinitionContributor {
@@ -35,7 +35,7 @@ public abstract class ElasticsearchAnalysisComponentDefinitionContextImpl<D exte
 
 	protected final D definition;
 
-	ElasticsearchAnalysisComponentDefinitionContextImpl(String name, D definition) {
+	AbstractElasticsearchAnalysisComponentDefinitionContext(String name, D definition) {
 		this.name = name;
 		this.definition = definition;
 	}

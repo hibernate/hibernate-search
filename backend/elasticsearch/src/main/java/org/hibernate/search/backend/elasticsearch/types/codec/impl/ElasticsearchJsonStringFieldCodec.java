@@ -10,11 +10,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-public class JsonStringFieldCodec implements ElasticsearchFieldCodec<String> {
+public class ElasticsearchJsonStringFieldCodec implements ElasticsearchFieldCodec<String> {
 
 	private final Gson gson;
 
-	public JsonStringFieldCodec(Gson gson) {
+	public ElasticsearchJsonStringFieldCodec(Gson gson) {
 		this.gson = gson;
 	}
 

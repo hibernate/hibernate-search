@@ -7,15 +7,15 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.JsonStringIndexSchemaFieldTypedContext;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchJsonStringIndexSchemaFieldTypedContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.JsonStringFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.StandardFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -33,13 +33,14 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class JsonStringIndexSchemaFieldContextImpl implements JsonStringIndexSchemaFieldTypedContext,
+public class ElasticsearchJsonStringIndexSchemaFieldContext implements
+		ElasticsearchJsonStringIndexSchemaFieldTypedContext,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
 
 	// Must be a singleton so that equals() works as required by the interface
-	private static final JsonStringFieldCodec CODEC = new JsonStringFieldCodec( GSON );
+	private static final ElasticsearchJsonStringFieldCodec CODEC = new ElasticsearchJsonStringFieldCodec( GSON );
 
 	private final IndexSchemaFieldDefinitionHelper<String> helper;
 
@@ -47,21 +48,21 @@ public class JsonStringIndexSchemaFieldContextImpl implements JsonStringIndexSch
 
 	private final String mappingJsonString;
 
-	public JsonStringIndexSchemaFieldContextImpl(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
+	public ElasticsearchJsonStringIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;
 	}
 
 	@Override
-	public JsonStringIndexSchemaFieldContextImpl dslConverter(
+	public ElasticsearchJsonStringIndexSchemaFieldContext dslConverter(
 			ToIndexFieldValueConverter<?, ? extends String> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return this;
 	}
 
 	@Override
-	public JsonStringIndexSchemaFieldContextImpl projectionConverter(
+	public ElasticsearchJsonStringIndexSchemaFieldContext projectionConverter(
 			FromIndexFieldValueConverter<? super String, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return this;
@@ -77,7 +78,7 @@ public class JsonStringIndexSchemaFieldContextImpl implements JsonStringIndexSch
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
-		StandardFieldConverter<String> converter = new StandardFieldConverter<>(
+		ElasticsearchStandardFieldConverter<String> converter = new ElasticsearchStandardFieldConverter<>(
 				helper.createUserIndexFieldConverter(),
 				CODEC
 		);

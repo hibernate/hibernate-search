@@ -15,11 +15,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonPrimitive;
 
-public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
+public class ElasticsearchLocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 
 	private final DateTimeFormatter formatter;
 
-	public LocalDateFieldCodec(DateTimeFormatter delegate) {
+	public ElasticsearchLocalDateFieldCodec(DateTimeFormatter delegate) {
 		this.formatter = delegate;
 	}
 
@@ -49,7 +49,7 @@ public class LocalDateFieldCodec implements ElasticsearchFieldCodec<LocalDate> {
 			return false;
 		}
 
-		LocalDateFieldCodec other = (LocalDateFieldCodec) obj;
+		ElasticsearchLocalDateFieldCodec other = (ElasticsearchLocalDateFieldCodec) obj;
 
 		return formatter.equals( other.formatter );
 	}
