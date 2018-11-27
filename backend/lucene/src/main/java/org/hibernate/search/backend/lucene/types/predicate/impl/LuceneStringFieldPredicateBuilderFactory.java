@@ -11,16 +11,16 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
 
 public final class LuceneStringFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<StringFieldConverter> {
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<LuceneStringFieldConverter> {
 
 	private final boolean tokenized;
 
 	private final QueryBuilder queryBuilder;
 
-	public LuceneStringFieldPredicateBuilderFactory(StringFieldConverter converter, boolean tokenized, QueryBuilder queryBuilder) {
+	public LuceneStringFieldPredicateBuilderFactory(LuceneStringFieldConverter converter, boolean tokenized, QueryBuilder queryBuilder) {
 		super( converter );
 		this.tokenized = tokenized;
 		this.queryBuilder = queryBuilder;

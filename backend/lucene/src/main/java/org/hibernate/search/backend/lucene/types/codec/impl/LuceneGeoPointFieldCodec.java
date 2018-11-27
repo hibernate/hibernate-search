@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
-public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
+public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
 	private static final String LATITUDE = "latitude";
 	private static final String LONGITUDE = "longitude";
@@ -34,7 +34,7 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
 	private final Set<String> storedFields;
 
-	public GeoPointFieldCodec(String absoluteFieldPath, boolean projectable, boolean sortable) {
+	public LuceneGeoPointFieldCodec(String absoluteFieldPath, boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 
@@ -88,11 +88,11 @@ public final class GeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( GeoPointFieldCodec.class != obj.getClass() ) {
+		if ( LuceneGeoPointFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		GeoPointFieldCodec other = (GeoPointFieldCodec) obj;
+		LuceneGeoPointFieldCodec other = (LuceneGeoPointFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable ) &&

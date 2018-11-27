@@ -6,53 +6,52 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
+import java.time.Instant;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.IntegerFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StandardFieldConverter;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneIntegerFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneInstantFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneInstantFieldConverter;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneInstantFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneIntegerFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneInstantFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-/**
- * @author Guillaume Smet
- */
-public class LuceneIntegerIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneIntegerIndexSchemaFieldContextImpl, Integer> {
+public class LuceneInstantIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneInstantIndexSchemaFieldContext, Instant> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneIntegerIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Integer.class );
+	public LuceneInstantIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+		super( schemaContext, relativeFieldName, Instant.class );
 	}
 
 	@Override
-	public LuceneIntegerIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneInstantIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
+	protected void contribute(IndexSchemaFieldDefinitionHelper<Instant> helper, LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode) {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		StandardFieldConverter<Integer> converter = new StandardFieldConverter<>( helper.createUserIndexFieldConverter() );
-		IntegerFieldCodec codec = new IntegerFieldCodec( resolvedProjectable, resolvedSortable );
+		LuceneInstantFieldConverter converter = new LuceneInstantFieldConverter( helper.createUserIndexFieldConverter() );
+		LuceneInstantFieldCodec codec = new LuceneInstantFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
+		LuceneIndexSchemaFieldNode<Instant> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
 				converter,
 				codec,
-				new LuceneIntegerFieldPredicateBuilderFactory( converter ),
-				new LuceneIntegerFieldSortBuilderFactory( resolvedSortable, converter ),
+				new LuceneInstantFieldPredicateBuilderFactory( converter ),
+				new LuceneInstantFieldSortBuilderFactory( resolvedSortable, converter ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
 		);
 
@@ -62,7 +61,7 @@ public class LuceneIntegerIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneIntegerIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneInstantIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 }

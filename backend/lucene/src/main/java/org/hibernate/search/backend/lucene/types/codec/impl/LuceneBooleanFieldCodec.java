@@ -6,55 +6,53 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.time.Instant;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.LongPoint;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class InstantFieldCodec implements LuceneFieldCodec<Instant> {
+public final class LuceneBooleanFieldCodec implements LuceneFieldCodec<Boolean> {
 
 	private final boolean projectable;
 
 	private final boolean sortable;
 
-	public InstantFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneBooleanFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Instant value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Boolean value) {
 		if ( value == null ) {
 			return;
 		}
+		Integer intValue = ( value ) ? 1 : 0;
 
-		long time = value.toEpochMilli();
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, time ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, intValue ) );
 		}
 
 		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, time ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, intValue.longValue() ) );
 		}
 
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, time ) );
+		documentBuilder.addField( new IntPoint( absoluteFieldPath, intValue ) );
 	}
 
 	@Override
-	public Instant decode(Document document, String absoluteFieldPath) {
+	public Boolean decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;
 		}
 
-		Long time = (Long) field.numericValue();
-		return Instant.ofEpochMilli( time );
+		Integer intValue = (Integer) field.numericValue();
+		return ( intValue > 0 );
 	}
 
 	@Override
@@ -62,11 +60,11 @@ public final class InstantFieldCodec implements LuceneFieldCodec<Instant> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( InstantFieldCodec.class != obj.getClass() ) {
+		if ( LuceneBooleanFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		InstantFieldCodec other = (InstantFieldCodec) obj;
+		LuceneBooleanFieldCodec other = (LuceneBooleanFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );

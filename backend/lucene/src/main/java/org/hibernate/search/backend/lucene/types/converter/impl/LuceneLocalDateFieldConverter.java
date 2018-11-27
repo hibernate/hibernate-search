@@ -11,9 +11,9 @@ import java.time.LocalDate;
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
-public final class LocalDateFieldConverter extends AbstractFieldConverter<LocalDate, Long> {
+public final class LuceneLocalDateFieldConverter extends AbstractLuceneFieldConverter<LocalDate, Long> {
 
-	public LocalDateFieldConverter(UserIndexFieldConverter<LocalDate> userConverter) {
+	public LuceneLocalDateFieldConverter(UserIndexFieldConverter<LocalDate> userConverter) {
 		super( userConverter );
 	}
 

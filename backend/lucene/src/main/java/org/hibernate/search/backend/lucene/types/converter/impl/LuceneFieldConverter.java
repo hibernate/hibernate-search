@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
  *
  * @param <F> The type of the index field.
  * @param <T> The type used internally when querying. May be different from the field type exposed to users;
- * see for example {@link LocalDateFieldConverter}.
+ * see for example {@link LuceneLocalDateFieldConverter}.
  */
 public interface LuceneFieldConverter<F, T> {
 

@@ -19,8 +19,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.codec.impl.StringFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.StringFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneStringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStringFieldSortBuilderFactory;
@@ -32,9 +32,9 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneStringIndexSchemaFieldContextImpl
-		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContextImpl, String>
-		implements StringIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContextImpl> {
+public class LuceneStringIndexSchemaFieldContext
+		extends AbstractLuceneStandardIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContext, String>
+		implements StringIndexSchemaFieldTypedContext<LuceneStringIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -45,12 +45,12 @@ public class LuceneStringIndexSchemaFieldContextImpl
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneStringIndexSchemaFieldContextImpl(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneStringIndexSchemaFieldContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, String.class );
 	}
 
 	@Override
-	public LuceneStringIndexSchemaFieldContextImpl analyzer(String analyzerName) {
+	public LuceneStringIndexSchemaFieldContext analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
@@ -60,7 +60,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public LuceneStringIndexSchemaFieldContextImpl normalizer(String normalizerName) {
+	public LuceneStringIndexSchemaFieldContext normalizer(String normalizerName) {
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
@@ -70,7 +70,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	public LuceneStringIndexSchemaFieldContextImpl sortable(Sortable sortable) {
+	public LuceneStringIndexSchemaFieldContext sortable(Sortable sortable) {
 		this.sortable = sortable;
 		return this;
 	}
@@ -95,11 +95,11 @@ public class LuceneStringIndexSchemaFieldContextImpl
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
-		StringFieldConverter converter = new StringFieldConverter(
+		LuceneStringFieldConverter converter = new LuceneStringFieldConverter(
 				helper.createUserIndexFieldConverter(),
 				analyzerOrNormalizer
 		);
-		StringFieldCodec codec = new StringFieldCodec(
+		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSortable,
 				getFieldType( resolvedProjectable, analyzer != null ),
 				analyzerOrNormalizer
@@ -125,7 +125,7 @@ public class LuceneStringIndexSchemaFieldContextImpl
 	}
 
 	@Override
-	protected LuceneStringIndexSchemaFieldContextImpl thisAsS() {
+	protected LuceneStringIndexSchemaFieldContext thisAsS() {
 		return this;
 	}
 

@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.types.converter.impl;
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
 
-public final class StandardFieldConverter<F> extends AbstractFieldConverter<F, F> {
+public final class LuceneStandardFieldConverter<F> extends AbstractLuceneFieldConverter<F, F> {
 
-	public StandardFieldConverter(UserIndexFieldConverter<F> userConverter) {
+	public LuceneStandardFieldConverter(UserIndexFieldConverter<F> userConverter) {
 		super( userConverter );
 	}
 

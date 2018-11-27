@@ -45,7 +45,8 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 	}
 
 	@Override
-	public void addFlattenedObjectDocumentBuilder(LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
+	public void addFlattenedObjectDocumentBuilder(
+			LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
 		if ( flattenedObjectDocumentBuilders == null ) {
 			flattenedObjectDocumentBuilders = new ArrayList<>();
 		}

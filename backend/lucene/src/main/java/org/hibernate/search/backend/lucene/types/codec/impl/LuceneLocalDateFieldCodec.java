@@ -24,7 +24,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
+public final class LuceneLocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
 	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
@@ -39,7 +39,7 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 
 	private final boolean sortable;
 
-	public LocalDateFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneLocalDateFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
@@ -85,11 +85,11 @@ public final class LocalDateFieldCodec implements LuceneFieldCodec<LocalDate> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LocalDateFieldCodec.class != obj.getClass() ) {
+		if ( LuceneLocalDateFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LocalDateFieldCodec other = (LocalDateFieldCodec) obj;
+		LuceneLocalDateFieldCodec other = (LuceneLocalDateFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}

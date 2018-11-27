@@ -17,7 +17,7 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
-public final class StringFieldCodec implements LuceneFieldCodec<String> {
+public final class LuceneStringFieldCodec implements LuceneFieldCodec<String> {
 
 	private final boolean sortable;
 
@@ -25,7 +25,7 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 
 	private final Analyzer normalizer;
 
-	public StringFieldCodec(boolean sortable, FieldType fieldType, Analyzer normalizer) {
+	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, Analyzer normalizer) {
 		this.sortable = sortable;
 		this.fieldType = fieldType;
 		this.normalizer = normalizer;
@@ -59,11 +59,11 @@ public final class StringFieldCodec implements LuceneFieldCodec<String> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( StringFieldCodec.class != obj.getClass() ) {
+		if ( LuceneStringFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		StringFieldCodec other = (StringFieldCodec) obj;
+		LuceneStringFieldCodec other = (LuceneStringFieldCodec) obj;
 
 		return ( sortable == other.sortable ) &&
 				Objects.equals( fieldType, other.fieldType ) &&

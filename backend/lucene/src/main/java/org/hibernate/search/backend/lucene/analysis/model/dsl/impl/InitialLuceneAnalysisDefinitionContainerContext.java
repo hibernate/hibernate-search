@@ -27,7 +27,7 @@ import org.apache.lucene.analysis.Analyzer;
 /**
  * @author Yoann Rodiere
  */
-public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnalysisDefinitionContainerContext,
+public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext,
 		LuceneAnalysisDefinitionContributor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -38,7 +38,7 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 	private Map<String, LuceneAnalyzerBuilder> normalizers = new LinkedHashMap<>();
 
-	public LuceneAnalysisDefinitionContainerContextImpl(LuceneAnalysisComponentFactory factory) {
+	public InitialLuceneAnalysisDefinitionContainerContext(LuceneAnalysisComponentFactory factory) {
 		this.factory = factory;
 	}
 
@@ -48,7 +48,7 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 			@Override
 			public LuceneCustomAnalyzerDefinitionContext custom() {
 				LuceneCustomAnalyzerDefinitionContextImpl definition = new LuceneCustomAnalyzerDefinitionContextImpl(
-						LuceneAnalysisDefinitionContainerContextImpl.this, name
+						InitialLuceneAnalysisDefinitionContainerContext.this, name
 				);
 				addAnalyzer( name, definition );
 				return definition;
@@ -56,9 +56,9 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 			@Override
 			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
-				LuceneAnalyzerInstanceContextImpl definition = new LuceneAnalyzerInstanceContextImpl( instance );
+				LuceneAnalyzerInstanceContext definition = new LuceneAnalyzerInstanceContext( instance );
 				addAnalyzer( name, definition );
-				return LuceneAnalysisDefinitionContainerContextImpl.this;
+				return InitialLuceneAnalysisDefinitionContainerContext.this;
 			}
 		};
 	}
@@ -69,7 +69,7 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 			@Override
 			public LuceneCustomNormalizerDefinitionContext custom() {
 				LuceneCustomNormalizerDefinitionContextImpl definition = new LuceneCustomNormalizerDefinitionContextImpl(
-						LuceneAnalysisDefinitionContainerContextImpl.this, name
+						InitialLuceneAnalysisDefinitionContainerContext.this, name
 				);
 				addNormalizer( name, definition );
 				return definition;
@@ -77,9 +77,9 @@ public class LuceneAnalysisDefinitionContainerContextImpl implements LuceneAnaly
 
 			@Override
 			public LuceneAnalysisDefinitionContainerContext instance(Analyzer instance) {
-				LuceneNormalizerInstanceContextImpl definition = new LuceneNormalizerInstanceContextImpl( name, instance );
+				LuceneNormalizerInstanceContext definition = new LuceneNormalizerInstanceContext( name, instance );
 				addNormalizer( name, definition );
-				return LuceneAnalysisDefinitionContainerContextImpl.this;
+				return InitialLuceneAnalysisDefinitionContainerContext.this;
 			}
 		};
 	}

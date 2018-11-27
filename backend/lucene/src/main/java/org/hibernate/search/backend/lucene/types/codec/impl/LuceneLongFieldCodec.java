@@ -6,26 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
+public final class LuceneLongFieldCodec implements LuceneFieldCodec<Long> {
 
 	private final boolean projectable;
 
 	private final boolean sortable;
 
-	public IntegerFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneLongFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Integer value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, Long value) {
 		if ( value == null ) {
 			return;
 		}
@@ -38,18 +39,18 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, value.longValue() ) );
 		}
 
-		documentBuilder.addField( new IntPoint( absoluteFieldPath, value ) );
+		documentBuilder.addField( new LongPoint( absoluteFieldPath, value ) );
 	}
 
 	@Override
-	public Integer decode(Document document, String absoluteFieldPath) {
+	public Long decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
 			return null;
 		}
 
-		return (Integer) field.numericValue();
+		return (Long) field.numericValue();
 	}
 
 	@Override
@@ -57,11 +58,11 @@ public final class IntegerFieldCodec implements LuceneFieldCodec<Integer> {
 		if ( this == obj ) {
 			return true;
 		}
-		if ( IntegerFieldCodec.class != obj.getClass() ) {
+		if ( LuceneLongFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		IntegerFieldCodec other = (IntegerFieldCodec) obj;
+		LuceneLongFieldCodec other = (LuceneLongFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );

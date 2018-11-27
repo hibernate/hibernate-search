@@ -11,11 +11,11 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefi
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDefinitionContext;
 
 
-class DelegatingAnalysisDefinitionContainerContextImpl implements LuceneAnalysisDefinitionContainerContext {
+class DelegatingAnalysisDefinitionContainerContext implements LuceneAnalysisDefinitionContainerContext {
 
 	private final LuceneAnalysisDefinitionContainerContext parentContext;
 
-	DelegatingAnalysisDefinitionContainerContextImpl(LuceneAnalysisDefinitionContainerContext parentContext) {
+	DelegatingAnalysisDefinitionContainerContext(LuceneAnalysisDefinitionContainerContext parentContext) {
 		this.parentContext = parentContext;
 	}
 

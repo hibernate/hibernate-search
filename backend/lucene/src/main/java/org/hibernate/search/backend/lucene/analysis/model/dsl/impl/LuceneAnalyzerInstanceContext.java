@@ -11,18 +11,16 @@ import org.hibernate.search.util.impl.common.Contracts;
 
 import org.apache.lucene.analysis.Analyzer;
 
-class LuceneNormalizerInstanceContextImpl implements LuceneAnalyzerBuilder {
-	private final String name;
+class LuceneAnalyzerInstanceContext implements LuceneAnalyzerBuilder {
 	private final Analyzer instance;
 
-	LuceneNormalizerInstanceContextImpl(String name, Analyzer instance) {
-		this.name = name;
+	LuceneAnalyzerInstanceContext(Analyzer instance) {
 		Contracts.assertNotNull( instance, "instance" );
 		this.instance = instance;
 	}
 
 	@Override
 	public Analyzer build(LuceneAnalysisComponentFactory factory) {
-		return factory.wrapNormalizer( name, instance );
+		return instance;
 	}
 }
