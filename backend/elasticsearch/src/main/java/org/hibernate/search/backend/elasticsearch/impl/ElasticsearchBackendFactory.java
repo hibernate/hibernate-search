@@ -27,9 +27,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.ES5IndexTypeJsonAdap
 import org.hibernate.search.backend.elasticsearch.gson.impl.ES5NormsTypeJsonAdapter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategyImpl;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategyImpl;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchStubWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -112,9 +112,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		switch ( multiTenancyStrategyConfiguration ) {
 			case NONE:
-				return new NoMultiTenancyStrategyImpl();
+				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:
-				return new DiscriminatorMultiTenancyStrategyImpl();
+				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",

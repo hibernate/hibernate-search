@@ -22,7 +22,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-public class DiscriminatorMultiTenancyStrategyImpl implements MultiTenancyStrategy {
+public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
