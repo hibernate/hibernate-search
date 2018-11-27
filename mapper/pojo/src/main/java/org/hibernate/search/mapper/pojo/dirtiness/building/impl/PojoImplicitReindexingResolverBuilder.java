@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverImpl;
+import org.hibernate.search.mapper.pojo.dirtiness.impl.DefaultPojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
@@ -79,7 +79,7 @@ class PojoImplicitReindexingResolverBuilder<T> {
 					containingEntitiesResolverRootOptional.orElseGet( PojoImplicitReindexingResolverNode::noOp );
 
 			return Optional.of(
-					new PojoImplicitReindexingResolverImpl<>( filter, containingEntitiesResolverRoot )
+					new DefaultPojoImplicitReindexingResolver<>( filter, containingEntitiesResolverRoot )
 			);
 		}
 	}
