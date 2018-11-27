@@ -196,7 +196,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			return;
 		}
 
-		//TODO: switch to specific batch-optimized workPlan
+		// TODO use 'SessionWorkExecutor workExecutor = mapping.createSearchManager( session ).createSessionWorkExecutor();' instead
 		PojoWorkPlan workPlan = mapping.createSearchManager( session ).createWorkPlan();
 
 		log.tracef( "received a list of objects to index: %s", entities );

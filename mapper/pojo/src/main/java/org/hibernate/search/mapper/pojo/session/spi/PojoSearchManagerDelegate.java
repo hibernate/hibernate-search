@@ -10,12 +10,14 @@ import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public interface PojoSearchManagerDelegate {
 
 	<E, O> PojoSearchTargetDelegate<E, O> createPojoSearchTarget(Collection<? extends Class<? extends E>> targetedTypes);
 
 	PojoWorkPlan createWorkPlan();
+
+	PojoSessionWorkExecutor createSessionWorkExecutor();
 
 }
