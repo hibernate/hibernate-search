@@ -19,7 +19,7 @@ import com.google.gson.JsonObject;
  *
  * @author Yoann Rodiere
  */
-public class JsonObjectAccessorImpl extends TypingJsonAccessor<JsonObject>
+public class JsonObjectAccessorImpl extends AbstractTypingJsonAccessor<JsonObject>
 		implements JsonObjectAccessor, JsonCompositeAccessor<JsonObject> {
 
 	private static final Pattern DOT_REGEX = Pattern.compile( "\\." );

@@ -11,15 +11,15 @@ import com.google.gson.JsonElement;
 /**
  * @author Yoann Rodiere
  */
-public class JsonLongAccessorImpl extends TypingJsonAccessor<Long> {
+public class JsonFloatAccessor extends AbstractTypingJsonAccessor<Float> {
 
-	public JsonLongAccessorImpl(JsonAccessor<JsonElement> parentAccessor) {
+	public JsonFloatAccessor(JsonAccessor<JsonElement> parentAccessor) {
 		super( parentAccessor );
 	}
 
 	@Override
-	protected JsonElementType<Long> getExpectedElementType() {
-		return JsonElementTypes.LONG;
+	protected JsonElementType<Float> getExpectedElementType() {
+		return JsonElementTypes.FLOAT;
 	}
 
 }

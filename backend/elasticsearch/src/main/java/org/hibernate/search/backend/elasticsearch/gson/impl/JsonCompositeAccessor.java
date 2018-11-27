@@ -10,7 +10,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
- * A {@link JsonAccessor} that can be crawled by a {@link CrawlingJsonAccessor}.
+ * A {@link JsonAccessor} that can be crawled by a {@link AbstractCrawlingJsonAccessor}.
  *
  * @author Yoann Rodiere
  */

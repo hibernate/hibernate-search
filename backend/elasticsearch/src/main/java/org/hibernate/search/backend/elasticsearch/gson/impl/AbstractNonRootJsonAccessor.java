@@ -8,10 +8,10 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import com.google.gson.JsonElement;
 
-abstract class NonRootJsonAccessor<P extends JsonElement, T> implements JsonAccessor<T> {
+abstract class AbstractNonRootJsonAccessor<P extends JsonElement, T> implements JsonAccessor<T> {
 	private final JsonAccessor<P> parentAccessor;
 
-	public NonRootJsonAccessor(JsonAccessor<P> parentAccessor) {
+	public AbstractNonRootJsonAccessor(JsonAccessor<P> parentAccessor) {
 		super();
 		this.parentAccessor = parentAccessor;
 	}

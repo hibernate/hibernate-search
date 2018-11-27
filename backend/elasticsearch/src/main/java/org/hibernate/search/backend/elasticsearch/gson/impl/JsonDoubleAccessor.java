@@ -11,15 +11,15 @@ import com.google.gson.JsonElement;
 /**
  * @author Yoann Rodiere
  */
-public class JsonBooleanAccessorImpl extends TypingJsonAccessor<Boolean> {
+public class JsonDoubleAccessor extends AbstractTypingJsonAccessor<Double> {
 
-	public JsonBooleanAccessorImpl(JsonAccessor<JsonElement> parentAccessor) {
+	public JsonDoubleAccessor(JsonAccessor<JsonElement> parentAccessor) {
 		super( parentAccessor );
 	}
 
 	@Override
-	protected JsonElementType<Boolean> getExpectedElementType() {
-		return JsonElementTypes.BOOLEAN;
+	protected JsonElementType<Double> getExpectedElementType() {
+		return JsonElementTypes.DOUBLE;
 	}
 
 }

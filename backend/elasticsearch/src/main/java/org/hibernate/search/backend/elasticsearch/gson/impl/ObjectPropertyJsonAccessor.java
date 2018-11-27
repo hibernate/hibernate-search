@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-class ObjectPropertyJsonAccessor extends CrawlingJsonAccessor<JsonObject> {
+class ObjectPropertyJsonAccessor extends AbstractCrawlingJsonAccessor<JsonObject> {
 	private final String propertyName;
 
 	public ObjectPropertyJsonAccessor(JsonCompositeAccessor<JsonObject> parentAccessor, String propertyName) {
