@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 		implements HibernateOrmSearchManager {
@@ -50,6 +51,11 @@ public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 	@Override
 	public PojoWorkPlan createWorkPlan() {
 		return getDelegate().createWorkPlan();
+	}
+
+	@Override
+	public PojoSessionWorkExecutor createSessionWorkExecutor() {
+		return getDelegate().createSessionWorkExecutor();
 	}
 
 	public static class HibernateOrmSearchManagerBuilderImpl extends AbstractBuilder<HibernateOrmSearchManagerImpl>

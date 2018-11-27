@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 public interface HibernateOrmSearchManager extends AutoCloseable {
 
@@ -26,5 +27,7 @@ public interface HibernateOrmSearchManager extends AutoCloseable {
 	 * the manager will <strong>not</strong> do it automatically upon closing.
 	 */
 	PojoWorkPlan createWorkPlan();
+
+	PojoSessionWorkExecutor createSessionWorkExecutor();
 
 }

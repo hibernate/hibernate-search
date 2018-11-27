@@ -12,10 +12,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
@@ -55,6 +57,11 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 	@Override
 	public PojoWorkPlan createWorkPlan() {
 		return new PojoWorkPlanImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
+	}
+
+	@Override
+	public PojoSessionWorkExecutor createSessionWorkExecutor() {
+		return new PojoSessionWorkExecutorImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
 	}
 
 }
