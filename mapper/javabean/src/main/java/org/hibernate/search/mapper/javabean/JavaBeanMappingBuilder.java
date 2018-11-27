@@ -12,7 +12,7 @@ import java.util.Set;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
-import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiatorImpl;
+import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
@@ -25,13 +25,13 @@ public final class JavaBeanMappingBuilder {
 
 	private final SearchIntegrationBuilder integrationBuilder;
 	private final JavaBeanMappingKey mappingKey;
-	private final JavaBeanMappingInitiatorImpl mappingInitiator;
+	private final JavaBeanMappingInitiator mappingInitiator;
 
 	JavaBeanMappingBuilder(ConfigurationPropertySource propertySource, MethodHandles.Lookup lookup) {
 		integrationBuilder = SearchIntegration.builder( propertySource );
 		JavaBeanBootstrapIntrospector introspector = new JavaBeanBootstrapIntrospector( lookup );
 		mappingKey = new JavaBeanMappingKey();
-		mappingInitiator = new JavaBeanMappingInitiatorImpl( introspector );
+		mappingInitiator = new JavaBeanMappingInitiator( introspector );
 		integrationBuilder.addMappingInitiator( mappingKey, mappingInitiator );
 		// Enable annotated type discovery by default
 		mappingInitiator.setAnnotatedTypeDiscoveryEnabled( true );

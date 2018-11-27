@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.javabean.session.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContextImpl;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
 import org.hibernate.search.mapper.javabean.search.impl.JavaBeanSearchTargetImpl;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
-import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContextImpl;
+import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
 import org.hibernate.search.mapper.javabean.work.impl.JavaBeanWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -25,7 +25,7 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
 public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements JavaBeanSearchManager {
 	private JavaBeanWorkPlanImpl workPlan;
 
-	private JavaBeanSearchManagerImpl(Builder builder) {
+	private JavaBeanSearchManagerImpl(JavaBeanSearchManagerBuilderImpl builder) {
 		super( builder );
 	}
 
@@ -52,24 +52,24 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements 
 		return workPlan;
 	}
 
-	public static class Builder extends AbstractBuilder<JavaBeanSearchManagerImpl> implements JavaBeanSearchManagerBuilder {
-		private final JavaBeanMappingContextImpl mappingContext;
+	public static class JavaBeanSearchManagerBuilderImpl extends AbstractBuilder<JavaBeanSearchManagerImpl> implements JavaBeanSearchManagerBuilder {
+		private final JavaBeanMappingContext mappingContext;
 		private String tenantId;
 
-		public Builder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContextImpl mappingContext) {
+		public JavaBeanSearchManagerBuilderImpl(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
 		}
 
 		@Override
-		public Builder tenantId(String tenantId) {
+		public JavaBeanSearchManagerBuilderImpl tenantId(String tenantId) {
 			this.tenantId = tenantId;
 			return this;
 		}
 
 		@Override
 		protected PojoSessionContextImplementor buildSessionContext() {
-			return new JavaBeanSessionContextImpl( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
+			return new JavaBeanSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
 		}
 
 		@Override

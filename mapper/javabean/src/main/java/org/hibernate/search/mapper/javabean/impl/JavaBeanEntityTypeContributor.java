@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.impl;
 
-import org.hibernate.search.mapper.javabean.model.impl.SimpleStringSetPojoPathFilterFactory;
+import org.hibernate.search.mapper.javabean.model.impl.JavaBeanSimpleStringSetPojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -15,7 +15,7 @@ class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 	@Override
 	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
 		try {
-			collector.markAsEntity( new SimpleStringSetPojoPathFilterFactory() );
+			collector.markAsEntity( new JavaBeanSimpleStringSetPojoPathFilterFactory() );
 		}
 		catch (RuntimeException e) {
 			collector.getFailureCollector().add( e );

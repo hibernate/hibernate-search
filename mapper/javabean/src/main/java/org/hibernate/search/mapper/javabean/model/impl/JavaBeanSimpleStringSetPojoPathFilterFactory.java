@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
  * <p>
  * See {@link PojoModelPathPropertyNode#toPropertyString()}.
  */
-public class SimpleStringSetPojoPathFilterFactory implements PojoPathFilterFactory<Set<String>> {
+public class JavaBeanSimpleStringSetPojoPathFilterFactory implements PojoPathFilterFactory<Set<String>> {
 	@Override
 	public PojoPathFilter<Set<String>> create(Set<PojoModelPathValueNode> paths) {
 		// Use a LinkedHashSet for deterministic iteration
