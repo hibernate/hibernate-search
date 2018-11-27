@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import org.easymock.EasyMockSupport;
 
-public class OrmExtensionTest extends EasyMockSupport {
+public class HibernateOrmExtensionTest extends EasyMockSupport {
 	private final SessionFactoryImplementor sessionFactoryImplementor = createMock( SessionFactoryImplementor.class );
 	private final SessionImplementor sessionImplementor = createMock( SessionImplementor.class );
 	private final HibernateOrmMappingContextImpl mappingContext =
@@ -44,13 +44,13 @@ public class OrmExtensionTest extends EasyMockSupport {
 				new IdentifierBridgeToDocumentIdentifierContextImpl( mappingContext );
 		resetAll();
 		replayAll();
-		assertThat( toDocumentContext.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
+		assertThat( toDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 
 		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
-		assertThat( fromDocumentContext.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		assertThat( fromDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 
@@ -59,7 +59,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		RoutingKeyBridgeToRoutingKeyContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 
@@ -68,7 +68,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		TypeBridgeWriteContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 
@@ -77,7 +77,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		PropertyBridgeWriteContext context = new BridgeSessionContext( sessionContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 
@@ -86,7 +86,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		ValueBridgeToIndexedValueContext context = new ValueBridgeToIndexedValueContextImpl( mappingContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 	}
 
@@ -95,7 +95,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		ToIndexFieldValueConvertContext context = new ToIndexFieldValueConvertContextImpl( mappingContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( mappingContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 	}
 
@@ -104,7 +104,7 @@ public class OrmExtensionTest extends EasyMockSupport {
 		FromIndexFieldValueConvertContext context = new FromIndexFieldValueConvertContextImpl( sessionContext );
 		resetAll();
 		replayAll();
-		assertThat( context.extension( OrmExtension.get() ) ).isSameAs( sessionContext );
+		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
 	}
 }

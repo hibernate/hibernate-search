@@ -32,7 +32,7 @@ import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.search.mapper.orm.util.impl.XClassOrdering;
+import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
@@ -113,13 +113,13 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	@SuppressWarnings( "unchecked" )
 	<T> Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
-		return XClassOrdering.get().getAscendingSuperTypes( xClass )
+		return HibernateOrmXClassOrdering.get().getAscendingSuperTypes( xClass )
 				.map( superType -> (HibernateOrmRawTypeModel<? super T>) getTypeModel( superType ) );
 	}
 
 	@SuppressWarnings( "unchecked" )
 	<T> Stream<HibernateOrmRawTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
-		return XClassOrdering.get().getDescendingSuperTypes( xClass )
+		return HibernateOrmXClassOrdering.get().getDescendingSuperTypes( xClass )
 				.map( superType -> (HibernateOrmRawTypeModel<? super T>) getTypeModel( superType ) );
 	}
 

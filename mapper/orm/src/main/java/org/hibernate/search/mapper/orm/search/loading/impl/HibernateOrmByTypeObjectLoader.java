@@ -18,33 +18,33 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class ByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> {
+public class HibernateOrmByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType;
+	private final Map<Class<? extends O>, HibernateOrmComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType;
 
-	public ByTypeObjectLoader(Map<Class<? extends O>, ComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
+	public HibernateOrmByTypeObjectLoader(Map<Class<? extends O>, HibernateOrmComposableObjectLoader<PojoReference, ? extends T>> delegatesByConcreteType) {
 		this.delegatesByConcreteType = delegatesByConcreteType;
 	}
 
 	@Override
 	public List<T> load(List<PojoReference> references) {
 		LinkedHashMap<PojoReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
-		Map<ComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
+		Map<HibernateOrmComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
 
 		// Split references by delegate (by entity type)
 		for ( PojoReference reference : references ) {
 			objectsByReference.put( reference, null );
-			ComposableObjectLoader<PojoReference, ? extends T> delegate = getDelegate( reference.getType() );
+			HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = getDelegate( reference.getType() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
 
 		// Load all references
-		for ( Map.Entry<ComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> entry :
+		for ( Map.Entry<HibernateOrmComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> entry :
 				referencesByDelegate.entrySet() ) {
-			ComposableObjectLoader<PojoReference, ? extends T> delegate = entry.getKey();
+			HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = entry.getKey();
 			List<PojoReference> referencesForDelegate = entry.getValue();
 			delegate.load( referencesForDelegate, objectsByReference );
 		}
@@ -63,8 +63,8 @@ public class ByTypeObjectLoader<O, T> implements ObjectLoader<PojoReference, T> 
 		return result;
 	}
 
-	private ComposableObjectLoader<PojoReference, ? extends T> getDelegate(Class<?> entityType) {
-		ComposableObjectLoader<PojoReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
+	private HibernateOrmComposableObjectLoader<PojoReference, ? extends T> getDelegate(Class<?> entityType) {
+		HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = delegatesByConcreteType.get( entityType );
 		if ( delegate == null ) {
 			throw log.unexpectedSearchHitType( entityType, delegatesByConcreteType.keySet() );
 		}

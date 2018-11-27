@@ -26,7 +26,7 @@ public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 		implements HibernateOrmSearchManager {
 	private final SessionImplementor sessionImplementor;
 
-	private HibernateOrmSearchManagerImpl(Builder builder) {
+	private HibernateOrmSearchManagerImpl(HibernateOrmSearchManagerBuilderImpl builder) {
 		super( builder );
 		this.sessionImplementor = builder.sessionImplementor;
 	}
@@ -52,12 +52,12 @@ public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 		return getDelegate().createWorkPlan();
 	}
 
-	public static class Builder extends AbstractBuilder<HibernateOrmSearchManagerImpl>
+	public static class HibernateOrmSearchManagerBuilderImpl extends AbstractBuilder<HibernateOrmSearchManagerImpl>
 			implements HibernateOrmSearchManagerBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;
 
-		public Builder(PojoMappingDelegate mappingDelegate,
+		public HibernateOrmSearchManagerBuilderImpl(PojoMappingDelegate mappingDelegate,
 				HibernateOrmMappingContextImpl mappingContext,
 				SessionImplementor sessionImplementor) {
 			super( mappingDelegate );

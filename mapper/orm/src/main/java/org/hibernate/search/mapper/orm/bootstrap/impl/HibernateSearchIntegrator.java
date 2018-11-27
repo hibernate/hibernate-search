@@ -102,7 +102,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	private void registerHibernateSearchEventListener(FullTextIndexEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {
 		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-		listenerRegistry.addDuplicationStrategy( new DuplicationStrategyImpl( FullTextIndexEventListener.class ) );
+		listenerRegistry.addDuplicationStrategy( new KeepIfSameClassDuplicationStrategy( FullTextIndexEventListener.class ) );
 
 		listenerRegistry.appendListeners( EventType.POST_INSERT, eventListener );
 		listenerRegistry.appendListeners( EventType.POST_UPDATE, eventListener );
@@ -113,10 +113,10 @@ public class HibernateSearchIntegrator implements Integrator {
 		listenerRegistry.appendListeners( EventType.FLUSH, eventListener );
 	}
 
-	public static class DuplicationStrategyImpl implements DuplicationStrategy {
-		private final Class checkClass;
+	public static class KeepIfSameClassDuplicationStrategy implements DuplicationStrategy {
+		private final Class<?> checkClass;
 
-		public DuplicationStrategyImpl(Class checkClass) {
+		public KeepIfSameClassDuplicationStrategy(Class<?> checkClass) {
 			this.checkClass = checkClass;
 		}
 

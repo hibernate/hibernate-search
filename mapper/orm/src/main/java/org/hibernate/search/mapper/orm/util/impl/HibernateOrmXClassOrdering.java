@@ -12,15 +12,15 @@ import java.util.stream.Stream;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.mapper.pojo.util.spi.AbstractPojoTypeOrdering;
 
-public final class XClassOrdering extends AbstractPojoTypeOrdering<XClass> {
+public final class HibernateOrmXClassOrdering extends AbstractPojoTypeOrdering<XClass> {
 
-	private static final XClassOrdering INSTANCE = new XClassOrdering();
+	private static final HibernateOrmXClassOrdering INSTANCE = new HibernateOrmXClassOrdering();
 
-	public static XClassOrdering get() {
+	public static HibernateOrmXClassOrdering get() {
 		return INSTANCE;
 	}
 
-	private XClassOrdering() {
+	private HibernateOrmXClassOrdering() {
 	}
 
 	@Override

@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExt
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
 
-public final class OrmExtension
+public final class HibernateOrmExtension
 		implements IdentifierBridgeToDocumentIdentifierContextExtension<HibernateOrmMappingContext>,
 		IdentifierBridgeFromDocumentIdentifierContextExtension<HibernateOrmSessionContext>,
 		RoutingKeyBridgeToRoutingKeyContextExtension<HibernateOrmSessionContext>,
@@ -39,13 +39,13 @@ public final class OrmExtension
 		ToIndexFieldValueConvertContextExtension<HibernateOrmMappingContext>,
 		FromIndexFieldValueConvertContextExtension<HibernateOrmSessionContext> {
 
-	private static final OrmExtension INSTANCE = new OrmExtension();
+	private static final HibernateOrmExtension INSTANCE = new HibernateOrmExtension();
 
-	public static OrmExtension get() {
+	public static HibernateOrmExtension get() {
 		return INSTANCE;
 	}
 
-	private OrmExtension() {
+	private HibernateOrmExtension() {
 		// Private constructor, use get() instead.
 	}
 

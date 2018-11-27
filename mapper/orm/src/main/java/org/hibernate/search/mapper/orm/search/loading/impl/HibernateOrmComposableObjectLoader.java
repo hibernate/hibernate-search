@@ -14,11 +14,11 @@ import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 /**
  * An {@link ObjectLoader} that can be easily composed with others object loaders.
  * <p>
- * See {@link ByTypeObjectLoader} for uses.
+ * See {@link HibernateOrmByTypeObjectLoader} for uses.
  * @param <R>
  * @param <O>
  */
-interface ComposableObjectLoader<R, O> extends ObjectLoader<R, O> {
+interface HibernateOrmComposableObjectLoader<R, O> extends ObjectLoader<R, O> {
 
 	/**
 	 * For each reference in the given list,
