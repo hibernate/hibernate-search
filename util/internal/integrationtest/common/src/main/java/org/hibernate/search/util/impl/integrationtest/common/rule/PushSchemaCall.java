@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
+import java.util.Objects;
+
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeNodeAssert;
 
-class PushSchemaCall {
+class PushSchemaCall extends Call<PushSchemaCall> {
 
 	private final String indexName;
 	private final StubIndexSchemaNode schemaNode;
@@ -26,6 +28,11 @@ class PushSchemaCall {
 					.matches( schemaNode );
 		}
 		return null;
+	}
+
+	@Override
+	boolean isSimilarTo(PushSchemaCall other) {
+		return Objects.equals( indexName, other.indexName );
 	}
 
 	@Override

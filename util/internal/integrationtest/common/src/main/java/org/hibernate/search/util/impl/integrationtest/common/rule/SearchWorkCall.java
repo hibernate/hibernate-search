@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchResult;
@@ -19,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearc
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
-class SearchWorkCall<T> {
+class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 	private final List<String> indexNames;
 	private final StubSearchWork work;
@@ -64,6 +65,11 @@ class SearchWorkCall<T> {
 
 		return new SearchResultFromMock<>( totalHitCount, getResults( actualCall.convertContext,
 				actualCall.projectionHitMapper, actualCall.rootProjection, behavior.getRawHits() ) );
+	}
+
+	@Override
+	boolean isSimilarTo(SearchWorkCall<?> other) {
+		return Objects.equals( indexNames, other.indexNames );
 	}
 
 	private static <U> List<U> getResults(FromIndexFieldValueConvertContext actualConvertContext,
