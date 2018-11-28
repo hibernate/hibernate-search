@@ -14,7 +14,7 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndex
 
 import org.junit.Assert;
 
-class IndexWorkCall {
+class IndexWorkCall extends Call<IndexWorkCall> {
 
 	enum Operation {
 		PREPARE,
@@ -44,6 +44,15 @@ class IndexWorkCall {
 				.matches( work );
 		return CompletableFuture.completedFuture( null );
 	}
+
+	@Override
+	boolean isSimilarTo(IndexWorkCall other) {
+		return Objects.equals( operation, other.operation )
+				&& Objects.equals( indexName, other.indexName )
+				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() )
+				&& Objects.equals( work.getIdentifier(), other.work.getIdentifier() );
+	}
+
 	@Override
 	public String toString() {
 		return operation + " call for a work on index '" + indexName + "', identifier '" + work.getIdentifier()

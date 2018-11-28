@@ -88,19 +88,24 @@ public class BackendMock implements TestRule {
 		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
-		callQueue.expect( new PushSchemaCall( indexName, builder.build() ) );
+		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, builder.build() ) );
 		return this;
 	}
 
 	public BackendMock expectAnySchema(String indexName) {
 		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
-		callQueue.expect( new PushSchemaCall( indexName, null ) );
+		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, null ) );
 		return this;
 	}
 
 	public WorkCallListContext expectWorks(String indexName) {
 		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
-		return new WorkCallListContext( indexName, callQueue );
+		return new WorkCallListContext( indexName, callQueue::expectInOrder );
+	}
+
+	public WorkCallListContext expectWorksAnyOrder(String indexName) {
+		CallQueue<IndexWorkCall> callQueue = behaviorMock.getIndexWorkCalls( indexName );
+		return new WorkCallListContext( indexName, callQueue::expectOutOfOrder );
 	}
 
 	public BackendMock expectSearchReferences(List<String> indexNames, Consumer<StubSearchWork.Builder> contributor,
@@ -128,18 +133,18 @@ public class BackendMock implements TestRule {
 		CallQueue<SearchWorkCall<?>> callQueue = behaviorMock.getSearchWorkCalls();
 		StubSearchWork.Builder builder = StubSearchWork.builder( resultType );
 		contributor.accept( builder );
-		callQueue.expect( new SearchWorkCall<>( indexNames, builder.build(), behavior ) );
+		callQueue.expectInOrder( new SearchWorkCall<>( indexNames, builder.build(), behavior ) );
 		return this;
 	}
 
 	public class WorkCallListContext {
 		private final String indexName;
-		private final CallQueue<IndexWorkCall> callQueue;
+		private final Consumer<IndexWorkCall> expectationConsumer;
 		private final List<StubIndexWork> works = new ArrayList<>();
 
-		private WorkCallListContext(String indexName, CallQueue<IndexWorkCall> callQueue) {
+		private WorkCallListContext(String indexName, Consumer<IndexWorkCall> expectationConsumer) {
 			this.indexName = indexName;
-			this.callQueue = callQueue;
+			this.expectationConsumer = expectationConsumer;
 		}
 
 		public WorkCallListContext add(Consumer<StubIndexWork.Builder> contributor) {
@@ -191,24 +196,24 @@ public class BackendMock implements TestRule {
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
-					.forEach( callQueue::expect );
+					.forEach( expectationConsumer );
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
-					.forEach( callQueue::expect );
+					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 
 		public BackendMock executed() {
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
-					.forEach( callQueue::expect );
+					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 
 		public BackendMock prepared() {
 			works.stream()
 					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
-					.forEach( callQueue::expect );
+					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 	}
@@ -247,9 +252,9 @@ public class BackendMock implements TestRule {
 		}
 
 		void verifyExpectationsMet() {
-			pushSchemaCalls.values().forEach( CallQueue::verifyEmpty );
-			indexWorkCalls.values().forEach( CallQueue::verifyEmpty );
-			searchCalls.verifyEmpty();
+			pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
+			indexWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
+			searchCalls.verifyExpectationsMet();
 		}
 
 		@Override
@@ -282,6 +287,21 @@ public class BackendMock implements TestRule {
 					.<CompletableFuture<?>>map( call -> callQueue.verify( call, IndexWorkCall::verify ) )
 					.reduce( (first, second) -> second )
 					.orElseGet( () -> CompletableFuture.completedFuture( null ) );
+		}
+
+		@Override
+		public CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work) {
+			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
+			callQueue.verify(
+					new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ),
+					IndexWorkCall::verify
+			);
+			callQueue.verify(
+					new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ),
+					IndexWorkCall::verify
+			);
+
+			return CompletableFuture.completedFuture( null );
 		}
 
 		@Override
