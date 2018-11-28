@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-final class GenericContextAwarePojoPropertyModel<T> implements PojoPropertyModel<T> {
+final class GenericContextAwarePojoPropertyMode<T> implements PojoPropertyModel<T> {
 
 	private final PojoPropertyModel<? super T> rawPropertyModel;
 	private final GenericContextAwarePojoGenericTypeModel<T> genericPropertyTypeModel;
 
-	GenericContextAwarePojoPropertyModel(
+	GenericContextAwarePojoPropertyMode(
 			PojoPropertyModel<? super T> rawPropertyModel,
 			GenericContextAwarePojoGenericTypeModel<T> genericPropertyTypeModel) {
 		this.rawPropertyModel = rawPropertyModel;
