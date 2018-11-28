@@ -76,6 +76,9 @@ Naming rules are the easiest. All classes/interfaces should be named according t
 ```
 
 * An `Abstract` prefix **must** be used for abstract classes.
+Exceptions are allowed for classes that don't implement any meaningful interface
+in which case the abstract class is assumed to represent both the interface and part of the implementation.
+and for marker classes (only private constructors).
 * An `Impl` suffix **must only** be used for non-abstract classes
 that are the only implementation of an interface defined in Hibernate Search,
 with the part of the name before `Impl` being the name of the interface.

@@ -345,6 +345,38 @@
         ]]></cypher>
     </constraint>
 
+
+    <constraint id="my-rules:AbstractTypesShouldUseAbstractPrefix">
+        <requiresConcept refId="my-rules:TypeMetadata" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <description>
+            The 'Abstract' prefix should be used on abstract types.
+            Exceptions are allowed when:
+            - the abstract type doesn't implement any Hibernate Search interface, or just interfaces from a util module,
+            in which case the abstract class is assumed to represent both the interface and part of the implementation.
+            - the abstract type has only private constructors,
+            in which case the type may just be a marker (to be used in annotations for example).
+        </description>
+        <cypher><![CDATA[
+            // Abstract types without an "Abstract" prefix in their name that implement a meaningful interface
+            MATCH (type:Type:HibernateSearch)-[:EXTENDS|IMPLEMENTS *]->(interface:Interface:HibernateSearch)
+                    <-[:CONTAINS]-(interfaceArtifact:Maven:Artifact)
+            WHERE
+                type.abstract
+                AND NOT type.nameWithoutContainingTypeName =~ "^Abstract.*"
+                // Exceptions
+                AND NOT interfaceArtifact.name STARTS WITH "hibernate-search-util-"
+            // Exclude types that have only private constructors
+            OPTIONAL MATCH (type)-[:DECLARES]->(nonPrivateConstructor:Constructor)
+            WHERE
+                nonPrivateConstructor.visibility <> 'private'
+            WITH type, count(nonPrivateConstructor) = 0 AS hasOnlyPrivateConstructors
+            WHERE
+                NOT hasOnlyPrivateConstructors
+            RETURN type
+        ]]></cypher>
+    </constraint>
+
     <constraint id="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName">
         <requiresConcept refId="my-rules:TypeMetadata" />
         <requiresConcept refId="my-rules:Anonymous" />
@@ -388,6 +420,7 @@
         <includeConstraint refId="my-rules:APIFieldsMayNotExposeSPITypes" />
         <includeConstraint refId="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules" />
         <includeConstraint refId="my-rules:TypesShouldUseImplSuffixWithRestraint" />
+        <includeConstraint refId="my-rules:AbstractTypesShouldUseAbstractPrefix" />
         <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
     </group>
 
