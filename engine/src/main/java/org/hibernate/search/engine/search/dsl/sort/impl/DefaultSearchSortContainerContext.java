@@ -21,13 +21,18 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public class SearchSortContainerContextImpl<B> implements SearchSortContainerContext {
+public class DefaultSearchSortContainerContext<B> implements SearchSortContainerContext {
 
 	private final SearchSortBuilderFactory<?, B> factory;
 
 	private final SearchSortDslContext<? super B> dslContext;
 
-	public SearchSortContainerContextImpl(SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
+	public DefaultSearchSortContainerContext(SearchSortBuilderFactory<?, B> factory) {
+		this.factory = factory;
+		this.dslContext = new SearchSortDslContextImpl<>( factory );
+	}
+
+	public DefaultSearchSortContainerContext(SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<? super B> dslContext) {
 		this.factory = factory;
 		this.dslContext = dslContext;
 	}

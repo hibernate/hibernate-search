@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class MatchPredicateFieldSetContextImpl<B>
-		implements MatchPredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
+		implements MatchPredicateFieldSetContext, AbstractMultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -65,7 +65,7 @@ class MatchPredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends MultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractMultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {

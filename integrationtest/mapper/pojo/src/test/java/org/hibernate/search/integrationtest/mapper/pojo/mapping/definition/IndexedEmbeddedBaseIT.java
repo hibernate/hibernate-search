@@ -37,7 +37,7 @@ import org.junit.Test;
  * <p>
  * Does not test all the corner cases of filtering when using {@link IndexedEmbedded#includePaths()} and
  * {@link IndexedEmbedded#maxDepth()}, which are tested in a unit test in the engine module
- * (the test is named {@code IndexSchemaNestingContextImplTest} at the time of this writing).
+ * (the test is named {@code ConfiguredIndexSchemaNestingContextTest} at the time of this writing).
  * <p>
  * Does not test uses of container value extractors (for now). Some of them are tested in
  * {@link AnnotationMappingSmokeIT} and {@link ProgrammaticMappingSmokeIT}.

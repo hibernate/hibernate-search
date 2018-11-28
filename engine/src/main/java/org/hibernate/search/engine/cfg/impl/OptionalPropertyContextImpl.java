@@ -36,12 +36,12 @@ final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T>
 
 	@Override
 	public PropertyContext<T> withDefault(T defaultValue) {
-		return new PropertyContextImpl<>( key, createOptionalParser().andThen( o -> o.orElse( defaultValue ) ) );
+		return new DefaultedPropertyContext<>( key, createOptionalParser().andThen( o -> o.orElse( defaultValue ) ) );
 	}
 
 	@Override
 	public PropertyContext<T> withDefault(Supplier<T> defaultValueSupplier) {
-		return new PropertyContextImpl<>( key, createOptionalParser().andThen( o -> o.orElseGet( defaultValueSupplier ) ) );
+		return new DefaultedPropertyContext<>( key, createOptionalParser().andThen( o -> o.orElseGet( defaultValueSupplier ) ) );
 	}
 
 	@Override

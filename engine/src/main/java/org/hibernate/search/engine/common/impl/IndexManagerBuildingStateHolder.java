@@ -44,7 +44,7 @@ class IndexManagerBuildingStateHolder {
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
 	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new HashMap<>();
-	private final Map<String, IndexMappingBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
+	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
 	IndexManagerBuildingStateHolder(RootBuildContext rootBuildContext,
 			ConfigurationPropertySource propertySource) {
@@ -61,7 +61,7 @@ class IndexManagerBuildingStateHolder {
 		BackendBuildingState<?> backendBuildingstate =
 				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
 
-		IndexMappingBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( indexName );
+		IndexManagerBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( indexName );
 		if ( state == null ) {
 			state = backendBuildingstate.createIndexManagerBuildingState(
 					indexName, multiTenancyEnabled, indexPropertySource
@@ -81,7 +81,7 @@ class IndexManagerBuildingStateHolder {
 
 	Map<String, IndexManagerImplementor<?>> getIndexManagersByName() {
 		Map<String, IndexManagerImplementor<?>> indexManagersByName = new HashMap<>();
-		for ( Map.Entry<String, IndexMappingBuildingStateImpl<?>> entry : indexManagerBuildingStateByName.entrySet() ) {
+		for ( Map.Entry<String, IndexManagerBuildingStateImpl<?>> entry : indexManagerBuildingStateByName.entrySet() ) {
 			indexManagersByName.put( entry.getKey(), entry.getValue().getBuilt() );
 		}
 		return indexManagersByName;
@@ -114,7 +114,7 @@ class IndexManagerBuildingStateHolder {
 			this.backend = backend;
 		}
 
-		IndexMappingBuildingStateImpl<D> createIndexManagerBuildingState(
+		IndexManagerBuildingStateImpl<D> createIndexManagerBuildingState(
 				String indexName, boolean multiTenancyEnabled,
 				ConfigurationPropertySource indexPropertySource) {
 			IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
@@ -122,7 +122,7 @@ class IndexManagerBuildingStateHolder {
 			);
 			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 			IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
-			return new IndexMappingBuildingStateImpl<>( indexName, builder, bindingContext );
+			return new IndexManagerBuildingStateImpl<>( indexName, builder, bindingContext );
 		}
 
 		void closeOnFailure() {
@@ -134,7 +134,7 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	private class IndexMappingBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
+	private class IndexManagerBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
@@ -142,7 +142,7 @@ class IndexManagerBuildingStateHolder {
 
 		private IndexManagerImplementor<D> built;
 
-		IndexMappingBuildingStateImpl(String indexName,
+		IndexManagerBuildingStateImpl(String indexName,
 				IndexManagerBuilder<D> builder,
 				IndexModelBindingContext bindingContext) {
 			this.indexName = indexName;

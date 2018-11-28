@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * or when calling {@link SearchQueryContext#sort(Consumer)} to build the sort using a lambda
  * (in which case the lambda may retrieve the resulting {@link SearchSort} object and cache it).
  */
-public final class RootSearchSortDslContextImpl<B>
+public final class SearchSortDslContextImpl<B>
 		implements SearchSortDslContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -38,7 +38,7 @@ public final class RootSearchSortDslContextImpl<B>
 	private SearchSort sortResult;
 	private boolean usedContributors = false;
 
-	public RootSearchSortDslContextImpl(SearchSortBuilderFactory<?, B> factory) {
+	public SearchSortDslContextImpl(SearchSortBuilderFactory<?, B> factory) {
 		this.factory = factory;
 	}
 

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 public class RootIndexModelBindingContext extends AbstractIndexModelBindingContext<IndexSchemaRootNodeBuilder> {
 
 	public RootIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
-		super( indexSchemaObjectNodeBuilder, IndexSchemaNestingContextImpl.root() );
+		super( indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext.root() );
 	}
 
 	@Override

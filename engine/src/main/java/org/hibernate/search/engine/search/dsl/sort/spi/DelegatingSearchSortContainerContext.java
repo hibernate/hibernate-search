@@ -21,11 +21,11 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <p>
  * Mainly useful when implementing a {@link SearchSortContainerContextExtension}.
  */
-public class DelegatingSearchSortContainerContextImpl implements SearchSortContainerContext {
+public class DelegatingSearchSortContainerContext implements SearchSortContainerContext {
 
 	private final SearchSortContainerContext delegate;
 
-	public DelegatingSearchSortContainerContextImpl(SearchSortContainerContext delegate) {
+	public DelegatingSearchSortContainerContext(SearchSortContainerContext delegate) {
 		this.delegate = delegate;
 	}
 

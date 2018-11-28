@@ -12,11 +12,11 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.PropertyContext;
 
-class PropertyContextImpl<T> implements PropertyContext<T> {
+class DefaultedPropertyContext<T> implements PropertyContext<T> {
 	private final String key;
 	private final Function<Optional<?>, T> converter;
 
-	PropertyContextImpl(String key, Function<Optional<?>, T> converter) {
+	DefaultedPropertyContext(String key, Function<Optional<?>, T> converter) {
 		this.key = key;
 		this.converter = converter;
 	}

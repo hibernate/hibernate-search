@@ -13,11 +13,11 @@ import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.AssertionFailure;
 
-public class ReferenceHitMapperImpl<R> implements ProjectionHitMapper<R, Void> {
+public class NoLoadingProjectionHitMapper<R> implements ProjectionHitMapper<R, Void> {
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
 
-	public ReferenceHitMapperImpl(Function<DocumentReference, R> documentReferenceTransformer) {
+	public NoLoadingProjectionHitMapper(Function<DocumentReference, R> documentReferenceTransformer) {
 		this.documentReferenceTransformer = documentReferenceTransformer;
 	}
 
@@ -33,14 +33,14 @@ public class ReferenceHitMapperImpl<R> implements ProjectionHitMapper<R, Void> {
 
 	@Override
 	public LoadingResult<Void> load() {
-		return LoadingResultImpl.INSTANCE;
+		return UnusableLoadingResult.INSTANCE;
 	}
 
-	private static class LoadingResultImpl implements LoadingResult<Void> {
+	private static class UnusableLoadingResult implements LoadingResult<Void> {
 
-		private static final LoadingResultImpl INSTANCE = new LoadingResultImpl();
+		private static final UnusableLoadingResult INSTANCE = new UnusableLoadingResult();
 
-		private LoadingResultImpl() {
+		private UnusableLoadingResult() {
 		}
 
 		@Override
