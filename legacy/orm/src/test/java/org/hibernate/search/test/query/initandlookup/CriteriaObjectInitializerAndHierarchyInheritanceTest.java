@@ -105,19 +105,19 @@ public class CriteriaObjectInitializerAndHierarchyInheritanceTest extends Search
 		FullTextSession session = Search.getFullTextSession( s );
 
 		List<?> results = getResults( session, AAA.class );
-		assertThat( results ).extracting( "name" ).containsExactlyInAnyOrder( "A AA AAA" );
+		assertThat( results ).extracting( "name" ).containsOnly( "A AA AAA" );
 		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AAA.class.getName() );
 
 		results = getResults( session, AAA.class, AAB.class );
-		assertThat( results ).extracting( "name" ).containsExactlyInAnyOrder( "A AA AAA", "A AA AAB" );
+		assertThat( results ).extracting( "name" ).containsOnly( "A AA AAA", "A AA AAB" );
 		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( AA.class.getName() );
 
 		results = getResults( session, AAA.class, AB.class );
-		assertThat( results ).extracting( "name" ).containsExactlyInAnyOrder( "A AA AAA", "A AB", "A AB ABA" );
+		assertThat( results ).extracting( "name" ).containsOnly( "A AA AAA", "A AB", "A AB ABA" );
 		assertThat( byteman.consumeNextRecordedEvent() ).isEqualTo( A.class.getName() );
 
 		results = getResults( session, AAA.class, BA.class );
-		assertThat( results ).extracting( "name" ).containsExactlyInAnyOrder( "A AA AAA", "B BA" );
+		assertThat( results ).extracting( "name" ).containsOnly( "A AA AAA", "B BA" );
 		// here, we have 2 Criterias returned: we only test the first one
 		assertThat( byteman.consumeNextRecordedEvent() ).isIn( AAA.class.getName(), BA.class.getName() );
 
