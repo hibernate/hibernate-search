@@ -152,7 +152,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 		GenericContextAwarePojoGenericTypeModel<? extends U> genericPropertyTypeModel =
 				new GenericContextAwarePojoGenericTypeModel<>( helper, propertyGenericTypeContext );
 		PojoPropertyModel<? extends U> propertyModel =
-				new GenericContextAwarePojoPropertyModel<>( rawPropertyModel, genericPropertyTypeModel );
+				new GenericContextAwarePojoPropertyMode<>( rawPropertyModel, genericPropertyTypeModel );
 		genericPropertyCache.put( cacheKey, propertyModel );
 		return propertyModel;
 	}

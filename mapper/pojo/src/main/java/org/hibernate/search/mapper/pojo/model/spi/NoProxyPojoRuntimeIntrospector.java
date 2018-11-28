@@ -10,7 +10,7 @@ package org.hibernate.search.mapper.pojo.model.spi;
 /**
  * @author Yoann Rodiere
  */
-class NoProxyPojoRuntimeIntrospector implements PojoRuntimeIntrospector {
+final class NoProxyPojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	private static final NoProxyPojoRuntimeIntrospector INSTANCE = new NoProxyPojoRuntimeIntrospector();
 
