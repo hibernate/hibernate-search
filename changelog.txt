@@ -1,6 +1,63 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha1 (28-11-2018)
+-------------------------
+
+** Bug
+    * HSEARCH-3389 Fix bugs in the Lucene backend when maxResults is set to 0
+    * HSEARCH-3267 Restore option to run WildFly integration tests against manually prepared distribution
+    * HSEARCH-3216 Deprecated API usage in example Implementing a class bridge
+    * HSEARCH-3215 Reference guide typos
+    * HSEARCH-3212 Class bridges are applied regardless of @IndexedEmbedded.includePaths
+    * HSEARCH-3167 Exceptions may not be reported in the right order when internals use Closer.split
+    * HSEARCH-3163 On bootstrap failure the SessionFactory is closed without propagating the root cause
+    * HSEARCH-3148 Search 6 groundwork - Lucene - Support bool() predicate with only mustNot() predicates
+    * HSEARCH-2554 Using array/iterable/map field bridges requires the @IndexedEmbedded annotation (second attempt)
+    * HSEARCH-2552 @IndexedEmbedded.includePaths should not allow to pick paths that were excluded from the embedded entity
+    * HSEARCH-2490 SortedMap is not supported for MapFieldBridge and IndexedEmbeddeds
+    * HSEARCH-2328 Code examples in the documentations are not automatically checked for correctness
+    * HSEARCH-2194 Handling of @IndexedEmbedded not working correctly for multi-level hierarchies
+    * HSEARCH-1710 Child collection being unnecessarily initialized through @ContainedIn
+    * HSEARCH-1394 SPI shouldn't expose impl types
+    * HSEARCH-1357 Remove LuceneOptions from the FieldBridge#set(String, Object, Document, LuceneOptions ) signature
+    * HSEARCH-383 Hibernate Search does not respect the @AccessType annotation in respect to @Id fields.
+
+** Improvement
+    * HSEARCH-3401 Merge the two "Search" classes into one
+    * HSEARCH-3395 Make the .reference() and .object() projections type-safe in the Projection DSL
+    * HSEARCH-3310 Split the @Field annotation into multiple, type-specific annotations
+    * HSEARCH-3287 Change the syntax of index configuration properties from h.s.index.myIndex.someProperty to h.s.indexes.myIndex.someProperty
+    * HSEARCH-3234 Upgrade to ORM 5.3.3
+    * HSEARCH-3233 Overriding an analyzer in the queryBuilder with an unknown analyzer should lead to a proper SearchException
+    * HSEARCH-3227 Upgrade to Elasticsearch 6
+    * HSEARCH-3211 Upgrade to ORM 5.3.2
+    * HSEARCH-3210 Upgrade to HCANN 5.0.4.Final
+    * HSEARCH-3208 Add advanced, conditional syntax to set the minimum number of should clauses required to match for boolean predicates in the DSL
+    * HSEARCH-3197 Allow to set the minimum number of should clauses required to match for boolean predicates in the DSL
+    * HSEARCH-3182 Sort Hibernate ORM metadata before processing it
+    * HSEARCH-3168 JBoss Modules should not use the deprecated module of Hibernate ORM
+    * HSEARCH-3164 Search 6 groundwork - Do not create unnecessary identifier/routingKey bridges for @IndexedEmbeddeds
+    * HSEARCH-3145 Rename the all() predicate to matchAll()
+    * HSEARCH-3139 Avoid SPIs leaking into APIs
+    * HSEARCH-2847 Comply with Hibernate ORM's access mode in @Spatial bridges
+    * HSEARCH-2765 Rename the SearchFactory API
+    * HSEARCH-2759 Handle private/protected field access for @Spatial fields
+    * HSEARCH-2756 Improve naming schemes of Elasticsearch configuration properties
+    * HSEARCH-2641 Allow for Elasticsearch analyzer definitions to be applied in class bridges/custom field bridges
+    * HSEARCH-2546 Give more context when there are errors while generating metadata
+    * HSEARCH-2498 Use a generic representation of queries in the DSL
+    * HSEARCH-2496 Smarter dirty checking when using @ContainedIn with custom field bridges
+    * HSEARCH-2462 Split internal metadata into two: agnostic metadata and indexing service specific metadata
+    * HSEARCH-2331 Enable creating a QueryBuilder with a multi-entity scope
+    * HSEARCH-2329 Provide support for more distance units
+    * HSEARCH-2294 Decide of the type of a range query based on the field instead of the value
+    * HSEARCH-2225 Consider adding typed version of query on FullTextEntityManager
+    * HSEARCH-2186 Abstract from direct usage of Lucene's Document as the internal data container
+    * HSEARCH-2181 Remove StringHelper from public API
+    * HSEARCH-2055 FieldBridge 2.0: generalize FieldBridge contract to deal with other backends
+    * HSEARCH-1869 Validate for each hibernate.search prefixed configuration property to be consumed
+
 5.10.0.Final (16-05-2018)
 -------------------------
 
