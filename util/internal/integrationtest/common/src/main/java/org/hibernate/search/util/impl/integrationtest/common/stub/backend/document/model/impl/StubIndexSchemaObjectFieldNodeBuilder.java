@@ -12,14 +12,14 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-class StubIndexSchemaObjectFieldNodeBuilder extends StubIndexSchemaObjectNodeBuilder
+class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder {
 
-	private StubIndexSchemaObjectNodeBuilder parent;
+	private AbstractStubIndexSchemaObjectNodeBuilder parent;
 	private final boolean included;
 	private IndexObjectFieldAccessor accessor;
 
-	StubIndexSchemaObjectFieldNodeBuilder(StubIndexSchemaObjectNodeBuilder parent,
+	StubIndexSchemaObjectFieldNodeBuilder(AbstractStubIndexSchemaObjectNodeBuilder parent,
 			StubIndexSchemaNode.Builder builder, boolean included) {
 		super( builder );
 		this.parent = parent;

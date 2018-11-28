@@ -12,11 +12,11 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-abstract class StubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
+abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
 	protected final StubIndexSchemaNode.Builder builder;
 
-	StubIndexSchemaObjectNodeBuilder(StubIndexSchemaNode.Builder builder) {
+	AbstractStubIndexSchemaObjectNodeBuilder(StubIndexSchemaNode.Builder builder) {
 		this.builder = builder;
 	}
 

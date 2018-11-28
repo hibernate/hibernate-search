@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaF
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubStringIndexSchemaFieldTypedContext
-		extends StubStandardIndexSchemaFieldTypedContext<StubStringIndexSchemaFieldTypedContext, String>
+		extends AbstractStubStandardIndexSchemaFieldTypedContext<StubStringIndexSchemaFieldTypedContext, String>
 		implements StringIndexSchemaFieldTypedContext<StubStringIndexSchemaFieldTypedContext> {
 
 	StubStringIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, boolean included) {

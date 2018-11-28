@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefiniti
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
-abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIndexSchemaFieldTypedContext<? extends S, F>, F>
+abstract class AbstractStubStandardIndexSchemaFieldTypedContext<S extends AbstractStubStandardIndexSchemaFieldTypedContext<? extends S, F>, F>
 		implements StandardIndexSchemaFieldTypedContext<S, F> {
 
 	private IndexSchemaFieldDefinitionHelper<F> helper;
@@ -24,7 +24,7 @@ abstract class StubStandardIndexSchemaFieldTypedContext<S extends StubStandardIn
 	private final Class<F> inputType;
 	private final boolean included;
 
-	StubStandardIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
+	AbstractStubStandardIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( builder, inputType );
 		this.builder = builder;
 		this.inputType = inputType;

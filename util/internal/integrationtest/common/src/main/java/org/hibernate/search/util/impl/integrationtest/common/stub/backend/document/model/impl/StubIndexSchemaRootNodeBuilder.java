@@ -12,7 +12,7 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
-public class StubIndexSchemaRootNodeBuilder extends StubIndexSchemaObjectNodeBuilder
+public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
 
 	private final StubBackendBehavior backendBehavior;

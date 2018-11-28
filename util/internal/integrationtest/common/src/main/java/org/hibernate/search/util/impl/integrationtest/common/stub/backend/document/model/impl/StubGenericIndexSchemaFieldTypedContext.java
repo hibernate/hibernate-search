@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubGenericIndexSchemaFieldTypedContext<F>
-		extends StubStandardIndexSchemaFieldTypedContext<StubGenericIndexSchemaFieldTypedContext<F>, F> {
+		extends AbstractStubStandardIndexSchemaFieldTypedContext<StubGenericIndexSchemaFieldTypedContext<F>, F> {
 
 	StubGenericIndexSchemaFieldTypedContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
 		super( builder, inputType, included );
