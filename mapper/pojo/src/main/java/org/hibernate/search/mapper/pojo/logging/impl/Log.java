@@ -302,4 +302,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 39, value = "Requested incompatible type for '%1$s': '%2$s'")
 	SearchException incompatibleRequestedType(@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode accessor, @FormatWith(ClassFormatter.class) Class<?> requestedType);
+
+	@Message(id = ID_OFFSET_2 + 40, value = "Cannot work on type %1$s, because it is not directly indexed.")
+	SearchException notDirectlyIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
 }

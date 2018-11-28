@@ -80,6 +80,12 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
+	public PojoTypeWorkExecutor<I, E, D> createWorkExecutor(AbstractPojoSessionContextImplementor sessionContext) {
+		return new PojoTypeWorkExecutor<>(
+				this, sessionContext, indexManager.createWorkExecutor( sessionContext )
+		);
+	}
+
 	IdentifierMapping<I, E> getIdentifierMapping() {
 		return identifierMapping;
 	}

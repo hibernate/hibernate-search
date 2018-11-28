@@ -61,7 +61,7 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 
 	@Override
 	public PojoSessionWorkExecutor createSessionWorkExecutor() {
-		return new PojoSessionWorkExecutorImpl( indexedTypeManagers, containedTypeManagers, sessionContext );
+		return new PojoSessionWorkExecutorImpl( indexedTypeManagers, sessionContext );
 	}
 
 }

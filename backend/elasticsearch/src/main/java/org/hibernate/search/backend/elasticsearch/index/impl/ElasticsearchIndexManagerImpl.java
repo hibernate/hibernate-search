@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -16,7 +17,10 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
+import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -72,6 +76,17 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
+	public IndexWorkExecutor<ElasticsearchDocumentObjectBuilder> createWorkExecutor(SessionContextImplementor sessionContext) {
+		// TODO must be implemented
+		return new IndexWorkExecutor() {
+			@Override
+			public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor) {
+				return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
+			}
+		};
+	}
+
+	@Override
 	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
 		return new ElasticsearchIndexSearchTargetContextBuilder( searchBackendContext, mappingContext, this );
 	}
@@ -86,6 +101,24 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 		ElasticsearchIndexSearchTargetContextBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetContextBuilder) searchTargetBuilder;
 		esSearchTargetBuilder.add( searchBackendContext, this );
+	}
+
+	@Override
+	public CompletableFuture<?> optimize() {
+		// TODO must be implemented
+		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
+	}
+
+	@Override
+	public CompletableFuture<?> purge() {
+		// TODO must be implemented
+		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
+	}
+
+	@Override
+	public CompletableFuture<?> flush() {
+		// TODO must be implemented
+		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
 	}
 
 	@Override
