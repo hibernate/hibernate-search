@@ -38,7 +38,7 @@ public class StandardFieldPredicateBuilderFactory implements ElasticsearchFieldP
 			return false;
 		}
 		StandardFieldPredicateBuilderFactory castedOther = (StandardFieldPredicateBuilderFactory) other;
-		return converter.isConvertFromDslCompatibleWith( castedOther.converter );
+		return converter.isConvertDslToIndexCompatibleWith( castedOther.converter );
 	}
 
 	@Override

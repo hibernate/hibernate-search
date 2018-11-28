@@ -23,7 +23,7 @@ class StubFieldSearchProjection<T> implements StubSearchProjection<T> {
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
 			FromIndexFieldValueConvertContext context) {
-		return converter.convertFromProjection( projectionFromIndex, context );
+		return converter.convertIndexToProjection( projectionFromIndex, context );
 	}
 
 	@Override

@@ -26,50 +26,50 @@ public final class UserIndexFieldConverter<F> {
 
 	private final Class<F> indexFieldType;
 	private final ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private final FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
+	private final FromIndexFieldValueConverter<? super F, ?> indexToProjectionConverter;
 
 	UserIndexFieldConverter(Class<F> indexFieldType, ToIndexFieldValueConverter<?,? extends F> dslToIndexConverter,
-			FromIndexFieldValueConverter<? super F,?> projectionFromIndexConverter) {
+			FromIndexFieldValueConverter<? super F,?> indexToProjectionConverter) {
 		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = dslToIndexConverter;
-		this.projectionFromIndexConverter = projectionFromIndexConverter;
+		this.indexToProjectionConverter = indexToProjectionConverter;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getName() + "["
 				+ "dslToIndexConverter=" + dslToIndexConverter
-				+ ", projectionFromIndexConverter=" + projectionFromIndexConverter
+				+ ", indexToProjectionConverter=" + indexToProjectionConverter
 				+ "]";
 	}
 
-	public F convertFromDsl(Object value, ToIndexFieldValueConvertContext context) {
+	public F convertDslToIndex(Object value, ToIndexFieldValueConvertContext context) {
 		return dslToIndexConverter.convertUnknown( value, context );
 	}
 
-	public Object convertFromProjection(F projection, FromIndexFieldValueConvertContext context) {
-		if ( projectionFromIndexConverter == null ) {
+	public Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context) {
+		if ( indexToProjectionConverter == null ) {
 			// FIXME detect this when the projection is configured and throw an exception with an explicit message instead. A converter set to null means we don't want to enable projections.
-			return projection;
+			return indexValue;
 		}
-		return projectionFromIndexConverter.convert( projection, context );
+		return indexToProjectionConverter.convert( indexValue, context );
 	}
 
 	/**
-	 * Determine whether another converter's {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)}
 	 * method is compatible with this one's,
 	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
-	 * e.g. two objects that implement {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} differently,
-	 * but still implement {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} in a compatible way.
+	 * e.g. two objects that implement {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} in a compatible way.
 	 *
 	 * @param other Another {@link UserIndexFieldConverter}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	public boolean isConvertFromDslCompatibleWith(UserIndexFieldConverter<?> other) {
+	public boolean isConvertDslToIndexCompatibleWith(UserIndexFieldConverter<?> other) {
 		if ( other == null ) {
 			return false;
 		}
@@ -77,29 +77,29 @@ public final class UserIndexFieldConverter<F> {
 	}
 
 	/**
-	 * Determine whether another converter's {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)}
 	 * method is compatible with this one's,
 	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
-	 * e.g. two objects that implement {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} differently,
-	 * but still implement {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} in a compatible way.
+	 * e.g. two objects that implement {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} in a compatible way.
 	 *
 	 * @param other Another {@link UserIndexFieldConverter}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	public boolean isConvertFromProjectionCompatibleWith(UserIndexFieldConverter<?> other) {
+	public boolean isConvertIndexToProjectionCompatibleWith(UserIndexFieldConverter<?> other) {
 		if ( other == null ) {
 			return false;
 		}
-		if ( projectionFromIndexConverter == null || other.projectionFromIndexConverter == null ) {
+		if ( indexToProjectionConverter == null || other.indexToProjectionConverter == null ) {
 			// If one projection converter is null, then both must be null in order to be compatible
-			return projectionFromIndexConverter == null && other.projectionFromIndexConverter == null;
+			return indexToProjectionConverter == null && other.indexToProjectionConverter == null;
 		}
 
-		return projectionFromIndexConverter.isCompatibleWith( other.projectionFromIndexConverter );
+		return indexToProjectionConverter.isCompatibleWith( other.indexToProjectionConverter );
 	}
 
 	/**
@@ -109,10 +109,10 @@ public final class UserIndexFieldConverter<F> {
 	 * @return {@code true} if the given projection type is compatible. {@code false} otherwise
 	 */
 	public boolean isProjectionCompatibleWith(Class<?> projectionType) {
-		if ( projectionFromIndexConverter == null ) {
+		if ( indexToProjectionConverter == null ) {
 			return projectionType.isAssignableFrom( indexFieldType );
 		}
 
-		return projectionFromIndexConverter.isConvertedTypeAssignableTo( projectionType );
+		return indexToProjectionConverter.isConvertedTypeAssignableTo( projectionType );
 	}
 }

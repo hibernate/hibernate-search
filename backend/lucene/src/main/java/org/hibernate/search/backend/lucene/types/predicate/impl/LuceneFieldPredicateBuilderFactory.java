@@ -37,7 +37,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 	 * Determine whether another predicate builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see LuceneFieldConverter#isConvertFromDslCompatibleWith(LuceneFieldConverter)
+	 * @see LuceneFieldConverter#isConvertDslToIndexCompatibleWith(LuceneFieldConverter)
 	 *
 	 * @param other Another {@link LuceneFieldPredicateBuilderFactory}, never {@code null}.
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.

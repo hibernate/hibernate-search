@@ -25,7 +25,7 @@ public interface ElasticsearchFieldConverter {
 	 * @return A value of the type used internally when querying this field.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	JsonElement convertFromDsl(Object value,
+	JsonElement convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context);
 
 	/**
@@ -33,33 +33,33 @@ public interface ElasticsearchFieldConverter {
 	 * @param context The context to use when converting.
 	 * @return A value of the type expected by users when projecting.
 	 */
-	Object convertFromProjection(JsonElement value, FromIndexFieldValueConvertContext context);
+	Object convertIndexToProjection(JsonElement value, FromIndexFieldValueConvertContext context);
 
 	/**
-	 * Determine whether another converter's {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromDslCompatibleWith(UserIndexFieldConverter)
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertDslToIndexCompatibleWith(UserIndexFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isConvertFromDslCompatibleWith(ElasticsearchFieldConverter other);
+	boolean isConvertDslToIndexCompatibleWith(ElasticsearchFieldConverter other);
 
 	/**
-	 * Determine whether another converter's {@link #convertFromProjection(JsonElement, FromIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertIndexToProjection(JsonElement, FromIndexFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromProjectionCompatibleWith(UserIndexFieldConverter)
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertIndexToProjectionCompatibleWith(UserIndexFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromProjection(JsonElement, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertIndexToProjection(JsonElement, FromIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isConvertFromProjectionCompatibleWith(ElasticsearchFieldConverter other);
+	boolean isConvertIndexToProjectionCompatibleWith(ElasticsearchFieldConverter other);
 
 	/**
 	 * Determine whether the given projection type is compatible with this converter.

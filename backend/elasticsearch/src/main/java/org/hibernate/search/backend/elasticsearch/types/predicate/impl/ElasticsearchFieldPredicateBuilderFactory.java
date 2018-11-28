@@ -38,7 +38,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	 * Determine whether another predicate builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see ElasticsearchFieldConverter#isConvertFromDslCompatibleWith(ElasticsearchFieldConverter)
+	 * @see ElasticsearchFieldConverter#isConvertDslToIndexCompatibleWith(ElasticsearchFieldConverter)
 	 *
 	 * @param other Another {@link ElasticsearchFieldPredicateBuilderFactory}, never {@code null}.
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.

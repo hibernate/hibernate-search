@@ -38,7 +38,7 @@ public abstract class AbstractMatchPredicateBuilder<F, T> extends AbstractSearch
 	@Override
 	public void value(Object value) {
 		try {
-			this.value = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.value = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

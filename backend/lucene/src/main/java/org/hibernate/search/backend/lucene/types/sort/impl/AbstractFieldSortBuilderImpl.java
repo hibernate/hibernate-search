@@ -60,7 +60,7 @@ abstract class AbstractFieldSortBuilderImpl extends AbstractSearchSortBuilder
 	@Override
 	public void missingAs(Object value) {
 		try {
-			missingValue = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			missingValue = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

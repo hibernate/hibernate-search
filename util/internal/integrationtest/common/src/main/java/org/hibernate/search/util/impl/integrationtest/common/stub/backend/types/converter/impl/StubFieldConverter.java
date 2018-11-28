@@ -18,11 +18,11 @@ public class StubFieldConverter<F> {
 		this.userConverter = userConverter;
 	}
 
-	public Object convertFromProjection(Object projection, FromIndexFieldValueConvertContext context) {
-		return userConverter.convertFromProjection( type.cast( projection ), context );
+	public Object convertIndexToProjection(Object indexValue, FromIndexFieldValueConvertContext context) {
+		return userConverter.convertIndexToProjection( type.cast( indexValue ), context );
 	}
 
-	public boolean isConvertFromProjectionCompatibleWith(StubFieldConverter<?> other) {
-		return userConverter.isConvertFromProjectionCompatibleWith( other.userConverter );
+	public boolean isConvertIndexToProjectionCompatibleWith(StubFieldConverter<?> other) {
+		return userConverter.isConvertIndexToProjectionCompatibleWith( other.userConverter );
 	}
 }

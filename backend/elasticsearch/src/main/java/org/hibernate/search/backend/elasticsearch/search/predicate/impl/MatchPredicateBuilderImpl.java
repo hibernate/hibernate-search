@@ -48,7 +48,7 @@ public class MatchPredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	public void value(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			element = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

@@ -55,7 +55,7 @@ public class FieldSortBuilderImpl extends AbstractSearchSortBuilder
 	public void missingAs(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			element = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

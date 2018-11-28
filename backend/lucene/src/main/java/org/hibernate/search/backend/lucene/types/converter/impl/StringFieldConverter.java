@@ -29,14 +29,14 @@ public final class StringFieldConverter extends AbstractFieldConverter<String, S
 	}
 
 	@Override
-	public String convertFromDsl(Object value,
+	public String convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		return userConverter.convertFromDsl( value, context );
+		return userConverter.convertDslToIndex( value, context );
 	}
 
 	@Override
-	public boolean isConvertFromDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
-		if ( !super.isConvertFromDslCompatibleWith( other ) ) {
+	public boolean isConvertDslToIndexCompatibleWith(LuceneFieldConverter<?, ?> other) {
+		if ( !super.isConvertDslToIndexCompatibleWith( other ) ) {
 			return false;
 		}
 

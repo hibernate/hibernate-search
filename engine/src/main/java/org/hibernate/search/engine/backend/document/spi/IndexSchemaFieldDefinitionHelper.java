@@ -33,7 +33,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	private final Class<F> indexFieldType;
 
 	private ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private FromIndexFieldValueConverter<? super F, ?> projectionFromIndexConverter;
+	private FromIndexFieldValueConverter<? super F, ?> indexToProjectionConverter;
 
 	private boolean accessorCreated = false;
 
@@ -48,7 +48,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 		this.schemaContext = schemaContext;
 		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = identityToIndexConverter;
-		this.projectionFromIndexConverter = null;
+		this.indexToProjectionConverter = null;
 	}
 
 	public IndexSchemaContext getSchemaContext() {
@@ -62,7 +62,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	public void projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.projectionFromIndexConverter = fromIndexConverter;
+		this.indexToProjectionConverter = fromIndexConverter;
 	}
 
 	/**
@@ -85,7 +85,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 		return new UserIndexFieldConverter<>(
 				indexFieldType,
 				dslToIndexConverter,
-				projectionFromIndexConverter
+				indexToProjectionConverter
 		);
 	}
 

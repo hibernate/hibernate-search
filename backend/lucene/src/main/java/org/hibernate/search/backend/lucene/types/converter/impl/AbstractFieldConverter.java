@@ -23,26 +23,26 @@ abstract class AbstractFieldConverter<F, T> implements LuceneFieldConverter<F, T
 	}
 
 	@Override
-	public Object convertFromProjection(F value, FromIndexFieldValueConvertContext context) {
-		return userConverter.convertFromProjection( value, context );
+	public Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context) {
+		return userConverter.convertIndexToProjection( indexValue, context );
 	}
 
 	@Override
-	public boolean isConvertFromDslCompatibleWith(LuceneFieldConverter<?, ?> other) {
+	public boolean isConvertDslToIndexCompatibleWith(LuceneFieldConverter<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
-		return userConverter.isConvertFromDslCompatibleWith( castedOther.userConverter );
+		return userConverter.isConvertDslToIndexCompatibleWith( castedOther.userConverter );
 	}
 
 	@Override
-	public boolean isConvertFromProjectionCompatibleWith(LuceneFieldConverter<?, ?> other) {
+	public boolean isConvertIndexToProjectionCompatibleWith(LuceneFieldConverter<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		AbstractFieldConverter<?, ?> castedOther = (AbstractFieldConverter<?, ?>) other;
-		return userConverter.isConvertFromProjectionCompatibleWith( castedOther.userConverter );
+		return userConverter.isConvertIndexToProjectionCompatibleWith( castedOther.userConverter );
 	}
 
 	@Override

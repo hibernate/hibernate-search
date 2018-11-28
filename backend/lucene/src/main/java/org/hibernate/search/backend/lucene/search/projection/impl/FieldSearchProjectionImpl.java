@@ -52,7 +52,7 @@ class FieldSearchProjectionImpl<F, T> implements LuceneSearchProjection<T, T> {
 			SearchProjectionExecutionContext context) {
 		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
 		FromIndexFieldValueConvertContext convertContext = context.getFromIndexFieldValueConvertContext();
-		return (T) converter.convertFromProjection( rawValue, convertContext );
+		return (T) converter.convertIndexToProjection( rawValue, convertContext );
 	}
 
 	@Override
