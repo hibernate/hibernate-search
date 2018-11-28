@@ -47,6 +47,12 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
+		public CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set when work were prepared and executed for index '"
+					+ indexName + "': " + work );
+		}
+
+		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
 				FromIndexFieldValueConvertContext convertContext,
 				ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
@@ -83,6 +89,8 @@ public abstract class StubBackendBehavior {
 	public abstract void prepareWorks(String indexName, List<StubIndexWork> works);
 
 	public abstract CompletableFuture<?> executeWorks(String indexName, List<StubIndexWork> works);
+
+	public abstract CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
 			FromIndexFieldValueConvertContext convertContext,

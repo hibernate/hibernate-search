@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -68,14 +66,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexWorkExecutor<StubDocumentElement> createWorkExecutor(SessionContextImplementor sessionContext) {
-		// TODO must be implemented
-		return new IndexWorkExecutor() {
-			@Override
-			public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor) {
-				return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-			}
-		};
+	public IndexWorkExecutor<StubDocumentElement> createWorkExecutor(SessionContextImplementor context) {
+		return new StubIndexWorkExecutor( this, context );
 	}
 
 	@Override
@@ -125,5 +117,9 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 
 	CompletableFuture<?> execute(List<StubIndexWork> works) {
 		return backend.getBehavior().executeWorks( name, works );
+	}
+
+	CompletableFuture<?> prepareAndExecuteWork(StubIndexWork work) {
+		return backend.getBehavior().prepareAndExecuteWork( name, work );
 	}
 }
