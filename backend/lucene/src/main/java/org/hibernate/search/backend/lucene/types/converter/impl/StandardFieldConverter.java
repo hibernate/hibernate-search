@@ -16,8 +16,8 @@ public final class StandardFieldConverter<F> extends AbstractFieldConverter<F, F
 	}
 
 	@Override
-	public F convertFromDsl(Object value,
+	public F convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		return userConverter.convertFromDsl( value, context );
+		return userConverter.convertDslToIndex( value, context );
 	}
 }

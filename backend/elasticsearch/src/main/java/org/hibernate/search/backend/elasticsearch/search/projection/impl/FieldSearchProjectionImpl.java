@@ -55,7 +55,7 @@ class FieldSearchProjectionImpl<T> implements ElasticsearchSearchProjection<T, T
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
 		FromIndexFieldValueConvertContext context = searchProjectionExecutionContext.getFromIndexFieldValueConvertContext();
-		return (T) converter.convertFromProjection( fieldValue, context );
+		return (T) converter.convertIndexToProjection( fieldValue, context );
 	}
 
 	@Override

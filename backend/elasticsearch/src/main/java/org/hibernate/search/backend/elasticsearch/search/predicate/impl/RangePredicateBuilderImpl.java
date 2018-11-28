@@ -55,7 +55,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			this.lowerLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.lowerLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -72,7 +72,7 @@ public class RangePredicateBuilderImpl extends AbstractSearchPredicateBuilder
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			this.upperLimit = converter.convertFromDsl( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.upperLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

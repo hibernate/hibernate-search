@@ -42,7 +42,7 @@ public class StubSearchTargetModel {
 			if ( result == null ) {
 				result = converter;
 			}
-			else if ( !result.isConvertFromProjectionCompatibleWith( converter ) ) {
+			else if ( !result.isConvertIndexToProjectionCompatibleWith( converter ) ) {
 				throw new IllegalStateException(
 						"Reference to field '" + absoluteFieldPath
 								+ "' on indexes " + indexNames

@@ -29,34 +29,34 @@ public final class StandardFieldConverter<F> implements ElasticsearchFieldConver
 	}
 
 	@Override
-	public JsonElement convertFromDsl(Object value, ToIndexFieldValueConvertContext context) {
-		F rawValue = userConverter.convertFromDsl( value, context );
+	public JsonElement convertDslToIndex(Object value, ToIndexFieldValueConvertContext context) {
+		F rawValue = userConverter.convertDslToIndex( value, context );
 		return codec.encode( rawValue );
 	}
 
 	@Override
-	public Object convertFromProjection(JsonElement element, FromIndexFieldValueConvertContext context) {
+	public Object convertIndexToProjection(JsonElement element, FromIndexFieldValueConvertContext context) {
 		F rawValue = codec.decode( element );
-		return userConverter.convertFromProjection( rawValue, context );
+		return userConverter.convertIndexToProjection( rawValue, context );
 	}
 
 	@Override
-	public boolean isConvertFromDslCompatibleWith(ElasticsearchFieldConverter other) {
+	public boolean isConvertDslToIndexCompatibleWith(ElasticsearchFieldConverter other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
-		return userConverter.isConvertFromDslCompatibleWith( castedOther.userConverter )
+		return userConverter.isConvertDslToIndexCompatibleWith( castedOther.userConverter )
 				&& codec.isCompatibleWith( castedOther.codec );
 	}
 
 	@Override
-	public boolean isConvertFromProjectionCompatibleWith(ElasticsearchFieldConverter other) {
+	public boolean isConvertIndexToProjectionCompatibleWith(ElasticsearchFieldConverter other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		StandardFieldConverter<?> castedOther = (StandardFieldConverter<?>) other;
-		return userConverter.isConvertFromProjectionCompatibleWith( castedOther.userConverter )
+		return userConverter.isConvertIndexToProjectionCompatibleWith( castedOther.userConverter )
 				&& codec.isCompatibleWith( castedOther.codec );
 	}
 

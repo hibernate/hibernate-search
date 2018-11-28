@@ -18,9 +18,9 @@ public final class LocalDateFieldConverter extends AbstractFieldConverter<LocalD
 	}
 
 	@Override
-	public Long convertFromDsl(Object value,
+	public Long convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		LocalDate rawValue = userConverter.convertFromDsl( value, context );
+		LocalDate rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;
 		}

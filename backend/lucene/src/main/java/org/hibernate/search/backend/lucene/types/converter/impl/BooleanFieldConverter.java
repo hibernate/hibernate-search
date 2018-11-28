@@ -16,9 +16,9 @@ public final class BooleanFieldConverter extends AbstractFieldConverter<Boolean,
 	}
 
 	@Override
-	public Integer convertFromDsl(Object value,
+	public Integer convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		Boolean rawValue = userConverter.convertFromDsl( value, context );
+		Boolean rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;
 		}

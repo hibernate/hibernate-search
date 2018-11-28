@@ -69,7 +69,7 @@ public class StandardFieldProjectionBuilderFactory<T> implements LuceneFieldProj
 
 		return projectable == other.projectable &&
 				codec.isCompatibleWith( other.codec ) &&
-				converter.isConvertFromProjectionCompatibleWith( other.converter );
+				converter.isConvertIndexToProjectionCompatibleWith( other.converter );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

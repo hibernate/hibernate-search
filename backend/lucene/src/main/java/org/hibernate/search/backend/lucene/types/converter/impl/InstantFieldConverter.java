@@ -18,9 +18,9 @@ public final class InstantFieldConverter extends AbstractFieldConverter<Instant,
 	}
 
 	@Override
-	public Long convertFromDsl(Object value,
+	public Long convertDslToIndex(Object value,
 			ToIndexFieldValueConvertContext context) {
-		Instant rawValue = userConverter.convertFromDsl( value, context );
+		Instant rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;
 		}

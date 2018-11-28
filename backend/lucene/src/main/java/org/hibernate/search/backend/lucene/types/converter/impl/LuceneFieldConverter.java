@@ -27,40 +27,40 @@ public interface LuceneFieldConverter<F, T> {
 	 * @return A value of the type used internally when querying this field.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	T convertFromDsl(Object value, ToIndexFieldValueConvertContext context);
+	T convertDslToIndex(Object value, ToIndexFieldValueConvertContext context);
 
 	/**
-	 * @param value The projected value returned by the codec.
+	 * @param indexValue The projected value returned by the codec.
 	 * @param context The context to use when converting.
 	 * @return A value of the type expected by users when projecting.
 	 */
-	Object convertFromProjection(F value, FromIndexFieldValueConvertContext context);
+	Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context);
 
 	/**
-	 * Determine whether another converter's {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromDslCompatibleWith(UserIndexFieldConverter)
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertDslToIndexCompatibleWith(UserIndexFieldConverter)
 	 *
 	 * @param other Another {@link LuceneFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromDsl(Object, ToIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isConvertFromDslCompatibleWith(LuceneFieldConverter<?, ?> other);
+	boolean isConvertDslToIndexCompatibleWith(LuceneFieldConverter<?, ?> other);
 
 	/**
-	 * Determine whether another converter's {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertFromProjectionCompatibleWith(UserIndexFieldConverter)
+	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertIndexToProjectionCompatibleWith(UserIndexFieldConverter)
 	 *
 	 * @param other Another {@link LuceneFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertFromProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isConvertFromProjectionCompatibleWith(LuceneFieldConverter<?, ?> other);
+	boolean isConvertIndexToProjectionCompatibleWith(LuceneFieldConverter<?, ?> other);
 
 	/**
 	 * Determine whether the given projection type is compatible with this converter.

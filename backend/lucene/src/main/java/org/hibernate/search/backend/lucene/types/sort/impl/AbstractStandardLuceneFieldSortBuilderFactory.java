@@ -49,7 +49,7 @@ abstract class AbstractStandardLuceneFieldSortBuilderFactory<T> implements Lucen
 		AbstractStandardLuceneFieldSortBuilderFactory<?> other = (AbstractStandardLuceneFieldSortBuilderFactory<?>) obj;
 
 		return sortable == other.sortable &&
-				converter.isConvertFromDslCompatibleWith( other.converter );
+				converter.isConvertDslToIndexCompatibleWith( other.converter );
 	}
 
 	protected void checkSortable(String absoluteFieldPath) {
