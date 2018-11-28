@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
@@ -20,7 +20,7 @@ class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 	}
 
 	@Override
-	public void process(DocumentElement target, Object source, PojoSessionContextImplementor sessionContext) {
+	public void process(DocumentElement target, Object source, AbstractPojoSessionContextImplementor sessionContext) {
 		// No-op
 	}
 

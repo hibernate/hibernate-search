@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.javabean.session.context.impl;
 
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 
-public class JavaBeanSessionContext extends PojoSessionContextImplementor {
+public class JavaBeanSessionContext extends AbstractPojoSessionContextImplementor {
 
 	private final JavaBeanMappingContext mappingContext;
 	private final String tenantId;

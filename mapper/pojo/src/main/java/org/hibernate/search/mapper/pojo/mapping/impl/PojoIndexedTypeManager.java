@@ -16,7 +16,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBui
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
@@ -88,12 +88,12 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return indexedJavaClass;
 	}
 
-	Supplier<E> toEntitySupplier(PojoSessionContextImplementor sessionContext, Object entity) {
+	Supplier<E> toEntitySupplier(AbstractPojoSessionContextImplementor sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
-	DocumentReferenceProvider toDocumentReferenceProvider(PojoSessionContextImplementor sessionContext,
+	DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoSessionContextImplementor sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
@@ -104,7 +104,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, PojoSessionContextImplementor sessionContext) {
+	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, AbstractPojoSessionContextImplementor sessionContext) {
 		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
 	}
 
@@ -119,7 +119,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(PojoSessionContextImplementor sessionContext) {
+	PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
 		return new PojoIndexedTypeWorkPlan<>(
 				this, sessionContext, indexManager.createWorkPlan( sessionContext )
 		);

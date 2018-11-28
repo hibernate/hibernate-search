@@ -12,9 +12,9 @@ import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingC
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
-public class HibernateOrmSessionContextImpl extends PojoSessionContextImplementor implements HibernateOrmSessionContext {
+public class HibernateOrmSessionContextImpl extends AbstractPojoSessionContextImplementor implements HibernateOrmSessionContext {
 
 	private final HibernateOrmMappingContextImpl mappingContext;
 	private final SessionImplementor sessionImplementor;

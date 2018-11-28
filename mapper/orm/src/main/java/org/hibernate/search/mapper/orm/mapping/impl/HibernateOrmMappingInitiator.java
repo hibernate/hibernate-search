@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
+import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 import org.hibernate.search.util.impl.common.StreamHelper;
 
 /*
@@ -36,7 +36,7 @@ import org.hibernate.search.util.impl.common.StreamHelper;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
  *  2. And more?
  */
-public class HibernateOrmMappingInitiator extends PojoMappingInitiatorImpl<HibernateOrmMapping>
+public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMapping>
 		implements HibernateOrmMappingDefinitionContainerContext {
 
 	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =

@@ -47,7 +47,7 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 			/*
 			 * TODO decide whether we want the sync/async setting to be scoped per index,
 			 * or per EntityManager/SearchManager, or both (with one scope overriding the other).
-			 * See also PostTransactionWorkQueueSynchronization#afterCompletion, PojoSearchManagerImpl#close
+			 * See also PostTransactionWorkQueueSynchronization#afterCompletion
 			 */
 			future.join();
 		}

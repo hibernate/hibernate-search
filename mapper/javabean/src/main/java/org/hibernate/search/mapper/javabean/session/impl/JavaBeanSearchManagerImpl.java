@@ -19,10 +19,10 @@ import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
 import org.hibernate.search.mapper.javabean.work.impl.JavaBeanWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
 
-public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements JavaBeanSearchManager {
+public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager implements JavaBeanSearchManager {
 	private JavaBeanWorkPlanImpl workPlan;
 
 	private JavaBeanSearchManagerImpl(JavaBeanSearchManagerBuilderImpl builder) {
@@ -68,7 +68,7 @@ public class JavaBeanSearchManagerImpl extends PojoSearchManagerImpl implements 
 		}
 
 		@Override
-		protected PojoSessionContextImplementor buildSessionContext() {
+		protected AbstractPojoSessionContextImplementor buildSessionContext() {
 			return new JavaBeanSessionContext( mappingContext, tenantId, PojoRuntimeIntrospector.noProxy() );
 		}
 

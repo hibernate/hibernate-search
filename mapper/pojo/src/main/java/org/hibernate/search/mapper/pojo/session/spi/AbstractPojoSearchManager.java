@@ -7,14 +7,14 @@
 package org.hibernate.search.mapper.pojo.session.spi;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 
-public abstract class PojoSearchManagerImpl {
+public abstract class AbstractPojoSearchManager {
 
 	private final PojoSearchManagerDelegate delegate;
 
-	protected PojoSearchManagerImpl(AbstractBuilder<? extends PojoSearchManagerImpl> builder) {
+	protected AbstractPojoSearchManager(AbstractBuilder<? extends AbstractPojoSearchManager> builder) {
 		this.delegate = builder.mappingDelegate.createSearchManagerDelegate( builder.buildSessionContext() );
 	}
 
@@ -22,7 +22,7 @@ public abstract class PojoSearchManagerImpl {
 		return delegate;
 	}
 
-	protected abstract static class AbstractBuilder<T extends PojoSearchManagerImpl> {
+	protected abstract static class AbstractBuilder<T extends AbstractPojoSearchManager> {
 
 		private final PojoMappingDelegate mappingDelegate;
 
@@ -30,7 +30,7 @@ public abstract class PojoSearchManagerImpl {
 			this.mappingDelegate = mappingDelegate;
 		}
 
-		protected abstract PojoSessionContextImplementor buildSessionContext();
+		protected abstract AbstractPojoSessionContextImplementor buildSessionContext();
 
 		public abstract T build();
 

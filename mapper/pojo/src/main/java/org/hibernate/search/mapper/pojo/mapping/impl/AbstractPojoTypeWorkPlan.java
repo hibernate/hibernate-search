@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
-abstract class PojoTypeWorkPlan {
+abstract class AbstractPojoTypeWorkPlan {
 
-	final PojoSessionContextImplementor sessionContext;
+	final AbstractPojoSessionContextImplementor sessionContext;
 
-	PojoTypeWorkPlan(PojoSessionContextImplementor sessionContext) {
+	AbstractPojoTypeWorkPlan(AbstractPojoSessionContextImplementor sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

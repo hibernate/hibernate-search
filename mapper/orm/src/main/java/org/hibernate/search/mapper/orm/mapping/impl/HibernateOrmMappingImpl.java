@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
+import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class HibernateOrmMappingImpl extends PojoMappingImplementor<HibernateOrmMapping>
+public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<HibernateOrmMapping>
 		implements HibernateOrmMapping {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

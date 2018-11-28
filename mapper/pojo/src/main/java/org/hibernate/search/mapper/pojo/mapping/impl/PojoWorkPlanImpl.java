@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -28,7 +28,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
-	private final PojoSessionContextImplementor sessionContext;
+	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -37,7 +37,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	PojoWorkPlanImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
-			PojoSessionContextImplementor sessionContext) {
+			AbstractPojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 		this.sessionContext = sessionContext;
@@ -52,7 +52,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.add( id, entity );
 	}
 
@@ -64,7 +64,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void update(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.update( id, entity );
 	}
 
@@ -76,7 +76,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void update(Object id, Object entity, String... dirtyPaths) {
 		Class<?> clazz = getIntrospector().getClass( entity );
-		PojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.update( id, entity, dirtyPaths );
 	}
 
@@ -88,7 +88,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void delete(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
 		delegate.delete( id, entity );
 	}
 
@@ -124,8 +124,8 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 		return introspector;
 	}
 
-	private PojoTypeWorkPlan getDelegate(Class<?> clazz) {
-		PojoTypeWorkPlan delegate = indexedTypeDelegates.get( clazz );
+	private AbstractPojoTypeWorkPlan getDelegate(Class<?> clazz) {
+		AbstractPojoTypeWorkPlan delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( clazz );
 			if ( delegate == null ) {
@@ -135,7 +135,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 		return delegate;
 	}
 
-	private PojoTypeWorkPlan createDelegate(Class<?> clazz) {
+	private AbstractPojoTypeWorkPlan createDelegate(Class<?> clazz) {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> indexedTypeManagerOptional =
 				indexedTypeManagers.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {

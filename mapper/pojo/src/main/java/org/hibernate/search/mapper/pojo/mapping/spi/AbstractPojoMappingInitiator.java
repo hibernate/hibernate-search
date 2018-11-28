@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-public abstract class PojoMappingInitiatorImpl<M>
+public abstract class AbstractPojoMappingInitiator<M>
 		implements MappingInitiator<PojoTypeMetadataContributor, M> {
 
 	private final PojoMappingFactory<M> mappingFactory;
@@ -36,7 +36,7 @@ public abstract class PojoMappingInitiatorImpl<M>
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
-	protected PojoMappingInitiatorImpl(PojoMappingFactory<M> mappingFactory,
+	protected AbstractPojoMappingInitiator(PojoMappingFactory<M> mappingFactory,
 			PojoBootstrapIntrospector introspector) {
 		this.mappingFactory = mappingFactory;
 		this.introspector = introspector;

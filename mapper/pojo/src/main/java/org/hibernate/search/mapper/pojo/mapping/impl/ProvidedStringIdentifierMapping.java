@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
  * @author Yoann Rodiere
@@ -37,12 +37,12 @@ public class ProvidedStringIdentifierMapping implements IdentifierMapping<String
 	}
 
 	@Override
-	public String toDocumentIdentifier(String identifier, PojoMappingContextImplementor context) {
+	public String toDocumentIdentifier(String identifier, AbstractPojoMappingContextImplementor context) {
 		return identifier;
 	}
 
 	@Override
-	public String fromDocumentIdentifier(String documentId, PojoSessionContextImplementor sessionContext) {
+	public String fromDocumentIdentifier(String documentId, AbstractPojoSessionContextImplementor sessionContext) {
 		return documentId;
 	}
 

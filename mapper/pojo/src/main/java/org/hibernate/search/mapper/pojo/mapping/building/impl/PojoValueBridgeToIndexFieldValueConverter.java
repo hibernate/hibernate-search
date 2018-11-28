@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFie
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 
 final class PojoValueBridgeToIndexFieldValueConverter<U, V extends U, F> implements ToIndexFieldValueConverter<V, F> {
 
@@ -56,8 +56,8 @@ final class PojoValueBridgeToIndexFieldValueConverter<U, V extends U, F> impleme
 		@Override
 		public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToIndexFieldValueConvertContext original,
 			MappingContextImplementor mappingContext) {
-			if ( mappingContext instanceof PojoMappingContextImplementor ) {
-				PojoMappingContextImplementor pojoMappingContext = (PojoMappingContextImplementor) mappingContext;
+			if ( mappingContext instanceof AbstractPojoMappingContextImplementor ) {
+				AbstractPojoMappingContextImplementor pojoMappingContext = (AbstractPojoMappingContextImplementor) mappingContext;
 				return Optional.of( pojoMappingContext.getToIndexedValueContext() );
 			}
 			else {

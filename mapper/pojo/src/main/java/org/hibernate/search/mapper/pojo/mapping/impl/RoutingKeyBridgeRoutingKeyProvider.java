@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 
@@ -27,7 +27,7 @@ public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider
 
 	@Override
 	public String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
-			PojoSessionContextImplementor context) {
+			AbstractPojoSessionContextImplementor context) {
 		return bridge.toRoutingKey(
 				context.getTenantIdentifier(), identifier,
 				new PojoElementImpl( entitySupplier.get() ),

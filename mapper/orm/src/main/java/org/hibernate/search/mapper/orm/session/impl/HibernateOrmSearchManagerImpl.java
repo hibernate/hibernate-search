@@ -18,11 +18,11 @@ import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingC
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerImpl;
+import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
-public class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
+public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 		implements HibernateOrmSearchManager {
 	private final SessionImplementor sessionImplementor;
 
@@ -66,7 +66,7 @@ public class HibernateOrmSearchManagerImpl extends PojoSearchManagerImpl
 		}
 
 		@Override
-		protected PojoSessionContextImplementor buildSessionContext() {
+		protected AbstractPojoSessionContextImplementor buildSessionContext() {
 			return new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
 		}
 

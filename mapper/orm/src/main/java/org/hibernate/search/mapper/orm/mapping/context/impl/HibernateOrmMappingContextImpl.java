@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.orm.mapping.context.impl;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 
-public class HibernateOrmMappingContextImpl extends PojoMappingContextImplementor implements HibernateOrmMappingContext {
+public class HibernateOrmMappingContextImpl extends AbstractPojoMappingContextImplementor implements HibernateOrmMappingContext {
 	private final SessionFactoryImplementor sessionFactory;
 
 	public HibernateOrmMappingContextImpl(SessionFactoryImplementor sessionFactory) {

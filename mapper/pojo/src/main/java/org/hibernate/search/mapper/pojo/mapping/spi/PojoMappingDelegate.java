@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 
 public interface PojoMappingDelegate extends AutoCloseable {
@@ -17,7 +17,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	@Override
 	void close();
 
-	PojoSearchManagerDelegate createSearchManagerDelegate(PojoSessionContextImplementor sessionContext);
+	PojoSearchManagerDelegate createSearchManagerDelegate(AbstractPojoSessionContextImplementor sessionContext);
 
 	/**
 	 * @param type A Java type.

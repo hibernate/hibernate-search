@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
@@ -24,11 +24,11 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
-	private final PojoSessionContextImplementor sessionContext;
+	private final AbstractPojoSessionContextImplementor sessionContext;
 
 	PojoSearchManagerDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
-			PojoSessionContextImplementor sessionContext) {
+			AbstractPojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 		this.sessionContext = sessionContext;
