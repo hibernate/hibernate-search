@@ -62,7 +62,7 @@ class SearchWorkCall<T> {
 
 		long totalHitCount = behavior.getTotalHitCount();
 
-		return new SearchResultImpl<>( totalHitCount, getResults( actualCall.convertContext,
+		return new SearchResultFromMock<>( totalHitCount, getResults( actualCall.convertContext,
 				actualCall.projectionHitMapper, actualCall.rootProjection, behavior.getRawHits() ) );
 	}
 
@@ -93,12 +93,12 @@ class SearchWorkCall<T> {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
 	}
 
-	private static final class SearchResultImpl<T> implements SearchResult<T> {
+	private static final class SearchResultFromMock<T> implements SearchResult<T> {
 
 		private final long totalHitCount;
 		private final List<T> hits;
 
-		public SearchResultImpl(long totalHitCount, List<T> hits) {
+		public SearchResultFromMock(long totalHitCount, List<T> hits) {
 			this.totalHitCount = totalHitCount;
 			this.hits = hits;
 		}
