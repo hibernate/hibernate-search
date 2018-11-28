@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import javax.transaction.TransactionManager;
@@ -27,7 +28,8 @@ import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -196,39 +198,59 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			return;
 		}
 
-		// TODO use 'SessionWorkExecutor workExecutor = mapping.createSearchManager( session ).createSessionWorkExecutor();' instead
-		PojoWorkPlan workPlan = mapping.createSearchManager( session ).createWorkPlan();
+		// TODO <<monitor>> indexingMonitor.entitiesLoaded( entities.size() );
+		PojoSessionWorkExecutor workExecutor = mapping.createSearchManager( session ).createSessionWorkExecutor();
+		CompletableFuture<?>[] futures = new CompletableFuture<?>[entities.size()];
 
-		log.tracef( "received a list of objects to index: %s", entities );
-		for ( Object object : entities ) {
-			try {
-				index( workPlan, object );
-				// TODO: implements monitor
-				// monitor.documentsBuilt( 1 );
-			}
-			catch (RuntimeException e) {
-				String errorMsg = log.massIndexerUnableToIndexInstance(
-						object.getClass().getName(),
-						object.toString()
-				);
-
-				// TODO: implements exception handler
-				// errorHandler.handleException( errorMsg, e );
-				// temporary re-throw the exception
-				throw new RuntimeException( errorMsg, e );
-			}
+		for ( int i = 0; i < entities.size(); i++ ) {
+			final Object entity = entities.get( i );
+			futures[i] = index( workExecutor, entity );
+			futures[i].exceptionally( exception -> {
+				handleException( entity, exception );
+				return null;
+			} );
 		}
+		// handle exceptions on a per-work basis
+		CompletableFuture.allOf( futures ).exceptionally( exception -> null ).join();
 
-		workPlan.execute().get();
+		Integer completedFutures = this.countCompletedTasks( futures );
+		// TODO <<monitor>> indexingMonitor.documentAdded( completedFutures );
 	}
 
-	private void index(PojoWorkPlan workPlan, Object entity) throws InterruptedException {
+	private CompletableFuture<?> index(PojoSessionWorkExecutor workExecutor, Object entity) throws InterruptedException {
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 		// raised the InterruptedException
 		if ( Thread.currentThread().isInterrupted() ) {
 			throw new InterruptedException();
 		}
 
-		workPlan.add( entity );
+		CompletableFuture<?> future = Futures.create( () -> workExecutor.add( entity )
+				.exceptionally( exception -> {
+					handleException( entity, exception );
+					return null;
+				} ) );
+
+		// TODO <<monitor>> indexingMonitor.documentBuilt( 1 );
+		return future;
+	}
+
+	private void handleException(Object entity, Throwable e) {
+		String errorMsg = log.massIndexerUnableToIndexInstance( entity.getClass().getName(), entity.toString() );
+
+		// TODO: implements exception handler
+		// errorHandler.handleException( errorMsg, e );
+		// temporary re-throw the exception
+		throw new RuntimeException( errorMsg, e );
+	}
+
+	private Integer countCompletedTasks(CompletableFuture<?>[] tasks) {
+		int result = 0;
+		for ( int i = 0; i < tasks.length; i++ ) {
+			if ( tasks[i].isDone() ) {
+				result++;
+			}
+		}
+
+		return result;
 	}
 }
