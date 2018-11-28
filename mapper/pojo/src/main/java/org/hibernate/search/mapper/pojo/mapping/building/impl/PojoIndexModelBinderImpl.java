@@ -133,7 +133,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
 		TypeBridge bridge = builder.build( bridgeBuildContext );
 
-		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
+		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
@@ -157,7 +157,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
 		PropertyBridge bridge = builder.build( bridgeBuildContext );
 
-		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
+		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
 				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
@@ -209,7 +209,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			ValueBridge<? super V, F> bridge, GenericTypeContext bridgeTypeContext,
 			PojoGenericTypeModel<V> valueTypeModel,
 			String relativeFieldName, FieldModelContributor contributor) {
-		IndexSchemaContributionListenerImpl listener = new IndexSchemaContributionListenerImpl();
+		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
 		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
 
@@ -249,7 +249,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		}
 	}
 
-	private class IndexSchemaContributionListenerImpl implements IndexSchemaContributionListener {
+	private class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {
 		private boolean schemaContributed = false;
 
 		@Override

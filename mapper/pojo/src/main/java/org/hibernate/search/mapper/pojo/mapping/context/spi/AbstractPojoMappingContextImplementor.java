@@ -12,12 +12,12 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
 
-public abstract class PojoMappingContextImplementor implements MappingContextImplementor {
+public abstract class AbstractPojoMappingContextImplementor implements MappingContextImplementor {
 
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
 
-	protected PojoMappingContextImplementor() {
+	protected AbstractPojoMappingContextImplementor() {
 		this.toDocumentIdentifierContext = new IdentifierBridgeToDocumentIdentifierContextImpl( this );
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
 	}

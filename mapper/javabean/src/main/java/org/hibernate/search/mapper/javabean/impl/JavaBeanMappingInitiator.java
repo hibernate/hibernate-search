@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.javabean.impl;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingFactory;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingInitiatorImpl;
+import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 
-public class JavaBeanMappingInitiator extends PojoMappingInitiatorImpl<JavaBeanMapping> {
+public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaBeanMapping> {
 
 	private final JavaBeanTypeConfigurationContributor typeConfigurationContributor;
 

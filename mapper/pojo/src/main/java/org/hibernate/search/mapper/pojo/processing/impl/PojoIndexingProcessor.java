@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.processing.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
@@ -27,7 +27,7 @@ public abstract class PojoIndexingProcessor<T> implements AutoCloseable, ToStrin
 	public void close() {
 	}
 
-	public abstract void process(DocumentElement target, T source, PojoSessionContextImplementor sessionContext);
+	public abstract void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext);
 
 	public static <T> PojoIndexingProcessor<T> noOp() {
 		return NoOpPojoIndexingProcessor.get();

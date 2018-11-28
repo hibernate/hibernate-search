@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.context.impl;
 
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 
-public class JavaBeanMappingContext extends PojoMappingContextImplementor {
+public class JavaBeanMappingContext extends AbstractPojoMappingContextImplementor {
 }

@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
@@ -48,12 +48,12 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	}
 
 	@Override
-	public String toDocumentIdentifier(I identifier, PojoMappingContextImplementor context) {
+	public String toDocumentIdentifier(I identifier, AbstractPojoMappingContextImplementor context) {
 		return bridge.toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override
-	public I fromDocumentIdentifier(String documentId, PojoSessionContextImplementor context) {
+	public I fromDocumentIdentifier(String documentId, AbstractPojoSessionContextImplementor context) {
 		return bridge.fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
 	}
 

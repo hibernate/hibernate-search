@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
  * @param <E> The entity type mapped to an index.
@@ -18,14 +18,14 @@ class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 
 	private final RoutingKeyProvider<E> routingKeyProvider;
 
-	private final PojoSessionContextImplementor sessionContext;
+	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final Object identifier;
 	private final String documentIdentifier;
 	private final Supplier<E> entitySupplier;
 
 	PojoDocumentReferenceProvider(
 			RoutingKeyProvider<E> routingKeyProvider,
-			PojoSessionContextImplementor sessionContext,
+			AbstractPojoSessionContextImplementor sessionContext,
 			Object identifier,
 			String documentIdentifier,
 			Supplier<E> entitySupplier) {

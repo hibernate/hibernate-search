@@ -19,8 +19,8 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.PojoMappingContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
@@ -33,12 +33,12 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers;
-	private final PojoSessionContextImplementor sessionContext;
+	private final AbstractPojoSessionContextImplementor sessionContext;
 	private MappedIndexSearchTarget<PojoReference, O> indexSearchTarget;
 
 	PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers,
-			PojoSessionContextImplementor sessionContext) {
+			AbstractPojoSessionContextImplementor sessionContext) {
 		this.typeManagers = typeManagers;
 		this.targetedTypeManagers = targetedTypeManagers;
 		this.sessionContext = sessionContext;
@@ -103,7 +103,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	}
 
 	private MappedIndexSearchTarget<PojoReference, O> getIndexSearchTarget() {
-		PojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
+		AbstractPojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
 		if ( indexSearchTarget == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends E, ?>> iterator = targetedTypeManagers.iterator();
 			MappedIndexSearchTargetBuilder<PojoReference, O> builder = iterator.next().createSearchTargetBuilder(

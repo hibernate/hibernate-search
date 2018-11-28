@@ -17,14 +17,14 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends PojoTypeWorkPlan {
+class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeWorkPlan {
 
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
 	private final IndexWorkPlan<D> delegate;
@@ -32,7 +32,7 @@ class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends PojoTypeW
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
 
-	PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, PojoSessionContextImplementor sessionContext,
+	PojoIndexedTypeWorkPlan(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
 			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
 		this.typeManager = typeManager;

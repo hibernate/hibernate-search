@@ -13,9 +13,9 @@ import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMapping
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchManagerImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingImplementor;
+import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 
-public class JavaBeanMappingImpl extends PojoMappingImplementor<JavaBeanMapping> implements CloseableJavaBeanMapping {
+public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBeanMapping> implements CloseableJavaBeanMapping {
 
 	private final JavaBeanMappingContext mappingContext;
 

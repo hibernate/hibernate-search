@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
-import org.hibernate.search.mapper.pojo.session.context.spi.PojoSessionContextImplementor;
+import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
@@ -62,7 +62,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 	}
 
 	@Override
-	public final void process(DocumentElement target, T source, PojoSessionContextImplementor sessionContext) {
+	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
 		if ( source == null ) {
 			return;
 		}
