@@ -11,13 +11,13 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
 public class ElasticsearchSearchSortContainerContextImpl
-		extends DelegatingSearchSortContainerContextImpl
+		extends DelegatingSearchSortContainerContext
 		implements ElasticsearchSearchSortContainerContext {
 
 	private final ElasticsearchSearchSortBuilderFactory factory;

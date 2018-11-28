@@ -10,11 +10,11 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
 
 
 public class ElasticsearchSearchPredicateFactoryContextImpl
-		extends DelegatingSearchPredicateFactoryContextImpl
+		extends DelegatingSearchPredicateFactoryContext
 		implements ElasticsearchSearchPredicateFactoryContext {
 
 	private final ElasticsearchSearchPredicateBuilderFactory factory;

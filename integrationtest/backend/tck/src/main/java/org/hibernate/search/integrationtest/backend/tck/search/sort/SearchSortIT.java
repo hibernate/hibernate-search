@@ -29,7 +29,7 @@ import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -531,7 +531,7 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedContext extends DelegatingSearchSortContainerContextImpl {
+	private static class MyExtendedContext extends DelegatingSearchSortContainerContext {
 		MyExtendedContext(SearchSortContainerContext delegate) {
 			super( delegate );
 		}

@@ -14,12 +14,12 @@ import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredic
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-class MultiFieldPredicateCommonState<B, F extends MultiFieldPredicateCommonState.FieldSetContext<B>>
+abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMultiFieldPredicateCommonState.FieldSetContext<B>>
 		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 
-	MultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
+	AbstractMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
 	}
 

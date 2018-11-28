@@ -17,12 +17,12 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 /**
  * @author Yoann Rodiere
  */
-class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
+class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 
-	private static final IndexSchemaNestingContextImpl ROOT =
-			new IndexSchemaNestingContextImpl( IndexSchemaFilter.root(), "", "" );
+	private static final ConfiguredIndexSchemaNestingContext ROOT =
+			new ConfiguredIndexSchemaNestingContext( IndexSchemaFilter.root(), "", "" );
 
-	public static IndexSchemaNestingContextImpl root() {
+	public static ConfiguredIndexSchemaNestingContext root() {
 		return ROOT;
 	}
 
@@ -30,7 +30,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 	private final String prefixFromFilter;
 	private final String unconsumedPrefix;
 
-	private IndexSchemaNestingContextImpl(IndexSchemaFilter filter, String prefixFromFilter,
+	private ConfiguredIndexSchemaNestingContext(IndexSchemaFilter filter, String prefixFromFilter,
 			String unconsumedPrefix) {
 		this.filter = filter;
 		this.prefixFromFilter = prefixFromFilter;
@@ -68,8 +68,8 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 		String nameRelativeToFilter = prefixFromFilter + relativeFieldName;
 		String prefixedRelativeName = unconsumedPrefix + relativeFieldName;
 		if ( filter.isPathIncluded( nameRelativeToFilter ) ) {
-			IndexSchemaNestingContextImpl nestedFilter =
-					new IndexSchemaNestingContextImpl( filter, nameRelativeToFilter + ".", "" );
+			ConfiguredIndexSchemaNestingContext nestedFilter =
+					new ConfiguredIndexSchemaNestingContext( filter, nameRelativeToFilter + ".", "" );
 			return nestedElementFactoryIfIncluded.apply( prefixedRelativeName, nestedFilter );
 		}
 		else {
@@ -96,8 +96,8 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 			}
 			String unconsumedPrefix = prefixToParse.substring( afterPreviousDotIndex );
 
-			IndexSchemaNestingContextImpl nestedContext =
-					new IndexSchemaNestingContextImpl( composedFilter, "", unconsumedPrefix );
+			ConfiguredIndexSchemaNestingContext nestedContext =
+					new ConfiguredIndexSchemaNestingContext( composedFilter, "", unconsumedPrefix );
 			return Optional.of( contextBuilder.build( nestedContext ) );
 		}
 		else {
@@ -109,7 +109,7 @@ class IndexSchemaNestingContextImpl implements IndexSchemaNestingContext {
 
 		void appendObject(String objectName);
 
-		T build(IndexSchemaNestingContextImpl nestingContext);
+		T build(ConfiguredIndexSchemaNestingContext nestingContext);
 
 	}
 }

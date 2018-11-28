@@ -42,7 +42,7 @@ public class RootFailureCollector implements FailureCollector {
 	 */
 	private final int failureLimit;
 
-	private FailureCollectorImpl delegate;
+	private NonRootFailureCollector delegate;
 	private int failureCount = 0;
 
 	public RootFailureCollector(int failureLimit) {
@@ -73,7 +73,7 @@ public class RootFailureCollector implements FailureCollector {
 	@Override
 	public ContextualFailureCollector withContext(EventContext context) {
 		if ( delegate == null ) {
-			delegate = new FailureCollectorImpl( this );
+			delegate = new NonRootFailureCollector( this );
 		}
 		return delegate.withContext( context );
 	}
@@ -81,7 +81,7 @@ public class RootFailureCollector implements FailureCollector {
 	@Override
 	public ContextualFailureCollector withContext(EventContextElement contextElement) {
 		if ( delegate == null ) {
-			delegate = new FailureCollectorImpl( this );
+			delegate = new NonRootFailureCollector( this );
 		}
 		return delegate.withContext( contextElement );
 	}
@@ -94,15 +94,15 @@ public class RootFailureCollector implements FailureCollector {
 		}
 	}
 
-	private static class FailureCollectorImpl implements FailureCollector {
+	private static class NonRootFailureCollector implements FailureCollector {
 		protected final RootFailureCollector root;
 		private Map<EventContextElement, ContextualFailureCollectorImpl> children;
 
-		private FailureCollectorImpl(RootFailureCollector root) {
+		private NonRootFailureCollector(RootFailureCollector root) {
 			this.root = root;
 		}
 
-		protected FailureCollectorImpl(FailureCollectorImpl parent) {
+		protected NonRootFailureCollector(NonRootFailureCollector parent) {
 			this.root = parent.root;
 		}
 
@@ -116,7 +116,7 @@ public class RootFailureCollector implements FailureCollector {
 				return withDefaultContext();
 			}
 			else {
-				FailureCollectorImpl failureCollector = this;
+				NonRootFailureCollector failureCollector = this;
 				for ( EventContextElement contextElement : elements ) {
 					failureCollector = failureCollector.withContext( contextElement );
 				}
@@ -168,13 +168,13 @@ public class RootFailureCollector implements FailureCollector {
 		}
 	}
 
-	private static class ContextualFailureCollectorImpl extends FailureCollectorImpl implements ContextualFailureCollector {
-		private final FailureCollectorImpl parent;
+	private static class ContextualFailureCollectorImpl extends NonRootFailureCollector implements ContextualFailureCollector {
+		private final NonRootFailureCollector parent;
 		private final EventContextElement context;
 
 		private List<String> failureMessages;
 
-		private ContextualFailureCollectorImpl(FailureCollectorImpl parent, EventContextElement context) {
+		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement context) {
 			super( parent );
 			this.parent = parent;
 			this.context = context;

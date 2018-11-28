@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
  * {@link SearchPredicateFactoryContext}.
  *
  * @see SearchPredicateFactoryContext#extension(SearchPredicateFactoryContextExtension)
- * @see DelegatingSearchPredicateFactoryContextImpl
+ * @see DelegatingSearchPredicateFactoryContext
  */
 public interface SearchPredicateFactoryContextExtension<T> {
 

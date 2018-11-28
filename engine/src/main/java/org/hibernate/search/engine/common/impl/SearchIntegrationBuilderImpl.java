@@ -275,12 +275,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 
 		void collect() {
-			mappingInitiator.configure( buildContext, propertySource, new ConfigurationCollector() );
+			mappingInitiator.configure( buildContext, propertySource, new MappingConfigurationCollectorImpl() );
 		}
 
 		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 
-			ContributorProvider contributorProvider = new ContributorProvider();
+			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
 			mapper = mappingInitiator.createMapper( buildContext, propertySource, contributorProvider );
 
 			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
@@ -374,7 +374,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 		}
 
-		private class ConfigurationCollector implements MappingConfigurationCollector<C> {
+		private class MappingConfigurationCollectorImpl implements MappingConfigurationCollector<C> {
 			@Override
 			public void mapToIndex(MappableTypeModel typeModel, String indexName) {
 				if ( typeModel.isAbstract() ) {
@@ -399,7 +399,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 		}
 
-		private class ContributorProvider implements TypeMetadataContributorProvider<C> {
+		private class TypeMetadataContributorProviderImpl implements TypeMetadataContributorProvider<C> {
 			@Override
 			public void forEach(MappableTypeModel typeModel, Consumer<C> contributorConsumer) {
 				typeModel.getDescendingSuperTypes()

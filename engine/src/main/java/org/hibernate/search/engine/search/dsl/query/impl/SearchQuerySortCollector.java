@@ -11,8 +11,8 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.impl.RootSearchSortDslContextImpl;
-import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.impl.SearchSortDslContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.impl.DefaultSearchSortContainerContext;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
@@ -25,11 +25,11 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 class SearchQuerySortCollector<C, B> {
 
 	private final SearchSortBuilderFactory<C, B> factory;
-	private final RootSearchSortDslContextImpl<B> rootDslContext;
+	private final SearchSortDslContextImpl<B> rootDslContext;
 
 	SearchQuerySortCollector(SearchSortBuilderFactory<C, B> factory) {
 		this.factory = factory;
-		this.rootDslContext = new RootSearchSortDslContextImpl<>( factory );
+		this.rootDslContext = new SearchSortDslContextImpl<>( factory );
 	}
 
 	void contribute(C collector) {
@@ -42,7 +42,7 @@ class SearchQuerySortCollector<C, B> {
 
 	void collect(Consumer<? super SearchSortContainerContext> dslPredicateContributor) {
 		SearchSortContainerContext containerContext =
-				new SearchSortContainerContextImpl<>( factory, rootDslContext );
+				new DefaultSearchSortContainerContext<>( factory, rootDslContext );
 		dslPredicateContributor.accept( containerContext );
 	}
 }

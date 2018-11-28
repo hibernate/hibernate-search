@@ -32,7 +32,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
-public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
+public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
@@ -54,7 +54,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void noFilter() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		checkFooBarIncluded( "", rootContext );
 
@@ -66,9 +66,9 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
@@ -82,7 +82,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 		// Check IndexedEmbedded composition
 
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"prefix1_level2", level1Context, typeModel2Mock, "level2.prefix2_",
 				null, null
 		);
@@ -91,9 +91,9 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_detectCycle_direct() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
@@ -120,14 +120,14 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_detectCycle_indirect() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.prefix1_",
 				null, null
 		);
 
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"prefix1_level2", level1Context, typeModel1Mock, "level2.prefix2_",
 				null, null
 		);
@@ -153,10 +153,10 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_noFilter_multiLevelInOneIndexedEmbedded() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		StubNestedContextBuilder nestedContextBuilderMock = createStrictMock( StubNestedContextBuilder.class );
-		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = newCapture();
+		Capture<ConfiguredIndexSchemaNestingContext> nestedContextCapture = newCapture();
 
 		Object expectedReturn;
 		Optional<Object> actualReturn;
@@ -176,7 +176,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		assertTrue( actualReturn.isPresent() );
 		assertSame( expectedReturn, actualReturn.get() );
 
-		IndexSchemaNestingContextImpl level3Context = nestedContextCapture.getValue();
+		ConfiguredIndexSchemaNestingContext level3Context = nestedContextCapture.getValue();
 
 		checkFooBarIncluded( "prefix1_", level3Context );
 	}
@@ -184,14 +184,14 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2552")
 	public void indexedEmbedded_includePaths() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
 		includePaths.add( "level2.prefix2_level3" );
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths
 		);
@@ -218,7 +218,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 		// Check IndexedEmbedded composition without a prefix
 
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null
 		);
@@ -269,16 +269,16 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
 	public void indexedEmbedded_noFilterThenIncludePaths() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// First level of @IndexedEmbedded: no filter
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"professionnelGC", rootContext, typeModel1Mock, "professionnelGC.",
 				null, null
 		);
 
 		// Second level of @IndexedEmbedded: includePaths filter
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"groupe", level1Context, typeModel1Mock, "groupe.",
 				null, CollectionHelper.asSet( "raisonSociale" )
 		);
@@ -289,7 +289,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_depth0() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 0 => do not allow IndexedEmbedded composition nor non-IndexedEmbedded nesting
 		// There is little use for this, but we test it as an edge case
@@ -302,12 +302,12 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_depth1() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 1 => do not allow IndexedEmbedded composition at all,
 		// but allow unlimited non-IndexedEmbedded nesting
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock,
 				"level1.", 1, null
 		);
@@ -327,12 +327,12 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_depth3_overridden() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		// Depth == 3 => allow three levels of IndexedEmbedded composition, including level1,
 		// and allow unlimited non-IndexedEmbedded nesting from any of those three levels
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock,
 				"level1.", 3, null
 		);
@@ -354,7 +354,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 		// Check IndexedEmbedded composition
 
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock,
 				"level2.", null, null
 		);
@@ -366,7 +366,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 				checkCompositeIncluded( "level4", level3NonIndexedEmbeddedContext, "level4" );
 		checkFooBarIncluded( "", level4NonIndexedEmbeddedContext );
 
-		IndexSchemaNestingContextImpl level3Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
 				"level3", level2Context, typeModel3Mock,
 				"level3.", null, null
 		);
@@ -396,14 +396,14 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_includePaths_depth1() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
 		includePaths.add( "level2.prefix2_level3" );
 
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				1, includePaths
 		);
@@ -419,7 +419,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 		// Check IndexedEmbedded composition without a prefix
 
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				null, null
 		);
@@ -469,12 +469,12 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 	@Test
 	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
-		IndexSchemaNestingContextImpl rootContext = IndexSchemaNestingContextImpl.root();
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
 
 		includePaths.add( "level2.level3" );
-		IndexSchemaNestingContextImpl level1Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock, "level1.",
 				null, includePaths
 		);
@@ -484,7 +484,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 
 		includePaths.clear();
 		includePaths.add( "level3-alt.level4" );
-		IndexSchemaNestingContextImpl level2Context = checkSimpleIndexedEmbeddedIncluded(
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
 				1, includePaths
 		);
@@ -563,10 +563,10 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		}
 	}
 
-	private IndexSchemaNestingContextImpl checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
-			IndexSchemaNestingContextImpl context, MappableTypeModel typeModel,
+	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
+			ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
-		Capture<IndexSchemaNestingContextImpl> nestedContextCapture = newCapture();
+		Capture<ConfiguredIndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
 		nestedContextBuilderMock.appendObject( expectedObjectName );
@@ -582,7 +582,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		return nestedContextCapture.getValue();
 	}
 
-	private void checkSimpleIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, MappableTypeModel typeModel,
+	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
 		resetAll();
 		replayAll();
@@ -619,7 +619,7 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 		checkCompositeExcluded( expectedPrefix + "foo.bar", context, "foo.bar", recurse );
 	}
 
-	private void checkFooBarIndexedEmbeddedExcluded(IndexSchemaNestingContextImpl context, MappableTypeModel typeModel) {
+	private void checkFooBarIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel) {
 		checkSimpleIndexedEmbeddedExcluded(
 				context, typeModel, "foo.", null, null
 		);
@@ -646,6 +646,6 @@ public class IndexSchemaNestingContextImplTest extends EasyMockSupport {
 	private interface StubCompositeFactoryFunction extends BiFunction<String, IndexSchemaNestingContext, Object> {
 	}
 
-	private interface StubNestedContextBuilder extends IndexSchemaNestingContextImpl.NestedContextBuilder<Object> {
+	private interface StubNestedContextBuilder extends ConfiguredIndexSchemaNestingContext.NestedContextBuilder<Object> {
 	}
 }

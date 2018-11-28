@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.common.Contracts;
 
 
 class SpatialWithinPredicateFieldSetContextImpl<B>
-		implements SpatialWithinPredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
+		implements SpatialWithinPredicateFieldSetContext, AbstractMultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private final CommonState<B> commonState;
 
@@ -118,7 +118,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends MultiFieldPredicateCommonState<B, SpatialWithinPredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractMultiFieldPredicateCommonState<B, SpatialWithinPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {

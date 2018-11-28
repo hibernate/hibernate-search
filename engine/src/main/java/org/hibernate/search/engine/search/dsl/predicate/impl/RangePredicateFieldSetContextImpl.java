@@ -25,7 +25,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class RangePredicateFieldSetContextImpl<B>
-		implements RangePredicateFieldSetContext, MultiFieldPredicateCommonState.FieldSetContext<B> {
+		implements RangePredicateFieldSetContext, AbstractMultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -77,7 +77,7 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends MultiFieldPredicateCommonState<B, RangePredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractMultiFieldPredicateCommonState<B, RangePredicateFieldSetContextImpl<B>>
 			implements RangePredicateFromContext, SearchPredicateTerminalContext {
 
 		private boolean hasNonNullBound = false;

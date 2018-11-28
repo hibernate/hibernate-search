@@ -19,7 +19,7 @@ class NonRootIndexModelBindingContext
 
 	NonRootIndexModelBindingContext(IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
 			Collection<IndexObjectFieldAccessor> parentObjectAccessors,
-			IndexSchemaNestingContextImpl nestingContext) {
+			ConfiguredIndexSchemaNestingContext nestingContext) {
 		super( indexSchemaObjectNodeBuilder, nestingContext );
 		this.parentObjectAccessors = Collections.unmodifiableCollection( parentObjectAccessors );
 	}

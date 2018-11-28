@@ -10,13 +10,13 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContextImpl;
+import org.hibernate.search.engine.search.dsl.predicate.spi.DelegatingSearchPredicateFactoryContext;
 
 import org.apache.lucene.search.Query;
 
 
 public class LuceneSearchPredicateFactoryContextImpl
-		extends DelegatingSearchPredicateFactoryContextImpl
+		extends DelegatingSearchPredicateFactoryContext
 		implements LuceneSearchPredicateFactoryContext {
 
 	private final LuceneSearchPredicateBuilderFactory factory;

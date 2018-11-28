@@ -25,11 +25,11 @@ import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.Contracts;
 
 
-public class SearchProjectionFactoryContextImpl<R, O> implements SearchProjectionFactoryContext<R, O> {
+public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjectionFactoryContext<R, O> {
 
 	private final SearchProjectionBuilderFactory factory;
 
-	public SearchProjectionFactoryContextImpl(SearchProjectionBuilderFactory factory) {
+	public DefaultSearchProjectionFactoryContext(SearchProjectionBuilderFactory factory) {
 		this.factory = factory;
 	}
 

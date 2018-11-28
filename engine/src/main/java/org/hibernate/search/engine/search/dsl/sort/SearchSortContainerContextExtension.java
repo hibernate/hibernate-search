@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
  * {@link SearchSortContainerContext}.
  *
  * @see SearchSortContainerContext#extension(SearchSortContainerContextExtension)
- * @see DelegatingSearchSortContainerContextImpl
+ * @see DelegatingSearchSortContainerContext
  */
 public interface SearchSortContainerContextExtension<T> {
 

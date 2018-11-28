@@ -13,13 +13,13 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.sort.NonEmptySortContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContextImpl;
+import org.hibernate.search.engine.search.dsl.sort.spi.DelegatingSearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 
 
 public class LuceneSearchSortContainerContextImpl
-		extends DelegatingSearchSortContainerContextImpl
+		extends DelegatingSearchSortContainerContext
 		implements LuceneSearchSortContainerContext {
 
 	private final LuceneSearchSortBuilderFactory factory;

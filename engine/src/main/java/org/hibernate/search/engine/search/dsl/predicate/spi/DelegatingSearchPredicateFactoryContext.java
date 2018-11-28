@@ -4,15 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.dsl.predicate.impl;
+package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
@@ -20,69 +19,71 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
+/**
+ * A delegating {@link SearchPredicateFactoryContext}.
+ * <p>
+ * Mainly useful when implementing a {@link SearchPredicateFactoryContextExtension}.
+ */
+public class DelegatingSearchPredicateFactoryContext implements SearchPredicateFactoryContext {
 
-public class SearchPredicateFactoryContextImpl<B> implements SearchPredicateFactoryContext {
+	private final SearchPredicateFactoryContext delegate;
 
-	private final SearchPredicateBuilderFactory<?, B> factory;
-
-	public SearchPredicateFactoryContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
-		this.factory = factory;
+	public DelegatingSearchPredicateFactoryContext(SearchPredicateFactoryContext delegate) {
+		this.delegate = delegate;
 	}
 
 	@Override
 	public MatchAllPredicateContext matchAll() {
-		return new MatchAllPredicateContextImpl<>( factory, this );
+		return delegate.matchAll();
 	}
 
 	@Override
 	public MatchIdPredicateContext id() {
-		return new MatchIdPredicateContextImpl<>( factory, this );
+		return delegate.id();
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext bool() {
-		return new BooleanJunctionPredicateContextImpl<>( factory, this );
+		return delegate.bool();
 	}
 
 	@Override
 	public SearchPredicate bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
-		BooleanJunctionPredicateContext context = bool();
-		clauseContributor.accept( context );
-		return context.toPredicate();
+		return delegate.bool( clauseContributor );
 	}
 
 	@Override
 	public MatchPredicateContext match() {
-		return new MatchPredicateContextImpl<>( factory );
+		return delegate.match();
 	}
 
 	@Override
 	public RangePredicateContext range() {
-		return new RangePredicateContextImpl<>( factory );
+		return delegate.range();
 	}
 
 	@Override
 	public NestedPredicateContext nested() {
-		return new NestedPredicateContextImpl<>( factory, this );
+		return delegate.nested();
 	}
 
 	@Override
 	public SpatialPredicateContext spatial() {
-		return new SpatialPredicateContextImpl<>( factory );
+		return delegate.spatial();
 	}
 
 	@Override
 	public <T> T extension(SearchPredicateFactoryContextExtension<T> extension) {
-		return DslExtensionState.returnIfSupported(
-				extension, extension.extendOptional( this, factory )
-		);
+		return delegate.extension( extension );
 	}
 
 	@Override
 	public SearchPredicateFactoryExtensionContext extension() {
-		return new SearchPredicateFactoryExtensionContextImpl<>( this, factory );
+		return delegate.extension();
 	}
 
+	protected SearchPredicateFactoryContext getDelegate() {
+		return delegate;
+	}
 }

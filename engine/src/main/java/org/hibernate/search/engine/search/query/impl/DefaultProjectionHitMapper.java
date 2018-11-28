@@ -16,14 +16,14 @@ import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
-public class ProjectionHitMapperImpl<R, O> implements ProjectionHitMapper<R, O> {
+public class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapper<R, O> {
 
 	private final Function<DocumentReference, R> documentReferenceTransformer;
 	private final ObjectLoader<R, O> objectLoader;
 
 	private final List<R> referencesToLoad = new ArrayList<>();
 
-	public ProjectionHitMapperImpl(Function<DocumentReference, R> documentReferenceTransformer,
+	public DefaultProjectionHitMapper(Function<DocumentReference, R> documentReferenceTransformer,
 			ObjectLoader<R, O> objectLoader) {
 		this.documentReferenceTransformer = documentReferenceTransformer;
 		this.objectLoader = objectLoader;
@@ -42,14 +42,14 @@ public class ProjectionHitMapperImpl<R, O> implements ProjectionHitMapper<R, O> 
 
 	@Override
 	public LoadingResult<O> load() {
-		return new LoadingResultImpl<>( objectLoader.load( referencesToLoad ) );
+		return new DefaultLoadingResult<>( objectLoader.load( referencesToLoad ) );
 	}
 
-	private static class LoadingResultImpl<O> implements LoadingResult<O> {
+	private static class DefaultLoadingResult<O> implements LoadingResult<O> {
 
 		private final List<O> loadedObjects;
 
-		private LoadingResultImpl(List<O> loadedObjects) {
+		private DefaultLoadingResult(List<O> loadedObjects) {
 			this.loadedObjects = CollectionHelper.toImmutableList( loadedObjects );
 		}
 
