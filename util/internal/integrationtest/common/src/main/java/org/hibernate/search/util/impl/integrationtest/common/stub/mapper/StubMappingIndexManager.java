@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
@@ -34,6 +35,14 @@ public class StubMappingIndexManager {
 
 	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubSessionContext sessionContext) {
 		return indexManager.createWorkPlan( sessionContext );
+	}
+
+	public IndexWorkExecutor<? extends DocumentElement> createWorkExecutor() {
+		return createWorkExecutor( new StubSessionContext() );
+	}
+
+	public IndexWorkExecutor<? extends DocumentElement> createWorkExecutor(StubSessionContext sessionContext) {
+		return indexManager.createWorkExecutor( sessionContext );
 	}
 
 	/**
