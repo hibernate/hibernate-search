@@ -59,27 +59,29 @@ public final class ConvertUtils {
 	 * @throws SearchException for invalid format or values.
 	 */
 	public static Optional<Boolean> convertBoolean(Object value) {
-		if ( value instanceof Boolean ) {
-			return Optional.of( (Boolean) value );
-		}
 		try {
-			Optional<String> optionalCleaned = optionalTrimmedNonEmpty( (String) value );
-			if ( optionalCleaned.isPresent() ) {
-				String cleaned = optionalCleaned.get();
-				// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
-				if ( "false".equalsIgnoreCase( cleaned ) ) {
-					return Optional.of( false );
-				}
-				else if ( "true".equalsIgnoreCase( cleaned ) ) {
-					return Optional.of( true );
+			if ( value instanceof Boolean ) {
+				return Optional.of( (Boolean) value );
+			}
+			if ( value instanceof String ) {
+				Optional<String> optionalCleaned = optionalTrimmedNonEmpty( (String) value );
+				if ( optionalCleaned.isPresent() ) {
+					String cleaned = optionalCleaned.get();
+					// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
+					if ( "false".equalsIgnoreCase( cleaned ) ) {
+						return Optional.of( false );
+					}
+					else if ( "true".equalsIgnoreCase( cleaned ) ) {
+						return Optional.of( true );
+					}
 				}
 			}
 		}
 		catch (RuntimeException e) {
-			throw log.invalidBooleanPropertyValue( e );
+			throw log.invalidBooleanPropertyValue( e.getMessage(), e );
 		}
 
-		throw log.invalidBooleanPropertyValue( null );
+		throw log.invalidBooleanPropertyValue( "", null );
 	}
 
 	/**
@@ -90,16 +92,20 @@ public final class ConvertUtils {
 	 * @throws SearchException for invalid format or values.
 	 */
 	public static Optional<Integer> convertInteger(Object value) {
-		if ( value instanceof Number ) {
-			return Optional.of( ( (Number) value ).intValue() );
-		}
 		try {
-			return optionalTrimmedNonEmpty( (String) value )
-					.map( Integer::parseInt );
+			if ( value instanceof Number ) {
+				return Optional.of( ( (Number) value ).intValue() );
+			}
+			if ( value instanceof String ) {
+				return optionalTrimmedNonEmpty( (String) value )
+						.map( Integer::parseInt );
+			}
 		}
 		catch (RuntimeException e) {
 			throw log.invalidIntegerPropertyValue( e.getMessage(), e );
 		}
+
+		throw log.invalidIntegerPropertyValue( "", null );
 	}
 
 	/**
@@ -110,16 +116,20 @@ public final class ConvertUtils {
 	 * @throws SearchException for invalid format or values.
 	 */
 	public static Optional<Long> convertLong(Object value) {
-		if ( value instanceof Number ) {
-			return Optional.of( ( (Number) value ).longValue() );
-		}
 		try {
-			return optionalTrimmedNonEmpty( (String) value )
-					.map( Long::parseLong );
+			if ( value instanceof Number ) {
+				return Optional.of( ( (Number) value ).longValue() );
+			}
+			if ( value instanceof String ) {
+				return optionalTrimmedNonEmpty( (String) value )
+						.map( Long::parseLong );
+			}
 		}
 		catch (RuntimeException e) {
 			throw log.invalidLongPropertyValue( e.getMessage(), e );
 		}
+
+		throw log.invalidLongPropertyValue( "", null );
 	}
 
 	public static <T> Optional<List<T>> convertMultiValue(Pattern separatorPattern,
