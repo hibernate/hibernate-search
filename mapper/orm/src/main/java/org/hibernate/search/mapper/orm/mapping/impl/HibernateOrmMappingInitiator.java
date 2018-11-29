@@ -18,6 +18,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
@@ -43,6 +44,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
 					.asBoolean()
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
+					.build();
+
+	private static final ConfigurationProperty<Optional<BeanReference>> MAPPING_CONFIGURER =
+			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
+					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata,
@@ -108,15 +114,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 		// Apply the user-provided mapping configurer if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-		ConfigurationProperty<Optional<HibernateOrmSearchMappingConfigurer>> mappingConfigurerProperty =
-				ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
-						.as(
-								HibernateOrmSearchMappingConfigurer.class,
-								reference -> beanProvider.getBean(
-										HibernateOrmSearchMappingConfigurer.class, reference )
-						)
-						.build();
-		mappingConfigurerProperty.get( propertySource )
+		MAPPING_CONFIGURER.get( propertySource )
+				.map( beanReference -> beanReference.getBean( beanProvider, HibernateOrmSearchMappingConfigurer.class ) )
 				.ifPresent( configurer -> configurer.configure( this ) );
 
 		super.configure( buildContext, propertySource, configurationCollector );

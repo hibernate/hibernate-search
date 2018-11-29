@@ -8,6 +8,8 @@ package org.hibernate.search.engine.cfg.spi;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
+
 public interface KeyContext {
 	OptionalPropertyContext<String> asString();
 
@@ -16,6 +18,8 @@ public interface KeyContext {
 	OptionalPropertyContext<Integer> asInteger();
 
 	OptionalPropertyContext<Long> asLong();
+
+	OptionalPropertyContext<BeanReference> asBeanReference(Class<?> expectedType);
 
 	<T> OptionalPropertyContext<T> as(Class<T> expectedType, Function<String, T> parser);
 }

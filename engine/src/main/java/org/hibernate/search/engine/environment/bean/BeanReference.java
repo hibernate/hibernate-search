@@ -55,4 +55,14 @@ public interface BeanReference {
 		return TypeAndNameBeanReference.createLenient( type, name );
 	}
 
+	/**
+	 * Create a {@link BeanReference} referencing a bean instance directly.
+	 *
+	 * @param instance The bean instance. Must not be null.
+	 * @return The corresponding {@link BeanReference}.
+	 */
+	static BeanReference ofInstance(Object instance) {
+		return new InstanceBeanReference( instance );
+	}
+
 }

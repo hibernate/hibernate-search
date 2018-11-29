@@ -239,4 +239,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 46, value = "Found an infinite IndexedEmbedded recursion involving path '%1$s' on type '%2$s'.")
 	SearchException indexedEmbeddedCyclicRecursion(String cyclicRecursionPath, @FormatWith(MappableTypeModelFormatter.class) MappableTypeModel parentTypeModel);
+
+	@Message(id = ID_OFFSET_2 + 47,
+			value = "Invalid BeanReference value: expected an instance of '%1$s', BeanReference, String or Class. %2$s")
+	SearchException invalidBeanReferencePropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType,
+			String nestedErrorMessage, @Cause Exception cause);
 }
