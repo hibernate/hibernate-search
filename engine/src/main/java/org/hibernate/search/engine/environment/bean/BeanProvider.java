@@ -30,14 +30,14 @@ public interface BeanProvider {
 	 * Retrieve a bean referenced by its type.
 	 * @param <T> The expected return type.
 	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
-	 * @param typeReference The type used as a reference to the bean to retrieve.
+	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
 	 * @return The resolved bean.
 	 * @throws SearchException if the reference is invalid (null) or the bean cannot be resolved.
 	 */
 	<T> T getBean(Class<T> expectedClass, Class<?> typeReference);
 
 	/**
-	 * Retrieve a bean referenced by its type.
+	 * Retrieve a bean referenced by its name.
 	 * @param <T> The expected return type.
 	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
 	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
@@ -47,13 +47,14 @@ public interface BeanProvider {
 	<T> T getBean(Class<T> expectedClass, String nameReference);
 
 	/**
-	 * Retrieve a bean referenced by its type, name, or both, depending on the content of the {@link BeanReference}.
+	 * Retrieve a bean referenced by its type and name.
 	 * @param <T> The expected return type.
 	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
-	 * @param reference The reference to the bean to retrieve. Must be non-null.
+	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
+	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
 	 * @return The resolved bean.
 	 * @throws SearchException if the reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	<T> T getBean(Class<T> expectedClass, BeanReference reference);
+	<T> T getBean(Class<T> expectedClass, Class<?> typeReference, String nameReference);
 
 }

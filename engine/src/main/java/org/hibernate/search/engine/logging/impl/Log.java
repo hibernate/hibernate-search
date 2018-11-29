@@ -207,17 +207,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 34, value = "No index manager registered for index manager name: '%1$s'.")
 	SearchException noIndexManagerRegistered(String indexManagerName);
 
-	@Message(id = ID_OFFSET_2 + 35, value = "Got an empty bean reference (type is null).")
-	SearchException emptyBeanReferenceTypeNull();
+	@Message(id = ID_OFFSET_2 + 35, value = "Invalid bean reference: type is null.")
+	SearchException invalidBeanReferenceTypeNull();
 
-	@Message(id = ID_OFFSET_2 + 36, value = "Got an empty bean reference (name is null or empty).")
-	SearchException emptyBeanReferenceNameNullOrEmpty();
+	@Message(id = ID_OFFSET_2 + 36, value = "Invalid bean reference: name is null or empty.")
+	SearchException invalidBeanReferenceNameNullOrEmpty();
 
-	@Message(id = ID_OFFSET_2 + 37, value = "Got an empty bean reference (reference is null.)")
-	SearchException emptyBeanReferenceNull();
-
-	@Message(id = ID_OFFSET_2 + 38, value = "Got an empty bean reference (no name, no type).")
-	SearchException emptyBeanReferenceNoNameNoType();
+	@Message(id = ID_OFFSET_2 + 37, value = "Invalid bean reference: type is null and name is null or empty.")
+	SearchException invalidBeanReferenceTypeIsNullAndNameNullOrEmpty();
 
 	@Message(id = ID_OFFSET_2 + 39, value = "This bean resolver does not support bean references using both a name and a type. Got both '%1$s' and '%2$s' in the same reference.")
 	SearchException resolveBeanUsingBothNameAndType(String nameReference, @FormatWith(ClassFormatter.class) Class<?> typeReference);
