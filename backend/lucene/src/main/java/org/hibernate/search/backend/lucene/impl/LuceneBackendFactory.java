@@ -163,7 +163,7 @@ public class LuceneBackendFactory implements BackendFactory {
 							.as(
 									LuceneAnalysisConfigurer.class,
 									reference -> beanProvider
-											.getBean( reference, LuceneAnalysisConfigurer.class )
+											.getBean( LuceneAnalysisConfigurer.class, reference )
 							)
 							.build();
 			return analysisConfigurerProperty.get( propertySource )

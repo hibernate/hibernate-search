@@ -26,23 +26,23 @@ public class BeanProviderImpl implements BeanProvider {
 	}
 
 	@Override
-	public <T> T getBean(Class<?> typeReference, Class<T> expectedClass) {
+	public <T> T getBean(Class<T> expectedClass, Class<?> typeReference) {
 		if ( typeReference == null ) {
 			throw log.emptyBeanReferenceTypeNull();
 		}
-		return beanResolver.resolve( typeReference, expectedClass );
+		return beanResolver.resolve( expectedClass, typeReference );
 	}
 
 	@Override
-	public <T> T getBean(String nameReference, Class<T> expectedClass) {
+	public <T> T getBean(Class<T> expectedClass, String nameReference) {
 		if ( StringHelper.isEmpty( nameReference ) ) {
 			throw log.emptyBeanReferenceNameNullOrEmpty();
 		}
-		return beanResolver.resolve( nameReference, expectedClass );
+		return beanResolver.resolve( expectedClass, nameReference );
 	}
 
 	@Override
-	public <T> T getBean(BeanReference reference, Class<T> expectedClass) {
+	public <T> T getBean(Class<T> expectedClass, BeanReference reference) {
 		if ( reference == null ) {
 			throw log.emptyBeanReferenceNull();
 		}
@@ -53,13 +53,13 @@ public class BeanProviderImpl implements BeanProvider {
 		boolean typeProvided = typeReference != null;
 
 		if ( nameProvided && typeProvided ) {
-			return beanResolver.resolve( nameReference, typeReference, expectedClass );
+			return beanResolver.resolve( expectedClass, nameReference, typeReference );
 		}
 		else if ( nameProvided ) {
-			return beanResolver.resolve( nameReference, expectedClass );
+			return beanResolver.resolve( expectedClass, nameReference );
 		}
 		else if ( typeProvided ) {
-			return beanResolver.resolve( typeReference, expectedClass );
+			return beanResolver.resolve( expectedClass, typeReference );
 		}
 		else {
 			throw log.emptyBeanReferenceNoNameNoType();

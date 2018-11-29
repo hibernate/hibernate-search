@@ -14,13 +14,12 @@ import java.util.StringJoiner;
  */
 final class ImmutableBeanReference implements BeanReference {
 
+	private final Class<?> type;
 	private final String name;
 
-	private final Class<?> type;
-
-	ImmutableBeanReference(String name, Class<?> type) {
-		this.name = name;
+	ImmutableBeanReference(Class<?> type, String name) {
 		this.type = type;
+		this.name = name;
 	}
 
 	@Override
@@ -28,12 +27,12 @@ final class ImmutableBeanReference implements BeanReference {
 		StringBuilder builder = new StringBuilder();
 		builder.append( "<" );
 		StringJoiner joiner = new StringJoiner( ", " );
+		if ( type != null ) {
+			joiner.add( "type=" + type );
+		}
 		if ( name != null ) {
 			// Add this even if name is empty
 			joiner.add( "name=" + name );
-		}
-		if ( type != null ) {
-			joiner.add( "type=" + type );
 		}
 		builder.append( joiner );
 		builder.append( ">" );
@@ -41,13 +40,13 @@ final class ImmutableBeanReference implements BeanReference {
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public Class<?> getType() {
+		return type;
 	}
 
 	@Override
-	public Class<?> getType() {
-		return type;
+	public String getName() {
+		return name;
 	}
 
 }

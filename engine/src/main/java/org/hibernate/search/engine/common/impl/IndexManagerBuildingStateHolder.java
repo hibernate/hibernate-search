@@ -98,7 +98,7 @@ class IndexManagerBuildingStateHolder {
 		String backendType = BACKEND_TYPE.get( backendPropertySource ).get();
 
 		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
-		BackendFactory backendFactory = beanProvider.getBean( backendType, BackendFactory.class );
+		BackendFactory backendFactory = beanProvider.getBean( BackendFactory.class, backendType );
 		BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
 		BackendImplementor<?> backend = backendFactory.create( backendName, backendBuildContext, backendPropertySource );

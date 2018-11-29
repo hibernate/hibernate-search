@@ -31,35 +31,35 @@ public interface BeanResolver extends AutoCloseable {
 
 	/**
 	 * Resolve a bean by its type.
+	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. The returned bean must implement this class.
 	 * @param typeReference The type of the bean to resolve.
 	 * Depending on the implementation, this could be a superclass or superinterface of the resolved bean.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
-	 * @param <T> The expected return type.
 	 * @return The resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(Class<?> typeReference, Class<T> expectedClass);
+	<T> T resolve(Class<T> expectedClass, Class<?> typeReference);
 
 	/**
 	 * Resolve a bean by its name.
-	 * @param nameReference The name of the bean to resolve.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
 	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. The returned bean must implement this class.
+	 * @param nameReference The name of the bean to resolve.
 	 * @return The resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(String nameReference, Class<T> expectedClass);
+	<T> T resolve(Class<T> expectedClass, String nameReference);
 
 	/**
 	 * Resolve a bean by its name <em>and</em> type.
+	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. The returned bean must implement this class.
 	 * @param nameReference The name of the bean to resolve.
 	 * @param typeReference The type of the bean to resolve.
 	 * Depending on the implementation, this could be a superclass or superinterface of the resolved bean.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
-	 * @param <T> The expected return type.
 	 * @return The resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass);
+	<T> T resolve(Class<T> expectedClass, String nameReference, Class<?> typeReference);
 
 }

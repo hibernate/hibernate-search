@@ -54,7 +54,7 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 			@Override
 			public <B> B produceBeanInstance(String s, Class<B> aClass) {
-				return delegate.resolve( s, aClass );
+				return delegate.resolve( aClass, s );
 			}
 		};
 	}
@@ -68,21 +68,21 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(Class<?> typeReference, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, Class<?> typeReference) {
 		ContainedBean<?> containedBean = beanContainer.getBean( typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer );
 		register( containedBean );
 		return expectedClass.cast( containedBean.getBeanInstance() );
 	}
 
 	@Override
-	public <T> T resolve(String nameReference, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, String nameReference) {
 		ContainedBean<T> containedBean = beanContainer.getBean( nameReference, expectedClass, LIFECYCLE_OPTIONS, fallbackInstanceProducer );
 		register( containedBean );
 		return containedBean.getBeanInstance();
 	}
 
 	@Override
-	public <T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, String nameReference, Class<?> typeReference) {
 		ContainedBean<?> containedBean = beanContainer.getBean( nameReference, typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer );
 		register( containedBean );
 		return expectedClass.cast( containedBean.getBeanInstance() );

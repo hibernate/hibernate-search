@@ -133,7 +133,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 							.as(
 									ElasticsearchAnalysisConfigurer.class,
 									reference -> beanProvider
-											.getBean( reference, ElasticsearchAnalysisConfigurer.class )
+											.getBean( ElasticsearchAnalysisConfigurer.class, reference )
 							)
 							.build();
 			return analysisConfigurerProperty.get( propertySource )

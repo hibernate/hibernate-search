@@ -30,6 +30,6 @@ public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 	@Override
 	public T build(BridgeBuildContext buildContext) {
 		BeanProvider beanProvider = buildContext.getBeanProvider();
-		return beanProvider.getBean( beanReference, expectedType );
+		return beanProvider.getBean( expectedType, beanReference );
 	}
 }

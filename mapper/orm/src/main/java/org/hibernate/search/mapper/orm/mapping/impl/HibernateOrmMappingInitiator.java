@@ -112,7 +112,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
 						.as(
 								HibernateOrmSearchMappingConfigurer.class,
-								reference -> beanProvider.getBean( reference, HibernateOrmSearchMappingConfigurer.class )
+								reference -> beanProvider.getBean(
+										HibernateOrmSearchMappingConfigurer.class, reference )
 						)
 						.build();
 		mappingConfigurerProperty.get( propertySource )

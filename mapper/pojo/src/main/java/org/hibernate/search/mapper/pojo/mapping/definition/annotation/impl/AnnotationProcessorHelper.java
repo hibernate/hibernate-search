@@ -116,7 +116,7 @@ class AnnotationProcessorHelper {
 
 		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 		AnnotationMarkerBuilder<A> builder =
-				beanProvider.getBean( markerBuilderReference, AnnotationMarkerBuilder.class );
+				beanProvider.getBean( AnnotationMarkerBuilder.class, markerBuilderReference );
 
 		builder.initialize( annotation );
 
@@ -150,7 +150,7 @@ class AnnotationProcessorHelper {
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanProvider.getBean( bridgeBuilderReference.get(), BridgeBuilder.class );
+			return beanProvider.getBean( BridgeBuilder.class, bridgeBuilderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -245,7 +245,7 @@ class AnnotationProcessorHelper {
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanProvider.getBean( bridgeBuilderReference.get(), BridgeBuilder.class );
+			return beanProvider.getBean( BridgeBuilder.class, bridgeBuilderReference.get() );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -263,7 +263,8 @@ class AnnotationProcessorHelper {
 			return new BeanResolverBridgeBuilder<>( bridgeClass, bridgeReferenceOptional.get() );
 		}
 		else if ( builderReferenceOptional.isPresent() ) {
-			AnnotationBridgeBuilder builder = beanProvider.getBean( builderReferenceOptional.get(), AnnotationBridgeBuilder.class );
+			AnnotationBridgeBuilder builder = beanProvider.getBean(
+					AnnotationBridgeBuilder.class, builderReferenceOptional.get() );
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 			builder.initialize( annotation );
 			return builder;
@@ -280,7 +281,7 @@ class AnnotationProcessorHelper {
 			return Optional.empty();
 		}
 		else {
-			return Optional.of( BeanReference.of( cleanedUpName, cleanedUpType ) );
+			return Optional.of( BeanReference.of( cleanedUpType, cleanedUpName ) );
 		}
 	}
 }

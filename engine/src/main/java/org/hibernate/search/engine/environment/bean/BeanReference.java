@@ -12,16 +12,16 @@ package org.hibernate.search.engine.environment.bean;
 public interface BeanReference {
 
 	/**
-	 * @return The name of the referenced bean.
-	 * {@code null} implies no name reference.
-	 */
-	String getName();
-
-	/**
 	 * @return The type of the referenced bean.
 	 * {@code null} implies no type reference.
 	 */
 	Class<?> getType();
+
+	/**
+	 * @return The name of the referenced bean.
+	 * {@code null} implies no name reference.
+	 */
+	String getName();
 
 	/**
 	 * Create a {@link BeanReference} referencing a bean by its name.
@@ -33,7 +33,7 @@ public interface BeanReference {
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static BeanReference ofName(String name) {
-		return new ImmutableBeanReference( name, null );
+		return new ImmutableBeanReference( null, name );
 	}
 
 	/**
@@ -43,18 +43,18 @@ public interface BeanReference {
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static BeanReference ofType(Class<?> type) {
-		return new ImmutableBeanReference( null, type );
+		return new ImmutableBeanReference( type, null );
 	}
 
 	/**
 	 * Create a {@link BeanReference} referencing a bean by its name and type.
 	 *
-	 * @param name The bean name.
 	 * @param type The bean type.
+	 * @param name The bean name.
 	 * @return The corresponding {@link BeanReference}.
 	 */
-	static BeanReference of(String name, Class<?> type) {
-		return new ImmutableBeanReference( name, type );
+	static BeanReference of(Class<?> type, String name) {
+		return new ImmutableBeanReference( type, name );
 	}
 
 }
