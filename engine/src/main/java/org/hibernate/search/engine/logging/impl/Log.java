@@ -61,20 +61,20 @@ public interface Log extends BasicLogger {
 	SearchException unableToConvertConfigurationProperty(String key, Object rawValue, String errorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 2,
-			value = "Invalid value: the value is not an instance of '%1$s' and is not a String that can be parsed: %2$s")
-	SearchException invalidPropertyValue(Class<?> expectedType, String errorMessage, @Cause Exception cause);
+			value = "Invalid value: expected either an instance of '%1$s' or a String that can be parsed. %2$s")
+	SearchException invalidPropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType, String errorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 3,
-			value = "Invalid boolean value: expected either a Boolean, the String 'true' or the String 'false'.")
-	SearchException invalidBooleanPropertyValue(@Cause Exception cause);
+			value = "Invalid Boolean value: expected either a Boolean, the String 'true' or the String 'false'. %1$s")
+	SearchException invalidBooleanPropertyValue(String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 4,
-			value = "%1$s")
-	SearchException invalidIntegerPropertyValue(String errorMessage, @Cause Exception cause);
+			value = "Invalid Integer value: expected either a Number or a String that can be parsed into an Integer. %1$s")
+	SearchException invalidIntegerPropertyValue(String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 5,
-			value = "%1$s")
-	SearchException invalidLongPropertyValue(String errorMessage, @Cause Exception cause);
+			value = "Invalid Long value: expected either a Number or a String that can be parsed into a Long. %1$s")
+	SearchException invalidLongPropertyValue(String nestedErrorMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 6,
 			value = "Invalid multi value: expected either a Collection or a String.")
