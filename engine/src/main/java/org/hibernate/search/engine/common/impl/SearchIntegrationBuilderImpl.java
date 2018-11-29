@@ -156,7 +156,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				beanResolver = new ReflectionBeanResolver( classResolver );
 			}
 
-			BeanProvider beanProvider = new BeanProviderImpl( beanResolver );
+			BeanProvider beanProvider = new BeanProviderImpl( classResolver, beanResolver );
 			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
 			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
