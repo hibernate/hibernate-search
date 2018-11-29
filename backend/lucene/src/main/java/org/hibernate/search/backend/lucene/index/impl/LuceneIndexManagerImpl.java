@@ -12,8 +12,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -83,13 +81,9 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public IndexWorkExecutor<LuceneRootDocumentBuilder> createWorkExecutor(SessionContextImplementor sessionContext) {
-		// TODO must be implemented
-		return new IndexWorkExecutor() {
-			@Override
-			public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor) {
-				return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-			}
-		};
+		return indexingBackendContext.createWorkExecutor(
+				workPlanOrchestrator, indexName, sessionContext
+		);
 	}
 
 	@Override
