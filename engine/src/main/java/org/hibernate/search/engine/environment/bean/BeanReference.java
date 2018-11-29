@@ -12,16 +12,14 @@ package org.hibernate.search.engine.environment.bean;
 public interface BeanReference {
 
 	/**
-	 * @return The type of the referenced bean.
-	 * {@code null} implies no type reference.
+	 * Get the bean this reference points to using the given provider.
+	 *
+	 * @param beanProvider A provider to get the bean from.
+	 * @param expectedType The expected type of the bean.
+	 * @param <T> The expected type of the bean.
+	 * @return The bean instance.
 	 */
-	Class<?> getType();
-
-	/**
-	 * @return The name of the referenced bean.
-	 * {@code null} implies no name reference.
-	 */
-	String getName();
+	<T> T getBean(BeanProvider beanProvider, Class<T> expectedType);
 
 	/**
 	 * Create a {@link BeanReference} referencing a bean by its name.
@@ -29,32 +27,32 @@ public interface BeanReference {
 	 * Note: when no dependency injection framework is used, Hibernate Search uses reflection to resolve beans,
 	 * and in that case "names" are interpreted as fully qualified class names.
 	 *
-	 * @param name The bean name.
+	 * @param name The bean name. Must not be null nor empty.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static BeanReference ofName(String name) {
-		return new ImmutableBeanReference( null, name );
+		return new NameBeanReference( name );
 	}
 
 	/**
 	 * Create a {@link BeanReference} referencing a bean by its type.
 	 *
-	 * @param type The bean type.
+	 * @param type The bean type. Must not be null.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static BeanReference ofType(Class<?> type) {
-		return new ImmutableBeanReference( type, null );
+		return new TypeBeanReference( type );
 	}
 
 	/**
-	 * Create a {@link BeanReference} referencing a bean by its name and type.
+	 * Create a {@link BeanReference} referencing a bean by its name or type, or both.
 	 *
-	 * @param type The bean type.
-	 * @param name The bean name.
+	 * @param type The bean type. May be null, but only if {@code name} is not null.
+	 * @param name The bean name. May be null, but only if {@code type} is not null.
 	 * @return The corresponding {@link BeanReference}.
 	 */
 	static BeanReference of(Class<?> type, String name) {
-		return new ImmutableBeanReference( type, name );
+		return TypeAndNameBeanReference.createLenient( type, name );
 	}
 
 }

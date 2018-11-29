@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
@@ -46,7 +45,7 @@ public final class BeanProviderImpl implements BeanProvider {
 	@Override
 	public <T> T getBean(Class<T> expectedClass, Class<?> typeReference) {
 		if ( typeReference == null ) {
-			throw log.emptyBeanReferenceTypeNull();
+			throw log.invalidBeanReferenceTypeNull();
 		}
 		return beanResolver.resolve( expectedClass, typeReference );
 	}
@@ -54,35 +53,20 @@ public final class BeanProviderImpl implements BeanProvider {
 	@Override
 	public <T> T getBean(Class<T> expectedClass, String nameReference) {
 		if ( StringHelper.isEmpty( nameReference ) ) {
-			throw log.emptyBeanReferenceNameNullOrEmpty();
+			throw log.invalidBeanReferenceNameNullOrEmpty();
 		}
 		return getBeanFromBeanResolverOrConfiguredBeans( expectedClass, nameReference );
 	}
 
 	@Override
-	public <T> T getBean(Class<T> expectedClass, BeanReference reference) {
-		if ( reference == null ) {
-			throw log.emptyBeanReferenceNull();
+	public <T> T getBean(Class<T> expectedClass, Class<?> typeReference, String nameReference) {
+		if ( typeReference == null ) {
+			throw log.invalidBeanReferenceTypeNull();
 		}
-
-		String nameReference = reference.getName();
-		Class<?> typeReference = reference.getType();
-		boolean nameProvided = StringHelper.isNotEmpty( nameReference );
-		boolean typeProvided = typeReference != null;
-
-		if ( nameProvided && typeProvided ) {
-			return beanResolver.resolve( expectedClass, nameReference, typeReference );
+		if ( StringHelper.isEmpty( nameReference ) ) {
+			throw log.invalidBeanReferenceNameNullOrEmpty();
 		}
-		else if ( nameProvided ) {
-			// This is the only situation where querying configured beans make sense
-			return getBeanFromBeanResolverOrConfiguredBeans( expectedClass, nameReference );
-		}
-		else if ( typeProvided ) {
-			return beanResolver.resolve( expectedClass, typeReference );
-		}
-		else {
-			throw log.emptyBeanReferenceNoNameNoType();
-		}
+		return beanResolver.resolve( expectedClass, nameReference, typeReference );
 	}
 
 	private <T> T getBeanFromBeanResolverOrConfiguredBeans(Class<T> expectedClass, String nameReference) {

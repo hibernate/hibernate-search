@@ -104,7 +104,9 @@ class AnnotationProcessorHelper {
 	<A extends Annotation> MarkerBuilder createMarkerBuilder(A annotation) {
 		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
 		MarkerMappingBuilderReference markerBuilderReferenceAnnotation = markerMapping.builder();
-		BeanReference markerBuilderReference =
+
+		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
+		AnnotationMarkerBuilder<A> builder =
 				toBeanReference(
 						markerBuilderReferenceAnnotation.name(),
 						markerBuilderReferenceAnnotation.type(),
@@ -112,11 +114,8 @@ class AnnotationProcessorHelper {
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping(
 								MarkerMapping.class, annotation.annotationType() )
-						);
-
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		AnnotationMarkerBuilder<A> builder =
-				beanProvider.getBean( AnnotationMarkerBuilder.class, markerBuilderReference );
+						)
+						.getBean( beanProvider, AnnotationMarkerBuilder.class );
 
 		builder.initialize( annotation );
 
@@ -150,7 +149,7 @@ class AnnotationProcessorHelper {
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanProvider.getBean( BridgeBuilder.class, bridgeBuilderReference.get() );
+			return bridgeBuilderReference.get().getBean( beanProvider, BridgeBuilder.class );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -245,7 +244,7 @@ class AnnotationProcessorHelper {
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return beanProvider.getBean( BridgeBuilder.class, bridgeBuilderReference.get() );
+			return bridgeBuilderReference.get().getBean( beanProvider, BridgeBuilder.class );
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -263,8 +262,9 @@ class AnnotationProcessorHelper {
 			return new BeanResolverBridgeBuilder<>( bridgeClass, bridgeReferenceOptional.get() );
 		}
 		else if ( builderReferenceOptional.isPresent() ) {
-			AnnotationBridgeBuilder builder = beanProvider.getBean(
-					AnnotationBridgeBuilder.class, builderReferenceOptional.get() );
+			AnnotationBridgeBuilder builder = builderReferenceOptional.get().getBean(
+					beanProvider, AnnotationBridgeBuilder.class
+			);
 			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
 			builder.initialize( annotation );
 			return builder;
