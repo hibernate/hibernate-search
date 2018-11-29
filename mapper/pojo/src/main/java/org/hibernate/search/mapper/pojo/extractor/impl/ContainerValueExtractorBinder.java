@@ -170,7 +170,7 @@ public class ContainerValueExtractorBinder {
 		for ( Class<? extends ContainerValueExtractor> extractorClass :
 				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
 			ContainerValueExtractor<?, ?> newExtractor =
-					beanProvider.getBean( extractorClass, ContainerValueExtractor.class );
+					beanProvider.getBean( ContainerValueExtractor.class, extractorClass );
 			if ( extractor == null ) {
 				// First extractor: must be able to process type C
 				extractor = (ContainerValueExtractor<? super C, ?>) newExtractor;

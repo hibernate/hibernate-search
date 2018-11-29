@@ -33,7 +33,7 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(Class<?> classOrFactoryClass, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, Class<?> classOrFactoryClass) {
 		Object instance = ClassLoaderHelper.untypedInstanceFromClass( classOrFactoryClass, expectedClass.getName() );
 
 		// TODO support @Factory annotation
@@ -42,16 +42,16 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(String classOrFactoryClassName, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, String classOrFactoryClassName) {
 		Class<?> classOrFactoryClass = ClassLoaderHelper.classForName(
 				expectedClass, classOrFactoryClassName, expectedClass.getName(), classResolver
 		);
 
-		return resolve( classOrFactoryClass, expectedClass );
+		return resolve( expectedClass, classOrFactoryClass );
 	}
 
 	@Override
-	public <T> T resolve(String nameReference, Class<?> typeReference, Class<T> expectedClass) {
+	public <T> T resolve(Class<T> expectedClass, String nameReference, Class<?> typeReference) {
 		throw log.resolveBeanUsingBothNameAndType( nameReference, typeReference );
 	}
 

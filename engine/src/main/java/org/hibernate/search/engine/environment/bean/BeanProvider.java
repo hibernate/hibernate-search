@@ -28,32 +28,32 @@ public interface BeanProvider {
 
 	/**
 	 * Retrieve a bean referenced by its type.
-	 * @param typeReference The type used as a reference to the bean to retrieve.
-	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
 	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
+	 * @param typeReference The type used as a reference to the bean to retrieve.
 	 * @return The resolved bean.
 	 * @throws SearchException if the reference is invalid (null) or the bean cannot be resolved.
 	 */
-	<T> T getBean(Class<?> typeReference, Class<T> expectedClass);
+	<T> T getBean(Class<T> expectedClass, Class<?> typeReference);
 
 	/**
 	 * Retrieve a bean referenced by its type.
-	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
-	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
 	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
+	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
 	 * @return The resolved bean.
 	 * @throws SearchException if the reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	<T> T getBean(String nameReference, Class<T> expectedClass);
+	<T> T getBean(Class<T> expectedClass, String nameReference);
 
 	/**
 	 * Retrieve a bean referenced by its type, name, or both, depending on the content of the {@link BeanReference}.
-	 * @param reference The reference to the bean to retrieve. Must be non-null.
-	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
 	 * @param <T> The expected return type.
+	 * @param expectedClass The expected class. Must be non-null. The returned bean will implement this class.
+	 * @param reference The reference to the bean to retrieve. Must be non-null.
 	 * @return The resolved bean.
 	 * @throws SearchException if the reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	<T> T getBean(BeanReference reference, Class<T> expectedClass);
+	<T> T getBean(Class<T> expectedClass, BeanReference reference);
 
 }
