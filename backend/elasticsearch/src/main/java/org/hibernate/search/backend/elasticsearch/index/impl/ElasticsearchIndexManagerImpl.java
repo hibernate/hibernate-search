@@ -17,8 +17,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -77,13 +75,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexWorkExecutor<ElasticsearchDocumentObjectBuilder> createWorkExecutor(SessionContextImplementor sessionContext) {
-		// TODO must be implemented
-		return new IndexWorkExecutor() {
-			@Override
-			public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor) {
-				return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-			}
-		};
+		return indexingBackendContext.createWorkExecutor( workPlanOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override
