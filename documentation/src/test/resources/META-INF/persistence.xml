@@ -21,7 +21,7 @@
         <properties>
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
             <property name="hibernate.search.backends.myBackend.type"
-                      value="org.hibernate.search.backend.lucene.impl.LuceneBackendFactory"/> <!--1-->
+                      value="lucene"/> <!--1-->
             <property name="hibernate.search.backends.myBackend.lucene.directory_provider"
                       value="local_directory"/> <!--2-->
             <!--
@@ -50,7 +50,7 @@
         <properties>
             <!-- tag::gettingstarted-configuration-orm_elasticsearch[] -->
             <property name="hibernate.search.backends.myBackend.type"
-                      value="org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory" /> <!--1-->
+                      value="elasticsearch" /> <!--1-->
             <!--
             <property name="hibernate.search.backends.myBackend.host"
                       value="https://elasticsearch.mycompany.com"/>
@@ -84,7 +84,7 @@
         <exclude-unlisted-classes />
         <properties>
             <property name="hibernate.search.backends.myBackend.type"
-                      value="org.hibernate.search.backend.lucene.impl.LuceneBackendFactory"/>
+                      value="lucene"/>
             <property name="hibernate.search.backends.myBackend.lucene.directory_provider"
                       value="local_directory"/>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
@@ -111,7 +111,7 @@
         <exclude-unlisted-classes />
         <properties>
             <property name="hibernate.search.backends.myBackend.type"
-                      value="org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory" />
+                      value="elasticsearch" />
             <!-- tag::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
             <property name="hibernate.search.backends.myBackend.analysis_configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyElasticsearchAnalysisConfigurer"/> <!--6-->
