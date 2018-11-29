@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.spi.KeyContext;
 import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 
 public class KeyContextImpl implements KeyContext {
 
@@ -37,6 +38,11 @@ public class KeyContextImpl implements KeyContext {
 	@Override
 	public OptionalPropertyContext<Long> asLong() {
 		return new OptionalPropertyContextImpl<>( key, ConvertUtils::convertLong );
+	}
+
+	@Override
+	public OptionalPropertyContext<BeanReference> asBeanReference(Class<?> expectedType) {
+		return new OptionalPropertyContextImpl<>( key, v -> ConvertUtils.convertBeanReference( expectedType, v ) );
 	}
 
 	@Override

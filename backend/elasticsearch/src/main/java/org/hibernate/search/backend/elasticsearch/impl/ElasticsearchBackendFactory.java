@@ -38,6 +38,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.EventContext;
@@ -64,6 +65,11 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.LOG_JSON_PRETTY_PRINTING )
 					.asBoolean()
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
+					.build();
+
+	private static final ConfigurationProperty<Optional<BeanReference>> ANALYSIS_CONFIGURER =
+			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
+					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
 					.build();
 
 	@Override
@@ -128,15 +134,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-			ConfigurationProperty<Optional<ElasticsearchAnalysisConfigurer>> analysisConfigurerProperty =
-					ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
-							.as(
-									ElasticsearchAnalysisConfigurer.class,
-									reference -> beanProvider
-											.getBean( ElasticsearchAnalysisConfigurer.class, reference )
-							)
-							.build();
-			return analysisConfigurerProperty.get( propertySource )
+			return ANALYSIS_CONFIGURER.get( propertySource )
+					.map( beanReference -> beanReference.getBean( beanProvider, ElasticsearchAnalysisConfigurer.class ) )
 					.map( configurer -> {
 						ElasticsearchAnalysisDefinitionContainerContextImpl collector
 								= new ElasticsearchAnalysisDefinitionContainerContextImpl();

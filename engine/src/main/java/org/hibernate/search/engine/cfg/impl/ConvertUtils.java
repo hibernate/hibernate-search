@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -130,6 +131,29 @@ public final class ConvertUtils {
 		}
 
 		throw log.invalidLongPropertyValue( "", null );
+	}
+
+	public static Optional<BeanReference> convertBeanReference(Class<?> expectedType, Object value) {
+		try {
+			if ( expectedType.isInstance( value ) ) {
+				return Optional.of( BeanReference.ofInstance( expectedType.cast( value ) ) );
+			}
+			if ( value instanceof BeanReference ) {
+				return Optional.of( (BeanReference) value );
+			}
+			if ( value instanceof Class ) {
+				return Optional.of( BeanReference.ofType( (Class<?>) value ) );
+			}
+			if ( value instanceof String ) {
+				return optionalTrimmedNonEmpty( (String) value )
+						.map( BeanReference::ofName );
+			}
+		}
+		catch (RuntimeException e) {
+			throw log.invalidBeanReferencePropertyValue( expectedType, e.getMessage(), e );
+		}
+
+		throw log.invalidBeanReferencePropertyValue( expectedType, "", null );
 	}
 
 	public static <T> Optional<List<T>> convertMultiValue(Pattern separatorPattern,

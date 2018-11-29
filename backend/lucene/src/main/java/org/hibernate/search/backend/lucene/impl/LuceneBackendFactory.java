@@ -32,6 +32,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
@@ -67,6 +68,11 @@ public class LuceneBackendFactory implements BackendFactory {
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
 					.withDefault( SearchBackendLuceneSettings.Defaults.MULTI_TENANCY_STRATEGY )
+					.build();
+
+	private static final ConfigurationProperty<Optional<BeanReference>> ANALYSIS_CONFIGURER =
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ANALYSIS_CONFIGURER )
+					.asBeanReference( LuceneAnalysisConfigurer.class )
 					.build();
 
 	@Override
@@ -158,15 +164,8 @@ public class LuceneBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-			ConfigurationProperty<Optional<LuceneAnalysisConfigurer>> analysisConfigurerProperty =
-					ConfigurationProperty.forKey( SearchBackendLuceneSettings.ANALYSIS_CONFIGURER )
-							.as(
-									LuceneAnalysisConfigurer.class,
-									reference -> beanProvider
-											.getBean( LuceneAnalysisConfigurer.class, reference )
-							)
-							.build();
-			return analysisConfigurerProperty.get( propertySource )
+			return ANALYSIS_CONFIGURER.get( propertySource )
+					.map( beanReference -> beanReference.getBean( beanProvider, LuceneAnalysisConfigurer.class ) )
 					.map( configurer -> {
 						LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
 								luceneVersion,
