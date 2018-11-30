@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -40,6 +41,21 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	@Override
 	public IndexWorkExecutor<D> createWorkExecutor(SessionContextImplementor sessionContext) {
 		return implementor.createWorkExecutor( sessionContext );
+	}
+
+	@Override
+	public CompletableFuture<?> optimize() {
+		return implementor.optimize();
+	}
+
+	@Override
+	public CompletableFuture<?> purge() {
+		return implementor.purge();
+	}
+
+	@Override
+	public CompletableFuture<?> flush() {
+		return implementor.flush();
 	}
 
 	@Override

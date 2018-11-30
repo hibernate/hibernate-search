@@ -79,6 +79,6 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
 	@Override
 	public PojoMappingWorkExecutor createMappingWorkExecutor() {
-		return new PojoMappingWorkExecutorImpl();
+		return new PojoMappingWorkExecutorImpl( indexedTypeManagers );
 	}
 }
