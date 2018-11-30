@@ -32,34 +32,20 @@ public interface BeanResolver extends AutoCloseable {
 	/**
 	 * Resolve a bean by its type.
 	 * @param <T> The expected return type.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
 	 * @param typeReference The type of the bean to resolve.
-	 * Depending on the implementation, this could be a superclass or superinterface of the resolved bean.
 	 * @return The resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(Class<T> expectedClass, Class<?> typeReference);
+	<T> T resolve(Class<T> typeReference);
 
 	/**
 	 * Resolve a bean by its name.
 	 * @param <T> The expected return type.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
-	 * @param nameReference The name of the bean to resolve.
-	 * @return The resolved bean.
-	 * @throws SearchException if the bean cannot be resolved.
-	 */
-	<T> T resolve(Class<T> expectedClass, String nameReference);
-
-	/**
-	 * Resolve a bean by its name <em>and</em> type.
-	 * @param <T> The expected return type.
-	 * @param expectedClass The expected class. The returned bean must implement this class.
-	 * @param nameReference The name of the bean to resolve.
 	 * @param typeReference The type of the bean to resolve.
-	 * Depending on the implementation, this could be a superclass or superinterface of the resolved bean.
+	 * @param nameReference The name of the bean to resolve.
 	 * @return The resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(Class<T> expectedClass, String nameReference, Class<?> typeReference);
+	<T> T resolve(Class<T> typeReference, String nameReference);
 
 }

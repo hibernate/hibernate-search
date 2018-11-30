@@ -28,12 +28,11 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * The bridge must implement {@link ValueBridge}.
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
 	 */
-	S valueBridge(BeanReference bridgeReference);
+	S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.

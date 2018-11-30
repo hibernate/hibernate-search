@@ -46,7 +46,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference>> MAPPING_CONFIGURER =
+	private static final ConfigurationProperty<Optional<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
@@ -115,7 +115,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// Apply the user-provided mapping configurer if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 		MAPPING_CONFIGURER.get( propertySource )
-				.map( beanReference -> beanReference.getBean( beanProvider, HibernateOrmSearchMappingConfigurer.class ) )
+				.map( beanProvider::getBean )
 				.ifPresent( configurer -> configurer.configure( this ) );
 
 		super.configure( buildContext, propertySource, configurationCollector );

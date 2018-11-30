@@ -207,18 +207,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 34, value = "No index manager registered for index manager name: '%1$s'.")
 	SearchException noIndexManagerRegistered(String indexManagerName);
 
-	@Message(id = ID_OFFSET_2 + 35, value = "Invalid bean reference: type is null.")
-	SearchException invalidBeanReferenceTypeNull();
-
-	@Message(id = ID_OFFSET_2 + 36, value = "Invalid bean reference: name is null or empty.")
-	SearchException invalidBeanReferenceNameNullOrEmpty();
-
-	@Message(id = ID_OFFSET_2 + 37, value = "Invalid bean reference: type is null and name is null or empty.")
-	SearchException invalidBeanReferenceTypeIsNullAndNameNullOrEmpty();
-
-	@Message(id = ID_OFFSET_2 + 39, value = "This bean resolver does not support bean references using both a name and a type. Got both '%1$s' and '%2$s' in the same reference.")
-	SearchException resolveBeanUsingBothNameAndType(String nameReference, @FormatWith(ClassFormatter.class) Class<?> typeReference);
-
 	@Message(id = ID_OFFSET_2 + 40, value = "Unable to instantiate class '%1$s': %2$s.")
 	SearchException unableToInstantiateClass(@FormatWith(ClassFormatter.class) Class<?> classToLoad, String causeMessage, @Cause Exception cause);
 
@@ -244,4 +232,10 @@ public interface Log extends BasicLogger {
 			value = "Invalid BeanReference value: expected an instance of '%1$s', BeanReference, String or Class. %2$s")
 	SearchException invalidBeanReferencePropertyValue(@FormatWith(ClassFormatter.class) Class<?> expectedType,
 			String nestedErrorMessage, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 48,
+			value = "Invalid bean type: type '%2$s' is not assignable to '%1$s'.")
+	SearchException invalidBeanType(
+			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
+			@FormatWith(ClassFormatter.class) Class<?> actualType);
 }

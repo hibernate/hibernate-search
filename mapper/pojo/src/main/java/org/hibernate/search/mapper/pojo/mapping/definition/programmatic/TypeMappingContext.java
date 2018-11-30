@@ -28,12 +28,11 @@ public interface TypeMappingContext {
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * The bridge must implement {@link RoutingKeyBridge}.
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
 	 */
-	TypeMappingContext routingKeyBridge(BeanReference bridgeReference);
+	TypeMappingContext routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.
@@ -49,12 +48,11 @@ public interface TypeMappingContext {
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * The bridge must implement {@link TypeBridge}.
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
 	 */
-	TypeMappingContext bridge(BeanReference bridgeReference);
+	TypeMappingContext bridge(BeanReference<? extends TypeBridge> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.

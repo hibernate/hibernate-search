@@ -133,20 +133,26 @@ public final class ConvertUtils {
 		throw log.invalidLongPropertyValue( "", null );
 	}
 
-	public static Optional<BeanReference> convertBeanReference(Class<?> expectedType, Object value) {
+	public static <T> Optional<BeanReference<? extends T>> convertBeanReference(Class<T> expectedType, Object value) {
 		try {
 			if ( expectedType.isInstance( value ) ) {
 				return Optional.of( BeanReference.ofInstance( expectedType.cast( value ) ) );
 			}
 			if ( value instanceof BeanReference ) {
-				return Optional.of( (BeanReference) value );
+				return Optional.of( ( (BeanReference<?>) value ).asSubTypeOf( expectedType ) );
 			}
 			if ( value instanceof Class ) {
-				return Optional.of( BeanReference.ofType( (Class<?>) value ) );
+				Class<?> castedValue = (Class<?>) value;
+				if ( !expectedType.isAssignableFrom( castedValue ) ) {
+					throw log.invalidBeanType( expectedType, castedValue );
+				}
+				@SuppressWarnings("unchecked") // Checked using reflection just above
+				Class<? extends T> castedValueAsChildType = (Class<? extends T>) value;
+				return Optional.of( BeanReference.of( castedValueAsChildType ) );
 			}
 			if ( value instanceof String ) {
 				return optionalTrimmedNonEmpty( (String) value )
-						.map( BeanReference::ofName );
+						.map( name -> BeanReference.of( expectedType, name ) );
 			}
 		}
 		catch (RuntimeException e) {

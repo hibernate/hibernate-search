@@ -19,7 +19,7 @@ public interface KeyContext {
 
 	OptionalPropertyContext<Long> asLong();
 
-	OptionalPropertyContext<BeanReference> asBeanReference(Class<?> expectedType);
+	<T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType);
 
 	<T> OptionalPropertyContext<T> as(Class<T> expectedType, Function<String, T> parser);
 }

@@ -23,12 +23,11 @@ public interface PropertyDocumentIdMappingContext extends PropertyMappingContext
 
 	/**
 	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * The bridge must implement {@link IdentifierBridge}.
 	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
 	 * (by name, by type, ...).
 	 * @return {@code this}, for method chaining.
 	 */
-	PropertyDocumentIdMappingContext identifierBridge(BeanReference bridgeReference);
+	PropertyDocumentIdMappingContext identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference);
 
 	/**
 	 * @param builder A bridge builder.

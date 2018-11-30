@@ -6,20 +6,15 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
-import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
  * @author Yoann Rodiere
  */
 public final class ReflectionBeanResolver implements BeanResolver {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ClassResolver classResolver;
 
@@ -33,26 +28,17 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(Class<T> expectedClass, Class<?> classOrFactoryClass) {
-		Object instance = ClassLoaderHelper.untypedInstanceFromClass( classOrFactoryClass, expectedClass.getName() );
-
-		// TODO support @Factory annotation
-
-		return expectedClass.cast( instance );
+	public <T> T resolve(Class<T> typeReference) {
+		return ClassLoaderHelper.untypedInstanceFromClass( typeReference, typeReference.getName() );
 	}
 
 	@Override
-	public <T> T resolve(Class<T> expectedClass, String classOrFactoryClassName) {
-		Class<?> classOrFactoryClass = ClassLoaderHelper.classForName(
-				expectedClass, classOrFactoryClassName, expectedClass.getName(), classResolver
+	public <T> T resolve(Class<T> typeReference, String implementationFullyQualifiedClassName) {
+		Class<? extends T> implementationClass = ClassLoaderHelper.classForName(
+				typeReference, implementationFullyQualifiedClassName, typeReference.getName(), classResolver
 		);
 
-		return resolve( expectedClass, classOrFactoryClass );
-	}
-
-	@Override
-	public <T> T resolve(Class<T> expectedClass, String nameReference, Class<?> typeReference) {
-		throw log.resolveBeanUsingBothNameAndType( nameReference, typeReference );
+		return resolve( implementationClass );
 	}
 
 }

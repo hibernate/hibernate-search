@@ -70,12 +70,12 @@ public class InitialPropertyMappingContext
 
 	@Override
 	public PropertyMappingContext bridge(Class<? extends PropertyBridge> bridgeClass) {
-		return bridge( BeanReference.ofType( bridgeClass ) );
+		return bridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public PropertyMappingContext bridge(BeanReference bridgeReference) {
-		return bridge( new BeanResolverBridgeBuilder<>( PropertyBridge.class, bridgeReference ) );
+	public PropertyMappingContext bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
+		return bridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override

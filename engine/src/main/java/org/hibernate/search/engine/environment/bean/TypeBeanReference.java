@@ -6,21 +6,14 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import java.lang.invoke.MethodHandles;
+import org.hibernate.search.util.impl.common.Contracts;
 
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+class TypeBeanReference<T> implements BeanReference<T> {
 
-final class TypeBeanReference implements BeanReference {
+	final Class<T> type;
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final Class<?> type;
-
-	TypeBeanReference(Class<?> type) {
-		if ( type == null ) {
-			throw log.invalidBeanReferenceNameNullOrEmpty();
-		}
+	TypeBeanReference(Class<T> type) {
+		Contracts.assertNotNull( type, "type" );
 		this.type = type;
 	}
 
@@ -30,8 +23,19 @@ final class TypeBeanReference implements BeanReference {
 	}
 
 	@Override
-	public <T> T getBean(BeanProvider beanProvider, Class<T> expectedType) {
-		return beanProvider.getBean( expectedType, type );
+	public T getBean(BeanProvider beanProvider) {
+		return beanProvider.getBean( type );
+	}
+
+	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
+	public <U> BeanReference<? extends U> asSubTypeOf(Class<U> expectedType) {
+		if ( expectedType.isAssignableFrom( type ) ) {
+			return (BeanReference<? extends U>) this;
+		}
+		else {
+			return BeanReference.super.asSubTypeOf( expectedType );
+		}
 	}
 
 }

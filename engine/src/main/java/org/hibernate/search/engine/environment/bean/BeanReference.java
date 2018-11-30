@@ -6,53 +6,58 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
+import org.hibernate.search.util.impl.common.StringHelper;
+
 /**
  * @author Yoann Rodiere
  */
-public interface BeanReference {
+public interface BeanReference<T> {
 
 	/**
 	 * Get the bean this reference points to using the given provider.
 	 *
 	 * @param beanProvider A provider to get the bean from.
-	 * @param expectedType The expected type of the bean.
-	 * @param <T> The expected type of the bean.
 	 * @return The bean instance.
 	 */
-	<T> T getBean(BeanProvider beanProvider, Class<T> expectedType);
+	T getBean(BeanProvider beanProvider);
 
 	/**
-	 * Create a {@link BeanReference} referencing a bean by its name.
-	 * <p>
-	 * Note: when no dependency injection framework is used, Hibernate Search uses reflection to resolve beans,
-	 * and in that case "names" are interpreted as fully qualified class names.
+	 * Cast this reference into a reference whose {@link #getBean(BeanProvider)} method is is guaranteed to
+	 * either fail or return an instance of the given type.
 	 *
-	 * @param name The bean name. Must not be null nor empty.
-	 * @return The corresponding {@link BeanReference}.
+	 * @param expectedType The expected bean type.
+	 * @param <U> The expected bean type.
+	 * @return A bean reference.
+	 * @throws ClassCastException If this reference is certain to never return an instance of the given type.
 	 */
-	static BeanReference ofName(String name) {
-		return new NameBeanReference( name );
+	default <U> BeanReference<? extends U> asSubTypeOf(Class<U> expectedType) {
+		return new CastingBeanReference<>( this, expectedType );
 	}
 
 	/**
-	 * Create a {@link BeanReference} referencing a bean by its type.
+	 * Create a {@link BeanReference} referencing a bean by its type only.
 	 *
 	 * @param type The bean type. Must not be null.
 	 * @return The corresponding {@link BeanReference}.
 	 */
-	static BeanReference ofType(Class<?> type) {
-		return new TypeBeanReference( type );
+	static <T> BeanReference<T> of(Class<T> type) {
+		return new TypeBeanReference<>( type );
 	}
 
 	/**
-	 * Create a {@link BeanReference} referencing a bean by its name or type, or both.
+	 * Create a {@link BeanReference} referencing a bean by type and name.
 	 *
-	 * @param type The bean type. May be null, but only if {@code name} is not null.
-	 * @param name The bean name. May be null, but only if {@code type} is not null.
+	 * @param type The bean type. Must not be null.
+	 * @param name The bean name. May be null or empty.
 	 * @return The corresponding {@link BeanReference}.
 	 */
-	static BeanReference of(Class<?> type, String name) {
-		return TypeAndNameBeanReference.createLenient( type, name );
+	static <T> BeanReference<T> of(Class<T> type, String name) {
+		if ( StringHelper.isNotEmpty( name ) ) {
+			return new TypeAndNameBeanReference<>( type, name );
+		}
+		else {
+			return new TypeBeanReference<>( type );
+		}
 	}
 
 	/**
@@ -61,8 +66,8 @@ public interface BeanReference {
 	 * @param instance The bean instance. Must not be null.
 	 * @return The corresponding {@link BeanReference}.
 	 */
-	static BeanReference ofInstance(Object instance) {
-		return new InstanceBeanReference( instance );
+	static <T> BeanReference<T> ofInstance(T instance) {
+		return new InstanceBeanReference<>( instance );
 	}
 
 }

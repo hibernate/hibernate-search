@@ -37,7 +37,7 @@ class IndexManagerBuildingStateHolder {
 	private static final ConfigurationProperty<Optional<String>> INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( "backend" ).asString().build();
 
-	private static final ConfigurationProperty<Optional<BeanReference>> BACKEND_TYPE =
+	private static final ConfigurationProperty<Optional<BeanReference<? extends BackendFactory>>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( "type" ).asBeanReference( BackendFactory.class ).build();
 
 	private final RootBuildContext rootBuildContext;
@@ -96,10 +96,10 @@ class IndexManagerBuildingStateHolder {
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
 		// TODO properly check that there is a value before calling get()
-		BeanReference backendFactoryReference = BACKEND_TYPE.get( backendPropertySource ).get();
+		BeanReference<? extends BackendFactory> backendFactoryReference = BACKEND_TYPE.get( backendPropertySource ).get();
 
 		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
-		BackendFactory backendFactory = backendFactoryReference.getBean( beanProvider, BackendFactory.class );
+		BackendFactory backendFactory = backendFactoryReference.getBean( beanProvider );
 		BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
 		BackendImplementor<?> backend = backendFactory.create( backendName, backendBuildContext, backendPropertySource );

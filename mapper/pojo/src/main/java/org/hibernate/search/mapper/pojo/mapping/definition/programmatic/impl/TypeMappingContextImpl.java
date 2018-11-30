@@ -78,12 +78,12 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
-		return routingKeyBridge( BeanReference.ofType( bridgeClass ) );
+		return routingKeyBridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext routingKeyBridge(BeanReference bridgeReference) {
-		return routingKeyBridge( new BeanResolverBridgeBuilder<>( RoutingKeyBridge.class, bridgeReference ) );
+	public TypeMappingContext routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
+		return routingKeyBridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
@@ -94,12 +94,12 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext bridge(Class<? extends TypeBridge> bridgeClass) {
-		return bridge( BeanReference.ofType( bridgeClass ) );
+		return bridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	public TypeMappingContext bridge(BeanReference bridgeReference) {
-		return bridge( new BeanResolverBridgeBuilder<>( TypeBridge.class, bridgeReference ) );
+	public TypeMappingContext bridge(BeanReference<? extends TypeBridge> bridgeReference) {
+		return bridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
