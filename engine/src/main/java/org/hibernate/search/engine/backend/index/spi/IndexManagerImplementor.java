@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -29,15 +27,11 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 
 	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext);
 
+	IndexWorkExecutor createWorkExecutor();
+
 	IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext);
 
 	void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder);
-
-	CompletableFuture<?> optimize();
-
-	CompletableFuture<?> purge();
-
-	CompletableFuture<?> flush();
 
 	@Override
 	void close();

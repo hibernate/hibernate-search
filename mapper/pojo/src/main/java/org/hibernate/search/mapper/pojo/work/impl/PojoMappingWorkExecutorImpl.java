@@ -8,10 +8,13 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
@@ -24,43 +27,49 @@ public class PojoMappingWorkExecutorImpl implements PojoMappingWorkExecutor {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 
+	private Map<Class<?>, IndexWorkExecutor> workExecutors = new HashMap<>();
+
 	public PojoMappingWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers) {
 		this.indexedTypeManagers = indexedTypeManagers;
 	}
 
 	@Override
 	public CompletableFuture<?> optimize(Collection<Class<?>> types) {
-		return doOperationOnTypes( PojoIndexedTypeManager::optimize, types );
+		return doOperationOnTypes( IndexWorkExecutor::optimize, types );
 	}
 
 	@Override
-	public CompletableFuture<?> purge(Collection<Class<?>> types) {
-		return doOperationOnTypes( PojoIndexedTypeManager::purge, types );
+	public CompletableFuture<?> purge(Collection<Class<?>> types, String tenantId) {
+		return doOperationOnTypes( workExecutor -> workExecutor.purge( tenantId ), types );
 	}
 
 	@Override
 	public CompletableFuture<?> flush(Collection<Class<?>> types) {
-		return doOperationOnTypes( PojoIndexedTypeManager::flush, types );
+		return doOperationOnTypes( IndexWorkExecutor::flush, types );
 	}
 
-	private CompletableFuture<?> doOperationOnTypes(Function<PojoIndexedTypeManager, CompletableFuture<?>> operation, Collection<Class<?>> types) {
+	private CompletableFuture<?> doOperationOnTypes(Function<IndexWorkExecutor, CompletableFuture<?>> operation, Collection<Class<?>> types) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[types.size()];
 		int typeCounter = 0;
 
 		for ( Class<?> type : types ) {
-			futures[typeCounter++] = operation.apply( getTypeManager( type ) );
+			// TODO Should we support concurrent accesses here?
+			if ( !workExecutors.containsKey( type ) ) {
+				workExecutors.put( type, createWorkExecutor( type ) );
+			}
+			futures[typeCounter++] = operation.apply( workExecutors.get( type ) );
 		}
 
 		// TODO use an << errorHandler >> here
 		return CompletableFuture.allOf( futures );
 	}
 
-	private PojoIndexedTypeManager<?, ?, ?> getTypeManager(Class<?> clazz) {
+	private IndexWorkExecutor createWorkExecutor(Class<?> clazz) {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> exactClass = indexedTypeManagers.getByExactClass( clazz );
 		if ( !exactClass.isPresent() ) {
 			throw log.notDirectlyIndexedType( clazz );
 		}
 
-		return exactClass.get();
+		return exactClass.get().createWorkExecutor();
 	}
 }

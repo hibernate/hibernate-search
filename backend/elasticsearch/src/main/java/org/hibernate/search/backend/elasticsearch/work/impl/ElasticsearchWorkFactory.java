@@ -32,6 +32,8 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey);
 
+	ElasticsearchWork<?> deleteAll(URLEncodedString indexName, String tenantId);
+
 	ElasticsearchWork<?> flush(URLEncodedString indexName);
 
 	ElasticsearchWork<?> optimize(URLEncodedString indexName);

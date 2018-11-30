@@ -11,9 +11,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 public final class StubIndexWork {
 
 	public enum Type {
-		ADD,
-		UPDATE,
-		FLUSH, OPTIMIZE, DELETE;
+		ADD, UPDATE, DELETE, OPTIMIZE, PURGE, FLUSH
 	}
 
 	public static Builder builder(Type type) {

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -65,5 +66,9 @@ public class IndexingBackendContext {
 
 		return new LuceneIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );
+	}
+
+	public IndexWorkExecutor createWorkExecutor(LuceneIndexWorkOrchestrator orchestrator, String indexName) {
+		return new LuceneIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator, indexName, eventContext );
 	}
 }

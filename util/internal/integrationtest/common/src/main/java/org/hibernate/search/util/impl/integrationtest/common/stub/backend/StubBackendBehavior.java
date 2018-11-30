@@ -59,6 +59,12 @@ public abstract class StubBackendBehavior {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
 					+ indexNames + "': " + work );
 		}
+
+		@Override
+		public CompletableFuture<?> executeBulkWork(String indexName, StubIndexWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set during execution of a bulk work for index '"
+					+ indexName + "': " + work );
+		}
 	};
 
 	private static Map<String, StubBackendBehavior> BEHAVIORS = new HashMap<>();
@@ -95,4 +101,6 @@ public abstract class StubBackendBehavior {
 	public abstract <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
 			FromIndexFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection);
+
+	public abstract CompletableFuture<?> executeBulkWork(String indexName, StubIndexWork work);
 }

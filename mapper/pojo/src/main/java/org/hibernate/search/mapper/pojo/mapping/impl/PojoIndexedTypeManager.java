@@ -7,12 +7,12 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
@@ -85,16 +85,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return new PojoTypeDocumentWorkExecutor<>( this, sessionContext, indexManager.createDocumentWorkExecutor( sessionContext ) );
 	}
 
-	public CompletableFuture<?> optimize() {
-		return indexManager.optimize();
-	}
-
-	public CompletableFuture<?> purge() {
-		return indexManager.purge();
-	}
-
-	public CompletableFuture<?> flush() {
-		return indexManager.flush();
+	public IndexWorkExecutor createWorkExecutor() {
+		return indexManager.createWorkExecutor();
 	}
 
 	IdentifierMapping<I, E> getIdentifierMapping() {

@@ -25,6 +25,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+
+import org.junit.Assert;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
@@ -171,6 +173,18 @@ public class BackendMock implements TestRule {
 			return work( StubIndexWork.Type.DELETE, contributor );
 		}
 
+		public WorkCallListContext optimize() {
+			return work( StubIndexWork.builder( StubIndexWork.Type.OPTIMIZE ).build() );
+		}
+
+		public WorkCallListContext purge(String tenantIdentifier) {
+			return work( StubIndexWork.builder( StubIndexWork.Type.PURGE ).tenantIdentifier( tenantIdentifier ).build() );
+		}
+
+		public WorkCallListContext flush() {
+			return work( StubIndexWork.builder( StubIndexWork.Type.FLUSH ).build() );
+		}
+
 		WorkCallListContext work(StubIndexWork.Type type, Consumer<StubIndexWork.Builder> contributor) {
 			StubIndexWork.Builder builder = StubIndexWork.builder( type );
 			contributor.accept( builder );
@@ -311,6 +325,21 @@ public class BackendMock implements TestRule {
 			return searchCalls.verify(
 					new SearchWorkCall<>( indexNames, work, convertContext, projectionHitMapper, rootProjection ),
 					SearchWorkCall::<T>verify );
+		}
+
+		@Override
+		public CompletableFuture<?> executeBulkWork(String indexName, StubIndexWork work) {
+			if ( work.getDocument() != null ) {
+				Assert.fail( "A bulk work is supposed not to have a document. Actual work: " + work );
+			}
+
+			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
+			callQueue.verify(
+					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
+					IndexWorkCall::verify
+			);
+
+			return CompletableFuture.completedFuture( null );
 		}
 	}
 

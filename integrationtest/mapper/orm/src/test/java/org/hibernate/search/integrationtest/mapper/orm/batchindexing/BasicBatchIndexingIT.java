@@ -68,6 +68,8 @@ public class BasicBatchIndexingIT {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 			MassIndexer indexer = ftSession.createIndexer();
 
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
 			backendMock.expectWorksAnyOrder( LoadingProjectionIT.Book.INDEX )
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
@@ -82,6 +84,15 @@ public class BasicBatchIndexingIT {
 							.field( "author", AUTHOR_3 )
 					)
 					.preparedThenExecuted();
+
+			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
+			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
+			backendMock.expectWorks( LoadingProjectionIT.Book.INDEX )
+					.purge( ftSession.getTenantIdentifier() )
+					.optimize()
+					.optimize()
+					.flush()
+					.executed();
 
 			try {
 				indexer.startAndWait();

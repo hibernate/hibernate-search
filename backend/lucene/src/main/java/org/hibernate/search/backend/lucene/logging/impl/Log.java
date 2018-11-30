@@ -403,4 +403,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 66,
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 67, value = "Unable to delete all entries with tenant identifier '%1$s'.")
+	SearchException unableToDeleteAllEntriesFromIndex(String tenantId, @Param EventContext context, @Cause Exception e);
 }

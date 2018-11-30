@@ -39,6 +39,11 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 	}
 
 	@Override
+	public LuceneIndexWork<?> deleteAll(String indexName, String tenantId) {
+		return multiTenancyStrategy.createDeleteAllEntriesLuceneWork( indexName, tenantId );
+	}
+
+	@Override
 	public LuceneIndexWork<?> flush(String indexName) {
 		return new LuceneFlushIndexWork( indexName );
 	}
