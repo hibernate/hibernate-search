@@ -195,24 +195,24 @@ public class BackendMock implements TestRule {
 		public BackendMock preparedThenExecuted() {
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 
 		public BackendMock executed() {
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
 
 		public BackendMock prepared() {
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}
@@ -275,7 +275,7 @@ public class BackendMock implements TestRule {
 		public void prepareWorks(String indexName, List<StubIndexWork> works) {
 			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
 			works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ) )
 					.forEach( call -> callQueue.verify( call, IndexWorkCall::verify ) );
 		}
 
@@ -283,7 +283,7 @@ public class BackendMock implements TestRule {
 		public CompletableFuture<?> executeWorks(String indexName, List<StubIndexWork> works) {
 			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
 			return works.stream()
-					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ) )
+					.map( work -> new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ) )
 					.<CompletableFuture<?>>map( call -> callQueue.verify( call, IndexWorkCall::verify ) )
 					.reduce( (first, second) -> second )
 					.orElseGet( () -> CompletableFuture.completedFuture( null ) );
@@ -293,11 +293,11 @@ public class BackendMock implements TestRule {
 		public CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work) {
 			CallQueue<IndexWorkCall> callQueue = getIndexWorkCalls( indexName );
 			callQueue.verify(
-					new IndexWorkCall( indexName, IndexWorkCall.Operation.PREPARE, work ),
+					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.PREPARE, work ),
 					IndexWorkCall::verify
 			);
 			callQueue.verify(
-					new IndexWorkCall( indexName, IndexWorkCall.Operation.EXECUTE, work ),
+					new IndexWorkCall( indexName, IndexWorkCall.WorkPhase.EXECUTE, work ),
 					IndexWorkCall::verify
 			);
 
