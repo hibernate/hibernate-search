@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
@@ -17,6 +16,7 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
@@ -46,7 +46,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference<? extends HibernateOrmSearchMappingConfigurer>>> MAPPING_CONFIGURER =
+	private static final OptionalConfigurationProperty<BeanReference<? extends HibernateOrmSearchMappingConfigurer>> MAPPING_CONFIGURER =
 			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
@@ -114,8 +114,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 		// Apply the user-provided mapping configurer if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-		MAPPING_CONFIGURER.get( propertySource )
-				.map( beanProvider::getBean )
+		MAPPING_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
 				.ifPresent( configurer -> configurer.configure( this ) );
 
 		super.configure( buildContext, propertySource, configurationCollector );

@@ -31,6 +31,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.EventContext;
@@ -53,7 +54,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
-	private static final ConfigurationProperty<Optional<String>> DIRECTORY_PROVIDER =
+	private static final OptionalConfigurationProperty<String> DIRECTORY_PROVIDER =
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_DIRECTORY_PROVIDER )
 					.asString()
 					.build();
@@ -70,7 +71,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					.withDefault( SearchBackendLuceneSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference<? extends LuceneAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
+	private static final OptionalConfigurationProperty<BeanReference<? extends LuceneAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( LuceneAnalysisConfigurer.class )
 					.build();
@@ -121,14 +122,10 @@ public class LuceneBackendFactory implements BackendFactory {
 	}
 
 	private DirectoryProvider getDirectoryProvider(EventContext backendContext, ConfigurationPropertySource propertySource) {
-		// TODO be more clever about the type, also supports providing a class
-		Optional<String> directoryProviderProperty = DIRECTORY_PROVIDER.get( propertySource );
-
-		if ( !directoryProviderProperty.isPresent() ) {
-			throw log.undefinedLuceneDirectoryProvider( backendContext );
-		}
-
-		String directoryProviderString = directoryProviderProperty.get();
+		// TODO be more clever about the type, also supports providing a class => use a BeanReference?
+		String directoryProviderString = DIRECTORY_PROVIDER.getOrThrow(
+				propertySource, propertyKey -> log.undefinedLuceneDirectoryProvider( propertyKey, backendContext )
+		);
 
 		if ( "local_directory".equals( directoryProviderString ) ) {
 			// TODO GSM: implement the checks properly
@@ -164,8 +161,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-			return ANALYSIS_CONFIGURER.get( propertySource )
-					.map( beanProvider::getBean )
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
 					.map( configurer -> {
 						LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
 								luceneVersion,

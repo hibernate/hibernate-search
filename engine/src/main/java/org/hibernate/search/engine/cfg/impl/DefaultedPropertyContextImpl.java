@@ -8,21 +8,24 @@ package org.hibernate.search.engine.cfg.impl;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.PropertyContext;
+import org.hibernate.search.engine.cfg.spi.DefaultedPropertyContext;
 
-class DefaultedPropertyContext<T> implements PropertyContext<T> {
+final class DefaultedPropertyContextImpl<T> implements DefaultedPropertyContext<T> {
 	private final String key;
-	private final Function<Optional<?>, T> converter;
+	private final Function<Object, Optional<T>> converter;
+	private final Supplier<T> defaultValueSupplier;
 
-	DefaultedPropertyContext(String key, Function<Optional<?>, T> converter) {
+	DefaultedPropertyContextImpl(String key, Function<Object, Optional<T>> converter, Supplier<T> defaultValueSupplier) {
 		this.key = key;
 		this.converter = converter;
+		this.defaultValueSupplier = defaultValueSupplier;
 	}
 
 	@Override
 	public ConfigurationProperty<T> build() {
-		return new FunctionConfigurationProperty<>( key, converter );
+		return new DefaultedConfigurationProperty<>( key, converter, defaultValueSupplier );
 	}
 }
