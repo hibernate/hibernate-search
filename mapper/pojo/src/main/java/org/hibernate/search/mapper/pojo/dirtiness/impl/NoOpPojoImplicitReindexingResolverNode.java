@@ -19,6 +19,11 @@ class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResol
 	}
 
 	@Override
+	public void close() {
+		// No-op
+	}
+
+	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, Object dirty, Object dirtinessState) {
 		// No-op

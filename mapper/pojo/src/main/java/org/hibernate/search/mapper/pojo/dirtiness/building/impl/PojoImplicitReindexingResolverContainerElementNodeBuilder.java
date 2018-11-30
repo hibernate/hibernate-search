@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
+import org.hibernate.search.util.impl.common.Closer;
 
 class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<C> {
@@ -37,6 +38,14 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 	@Override
 	BoundPojoModelPathValueNode<?, ? extends C, V> getModelPath() {
 		return modelPath;
+	}
+
+	@Override
+	void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			// TODO HSEARCH-3170 release the extractor beans
+			closer.push( PojoImplicitReindexingResolverValueNodeBuilderDelegate::closeOnFailure, valueBuilderDelegate );
+		}
 	}
 
 	PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> value() {

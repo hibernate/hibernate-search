@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Closer;
 
 class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 
@@ -37,6 +38,15 @@ class PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> {
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		this.modelPath = modelPath;
 		this.buildingHelper = buildingHelper;
+	}
+
+	void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( AbstractPojoImplicitReindexingResolverNodeBuilder::closeOnFailure, typeNodeBuilder );
+			closer.pushAll(
+					AbstractPojoImplicitReindexingResolverNodeBuilder::closeOnFailure, castedTypeNodeBuilders.values()
+			);
+		}
 	}
 
 	PojoTypeModel<V> getTypeModel() {

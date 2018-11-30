@@ -19,7 +19,10 @@ import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
  * @param <T> The type of entities this object is able to handle.
  * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public interface PojoImplicitReindexingResolver<T, S> extends ToStringTreeAppendable {
+public interface PojoImplicitReindexingResolver<T, S> extends AutoCloseable, ToStringTreeAppendable {
+
+	@Override
+	void close();
 
 	/**
 	 * @param dirtinessState A set of dirty paths.

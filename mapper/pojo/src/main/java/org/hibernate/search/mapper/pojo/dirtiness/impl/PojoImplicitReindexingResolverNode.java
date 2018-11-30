@@ -19,12 +19,15 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  * This type may be an entity type, an embeddable type, a collection type, ...
  * @param <S> The expected type of the object describing the "dirtiness state".
  */
-public abstract class PojoImplicitReindexingResolverNode<T, S> implements ToStringTreeAppendable {
+public abstract class PojoImplicitReindexingResolverNode<T, S> implements AutoCloseable, ToStringTreeAppendable {
 
 	@Override
 	public String toString() {
 		return new ToStringTreeBuilder().value( this ).toString();
 	}
+
+	@Override
+	public abstract void close();
 
 	/**
 	 * Add all entities that should be reindexed to {@code collector},

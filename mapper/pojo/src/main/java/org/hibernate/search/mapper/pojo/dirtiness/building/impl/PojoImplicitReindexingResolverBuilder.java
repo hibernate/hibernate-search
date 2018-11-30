@@ -45,6 +45,10 @@ class PojoImplicitReindexingResolverBuilder<T> {
 		return getClass().getSimpleName() + "[" + rawTypeModel + "]";
 	}
 
+	void closeOnFailure() {
+		containingEntitiesResolverRootBuilder.closeOnFailure();
+	}
+
 	void addDirtyPathTriggeringSelfReindexing(BoundPojoModelPathValueNode<?, ?, ?> dirtyPathFromEntityType) {
 		checkNotFrozen();
 		dirtyPathsTriggeringSelfReindexing.add( dirtyPathFromEntityType.toUnboundPath() );

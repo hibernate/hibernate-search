@@ -68,6 +68,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 			closer.push( IdentifierMapping::close, identifierMapping );
 			closer.push( RoutingKeyProvider::close, routingKeyProvider );
 			closer.push( PojoIndexingProcessor::close, processor );
+			closer.push( PojoImplicitReindexingResolver::close, reindexingResolver );
 		}
 	}
 

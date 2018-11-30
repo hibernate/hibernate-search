@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
@@ -34,6 +35,13 @@ public class PojoImplicitReindexingResolverPropertyNode<T, S, P> extends PojoImp
 			Collection<PojoImplicitReindexingResolverNode<? super P, S>> nestedNodes) {
 		this.handle = handle;
 		this.nestedNodes = nestedNodes;
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
+		}
 	}
 
 	@Override

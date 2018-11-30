@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
@@ -36,6 +37,14 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 			Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes) {
 		this.extractor = extractor;
 		this.nestedNodes = nestedNodes;
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			// TODO HSEARCH-3170 release the extractor beans
+			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
+		}
 	}
 
 	@Override

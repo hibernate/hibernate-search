@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 /**
@@ -28,6 +29,13 @@ public class PojoImplicitReindexingResolverOriginalTypeNode<T, S> extends PojoIm
 	public PojoImplicitReindexingResolverOriginalTypeNode(
 			Collection<PojoImplicitReindexingResolverNode<? super T, S>> nestedNodes) {
 		this.nestedNodes = nestedNodes;
+	}
+
+	@Override
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
+		}
 	}
 
 	@Override

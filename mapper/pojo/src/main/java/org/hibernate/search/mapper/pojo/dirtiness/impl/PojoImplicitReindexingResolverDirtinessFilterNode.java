@@ -34,6 +34,11 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends Poj
 	}
 
 	@Override
+	public void close() {
+		delegate.close();
+	}
+
+	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "dirtyPathFilter", dirtyPathFilter );

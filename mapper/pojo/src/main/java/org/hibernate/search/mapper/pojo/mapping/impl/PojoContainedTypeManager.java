@@ -36,7 +36,7 @@ public class PojoContainedTypeManager<E> implements AutoCloseable, ToStringTreeA
 
 	@Override
 	public void close() {
-		// Nothing to do
+		reindexingResolver.close();
 	}
 
 	@Override

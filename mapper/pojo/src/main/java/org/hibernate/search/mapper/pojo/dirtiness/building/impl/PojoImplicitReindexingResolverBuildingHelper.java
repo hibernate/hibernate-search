@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.util.impl.common.Closer;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
 
@@ -70,6 +71,12 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 
 	public <T> PojoIndexingDependencyCollectorTypeNode<T> createDependencyCollector(PojoRawTypeModel<T> typeModel) {
 		return new PojoIndexingDependencyCollectorTypeNode<>( typeModel, this );
+	}
+
+	public void closeOnFailure() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( PojoImplicitReindexingResolverBuilder::closeOnFailure, builderByType.values() );
+		}
 	}
 
 	public <T, S> Optional<PojoImplicitReindexingResolver<T, S>> build(PojoRawTypeModel<T> typeModel,

@@ -37,6 +37,8 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 
 	abstract BoundPojoModelPath getModelPath();
 
+	abstract void closeOnFailure();
+
 	/**
 	 * Freeze the builder, signaling that no mutating method will be called anymore
 	 * and that derived data can be safely computed.
@@ -86,6 +88,8 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 		Set<PojoModelPathValueNode> immutableDirtyPathsAcceptedByFilter =
 				getDirtyPathsTriggeringReindexingIncludingNestedNodes();
 
+		Optional<PojoImplicitReindexingResolverNode<T, S>> result;
+
 		/*
 		 * The following code allows us to decide whether we need a path filter
 		 * (a PojoImplicitReindexingResolverDirtinessFilterNode) to wrap our node,
@@ -106,14 +110,12 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 			 *
 			 * Thus we need to filter out all the paths that are not tied to this node.
 			 */
-			Optional<PojoImplicitReindexingResolverNode<T, S>> result =
-					doBuild( pathFilterFactory, immutableDirtyPathsAcceptedByFilter );
+			result = doBuild( pathFilterFactory, immutableDirtyPathsAcceptedByFilter );
 			if ( result.isPresent() ) {
 				result = Optional.of(
 						wrapWithFilter( result.get(), pathFilterFactory, immutableDirtyPathsAcceptedByFilter )
 				);
 			}
-			return result;
 		}
 		else {
 			/*
@@ -131,8 +133,15 @@ abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 			 * Thus we do not need to add our own dirty check: no filter node wrapping the node we are building
 			 * is necessary.
 			 */
-			return doBuild( pathFilterFactory, allPotentialDirtyPaths );
+			result = doBuild( pathFilterFactory, allPotentialDirtyPaths );
 		}
+
+		if ( !result.isPresent() ) {
+			// If for some reason this node is not used, it may still hold resources that should be closed
+			closeOnFailure();
+		}
+
+		return result;
 	}
 
 	abstract <S> Optional<PojoImplicitReindexingResolverNode<T, S>> doBuild(PojoPathFilterFactory<S> pathFilterFactory,

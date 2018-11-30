@@ -151,16 +151,16 @@ public class PojoMapper<M> implements Mapper<M> {
 						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
 				);
 
-		// First phase: build the processors and contribute to the reindexing resolvers
-		for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
-			pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
-		}
-		if ( failureCollector.hasFailure() ) {
-			throw new MappingAbortedException();
-		}
-
 		PojoMappingDelegate mappingImplementor = null;
 		try {
+			// First phase: build the processors and contribute to the reindexing resolvers
+			for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
+				pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
+			}
+			if ( failureCollector.hasFailure() ) {
+				throw new MappingAbortedException();
+			}
+
 			// Second phase: build the indexed type managers and their reindexing resolvers
 			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?, ?>> entry
 					: indexedTypeManagerBuilders.entrySet() ) {
@@ -203,6 +203,10 @@ public class PojoMapper<M> implements Mapper<M> {
 		}
 		catch (MappingAbortedException | RuntimeException e) {
 			new SuppressingCloser( e )
+					.push(
+							PojoImplicitReindexingResolverBuildingHelper::closeOnFailure,
+							reindexingResolverBuildingHelper
+					)
 					.push(
 							PojoIndexedTypeManagerContainer.Builder::closeOnFailure,
 							indexedTypeManagerContainerBuilder

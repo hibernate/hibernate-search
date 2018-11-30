@@ -24,6 +24,11 @@ class NoOpPojoImplicitReindexingResolver implements PojoImplicitReindexingResolv
 	}
 
 	@Override
+	public void close() {
+		// No-op
+	}
+
+	@Override
 	public boolean requiresSelfReindexing(Object dirtinessState) {
 		return false;
 	}
