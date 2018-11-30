@@ -70,7 +70,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					.withDefault( SearchBackendLuceneSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference>> ANALYSIS_CONFIGURER =
+	private static final ConfigurationProperty<Optional<BeanReference<? extends LuceneAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( LuceneAnalysisConfigurer.class )
 					.build();
@@ -165,7 +165,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 			return ANALYSIS_CONFIGURER.get( propertySource )
-					.map( beanReference -> beanReference.getBean( beanProvider, LuceneAnalysisConfigurer.class ) )
+					.map( beanProvider::getBean )
 					.map( configurer -> {
 						LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
 								luceneVersion,

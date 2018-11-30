@@ -67,7 +67,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference>> ANALYSIS_CONFIGURER =
+	private static final ConfigurationProperty<Optional<BeanReference<? extends ElasticsearchAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
 					.build();
@@ -135,7 +135,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 			return ANALYSIS_CONFIGURER.get( propertySource )
-					.map( beanReference -> beanReference.getBean( beanProvider, ElasticsearchAnalysisConfigurer.class ) )
+					.map( beanProvider::getBean )
 					.map( configurer -> {
 						ElasticsearchAnalysisDefinitionContainerContextImpl collector
 								= new ElasticsearchAnalysisDefinitionContainerContextImpl();

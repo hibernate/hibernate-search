@@ -41,8 +41,8 @@ public class KeyContextImpl implements KeyContext {
 	}
 
 	@Override
-	public OptionalPropertyContext<BeanReference> asBeanReference(Class<?> expectedType) {
-		return new OptionalPropertyContextImpl<>( key, v -> ConvertUtils.convertBeanReference( expectedType, v ) );
+	public <T> OptionalPropertyContext<BeanReference<? extends T>> asBeanReference(Class<T> expectedBeanType) {
+		return new OptionalPropertyContextImpl<>( key, v -> ConvertUtils.convertBeanReference( expectedBeanType, v ) );
 	}
 
 	@Override

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.BeanProvider;
@@ -15,14 +14,10 @@ import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.LoggerFactory;
-import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.impl.common.Contracts;
 
 public final class BeanProviderImpl implements BeanProvider {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanResolver beanResolver;
 	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans;
@@ -43,35 +38,21 @@ public final class BeanProviderImpl implements BeanProvider {
 	}
 
 	@Override
-	public <T> T getBean(Class<T> expectedClass, Class<?> typeReference) {
-		if ( typeReference == null ) {
-			throw log.invalidBeanReferenceTypeNull();
-		}
-		return beanResolver.resolve( expectedClass, typeReference );
+	public <T> T getBean(Class<T> typeReference) {
+		Contracts.assertNotNull( typeReference, "typeReference" );
+		return beanResolver.resolve( typeReference );
 	}
 
 	@Override
-	public <T> T getBean(Class<T> expectedClass, String nameReference) {
-		if ( StringHelper.isEmpty( nameReference ) ) {
-			throw log.invalidBeanReferenceNameNullOrEmpty();
-		}
-		return getBeanFromBeanResolverOrConfiguredBeans( expectedClass, nameReference );
+	public <T> T getBean(Class<T> typeReference, String nameReference) {
+		Contracts.assertNotNull( typeReference, "typeReference" );
+		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
+		return getBeanFromBeanResolverOrConfiguredBeans( typeReference, nameReference );
 	}
 
-	@Override
-	public <T> T getBean(Class<T> expectedClass, Class<?> typeReference, String nameReference) {
-		if ( typeReference == null ) {
-			throw log.invalidBeanReferenceTypeNull();
-		}
-		if ( StringHelper.isEmpty( nameReference ) ) {
-			throw log.invalidBeanReferenceNameNullOrEmpty();
-		}
-		return beanResolver.resolve( expectedClass, nameReference, typeReference );
-	}
-
-	private <T> T getBeanFromBeanResolverOrConfiguredBeans(Class<T> expectedClass, String nameReference) {
+	private <T> T getBeanFromBeanResolverOrConfiguredBeans(Class<T> typeReference, String nameReference) {
 		try {
-			return beanResolver.resolve( expectedClass, nameReference );
+			return beanResolver.resolve( typeReference, nameReference );
 		}
 		catch (SearchException e) {
 			/*
@@ -81,7 +62,7 @@ public final class BeanProviderImpl implements BeanProvider {
 			 * doesn't break existing user's configuration.
 			 */
 			try {
-				T explicitlyConfiguredBean = getExplicitlyConfiguredBean( expectedClass, nameReference );
+				T explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
 				if ( explicitlyConfiguredBean != null ) {
 					return explicitlyConfiguredBean;
 				}

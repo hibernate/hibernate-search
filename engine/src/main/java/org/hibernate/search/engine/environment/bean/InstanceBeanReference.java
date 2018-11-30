@@ -8,11 +8,11 @@ package org.hibernate.search.engine.environment.bean;
 
 import org.hibernate.search.util.impl.common.Contracts;
 
-final class InstanceBeanReference implements BeanReference {
+final class InstanceBeanReference<T> implements BeanReference<T> {
 
-	private final Object instance;
+	private final T instance;
 
-	InstanceBeanReference(Object instance) {
+	InstanceBeanReference(T instance) {
 		Contracts.assertNotNull( instance, "instance" );
 		this.instance = instance;
 	}
@@ -23,8 +23,16 @@ final class InstanceBeanReference implements BeanReference {
 	}
 
 	@Override
-	public <T> T getBean(BeanProvider beanProvider, Class<T> expectedType) {
-		return expectedType.cast( instance );
+	public T getBean(BeanProvider beanProvider) {
+		return instance;
 	}
 
+	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
+	public <U> BeanReference<? extends U> asSubTypeOf(Class<U> expectedType) {
+		// Let the type itself throw a ClassCastException if something is wrong
+		expectedType.cast( instance );
+		// The cast above worked, so we can do this safely:
+		return (BeanReference<? extends U>) this;
+	}
 }

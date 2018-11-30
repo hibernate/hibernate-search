@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReferen
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -81,7 +82,7 @@ public class BridgeIT {
 
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( buildContext -> new TypeBridge() {
+						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> new TypeBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldAccessor<String> indexFieldAccessor;
 
@@ -145,7 +146,7 @@ public class BridgeIT {
 
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( buildContext -> new PropertyBridge() {
+						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> new PropertyBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldAccessor<String> indexFieldAccessor;
 

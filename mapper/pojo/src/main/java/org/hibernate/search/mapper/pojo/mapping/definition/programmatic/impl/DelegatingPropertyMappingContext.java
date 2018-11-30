@@ -48,7 +48,7 @@ class DelegatingPropertyMappingContext implements PropertyMappingContext {
 	}
 
 	@Override
-	public PropertyMappingContext bridge(BeanReference bridgeReference) {
+	public PropertyMappingContext bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
 		return delegate.bridge( bridgeReference );
 	}
 

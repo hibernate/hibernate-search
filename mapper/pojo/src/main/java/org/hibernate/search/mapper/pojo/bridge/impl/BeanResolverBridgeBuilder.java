@@ -13,12 +13,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 
-	private final Class<T> expectedType;
+	private final BeanReference<T> beanReference;
 
-	private final BeanReference beanReference;
-
-	public BeanResolverBridgeBuilder(Class<T> expectedType, BeanReference beanReference) {
-		this.expectedType = expectedType;
+	public BeanResolverBridgeBuilder(BeanReference<T> beanReference) {
 		this.beanReference = beanReference;
 	}
 
@@ -30,6 +27,6 @@ public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 	@Override
 	public T build(BridgeBuildContext buildContext) {
 		BeanProvider beanProvider = buildContext.getBeanProvider();
-		return beanReference.getBean( beanProvider, expectedType );
+		return beanReference.getBean( beanProvider );
 	}
 }

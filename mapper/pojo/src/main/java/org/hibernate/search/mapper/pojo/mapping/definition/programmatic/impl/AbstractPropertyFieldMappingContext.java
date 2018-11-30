@@ -62,17 +62,12 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 
 	@Override
 	public S valueBridge(Class<? extends ValueBridge<?, ?>> bridgeClass) {
-		return valueBridge( BeanReference.ofType( bridgeClass ) );
+		return valueBridge( BeanReference.of( bridgeClass ) );
 	}
 
 	@Override
-	// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
-	@SuppressWarnings( "unchecked" )
-	public S valueBridge(BeanReference bridgeReference) {
-		return valueBridge(
-				(BeanResolverBridgeBuilder<? extends ValueBridge<?, ?>>)
-						new BeanResolverBridgeBuilder( ValueBridge.class, bridgeReference )
-		);
+	public S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference) {
+		return valueBridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
