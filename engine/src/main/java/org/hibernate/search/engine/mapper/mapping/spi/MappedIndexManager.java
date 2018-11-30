@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -30,11 +30,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext);
 
-	CompletableFuture<?> optimize();
-
-	CompletableFuture<?> purge();
-
-	CompletableFuture<?> flush();
+	IndexWorkExecutor createWorkExecutor();
 
 	<R, O> MappedIndexSearchTargetBuilder<R, O> createSearchTargetBuilder(MappingContextImplementor mappingContext,
 			Function<DocumentReference, R> documentReferenceTransformer);

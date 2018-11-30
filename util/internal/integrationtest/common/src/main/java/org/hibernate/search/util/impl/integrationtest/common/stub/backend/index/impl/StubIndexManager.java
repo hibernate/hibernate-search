@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -71,6 +72,11 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
+	public IndexWorkExecutor createWorkExecutor() {
+		return new StubIndexWorkExecutor( name, backend.getBehavior() );
+	}
+
+	@Override
 	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
 		return new StubIndexSearchTargetContext.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
@@ -78,24 +84,6 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	@Override
 	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
 		((StubIndexSearchTargetContext.Builder)searchTargetBuilder).add( backend, name, rootSchemaNode );
-	}
-
-	@Override
-	public CompletableFuture<?> optimize() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-	}
-
-	@Override
-	public CompletableFuture<?> purge() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-	}
-
-	@Override
-	public CompletableFuture<?> flush() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
 	}
 
 	@Override

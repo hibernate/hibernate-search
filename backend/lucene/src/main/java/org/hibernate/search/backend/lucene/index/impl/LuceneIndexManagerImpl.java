@@ -8,10 +8,10 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -74,16 +74,17 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkPlan(
-				workPlanOrchestrator, indexName, sessionContext
-		);
+		return indexingBackendContext.createWorkPlan( workPlanOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor(
-				workPlanOrchestrator, indexName, sessionContext
-		);
+		return indexingBackendContext.createDocumentWorkExecutor( streamOrchestrator, indexName, sessionContext );
+	}
+
+	@Override
+	public IndexWorkExecutor createWorkExecutor() {
+		return indexingBackendContext.createWorkExecutor( streamOrchestrator, indexName );
 	}
 
 	@Override
@@ -101,24 +102,6 @@ class LuceneIndexManagerImpl
 
 		LuceneIndexSearchTargetContextBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetContextBuilder) searchTargetBuilder;
 		luceneSearchTargetBuilder.add( searchBackendContext, this );
-	}
-
-	@Override
-	public CompletableFuture<?> optimize() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-	}
-
-	@Override
-	public CompletableFuture<?> purge() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
-	}
-
-	@Override
-	public CompletableFuture<?> flush() {
-		// TODO must be implemented
-		return CompletableFuture.completedFuture( "Stub method: must be implemented!" );
 	}
 
 	@Override

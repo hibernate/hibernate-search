@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -44,18 +44,8 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public CompletableFuture<?> optimize() {
-		return implementor.optimize();
-	}
-
-	@Override
-	public CompletableFuture<?> purge() {
-		return implementor.purge();
-	}
-
-	@Override
-	public CompletableFuture<?> flush() {
-		return implementor.flush();
+	public IndexWorkExecutor createWorkExecutor() {
+		return implementor.createWorkExecutor();
 	}
 
 	@Override

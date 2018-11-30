@@ -21,6 +21,8 @@ public interface LuceneWorkFactory {
 
 	LuceneIndexWork<?> delete(String indexName, String tenantId, String id, String routingKey);
 
+	LuceneIndexWork<?> deleteAll(String indexName, String tenantId);
+
 	LuceneIndexWork<?> commit(String indexName);
 
 	LuceneIndexWork<?> flush(String indexName);

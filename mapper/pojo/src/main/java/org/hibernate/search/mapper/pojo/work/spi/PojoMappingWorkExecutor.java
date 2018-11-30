@@ -13,7 +13,7 @@ public interface PojoMappingWorkExecutor {
 
 	CompletableFuture<?> optimize(Collection<Class<?>> types);
 
-	CompletableFuture<?> purge(Collection<Class<?>> types);
+	CompletableFuture<?> purge(Collection<Class<?>> types, String tenantId);
 
 	CompletableFuture<?> flush(Collection<Class<?>> types);
 

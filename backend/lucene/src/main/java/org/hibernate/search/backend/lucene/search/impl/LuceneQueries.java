@@ -38,6 +38,10 @@ public class LuceneQueries {
 		return wrapWithDiscriminatorTenantIdQuery( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), tenantId );
 	}
 
+	public static Query discriminatorMultiTenancyDeleteAllDocumentsQuery(String tenantId) {
+		return new BooleanQuery.Builder().add( new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) ), Occur.FILTER ).build();
+	}
+
 	public static Query wrapWithDiscriminatorTenantIdQuery(Query originalLuceneQuery, String tenantId) {
 		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 		queryBuilder.add( originalLuceneQuery, Occur.MUST );

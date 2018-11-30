@@ -158,7 +158,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
-			mappingWorkExecutor.purge( rootEntities ).join();
+			mappingWorkExecutor.purge( rootEntities, tenantId ).join();
 			if ( this.optimizeAfterPurge ) {
 				mappingWorkExecutor.optimize( rootEntities ).join();
 			}

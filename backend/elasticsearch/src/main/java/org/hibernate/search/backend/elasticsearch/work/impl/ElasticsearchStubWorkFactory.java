@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
@@ -27,9 +28,11 @@ import com.google.gson.JsonObject;
 public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
 	private final GsonProvider gsonProvider;
+	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider) {
+	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider, MultiTenancyStrategy multiTenancyStrategy) {
 		this.gsonProvider = gsonProvider;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
 	@Override
@@ -103,6 +106,22 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
+	public ElasticsearchWork<?> deleteAll(URLEncodedString indexName, String tenantId) {
+		JsonObject matchAll = new JsonObject();
+		matchAll.add( "match_all", new JsonObject() );
+		JsonObject document = new JsonObject();
+		document.add( "query", multiTenancyStrategy.decorateJsonQuery( matchAll, tenantId ) );
+
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.pathComponent( indexName )
+				.pathComponent( Paths._DELETE_BY_QUERY )
+				.param( "conflicts", "proceed" )
+				.param( "refresh", true )
+				.body( document );
+		return new ElasticsearchStubWork<>( builder.build() );
+	}
+
+	@Override
 	public ElasticsearchWork<?> flush(URLEncodedString indexName) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.pathComponent( indexName )
@@ -153,5 +172,4 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
 		return new ElasticsearchStubWork<>( builder.build(), searchResultExtractor::extract );
 	}
-
 }
