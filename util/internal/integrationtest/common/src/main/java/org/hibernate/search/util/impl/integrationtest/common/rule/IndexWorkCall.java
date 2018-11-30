@@ -16,27 +16,27 @@ import org.junit.Assert;
 
 class IndexWorkCall extends Call<IndexWorkCall> {
 
-	enum Operation {
+	enum WorkPhase {
 		PREPARE,
 		EXECUTE
 	}
 
 	private final String indexName;
-	private final Operation operation;
+	private final WorkPhase phase;
 	private final StubIndexWork work;
 
-	IndexWorkCall(String indexName, Operation operation, StubIndexWork work) {
+	IndexWorkCall(String indexName, WorkPhase phase, StubIndexWork work) {
 		this.indexName = indexName;
-		this.operation = operation;
+		this.phase = phase;
 		this.work = work;
 	}
 
 	public CompletableFuture<?> verify(IndexWorkCall actualCall) {
-		String whenThisWorkWasExpected = "when a " + operation + " call for a work on index '" + indexName
+		String whenThisWorkWasExpected = "when a " + phase + " call for a work on index '" + indexName
 				+ "', identifier '" + work.getIdentifier() + "' was expected";
-		if ( !Objects.equals( operation, actualCall.operation ) ) {
-			Assert.fail( "Incorrect work operation " + whenThisWorkWasExpected + ".\n\tExpected: "
-					+ operation + ", actual: " + actualCall.operation
+		if ( !Objects.equals( phase, actualCall.phase ) ) {
+			Assert.fail( "Incorrect work phase " + whenThisWorkWasExpected + ".\n\tExpected: "
+					+ phase + ", actual: " + actualCall.phase
 					+ ".\n\tExpected work: " + work + "\n\tActual work: " + actualCall.work );
 		}
 		StubIndexWorkAssert.assertThat( actualCall.work )
@@ -47,7 +47,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 
 	@Override
 	boolean isSimilarTo(IndexWorkCall other) {
-		return Objects.equals( operation, other.operation )
+		return Objects.equals( phase, other.phase )
 				&& Objects.equals( indexName, other.indexName )
 				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() )
 				&& Objects.equals( work.getIdentifier(), other.work.getIdentifier() );
@@ -55,7 +55,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 
 	@Override
 	public String toString() {
-		return operation + " call for a work on index '" + indexName + "', identifier '" + work.getIdentifier()
+		return phase + " call for a work on index '" + indexName + "', identifier '" + work.getIdentifier()
 				+ "'; work = " + work;
 	}
 }
