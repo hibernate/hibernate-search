@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.cfg.spi;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.KeyContextImpl;
@@ -20,6 +21,17 @@ public interface ConfigurationProperty<T> {
 	 * @return The value of this property according to the given source.
 	 */
 	T get(ConfigurationPropertySource source);
+
+	/**
+	 * Get and transform the value of this configuration property.
+	 * <p>
+	 * Any exception occurring during transformation will be wrapped in another exception adding some context,
+	 * such as the {@link #resolveOrRaw(ConfigurationPropertySource) resolved key} for this property.
+	 *
+	 * @param source A configuration source.
+	 * @return The value of this property according to the given source.
+	 */
+	<R> R getAndTransform(ConfigurationPropertySource source, Function<T, R> transform);
 
 	/**
 	 * Resolve the key for this configuration property

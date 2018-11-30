@@ -29,7 +29,13 @@ import org.easymock.EasyMockSupport;
 public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 
 	private final ConfigurationPropertySource sourceMock = createMock( ConfigurationPropertySource.class );
-	private final BeanProvider beanProviderMock = createMock( BeanProvider.class );
+	/*
+	  * Use a partial mock, so that getBean(BeanReference) just uses its default implementation.
+	  *
+	  * Note we have to mock using an abstract class, otherwise we get an exception
+	  * with message "Partial mocking doesn't make sense for interface"
+	  */
+	private final BeanProvider beanProviderMock = partialMockBuilder( AbstractBeanProviderMock.class ).createMock();
 
 	@Test
 	public void withDefault() {
@@ -276,6 +282,37 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		verifyAll();
 	}
 
+	@Test
+	public void invalidReference() {
+		String key = "invalidReference";
+		String resolvedKey = "some.prefix." + key;
+		OptionalConfigurationProperty<BeanReference<? extends StubBean>> property =
+				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
+						.build();
+
+		String propertyValue = "name";
+		SimulatedFailure simulatedFailure = new SimulatedFailure();
+
+		resetAll();
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( propertyValue ) );
+		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
+		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name" ) )
+				.andThrow( simulatedFailure );
+		replayAll();
+		SubTest.expectException(
+				() -> {
+					property.getAndMap( sourceMock, beanProviderMock::getBean );
+				}
+		)
+				.assertThrown()
+				.hasCause( simulatedFailure )
+				.hasMessageContaining(
+						"Unable to convert configuration property '" + resolvedKey
+								+ "' with value '" + propertyValue + "':"
+				);
+		verifyAll();
+	}
+
 	@SafeVarargs
 	private static <T> Collection<T> createCollection(T... values) {
 		// Don't create a List, that would be too easy.
@@ -309,4 +346,9 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		}
 	}
 
+	private class SimulatedFailure extends RuntimeException {
+	}
+
+	private abstract class AbstractBeanProviderMock implements BeanProvider {
+	}
 }

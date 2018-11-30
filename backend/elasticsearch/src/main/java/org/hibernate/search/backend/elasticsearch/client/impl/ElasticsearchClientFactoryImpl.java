@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearch
 import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.util.impl.common.SearchThreadFactory;
 
 /**
@@ -40,12 +41,12 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.HOST )
 					.build();
 
-	private static final ConfigurationProperty<Optional<String>> USERNAME =
+	private static final OptionalConfigurationProperty<String> USERNAME =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.USERNAME )
 					.asString()
 					.build();
 
-	private static final ConfigurationProperty<Optional<String>> PASSWORD =
+	private static final OptionalConfigurationProperty<String> PASSWORD =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.PASSWORD )
 					.asString()
 					.build();

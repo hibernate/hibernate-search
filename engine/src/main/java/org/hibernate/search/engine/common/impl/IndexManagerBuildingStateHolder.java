@@ -8,10 +8,10 @@ package org.hibernate.search.engine.common.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -34,10 +34,10 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  */
 class IndexManagerBuildingStateHolder {
 
-	private static final ConfigurationProperty<Optional<String>> INDEX_BACKEND_NAME =
+	private static final OptionalConfigurationProperty<String> INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( "backend" ).asString().build();
 
-	private static final ConfigurationProperty<Optional<BeanReference<? extends BackendFactory>>> BACKEND_TYPE =
+	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( "type" ).asBeanReference( BackendFactory.class ).build();
 
 	private final RootBuildContext rootBuildContext;
@@ -57,7 +57,7 @@ class IndexManagerBuildingStateHolder {
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
 		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName )
 				.withFallback( defaultIndexPropertySource );
-		// TODO more checks on the backend name (is non-null, non-empty)
+		// TODO more checks on the backend name (is non-null, non-empty) => use INDEX_BACKEND_NAME.getOrThrow?
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
 		BackendBuildingState<?> backendBuildingstate =
 				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
@@ -95,7 +95,7 @@ class IndexManagerBuildingStateHolder {
 
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
-		// TODO properly check that there is a value before calling get()
+		// TODO properly check that there is a value before calling get() => use BACKEND_TYPE.getOrThrow
 		BeanReference<? extends BackendFactory> backendFactoryReference = BACKEND_TYPE.get( backendPropertySource ).get();
 
 		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();

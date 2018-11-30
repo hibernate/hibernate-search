@@ -18,6 +18,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -138,6 +139,36 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 	}
 
 	@Test
+	public void withoutDefault_getOrThrow() {
+		String key = "withoutDefault_getOrThrow";
+		String resolvedKey = "some.prefix." + key;
+		OptionalConfigurationProperty<T> property =
+				testedMethod.apply(
+						ConfigurationProperty.forKey( key )
+				)
+						.build();
+
+		// No value -> exception
+		resetAll();
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
+		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
+		replayAll();
+		SubTest.expectException( () -> property.getOrThrow( sourceMock, SimulatedFailure::new ) )
+				.assertThrown()
+				.isInstanceOf( SimulatedFailure.class )
+				.hasMessage( resolvedKey );
+		verifyAll();
+
+		// Valid value -> no exception
+		resetAll();
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( expectedValue ) );
+		replayAll();
+		T result = property.getOrThrow( sourceMock, SimulatedFailure::new );
+		verifyAll();
+		assertThat( result ).isEqualTo( expectedValue );
+	}
+
+	@Test
 	public void multiValued() {
 		String key = "multiValued";
 		ConfigurationProperty<Optional<List<T>>> property =
@@ -213,6 +244,12 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 		@Override
 		public int hashCode() {
 			return Objects.hash( value );
+		}
+	}
+
+	private static class SimulatedFailure extends RuntimeException {
+		SimulatedFailure(String message) {
+			super( message );
 		}
 	}
 

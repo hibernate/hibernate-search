@@ -12,16 +12,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.DefaultedPropertyContext;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
-import org.hibernate.search.engine.cfg.spi.PropertyContext;
 
 final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T> {
 
 	private final String key;
 	private final Function<Object, Optional<T>> converter;
 
-	public OptionalPropertyContextImpl(String key, Function<Object, Optional<T>> converter) {
+	OptionalPropertyContextImpl(String key, Function<Object, Optional<T>> converter) {
 		this.key = key;
 		this.converter = converter;
 	}
@@ -35,21 +35,17 @@ final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T>
 	}
 
 	@Override
-	public PropertyContext<T> withDefault(T defaultValue) {
-		return new DefaultedPropertyContext<>( key, createOptionalParser().andThen( o -> o.orElse( defaultValue ) ) );
+	public DefaultedPropertyContext<T> withDefault(T defaultValue) {
+		return new DefaultedPropertyContextImpl<>( key, converter, () -> defaultValue );
 	}
 
 	@Override
-	public PropertyContext<T> withDefault(Supplier<T> defaultValueSupplier) {
-		return new DefaultedPropertyContext<>( key, createOptionalParser().andThen( o -> o.orElseGet( defaultValueSupplier ) ) );
+	public DefaultedPropertyContext<T> withDefault(Supplier<T> defaultValueSupplier) {
+		return new DefaultedPropertyContextImpl<>( key, converter, defaultValueSupplier );
 	}
 
 	@Override
-	public ConfigurationProperty<Optional<T>> build() {
-		return new FunctionConfigurationProperty<>( key, createOptionalParser() );
-	}
-
-	private Function<Optional<?>, Optional<T>> createOptionalParser() {
-		return o -> o.flatMap( converter );
+	public OptionalConfigurationProperty<T> build() {
+		return new OptionalConfigurationPropertyImpl<>( key, converter );
 	}
 }

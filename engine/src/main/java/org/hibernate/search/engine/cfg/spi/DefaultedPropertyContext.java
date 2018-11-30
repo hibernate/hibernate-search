@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.cfg.spi;
 
-public interface PropertyContext<T> {
+public interface DefaultedPropertyContext<T> {
+
 	ConfigurationProperty<T> build();
+
 }

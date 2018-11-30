@@ -15,23 +15,32 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-class FunctionConfigurationProperty<T> implements ConfigurationProperty<T> {
+abstract class AbstractConfigurationProperty<T> implements ConfigurationProperty<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String key;
-	private final Function<Optional<?>, T> function;
 
-	FunctionConfigurationProperty(String key, Function<Optional<?>, T> function) {
+	AbstractConfigurationProperty(String key) {
 		this.key = key;
-		this.function = function;
 	}
 
 	@Override
 	public T get(ConfigurationPropertySource source) {
+		return doGet( source, Function.identity() );
+	}
+
+	@Override
+	public <R> R getAndTransform(ConfigurationPropertySource source, Function<T, R> transform) {
+		return doGet( source, transform );
+	}
+
+	abstract <R> R convert(Optional<?> rawValue, Function<T, R> transform);
+
+	<R> R doGet(ConfigurationPropertySource source, Function<T, R> transform) {
 		Optional<?> rawValue = source.get( key );
 		try {
-			return function.apply( rawValue );
+			return convert( rawValue, transform );
 		}
 		catch (RuntimeException e) {
 			String displayedKey = key;

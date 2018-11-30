@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
-import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
@@ -37,6 +36,7 @@ import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -67,7 +67,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
-	private static final ConfigurationProperty<Optional<BeanReference<? extends ElasticsearchAnalysisConfigurer>>> ANALYSIS_CONFIGURER =
+	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
 					.build();
@@ -134,8 +134,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-			return ANALYSIS_CONFIGURER.get( propertySource )
-					.map( beanProvider::getBean )
+			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
 					.map( configurer -> {
 						ElasticsearchAnalysisDefinitionContainerContextImpl collector
 								= new ElasticsearchAnalysisDefinitionContainerContextImpl();

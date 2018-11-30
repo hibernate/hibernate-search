@@ -164,8 +164,8 @@ public interface Log extends BasicLogger {
 			@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 3,
-			value = "Undefined Lucene directory provider.")
-	SearchException undefinedLuceneDirectoryProvider(@Param EventContext context);
+			value = "Undefined Lucene directory provider for property '%1$s'.")
+	SearchException undefinedLuceneDirectoryProvider(String propertyKey, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 4,
 			value = "Unrecognized Lucene directory provider '%1$s'.")
