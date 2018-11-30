@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -84,6 +85,18 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		return new PojoTypeWorkExecutor<>(
 				this, sessionContext, indexManager.createWorkExecutor( sessionContext )
 		);
+	}
+
+	public CompletableFuture<?> optimize() {
+		return indexManager.optimize();
+	}
+
+	public CompletableFuture<?> purge() {
+		return indexManager.purge();
+	}
+
+	public CompletableFuture<?> flush() {
+		return indexManager.flush();
 	}
 
 	IdentifierMapping<I, E> getIdentifierMapping() {
