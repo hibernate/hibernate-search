@@ -74,18 +74,6 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindExtractorPath(
-			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath) {
-		return extractorBinder.tryBindPath( pojoGenericTypeModel, extractorPath );
-	}
-
-	@Override
-	public <C, V> Optional<? extends ContainerValueExtractor<? super C, V>> tryCreateExtractors(
-			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
-		return extractorBinder.tryCreate( boundExtractorPath );
-	}
-
-	@Override
 	public <C, V> ContainerValueExtractor<? super C, V> createExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );

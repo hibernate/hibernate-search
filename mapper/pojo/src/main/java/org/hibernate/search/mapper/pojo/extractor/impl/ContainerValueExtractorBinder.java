@@ -155,17 +155,23 @@ public class ContainerValueExtractorBinder {
 	}
 
 	/**
-	 * Attempts to create a container value extractor from a bound path.
+	 * Create a container value extractor from a bound path, or fail.
 	 *
 	 * @param boundPath The bound path to create the extractor from.
 	 * @param <C> The source type.
 	 * @param <V> The extracted value type.
-	 * @return The extractor, or an empty optional if the bound path was empty.
+	 * @return The extractor.
+	 * @throws AssertionFailure if the bound path was empty
 	 */
 	// Checks are performed using reflection when building the resolved path
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
-	public <C, V> Optional<ContainerValueExtractor<? super C, V>> tryCreate(
-			BoundContainerValueExtractorPath<C, V> boundPath) {
+	public <C, V> ContainerValueExtractor<? super C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
+		if ( boundPath.getExtractorPath().isEmpty() ) {
+			throw new AssertionFailure(
+					"Received a request to create extractors, but the extractor path was empty."
+							+ " There is probably a bug in Hibernate Search."
+			);
+		}
 		ContainerValueExtractor<? super C, ?> extractor = null;
 		for ( Class<? extends ContainerValueExtractor> extractorClass :
 				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
@@ -179,33 +185,7 @@ public class ContainerValueExtractorBinder {
 				extractor = new ChainingContainerValueExtractor( extractor, newExtractor );
 			}
 		}
-		if ( extractor == null ) {
-			return Optional.empty();
-		}
-		else {
-			return Optional.of( (ContainerValueExtractor<C, V>) extractor );
-		}
-	}
-
-	/**
-	 * Create a container value extractor from a bound path, or fail.
-	 *
-	 * @param boundPath The bound path to create the extractor from.
-	 * @param <C> The source type.
-	 * @param <V> The extracted value type.
-	 * @return The extractor.
-	 * @throws AssertionFailure if the bound path was empty
-	 */
-	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C, V> ContainerValueExtractor<? super C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
-		if ( boundPath.getExtractorPath().isEmpty() ) {
-			throw new AssertionFailure(
-					"Received a request to create extractors, but the extractor path was empty."
-					+ " There is probably a bug in Hibernate Search."
-			);
-		}
-		// tryCreate will always return a non-empty result in this case, since the resolved path is non-empty
-		return tryCreate( boundPath ).get();
+		return (ContainerValueExtractor<C, V>) extractor;
 	}
 
 	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerValueExtractorPath extractorPath) {
