@@ -187,12 +187,6 @@
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
-        <!--
-            Explicit JAXB/javax.xml.bind dependencies: to be removed in HSEARCH-3376
-         -->
-        <!-- This should be aligned with the version used in ORM -->
-        <version.javax.xml.bind.jaxb-api>2.3.1</version.javax.xml.bind.jaxb-api>
-        <version.org.glassfish.jaxb>2.3.1</version.org.glassfish.jaxb>
 
         <!-- >>> JSR 352 -->
         <version.javax.batch>1.0</version.javax.batch>
@@ -781,18 +775,6 @@
                 <artifactId>javax.batch-api</artifactId>
                 <version>${version.javax.batch}</version>
                 <scope>provided</scope>
-            </dependency>
-
-            <!-- To be removed in HSEARCH-3376 -->
-            <dependency>
-                <groupId>javax.xml.bind</groupId>
-                <artifactId>jaxb-api</artifactId>
-                <version>${version.javax.xml.bind.jaxb-api}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish.jaxb</groupId>
-                <artifactId>jaxb-runtime</artifactId>
-                <version>${version.org.glassfish.jaxb}</version>
             </dependency>
 
             <!-- Test -->
