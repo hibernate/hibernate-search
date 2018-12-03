@@ -89,7 +89,7 @@ public class SearchSetupHelper implements TestRule {
 
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
+		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
 
@@ -97,7 +97,7 @@ public class SearchSetupHelper implements TestRule {
 			this.propertySource = propertySource;
 		}
 
-		public SetupContext withProperty(String key, String value) {
+		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
 			return this;
 		}
@@ -116,7 +116,7 @@ public class SearchSetupHelper implements TestRule {
 		public SearchIntegration setup() {
 			SearchIntegrationBuilder integrationBuilder = SearchIntegration.builder( propertySource );
 
-			for ( Map.Entry<String, String> entry : overriddenProperties.entrySet() ) {
+			for ( Map.Entry<String, Object> entry : overriddenProperties.entrySet() ) {
 				integrationBuilder = integrationBuilder.setProperty( entry.getKey(), entry.getValue() );
 			}
 

@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -61,7 +60,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private static final int FAILURE_LIMIT = 100;
 
 	private final ConfigurationPropertySource mainPropertySource;
-	private final Properties overriddenProperties = new Properties();
+	private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private ClassResolver classResolver;
@@ -92,14 +91,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public SearchIntegrationBuilder setProperty(String name, String value) {
-		this.overriddenProperties.setProperty( name, value );
-		return this;
-	}
-
-	@Override
-	public SearchIntegrationBuilder setProperties(Properties properties) {
-		this.overriddenProperties.putAll( properties );
+	public SearchIntegrationBuilder setProperty(String name, Object value) {
+		this.overriddenProperties.put( name, value );
 		return this;
 	}
 
@@ -163,7 +156,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			ConfigurationPropertySource propertySource;
 			if ( !overriddenProperties.isEmpty() ) {
 				propertySource = mainPropertySource.withOverride(
-						ConfigurationPropertySource.fromProperties( overriddenProperties )
+						ConfigurationPropertySource.fromMap( overriddenProperties )
 				);
 			}
 			else {

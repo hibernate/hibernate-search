@@ -82,7 +82,7 @@ public final class JavaBeanMappingBuilder {
 		return this;
 	}
 
-	public JavaBeanMappingBuilder setProperty(String name, String value) {
+	public JavaBeanMappingBuilder setProperty(String name, Object value) {
 		integrationBuilder.setProperty( name, value );
 		return this;
 	}
