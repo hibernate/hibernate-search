@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
+	private final MarkerBuildContext markerBuildContext;
 	private final FailureCollector failureCollector;
 	private final PojoRawTypeModel<?> rawTypeModel;
 
@@ -30,7 +32,9 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
-	PojoTypeAdditionalMetadataBuilder(FailureCollector failureCollector, PojoRawTypeModel<?> rawTypeModel) {
+	PojoTypeAdditionalMetadataBuilder(MarkerBuildContext markerBuildContext,
+			FailureCollector failureCollector, PojoRawTypeModel<?> rawTypeModel) {
+		this.markerBuildContext = markerBuildContext;
 		this.failureCollector = failureCollector;
 		this.rawTypeModel = rawTypeModel;
 	}
@@ -52,6 +56,10 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 				propertyName,
 				ignored -> new PojoPropertyAdditionalMetadataBuilder( this, propertyName )
 		);
+	}
+
+	MarkerBuildContext getMarkerBuildContext() {
+		return markerBuildContext;
 	}
 
 	public PojoTypeAdditionalMetadata build() {

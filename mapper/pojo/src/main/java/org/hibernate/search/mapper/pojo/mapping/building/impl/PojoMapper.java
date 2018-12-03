@@ -81,7 +81,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		this.wrapperFactory = wrapperFactory;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
-				failureCollector, contributorProvider
+				new MarkerBuildContextImpl( buildContext ), failureCollector, contributorProvider
 		);
 
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );

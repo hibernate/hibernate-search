@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -273,7 +274,7 @@ public class AnnotationMappingDiscoveryIT {
 			}
 
 			@Override
-			public Object build() {
+			public Object build(MarkerBuildContext buildContext) {
 				return new CustomMarker();
 			}
 		}

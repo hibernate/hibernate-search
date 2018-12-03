@@ -6,17 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
-/**
- * @author Yoann Rodiere
- */
-public interface MarkerBuilder {
+import org.hibernate.search.engine.environment.bean.BeanProvider;
 
-	/**
-	 * Build a marker.
-	 *
-	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A marker instance.
-	 */
-	Object build(MarkerBuildContext buildContext);
+public interface MarkerBuildContext {
+
+	BeanProvider getBeanProvider();
 
 }

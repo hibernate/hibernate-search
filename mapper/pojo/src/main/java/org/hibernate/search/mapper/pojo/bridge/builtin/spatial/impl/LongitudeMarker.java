@@ -10,6 +10,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.GeoPointBridgeBui
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.LatitudeLongitudeMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 
 public class LongitudeMarker {
 
@@ -29,7 +30,7 @@ public class LongitudeMarker {
 		}
 
 		@Override
-		public Object build() {
+		public Object build(MarkerBuildContext buildContext) {
 			return new LongitudeMarker( markerSet );
 		}
 	}
