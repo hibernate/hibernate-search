@@ -61,7 +61,7 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		protected AbstractSetupContext() {
 		}
 
-		protected abstract C withPropertyRadical(String keyRadical, String value);
+		protected abstract C withPropertyRadical(String keyRadical, Object value);
 
 		/**
 		 * Add configuration to be applied to the builder during setup.

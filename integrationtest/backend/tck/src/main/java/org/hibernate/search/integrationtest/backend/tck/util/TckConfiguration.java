@@ -11,7 +11,9 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
@@ -82,17 +84,17 @@ public final class TckConfiguration {
 			throw new IllegalStateException( "Error loading TCK properties file: " + propertyFilePath );
 		}
 
-		Properties overriddenProperties = new Properties();
+		Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
 		properties.forEach( (k, v) -> {
 			if ( v instanceof String ) {
-				overriddenProperties.put( k, ( (String) v ).replace( "#{tck.test.id}", testId ).replace( "#{tck.startup.timestamp}", startupTimestamp ) );
+				overriddenProperties.put( (String) k, ( (String) v ).replace( "#{tck.test.id}", testId ).replace( "#{tck.startup.timestamp}", startupTimestamp ) );
 			}
 			else {
-				overriddenProperties.put( k, v );
+				overriddenProperties.put( (String) k, v );
 			}
 		} );
 
-		return ConfigurationPropertySource.fromProperties( overriddenProperties ).withMask( "backend" );
+		return ConfigurationPropertySource.fromMap( overriddenProperties ).withMask( "backend" );
 	}
 }

@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.engine.cfg;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
 import org.hibernate.search.engine.cfg.impl.EmptyConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.FallbackConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
@@ -84,9 +86,19 @@ public interface ConfigurationPropertySource {
 	}
 
 	/**
-	 * @param properties The {@link Properties} object to extract properties from.
-	 * @return An source containing the properties from the given {@link Properties} object.
+	 * @param map The {@link Map} object to extract property values from.
+	 * @return A source containing the properties from the given {@link Map} object.
 	 */
+	static ConfigurationPropertySource fromMap(Map<String, ?> map) {
+		return new MapConfigurationPropertySource( map );
+	}
+
+	/**
+	 * @param properties The {@link Properties} object to extract property values from.
+	 * @return A source containing the properties from the given {@link Properties} object.
+	 * @deprecated Where possible, use {@link #fromMap(Map)} instead, which supports non-string values.
+	 */
+	@Deprecated
 	static ConfigurationPropertySource fromProperties(Properties properties) {
 		return new PropertiesConfigurationPropertySource( properties );
 	}

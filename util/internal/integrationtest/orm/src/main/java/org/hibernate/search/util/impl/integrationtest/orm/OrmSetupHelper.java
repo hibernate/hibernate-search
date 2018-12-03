@@ -42,6 +42,7 @@ public final class OrmSetupHelper
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}
 
+		@Override
 		public SetupContext withPropertyRadical(String keyRadical, Object value) {
 			return withProperty( SearchOrmSettings.PREFIX + keyRadical, value );
 		}
@@ -54,11 +55,6 @@ public final class OrmSetupHelper
 		public SessionFactory setup(Class<?> ... annotatedTypes) {
 			return withConfiguration( builder -> builder.addAnnotatedClasses( Arrays.asList( annotatedTypes ) ) )
 					.setup();
-		}
-
-		@Override
-		protected SetupContext withPropertyRadical(String keyRadical, String value) {
-			return withPropertyRadical( keyRadical, (Object) value );
 		}
 
 		@Override

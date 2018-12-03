@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import java.util.Properties;
-
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -25,9 +23,7 @@ public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver);
 
-	SearchIntegrationBuilder setProperty(String name, String value);
-
-	SearchIntegrationBuilder setProperties(Properties properties);
+	SearchIntegrationBuilder setProperty(String name, Object value);
 
 	<M> SearchIntegrationBuilder addMappingInitiator(MappingKey<M> mappingKey, MappingInitiator<?, M> initiator);
 

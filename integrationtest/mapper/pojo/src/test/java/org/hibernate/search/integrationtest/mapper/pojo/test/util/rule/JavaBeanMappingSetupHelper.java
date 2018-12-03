@@ -50,7 +50,7 @@ public final class JavaBeanMappingSetupHelper
 			extends MappingSetupHelper<SetupContext, JavaBeanMappingBuilder, CloseableJavaBeanMapping>.AbstractSetupContext {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<String, String> overriddenProperties = new LinkedHashMap<>();
+		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
 		private final ConfigurationPropertySource propertySource;
 
@@ -60,7 +60,7 @@ public final class JavaBeanMappingSetupHelper
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}
 
-		public SetupContext withProperty(String key, String value) {
+		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
 			return thisAsC();
 		}
@@ -89,7 +89,7 @@ public final class JavaBeanMappingSetupHelper
 		}
 
 		@Override
-		protected SetupContext withPropertyRadical(String keyRadical, String value) {
+		protected SetupContext withPropertyRadical(String keyRadical, Object value) {
 			// The JavaBean mapper doesn't use any particular prefix, so the key radical is the whole key.
 			return withProperty( keyRadical, value );
 		}
