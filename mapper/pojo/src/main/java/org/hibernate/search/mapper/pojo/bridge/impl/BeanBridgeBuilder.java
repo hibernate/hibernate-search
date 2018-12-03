@@ -11,11 +11,16 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
-public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
+/**
+ * A bridge builder that simply retrieves the bridge as a bean from the bean provider.
+ *
+ * @param <B> The type of bridges returned by this builder.
+ */
+public final class BeanBridgeBuilder<B> implements BridgeBuilder<B> {
 
-	private final BeanReference<T> beanReference;
+	private final BeanReference<B> beanReference;
 
-	public BeanResolverBridgeBuilder(BeanReference<T> beanReference) {
+	public BeanBridgeBuilder(BeanReference<B> beanReference) {
 		this.beanReference = beanReference;
 	}
 
@@ -25,7 +30,7 @@ public class BeanResolverBridgeBuilder<T> implements BridgeBuilder<T> {
 	}
 
 	@Override
-	public T build(BridgeBuildContext buildContext) {
+	public B build(BridgeBuildContext buildContext) {
 		BeanProvider beanProvider = buildContext.getBeanProvider();
 		return beanReference.getBean( beanProvider );
 	}

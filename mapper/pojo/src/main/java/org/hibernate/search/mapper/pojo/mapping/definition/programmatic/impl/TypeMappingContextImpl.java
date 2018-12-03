@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
@@ -83,7 +83,7 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
-		return routingKeyBridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
+		return routingKeyBridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public class TypeMappingContextImpl
 
 	@Override
 	public TypeMappingContext bridge(BeanReference<? extends TypeBridge> bridgeReference) {
-		return bridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
+		return bridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override

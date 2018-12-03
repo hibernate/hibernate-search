@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchem
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
@@ -67,7 +67,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 
 	@Override
 	public S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference) {
-		return valueBridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
+		return valueBridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override

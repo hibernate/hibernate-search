@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
@@ -75,7 +75,7 @@ public class InitialPropertyMappingContext
 
 	@Override
 	public PropertyMappingContext bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
-		return bridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
+		return bridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override

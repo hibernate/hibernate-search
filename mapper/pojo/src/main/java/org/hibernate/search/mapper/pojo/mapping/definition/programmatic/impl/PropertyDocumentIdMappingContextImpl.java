@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
@@ -46,7 +46,7 @@ public class PropertyDocumentIdMappingContextImpl extends DelegatingPropertyMapp
 
 	@Override
 	public PropertyDocumentIdMappingContext identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference) {
-		return identifierBridge( new BeanResolverBridgeBuilder<>( bridgeReference ) );
+		return identifierBridge( new BeanBridgeBuilder<>( bridgeReference ) );
 	}
 
 	@Override

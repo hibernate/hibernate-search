@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeRefer
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
-import org.hibernate.search.mapper.pojo.bridge.impl.BeanResolverBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -146,7 +146,7 @@ class AnnotationProcessorHelper {
 			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
 			@SuppressWarnings( "unchecked" )
 			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
-					(BridgeBuilder<? extends IdentifierBridge<?>>) new BeanResolverBridgeBuilder<>( bridgeReference.get() );
+					(BridgeBuilder<? extends IdentifierBridge<?>>) new BeanBridgeBuilder<>( bridgeReference.get() );
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
@@ -243,7 +243,7 @@ class AnnotationProcessorHelper {
 			// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
 			@SuppressWarnings( "unchecked" )
 			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
-					(BridgeBuilder<? extends ValueBridge<?, ?>>) new BeanResolverBridgeBuilder<>( bridgeReference.get() );
+					(BridgeBuilder<? extends ValueBridge<?, ?>>) new BeanBridgeBuilder<>( bridgeReference.get() );
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
@@ -264,7 +264,7 @@ class AnnotationProcessorHelper {
 			throw log.conflictingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
 		}
 		else if ( bridgeReferenceOptional.isPresent() ) {
-			return new BeanResolverBridgeBuilder<>( bridgeReferenceOptional.get() );
+			return new BeanBridgeBuilder<>( bridgeReferenceOptional.get() );
 		}
 		else if ( builderReferenceOptional.isPresent() ) {
 			AnnotationBridgeBuilder builder = builderReferenceOptional.get().getBean( beanProvider );
