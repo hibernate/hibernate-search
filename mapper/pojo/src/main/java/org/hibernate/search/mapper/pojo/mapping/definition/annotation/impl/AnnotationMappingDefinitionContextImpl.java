@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
@@ -58,10 +57,9 @@ public class AnnotationMappingDefinitionContextImpl implements AnnotationMapping
 	@Override
 	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
-		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 		FailureCollector failureCollector = buildContext.getFailureCollector();
 		AnnotationProcessorProvider annotationProcessorProvider =
-				new AnnotationProcessorProvider( beanProvider, failureCollector );
+				new AnnotationProcessorProvider( failureCollector );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
 				new AnnotationPojoTypeMetadataContributorFactory( annotationProcessorProvider );
 

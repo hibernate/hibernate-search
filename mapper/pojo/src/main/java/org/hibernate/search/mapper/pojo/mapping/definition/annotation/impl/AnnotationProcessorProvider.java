@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -62,8 +61,8 @@ class AnnotationProcessorProvider {
 	private final List<TypeAnnotationProcessor<?>> typeAnnotationProcessors;
 	private final List<PropertyAnnotationProcessor<?>> propertyAnnotationProcessors;
 
-	AnnotationProcessorProvider(BeanProvider beanProvider, FailureCollector rootFailureCollector) {
-		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( beanProvider, rootFailureCollector );
+	AnnotationProcessorProvider(FailureCollector rootFailureCollector) {
+		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( rootFailureCollector );
 
 		this.typeAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
 				new RoutingKeyBridgeProcessor( helper ),

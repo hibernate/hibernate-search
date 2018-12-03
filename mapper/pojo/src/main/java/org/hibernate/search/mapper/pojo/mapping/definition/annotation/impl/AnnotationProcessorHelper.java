@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -31,7 +30,10 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeRefer
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.impl.AnnotationInitializingBeanDelegatingBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.AnnotationInitializingBeanDelegatingMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
+import org.hibernate.search.mapper.pojo.bridge.impl.BeanDelegatingBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -55,11 +57,9 @@ class AnnotationProcessorHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final BeanProvider beanProvider;
 	private final FailureCollector rootFailureCollector;
 
-	AnnotationProcessorHelper(BeanProvider beanProvider, FailureCollector rootFailureCollector) {
-		this.beanProvider = beanProvider;
+	AnnotationProcessorHelper(FailureCollector rootFailureCollector) {
 		this.rootFailureCollector = rootFailureCollector;
 	}
 
@@ -105,8 +105,7 @@ class AnnotationProcessorHelper {
 		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
 		MarkerMappingBuilderReference markerBuilderReferenceAnnotation = markerMapping.builder();
 
-		// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-		AnnotationMarkerBuilder<A> builder =
+		return new AnnotationInitializingBeanDelegatingMarkerBuilder<>(
 				toBeanReference(
 						AnnotationMarkerBuilder.class,
 						MarkerMappingBuilderReference.UndefinedImplementationType.class,
@@ -114,25 +113,21 @@ class AnnotationProcessorHelper {
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping(
 								MarkerMapping.class, annotation.annotationType()
-						) )
-						.getBean( beanProvider );
-
-		builder.initialize( annotation );
-
-		return builder;
+						) ),
+				annotation
+		);
 	}
 
+	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	BridgeBuilder<? extends IdentifierBridge<?>> createIdentifierBridgeBuilder(
 			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
 		IdentifierBridgeBeanReference bridgeReferenceAnnotation = annotation.identifierBridge();
-		@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = toBeanReference(
 				IdentifierBridge.class,
 				IdentifierBridgeBeanReference.UndefinedImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
 		IdentifierBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation = annotation.identifierBridgeBuilder();
-		@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
 				BridgeBuilder.class,
 				IdentifierBridgeBuilderBeanReference.UndefinedImplementationType.class,
@@ -143,15 +138,22 @@ class AnnotationProcessorHelper {
 			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
+			BridgeBuilder<? extends IdentifierBridge> rawBuilder =
+					new BeanBridgeBuilder<>( bridgeReference.get() );
 			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
 			@SuppressWarnings( "unchecked" )
 			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
-					(BridgeBuilder<? extends IdentifierBridge<?>>) new BeanBridgeBuilder<>( bridgeReference.get() );
+					(BridgeBuilder<? extends IdentifierBridge<?>>) rawBuilder;
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return bridgeBuilderReference.get().getBean( beanProvider );
+			BridgeBuilder<? extends IdentifierBridge> rawBuilder =
+					new BeanDelegatingBridgeBuilder<>( bridgeBuilderReference.get(), IdentifierBridge.class );
+			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
+			@SuppressWarnings( "unchecked" )
+			BridgeBuilder<? extends IdentifierBridge<?>> castedBuilder =
+					(BridgeBuilder<? extends IdentifierBridge<?>>) rawBuilder;
+			return castedBuilder;
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -165,7 +167,9 @@ class AnnotationProcessorHelper {
 		RoutingKeyBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
 
 		return createAnnotationMappedBridgeBuilder(
-				RoutingKeyBridgeMapping.class, annotation,
+				RoutingKeyBridge.class,
+				RoutingKeyBridgeMapping.class,
+				annotation,
 				toBeanReference(
 						RoutingKeyBridge.class,
 						RoutingKeyBridgeReference.UndefinedImplementationType.class,
@@ -185,7 +189,9 @@ class AnnotationProcessorHelper {
 		TypeBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
 
 		return createAnnotationMappedBridgeBuilder(
-				TypeBridgeMapping.class, annotation,
+				TypeBridge.class,
+				TypeBridgeMapping.class,
+				annotation,
 				toBeanReference(
 						TypeBridge.class,
 						TypeBridgeReference.UndefinedImplementationType.class,
@@ -205,7 +211,9 @@ class AnnotationProcessorHelper {
 		PropertyBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
 
 		return createAnnotationMappedBridgeBuilder(
-				PropertyBridgeMapping.class, annotation,
+				PropertyBridge.class,
+				PropertyBridgeMapping.class,
+				annotation,
 				toBeanReference(
 						PropertyBridge.class,
 						PropertyBridgeReference.UndefinedImplementationType.class,
@@ -219,17 +227,16 @@ class AnnotationProcessorHelper {
 		);
 	}
 
+	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
 			ValueBridgeBeanReference bridgeReferenceAnnotation,
 			ValueBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
-		@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
 				ValueBridge.class,
 				ValueBridgeBeanReference.UndefinedImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
 				BridgeBuilder.class,
 				ValueBridgeBuilderBeanReference.UndefinedImplementationType.class,
@@ -240,15 +247,22 @@ class AnnotationProcessorHelper {
 			throw log.invalidFieldDefiningBothBridgeReferenceAndBridgeBuilderReference( annotationHolder.getName() );
 		}
 		else if ( bridgeReference.isPresent() ) {
-			// The builder will return an object of some class T where T extends ValueBridge<?, ?>, so this is safe
+			BridgeBuilder<? extends ValueBridge> rawBuilder =
+					new BeanBridgeBuilder<>( bridgeReference.get() );
+			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
 			@SuppressWarnings( "unchecked" )
 			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
-					(BridgeBuilder<? extends ValueBridge<?, ?>>) new BeanBridgeBuilder<>( bridgeReference.get() );
+					(BridgeBuilder<? extends ValueBridge<?, ?>>) rawBuilder;
 			return castedBuilder;
 		}
 		else if ( bridgeBuilderReference.isPresent() ) {
-			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			return bridgeBuilderReference.get().getBean( beanProvider );
+			BridgeBuilder<? extends ValueBridge> rawBuilder =
+					new BeanDelegatingBridgeBuilder<>( bridgeBuilderReference.get(), ValueBridge.class );
+			// The builder will return an object of some class T where T extends IdentifierBridge, so this is safe
+			@SuppressWarnings( "unchecked" )
+			BridgeBuilder<? extends ValueBridge<?, ?>> castedBuilder =
+					(BridgeBuilder<? extends ValueBridge<?, ?>>) rawBuilder;
+			return castedBuilder;
 		}
 		else {
 			// The bridge will be auto-detected from the property type
@@ -257,7 +271,7 @@ class AnnotationProcessorHelper {
 	}
 
 	private <A extends Annotation, B> BridgeBuilder<? extends B> createAnnotationMappedBridgeBuilder(
-			Class<? extends Annotation> bridgeMappingAnnotation, A annotation,
+			Class<B> expectedBridgeType, Class<? extends Annotation> bridgeMappingAnnotation, A annotation,
 			Optional<BeanReference<? extends B>> bridgeReferenceOptional,
 			Optional<BeanReference<? extends AnnotationBridgeBuilder>> builderReferenceOptional) {
 		if ( bridgeReferenceOptional.isPresent() && builderReferenceOptional.isPresent() ) {
@@ -267,10 +281,11 @@ class AnnotationProcessorHelper {
 			return new BeanBridgeBuilder<>( bridgeReferenceOptional.get() );
 		}
 		else if ( builderReferenceOptional.isPresent() ) {
-			AnnotationBridgeBuilder builder = builderReferenceOptional.get().getBean( beanProvider );
-			// TODO check generic parameters of builder.getClass() somehow, maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge
-			builder.initialize( annotation );
-			return builder;
+			return new AnnotationInitializingBeanDelegatingBridgeBuilder<>(
+					builderReferenceOptional.get(),
+					expectedBridgeType,
+					annotation
+			);
 		}
 		else {
 			throw log.missingBridgeReferenceInBridgeMapping( bridgeMappingAnnotation, annotation.annotationType() );
