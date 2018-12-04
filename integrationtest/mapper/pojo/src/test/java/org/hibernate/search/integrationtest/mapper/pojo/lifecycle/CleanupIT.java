@@ -9,12 +9,19 @@ package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import org.hibernate.search.engine.cfg.SearchEngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
+import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.StartupStubContainerValueExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
@@ -39,6 +46,8 @@ public class CleanupIT {
 	private static final StartupStubBridge.CounterKeys ROUTING_KEY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys TYPE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys PROPERTY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
+	private static final StartupStubContainerValueExtractor.CounterKeys CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS =
+			StartupStubContainerValueExtractor.createKeys();
 	private static final StartupStubBridge.CounterKeys VALUE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 
 	@Rule
@@ -68,7 +77,10 @@ public class CleanupIT {
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
+									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+											StartupStubContainerValueExtractor.class
+									) );
 		} );
 
 		backendMock.verifyExpectationsMet();
@@ -90,6 +102,7 @@ public class CleanupIT {
 		assertEquals( 1, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.close ) );
 
 		assertEquals( 3, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertEquals( 4, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 
 		mapping.close();
 		mapping = null;
@@ -113,7 +126,10 @@ public class CleanupIT {
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
+									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+											StartupStubContainerValueExtractor.class
+									) );
 			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
 		} );
 
@@ -124,6 +140,7 @@ public class CleanupIT {
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 		// ... except index managers...
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 
@@ -145,7 +162,10 @@ public class CleanupIT {
 					.property( "text" )
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
-									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) );
+									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+											StartupStubContainerValueExtractor.class
+									) );
 			typeContext.bridge( new FailingBridgeBuilder() );
 		} );
 
@@ -156,6 +176,7 @@ public class CleanupIT {
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 		// ... except index managers...
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 
@@ -175,6 +196,9 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+										StartupStubContainerValueExtractor.class
+								) )
 				.property( "id" )
 						.documentId()
 								.identifierBridge( new FailingBridgeBuilder() )
@@ -187,6 +211,7 @@ public class CleanupIT {
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 		// ... except index managers...
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 
@@ -208,6 +233,9 @@ public class CleanupIT {
 				.property( "text" )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+										StartupStubContainerValueExtractor.class
+								) )
 						.bridge( new FailingBridgeBuilder() )
 		);
 
@@ -218,6 +246,7 @@ public class CleanupIT {
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 		// ... except index managers...
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 
@@ -237,7 +266,16 @@ public class CleanupIT {
 						.documentId().identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
 				.property( "text" )
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
-						.genericField( "otherText" ).valueBridge( new FailingBridgeBuilder() )
+						.genericField( "otherText" )
+								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+										StartupStubContainerValueExtractor.class
+								) )
+						.genericField( "yetAnotherText" )
+								.valueBridge( new FailingBridgeBuilder() )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+										StartupStubContainerValueExtractor.class
+								) )
 		);
 
 
@@ -248,6 +286,48 @@ public class CleanupIT {
 		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
 		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
+		// ... except index managers...
+		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
+
+		// ... and all instantiated objects must have been closed.
+		assertEquals( 0, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY )
+				- counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
+		assertRuntimeComponentsClosed();
+	}
+
+	@Test
+	public void failingContainerValueExtractorBuilding() {
+		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
+				.indexed( OtherIndexedEntity.INDEX )
+				.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
+				.bridge( new SucceedingBridgeBuilder( TYPE_BRIDGE_COUNTER_KEYS ) )
+				.property( "id" )
+						.documentId().identifierBridge( new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS ) )
+				.property( "text" )
+						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
+						.genericField( "otherText" )
+								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+										StartupStubContainerValueExtractor.class
+								) )
+						.genericField( "yetAnotherText" )
+								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+								.withExtractors( ContainerValueExtractorPath.explicitExtractors( Arrays.asList(
+										StartupStubContainerValueExtractor.class, // The first one succeeds, but...
+										FailingContainerValueExtractor.class // This one fails.
+								) ) )
+		);
+
+
+		// We must have instantiated objects...
+		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
+		assertNotEquals( 0, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( TYPE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( PROPERTY_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance ) );
+		assertNotEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance ) );
 		// ... except index managers...
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
 
@@ -268,6 +348,23 @@ public class CleanupIT {
 
 	private void startup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
 		this.mapping = setupHelper.withBackendMock( backendMock )
+				/*
+				 * Make the StartubStubContainerValueExtractor available through a factory
+				 * that will return a BeanHolder that increments static counters
+				 * (so that we can check the bean holders are properly closed).
+				 */
+				.withProperty( SearchEngineSettings.BEAN_CONFIGURERS, Arrays.asList(
+						new BeanConfigurer() {
+							@Override
+							public void configure(BeanConfigurationContext context) {
+								context.define(
+										StartupStubContainerValueExtractor.class,
+										creationContext ->
+												StartupStubContainerValueExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS )
+								);
+							}
+						}
+				) )
 				.withConfiguration(
 						builder -> {
 							builder.addEntityType( IndexedEntity.class );
@@ -283,11 +380,17 @@ public class CleanupIT {
 													new SucceedingBridgeBuilder( IDENTIFIER_BRIDGE_COUNTER_KEYS )
 											)
 									.property( "text" )
-											.genericField().valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+											.genericField()
+													.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
+													.withExtractors( ContainerValueExtractorPath.explicitExtractor(
+															StartupStubContainerValueExtractor.class
+													) )
 									.property( "embedded" )
 											.associationInverseSide(
 													PojoModelPath.fromRoot( "embedding" )
-															.value( ContainerValueExtractorPath.defaultExtractors() )
+															.value( ContainerValueExtractorPath.explicitExtractor(
+																	StartupStubContainerValueExtractor.class
+															) )
 											)
 											.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 											/*
@@ -300,7 +403,9 @@ public class CleanupIT {
 									.property( "otherEmbedded" )
 											.associationInverseSide(
 													PojoModelPath.fromRoot( "otherEmbedding" )
-															.value( ContainerValueExtractorPath.defaultExtractors() )
+															.value( ContainerValueExtractorPath.explicitExtractor(
+																	StartupStubContainerValueExtractor.class
+															) )
 											);
 
 							additionalMappingContributor.accept( mappingDefinition );
@@ -330,6 +435,8 @@ public class CleanupIT {
 				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.close ) );
 		assertEquals( 0, counters.get( VALUE_BRIDGE_COUNTER_KEYS.instance )
 				- counters.get( VALUE_BRIDGE_COUNTER_KEYS.holderClose ) );
+		assertEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance )
+				- counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.holderClose ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
 				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
 	}
@@ -393,8 +500,7 @@ public class CleanupIT {
 			return otherEmbedding;
 		}
 
-		public void setOtherEmbedding(
-				IndexedEntity otherEmbedding) {
+		public void setOtherEmbedding(IndexedEntity otherEmbedding) {
 			this.otherEmbedding = otherEmbedding;
 		}
 	}
@@ -434,6 +540,17 @@ public class CleanupIT {
 		@Override
 		public BeanHolder<StartupStubBridge> build(BridgeBuildContext buildContext) {
 			throw new SimulatedFailure();
+		}
+	}
+
+	public static class FailingContainerValueExtractor implements ContainerValueExtractor<Object, Object> {
+		public FailingContainerValueExtractor() {
+			throw new SimulatedFailure();
+		}
+
+		@Override
+		public Stream<Object> extract(Object container) {
+			throw new UnsupportedOperationException( "Unexpected runtime use" );
 		}
 	}
 
