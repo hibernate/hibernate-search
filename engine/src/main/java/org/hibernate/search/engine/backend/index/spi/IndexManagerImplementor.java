@@ -27,7 +27,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 
 	IndexWorkPlan<D> createWorkPlan(SessionContextImplementor sessionContext);
 
-	IndexWorkExecutor<D> createWorkExecutor(SessionContextImplementor sessionContext);
+	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(SessionContextImplementor sessionContext);
 
 	IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext);
 

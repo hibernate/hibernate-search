@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -66,8 +66,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexWorkExecutor<StubDocumentElement> createWorkExecutor(SessionContextImplementor context) {
-		return new StubIndexWorkExecutor( this, context );
+	public IndexDocumentWorkExecutor<StubDocumentElement> createDocumentWorkExecutor(SessionContextImplementor context) {
+		return new StubIndexDocumentWorkExecutor( this, context );
 	}
 
 	@Override

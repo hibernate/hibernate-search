@@ -8,7 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface IndexWorkExecutor<D> {
+public interface IndexDocumentWorkExecutor<D> {
 
 	CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
 

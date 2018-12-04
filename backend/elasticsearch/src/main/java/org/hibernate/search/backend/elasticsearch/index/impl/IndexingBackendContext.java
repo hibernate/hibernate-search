@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
@@ -77,13 +77,13 @@ public class IndexingBackendContext {
 				indexName, typeName, sessionContext );
 	}
 
-	IndexWorkExecutor<ElasticsearchDocumentObjectBuilder> createWorkExecutor(
+	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
+		return new ElasticsearchIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, typeName, sessionContext );
 	}
 }

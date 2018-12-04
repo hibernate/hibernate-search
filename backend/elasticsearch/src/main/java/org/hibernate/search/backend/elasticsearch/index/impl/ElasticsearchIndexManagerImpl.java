@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -74,8 +74,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexWorkExecutor<ElasticsearchDocumentObjectBuilder> createWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkExecutor( workPlanOrchestrator, elasticsearchIndexName, typeName, sessionContext );
+	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
+		return indexingBackendContext.createDocumentWorkExecutor( workPlanOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override

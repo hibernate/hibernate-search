@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -58,12 +58,12 @@ public class IndexingBackendContext {
 				indexName, sessionContext );
 	}
 
-	IndexWorkExecutor<LuceneRootDocumentBuilder> createWorkExecutor(
+	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
+		return new LuceneIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, sessionContext );
 	}
 }

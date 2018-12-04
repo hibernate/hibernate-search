@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
@@ -80,8 +80,8 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexWorkExecutor<LuceneRootDocumentBuilder> createWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkExecutor(
+	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
+		return indexingBackendContext.createDocumentWorkExecutor(
 				workPlanOrchestrator, indexName, sessionContext
 		);
 	}

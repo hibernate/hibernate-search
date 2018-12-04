@@ -11,17 +11,17 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
-public class PojoTypeWorkExecutor<I, E, D extends DocumentElement> {
+public class PojoTypeDocumentWorkExecutor<I, E, D extends DocumentElement> {
 
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoIndexedTypeManager<I, E, D> typeManager;
-	private final IndexWorkExecutor<D> delegate;
+	private final IndexDocumentWorkExecutor<D> delegate;
 
-	public PojoTypeWorkExecutor(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
-			IndexWorkExecutor<D> delegate) {
+	public PojoTypeDocumentWorkExecutor(PojoIndexedTypeManager<I, E, D> typeManager, AbstractPojoSessionContextImplementor sessionContext,
+			IndexDocumentWorkExecutor<D> delegate) {
 		this.sessionContext = sessionContext;
 		this.typeManager = typeManager;
 		this.delegate = delegate;
