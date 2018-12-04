@@ -16,6 +16,7 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.impl.common.Throwables;
 
 /**
  * Utility class to load instances of other classes by using a fully qualified name,
@@ -100,10 +101,12 @@ public class ClassLoaderHelper {
 		}
 		catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			if ( StringHelper.isEmpty( componentDescription ) ) {
-				throw log.unableToInstantiateClass( classToLoad, e.getMessage(), e );
+				throw log.unableToInstantiateClass( classToLoad, Throwables.getFirstNonNullMessage( e ), e );
 			}
 			else {
-				throw log.unableToInstantiateComponent( componentDescription, classToLoad, e.getMessage(), e );
+				throw log.unableToInstantiateComponent(
+						componentDescription, classToLoad, Throwables.getFirstNonNullMessage( e ), e
+				);
 			}
 		}
 	}
@@ -161,7 +164,9 @@ public class ClassLoaderHelper {
 			instance = singleMapConstructor.newInstance( constructorParameter );
 		}
 		catch (Exception e) {
-			throw log.unableToInstantiateComponent( componentDescription, classToLoad, e.getMessage(), e );
+			throw log.unableToInstantiateComponent(
+					componentDescription, classToLoad, Throwables.getFirstNonNullMessage( e ), e
+			);
 		}
 		return verifySuperTypeCompatibility( targetSuperType, instance, classToLoad, componentDescription );
 	}

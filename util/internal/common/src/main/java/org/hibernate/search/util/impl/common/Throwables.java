@@ -63,4 +63,13 @@ public final class Throwables {
 		return toThrow;
 	}
 
+	public static String getFirstNonNullMessage(Throwable t) {
+		Throwable cause = t.getCause();
+		while ( t.getMessage() == null && cause != null ) {
+			t = cause;
+			cause = t.getCause();
+		}
+		return t.getMessage();
+	}
+
 }
