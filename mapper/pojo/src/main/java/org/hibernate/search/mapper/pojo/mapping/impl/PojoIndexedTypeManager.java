@@ -81,10 +81,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
-	public PojoTypeWorkExecutor<I, E, D> createWorkExecutor(AbstractPojoSessionContextImplementor sessionContext) {
-		return new PojoTypeWorkExecutor<>(
-				this, sessionContext, indexManager.createWorkExecutor( sessionContext )
-		);
+	public PojoTypeDocumentWorkExecutor<I, E, D> createDocumentWorkExecutor(AbstractPojoSessionContextImplementor sessionContext) {
+		return new PojoTypeDocumentWorkExecutor<>( this, sessionContext, indexManager.createDocumentWorkExecutor( sessionContext ) );
 	}
 
 	public CompletableFuture<?> optimize() {

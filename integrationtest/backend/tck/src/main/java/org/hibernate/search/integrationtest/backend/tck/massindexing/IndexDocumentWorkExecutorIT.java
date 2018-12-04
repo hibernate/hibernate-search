@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Verify that the {@link IndexWorkExecutor}, provided by a backend, is working properly, storing correctly the indexes.
+ * Verify that the {@link IndexDocumentWorkExecutor}, provided by a backend, is working properly, storing correctly the indexes.
  */
-public class IndexWorkExecutorIT {
+public class IndexDocumentWorkExecutorIT {
 
 	private static final String INDEX_NAME = "lordOfTheRingsChapters";
 	public static final int NUMBER_OF_BOOKS = 200;
@@ -55,12 +55,12 @@ public class IndexWorkExecutorIT {
 
 	@Test
 	public void checkAllDocumentsAreSearchable() throws Exception {
-		IndexWorkExecutor<? extends DocumentElement> workExecutor = indexManager.createWorkExecutor();
+		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor();
 		CompletableFuture[] tasks = new CompletableFuture[NUMBER_OF_BOOKS];
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
-			tasks[i] = workExecutor.add( referenceProvider( id ), document -> {
+			tasks[i] = documentWorkExecutor.add( referenceProvider( id ), document -> {
 				indexAccessors.title.write( document, "The Lord of the Rings cap. " + id );
 			} );
 		}

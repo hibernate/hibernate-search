@@ -18,10 +18,10 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
-class LuceneIndexWorkExecutor implements IndexWorkExecutor<LuceneRootDocumentBuilder> {
+class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -29,7 +29,7 @@ class LuceneIndexWorkExecutor implements IndexWorkExecutor<LuceneRootDocumentBui
 	private final String indexName;
 	private final String tenantId;
 
-	LuceneIndexWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			LuceneIndexWorkOrchestrator orchestrator,
 			String indexName, SessionContextImplementor sessionContext) {
 		this.factory = factory;

@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeWorkExecutor;
+import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeDocumentWorkExecutor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
@@ -29,7 +29,7 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 
-	private Map<Class<?>, PojoTypeWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
+	private Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
 
 	public PojoSessionWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers, AbstractPojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;
@@ -45,21 +45,21 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	@Override
 	public CompletableFuture<?> add(Object id, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeWorkExecutor<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
+		PojoTypeDocumentWorkExecutor<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
 		if ( typeExecutor == null ) {
-			typeExecutor = createTypeExecutor( clazz );
+			typeExecutor = createTypeDocumentExecutor( clazz );
 			typeExecutors.put( clazz, typeExecutor );
 		}
 
 		return typeExecutor.add( id, entity );
 	}
 
-	private PojoTypeWorkExecutor<?, ?, ?> createTypeExecutor(Class<?> clazz) {
+	private PojoTypeDocumentWorkExecutor<?, ?, ?> createTypeDocumentExecutor(Class<?> clazz) {
 		Optional<? extends PojoIndexedTypeManager<?, ?, ?>> exactClass = indexedTypeManagers.getByExactClass( clazz );
 		if ( !exactClass.isPresent() ) {
 			throw log.notDirectlyIndexedType( clazz );
 		}
 
-		return exactClass.get().createWorkExecutor( sessionContext );
+		return exactClass.get().createDocumentWorkExecutor( sessionContext );
 	}
 }
