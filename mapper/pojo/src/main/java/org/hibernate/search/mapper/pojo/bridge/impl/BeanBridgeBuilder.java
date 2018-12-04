@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
@@ -30,7 +31,7 @@ public final class BeanBridgeBuilder<B> implements BridgeBuilder<B> {
 	}
 
 	@Override
-	public B build(BridgeBuildContext buildContext) {
+	public BeanHolder<B> build(BridgeBuildContext buildContext) {
 		BeanProvider beanProvider = buildContext.getBeanProvider();
 		return beanReference.getBean( beanProvider );
 	}

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import java.lang.annotation.Annotation;
 
-import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
@@ -43,15 +43,23 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extend
 	}
 
 	@Override
-	public B build(BridgeBuildContext buildContext) {
-		AnnotationBridgeBuilder delegate = delegateReference.getBean( buildContext.getBeanProvider() );
-		/*
-		 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of delegate.getClass() somehow,
-		 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
-		 * and throwing an exception with a detailed explanation if something is wrong.
-		 */
-		delegate.initialize( annotation );
-		return expectedBridgeType.cast( delegate.build( buildContext ) );
+	public BeanHolder<? extends B> build(BridgeBuildContext buildContext) {
+		BeanHolder<?> bridgeHolder;
+		try ( BeanHolder<? extends AnnotationBridgeBuilder> delegateHolder =
+				delegateReference.getBean( buildContext.getBeanProvider() ) ) {
+			/*
+			 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of delegate.getClass() somehow,
+			 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
+			 * and throwing an exception with a detailed explanation if something is wrong.
+			 */
+			delegateHolder.get().initialize( annotation );
+			bridgeHolder = delegateHolder.get().build( buildContext );
+		}
+
+		expectedBridgeType.cast( bridgeHolder.get() );
+		@SuppressWarnings( "unchecked" ) // The cast above is enough, since BeanHolder must return the same instance for each call to get()
+		BeanHolder<? extends B> castedBridgeHolder = (BeanHolder<? extends B>) bridgeHolder;
+		return castedBridgeHolder;
 	}
 
 }

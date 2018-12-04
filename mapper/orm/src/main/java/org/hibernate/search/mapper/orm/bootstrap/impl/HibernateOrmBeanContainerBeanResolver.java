@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.container.spi.ContainedBean;
-import org.hibernate.resource.beans.container.spi.ContainedBeanImplementor;
 import org.hibernate.resource.beans.spi.BeanInstanceProducer;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.util.impl.common.Contracts;
 
 /**
@@ -35,60 +33,47 @@ final class HibernateOrmBeanContainerBeanResolver implements BeanResolver {
 
 	private final BeanContainer beanContainer;
 
-	private final ConcurrentHashMap<ContainedBeanImplementor, Object> beansToCleanup = new ConcurrentHashMap<>();
-
-	private final BeanResolver fallback;
+	private final ReflectionBeanResolver fallback;
 	private final BeanInstanceProducer fallbackInstanceProducer;
 
-	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer, BeanResolver fallback) {
+	HibernateOrmBeanContainerBeanResolver(BeanContainer beanContainer, ReflectionBeanResolver fallback) {
 		Contracts.assertNotNull( beanContainer, "beanContainer" );
 		this.beanContainer = beanContainer;
 		this.fallback = fallback;
 		this.fallbackInstanceProducer = new BeanInstanceProducer() {
-			private final BeanResolver delegate = fallback;
+			private final ReflectionBeanResolver delegate = fallback;
 
 			@Override
 			public <B> B produceBeanInstance(Class<B> aClass) {
-				return delegate.resolve( aClass );
+				return delegate.resolveNoClosingNecessary( aClass );
 			}
 
 			@Override
 			public <B> B produceBeanInstance(String s, Class<B> aClass) {
-				return delegate.resolve( aClass, s );
+				return delegate.resolveNoClosingNecessary( aClass, s );
 			}
 		};
 	}
 
 	@Override
 	public void close() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( ContainedBeanImplementor::release, beansToCleanup.keySet() );
-			closer.push( BeanResolver::close, fallback );
-		}
+		fallback.close();
 	}
 
 	@Override
-	public <T> T resolve(Class<T> typeReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
 		ContainedBean<T> containedBean = beanContainer.getBean(
 				typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer
 		);
-		register( containedBean );
-		return containedBean.getBeanInstance();
+		return new HibernateOrmContainedBeanBeanHolderAdapter<>( containedBean );
 	}
 
 	@Override
-	public <T> T resolve(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference) {
 		ContainedBean<T> containedBean = beanContainer.getBean(
 				nameReference, typeReference, LIFECYCLE_OPTIONS, fallbackInstanceProducer
 		);
-		register( containedBean );
-		return containedBean.getBeanInstance();
-	}
-
-	private void register(ContainedBean<?> containedBean) {
-		if ( containedBean instanceof ContainedBeanImplementor ) {
-			beansToCleanup.put( (ContainedBeanImplementor) containedBean, containedBean );
-		}
+		return new HibernateOrmContainedBeanBeanHolderAdapter<>( containedBean );
 	}
 
 }

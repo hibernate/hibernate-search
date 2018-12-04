@@ -15,7 +15,10 @@ public interface MarkerBuilder {
 	 * Build a marker.
 	 *
 	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A marker instance.
+	 * @return A marker instance. That instance is not considered as a bean,
+	 * thus is not enclosed in a {@link org.hibernate.search.engine.environment.bean.BeanHolder}.
+	 * As a consequence, the marker instance <strong>must not</strong> hold references to resources
+	 * that should eventually be released by Hibernate Search.
 	 */
 	Object build(MarkerBuildContext buildContext);
 

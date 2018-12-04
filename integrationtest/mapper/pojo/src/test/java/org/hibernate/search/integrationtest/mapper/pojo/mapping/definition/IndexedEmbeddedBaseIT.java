@@ -383,7 +383,7 @@ public class IndexedEmbeddedBaseIT {
 		StartupStubBridge.CounterKeys filteredOutBridgeCounterKeys = StartupStubBridge.createKeys();
 
 		BridgeBuilder<StartupStubBridge> filteredOutBridgeBuilder =
-				c -> new StartupStubBridge( filteredOutBridgeCounterKeys );
+				c -> StartupStubBridge.create( filteredOutBridgeCounterKeys );
 
 		backendMock.expectSchema( INDEX_NAME, b -> b
 				.objectField( "level1", b2 -> b2
@@ -416,7 +416,10 @@ public class IndexedEmbeddedBaseIT {
 		 * but then immediately closed.
 		 */
 		assertEquals( 3, counters.get( filteredOutBridgeCounterKeys.instance ) );
-		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance ) - counters.get( filteredOutBridgeCounterKeys.close ) );
+		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance )
+				- counters.get( filteredOutBridgeCounterKeys.close ) );
+		assertEquals( 0, counters.get( filteredOutBridgeCounterKeys.instance )
+				- counters.get( filteredOutBridgeCounterKeys.holderClose ) );
 
 		doTestEmbeddedRuntime(
 				mapping,

@@ -10,8 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
@@ -44,7 +46,9 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * @author Yoann Rodiere
@@ -80,7 +84,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <I> IdentifierBridge<I> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
+	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		PojoGenericTypeModel<I> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
@@ -88,79 +92,113 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			defaultedBuilder = bridgeResolver.resolveIdentifierBridgeForType( typeModel );
 		}
 		/*
-		 * TODO check that the bridge is suitable for the given typeModel
+		 * TODO HSEARCH-3243 check that the bridge is suitable for the given typeModel
 		 * (use introspection, similarly to what we do to detect the value bridge's field type?)
 		 */
-		IdentifierBridge<I> bridge = (IdentifierBridge<I>) defaultedBuilder.build( bridgeBuildContext );
-
-		bridge.bind( new IdentifierBridgeBindingContextImpl<>(
-				new PojoModelValueElement<>( typeModel )
-		) );
-
-		return bridge;
+		BeanHolder<? extends IdentifierBridge<I>> bridgeHolder =
+				(BeanHolder<IdentifierBridge<I>>) defaultedBuilder.build( bridgeBuildContext );
+		try {
+			bridgeHolder.get().bind( new IdentifierBridgeBindingContextImpl<>(
+					new PojoModelValueElement<>( typeModel )
+			) );
+			return bridgeHolder;
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( BeanHolder::close, bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override
 	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> builder) {
-		RoutingKeyBridge bridge = builder.build( bridgeBuildContext );
+		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = builder.build( bridgeBuildContext );
+		try {
+			PojoModelTypeRootElement<T> pojoModelRootElement =
+					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			bridgeHolder.get().bind( new RoutingKeyBridgeBindingContextImpl(
+					pojoModelRootElement
+			) );
 
-		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind( new RoutingKeyBridgeBindingContextImpl(
-				pojoModelRootElement
-		) );
+			bindingContext.explicitRouting();
 
-		bindingContext.explicitRouting();
-
-		return new BoundRoutingKeyBridge<>( bridge, pojoModelRootElement );
+			return new BoundRoutingKeyBridge<>( bridgeHolder, pojoModelRootElement );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( BeanHolder::close, bridgeHolder );
+			throw e;
+		}
 	}
 
 	@Override
 	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
-		TypeBridge bridge = builder.build( bridgeBuildContext );
+		BeanHolder<? extends TypeBridge> bridgeHolder = builder.build( bridgeBuildContext );
+		try {
+			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
-		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
+			PojoModelTypeRootElement<T> pojoModelRootElement =
+					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			bridgeHolder.get().bind( new TypeBridgeBindingContextImpl(
+					pojoModelRootElement,
+					bindingContext.getSchemaElement( listener )
+			) );
 
-		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind( new TypeBridgeBindingContextImpl(
-				pojoModelRootElement,
-				bindingContext.getSchemaElement( listener )
-		) );
-
-		// If all fields are filtered out, we should ignore the bridge
-		if ( listener.schemaContributed ) {
-			return Optional.of( new BoundTypeBridge<>( bridge, pojoModelRootElement ) );
+			// If all fields are filtered out, we should ignore the bridge
+			if ( listener.schemaContributed ) {
+				return Optional.of( new BoundTypeBridge<>( bridgeHolder, pojoModelRootElement ) );
+			}
+			else {
+				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+					closer.push( holder -> holder.get().close(), bridgeHolder );
+					closer.push( BeanHolder::close, bridgeHolder );
+				}
+				return Optional.empty();
+			}
 		}
-		else {
-			bridge.close();
-			return Optional.empty();
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( BeanHolder::close, bridgeHolder );
+			throw e;
 		}
 	}
 
 	@Override
 	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
-		PropertyBridge bridge = builder.build( bridgeBuildContext );
+		BeanHolder<? extends PropertyBridge> bridgeHolder = builder.build( bridgeBuildContext );
+		try {
+			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
 
-		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
+			PojoModelPropertyRootElement<P> pojoModelRootElement =
+					new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
+			bridgeHolder.get().bind( new PropertyBridgeBindingContextImpl(
+					pojoModelRootElement,
+					bindingContext.getSchemaElement( listener )
+			) );
 
-		PojoModelPropertyRootElement<P> pojoModelRootElement =
-				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
-		bridge.bind( new PropertyBridgeBindingContextImpl(
-				pojoModelRootElement,
-				bindingContext.getSchemaElement( listener )
-		) );
-
-		// If all fields are filtered out, we should ignore the bridge
-		if ( listener.schemaContributed ) {
-			return Optional.of( new BoundPropertyBridge<>( bridge, pojoModelRootElement ) );
+			// If all fields are filtered out, we should ignore the bridge
+			if ( listener.schemaContributed ) {
+				return Optional.of( new BoundPropertyBridge<>( bridgeHolder, pojoModelRootElement ) );
+			}
+			else {
+				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+					closer.push( holder -> holder.get().close(), bridgeHolder );
+					closer.push( BeanHolder::close, bridgeHolder );
+				}
+				return Optional.empty();
+			}
 		}
-		else {
-			bridge.close();
-			return Optional.empty();
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( BeanHolder::close, bridgeHolder );
+			throw e;
 		}
 	}
 
@@ -175,10 +213,56 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			defaultedBuilder = bridgeResolver.resolveValueBridgeForType( valueTypeModel );
 		}
 
-		ValueBridge<?, ?> bridge = defaultedBuilder.build( bridgeBuildContext );
+		BeanHolder<? extends ValueBridge<?, ?>> bridgeHolder = defaultedBuilder.build( bridgeBuildContext );
+		try {
 
-		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
+			PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
+			IndexSchemaElement schemaElement = bindingContext.getSchemaElement( listener );
 
+			/*
+			 * In general, this cast is illegal because SomeGenericType<? extends ValueBridge<?, ?>>,
+			 * for all we know, may always return a different bridge for each invocation of its get() method:
+			 * first a ValueBridge<Object, Integer>, then a ValueBridge<Long, String>, etc.
+			 * Thus there may not a be a single pair of values V and F such that the generic type can safely
+			 * be considered as implementing SomeGenericType<? extends ValueBridge<V, F>>.
+			 * But in the case of BeanHolder, only one instance of the bridge is ever returned by get(),
+			 * so there *is* a single pair of values V and F such that our bean holder can safely be considered
+			 * an instance of BeanHolder<? extends ValueBridge<V, F>>.
+			 */
+			@SuppressWarnings({"unchecked", "rawtypes"})
+			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
+					schemaElement, valueTypeModel,
+					(BeanHolder<? extends ValueBridge>) bridgeHolder,
+					relativeFieldName, contributor
+			);
+
+			// If all fields are filtered out, we should ignore the bridge
+			if ( listener.schemaContributed ) {
+				return Optional.of( boundValueBridge );
+			}
+			else {
+				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+					closer.push( holder -> holder.get().close(), bridgeHolder );
+					closer.push( BeanHolder::close, bridgeHolder );
+				}
+				return Optional.empty();
+			}
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( holder -> holder.get().close(), bridgeHolder )
+					.push( BeanHolder::close, bridgeHolder );
+			throw e;
+		}
+	}
+
+	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
+			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel,
+			BeanHolder<? extends B> bridgeHolder,
+			String relativeFieldName, FieldModelContributor contributor) {
+		B bridge = bridgeHolder.get();
+
+		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridgeHolder.get().getClass() );
 		Class<?> bridgeParameterType = bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 0 )
 				.map( ReflectionUtils::getRawType )
 				.orElseThrow( () -> log.unableToInferValueBridgeInputType( bridge ) );
@@ -187,27 +271,22 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			throw log.invalidInputTypeForValueBridge( bridge, valueTypeModel );
 		}
 
-		@SuppressWarnings( "unchecked" ) // We checked just above that this cast is valid
-		ValueBridge<? super V, ?> typedBridge = (ValueBridge<? super V, ?>) bridge;
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		PojoGenericTypeModel<? extends V2> castedValueTypeModel =
+				(PojoGenericTypeModel<? extends V2>) valueTypeModel;
+		@SuppressWarnings("unchecked") // Checked using reflection just above
+		BeanHolder<? extends ValueBridge<? super V, F>> castedBridgeHolder =
+				(BeanHolder<? extends ValueBridge<? super V, F>>) bridgeHolder;
 
-		return doAddValueBridge( bindingContext, typedBridge, bridgeTypeContext, valueTypeModel, relativeFieldName, contributor );
-	}
-
-	private <V, F> Optional<BoundValueBridge<V, ?>> doAddValueBridge(IndexModelBindingContext bindingContext,
-			ValueBridge<? super V, F> bridge, GenericTypeContext bridgeTypeContext,
-			PojoGenericTypeModel<V> valueTypeModel,
-			String relativeFieldName, FieldModelContributor contributor) {
-		PojoIndexSchemaContributionListener listener = new PojoIndexSchemaContributionListener();
-
-		IndexSchemaFieldContext fieldContext = bindingContext.getSchemaElement( listener ).field( relativeFieldName );
-
-		// First give the bridge a chance to contribute to the model
-		ValueBridgeBindingContextImpl bridgeBindingContext = new ValueBridgeBindingContextImpl(
-				new PojoModelValueElement<>( valueTypeModel ),
+		// Then give the bridge a chance to contribute to the index schema
+		IndexSchemaFieldContext fieldContext = schemaElement.field( relativeFieldName );
+		ValueBridgeBindingContextImpl<V2> bridgeBindingContext = new ValueBridgeBindingContextImpl<>(
+				new PojoModelValueElement<>( castedValueTypeModel ),
 				fieldContext
 		);
 		StandardIndexSchemaFieldTypedContext<?, ? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
 
+		// If the bridge did not contribute anything, infer the field type and define it automatically
 		if ( typedFieldContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
 			Class<? super F> returnType =
@@ -227,14 +306,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		IndexFieldAccessor<? super F> indexFieldAccessor = typedFieldContext.createAccessor();
 
-		// If all fields are filtered out, we should ignore the bridge
-		if ( listener.schemaContributed ) {
-			return Optional.of( new BoundValueBridge<>( bridge, indexFieldAccessor ) );
-		}
-		else {
-			bridge.close();
-			return Optional.empty();
-		}
+		return new BoundValueBridge<>( castedBridgeHolder, indexFieldAccessor );
 	}
 
 	private class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {

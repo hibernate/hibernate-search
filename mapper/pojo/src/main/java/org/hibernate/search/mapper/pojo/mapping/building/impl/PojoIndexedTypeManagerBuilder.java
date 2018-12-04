@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -123,13 +124,9 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			}
 		}
 
-		RoutingKeyBridge routingKeyBridge = identityMappingCollector.routingKeyBridge;
-		RoutingKeyProvider<E> routingKeyProvider;
-		if ( routingKeyBridge == null ) {
+		RoutingKeyProvider<E> routingKeyProvider = identityMappingCollector.routingKeyProvider;
+		if ( routingKeyProvider == null ) {
 			routingKeyProvider = RoutingKeyProvider.alwaysNull();
-		}
-		else {
-			routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( routingKeyBridge );
 		}
 
 		/*
@@ -171,7 +168,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 	private class PojoIdentityMappingCollectorImpl implements PojoIdentityMappingCollector {
 		private IdentifierMapping<?, E> identifierMapping;
-		private RoutingKeyBridge routingKeyBridge;
+		private RoutingKeyBridgeRoutingKeyProvider<E> routingKeyProvider;
 
 		PojoIdentityMappingCollectorImpl(IdentifierMapping<?, E> identifierMapping) {
 			this.identifierMapping = identifierMapping;
@@ -180,17 +177,18 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				closer.push( IdentifierMapping::close, identifierMapping );
-				closer.push( RoutingKeyBridge::close, routingKeyBridge );
+				closer.push( RoutingKeyBridgeRoutingKeyProvider::close, routingKeyProvider );
 			}
 		}
 
 		@Override
-		public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath, IdentifierBridge<T> bridge) {
+		public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
+				BeanHolder<? extends IdentifierBridge<T>> bridgeHolder) {
 			PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 			this.identifierMapping = new PropertyIdentifierMapping<>(
 					propertyModel.getTypeModel().getRawType().getCaster(),
 					propertyModel.getHandle(),
-					bridge
+					bridgeHolder
 			);
 		}
 
@@ -203,8 +201,8 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		}
 
 		@Override
-		public void routingKeyBridge(RoutingKeyBridge bridge) {
-			this.routingKeyBridge = bridge;
+		public void routingKeyBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+			this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( bridgeHolder );
 		}
 	}
 }

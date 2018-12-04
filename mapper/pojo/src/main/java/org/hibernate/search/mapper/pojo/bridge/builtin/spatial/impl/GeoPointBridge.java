@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -73,8 +74,8 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 		}
 
 		@Override
-		public GeoPointBridge build(BridgeBuildContext buildContext) {
-			return new GeoPointBridge( fieldName, projectable, markerSet );
+		public BeanHolder<? extends GeoPointBridge> build(BridgeBuildContext buildContext) {
+			return BeanHolder.of( new GeoPointBridge( fieldName, projectable, markerSet ) );
 		}
 	}
 

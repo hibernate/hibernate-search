@@ -33,20 +33,20 @@ public interface BeanProvider {
 	 * Retrieve a bean referenced by its type.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
-	 * @return The resolved bean.
+	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the reference is invalid (null) or the bean cannot be resolved.
 	 */
-	<T> T getBean(Class<T> typeReference);
+	<T> BeanHolder<T> getBean(Class<T> typeReference);
 
 	/**
 	 * Retrieve a bean referenced by its type and name.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type used as a reference to the bean to retrieve. Must be non-null.
 	 * @param nameReference The name used as a reference to the bean to retrieve. Must be non-null and non-empty.
-	 * @return The resolved bean.
+	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	<T> T getBean(Class<T> typeReference, String nameReference);
+	<T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference);
 
 	/**
 	 * Retrieve a bean from a {@link BeanReference}.
@@ -57,10 +57,10 @@ public interface BeanProvider {
 	 *
 	 * @param <T> The expected return type.
 	 * @param reference The reference to the bean to retrieve. Must be non-null.
-	 * @return The resolved bean.
+	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the reference is invalid (null or empty) or the bean cannot be resolved.
 	 */
-	default <T> T getBean(BeanReference<T> reference) {
+	default <T> BeanHolder<T> getBean(BeanReference<T> reference) {
 		Contracts.assertNotNull( reference, "reference" );
 		return reference.getBean( this );
 	}

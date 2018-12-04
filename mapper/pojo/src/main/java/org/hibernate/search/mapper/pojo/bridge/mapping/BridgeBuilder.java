@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+
 public interface BridgeBuilder<B> {
 
 	/**
@@ -14,8 +16,9 @@ public interface BridgeBuilder<B> {
 	 * <strong>Warning:</strong> this method can be called multiple times and must return a new instance to each call.
 	 *
 	 * @param buildContext A object providing access to other components involved in the build process.
-	 * @return A new bridge instance.
+	 * @return A new bridge instance, enclosed in a {@link BeanHolder}.
+	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
 	 */
-	B build(BridgeBuildContext buildContext);
+	BeanHolder<? extends B> build(BridgeBuildContext buildContext);
 
 }

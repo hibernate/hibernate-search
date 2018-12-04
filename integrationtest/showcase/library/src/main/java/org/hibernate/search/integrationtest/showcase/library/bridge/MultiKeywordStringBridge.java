@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
@@ -43,11 +44,11 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		}
 
 		@Override
-		public PropertyBridge build(BridgeBuildContext buildContext) {
+		public BeanHolder<PropertyBridge> build(BridgeBuildContext buildContext) {
 			if ( fieldName == null || fieldName.isEmpty() ) {
 				throw new IllegalArgumentException( "fieldName is a mandatory parameter" );
 			}
-			return new MultiKeywordStringBridge( this );
+			return BeanHolder.of( new MultiKeywordStringBridge( this ) );
 		}
 	}
 

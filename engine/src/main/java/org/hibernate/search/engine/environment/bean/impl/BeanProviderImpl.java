@@ -8,6 +8,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
@@ -38,19 +39,19 @@ public final class BeanProviderImpl implements BeanProvider {
 	}
 
 	@Override
-	public <T> T getBean(Class<T> typeReference) {
+	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		return beanResolver.resolve( typeReference );
 	}
 
 	@Override
-	public <T> T getBean(Class<T> typeReference, String nameReference) {
+	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
 		return getBeanFromBeanResolverOrConfiguredBeans( typeReference, nameReference );
 	}
 
-	private <T> T getBeanFromBeanResolverOrConfiguredBeans(Class<T> typeReference, String nameReference) {
+	private <T> BeanHolder<T> getBeanFromBeanResolverOrConfiguredBeans(Class<T> typeReference, String nameReference) {
 		try {
 			return beanResolver.resolve( typeReference, nameReference );
 		}
@@ -62,7 +63,7 @@ public final class BeanProviderImpl implements BeanProvider {
 			 * doesn't break existing user's configuration.
 			 */
 			try {
-				T explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
+				BeanHolder<T> explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
 				if ( explicitlyConfiguredBean != null ) {
 					return explicitlyConfiguredBean;
 				}
@@ -74,7 +75,7 @@ public final class BeanProviderImpl implements BeanProvider {
 		}
 	}
 
-	private <T> T getExplicitlyConfiguredBean(Class<T> exposedType, String name) {
+	private <T> BeanHolder<T> getExplicitlyConfiguredBean(Class<T> exposedType, String name) {
 		ConfiguredBeanKey<T> key = new ConfiguredBeanKey<>( exposedType, name );
 		@SuppressWarnings("unchecked") // We know the factory has the correct type, see BeanConfigurationContextImpl
 		BeanFactory<T> factory = (BeanFactory<T>) explicitlyConfiguredBeans.get( key );

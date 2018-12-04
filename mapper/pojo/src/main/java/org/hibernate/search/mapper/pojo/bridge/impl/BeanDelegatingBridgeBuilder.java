@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -34,9 +35,17 @@ public final class BeanDelegatingBridgeBuilder<B> implements BridgeBuilder<B> {
 	}
 
 	@Override
-	public B build(BridgeBuildContext buildContext) {
-		BridgeBuilder<?> delegate = delegateReference.getBean( buildContext.getBeanProvider() );
-		return expectedBridgeType.cast( delegate.build( buildContext ) );
+	public BeanHolder<? extends B> build(BridgeBuildContext buildContext) {
+		BeanHolder<?> bridgeHolder;
+		try ( BeanHolder<? extends BridgeBuilder> delegateHolder =
+				delegateReference.getBean( buildContext.getBeanProvider() ) ) {
+			bridgeHolder = delegateHolder.get().build( buildContext );
+		}
+
+		expectedBridgeType.cast( bridgeHolder.get() );
+		@SuppressWarnings( "unchecked" ) // The cast above is enough, since BeanHolder must return the same instance for each call to get()
+		BeanHolder<? extends B> castedBridgeHolder = (BeanHolder<? extends B>) bridgeHolder;
+		return castedBridgeHolder;
 	}
 
 }

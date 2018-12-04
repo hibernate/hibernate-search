@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
@@ -51,18 +52,18 @@ public final class BridgeResolver {
 		TypePatternMatcher concreteEnumPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( Enum.class )
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );
 
-		addIdentifierBridgeForExactRawType( Integer.class, ignored -> new DefaultIntegerIdentifierBridge() );
-		addIdentifierBridgeForExactRawType( Long.class, ignored -> new DefaultLongIdentifierBridge() );
-		addIdentifierBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumIdentifierBridge<>() );
+		addIdentifierBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new DefaultIntegerIdentifierBridge() ) );
+		addIdentifierBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new DefaultLongIdentifierBridge() ) );
+		addIdentifierBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumIdentifierBridge<>() ) );
 
-		addValueBridgeForExactRawType( Integer.class, ignored -> new PassThroughValueBridge<>( Integer.class ) );
-		addValueBridgeForExactRawType( Long.class, ignored -> new PassThroughValueBridge<>( Long.class ) );
-		addValueBridgeForExactRawType( Boolean.class, ignored -> new PassThroughValueBridge<>( Boolean.class ) );
-		addValueBridgeForExactRawType( String.class, ignored -> new PassThroughValueBridge<>( String.class ) );
-		addValueBridgeForExactRawType( LocalDate.class, ignored -> new PassThroughValueBridge<>( LocalDate.class ) );
-		addValueBridgeForExactRawType( Instant.class, ignored -> new PassThroughValueBridge<>( Instant.class ) );
-		addValueBridgeForExactRawType( Date.class, ignored -> new DefaultJavaUtilDateValueBridge() );
-		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> new DefaultEnumValueBridge<>() );
+		addValueBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Integer.class ) ) );
+		addValueBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Long.class ) ) );
+		addValueBridgeForExactRawType( Boolean.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Boolean.class ) ) );
+		addValueBridgeForExactRawType( String.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( String.class ) ) );
+		addValueBridgeForExactRawType( LocalDate.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDate.class ) ) );
+		addValueBridgeForExactRawType( Instant.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Instant.class ) ) );
+		addValueBridgeForExactRawType( Date.class, ignored -> BeanHolder.of( new DefaultJavaUtilDateValueBridge() ) );
+		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumValueBridge<>() ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {

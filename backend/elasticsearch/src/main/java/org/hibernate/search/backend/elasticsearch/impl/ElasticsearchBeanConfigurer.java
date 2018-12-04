@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
@@ -15,7 +16,7 @@ public class ElasticsearchBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				BackendFactory.class, "elasticsearch",
-				factoryCreationContext -> new ElasticsearchBackendFactory()
+				factoryCreationContext -> BeanHolder.of( new ElasticsearchBackendFactory() )
 		);
 	}
 }

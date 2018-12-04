@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -57,7 +58,7 @@ class IndexManagerBuildingStateHolder {
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
 		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName )
 				.withFallback( defaultIndexPropertySource );
-		// TODO more checks on the backend name (is non-null, non-empty) => use INDEX_BACKEND_NAME.getOrThrow?
+		// TODO HSEARCH-3442 more checks on the backend name (is non-null, non-empty) => use INDEX_BACKEND_NAME.getOrThrow?
 		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
 		BackendBuildingState<?> backendBuildingstate =
 				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
@@ -95,15 +96,16 @@ class IndexManagerBuildingStateHolder {
 
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
-		// TODO properly check that there is a value before calling get() => use BACKEND_TYPE.getOrThrow
-		BeanReference<? extends BackendFactory> backendFactoryReference = BACKEND_TYPE.get( backendPropertySource ).get();
-
 		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
-		BackendFactory backendFactory = backendFactoryReference.getBean( beanProvider );
-		BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
+		// TODO HSEARCH-3442 properly check that there is a value before calling get() => use BACKEND_TYPE.getOrThrow;
+		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
+				BACKEND_TYPE.getAndMap( backendPropertySource, beanProvider::getBean ).get() ) {
+			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
-		BackendImplementor<?> backend = backendFactory.create( backendName, backendBuildContext, backendPropertySource );
-		return new BackendBuildingState<>( backendBuildContext, backend );
+			BackendImplementor<?> backend = backendFactoryHolder.get()
+					.create( backendName, backendBuildContext, backendPropertySource );
+			return new BackendBuildingState<>( backendBuildContext, backend );
+		}
 	}
 
 	private class BackendBuildingState<D extends DocumentElement> {

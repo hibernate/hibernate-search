@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
@@ -27,21 +28,22 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcessor<T> {
 
 	private final PropertyHandle handle;
-	private final Collection<PropertyBridge> propertyBridges;
+	private final Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders;
 	private final Collection<PojoIndexingProcessor<? super P>> nestedNodes;
 
 	public PojoIndexingProcessorPropertyNode(PropertyHandle handle,
-			Collection<PropertyBridge> propertyBridges,
+			Collection<BeanHolder<? extends PropertyBridge>> propertyBridgeHolders,
 			Collection<PojoIndexingProcessor<? super P>> nestedNodes) {
 		this.handle = handle;
-		this.propertyBridges = propertyBridges;
+		this.propertyBridgeHolders = propertyBridgeHolders;
 		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( PropertyBridge::close, propertyBridges );
+			closer.pushAll( holder -> holder.get().close(), propertyBridgeHolders );
+			closer.pushAll( BeanHolder::close, propertyBridgeHolders );
 			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
@@ -51,8 +53,8 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "handle", handle );
 		builder.startList( "bridges" );
-		for ( PropertyBridge bridge : propertyBridges ) {
-			builder.value( bridge );
+		for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
+			builder.value( bridgeHolder.get() );
 		}
 		builder.endList();
 		builder.startList( "nestedNodes" );
@@ -66,10 +68,10 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
 		// TODO add generic type parameters to property handles
 		P propertyValue = (P) handle.get( source );
-		if ( !propertyBridges.isEmpty() ) {
+		if ( !propertyBridgeHolders.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
-			for ( PropertyBridge bridge : propertyBridges ) {
-				bridge.write( target, bridgedElement, sessionContext.getPropertyBridgeWriteContext() );
+			for ( BeanHolder<? extends PropertyBridge> bridgeHolder : propertyBridgeHolders ) {
+				bridgeHolder.get().write( target, bridgedElement, sessionContext.getPropertyBridgeWriteContext() );
 			}
 		}
 		for ( PojoIndexingProcessor<? super P> nestedNode : nestedNodes ) {

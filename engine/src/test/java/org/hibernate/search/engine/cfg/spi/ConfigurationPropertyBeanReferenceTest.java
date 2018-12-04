@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -45,28 +46,29 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 						.withDefault( BeanReference.of( StubBean.class, "theDefault" ) )
 						.build();
 
-		StubBeanImpl1 expected = new StubBeanImpl1();
-		StubBean result;
+		BeanHolder<StubBeanImpl1> expected = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBean> expectedAsStubBean = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<? extends StubBean> result;
 
 		// No value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( Optional.empty() );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "theDefault" ) )
-				.andReturn( expected );
+				.andReturn( expectedAsStubBean );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanProviderMock );
 		verifyAll();
-		assertThat( result ).isEqualTo( expected );
+		assertThat( result ).isEqualTo( expectedAsStubBean );
 
 		// String value
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name" ) )
-				.andReturn( expected );
+				.andReturn( expectedAsStubBean );
 		replayAll();
 		result = property.get( sourceMock ).getBean( beanProviderMock );
 		verifyAll();
-		assertThat( result ).isEqualTo( expected );
+		assertThat( result ).isEqualTo( expectedAsStubBean );
 
 		// Class value
 		resetAll();
@@ -96,9 +98,10 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
 						.build();
 
-		StubBeanImpl1 expected = new StubBeanImpl1();
+		BeanHolder<StubBeanImpl1> expected = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBean> expectedAsStubBean = BeanHolder.of( new StubBeanImpl1() );
 		Optional<BeanReference<? extends StubBean>> reference;
-		StubBean result;
+		BeanHolder<? extends StubBean> result;
 
 		// No value
 		resetAll();
@@ -112,13 +115,13 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name" ) )
-				.andReturn( expected );
+				.andReturn( expectedAsStubBean );
 		replayAll();
 		reference = property.get( sourceMock );
 		assertThat( reference ).isNotEmpty();
 		result = reference.get().getBean( beanProviderMock );
 		verifyAll();
-		assertThat( result ).isEqualTo( expected );
+		assertThat( result ).isEqualTo( expectedAsStubBean );
 
 		// Class value
 		resetAll();
@@ -153,10 +156,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 						.multivalued( Pattern.compile( " " ) )
 						.build();
 
-		StubBeanImpl1 expected1 = new StubBeanImpl1();
-		StubBeanImpl2 expected2 = new StubBeanImpl2();
+		BeanHolder<StubBeanImpl1> expected1 = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBean> expected1AsStubBean = BeanHolder.of( new StubBeanImpl1() );
+		BeanHolder<StubBeanImpl2> expected2 = BeanHolder.of( new StubBeanImpl2() );
+		BeanHolder<StubBean> expected2AsStubBean = BeanHolder.of( new StubBeanImpl2() );
 		Optional<List<BeanReference<? extends StubBean>>> references;
-		List<StubBean> result;
+		List<BeanHolder<? extends StubBean>> result;
 
 		// No value
 		resetAll();
@@ -170,27 +175,27 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name" ) );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name" ) )
-				.andReturn( expected1 );
+				.andReturn( expected1AsStubBean );
 		replayAll();
 		references = property.get( sourceMock );
 		assertThat( references ).isNotEmpty();
 		result = getAllBeans( references.get(), beanProviderMock );
 		verifyAll();
-		assertThat( result ).containsExactly( expected1 );
+		assertThat( result ).containsExactly( expected1AsStubBean );
 
 		// String value - multiple
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name1 name2" ) );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name1" ) )
-				.andReturn( expected1 );
+				.andReturn( expected1AsStubBean );
 		EasyMock.expect( beanProviderMock.getBean( StubBean.class, "name2" ) )
-				.andReturn( expected2 );
+				.andReturn( expected2AsStubBean );
 		replayAll();
 		references = property.get( sourceMock );
 		assertThat( references ).isNotEmpty();
 		result = getAllBeans( references.get(), beanProviderMock );
 		verifyAll();
-		assertThat( result ).containsExactly( expected1, expected2 );
+		assertThat( result ).containsExactly( expected1AsStubBean, expected2AsStubBean );
 
 		// Class value - one
 		resetAll();
@@ -321,9 +326,9 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		return collection;
 	}
 
-	private static <T> List<T> getAllBeans(List<BeanReference<? extends T>> beanReferences,
+	private static <T> List<BeanHolder<? extends T>> getAllBeans(List<BeanReference<? extends T>> beanReferences,
 			BeanProvider beanProviderMock) {
-		List<T> beans = new ArrayList<>();
+		List<BeanHolder<? extends T>> beans = new ArrayList<>();
 		for ( BeanReference<? extends T> beanReference : beanReferences ) {
 			beans.add( beanReference.getBean( beanProviderMock ) );
 		}

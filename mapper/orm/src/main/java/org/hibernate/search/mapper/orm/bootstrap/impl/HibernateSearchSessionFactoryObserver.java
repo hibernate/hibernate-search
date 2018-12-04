@@ -125,7 +125,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( contextFuture.isDone() ) {
 			return;
 		}
-		BeanResolver reflectionBeanResolver = null;
+		ReflectionBeanResolver reflectionBeanResolver = null;
 		BeanResolver beanResolver = null;
 		try {
 			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );

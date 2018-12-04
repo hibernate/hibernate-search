@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import java.lang.annotation.Annotation;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
@@ -40,14 +41,16 @@ public final class AnnotationInitializingBeanDelegatingMarkerBuilder<A extends A
 
 	@Override
 	public Object build(MarkerBuildContext buildContext) {
-		AnnotationMarkerBuilder delegate = delegateReference.getBean( buildContext.getBeanProvider() );
-		/*
-		 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of delegate.getClass() somehow,
-		 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
-		 * and throwing an exception with a detailed explanation if something is wrong.
-		 */
-		delegate.initialize( annotation );
-		return delegate.build( buildContext );
+		try ( BeanHolder<? extends AnnotationMarkerBuilder> delegateHolder =
+				delegateReference.getBean( buildContext.getBeanProvider() ) ) {
+			/*
+			 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of delegate.getClass() somehow,
+			 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
+			 * and throwing an exception with a detailed explanation if something is wrong.
+			 */
+			delegateHolder.get().initialize( annotation );
+			return delegateHolder.get().build( buildContext );
+		}
 	}
 
 }

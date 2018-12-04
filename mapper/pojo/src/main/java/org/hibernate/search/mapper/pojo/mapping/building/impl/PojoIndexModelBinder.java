@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -49,7 +50,7 @@ public interface PojoIndexModelBinder {
 	<C, V> ContainerValueExtractor<? super C, V> createExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
-	<I> IdentifierBridge<I> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
+	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
 	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,

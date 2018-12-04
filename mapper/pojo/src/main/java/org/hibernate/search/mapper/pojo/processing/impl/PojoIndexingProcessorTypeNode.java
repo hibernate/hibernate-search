@@ -10,6 +10,7 @@ import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
@@ -26,21 +27,22 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
 	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
-	private final Collection<TypeBridge> bridges;
+	private final Collection<BeanHolder<? extends TypeBridge>> bridgeHolders;
 	private final Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes;
 
 	public PojoIndexingProcessorTypeNode(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
-			Collection<TypeBridge> bridges,
+			Collection<BeanHolder<? extends TypeBridge>> bridgeHolders,
 			Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes) {
 		this.parentObjectAccessors = parentObjectAccessors;
-		this.bridges = bridges;
+		this.bridgeHolders = bridgeHolders;
 		this.propertyNodes = propertyNodes;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( TypeBridge::close, bridges );
+			closer.pushAll( holder -> holder.get().close(), bridgeHolders );
+			closer.pushAll( BeanHolder::close, bridgeHolders );
 			closer.pushAll( PojoIndexingProcessor::close, propertyNodes );
 		}
 	}
@@ -50,8 +52,8 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		builder.attribute( "class", getClass().getSimpleName() );
 		builder.attribute( "objectAccessors", parentObjectAccessors );
 		builder.startList( "bridges" );
-		for ( TypeBridge bridge : bridges ) {
-			builder.value( bridge );
+		for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
+			builder.value( bridgeHolder.get() );
 		}
 		builder.endList();
 		builder.startList( "propertyNodes" );
@@ -70,10 +72,10 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 		for ( IndexObjectFieldAccessor objectAccessor : parentObjectAccessors ) {
 			parentObject = objectAccessor.add( parentObject );
 		}
-		if ( !bridges.isEmpty() ) {
+		if ( !bridgeHolders.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( source );
-			for ( TypeBridge bridge : bridges ) {
-				bridge.write( parentObject, bridgedElement, sessionContext.getTypeBridgeWriteContext() );
+			for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
+				bridgeHolder.get().write( parentObject, bridgedElement, sessionContext.getTypeBridgeWriteContext() );
 			}
 		}
 		for ( PojoIndexingProcessorPropertyNode<? super T, ?> propertyNode : propertyNodes ) {

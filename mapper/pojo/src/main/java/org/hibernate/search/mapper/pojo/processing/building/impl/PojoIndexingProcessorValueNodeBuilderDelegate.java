@@ -104,7 +104,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( boundBridge -> boundBridge.getBridge().close(), boundBridges );
+			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().get().close(), boundBridges );
+			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().close(), boundBridges );
 			closer.pushAll( PojoIndexingProcessorTypeNodeBuilder::closeOnFailure, typeNodeBuilders );
 		}
 	}
@@ -154,7 +155,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private static <V, F> PojoIndexingProcessor<V> createValueBridgeNode(BoundValueBridge<V, F> boundBridge) {
 		return new PojoIndexingProcessorValueBridgeNode<>(
-				boundBridge.getBridge(), boundBridge.getIndexFieldAccessor()
+				boundBridge.getBridgeHolder(), boundBridge.getIndexFieldAccessor()
 		);
 	}
 }

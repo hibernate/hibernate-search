@@ -8,11 +8,13 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.util.impl.common.Closer;
 
 /**
  * @author Yoann Rodiere
@@ -21,18 +23,22 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 
 	private final PojoCaster<? super I> caster;
 	private final PropertyHandle property;
-	private final IdentifierBridge<I> bridge;
+	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
 	@SuppressWarnings("unchecked")
-	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle property, IdentifierBridge<I> bridge) {
+	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle property,
+			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;
 		this.property = property;
-		this.bridge = bridge;
+		this.bridgeHolder = bridgeHolder;
 	}
 
 	@Override
 	public void close() {
-		bridge.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( BeanHolder::close, bridgeHolder );
+		}
 	}
 
 	@Override
@@ -49,12 +55,12 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 
 	@Override
 	public String toDocumentIdentifier(I identifier, AbstractPojoMappingContextImplementor context) {
-		return bridge.toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
+		return bridgeHolder.get().toDocumentIdentifier( identifier, context.getIdentifierBridgeToDocumentIdentifierContext() );
 	}
 
 	@Override
 	public I fromDocumentIdentifier(String documentId, AbstractPojoSessionContextImplementor context) {
-		return bridge.fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
+		return bridgeHolder.get().fromDocumentIdentifier( documentId, context.getIdentifierBridgeFromDocumentIdentifierContext() );
 	}
 
 }

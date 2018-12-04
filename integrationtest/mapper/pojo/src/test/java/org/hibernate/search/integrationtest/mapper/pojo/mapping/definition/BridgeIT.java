@@ -14,6 +14,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
@@ -82,7 +83,7 @@ public class BridgeIT {
 
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> new TypeBridge() {
+						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldAccessor<String> indexFieldAccessor;
 
@@ -101,7 +102,7 @@ public class BridgeIT {
 									TypeBridgeWriteContext context) {
 								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
 							}
-						} )
+						} ) )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -146,7 +147,7 @@ public class BridgeIT {
 
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> new PropertyBridge() {
+						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
 							private IndexFieldAccessor<String> indexFieldAccessor;
 
@@ -164,7 +165,7 @@ public class BridgeIT {
 									PropertyBridgeWriteContext context) {
 								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
 							}
-						} )
+						} ) )
 		)
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

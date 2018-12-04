@@ -6,8 +6,15 @@
  */
 package org.hibernate.search.engine.environment.bean.spi;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+
 public interface BeanFactory<T> {
 
-	T create(BeanCreationContext context);
+	/**
+	 * @param context A context object providing ways to create more beans, in particular.
+	 * @return The created bean, enclosed in a {@link BeanHolder}.
+	 * Use {@link BeanHolder#of(Object)} if you don't need any particular closing behavior.
+	 */
+	BeanHolder<T> create(BeanCreationContext context);
 
 }

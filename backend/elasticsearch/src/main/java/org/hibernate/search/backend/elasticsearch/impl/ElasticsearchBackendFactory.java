@@ -37,6 +37,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -136,11 +137,13 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
-					.map( configurer -> {
-						ElasticsearchAnalysisDefinitionContainerContextImpl collector
-								= new ElasticsearchAnalysisDefinitionContainerContextImpl();
-						configurer.configure( collector );
-						return new ElasticsearchAnalysisDefinitionRegistry( collector );
+					.map( holder -> {
+						try ( BeanHolder<? extends ElasticsearchAnalysisConfigurer> configurerHolder = holder ) {
+							ElasticsearchAnalysisDefinitionContainerContextImpl collector =
+									new ElasticsearchAnalysisDefinitionContainerContextImpl();
+							configurerHolder.get().configure( collector );
+							return new ElasticsearchAnalysisDefinitionRegistry( collector );
+						}
 					} )
 					// Otherwise just use an empty registry
 					.orElseGet( ElasticsearchAnalysisDefinitionRegistry::new );

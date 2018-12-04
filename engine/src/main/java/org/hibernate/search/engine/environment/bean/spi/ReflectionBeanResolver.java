@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.environment.bean.spi;
 
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoaderHelper;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 
@@ -28,17 +29,24 @@ public final class ReflectionBeanResolver implements BeanResolver {
 	}
 
 	@Override
-	public <T> T resolve(Class<T> typeReference) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference) {
+		return BeanHolder.of( resolveNoClosingNecessary( typeReference ) );
+	}
+
+	public <T> T resolveNoClosingNecessary(Class<T> typeReference) {
 		return ClassLoaderHelper.untypedInstanceFromClass( typeReference, typeReference.getName() );
 	}
 
 	@Override
-	public <T> T resolve(Class<T> typeReference, String implementationFullyQualifiedClassName) {
+	public <T> BeanHolder<T> resolve(Class<T> typeReference, String implementationFullyQualifiedClassName) {
+		return BeanHolder.of( resolveNoClosingNecessary( typeReference, implementationFullyQualifiedClassName ) );
+	}
+
+	public <T> T resolveNoClosingNecessary(Class<T> typeReference, String implementationFullyQualifiedClassName) {
 		Class<? extends T> implementationClass = ClassLoaderHelper.classForName(
 				typeReference, implementationFullyQualifiedClassName, typeReference.getName(), classResolver
 		);
-
-		return resolve( implementationClass );
+		return ClassLoaderHelper.untypedInstanceFromClass( implementationClass, implementationFullyQualifiedClassName );
 	}
 
 }

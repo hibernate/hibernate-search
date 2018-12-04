@@ -23,7 +23,7 @@ class TypeBeanReference<T> implements BeanReference<T> {
 	}
 
 	@Override
-	public T getBean(BeanProvider beanProvider) {
+	public BeanHolder<T> getBean(BeanProvider beanProvider) {
 		return beanProvider.getBean( type );
 	}
 

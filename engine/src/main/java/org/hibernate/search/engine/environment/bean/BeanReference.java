@@ -19,7 +19,7 @@ public interface BeanReference<T> {
 	 * @param beanProvider A provider to get the bean from.
 	 * @return The bean instance.
 	 */
-	T getBean(BeanProvider beanProvider);
+	BeanHolder<T> getBean(BeanProvider beanProvider);
 
 	/**
 	 * Cast this reference into a reference whose {@link #getBean(BeanProvider)} method is is guaranteed to

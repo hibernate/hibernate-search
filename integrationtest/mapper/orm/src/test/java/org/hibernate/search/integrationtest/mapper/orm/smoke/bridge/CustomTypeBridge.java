@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
@@ -43,8 +44,8 @@ public final class CustomTypeBridge implements TypeBridge {
 		}
 
 		@Override
-		public TypeBridge build(BridgeBuildContext buildContext) {
-			return new CustomTypeBridge( objectName );
+		public BeanHolder<TypeBridge> build(BridgeBuildContext buildContext) {
+			return BeanHolder.of( new CustomTypeBridge( objectName ) );
 		}
 	}
 

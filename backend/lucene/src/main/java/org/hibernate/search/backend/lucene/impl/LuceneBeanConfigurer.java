@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
@@ -15,7 +16,7 @@ public class LuceneBeanConfigurer implements BeanConfigurer {
 	public void configure(BeanConfigurationContext context) {
 		context.define(
 				BackendFactory.class, "lucene",
-				factoryCreationContext -> new LuceneBackendFactory()
+				factoryCreationContext -> BeanHolder.of( new LuceneBackendFactory() )
 		);
 	}
 }

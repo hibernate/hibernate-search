@@ -17,6 +17,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
@@ -115,7 +116,11 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		// Apply the user-provided mapping configurer if necessary
 		final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 		MAPPING_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
-				.ifPresent( configurer -> configurer.configure( this ) );
+				.ifPresent( holder -> {
+					try ( BeanHolder<? extends HibernateOrmSearchMappingConfigurer> configurerHolder = holder ) {
+						configurerHolder.get().configure( this );
+					}
+				} );
 
 		super.configure( buildContext, propertySource, configurationCollector );
 	}

@@ -6,20 +6,21 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
 
 public final class BoundPropertyBridge<P> {
-	private final PropertyBridge bridge;
+	private final BeanHolder<? extends PropertyBridge> bridgeHolder;
 	private final PojoModelPropertyRootElement<P> pojoModelRootElement;
 
-	BoundPropertyBridge(PropertyBridge bridge, PojoModelPropertyRootElement<P> pojoModelRootElement) {
-		this.bridge = bridge;
+	BoundPropertyBridge(BeanHolder<? extends PropertyBridge> bridgeHolder, PojoModelPropertyRootElement<P> pojoModelRootElement) {
+		this.bridgeHolder = bridgeHolder;
 		this.pojoModelRootElement = pojoModelRootElement;
 	}
 
-	public PropertyBridge getBridge() {
-		return bridge;
+	public BeanHolder<? extends PropertyBridge> getBridgeHolder() {
+		return bridgeHolder;
 	}
 
 	public PojoModelPropertyRootElement<P> getPojoModelRootElement() {

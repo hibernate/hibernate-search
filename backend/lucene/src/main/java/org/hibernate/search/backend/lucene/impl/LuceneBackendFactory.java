@@ -32,6 +32,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.util.EventContext;
@@ -162,16 +163,18 @@ public class LuceneBackendFactory implements BackendFactory {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanProvider::getBean )
-					.map( configurer -> {
-						LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
-								luceneVersion,
-								buildContext.getServiceManager().getClassResolver(),
-								buildContext.getServiceManager().getResourceResolver()
-						);
-						InitialLuceneAnalysisDefinitionContainerContext collector
-								= new InitialLuceneAnalysisDefinitionContainerContext( analysisComponentFactory );
-						configurer.configure( collector );
-						return new LuceneAnalysisDefinitionRegistry( collector );
+					.map( holder -> {
+						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
+							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
+									luceneVersion,
+									buildContext.getServiceManager().getClassResolver(),
+									buildContext.getServiceManager().getResourceResolver()
+							);
+							InitialLuceneAnalysisDefinitionContainerContext collector =
+									new InitialLuceneAnalysisDefinitionContainerContext( analysisComponentFactory );
+							configurerHolder.get().configure( collector );
+							return new LuceneAnalysisDefinitionRegistry( collector );
+						}
 					} )
 					// Otherwise just use an empty registry
 					.orElseGet( LuceneAnalysisDefinitionRegistry::new );

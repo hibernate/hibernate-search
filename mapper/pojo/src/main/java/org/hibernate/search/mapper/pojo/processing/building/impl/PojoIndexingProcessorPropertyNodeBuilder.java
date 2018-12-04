@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -81,7 +82,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
 	public void identifierBridge(BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		if ( identityMappingCollector.isPresent() ) {
-			IdentifierBridge<P> bridge = mappingHelper.getIndexModelBinder().addIdentifierBridge(
+			BeanHolder<? extends IdentifierBridge<P>> bridge = mappingHelper.getIndexModelBinder().addIdentifierBridge(
 					modelPath, builder
 			);
 			identityMappingCollector.get().identifierBridge( modelPath, bridge );
@@ -140,7 +141,8 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( boundBridge -> boundBridge.getBridge().close(), boundPropertyBridges );
+			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().get().close(), boundPropertyBridges );
+			closer.pushAll( boundBridge -> boundBridge.getBridgeHolder().close(), boundPropertyBridges );
 			closer.push(
 					PojoIndexingProcessorValueNodeBuilderDelegate::closeOnFailure,
 					valueWithoutExtractorBuilderDelegate
@@ -172,10 +174,10 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 		Collection<PojoIndexingProcessor<? super P>> immutableNestedNodes = Collections.emptyList();
 		try {
-			Collection<PropertyBridge> immutableBridges = boundPropertyBridges.isEmpty()
+			Collection<BeanHolder<? extends PropertyBridge>> immutableBridgeHolders = boundPropertyBridges.isEmpty()
 					? Collections.emptyList() : new ArrayList<>();
 			for ( BoundPropertyBridge<P> boundBridge : boundPropertyBridges ) {
-				immutableBridges.add( boundBridge.getBridge() );
+				immutableBridgeHolders.add( boundBridge.getBridgeHolder() );
 				boundBridge.getPojoModelRootElement().contributeDependencies( propertyDependencyCollector );
 			}
 			Collection<PojoIndexingProcessor<? super P>> valueWithoutExtractorNodes =
@@ -196,7 +198,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 					.map( Optional::get )
 					.forEach( immutableNestedNodes::add );
 
-			if ( immutableBridges.isEmpty() && immutableNestedNodes.isEmpty() ) {
+			if ( immutableBridgeHolders.isEmpty() && immutableNestedNodes.isEmpty() ) {
 				/*
 				 * If this node doesn't have any bridge, nor any nested node,
 				 * it is useless and we don't need to build it.
@@ -205,7 +207,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorPropertyNode<>(
-						modelPath.getPropertyHandle(), immutableBridges, immutableNestedNodes
+						modelPath.getPropertyHandle(), immutableBridgeHolders, immutableNestedNodes
 				) );
 			}
 		}

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.test.util;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -43,6 +44,7 @@ public class StartupStubBridge
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
 		public final StaticCounters.Key close = StaticCounters.createKey();
+		public final StaticCounters.Key holderClose = StaticCounters.createKey();
 
 		private CounterKeys() {
 		}
@@ -52,11 +54,16 @@ public class StartupStubBridge
 		return new CounterKeys();
 	}
 
+	public static BeanHolder<StartupStubBridge> create(CounterKeys counterKeys) {
+		StartupStubBridge bridge = new StartupStubBridge( counterKeys );
+		return new CloseCountingBeanHolder<>( bridge, counterKeys.holderClose );
+	}
+
 	public final CounterKeys counterKeys;
 
 	private boolean closed = false;
 
-	public StartupStubBridge(CounterKeys counterKeys) {
+	private StartupStubBridge(CounterKeys counterKeys) {
 		StaticCounters.get().increment( counterKeys.instance );
 		this.counterKeys = counterKeys;
 	}

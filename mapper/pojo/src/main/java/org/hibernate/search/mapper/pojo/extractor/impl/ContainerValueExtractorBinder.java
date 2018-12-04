@@ -175,8 +175,9 @@ public class ContainerValueExtractorBinder {
 		ContainerValueExtractor<? super C, ?> extractor = null;
 		for ( Class<? extends ContainerValueExtractor> extractorClass :
 				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
+			// TODO HSEARCH-3170 properly handle the release of container value extractor beans
 			ContainerValueExtractor<?, ?> newExtractor =
-					beanProvider.getBean( extractorClass );
+					beanProvider.getBean( extractorClass ).get();
 			if ( extractor == null ) {
 				// First extractor: must be able to process type C
 				extractor = (ContainerValueExtractor<? super C, ?>) newExtractor;

@@ -8,27 +8,32 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.util.impl.common.Closer;
 
 public class RoutingKeyBridgeRoutingKeyProvider<E> implements RoutingKeyProvider<E> {
 
-	private final RoutingKeyBridge bridge;
+	private final BeanHolder<? extends RoutingKeyBridge> bridgeHolder;
 
-	public RoutingKeyBridgeRoutingKeyProvider(RoutingKeyBridge bridge) {
-		this.bridge = bridge;
+	public RoutingKeyBridgeRoutingKeyProvider(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
+		this.bridgeHolder = bridgeHolder;
 	}
 
 	@Override
 	public void close() {
-		bridge.close();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( holder -> holder.get().close(), bridgeHolder );
+			closer.push( BeanHolder::close, bridgeHolder );
+		}
 	}
 
 	@Override
 	public String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
 			AbstractPojoSessionContextImplementor context) {
-		return bridge.toRoutingKey(
+		return bridgeHolder.get().toRoutingKey(
 				context.getTenantIdentifier(), identifier,
 				new PojoElementImpl( entitySupplier.get() ),
 				context.getRoutingKeyBridgeToRoutingKeyContext()

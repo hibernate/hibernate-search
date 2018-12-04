@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.environment.bean.spi;
 
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.util.SearchException;
 
@@ -23,6 +24,9 @@ public interface BeanResolver extends AutoCloseable {
 	 * Release any internal resource created while resolving beans.
 	 * <p>
 	 * Provided beans will not be usable after a call to this method.
+	 * <p>
+	 * May not release all resources that were allocated for each {@link BeanHolder};
+	 * {@link BeanHolder#close()} still needs to be called consistently for each created bean.
 	 *
 	 * @see AutoCloseable#close()
 	 */
@@ -33,19 +37,19 @@ public interface BeanResolver extends AutoCloseable {
 	 * Resolve a bean by its type.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type of the bean to resolve.
-	 * @return The resolved bean.
+	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(Class<T> typeReference);
+	<T> BeanHolder<T> resolve(Class<T> typeReference);
 
 	/**
 	 * Resolve a bean by its name.
 	 * @param <T> The expected return type.
 	 * @param typeReference The type of the bean to resolve.
 	 * @param nameReference The name of the bean to resolve.
-	 * @return The resolved bean.
+	 * @return A {@link BeanHolder} containing the resolved bean.
 	 * @throws SearchException if the bean cannot be resolved.
 	 */
-	<T> T resolve(Class<T> typeReference, String nameReference);
+	<T> BeanHolder<T> resolve(Class<T> typeReference, String nameReference);
 
 }

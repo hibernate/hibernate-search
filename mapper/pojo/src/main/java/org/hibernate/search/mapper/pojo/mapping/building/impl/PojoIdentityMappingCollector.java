@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
 public interface PojoIdentityMappingCollector {
 
-	<T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath, IdentifierBridge<T> bridge);
+	<T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
+			BeanHolder<? extends IdentifierBridge<T>> bridge);
 
-	void routingKeyBridge(RoutingKeyBridge bridge);
+	void routingKeyBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder);
 }

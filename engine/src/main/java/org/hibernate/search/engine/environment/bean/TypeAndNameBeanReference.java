@@ -24,7 +24,7 @@ final class TypeAndNameBeanReference<T> extends TypeBeanReference<T> {
 	}
 
 	@Override
-	public T getBean(BeanProvider beanProvider) {
+	public BeanHolder<T> getBean(BeanProvider beanProvider) {
 		return beanProvider.getBean( type, name );
 	}
 

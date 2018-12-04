@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
+import org.hibernate.search.util.impl.common.SuppressingCloser;
+
 final class CastingBeanReference<T> implements BeanReference<T> {
 	private final BeanReference<?> casted;
 	private final Class<T> expectedType;
@@ -16,8 +18,19 @@ final class CastingBeanReference<T> implements BeanReference<T> {
 	}
 
 	@Override
-	public T getBean(BeanProvider beanProvider) {
-		return expectedType.cast( casted.getBean( beanProvider ) );
+	@SuppressWarnings("unchecked") // Checked using reflection
+	public BeanHolder<T> getBean(BeanProvider beanProvider) {
+		BeanHolder<?> beanHolder = casted.getBean( beanProvider );
+		try {
+			// Just let the type throw an exception if something is wrong
+			expectedType.cast( beanHolder.get() );
+			// The instance can safely be cast to the expected type, so we can safely do this
+			return (BeanHolder<T>) beanHolder;
+		}
+		catch (Exception e) {
+			new SuppressingCloser( e ).push( beanHolder );
+			throw e;
+		}
 	}
 
 	@Override
