@@ -6,10 +6,16 @@
  */
 package org.hibernate.search.engine.environment.bean.impl;
 
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.SearchEngineSettings;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
@@ -18,20 +24,34 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Contracts;
 
-public final class BeanProviderImpl implements BeanProvider {
+public final class ConfiguredBeanProvider implements BeanProvider {
+
+	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
+			ConfigurationProperty.forKey( SearchEngineSettings.BEAN_CONFIGURERS )
+					.asBeanReference( BeanConfigurer.class )
+					.multivalued( Pattern.compile( "\\s+" ) )
+					.withDefault( SearchEngineSettings.Defaults.BEAN_CONFIGURERS )
+					.build();
 
 	private final BeanResolver beanResolver;
 	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans;
 
 	private final BeanCreationContext beanCreationContext;
 
-	public BeanProviderImpl(ClassResolver classResolver, BeanResolver beanResolver) {
+	public ConfiguredBeanProvider(ClassResolver classResolver, BeanResolver beanResolver,
+			ConfigurationPropertySource configurationPropertySource) {
 		this.beanResolver = beanResolver;
 
-		// TODO maybe also add a way to pass configurer through a configuration property?
 		BeanConfigurationContextImpl configurationContext = new BeanConfigurationContextImpl();
 		for ( BeanConfigurer beanConfigurer : classResolver.loadJavaServices( BeanConfigurer.class ) ) {
 			beanConfigurer.configure( configurationContext );
+		}
+		BeanResolverOnlyBeanProvider beanProviderForConfigurers = new BeanResolverOnlyBeanProvider( beanResolver );
+		try ( BeanHolder<List<BeanConfigurer>> beanConfigurersFromConfigurationProperties =
+				BEAN_CONFIGURERS.getAndTransform( configurationPropertySource, beanProviderForConfigurers::getBeans ) ) {
+			for ( BeanConfigurer beanConfigurer : beanConfigurersFromConfigurationProperties.get() ) {
+				beanConfigurer.configure( configurationContext );
+			}
 		}
 		this.explicitlyConfiguredBeans = configurationContext.getConfiguredBeans();
 

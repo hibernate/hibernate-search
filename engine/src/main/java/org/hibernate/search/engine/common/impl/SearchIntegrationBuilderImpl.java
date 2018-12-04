@@ -25,7 +25,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.environment.bean.impl.BeanProviderImpl;
+import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
@@ -149,10 +149,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				beanResolver = new ReflectionBeanResolver( classResolver );
 			}
 
-			BeanProvider beanProvider = new BeanProviderImpl( classResolver, beanResolver );
-			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
-			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
-
 			ConfigurationPropertySource propertySource;
 			if ( !overriddenProperties.isEmpty() ) {
 				propertySource = mainPropertySource.withOverride(
@@ -162,6 +158,10 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			else {
 				propertySource = mainPropertySource;
 			}
+
+			BeanProvider beanProvider = new ConfiguredBeanProvider( classResolver, beanResolver, propertySource );
+			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
+			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( rootBuildContext, propertySource );
 
