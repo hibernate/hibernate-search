@@ -1,6 +1,23 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.0.CR1 (04-12-2018)
+-------------------------
+
+** Improvement
+    * HSEARCH-3237 Remove the dependency to javax.xml.bind from the Elasticsearch module
+
+** Task
+    * HSEARCH-3420 Make the build fully compatible with JDK11
+    * HSEARCH-3417 Remove the snapshot dependencies trigger from the Jenkinsfile
+    * HSEARCH-3410 Upgrade to ORM 5.4.0.CR2 + HCANN 5.1.0.Final
+    * HSEARCH-3376 Remove the explicit dependency to JAXB/javax.xml.bind from the ORM modules when building with JDK9+
+    * HSEARCH-3364 Upgrade feature packs and WildFly integration tests to WildFly 14
+    * HSEARCH-3238 Upgrade EasyMock to a version compatible with JDK11
+    * HSEARCH-3218 Prepare for checkstyle 8.11
+    * HSEARCH-3198 Strip down the README and redirect to the website for getting started information
+    * HSEARCH-3194 Upgrade feature packs and integration tests to WildFly 13
+
 5.10.5.Final (21-11-2018)
 -------------------------
 
