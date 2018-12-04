@@ -61,38 +61,43 @@ public final class ConfiguredBeanProvider implements BeanProvider {
 	@Override
 	public <T> BeanHolder<T> getBean(Class<T> typeReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
-		return beanResolver.resolve( typeReference );
+		try {
+			return beanResolver.resolve( typeReference );
+		}
+		catch (SearchException e) {
+			return fallbackToConfiguredBeans( e, typeReference, null );
+		}
 	}
 
 	@Override
 	public <T> BeanHolder<T> getBean(Class<T> typeReference, String nameReference) {
 		Contracts.assertNotNull( typeReference, "typeReference" );
 		Contracts.assertNotNullNorEmpty( nameReference, "nameReference" );
-		return getBeanFromBeanResolverOrConfiguredBeans( typeReference, nameReference );
-	}
-
-	private <T> BeanHolder<T> getBeanFromBeanResolverOrConfiguredBeans(Class<T> typeReference, String nameReference) {
 		try {
 			return beanResolver.resolve( typeReference, nameReference );
 		}
 		catch (SearchException e) {
-			/*
-			 * Fall back to an explicitly configured bean.
-			 * It's important to do this *after* trying the bean resolver,
-			 * so that adding explicitly configured beans in a new version of Hibernate Search
-			 * doesn't break existing user's configuration.
-			 */
-			try {
-				BeanHolder<T> explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
-				if ( explicitlyConfiguredBean != null ) {
-					return explicitlyConfiguredBean;
-				}
-			}
-			catch (RuntimeException e2) {
-				e.addSuppressed( e2 );
-			}
-			throw e;
+			return fallbackToConfiguredBeans( e, typeReference, nameReference );
 		}
+	}
+
+	/*
+	 * Fall back to an explicitly configured bean.
+	 * It's important to do this *after* trying the bean resolver,
+	 * so that adding explicitly configured beans in a new version of Hibernate Search
+	 * doesn't break existing user's configuration.
+	 */
+	private <T> BeanHolder<T> fallbackToConfiguredBeans(SearchException e, Class<T> typeReference, String nameReference) {
+		try {
+			BeanHolder<T> explicitlyConfiguredBean = getExplicitlyConfiguredBean( typeReference, nameReference );
+			if ( explicitlyConfiguredBean != null ) {
+				return explicitlyConfiguredBean;
+			}
+		}
+		catch (RuntimeException e2) {
+			e.addSuppressed( e2 );
+		}
+		throw e;
 	}
 
 	private <T> BeanHolder<T> getExplicitlyConfiguredBean(Class<T> exposedType, String name) {

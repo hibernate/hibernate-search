@@ -8,6 +8,8 @@ package org.hibernate.search.engine.environment.bean.spi;
 
 public interface BeanConfigurationContext {
 
+	<T> void define(Class<T> exposedType, BeanFactory<T> factory);
+
 	<T> void define(Class<T> exposedType, String name, BeanFactory<T> factory);
 
 }

@@ -19,6 +19,13 @@ final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 	private Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans = new HashMap<>();
 
 	@Override
+	public <T> void define(Class<T> exposedType, BeanFactory<T> factory) {
+		Contracts.assertNotNull( exposedType, "exposedType" );
+		Contracts.assertNotNull( factory, "factory" );
+		explicitlyConfiguredBeans.put( new ConfiguredBeanKey<>( exposedType, null ), factory );
+	}
+
+	@Override
 	public <T> void define(Class<T> exposedType, String name, BeanFactory<T> factory) {
 		Contracts.assertNotNull( exposedType, "exposedType" );
 		Contracts.assertNotNull( name, "name" );
