@@ -7,11 +7,14 @@
 package org.hibernate.search.engine.environment.bean;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * The main entry point for components looking to retrieve user-provided beans.
@@ -63,6 +66,39 @@ public interface BeanProvider {
 	default <T> BeanHolder<T> getBean(BeanReference<T> reference) {
 		Contracts.assertNotNull( reference, "reference" );
 		return reference.getBean( this );
+	}
+
+	/**
+	 * Retrieve a list of beans from a list of {@link BeanReference}s.
+	 * <p>
+	 * The main advantage of calling this method over looping and calling {@link #getBean(BeanReference)} repeatedly
+	 * is that errors are handled correctly: if a bean was already instantiated, and getting the next one fails,
+	 * then the first bean will be properly {@link BeanHolder#close() closed} before the exception is propagated.
+	 * Also, this method returns a {@code BeanHolder<List<T>>} instead of a {@code List<BeanHolder<T>>},
+	 * so its result is easier to use in a try-with-resources.
+	 * <p>
+	 * This method is also syntactic sugar to allow to write {@code bridgeProvider::getBeans}
+	 * and get a {@code Function<BeanReference<T>, T>} that can be used in {@link java.util.Optional#map(Function)}
+	 * for instance.
+	 *
+	 * @param <T> The expected return type.
+	 * @param references The references to the beans to retrieve. Must be non-null.
+	 * @return A {@link BeanHolder} containing a {@link List} containing the resolved beans,
+	 * in the same order as the {@code references}.
+	 * @throws SearchException if one reference is invalid (null or empty) or the corresponding bean cannot be resolved.
+	 */
+	default <T> BeanHolder<List<T>> getBeans(List<? extends BeanReference<? extends T>> references) {
+		List<BeanHolder<? extends T>> beanHolders = new ArrayList<>();
+		try {
+			for ( BeanReference<? extends T> reference : references ) {
+				beanHolders.add( reference.getBean( this ) );
+			}
+			return BeanHolder.of( beanHolders );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).pushAll( BeanHolder::close, beanHolders );
+			throw e;
+		}
 	}
 
 }

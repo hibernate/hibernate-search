@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
+import java.util.List;
+
 /**
  * An object holding a bean instance, and allowing to release it.
  *
@@ -42,6 +44,17 @@ public interface BeanHolder<T> extends AutoCloseable {
 	 */
 	static <T> BeanHolder<T> of(T instance) {
 		return new SimpleBeanHolder<>( instance );
+	}
+
+	/**
+	 * @param beanHolders The bean holders.
+	 * @param <T> The type of the bean instances.
+	 * @return A {@link BeanHolder} whose {@link #get()} method returns a list containing
+	 * the instance of each given bean holder, in order,
+	 * and whose {@link #close()} method closes every given bean holder.
+	 */
+	static <T> BeanHolder<List<T>> of(List<? extends BeanHolder<? extends T>> beanHolders) {
+		return new CompositeBeanHolder<>( beanHolders );
 	}
 
 }
