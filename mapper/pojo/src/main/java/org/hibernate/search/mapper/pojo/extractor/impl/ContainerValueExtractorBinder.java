@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
@@ -33,6 +34,7 @@ import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatche
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * Binds {@link ContainerValueExtractorPath}s to a given input type,
@@ -165,7 +167,7 @@ public class ContainerValueExtractorBinder {
 	 */
 	// Checks are performed using reflection when building the resolved path
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
-	public <C, V> ContainerValueExtractor<? super C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
+	public <C, V> ContainerValueExtractorHolder<C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
 		if ( boundPath.getExtractorPath().isEmpty() ) {
 			throw new AssertionFailure(
 					"Received a request to create extractors, but the extractor path was empty."
@@ -173,20 +175,29 @@ public class ContainerValueExtractorBinder {
 			);
 		}
 		ContainerValueExtractor<? super C, ?> extractor = null;
-		for ( Class<? extends ContainerValueExtractor> extractorClass :
-				boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
-			// TODO HSEARCH-3170 properly handle the release of container value extractor beans
-			ContainerValueExtractor<?, ?> newExtractor =
-					beanProvider.getBean( extractorClass ).get();
-			if ( extractor == null ) {
-				// First extractor: must be able to process type C
-				extractor = (ContainerValueExtractor<? super C, ?>) newExtractor;
+		List<BeanHolder<?>> beanHolders = new ArrayList<>();
+		try {
+			for ( Class<? extends ContainerValueExtractor> extractorClass :
+					boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
+				BeanHolder<? extends ContainerValueExtractor> newExtractorHolder =
+						beanProvider.getBean( extractorClass );
+				beanHolders.add( newExtractorHolder );
+				if ( extractor == null ) {
+					// First extractor: must be able to process type C
+					extractor = (ContainerValueExtractor<? super C, ?>) newExtractorHolder.get();
+				}
+				else {
+					extractor = new ChainingContainerValueExtractor( extractor, newExtractorHolder.get() );
+				}
 			}
-			else {
-				extractor = new ChainingContainerValueExtractor( extractor, newExtractor );
-			}
+			return new ContainerValueExtractorHolder<>(
+					(ContainerValueExtractor<? super C, V>) extractor, beanHolders
+			);
 		}
-		return (ContainerValueExtractor<C, V>) extractor;
+		catch (RuntimeException e) {
+			new SuppressingCloser( e ).pushAll( BeanHolder::close, beanHolders );
+			throw e;
+		}
 	}
 
 	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerValueExtractorPath extractorPath) {

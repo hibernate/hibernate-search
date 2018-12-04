@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -24,18 +24,19 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexingProcessor<C> {
 
-	private final ContainerValueExtractor<C, V> extractor;
+	private final ContainerValueExtractorHolder<C, V> extractorHolder;
 	private final Collection<PojoIndexingProcessor<? super V>> nestedNodes;
 
-	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractor<C, V> extractor,
+	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractorHolder<C, V> extractorHolder,
 			Collection<PojoIndexingProcessor<? super V>> nestedNodes) {
-		this.extractor = extractor;
+		this.extractorHolder = extractorHolder;
 		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( ContainerValueExtractorHolder::close, extractorHolder );
 			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}
@@ -43,7 +44,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "extractor", extractor );
+		builder.attribute( "extractor", extractorHolder.get() );
 		builder.startList( "nestedNodes" );
 		for ( PojoIndexingProcessor<?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
@@ -53,7 +54,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 
 	@Override
 	public final void process(DocumentElement target, C source, AbstractPojoSessionContextImplementor sessionContext) {
-		try ( Stream<V> stream = extractor.extract( source ) ) {
+		try ( Stream<V> stream = extractorHolder.get().extract( source ) ) {
 			stream.forEach( sourceItem -> processItem( target, sourceItem, sessionContext ) );
 		}
 	}

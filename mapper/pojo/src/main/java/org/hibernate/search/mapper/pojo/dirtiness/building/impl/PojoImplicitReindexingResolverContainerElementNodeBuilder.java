@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverContainerElementNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -22,15 +22,15 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<C> {
 
 	private final BoundPojoModelPathValueNode<?, ? extends C, V> modelPath;
-	private final ContainerValueExtractor<C, V> extractor;
+	private final ContainerValueExtractorHolder<C, V> extractorHolder;
 	private final PojoImplicitReindexingResolverValueNodeBuilderDelegate<V> valueBuilderDelegate;
 
 	PojoImplicitReindexingResolverContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, ? extends C, V> modelPath,
-			ContainerValueExtractor<C, V> extractor,
+			ContainerValueExtractorHolder<C, V> extractorHolder,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.modelPath = modelPath;
-		this.extractor = extractor;
+		this.extractorHolder = extractorHolder;
 		this.valueBuilderDelegate =
 				new PojoImplicitReindexingResolverValueNodeBuilderDelegate<>( modelPath, buildingHelper );
 	}
@@ -43,7 +43,7 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			// TODO HSEARCH-3170 release the extractor beans
+			closer.push( ContainerValueExtractorHolder::close, extractorHolder );
 			closer.push( PojoImplicitReindexingResolverValueNodeBuilderDelegate::closeOnFailure, valueBuilderDelegate );
 		}
 	}
@@ -73,7 +73,7 @@ class PojoImplicitReindexingResolverContainerElementNodeBuilder<C, V>
 		}
 		else {
 			return Optional.of( new PojoImplicitReindexingResolverContainerElementNode<>(
-					extractor, valueTypeNodes
+					extractorHolder, valueTypeNodes
 			) );
 		}
 	}

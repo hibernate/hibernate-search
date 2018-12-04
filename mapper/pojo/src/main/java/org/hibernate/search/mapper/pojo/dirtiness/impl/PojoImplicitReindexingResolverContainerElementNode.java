@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -30,19 +30,19 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 		extends PojoImplicitReindexingResolverNode<C, S> {
 
-	private final ContainerValueExtractor<C, V> extractor;
+	private final ContainerValueExtractorHolder<C, V> extractorHolder;
 	private final Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes;
 
-	public PojoImplicitReindexingResolverContainerElementNode(ContainerValueExtractor<C, V> extractor,
+	public PojoImplicitReindexingResolverContainerElementNode(ContainerValueExtractorHolder<C, V> extractorHolder,
 			Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes) {
-		this.extractor = extractor;
+		this.extractorHolder = extractorHolder;
 		this.nestedNodes = nestedNodes;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			// TODO HSEARCH-3170 release the extractor beans
+			closer.push( ContainerValueExtractorHolder::close, extractorHolder );
 			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
 		}
 	}
@@ -50,7 +50,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "extractor", extractor );
+		builder.attribute( "extractor", extractorHolder.get() );
 		builder.startList( "nestedNodes" );
 		for ( PojoImplicitReindexingResolverNode<?, ?> nestedNode : nestedNodes ) {
 			builder.value( nestedNode );
@@ -61,7 +61,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, C dirty, S dirtinessState) {
-		try ( Stream<V> stream = extractor.extract( dirty ) ) {
+		try ( Stream<V> stream = extractorHolder.get().extract( dirty ) ) {
 			stream.forEach( containerElement -> resolveEntitiesToReindexForContainerElement(
 					collector, runtimeIntrospector, containerElement, dirtinessState
 			) );

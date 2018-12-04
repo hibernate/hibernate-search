@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -124,11 +124,11 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	 */
 	private <V> PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, V> createContainerElementNodeBuilder(
 			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
-		ContainerValueExtractor<? super P, V> extractor =
-				mappingHelper.getIndexModelBinder().createExtractors( boundExtractorPath );
 		BoundPojoModelPathValueNode<T, P, V> containerElementPath = modelPath.value( boundExtractorPath );
+		ContainerValueExtractorHolder<P, V> extractorHolder =
+				mappingHelper.getIndexModelBinder().createExtractors( boundExtractorPath );
 		return new PojoIndexingProcessorContainerElementNodeBuilder<>(
-				containerElementPath, extractor,
+				containerElementPath, extractorHolder,
 				mappingHelper, bindingContext
 		);
 	}

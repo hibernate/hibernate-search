@@ -11,12 +11,13 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
+import org.hibernate.search.util.impl.common.Closer;
 
 /**
  * A builder of {@link PojoIndexingProcessorContainerElementNode}.
@@ -28,16 +29,16 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorCon
 class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extends AbstractPojoProcessorNodeBuilder {
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
-	private final ContainerValueExtractor<C, V> extractor;
+	private final ContainerValueExtractorHolder<C, V> extractorHolder;
 
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, V> valueNodeProcessorCollectionBuilder;
 
 	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, P, V> modelPath,
-			ContainerValueExtractor<C, V> extractor,
+			ContainerValueExtractorHolder<C, V> extractorHolder,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
 		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
-		this.extractor = extractor;
+		this.extractorHolder = extractorHolder;
 
 		valueNodeProcessorCollectionBuilder = new PojoIndexingProcessorValueNodeBuilderDelegate<>(
 				modelPath,
@@ -56,7 +57,13 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 
 	@Override
 	void closeOnFailure() {
-		valueNodeProcessorCollectionBuilder.closeOnFailure();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( ContainerValueExtractorHolder::close, extractorHolder );
+			closer.pushAll(
+					PojoIndexingProcessorValueNodeBuilderDelegate::closeOnFailure,
+					valueNodeProcessorCollectionBuilder
+			);
+		}
 	}
 
 	Optional<PojoIndexingProcessorContainerElementNode<C, V>> build(
@@ -78,13 +85,15 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 		if ( immutableNestedProcessors.isEmpty() ) {
 			/*
 			 * If this processor doesn't have any bridge, nor any nested processor,
-			 * it is useless and we don't need to build it
+			 * it is useless and we don't need to build it.
+			 * Release the other resources (the container value extractors) and return.
 			 */
+			extractorHolder.close();
 			return Optional.empty();
 		}
 		else {
 			return Optional.of( new PojoIndexingProcessorContainerElementNode<>(
-					extractor, immutableNestedProcessors
+					extractorHolder, immutableNestedProcessors
 			) );
 		}
 	}

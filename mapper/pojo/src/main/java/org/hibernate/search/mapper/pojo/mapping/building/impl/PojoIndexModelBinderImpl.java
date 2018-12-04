@@ -31,10 +31,10 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
@@ -78,7 +78,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <C, V> ContainerValueExtractor<? super C, V> createExtractors(
+	public <C, V> ContainerValueExtractorHolder<C, V> createExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}

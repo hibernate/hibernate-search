@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -129,7 +129,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return extractorBinder.bindPath( typeModel, extractorPath );
 	}
 
-	<V, T> ContainerValueExtractor<? super T, V> createExtractors(
+	<V, T> ContainerValueExtractorHolder<T, V> createExtractors(
 			BoundContainerValueExtractorPath<T, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}

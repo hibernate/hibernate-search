@@ -16,9 +16,9 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -141,11 +141,11 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	 */
 	private <V> PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, V>
 			createContainerBuilder(BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
-		ContainerValueExtractor<? super P, V> extractor =
+		ContainerValueExtractorHolder<P, V> extractorHolder =
 				buildingHelper.createExtractors( boundExtractorPath );
 		BoundPojoModelPathValueNode<T, P, V> containerElementPath = modelPath.value( boundExtractorPath );
 		return new PojoImplicitReindexingResolverContainerElementNodeBuilder<>(
-				containerElementPath, extractor, buildingHelper
+				containerElementPath, extractorHolder, buildingHelper
 		);
 	}
 

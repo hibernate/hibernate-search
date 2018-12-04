@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -47,7 +48,7 @@ public interface PojoIndexModelBinder {
 	<C> BoundContainerValueExtractorPath<C, ?> bindExtractorPath(
 			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath);
 
-	<C, V> ContainerValueExtractor<? super C, V> createExtractors(
+	<C, V> ContainerValueExtractorHolder<C, V> createExtractors(
 			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
 
 	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
