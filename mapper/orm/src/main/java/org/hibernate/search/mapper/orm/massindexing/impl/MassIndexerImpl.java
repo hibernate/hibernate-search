@@ -18,6 +18,8 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.util.impl.common.Executors;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
@@ -49,7 +51,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
-	//TODO: restore the MassIndexerProgressMonitor
+	private MassIndexerProgressMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
 
@@ -58,7 +60,9 @@ public class MassIndexerImpl implements MassIndexer {
 		this.mapping = sessionFactory.getServiceRegistry().getService( HibernateSearchContextService.class ).getMapping();
 		this.tenantIdentifier = tenantIdentifier;
 		this.rootEntities = toRootEntities( mapping, entities );
-		//TODO: restore the MassIndexerProgressMonitor. Using a JMXRegistrar or a SimpleIndexingProgressMonitor
+
+		// TODO provide a JMXRegistrar alternative
+		this.monitor = new SimpleIndexingProgressMonitor();
 	}
 
 	/**
@@ -207,7 +211,7 @@ public class MassIndexerImpl implements MassIndexer {
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				idFetchSize, idLoadingTransactionTimeout,
+				monitor, idFetchSize, idLoadingTransactionTimeout,
 				tenantIdentifier
 		);
 	}

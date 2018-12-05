@@ -28,6 +28,7 @@ import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -49,6 +50,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
+	private final MassIndexerProgressMonitor monitor;
 	private final String idName;
 	private final CountDownLatch producerEndSignal;
 	private final Integer transactionTimeout;
@@ -61,16 +63,15 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final TransactionManager transactionManager;
 
 	public IdentifierConsumerDocumentProducer(
-			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
-			SessionFactory sessionFactory,
-			CountDownLatch producerEndSignal,
-			CacheMode cacheMode, Class<?> indexedType, String idName,
-			Integer transactionTimeout,
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, MassIndexerProgressMonitor monitor,
+			SessionFactory sessionFactory, CountDownLatch producerEndSignal, CacheMode cacheMode,
+			Class<?> indexedType, String idName, Integer transactionTimeout,
 			String tenantId, HibernateOrmMapping mapping) {
 		this.source = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;
 		this.cacheMode = cacheMode;
 		this.type = indexedType;
+		this.monitor = monitor;
 		this.idName = idName;
 		this.producerEndSignal = producerEndSignal;
 		this.transactionTimeout = transactionTimeout;
@@ -154,8 +155,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 					.add( Restrictions.in( idName, listIds ) );
 			List<?> list = criteria.list();
 
-			// TODO: implements monitor
-			//monitor.entitiesLoaded( list.size() );
+
 
 			indexAllQueue( session, list );
 			session.clear();
@@ -198,7 +198,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 			return;
 		}
 
-		// TODO <<monitor>> indexingMonitor.entitiesLoaded( entities.size() );
+		monitor.entitiesLoaded( entities.size() );
 		PojoSessionWorkExecutor workExecutor = mapping.createSearchManager( session ).createSessionWorkExecutor();
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[entities.size()];
 
@@ -213,8 +213,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		// handle exceptions on a per-work basis
 		CompletableFuture.allOf( futures ).exceptionally( exception -> null ).join();
 
-		Integer completedFutures = this.countCompletedTasks( futures );
-		// TODO <<monitor>> indexingMonitor.documentAdded( completedFutures );
+		monitor.documentsAdded( entities.size() );
 	}
 
 	private CompletableFuture<?> index(PojoSessionWorkExecutor workExecutor, Object entity) throws InterruptedException {
@@ -230,7 +229,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 					return null;
 				} ) );
 
-		// TODO <<monitor>> indexingMonitor.documentBuilt( 1 );
+		monitor.documentsBuilt( 1 );
 		return future;
 	}
 
@@ -241,16 +240,5 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		// errorHandler.handleException( errorMsg, e );
 		// temporary re-throw the exception
 		throw new RuntimeException( errorMsg, e );
-	}
-
-	private Integer countCompletedTasks(CompletableFuture<?>[] tasks) {
-		int result = 0;
-		for ( int i = 0; i < tasks.length; i++ ) {
-			if ( tasks[i].isDone() ) {
-				result++;
-			}
-		}
-
-		return result;
 	}
 }

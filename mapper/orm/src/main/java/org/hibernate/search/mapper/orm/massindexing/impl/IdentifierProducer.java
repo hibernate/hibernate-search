@@ -22,6 +22,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -44,6 +45,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
 	private final Class<?> indexedType;
+	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final String tenantId;
@@ -53,24 +55,24 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
 	 * @param indexedType the entity type to be loaded
+	 * @param monitor
 	 * @param objectsLimit if not zero
 	 * @param idFetchSize the fetch size
 	 * @param tenantId the tenant identifier
 	 */
 	public IdentifierProducer(
-			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities,
-			SessionFactory sessionFactory,
-			int objectLoadingBatchSize,
-			Class<?> indexedType,
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, SessionFactory sessionFactory,
+			int objectLoadingBatchSize, Class<?> indexedType, MassIndexerProgressMonitor monitor,
 			long objectsLimit, int idFetchSize, String tenantId) {
-				this.destination = fromIdentifierListToEntities;
-				this.sessionFactory = sessionFactory;
-				this.batchSize = objectLoadingBatchSize;
-				this.indexedType = indexedType;
-				this.objectsLimit = objectsLimit;
-				this.idFetchSize = idFetchSize;
-				this.tenantId = tenantId;
-				log.trace( "created" );
+		this.destination = fromIdentifierListToEntities;
+		this.sessionFactory = sessionFactory;
+		this.batchSize = objectLoadingBatchSize;
+		this.indexedType = indexedType;
+		this.monitor = monitor;
+		this.objectsLimit = objectsLimit;
+		this.idFetchSize = idFetchSize;
+		this.tenantId = tenantId;
+		log.trace( "created" );
 	}
 
 	@Override
@@ -140,8 +142,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		if ( log.isDebugEnabled() ) {
 			log.debugf( "going to fetch %d primary keys", (Long) totalCount );
 		}
-		// TODO: handle monitor
-		// monitor.addToTotalCount( totalCount );
+		monitor.addToTotalCount( totalCount );
 
 		Criteria criteria = createCriteria( session )
 			.setProjection( Projections.id() )
