@@ -8,6 +8,7 @@
 package org.hibernate.search.mapper.orm.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
+import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.util.Collection;
@@ -38,6 +39,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
+		@ValidIdRange(min = 27, max = 28),
+		@ValidIdRange(min = 30, max = 31),
 		@ValidIdRange(min = 36, max = 36),
 		@ValidIdRange(min = 62, max = 62),
 		@ValidIdRange(min = 65, max = 65),
@@ -55,6 +58,22 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 27, value = "Going to reindex %d entities")
+	void indexingEntities(long count);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 28, value = "Reindexed %1$d entities")
+	void indexingEntitiesCompleted(long nbrOfEntities);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 30, value = "%1$d documents indexed in %2$d ms")
+	void indexingDocumentsCompleted(long doneCount, long elapsedMs);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 31, value = "Indexing speed: %1$f documents/second; progress: %2$.2f%%")
+	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")
