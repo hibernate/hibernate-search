@@ -18,6 +18,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Executors;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -44,6 +45,8 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
 	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
 
+	private final MassIndexerProgressMonitor monitor;
+
 	// loading options
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
@@ -58,17 +61,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private final List<Future<?>> tasks = new ArrayList<>();
 
-	public BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory,
-								HibernateOrmMapping mapping,
-								Class<?> type,
-								int objectLoadingThreads,
-								CacheMode cacheMode,
-								int objectLoadingBatchSize,
-								CountDownLatch endAllSignal,
-								long objectsLimit,
-								int idFetchSize,
-								Integer transactionTimeout,
-								String tenantId) {
+	public BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Class<?> type,
+			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
+			CountDownLatch endAllSignal, MassIndexerProgressMonitor monitor, long objectsLimit,
+			int idFetchSize, Integer transactionTimeout, String tenantId) {
 		this.indexedType = type;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
@@ -93,6 +89,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.endAllSignal = endAllSignal;
 		this.producerEndSignal = new CountDownLatch( documentBuilderThreads );
 
+		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 	}
 
@@ -135,13 +132,11 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction( transactionalContext,
 				new IdentifierProducer(
-						primaryKeyStream, sessionFactory,
-						objectLoadingBatchSize, indexedType,
-						objectsLimit, idFetchSize,
-						tenantId
+						primaryKeyStream, sessionFactory, objectLoadingBatchSize,
+						indexedType, monitor, objectsLimit,
+						idFetchSize, tenantId
 				),
-				transactionTimeout,
-				tenantId );
+				transactionTimeout, tenantId );
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
 		try {
@@ -154,9 +149,10 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	private void startTransformationToLuceneWork() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer(
-				primaryKeyStream, sessionFactory, producerEndSignal,
-				cacheMode, indexedType, idNameOfIndexedType,
-				transactionTimeout, tenantId, mapping
+				primaryKeyStream, monitor, sessionFactory,
+				producerEndSignal, cacheMode, indexedType,
+				idNameOfIndexedType, transactionTimeout, tenantId,
+				mapping
 		);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {

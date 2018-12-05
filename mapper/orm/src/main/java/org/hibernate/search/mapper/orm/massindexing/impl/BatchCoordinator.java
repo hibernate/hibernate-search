@@ -17,6 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Executors;
@@ -49,26 +50,18 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
 	private final CountDownLatch endAllSignal;
+	private final MassIndexerProgressMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
 	private final String tenantId;
 	private final List<Future<?>> indexingTasks = new ArrayList<>();
 
-	public BatchCoordinator(Set<Class<?>> rootEntities,
-							SessionFactoryImplementor sessionFactory,
-							HibernateOrmMapping mapping,
-							int typesToIndexInParallel,
-							int documentBuilderThreads,
-							CacheMode cacheMode,
-							int objectLoadingBatchSize,
-							long objectsLimit,
-							boolean optimizeAtEnd,
-							boolean purgeAtStart,
-							boolean optimizeAfterPurge,
-							int idFetchSize,
-							Integer transactionTimeout,
-							String tenantId) {
+	public BatchCoordinator(Set<Class<?>> rootEntities, SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
+							int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
+							int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
+							boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexerProgressMonitor monitor,
+							int idFetchSize, Integer transactionTimeout, String tenantId) {
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
@@ -83,6 +76,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		this.optimizeAtEnd = optimizeAtEnd;
 		this.purgeAtStart = purgeAtStart;
 		this.optimizeAfterPurge = optimizeAfterPurge;
+		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.endAllSignal = new CountDownLatch( rootEntities.size() );
 	}
@@ -114,7 +108,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			Thread.currentThread().interrupt();
 		}
 		finally {
-			//TODO: Implement a monitor, then close it here
+			monitor.indexingCompleted();
 		}
 	}
 
@@ -128,7 +122,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			indexingTasks.add( executor.submit( new BatchIndexingWorkspace( sessionFactory, mapping, type, documentBuilderThreads, cacheMode,
-					objectLoadingBatchSize, endAllSignal, objectsLimit, idFetchSize, transactionTimeout, tenantId
+					objectLoadingBatchSize, endAllSignal, monitor, objectsLimit, idFetchSize, transactionTimeout, tenantId
 			) ) );
 
 		}
