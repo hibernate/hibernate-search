@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
@@ -45,6 +46,10 @@ public class StubMappingIndexManager {
 		return indexManager.createDocumentWorkExecutor( sessionContext );
 	}
 
+	public IndexWorkExecutor createWorkExecutor() {
+		return indexManager.createWorkExecutor();
+	}
+
 	/**
 	 * @return A search target scoped to this index only.
 	 */
@@ -78,5 +83,4 @@ public class StubMappingIndexManager {
 		}
 		return new GenericStubMappingSearchTarget<>( builder.build() );
 	}
-
 }
