@@ -18,7 +18,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Executors;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -45,7 +45,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
 	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
 
-	private final MassIndexerProgressMonitor monitor;
+	private final MassIndexingMonitor monitor;
 
 	// loading options
 	private final CacheMode cacheMode;
@@ -63,7 +63,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	public BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping, Class<?> type,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
-			CountDownLatch endAllSignal, MassIndexerProgressMonitor monitor, long objectsLimit,
+			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,
 			int idFetchSize, Integer transactionTimeout, String tenantId) {
 		this.indexedType = type;
 		this.idFetchSize = idFetchSize;

@@ -22,7 +22,7 @@ import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.internal.StatelessSessionImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -45,7 +45,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
 	private final Class<?> indexedType;
-	private final MassIndexerProgressMonitor monitor;
+	private final MassIndexingMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final String tenantId;
@@ -62,7 +62,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 */
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, SessionFactory sessionFactory,
-			int objectLoadingBatchSize, Class<?> indexedType, MassIndexerProgressMonitor monitor,
+			int objectLoadingBatchSize, Class<?> indexedType, MassIndexingMonitor monitor,
 			long objectsLimit, int idFetchSize, String tenantId) {
 		this.destination = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;

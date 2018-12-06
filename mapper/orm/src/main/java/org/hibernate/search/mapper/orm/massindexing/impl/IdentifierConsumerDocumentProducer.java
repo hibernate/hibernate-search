@@ -28,7 +28,7 @@ import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -50,7 +50,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final SessionFactory sessionFactory;
 	private final CacheMode cacheMode;
 	private final Class<?> type;
-	private final MassIndexerProgressMonitor monitor;
+	private final MassIndexingMonitor monitor;
 	private final String idName;
 	private final CountDownLatch producerEndSignal;
 	private final Integer transactionTimeout;
@@ -63,7 +63,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	private final TransactionManager transactionManager;
 
 	public IdentifierConsumerDocumentProducer(
-			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, MassIndexerProgressMonitor monitor,
+			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, MassIndexingMonitor monitor,
 			SessionFactory sessionFactory, CountDownLatch producerEndSignal, CacheMode cacheMode,
 			Class<?> indexedType, String idName, Integer transactionTimeout,
 			String tenantId, HibernateOrmMapping mapping) {

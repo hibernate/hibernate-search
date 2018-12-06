@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.util.impl.common.Executors;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -51,7 +51,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean optimizeAtEnd = true;
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
-	private MassIndexerProgressMonitor monitor;
+	private MassIndexingMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
 

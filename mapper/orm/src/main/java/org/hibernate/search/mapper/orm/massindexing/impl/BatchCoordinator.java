@@ -17,7 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexerProgressMonitor;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Executors;
@@ -50,7 +50,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
 	private final CountDownLatch endAllSignal;
-	private final MassIndexerProgressMonitor monitor;
+	private final MassIndexingMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
@@ -60,7 +60,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	public BatchCoordinator(Set<Class<?>> rootEntities, SessionFactoryImplementor sessionFactory, HibernateOrmMapping mapping,
 							int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 							int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
-							boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexerProgressMonitor monitor,
+							boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
 							int idFetchSize, Integer transactionTimeout, String tenantId) {
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;

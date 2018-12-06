@@ -21,7 +21,24 @@ package org.hibernate.search.mapper.orm.massindexing.monitor;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public interface MassIndexerProgressMonitor extends IndexingMonitor {
+public interface MassIndexingMonitor {
+
+	/**
+	 * Notify the monitor that {@code increment} more documents have been added to the index.
+	 * <p>
+	 * Summing the numbers passed to this method gives the total
+	 * number of documents that have been added to the index so far.
+	 * <p>
+	 * This method is invoked several times during indexing,
+	 * and calls are <strong>incremental</strong>:
+	 * calling {@code documentsAdded(3)} and then {@code documentsAdded(1)}
+	 * should be understood as "3+1 documents, i.e. 4 documents have been added to the index".
+	 * <p>
+	 * This method can be invoked from several threads thus implementors are required to be thread-safe.
+	 *
+	 * @param increment additional number of documents built
+	 */
+	void documentsAdded(long increment);
 
 	/**
 	 * Notify the monitor that {@code increment} more documents have been built.
