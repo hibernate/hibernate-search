@@ -96,6 +96,16 @@ public interface SearchProjectionFactoryContext<R, O> {
 	}
 
 	/**
+	 * Create a projection that will compose a {@link List} based on the given almost-built projections.
+	 *
+	 * @param terminalContexts The terminal contexts allowing to retrieve {@link SearchProjection}s.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default CompositeProjectionContext<List<?>> composite(SearchProjectionTerminalContext<?> ... terminalContexts) {
+		return composite( Function.identity(), terminalContexts );
+	}
+
+	/**
 	 * Create a projection that will compose a custom object based on the given projections.
 	 *
 	 * @param transformer The function that will transform the list of projected elements into a custom object.
@@ -105,6 +115,22 @@ public interface SearchProjectionFactoryContext<R, O> {
 	<T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
 
 	/**
+	 * Create a projection that will compose a custom object based on the given almost-built projections.
+	 *
+	 * @param transformer The function that will transform the projected element into a custom object.
+	 * @param terminalContexts The terminal contexts allowing to retrieve {@link SearchProjection}s.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default <T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer,
+			SearchProjectionTerminalContext<?> ... terminalContexts) {
+		SearchProjection<?>[] projections = new SearchProjection<?>[terminalContexts.length];
+		for ( int i = 0; i < terminalContexts.length; i++ ) {
+			projections[i] = terminalContexts[i].toProjection();
+		}
+		return composite( transformer, projections );
+	}
+
+	/**
 	 * Create a projection that will compose a custom object based on one given projection.
 	 *
 	 * @param transformer The function that will transform the projected element into a custom object.
@@ -112,6 +138,18 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+
+	/**
+	 * Create a projection that will compose a custom object based on one almost-built projection.
+	 *
+	 * @param transformer The function that will transform the projected element into a custom object.
+	 * @param terminalContext The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the element passed to the transformer.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default <P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjectionTerminalContext<P> terminalContext) {
+		return composite( transformer, terminalContext.toProjection() );
+	}
 
 	/**
 	 * Create a projection that will compose a custom object based on two given projections.
@@ -125,6 +163,24 @@ public interface SearchProjectionFactoryContext<R, O> {
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
 	/**
+	 * Create a projection that will compose a custom object based on two almost-built projections.
+	 *
+	 * @param transformer The function that will transform the projected elements into a custom object.
+	 * @param terminalContext1 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the first element passed to the transformer.
+	 * @param terminalContext2 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the second element passed to the transformer.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default <P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
+			SearchProjectionTerminalContext<P1> terminalContext1, SearchProjectionTerminalContext<P2> terminalContext2) {
+		return composite(
+				transformer,
+				terminalContext1.toProjection(), terminalContext2.toProjection()
+		);
+	}
+
+	/**
 	 * Create a projection that will compose a custom object based on three given projections.
 	 *
 	 * @param transformer The function that will transform the projected elements into a custom object.
@@ -135,4 +191,25 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 */
 	<P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
+
+	/**
+	 * Create a projection that will compose a custom object based on three almost-built projections.
+	 *
+	 * @param transformer The function that will transform the projected elements into a custom object.
+	 * @param terminalContext1 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the first element passed to the transformer.
+	 * @param terminalContext2 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the second element passed to the transformer.
+	 * @param terminalContext3 The terminal context allowing to retrieve the {@link SearchProjection}
+	 * that will be used to produce the third element passed to the transformer.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default <P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
+			SearchProjectionTerminalContext<P1> terminalContext1, SearchProjectionTerminalContext<P2> terminalContext2,
+			SearchProjectionTerminalContext<P3> terminalContext3) {
+		return composite(
+				transformer,
+				terminalContext1.toProjection(), terminalContext2.toProjection(), terminalContext3.toProjection()
+		);
+	}
 }

@@ -76,7 +76,7 @@ public class CompositeSearchProjectionIT {
 	}
 
 	@Test
-	public void compositeList() {
+	public void compositeList_fromSearchProjectionObjects() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
@@ -99,7 +99,29 @@ public class CompositeSearchProjectionIT {
 	}
 
 	@Test
-	public void compositeList_transformer() {
+	public void compositeList_fromTerminalContexts() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<List<?>> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								f.field( indexMapping.author.relativeFieldName, String.class ),
+								f.field( indexMapping.title.relativeFieldName, String.class )
+						)
+								.toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertThat( query ).hasHitsAnyOrder(
+				Arrays.asList( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
+				Arrays.asList( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
+				Arrays.asList( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+		);
+	}
+
+	@Test
+	public void compositeList_transformer_fromSearchProjectionObjects() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Bi> query = searchTarget.query()
@@ -123,7 +145,29 @@ public class CompositeSearchProjectionIT {
 	}
 
 	@Test
-	public void compositeFunction() {
+	public void compositeList_transformer_fromTerminalContext() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Book_Bi> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								this::listToBook_Bi,
+								f.field( indexMapping.author.relativeFieldName, String.class ),
+								f.field( indexMapping.title.relativeFieldName, String.class )
+						).toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertThat( query ).hasHitsAnyOrder(
+				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
+				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
+				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+		);
+	}
+
+	@Test
+	public void compositeFunction_fromSearchProjectionObjects() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book> query = searchTarget.query()
@@ -145,7 +189,29 @@ public class CompositeSearchProjectionIT {
 	}
 
 	@Test
-	public void compositeBiFunction() {
+	public void compositeFunction_fromTerminalContext() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Book> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								Book::new,
+								f.field( indexMapping.title.relativeFieldName, String.class )
+						)
+								.toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertThat( query ).hasHitsAnyOrder(
+				new Book( indexMapping.title.document1Value.indexedValue ),
+				new Book( indexMapping.title.document2Value.indexedValue ),
+				new Book( indexMapping.title.document3Value.indexedValue )
+		);
+	}
+
+	@Test
+	public void compositeBiFunction_fromSearchProjectionObjects() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Bi> query = searchTarget.query()
@@ -169,7 +235,29 @@ public class CompositeSearchProjectionIT {
 	}
 
 	@Test
-	public void compositeTriFunction() {
+	public void compositeBiFunction_fromTerminalContexts() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Book_Bi> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								Book_Bi::new,
+								f.field( indexMapping.author.relativeFieldName, String.class ),
+								f.field( indexMapping.title.relativeFieldName, String.class )
+						).toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertThat( query ).hasHitsAnyOrder(
+				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
+				new Book_Bi( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue ),
+				new Book_Bi( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue )
+		);
+	}
+
+	@Test
+	public void compositeTriFunction_fromSearchProjectionObjects() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Tri> query = searchTarget.query()
@@ -182,6 +270,32 @@ public class CompositeSearchProjectionIT {
 										.field( indexMapping.title.relativeFieldName, String.class ).toProjection(),
 								searchTarget.projection()
 										.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
+						).toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertThat( query ).hasHitsAnyOrder(
+				new Book_Tri( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue,
+						indexMapping.releaseDate.document1Value.indexedValue ),
+				new Book_Tri( indexMapping.author.document2Value.indexedValue, indexMapping.title.document2Value.indexedValue,
+						indexMapping.releaseDate.document2Value.indexedValue ),
+				new Book_Tri( indexMapping.author.document3Value.indexedValue, indexMapping.title.document3Value.indexedValue,
+						indexMapping.releaseDate.document3Value.indexedValue )
+		);
+	}
+
+	@Test
+	public void compositeTriFunction_fromTerminalContexts() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Book_Tri> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								Book_Tri::new,
+								f.field( indexMapping.author.relativeFieldName, String.class ),
+								f.field( indexMapping.title.relativeFieldName, String.class ),
+								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class )
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
