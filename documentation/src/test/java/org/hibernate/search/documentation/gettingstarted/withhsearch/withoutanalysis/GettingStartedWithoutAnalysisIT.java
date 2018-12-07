@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
 import org.junit.After;
@@ -77,6 +78,22 @@ public class GettingStartedWithoutAnalysisIT {
 			// end::indexing[]
 
 			bookIdHolder.set( book.getId() );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			try {
+			// tag::manual-index[]
+				FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager ); // <1>
+
+				MassIndexer indexer = fullTextEntityManager.createIndexer( Book.class ) // <2>
+						.threadsToLoadObjects( 7 ); // <3>
+
+				indexer.startAndWait(); // <4>
+			// end::manual-index[]
+			}
+			catch (InterruptedException e) {
+				throw new RuntimeException( e );
+			}
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {

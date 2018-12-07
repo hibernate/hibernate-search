@@ -245,10 +245,19 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 
 However, keep in mind that data already present in your database when you add the Hibernate Search integration
 is unknown to Hibernate Search, and thus has to be indexed through a batch process.
+To that end, you can use the mass indexer API, as shown in the following code:
 
-IMPORTANT: The mass indexer is not yet available in Hibernate Search {hibernateSearchVersion}.
-We will add an example here when it is implemented.
-See https://hibernate.atlassian.net/browse/HSEARCH-3268[HSEARCH-3268].
+.Using Hibernate Search MassIndexer API to manually (re)index the already persisted data
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
+----
+<1> Get the Hibernate Search-specific version of the `EntityManager`, called `FullTextEntityManager`.
+<2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
+<3> It is possible to set the number of threads to be used. For the complete option list see <<manual-index-changes>>.
+<4> Invoke the batch indexing process.
+====
 
 [[getting-started-searching]]
 === Searching
