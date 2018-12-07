@@ -80,13 +80,12 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
-								searchTarget.projection()
-										.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								searchTarget.projection()
-										.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
-						).toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
+								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -125,13 +124,11 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Bi> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								this::listToBook_Bi,
-								searchTarget.projection()
-										.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								searchTarget.projection()
-										.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
+								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -171,12 +168,12 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								Book::new,
-								searchTarget.projection()
-										.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
-						).toProjection()
+								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -215,13 +212,11 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Bi> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								Book_Bi::new,
-								searchTarget.projection()
-										.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								searchTarget.projection()
-										.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
+								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
+								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -261,15 +256,12 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Tri> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								Book_Tri::new,
-								searchTarget.projection()
-										.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-								searchTarget.projection()
-										.field( indexMapping.title.relativeFieldName, String.class ).toProjection(),
-								searchTarget.projection()
-										.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
+								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
+								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection(),
+								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -316,17 +308,15 @@ public class CompositeSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Book_Bi_Score> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								Book_Bi_Score::new,
-								searchTarget.projection().composite(
+								f.composite(
 										Book_Bi::new,
-										searchTarget.projection()
-												.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
-										searchTarget.projection()
-												.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
-								).toProjection(),
-								searchTarget.projection().score().toProjection()
+										f.field( indexMapping.author.relativeFieldName, String.class ),
+										f.field( indexMapping.title.relativeFieldName, String.class )
+								),
+								f.score()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )

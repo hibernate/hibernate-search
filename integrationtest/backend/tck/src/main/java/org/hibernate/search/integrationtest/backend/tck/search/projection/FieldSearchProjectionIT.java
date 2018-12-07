@@ -118,7 +118,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -140,7 +140,7 @@ public class FieldSearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
-					.asProjection( searchTarget.projection().field( fieldPath ).toProjection() )
+					.asProjection( f -> f.field( fieldPath ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
@@ -157,8 +157,9 @@ public class FieldSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<CharSequence> query = searchTarget.query()
-				.asProjection( searchTarget.projection()
-						.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection() )
+				.asProjection( f ->
+						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection()
+				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -255,7 +256,7 @@ public class FieldSearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()
-					.asProjection( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
+					.asProjection( f -> f.field( fieldPath, ValueWrapper.class ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
@@ -294,9 +295,12 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjections(
-										searchTarget.projection().field( fieldPath, model.type ).toProjection(),
-										searchTarget.projection().field( fieldPath, model.type ).toProjection()
+								.asProjection( f ->
+										f.composite(
+												f.field( fieldPath, model.type ),
+												f.field( fieldPath, model.type )
+										)
+										.toProjection()
 								)
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
@@ -321,7 +325,8 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						searchTarget.query()
 								.asProjection(
-										searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+										f -> f.field( fieldPath, model.type ).toProjection()
+								)
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -347,7 +352,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -382,7 +387,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjection( searchTarget.projection().field( fieldPath, model.type ).toProjection() )
+								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(
@@ -406,7 +411,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						searchTarget.query()
-								.asProjection( searchTarget.projection().field( fieldPath, ValueWrapper.class ).toProjection() )
+								.asProjection( f -> f.field( fieldPath, ValueWrapper.class ).toProjection() )
 								.predicate( f -> f.matchAll().toPredicate() )
 								.build()
 				).hasHitsAnyOrder(

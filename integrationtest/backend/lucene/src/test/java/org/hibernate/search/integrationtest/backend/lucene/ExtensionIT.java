@@ -285,7 +285,7 @@ public class ExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Integer> query = searchTarget.query()
-				.asProjection( searchTarget.projection().field( "nativeField", Integer.class ).toProjection() )
+				.asProjection( f -> f.field( "nativeField", Integer.class ).toProjection() )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
 				.build();
 
@@ -311,13 +311,8 @@ public class ExtensionIT {
 		// now, let's check that projecting on the field throws an exception
 		SubTest.expectException(
 				"projection on native field not supporting projections",
-				() -> {
-						SearchQuery<Integer> projectionQuery = searchTarget.query()
-								.asProjection( searchTarget.projection().field( "nativeField_unsupportedProjection", Integer.class ).toProjection() )
-								.predicate( f -> f.matchAll().toPredicate() )
-								.build();
-						projectionQuery.execute();
-				} )
+				() -> searchTarget.projection().field( "nativeField_unsupportedProjection", Integer.class )
+		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )

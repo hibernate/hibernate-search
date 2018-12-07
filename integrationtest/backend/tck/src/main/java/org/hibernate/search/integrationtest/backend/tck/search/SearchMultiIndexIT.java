@@ -160,7 +160,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SearchQuery<String> query = searchTarget.query()
-				.asProjection( searchTarget.projection().field( "sortField", String.class ).toProjection() )
+				.asProjection( f -> f.field( "sortField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -192,7 +192,7 @@ public class SearchMultiIndexIT {
 		// Projection
 
 		SearchQuery<String> projectionQuery = searchTarget.query()
-				.asProjection( searchTarget.projection().field( "additionalField", String.class ).toProjection() )
+				.asProjection( f -> f.field( "additionalField", String.class ).toProjection() )
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
@@ -242,9 +242,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on unknown field with multiple targeted indexes",
-				() -> searchTarget.query().asProjection(
-						searchTarget.projection().field( "unknownField", Object.class ).toProjection()
-				)
+				() -> searchTarget.projection().field( "unknownField", Object.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

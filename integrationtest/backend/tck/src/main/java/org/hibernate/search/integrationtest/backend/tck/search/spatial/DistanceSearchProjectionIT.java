@@ -32,9 +32,12 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection().distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
@@ -52,12 +55,13 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection()
-								.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
-								.unit( DistanceUnit.KILOMETERS )
-								.toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
+										.unit( DistanceUnit.KILOMETERS )
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
@@ -75,18 +79,15 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection()
-								.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
-								.toProjection(),
-						searchTarget.projection()
-								.distance( "geoPoint", GeoPoint.of( 45.763363, 4.833527 ) )
-								.toProjection(),
-						searchTarget.projection()
-								.distance( "geoPoint_1", GeoPoint.of( 45.749828, 4.854172 ) )
-								.unit( DistanceUnit.KILOMETERS )
-								.toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ),
+								f.distance( "geoPoint", GeoPoint.of( 45.763363, 4.833527 ) ),
+								f.distance( "geoPoint_1", GeoPoint.of( 45.749828, 4.854172 ) )
+										.unit( DistanceUnit.KILOMETERS )
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
@@ -116,9 +117,12 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection().distance( "geoPoint", center ).toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.distance( "geoPoint", center )
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c
@@ -140,10 +144,15 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<List<?>> query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection().distance( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
-								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 ) ).toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.distance(
+										"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
+										GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
+								)
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )

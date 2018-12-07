@@ -19,7 +19,6 @@ import java.util.function.BiFunction;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -387,9 +386,8 @@ public class FieldDefaultBridgeIT {
 
 		// Searching
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchTarget searchTarget = manager.search( entityType );
-			SearchQuery<P> query = searchTarget.query()
-					.asProjection( searchTarget.projection().field( "myProperty", propertyType ).toProjection() )
+			SearchQuery<P> query = manager.search( entityType ).query()
+					.asProjection( f -> f.field( "myProperty", propertyType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 

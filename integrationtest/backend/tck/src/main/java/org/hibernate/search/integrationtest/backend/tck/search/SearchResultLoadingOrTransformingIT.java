@@ -203,11 +203,14 @@ public class SearchResultLoadingOrTransformingIT {
 				indexManager.createSearchTarget( referenceTransformerMock );
 
 		SearchQuery<List<?>> projectionsQuery = searchTarget.query( objectLoaderMock )
-				.asProjections(
-						searchTarget.projection().field( "string", String.class ).toProjection(),
-						searchTarget.projection().documentReference().toProjection(),
-						searchTarget.projection().reference().toProjection(),
-						searchTarget.projection().object().toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.documentReference(),
+								f.reference(),
+								f.object()
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
@@ -231,17 +234,17 @@ public class SearchResultLoadingOrTransformingIT {
 		Function<List<?>, StubTransformedHit> hitTransformerMock = EasyMock.createMock( StubHitTransformer.class );
 
 		SearchQuery<StubTransformedHit> query = searchTarget.query()
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								hitTransformerMock,
-								searchTarget.projection().field( "string", String.class ).toProjection(),
-								searchTarget.projection().field( "string_analyzed", String.class ).toProjection(),
-								searchTarget.projection().field( "integer", Integer.class ).toProjection(),
-								searchTarget.projection().field( "localDate", LocalDate.class ).toProjection(),
-								searchTarget.projection().field( "geoPoint", GeoPoint.class ).toProjection(),
-								searchTarget.projection().documentReference().toProjection(),
-								searchTarget.projection().reference().toProjection(),
-								searchTarget.projection().object().toProjection()
+								f.field( "string", String.class ).toProjection(),
+								f.field( "string_analyzed", String.class ).toProjection(),
+								f.field( "integer", Integer.class ).toProjection(),
+								f.field( "localDate", LocalDate.class ).toProjection(),
+								f.field( "geoPoint", GeoPoint.class ).toProjection(),
+								f.documentReference().toProjection(),
+								f.reference().toProjection(),
+								f.object().toProjection()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
@@ -306,13 +309,13 @@ public class SearchResultLoadingOrTransformingIT {
 				indexManager.createSearchTarget( referenceTransformerMock );
 
 		SearchQuery<StubTransformedHit> query = searchTarget.query( objectLoaderMock )
-				.asProjection(
-						searchTarget.projection().composite(
+				.asProjection( f ->
+						f.composite(
 								hitTransformerMock,
-								searchTarget.projection().field( "string", String.class ).toProjection(),
-								searchTarget.projection().documentReference().toProjection(),
-								searchTarget.projection().reference().toProjection(),
-								searchTarget.projection().object().toProjection()
+								f.field( "string", String.class ).toProjection(),
+								f.documentReference().toProjection(),
+								f.reference().toProjection(),
+								f.object().toProjection()
 						).toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )

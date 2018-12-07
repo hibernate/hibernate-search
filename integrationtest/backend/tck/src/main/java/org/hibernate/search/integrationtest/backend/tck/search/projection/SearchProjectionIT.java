@@ -218,7 +218,7 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Float> query = searchTarget.query()
-				.asProjection( searchTarget.projection().score().toProjection() )
+				.asProjection( f -> f.score().toProjection() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ).toPredicate() )
 				.sort( c -> c.byScore().desc() )
 				.build();
@@ -246,10 +246,13 @@ public class SearchProjectionIT {
 		SearchQuery<List<?>> query;
 
 		query = searchTarget.query()
-				.asProjections(
-						searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, String.class ).toProjection(),
-						searchTarget.projection().documentReference().toProjection(),
-						searchTarget.projection().field( indexMapping.string2Field.relativeFieldName, String.class ).toProjection()
+				.asProjection( f ->
+						f.composite(
+								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
+								f.documentReference(),
+								f.field( indexMapping.string2Field.relativeFieldName, String.class )
+						)
+						.toProjection()
 				)
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
