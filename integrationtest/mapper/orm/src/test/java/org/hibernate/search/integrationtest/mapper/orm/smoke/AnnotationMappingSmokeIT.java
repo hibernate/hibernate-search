@@ -32,7 +32,6 @@ import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBr
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
@@ -43,7 +42,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Identifier
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
-import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -328,118 +326,6 @@ public class AnnotationMappingSmokeIT {
 					.containsExactly(
 							session.get( IndexedEntity.class, 0 ),
 							session.get( YetAnotherIndexedEntity.class, 1 )
-					);
-			// TODO getResultSize
-		} );
-	}
-
-	@Test
-	public void search_singleElementProjection() {
-		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-
-			FullTextSearchTarget<?> searchTarget = ftSession.search(
-					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			);
-
-			FullTextQuery<String> query = searchTarget
-					.query()
-					.asProjection(
-							searchTarget.projection().field( "myTextField", String.class ).toProjection()
-					)
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-			query.setFirstResult( 3 );
-			query.setMaxResults( 2 );
-
-			backendMock.expectSearchProjection(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
-					StubSearchWorkBehavior.of(
-							2L,
-							"text1",
-							null
-					)
-			);
-
-			List<String> result = query.list();
-			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( result )
-					.containsExactly(
-							"text1",
-							null
-					);
-		} );
-	}
-
-	@Test
-	public void search_multipleElementsProjection() {
-		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-
-			FullTextSearchTarget<?> searchTarget = ftSession.search(
-					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			);
-
-			FullTextQuery<List<?>> query = searchTarget
-					.query()
-					.asProjections(
-							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
-							searchTarget.projection().reference().toProjection(),
-							searchTarget.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
-							searchTarget.projection().documentReference().toProjection(),
-							searchTarget.projection().object().toProjection(),
-							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
-					)
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-
-			backendMock.expectSearchProjections(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> { },
-					StubSearchWorkBehavior.of(
-							2L,
-							Arrays.asList(
-									"text1",
-									reference( IndexedEntity.INDEX, "0" ),
-									LocalDate.of( 2017, 11, 1 ),
-									reference( IndexedEntity.INDEX, "0" ),
-									reference( IndexedEntity.INDEX, "0" ),
-									"text2"
-							),
-							Arrays.asList(
-									null,
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
-									LocalDate.of( 2017, 11, 2 ),
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
-									null
-							)
-					)
-			);
-
-			List<List<?>> result = query.list();
-			backendMock.verifyExpectationsMet();
-			Assertions.assertThat( result )
-					.containsExactly(
-							Arrays.asList(
-									"text1",
-									new PojoReferenceImpl( IndexedEntity.class, 0 ),
-									LocalDate.of( 2017, 11, 1 ),
-									reference( IndexedEntity.INDEX, "0" ),
-									session.get( IndexedEntity.class, 0 ),
-									"text2"
-							),
-							Arrays.asList(
-									null,
-									new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
-									LocalDate.of( 2017, 11, 2 ),
-									reference( YetAnotherIndexedEntity.INDEX, "1" ),
-									session.get( YetAnotherIndexedEntity.class, 1 ),
-									null
-							)
 					);
 		} );
 	}
