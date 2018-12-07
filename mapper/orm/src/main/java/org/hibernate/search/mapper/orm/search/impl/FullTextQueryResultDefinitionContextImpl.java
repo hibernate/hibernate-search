@@ -7,15 +7,18 @@
 package org.hibernate.search.mapper.orm.search.impl;
 
 import java.util.List;
+import java.util.function.Function;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.impl.FullTextQueryImpl;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
 class FullTextQueryResultDefinitionContextImpl<O>
@@ -42,14 +45,19 @@ class FullTextQueryResultDefinitionContextImpl<O>
 	}
 
 	@Override
-	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
-			SearchProjection<T> projection) {
+	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(SearchProjection<T> projection) {
 		MutableObjectLoadingOptions loadingOptions = new MutableObjectLoadingOptions();
 		return searchTargetDelegate.queryAsProjection(
 				objectLoaderBuilder.build( loadingOptions ),
 				q -> new FullTextQueryImpl<>( q, sessionImplementor, loadingOptions ),
 				projection
 		);
+	}
+
+	@Override
+	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
+			Function<? super SearchProjectionFactoryContext<PojoReference, O>, SearchProjection<T>> projectionContributor) {
+		return asProjection( projectionContributor.apply( searchTargetDelegate.projection() ) );
 	}
 
 	@Override
