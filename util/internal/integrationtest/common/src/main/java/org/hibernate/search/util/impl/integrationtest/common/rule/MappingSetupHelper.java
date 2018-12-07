@@ -8,9 +8,11 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 
 import org.junit.rules.TestRule;
@@ -21,27 +23,40 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 
 	private final List<R> toClose = new ArrayList<>();
 
+	private TestHelper testHelper;
+
 	public C withBackendMock(BackendMock backendMock) {
+		String backendName = backendMock.getBackendName();
 		return createSetupContext()
-				.withPropertyRadical( "backends.stubBackend.type", StubBackendFactory.class.getName() )
-				.withPropertyRadical( "indexes.default.backend", backendMock.getBackendName() );
+				.withPropertyRadical( "backends." + backendName + ".type", StubBackendFactory.class.getName() )
+				.withPropertyRadical( "indexes.default.backend", backendName );
+	}
+
+	public C withBackend(String configurationId, String backendName) {
+		String propertiesPath = getPropertiesPath( configurationId );
+		return createSetupContext()
+				.withPropertyRadical( "indexes.default.backend", backendName )
+				.withProperties( testHelper.getPropertiesFromFile( propertiesPath ) );
 	}
 
 	@Override
 	public Statement apply(Statement base, Description description) {
-		return statement( base );
+		return statement( base, description );
 	}
 
 	protected abstract C createSetupContext();
 
+	protected abstract String getPropertiesPath(String configurationId);
+
 	protected abstract void close(R toClose) throws Exception;
 
-	private Statement statement(Statement base) {
+	private Statement statement(Statement base, Description description) {
 		return new Statement() {
 
 			@Override
 			public void evaluate() throws Throwable {
 				try ( Closer<Exception> closer = new Closer<>() ) {
+					testHelper = TestHelper.create( description );
 					try {
 						base.evaluate();
 					}
@@ -62,6 +77,13 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		}
 
 		protected abstract C withPropertyRadical(String keyRadical, Object value);
+
+		protected abstract C withProperty(String keyRadical, Object value);
+
+		protected C withProperties(Map<String, Object> properties) {
+			properties.forEach( this::withProperty );
+			return thisAsC();
+		}
 
 		/**
 		 * Add configuration to be applied to the builder during setup.

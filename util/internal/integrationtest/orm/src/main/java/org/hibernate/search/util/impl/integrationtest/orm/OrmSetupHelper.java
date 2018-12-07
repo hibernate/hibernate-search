@@ -27,6 +27,11 @@ public final class OrmSetupHelper
 	}
 
 	@Override
+	protected String getPropertiesPath(String configurationId) {
+		return "/hibernate-test-" + configurationId + ".properties";
+	}
+
+	@Override
 	protected void close(SessionFactory toClose) {
 		toClose.close();
 	}
@@ -47,6 +52,7 @@ public final class OrmSetupHelper
 			return withProperty( SearchOrmSettings.PREFIX + keyRadical, value );
 		}
 
+		@Override
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
 			return thisAsC();

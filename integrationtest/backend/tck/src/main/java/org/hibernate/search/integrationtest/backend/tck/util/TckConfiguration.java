@@ -6,19 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 
 /**
  * Allows to run the tests with different backends depending on the content of the property file at
@@ -40,14 +33,9 @@ public final class TckConfiguration {
 		return instance;
 	}
 
-	private final String startupTimestamp;
-
 	private final TckBackendFeatures backendFeatures;
 
 	private TckConfiguration() {
-		this.startupTimestamp = new SimpleDateFormat( "yyyy-MM-dd-HH-mm-ss.SSS", Locale.ROOT )
-				.format( new Date() );
-
 		Iterator<TckBackendFeatures> featuresIterator = ServiceLoader.load( TckBackendFeatures.class ).iterator();
 		if ( featuresIterator.hasNext() ) {
 			this.backendFeatures = featuresIterator.next();
@@ -64,37 +52,12 @@ public final class TckConfiguration {
 		return backendFeatures;
 	}
 
-	public ConfigurationPropertySource getBackendProperties(String testId, String configurationId) {
+	public ConfigurationPropertySource getBackendProperties(TestHelper testHelper, String configurationId) {
 		String propertiesPath =
 				configurationId == null
 						? DEFAULT_PROPERTIES_PATH
 						: SPECIFIC_PROPERTIES_PATH_FUNCTION.apply( configurationId );
-		return getPropertySourceFromFile( propertiesPath, testId );
-	}
-
-	private ConfigurationPropertySource getPropertySourceFromFile(String propertyFilePath, String testId) {
-		Properties properties = new Properties();
-		try ( InputStream propertiesInputStream = getClass().getResourceAsStream( propertyFilePath ) ) {
-			if ( propertiesInputStream == null ) {
-				throw new IllegalStateException( "Missing TCK properties file in the classpath: " + propertyFilePath );
-			}
-			properties.load( propertiesInputStream );
-		}
-		catch (IOException e) {
-			throw new IllegalStateException( "Error loading TCK properties file: " + propertyFilePath );
-		}
-
-		Map<String, Object> overriddenProperties = new LinkedHashMap<>();
-
-		properties.forEach( (k, v) -> {
-			if ( v instanceof String ) {
-				overriddenProperties.put( (String) k, ( (String) v ).replace( "#{tck.test.id}", testId ).replace( "#{tck.startup.timestamp}", startupTimestamp ) );
-			}
-			else {
-				overriddenProperties.put( (String) k, v );
-			}
-		} );
-
-		return ConfigurationPropertySource.fromMap( overriddenProperties ).withMask( "backend" );
+		return ConfigurationPropertySource.fromMap( testHelper.getPropertiesFromFile( propertiesPath ) )
+				.withMask( "backend" );
 	}
 }

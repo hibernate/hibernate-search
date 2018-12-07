@@ -42,6 +42,11 @@ public final class JavaBeanMappingSetupHelper
 	}
 
 	@Override
+	protected String getPropertiesPath(String configurationId) {
+		return "/javabean-test-" + configurationId + ".properties";
+	}
+
+	@Override
 	protected void close(CloseableJavaBeanMapping toClose) {
 		toClose.close();
 	}
@@ -60,6 +65,7 @@ public final class JavaBeanMappingSetupHelper
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}
 
+		@Override
 		public SetupContext withProperty(String key, Object value) {
 			overriddenProperties.put( key, value );
 			return thisAsC();

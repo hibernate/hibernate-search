@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -31,35 +32,7 @@ public class SearchSetupHelper implements TestRule {
 
 	private final List<SearchIntegration> mappingRepositories = new ArrayList<>();
 
-	private String testId;
-
-	@Override
-	public Statement apply(Statement base, Description description) {
-		return statement( base, description );
-	}
-
-	private Statement statement(final Statement base, final Description description) {
-		return new Statement() {
-
-			@Override
-			public void evaluate() throws Throwable {
-				before( description );
-				try ( Closer<RuntimeException> closer = new Closer<>() ) {
-					try {
-						base.evaluate();
-					}
-					finally {
-						closer.pushAll( SearchIntegration::close, mappingRepositories );
-						mappingRepositories.clear();
-					}
-				}
-			}
-		};
-	}
-
-	protected void before(Description description) {
-		testId = description.getTestClass().getSimpleName() + "-" + description.getMethodName();
-	}
+	private TestHelper testHelper;
 
 	public SetupContext withDefaultConfiguration() {
 		return withConfiguration( null );
@@ -75,7 +48,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public SetupContext withConfiguration(String configurationId, String backendName) {
 		TckConfiguration tckConfiguration = TckConfiguration.get();
-		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testId, configurationId )
+		ConfigurationPropertySource propertySource = tckConfiguration.getBackendProperties( testHelper, configurationId )
 				.withPrefix( "backends." + backendName );
 
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
@@ -83,6 +56,30 @@ public class SearchSetupHelper implements TestRule {
 
 		return new SetupContext( propertySource )
 				.withProperty( "indexes.default.backend", backendName );
+	}
+
+	@Override
+	public Statement apply(Statement base, Description description) {
+		return statement( base, description );
+	}
+
+	private Statement statement(final Statement base, final Description description) {
+		return new Statement() {
+
+			@Override
+			public void evaluate() throws Throwable {
+				testHelper = TestHelper.create( description );
+				try ( Closer<RuntimeException> closer = new Closer<>() ) {
+					try {
+						base.evaluate();
+					}
+					finally {
+						closer.pushAll( SearchIntegration::close, mappingRepositories );
+						mappingRepositories.clear();
+					}
+				}
+			}
+		};
 	}
 
 	public class SetupContext {
