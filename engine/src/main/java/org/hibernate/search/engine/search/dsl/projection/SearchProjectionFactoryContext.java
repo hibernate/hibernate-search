@@ -85,35 +85,52 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 */
 	DistanceToFieldProjectionContext distance(String absoluteFieldPath, GeoPoint center);
 
+	/**
+	 * Create a projection that will compose a {@link List} based on the given projections.
+	 *
+	 * @param projections The projections used to populate the list, in order.
+	 * @return A context allowing to define the projection more precisely.
+	 */
 	default CompositeProjectionContext<List<?>> composite(SearchProjection<?>... projections) {
 		return composite( Function.identity(), projections );
 	}
 
 	/**
-	 * Creates a composite projection i.e. a projection composed of other projections.
+	 * Create a projection that will compose a custom object based on the given projections.
 	 *
+	 * @param transformer The function that will transform the list of projected elements into a custom object.
+	 * @param projections The projections used to populate the list, in order.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<T> CompositeProjectionContext<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
 
 	/**
-	 * Creates a composite projection i.e. a projection composed of other projections.
+	 * Create a projection that will compose a custom object based on one given projection.
 	 *
+	 * @param transformer The function that will transform the projected element into a custom object.
+	 * @param projection The original projection used to produce the element passed to the transformer.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P, T> CompositeProjectionContext<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
 
 	/**
-	 * Creates a composite projection i.e. a projection composed of other projections.
+	 * Create a projection that will compose a custom object based on two given projections.
 	 *
+	 * @param transformer The function that will transform the projected elements into a custom object.
+	 * @param projection1 The projection used to produce the first element passed to the transformer.
+	 * @param projection2 The projection used to produce the second element passed to the transformer.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P1, P2, T> CompositeProjectionContext<T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
 	/**
-	 * Creates a composite projection i.e. a projection composed of other projections.
+	 * Create a projection that will compose a custom object based on three given projections.
 	 *
+	 * @param transformer The function that will transform the projected elements into a custom object.
+	 * @param projection1 The projection used to produce the first element passed to the transformer.
+	 * @param projection2 The projection used to produce the second element passed to the transformer.
+	 * @param projection3 The projection used to produce the third element passed to the transformer.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	<P1, P2, P3, T> CompositeProjectionContext<T> composite(TriFunction<P1, P2, P3, T> transformer,
