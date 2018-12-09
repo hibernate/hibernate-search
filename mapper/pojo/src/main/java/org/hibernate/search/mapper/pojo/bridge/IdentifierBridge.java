@@ -61,6 +61,8 @@ public interface IdentifierBridge<I> extends AutoCloseable {
 	 */
 	I fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context);
 
+	boolean isCompatibleWith(IdentifierBridge<?> bridge);
+
 	/**
 	 * Close any resource before the bridge is discarded.
 	 */

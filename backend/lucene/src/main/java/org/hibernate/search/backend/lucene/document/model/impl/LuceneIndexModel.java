@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.ScopedAnalyzer;
+import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.CollectionHelper;
-
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
 /**
  * @author Guillaume Smet
  */
 public class LuceneIndexModel implements AutoCloseable {
+
+	private static final ToIndexIdValueConverter<Object> NOOP_ID_CONVERTER = new ToIndexIdValueConverter<Object>() { };
 
 	private final String indexName;
 
@@ -29,38 +29,27 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final ScopedAnalyzer scopedAnalyzer;
 
-	public LuceneIndexModel(String indexName, LuceneRootIndexSchemaContributor contributor) {
+	private final ToIndexIdValueConverter<?> idConverter;
+
+	public LuceneIndexModel(String indexName,
+			ToIndexIdValueConverter<?> idConverter,
+			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
+			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
+			ScopedAnalyzer scopedAnalyzer) {
 		this.indexName = indexName;
-
-		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
-		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
-		// TODO the default analyzer should be configurable, for now, we default to no analysis
-		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder( new KeywordAnalyzer() );
-		contributor.contribute( new LuceneIndexSchemaNodeCollector() {
-			@Override
-			public void collectAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
-				scopedAnalyzerBuilder.setAnalyzer( absoluteFieldPath, analyzer );
-			}
-
-			@Override
-			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
-				fieldNodesBuilder.put( absoluteFieldPath, node );
-			}
-
-			@Override
-			public void collectObjectNode(String absolutePath, LuceneIndexSchemaObjectNode node) {
-				objectNodesBuilder.put( absolutePath, node );
-			}
-		} );
-
-		objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
-		fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
-		scopedAnalyzer = scopedAnalyzerBuilder.build();
+		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
+		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
+		this.scopedAnalyzer = scopedAnalyzer;
+		this.idConverter = idConverter == null ? NOOP_ID_CONVERTER : idConverter;
 	}
 
 	@Override
 	public void close() {
 		scopedAnalyzer.close();
+	}
+
+	public ToIndexIdValueConverter<?> getIdConverter() {
+		return idConverter;
 	}
 
 	public String getIndexName() {

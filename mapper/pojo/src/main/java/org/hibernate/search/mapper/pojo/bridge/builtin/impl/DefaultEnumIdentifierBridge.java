@@ -32,4 +32,9 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 		return Enum.valueOf( enumType, documentIdentifier );
 	}
 
+	@Override
+	public boolean isCompatibleWith(IdentifierBridge<?> bridge) {
+		return false;
+	}
+
 }

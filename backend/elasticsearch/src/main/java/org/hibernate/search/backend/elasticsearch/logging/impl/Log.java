@@ -329,4 +329,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 48,
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 49,
+			value = "Incompatible id converters: <%1$s> <%2$s>")
+	SearchException incompatibleIdConverters(String idConverter1, String idConverter2);
 }

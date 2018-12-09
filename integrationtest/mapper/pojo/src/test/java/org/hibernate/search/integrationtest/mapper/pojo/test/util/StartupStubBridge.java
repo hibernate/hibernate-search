@@ -132,6 +132,11 @@ public class StartupStubBridge
 		throw unexpectedRuntimeUse();
 	}
 
+	@Override
+	public boolean isCompatibleWith(IdentifierBridge<?> bridge) {
+		throw unexpectedRuntimeUse();
+	}
+
 	private AssertionFailure unexpectedRuntimeUse() {
 		StaticCounters.get().increment( counterKeys.runtimeUse );
 		return new AssertionFailure(

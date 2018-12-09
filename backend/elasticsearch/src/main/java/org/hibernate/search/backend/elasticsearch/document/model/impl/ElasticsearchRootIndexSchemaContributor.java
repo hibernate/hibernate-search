@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 
 public interface ElasticsearchRootIndexSchemaContributor {
 
-	RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector);
+	ElasticsearchIndexModel build(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, ElasticsearchIndexSettingsBuilder settingsBuilder);
 
 }

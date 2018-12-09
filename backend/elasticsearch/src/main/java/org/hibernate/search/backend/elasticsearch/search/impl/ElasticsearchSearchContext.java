@@ -7,18 +7,27 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
 public final class ElasticsearchSearchContext {
+
+	private final ToIndexIdValueConvertContext toIndexIdValueConvertContext;
 
 	private final ToIndexFieldValueConvertContext toIndexFieldValueConvertContext;
 
 	public ElasticsearchSearchContext(MappingContextImplementor mappingContext) {
 		this.toIndexFieldValueConvertContext = new ToIndexFieldValueConvertContextImpl( mappingContext );
+		this.toIndexIdValueConvertContext = new ToIndexIdValueConvertContextImpl( mappingContext );
 	}
 
 	public ToIndexFieldValueConvertContext getToIndexFieldValueConvertContext() {
 		return toIndexFieldValueConvertContext;
+	}
+
+	public ToIndexIdValueConvertContext getToIndexIdValueConvertContext() {
+		return toIndexIdValueConvertContext;
 	}
 }

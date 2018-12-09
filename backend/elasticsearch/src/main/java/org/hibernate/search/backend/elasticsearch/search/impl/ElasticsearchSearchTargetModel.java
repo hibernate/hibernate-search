@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -52,6 +54,18 @@ public class ElasticsearchSearchTargetModel {
 
 	public Set<ElasticsearchIndexModel> getIndexModels() {
 		return indexModels;
+	}
+
+	public ToIndexIdValueConverter<?> getIdConverter() {
+		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
+		ToIndexIdValueConverter<?> idConverter = iterator.next().getIdConverter();
+		while ( iterator.hasNext() ) {
+			ElasticsearchIndexModel next = iterator.next();
+			if ( !idConverter.isCompatibleWith( next.getIdConverter() ) ) {
+				throw log.incompatibleIdConverters( String.valueOf( idConverter ), String.valueOf( next.getIdConverter() ) );
+			}
+		}
+		return idConverter;
 	}
 
 	public <T> T getSchemaNodeComponent(String absoluteFieldPath,

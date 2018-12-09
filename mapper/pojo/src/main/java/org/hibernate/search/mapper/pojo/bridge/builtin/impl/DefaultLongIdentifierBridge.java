@@ -23,4 +23,9 @@ public final class DefaultLongIdentifierBridge implements IdentifierBridge<Long>
 		return Long.parseLong( documentIdentifier );
 	}
 
+	@Override
+	public boolean isCompatibleWith(IdentifierBridge<?> bridge) {
+		return false;
+	}
+
 }

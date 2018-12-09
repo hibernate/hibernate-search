@@ -92,7 +92,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <I> IdentifierBridge<I> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
+	public <I> IdentifierBridge<I> addIdentifierBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		PojoGenericTypeModel<I> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
@@ -109,6 +110,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				new PojoModelValueElement<>( typeModel )
 		) );
 
+		bindingContext.idConverter( new IdentifierBridgeToIndexIdValueConverter( bridge ) );
 		return bridge;
 	}
 

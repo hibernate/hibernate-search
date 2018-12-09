@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
+import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
+
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
 	/**
@@ -14,5 +16,7 @@ public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder
 	 * to be used to route the document to a specific shard.
 	 */
 	void explicitRouting();
+
+	<I> void idConverter(ToIndexIdValueConverter<I> idConverter);
 
 }

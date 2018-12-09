@@ -63,7 +63,7 @@ public class LuceneIndexManagerBuilder implements IndexManagerBuilder<LuceneRoot
 		LuceneIndexModel model = null;
 		IndexWriter indexWriter = null;
 		try {
-			model = new LuceneIndexModel( indexName, schemaRootNodeBuilder );
+			model = schemaRootNodeBuilder.build( indexName );
 			indexWriter = createIndexWriter( model );
 			return new LuceneIndexManagerImpl(
 					indexingBackendContext, searchBackendContext, indexName, model, indexWriter

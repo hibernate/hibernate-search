@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
 /**
@@ -58,11 +58,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
 		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
 
-		ElasticsearchIndexModel model = new ElasticsearchIndexModel(
-				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				schemaRootNodeBuilder,
-				settingsBuilder
-		);
+		ElasticsearchIndexModel model = schemaRootNodeBuilder
+				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
 		indexingBackendContext.initializeIndex( encodedElasticsearchIndexName, encodedTypeName, model )

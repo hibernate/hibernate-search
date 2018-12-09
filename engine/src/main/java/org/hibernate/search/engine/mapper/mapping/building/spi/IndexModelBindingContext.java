@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -32,6 +33,8 @@ public interface IndexModelBindingContext {
 	 * to be used to route the document to a specific shard.
 	 */
 	void explicitRouting();
+
+	<I> void idConverter(ToIndexIdValueConverter<I> idConverter);
 
 	Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);

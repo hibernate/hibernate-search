@@ -406,4 +406,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 67, value = "Unable to delete all entries with tenant identifier '%1$s'.")
 	SearchException unableToDeleteAllEntriesFromIndex(String tenantId, @Param EventContext context, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 68,
+			value = "Incompatible id converters: <%1$s> <%2$s>")
+	SearchException incompatibleIdConverters(String idConverter1, String idConverter2);
 }

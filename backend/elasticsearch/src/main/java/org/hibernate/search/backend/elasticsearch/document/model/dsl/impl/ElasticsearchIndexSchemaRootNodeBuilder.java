@@ -6,16 +6,24 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchRootIndexSchemaContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
+import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder, ElasticsearchRootIndexSchemaContributor {
@@ -24,6 +32,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private RoutingType routing = null;
+	private ToIndexIdValueConverter idConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(String hibernateSearchIndexName,
 			MultiTenancyStrategy multiTenancyStrategy) {
@@ -43,7 +52,12 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public RootTypeMapping contribute(ElasticsearchIndexSchemaNodeCollector collector) {
+	public void idConverter(ToIndexIdValueConverter idConverter) {
+		this.idConverter = idConverter;
+	}
+
+	@Override
+	public ElasticsearchIndexModel build(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, ElasticsearchIndexSettingsBuilder settingsBuilder) {
 		ElasticsearchIndexSchemaObjectNode node = ElasticsearchIndexSchemaObjectNode.root();
 
 		RootTypeMapping mapping = new RootTypeMapping();
@@ -56,9 +70,25 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		// TODO allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
 		mapping.setDynamic( DynamicType.STRICT );
 
+		final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
+		final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+
+		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
+			@Override
+			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node) {
+				objectNodes.put( absolutePath, node );
+			}
+
+			@Override
+			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node) {
+				fieldNodes.put( absoluteFieldPath, node );
+			}
+		};
+
 		contributeChildren( mapping, node, collector );
 
-		return mapping;
+		ElasticsearchIndexModel model = new ElasticsearchIndexModel( hibernateSearchIndexName, elasticsearchIndexName, settingsBuilder, idConverter, mapping, objectNodes, fieldNodes );
+		return model;
 	}
 
 	@Override
