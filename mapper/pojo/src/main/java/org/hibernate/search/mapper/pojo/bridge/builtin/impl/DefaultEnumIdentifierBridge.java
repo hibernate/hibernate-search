@@ -32,4 +32,18 @@ public final class DefaultEnumIdentifierBridge<T extends Enum<T>> implements Ide
 		return Enum.valueOf( enumType, documentIdentifier );
 	}
 
+	@Override
+	public T cast(Object value) {
+		return enumType.cast( value );
+	}
+
+	@Override
+	public boolean isCompatibleWith(IdentifierBridge<?> other) {
+		if ( !getClass().equals( other.getClass() ) ) {
+			return false;
+		}
+		DefaultEnumIdentifierBridge<?> castedOther = (DefaultEnumIdentifierBridge<?>) other;
+		return enumType.equals( castedOther.enumType );
+	}
+
 }

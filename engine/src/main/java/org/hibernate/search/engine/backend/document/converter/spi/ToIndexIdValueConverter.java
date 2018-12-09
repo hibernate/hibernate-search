@@ -4,15 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.document.converter;
+package org.hibernate.search.engine.backend.document.converter.spi;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContextExtension;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextExtension;
 
 /**
- * A converter from a source value to a target value that should be used as an identifier.
+ * A converter from a source identifier value to a target value that should be used as a document identifier.
+ *
+ * @param <I> The type of source identifier values.
  */
-public interface ToIndexIdValueConverter {
+public interface ToIndexIdValueConverter<I> {
 
 	/**
 	 * @param value The source value to convert.
@@ -42,7 +44,7 @@ public interface ToIndexIdValueConverter {
 	 * {@link #convertUnknown(Object, ToIndexIdValueConvertContext)} method is guaranteed to always return the
 	 * same value as this object's when given the same input. {@code false} otherwise, or when in doubt.
 	 */
-	default boolean isCompatibleWith(ToIndexIdValueConverter other) {
+	default boolean isCompatibleWith(ToIndexIdValueConverter<?> other) {
 		return equals( other );
 	}
 

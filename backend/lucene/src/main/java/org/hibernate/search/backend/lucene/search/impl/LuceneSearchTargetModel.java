@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -50,6 +52,28 @@ public class LuceneSearchTargetModel {
 
 	public Set<ReaderProvider> getReaderProviders() {
 		return readerProviders;
+	}
+
+	public ToIndexIdValueConverter<?> getIdDslConverter() {
+		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
+		LuceneIndexModel indexModelForSelectedIdConverter = iterator.next();
+		ToIndexIdValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
+
+		while ( iterator.hasNext() ) {
+			LuceneIndexModel indexModel = iterator.next();
+			ToIndexIdValueConverter<?> idConverter = indexModel.getIdDslConverter();
+			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
+				throw log.conflictingIdentifierTypesForPredicate(
+						selectedIdConverter, idConverter,
+						EventContexts.fromIndexNames(
+								indexModelForSelectedIdConverter.getIndexName(),
+								indexModel.getIndexName()
+						)
+				);
+			}
+		}
+
+		return selectedIdConverter;
 	}
 
 	public <T> T getSchemaNodeComponent(String absoluteFieldPath,

@@ -15,17 +15,28 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private List<String> values = new ArrayList<>();
+	private final LuceneSearchContext searchContext;
+	private final ToIndexIdValueConverter<?> idDslConverter;
+
+	public LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext, ToIndexIdValueConverter<?> idDslConverter) {
+		this.searchContext = searchContext;
+		this.idDslConverter = idDslConverter;
+	}
 
 	@Override
 	public void value(Object value) {
-		values.add( (String) value );
+		ToIndexIdValueConvertContext toIndexIdValueConvertContext = searchContext.getToIndexIdValueConvertContext();
+		values.add( idDslConverter.convertUnknown( value, toIndexIdValueConvertContext ) );
 	}
 
 	@Override

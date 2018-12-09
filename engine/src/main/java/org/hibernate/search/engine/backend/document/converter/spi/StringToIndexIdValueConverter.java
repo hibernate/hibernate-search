@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.engine.backend.document.converter.spi;
 
-import org.hibernate.search.engine.backend.document.converter.ToIndexIdValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
 
-public final class StringToIndexIdValueConverter implements ToIndexIdValueConverter {
+public final class StringToIndexIdValueConverter implements ToIndexIdValueConverter<String> {
 
 	@Override
 	public String convert(String value, ToIndexIdValueConvertContext context) {
@@ -22,7 +21,7 @@ public final class StringToIndexIdValueConverter implements ToIndexIdValueConver
 	}
 
 	@Override
-	public boolean isCompatibleWith(ToIndexIdValueConverter other) {
+	public boolean isCompatibleWith(ToIndexIdValueConverter<?> other) {
 		return getClass().equals( other.getClass() );
 	}
 }

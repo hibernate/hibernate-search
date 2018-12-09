@@ -81,7 +81,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
-		return new ElasticsearchMatchIdPredicateBuilder( searchContext );
+		return new ElasticsearchMatchIdPredicateBuilder( searchContext, searchTargetModel.getIdDslConverter() );
 	}
 
 	@Override

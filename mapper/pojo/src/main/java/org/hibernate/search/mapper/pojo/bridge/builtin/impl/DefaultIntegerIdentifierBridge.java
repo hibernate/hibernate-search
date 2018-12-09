@@ -23,4 +23,14 @@ public final class DefaultIntegerIdentifierBridge implements IdentifierBridge<In
 		return Integer.parseInt( documentIdentifier );
 	}
 
+	@Override
+	public Integer cast(Object value) {
+		return (Integer) value;
+	}
+
+	@Override
+	public boolean isCompatibleWith(IdentifierBridge<?> other) {
+		return getClass().equals( other.getClass() );
+	}
+
 }

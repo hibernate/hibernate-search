@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 
 public class RootIndexModelBindingContext extends AbstractIndexModelBindingContext<IndexSchemaRootNodeBuilder> {
@@ -28,4 +29,8 @@ public class RootIndexModelBindingContext extends AbstractIndexModelBindingConte
 		indexSchemaObjectNodeBuilder.explicitRouting();
 	}
 
+	@Override
+	public void idDslConverter(ToIndexIdValueConverter<?> idConverter) {
+		indexSchemaObjectNodeBuilder.idDslConverter( idConverter );
+	}
 }

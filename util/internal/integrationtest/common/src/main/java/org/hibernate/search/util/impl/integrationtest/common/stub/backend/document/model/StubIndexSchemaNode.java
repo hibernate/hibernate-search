@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
@@ -43,10 +44,12 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	 * to make it easier to define nodes that should be matched.
 	 */
 	private final StubFieldConverter<?> converter;
+	private final ToIndexIdValueConverter<?> idDslConverter;
 
 	private StubIndexSchemaNode(Builder builder) {
 		super( builder );
 		this.converter = builder.converter;
+		this.idDslConverter = builder.idDslConverter;
 	}
 
 	public StubFieldConverter<?> getConverter() {
@@ -55,6 +58,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaContext {
 		private StubFieldConverter<?> converter;
+		private ToIndexIdValueConverter<?> idDslConverter;
 
 		private Builder(Builder parent, String relativeFieldName, Type type) {
 			super( parent, relativeFieldName );
@@ -98,6 +102,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder explicitRouting() {
 			attribute( "explicitRouting", true );
+			return this;
+		}
+
+		public Builder idDslConverter(ToIndexIdValueConverter<?> idDslConverter) {
+			this.idDslConverter = idDslConverter;
 			return this;
 		}
 

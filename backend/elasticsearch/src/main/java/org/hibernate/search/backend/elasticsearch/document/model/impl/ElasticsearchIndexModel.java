@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.EventContext;
 
 /**
  * @author Yoann Rodiere
@@ -24,27 +24,25 @@ public class ElasticsearchIndexModel {
 	private final String hibernateSearchIndexName;
 	private final URLEncodedString elasticsearchIndexName;
 	private final RootTypeMapping mapping;
-	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
-	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
 	private final IndexSettings settings;
 
-	public ElasticsearchIndexModel(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
-			ElasticsearchRootIndexSchemaContributor contributor,
-			ElasticsearchIndexSettingsBuilder settingsBuilder) {
+	private final ToIndexIdValueConverter<?> idDslConverter;
+	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
+	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
+
+	public ElasticsearchIndexModel(String hibernateSearchIndexName,
+			URLEncodedString elasticsearchIndexName,
+			ElasticsearchIndexSettingsBuilder settingsBuilder,
+			RootTypeMapping mapping, ToIndexIdValueConverter<?> idDslConverter,
+			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
+			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
-		this.mapping = contributor.contribute( new ElasticsearchIndexSchemaNodeCollector() {
-			@Override
-			public void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node) {
-				objectNodes.put( absolutePath, node );
-			}
-
-			@Override
-			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node) {
-				fieldNodes.put( absoluteFieldPath, node );
-			}
-		} );
 		this.settings = settingsBuilder.build();
+		this.idDslConverter = idDslConverter;
+		this.objectNodes = objectNodes;
+		this.fieldNodes = fieldNodes;
+		this.mapping = mapping;
 	}
 
 	public String getHibernateSearchIndexName() {
@@ -65,6 +63,10 @@ public class ElasticsearchIndexModel {
 
 	public IndexSettings getSettings() {
 		return settings;
+	}
+
+	public ToIndexIdValueConverter<?> getIdDslConverter() {
+		return idDslConverter;
 	}
 
 	public ElasticsearchIndexSchemaObjectNode getObjectNode(String absolutePath) {

@@ -84,7 +84,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(BoundPojoModelPathPropertyNode<?, I> modelPath,
+	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(IndexModelBindingContext bindingContext,
+			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		PojoGenericTypeModel<I> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
 		BridgeBuilder<? extends IdentifierBridge<?>> defaultedBuilder = builder;
@@ -98,9 +99,11 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		BeanHolder<? extends IdentifierBridge<I>> bridgeHolder =
 				(BeanHolder<IdentifierBridge<I>>) defaultedBuilder.build( bridgeBuildContext );
 		try {
-			bridgeHolder.get().bind( new IdentifierBridgeBindingContextImpl<>(
+			IdentifierBridge<I> bridge = bridgeHolder.get();
+			bridge.bind( new IdentifierBridgeBindingContextImpl<>(
 					new PojoModelValueElement<>( typeModel )
 			) );
+			bindingContext.idDslConverter( new PojoIdentifierBridgeToIndexIdValueConverter( bridge ) );
 			return bridgeHolder;
 		}
 		catch (RuntimeException e) {

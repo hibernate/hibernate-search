@@ -62,6 +62,21 @@ public interface IdentifierBridge<I> extends AutoCloseable {
 	I fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context);
 
 	/**
+	 * Cast an input value to the expected type {@link I}.
+	 * <p>
+	 * Called for values passed to the predicate DSL in particular.
+	 *
+	 * @param value The value to convert.
+	 * @return The checked value.
+	 * @throws RuntimeException If the value does not match the expected type.
+	 */
+	I cast(Object value);
+
+	default boolean isCompatibleWith(IdentifierBridge<?> other) {
+		return equals( other );
+	}
+
+	/**
 	 * Close any resource before the bridge is discarded.
 	 */
 	@Override

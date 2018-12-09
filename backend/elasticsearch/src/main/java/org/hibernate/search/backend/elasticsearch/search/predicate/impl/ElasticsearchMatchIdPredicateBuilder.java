@@ -12,6 +12,8 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -42,14 +44,22 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 
 	private static final JsonObjectAccessor IDS = JsonAccessor.root().property( "ids" ).asObject();
 	private static final JsonAccessor<JsonElement> VALUES = JsonAccessor.root().property( "values" );
+
+	private final ElasticsearchSearchContext searchContext;
+
+	private final ToIndexIdValueConverter<?> idDslConverter;
+
 	private List<String> values = new ArrayList<>();
 
-	public ElasticsearchMatchIdPredicateBuilder(ElasticsearchSearchContext searchContext) {
+	public ElasticsearchMatchIdPredicateBuilder(ElasticsearchSearchContext searchContext, ToIndexIdValueConverter<?> idDslConverter) {
+		this.searchContext = searchContext;
+		this.idDslConverter = idDslConverter;
 	}
 
 	@Override
 	public void value(Object value) {
-		values.add( (String) value );
+		ToIndexIdValueConvertContext toIndexIdValueConvertContext = searchContext.getToIndexIdValueConvertContext();
+		values.add( idDslConverter.convertUnknown( value, toIndexIdValueConvertContext ) );
 	}
 
 	@Override

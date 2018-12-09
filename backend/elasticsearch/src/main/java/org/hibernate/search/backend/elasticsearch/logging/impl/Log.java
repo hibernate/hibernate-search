@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -329,4 +330,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 48,
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 49,
+			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
+	SearchException conflictingIdentifierTypesForPredicate(ToIndexIdValueConverter<?> component1,
+			ToIndexIdValueConverter<?> component2, @Param EventContext context);
 }

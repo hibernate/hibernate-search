@@ -7,15 +7,23 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
 public final class LuceneSearchContext {
 
+	private final ToIndexIdValueConvertContext toIndexIdValueConvertContext;
 	private final ToIndexFieldValueConvertContext toIndexFieldValueConvertContext;
 
 	public LuceneSearchContext(MappingContextImplementor mappingContext) {
+		this.toIndexIdValueConvertContext = new ToIndexIdValueConvertContextImpl( mappingContext );
 		this.toIndexFieldValueConvertContext = new ToIndexFieldValueConvertContextImpl( mappingContext );
+	}
+
+	public ToIndexIdValueConvertContext getToIndexIdValueConvertContext() {
+		return toIndexIdValueConvertContext;
 	}
 
 	public ToIndexFieldValueConvertContext getToIndexFieldValueConvertContext() {

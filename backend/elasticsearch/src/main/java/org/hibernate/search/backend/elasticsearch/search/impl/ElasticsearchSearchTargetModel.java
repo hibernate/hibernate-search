@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -52,6 +54,28 @@ public class ElasticsearchSearchTargetModel {
 
 	public Set<ElasticsearchIndexModel> getIndexModels() {
 		return indexModels;
+	}
+
+	public ToIndexIdValueConverter<?> getIdDslConverter() {
+		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
+		ElasticsearchIndexModel indexModelForSelectedIdConverter = iterator.next();
+		ToIndexIdValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
+
+		while ( iterator.hasNext() ) {
+			ElasticsearchIndexModel indexModel = iterator.next();
+			ToIndexIdValueConverter<?> idConverter = indexModel.getIdDslConverter();
+			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
+				throw log.conflictingIdentifierTypesForPredicate(
+						selectedIdConverter, idConverter,
+						EventContexts.fromIndexNames(
+								indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
+								indexModel.getHibernateSearchIndexName()
+						)
+				);
+			}
+		}
+
+		return selectedIdConverter;
 	}
 
 	public <T> T getSchemaNodeComponent(String absoluteFieldPath,

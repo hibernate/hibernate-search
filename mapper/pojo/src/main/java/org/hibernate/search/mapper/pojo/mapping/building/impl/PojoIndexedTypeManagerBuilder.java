@@ -196,7 +196,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				BoundPojoModelPathPropertyNode<?, T> entityIdPath) {
 			identifierBridge(
 					entityIdPath,
-					mappingHelper.getIndexModelBinder().addIdentifierBridge( entityIdPath, null )
+					mappingHelper.getIndexModelBinder().addIdentifierBridge( indexManagerBuildingState.getRootBindingContext(), entityIdPath, null )
 			);
 		}
 

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.backend.document.converter.runtime.spi;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexIdValueConvertContextExtension;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 

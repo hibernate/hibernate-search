@@ -74,7 +74,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
-		return new LuceneMatchIdPredicateBuilder();
+		return new LuceneMatchIdPredicateBuilder( searchContext, searchTargetModel.getIdDslConverter() );
 	}
 
 	@Override
