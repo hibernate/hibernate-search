@@ -10,8 +10,6 @@ import org.hibernate.query.Query;
 
 public interface FullTextQuery<T> extends Query<T>, org.hibernate.search.mapper.orm.jpa.FullTextQuery<T> {
 
-	// TODO getResultSize
-
 	// TODO facets
 
 	// TODO timeouts

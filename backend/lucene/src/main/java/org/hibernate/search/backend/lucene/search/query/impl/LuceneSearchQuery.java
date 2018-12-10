@@ -80,4 +80,15 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 				luceneCollectorProvider, searchResultExtractor ) );
 		return queryOrchestrator.submit( work ).join();
 	}
+
+	@Override
+	public long executeCount() {
+		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<T>(
+				indexNames,
+				readerProviders,
+				luceneQuery, luceneSort,
+				firstResultIndex, 0L,
+				luceneCollectorProvider, searchResultExtractor ) );
+		return queryOrchestrator.submit( work ).join().getHitCount();
+	}
 }

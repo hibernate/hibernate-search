@@ -19,4 +19,6 @@ public interface SearchQuery<T> {
 
 	SearchResult<T> execute();
 
+	long executeCount();
+
 }

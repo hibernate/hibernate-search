@@ -372,4 +372,19 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 		return "FullTextQueryImpl(" + getQueryString() + ")";
 	}
 
+	@Override
+	public long getResultSize() {
+		try {
+			return searchQuery.executeCount();
+		}
+		catch (QueryExecutionRequestException | ArithmeticException e) {
+			throw new IllegalStateException( e );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
+	}
 }

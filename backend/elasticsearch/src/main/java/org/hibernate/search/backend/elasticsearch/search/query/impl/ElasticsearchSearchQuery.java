@@ -75,4 +75,13 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 		return queryOrchestrator.submit( work ).join();
 	}
 
+	@Override
+	public long executeCount() {
+		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
+				indexNames, routingKeys,
+				payload, searchResultExtractor,
+				firstResultIndex, 0L );
+		SearchResult<T> executeNoHits = queryOrchestrator.submit( work ).join();
+		return executeNoHits.getHitCount();
+	}
 }

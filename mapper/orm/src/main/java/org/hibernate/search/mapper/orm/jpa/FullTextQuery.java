@@ -9,4 +9,7 @@ package org.hibernate.search.mapper.orm.jpa;
 import javax.persistence.TypedQuery;
 
 public interface FullTextQuery<T> extends TypedQuery<T> {
+
+	long getResultSize();
+
 }
