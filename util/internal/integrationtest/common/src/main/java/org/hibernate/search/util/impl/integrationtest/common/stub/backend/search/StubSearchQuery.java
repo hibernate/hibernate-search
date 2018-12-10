@@ -59,9 +59,6 @@ final class StubSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public long executeCount() {
-		// TODO use a count-specific expectation
-		return backend.getBehavior().executeSearchWork(
-				indexNames, workBuilder.build(), convertContext, projectionHitMapper, rootProjection
-		).getHitCount();
+		return backend.getBehavior().executeCountWork( indexNames );
 	}
 }

@@ -123,6 +123,22 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
+	public long getResultSize() {
+		try {
+			return searchQuery.executeCount();
+		}
+		catch (QueryExecutionRequestException e) {
+			throw new IllegalStateException( e );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
+	}
+
+	@Override
 	public FullTextQueryImpl<R> setMaxResults(int maxResults) {
 		if ( maxResults < 0 ) {
 			throw new IllegalArgumentException(
@@ -370,21 +386,5 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	@Override
 	public String toString() {
 		return "FullTextQueryImpl(" + getQueryString() + ")";
-	}
-
-	@Override
-	public long getResultSize() {
-		try {
-			return searchQuery.executeCount();
-		}
-		catch (QueryExecutionRequestException | ArithmeticException e) {
-			throw new IllegalStateException( e );
-		}
-		catch (TypeMismatchException e) {
-			throw new IllegalArgumentException( e );
-		}
-		catch (HibernateException he) {
-			throw getExceptionConverter().convert( he );
-		}
 	}
 }

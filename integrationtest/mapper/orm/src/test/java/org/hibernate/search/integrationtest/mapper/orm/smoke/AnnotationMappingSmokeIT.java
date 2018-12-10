@@ -328,15 +328,7 @@ public class AnnotationMappingSmokeIT {
 							session.get( YetAnotherIndexedEntity.class, 1 )
 					);
 
-			backendMock.resetExpectations();
-			// TODO use a count-specific expectation
-			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
-					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
-					StubSearchWorkBehavior.of( 6L )
-			);
+			backendMock.expectCount( Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 6L );
 
 			long resultSize = query.getResultSize();
 			backendMock.verifyExpectationsMet();

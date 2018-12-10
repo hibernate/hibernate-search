@@ -139,6 +139,12 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
+	public BackendMock expectCount(List<String> indexNames, long expectedResult) {
+		CallQueue<CountWorkCall> callQueue = behaviorMock.getCountWorkCalls();
+		callQueue.expectInOrder( new CountWorkCall( indexNames, expectedResult ) );
+		return this;
+	}
+
 	public class WorkCallListContext {
 		private final String indexName;
 		private final Consumer<IndexWorkCall> expectationConsumer;
@@ -242,6 +248,8 @@ public class BackendMock implements TestRule {
 
 		private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
+		private final CallQueue<CountWorkCall> countCalls = new CallQueue<>();
+
 		void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, IndexFieldAddBehavior behavior) {
 			indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
 		}
@@ -256,6 +264,10 @@ public class BackendMock implements TestRule {
 
 		CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
 			return searchCalls;
+		}
+
+		CallQueue<CountWorkCall> getCountWorkCalls() {
+			return countCalls;
 		}
 
 		void resetExpectations() {
@@ -340,6 +352,11 @@ public class BackendMock implements TestRule {
 			);
 
 			return CompletableFuture.completedFuture( null );
+		}
+
+		@Override
+		public long executeCountWork(List<String> indexNames) {
+			return countCalls.verify( new CountWorkCall( indexNames, null ), CountWorkCall::verify );
 		}
 	}
 
