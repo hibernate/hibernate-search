@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtil
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -323,6 +324,25 @@ public class SearchResultLoadingOrTransformingIT {
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
+	}
+
+	@Test
+	public void count() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertEquals( 2L, query.executeCount() );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ).toPredicate() )
+				.build();
+
+		assertEquals( 1L, query.executeCount() );
 	}
 
 	private void initData() {
