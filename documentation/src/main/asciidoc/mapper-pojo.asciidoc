@@ -12,7 +12,7 @@ include a description of how to:
  * define a mapping programmatically.
 ////
 
-[[mapper-pojo-field]]
+[[mapper-pojo-directfieldmapping]]
 === Direct field mapping
 
 include::todo-placeholder.asciidoc[]
@@ -21,6 +21,141 @@ include::todo-placeholder.asciidoc[]
 TODO The getting started section has a link pointing here and expects the section to
 include a detailed description of each @*Field annotation.
 ////
+
+Direct field mapping allows to map a property to an index field directly:
+you just need to add an annotation, configure the field through the annotation attributes,
+and Hibernate Search will take care of extracting the property value and populating the index field when necessary.
+
+Direct field mapping looks like this:
+
+.Mapping properties to fields directly
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/directfieldmapping/Book.java[tags=direct-field-mapping]
+----
+<1> Map the `title` property to a full-text field with the same name.
+Some options can be set to customize the fields' behavior, in this case the analyzer (for full-text indexing)
+and the fact that this field is projectable (its value can be retrieved from the index).
+<2> Map the `title` property to *another* field, configured differently:
+it is not analyzed, but simply normalized (i.e. it's not split into multiple tokens),
+and it is stored in such a way that it can be used in sorts.
++
+Mapping a single property to multiple fields is particularly useful when doing full-text search:
+at query time, you can use a different field depending on what you need.
+You can map a property to as many fields as you want, but each must have a unique name.
+<3> Map another property to its own field.
+====
+
+Before you map a property, you must consider two things:
+
+The `@*Field` annotation::
+In its simplest form, direct field mapping is achieved by applying the `@GenericField` annotation to a property.
+This annotation will work for every supported property type, but is rather limited:
+it does not allow full-text search in particular.
+To go further, you will need to rely on different, more specific annotations,
+which offer specific attributes.
+The available annotations are described in details in <<mapper-pojo-directfieldmapping-annotations>>.
+The type of the property::
+In order for the `@*Field` annotation to work correctly, the type of the mapped property must be supported by Hibernate Search.
+See <<mapper-pojo-bridge-valuebridge-builtin>> for a list of all types that are supported out of the box,
+and <<mapper-pojo-directfieldmapping-custom-types>> for indications on how to handle more complex types,
+be it simply containers (`List<String>`, `Map<String, Integer>`, ...)
+or custom types.
+
+Each field annotation has its own attributes, but the following ones are common to most annotations:
+
+`name`::
+The name of the index field. By default, it is the same as the property name.
+You may want to change it in particular when mapping a single property to multiple fields.
++
+Value: `String`. Defaults to the name of the property.
+[[mapper-pojo-directfieldmapping-sortable]] `sortable`::
+Whether the field can be <<mapper-orm-query-sort, sorted on>>,
+i.e. whether a specific data structure is added to the index to allow efficient sorts when querying.
++
+Value: `Sortable.YES`, `Sortable.NO`, `Sortable.DEFAULT`.
++
+[IMPORTANT]
+====
+This option is not available for `@FullTextField`.
+See <<mapper-pojo-directfieldmapping-annotations-fulltextfield,here>> for an explanation and some solutions.
+====
+[[mapper-pojo-directfieldmapping-projectable]] `projectable`::
+Whether the field can be <<mapper-orm-query-projection, projected on>>,
+i.e. whether the field value is stored in the index to allow later retrieval when querying.
++
+Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
+
+[[mapper-pojo-directfieldmapping-annotations]]
+==== Available field annotations
+
+Various direct field mapping annotations exist,
+each offering its own set of customization options:
+
+`@GenericField`::
+A good default choice that will work for every supported property type.
++
+Fields mapped using this annotation do not provide any advanced features such as full-text search:
+matches on a generic field are exact matches.
+
+[[mapper-pojo-directfieldmapping-annotations-fulltextfield]] `@FullTextField`::
+A text field whose value is considered as multiple words.
+Only works for `String` fields.
++
+Matches on a full-text field can be more subtle than exact matches:
+match fields which contains a given word,
+match fields regardless of case,
+match fields ignoring diacritics,
+...
++
+Full-text fields must be assigned an `analyzer`, referenced by its name.
+See <<analysis>> for more details about analyzers and full-text analysis.
++
+IMPORTANT: Full-text fields cannot be sorted on.
+If you need to sort on the value of a property,
+it is recommended to use `@KeywordField`, with a normalizer if necessary (see below).
+Note that multiple fields can be added to the same property,
+so you can use both `@FullTextField` and `@KeywordField` if you need both
+full-text search and sorting.
+
+`@KeywordField`::
+A text field whose value is considered as a single keyword.
+Only works for `String` fields.
++
+Keyword fields allow subtle matches, similarly to full-text fields,
+with the limitation that keyword fields only contain one token.
+On the other hand, this limitation allows keyword fields to be <<mapper-pojo-directfieldmapping-sortable,sorted on>>.
++
+Keyword fields may be assigned a `normalizer`, referenced by its name.
+See <<analysis>> for more details about normalizers and full-text analysis.
+
+[[mapper-pojo-directfieldmapping-custom-types]]
+==== Mapping custom property types
+
+Even types that are not <<mapper-pojo-bridge-valuebridge-builtin,supported out of the box>> can be mapped.
+There are various solutions, some simple and some more powerful,
+but they all come down to extracting data from the unsupported type and convert it to types that are
+supported by the backend.
+
+There are two cases to distinguish:
+
+1. If the unsupported type is simply a container (`List<String>`)
+or multiple nested containers (`Map<Integer, List<String>>`)
+whose elements have a supported type,
+then what you need is a container value extractor.
++
+By default, built-in extractors are transparently applied to standard container types:
+`Iterable` and subtypes, `Map` (extracting the value), `Optional`, `OptionalInt`, ...
+If that is all you need, then no extra configuration is necessary.
++
+If your container is a custom one, or you need a different behavior than the default
+(extract keys instead of values from a `Map`, for example),
+then you will need to set a custom extractor chain on the `@*Field` annotation.
+All `@*Field` annotations expose an `extractor` attribute to that end.
+See <<mapper-pojo-containervalueextractor>> for more information on available extractors and custom extractors.
+2. Otherwise, you will have to rely on a custom component, called a bridge, to extract data from your type.
+See <<mapper-pojo-bridge>> for more information on custom bridges.
 
 [[mapper-pojo-bridge]]
 === Bridges
@@ -69,6 +204,32 @@ The corresponding annotation is `org.hibernate.search.integrationtest.showcase.l
 * `org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge` implements `TypeBridge`.
 The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBridge`.
 
+=== Value bridges
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-pojo-bridge-valuebridge-builtin]]
+==== Built-in value bridges
+
+IMPORTANT: There are few supported types at the moment.
+This will be solved before the 6.0.0.Final release, see https://hibernate.atlassian.net/browse/HSEARCH-3047[HSEARCH-3047].
+
+The following types have built-in value bridges,
+meaning they are supported out-of-the box for <<mapper-pojo-directfieldmapping,direct field mapping>> using `@*Field` annotations:
+
+* `java.lang.String`
+* `java.lang.Integer`
+* `java.lang.Long`
+* `java.lang.Boolean`
+* `java.time.LocalDate`
+* `java.time.Instant`
+* `java.util.Date`
+* All enum types
+
+==== Type bridges and property bridges
+
+include::todo-placeholder.asciidoc[]
+
 [[mapper-pojo-indexedembedded]]
 === Indexed-embedded
 // Search 5 anchors backward compatibility
@@ -79,4 +240,13 @@ include::todo-placeholder.asciidoc[]
 ////
 TODO The getting started section has a link pointing here and expects the section to
 include a detailed description of @IndexedEmbedded
+////
+
+[[mapper-pojo-containervalueextractor]]
+=== Container value extractors
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO Detailed description of container value extractors, list of built-in extractors, instructions to create one's own
 ////

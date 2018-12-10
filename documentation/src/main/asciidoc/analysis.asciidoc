@@ -3,7 +3,11 @@
 // Search 5 anchors backward compatibility
 [[analyzer]]
 
-include::todo-placeholder.asciidoc[]
+[IMPORTANT]
+====
+This section is currently incomplete.
+A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+====
 
 ////
 TODO The getting started section has a link pointing here and expects the section to

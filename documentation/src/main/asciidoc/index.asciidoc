@@ -22,6 +22,8 @@ include::mapper-pojo.asciidoc[]
 
 include::analysis.asciidoc[]
 
+include::mapper-orm-query.asciidoc[]
+
 include::search-dsl.asciidoc[]
 
 include::manual-index.asciidoc[]

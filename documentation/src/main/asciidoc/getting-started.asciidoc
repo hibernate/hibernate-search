@@ -224,7 +224,7 @@ Just remember that Hibernate Search allows more complex mappings:
 
 * Other `@*Field` annotations exist, some of them allowing full-text search,
 some of them allowing finer-grained configuration for field of a certain type.
-You can find out more about `@*Field` annotations in <<mapper-pojo-field>>.
+You can find out more about `@*Field` annotations in <<mapper-pojo-directfieldmapping>>.
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
 See <<mapper-pojo-bridge>> for more information.
 
@@ -430,4 +430,4 @@ were analysis configuration (<<analysis>>) and bridges (<<mapper-pojo-bridge>>).
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include
-<<search-dsl-sort,sorts>> and <<search-dsl-projection,projections>>
+<<mapper-orm-query-sort,sorts>> and <<mapper-orm-query-projection,projections>>
