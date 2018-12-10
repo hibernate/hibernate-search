@@ -29,6 +29,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
+import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -114,13 +115,14 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	}
 
 	private void loadAllFromQueue(SessionImplementor session) throws Exception {
-		try {
+		try ( HibernateOrmSearchManager searchManager = mapping.createSearchManager( session ) ) {
+			PojoSessionWorkExecutor workExecutor = searchManager.createSessionWorkExecutor();
 			List<Serializable> idList;
 			do {
 				idList = source.take();
 				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
-					loadList( idList, session );
+					loadList( idList, session, workExecutor );
 				}
 			}
 			while ( idList != null );
@@ -138,10 +140,11 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	 *
 	 * @param listIds the list of entity identifiers (of type
 	 * @param session the session to be used
+	 * @param workExecutor the work executor to be used
 	 *
 	 * @throws InterruptedException
 	 */
-	private void loadList(List<Serializable> listIds, SessionImplementor session) throws Exception {
+	private void loadList(List<Serializable> listIds, SessionImplementor session, PojoSessionWorkExecutor workExecutor) throws Exception {
 		try {
 			beginTransaction( session );
 
@@ -155,9 +158,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 					.add( Restrictions.in( idName, listIds ) );
 			List<?> list = criteria.list();
 
-
-
-			indexAllQueue( session, list );
+			indexAllQueue( workExecutor, list );
 			session.clear();
 		}
 		finally {
@@ -193,13 +194,12 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		}
 	}
 
-	private void indexAllQueue(SessionImplementor session, List<?> entities) throws InterruptedException, ExecutionException {
+	private void indexAllQueue(PojoSessionWorkExecutor workExecutor, List<?> entities) throws InterruptedException, ExecutionException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}
 
 		monitor.entitiesLoaded( entities.size() );
-		PojoSessionWorkExecutor workExecutor = mapping.createSearchManager( session ).createSessionWorkExecutor();
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
