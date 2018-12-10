@@ -50,20 +50,16 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	@Override
 	public void runWithErrorHandler() throws Exception {
 		if ( wrapInTransaction ) {
-			final StatelessSession statelessSession = batchContext
-					.factory
-					.withStatelessOptions()
+			try ( StatelessSession statelessSession = batchContext.factory.withStatelessOptions()
 					.tenantIdentifier( tenantId )
-					.openStatelessSession();
-
-			if ( transactionTimeout != null ) {
-				batchContext.transactionManager.setTransactionTimeout( transactionTimeout );
+					.openStatelessSession() ) {
+				if ( transactionTimeout != null ) {
+					batchContext.transactionManager.setTransactionTimeout( transactionTimeout );
+				}
+				batchContext.transactionManager.begin();
+				statelessSessionAwareRunnable.run( statelessSession );
+				batchContext.transactionManager.commit();
 			}
-			batchContext.transactionManager.begin();
-			statelessSessionAwareRunnable.run( statelessSession );
-			batchContext.transactionManager.commit();
-
-			statelessSession.close();
 		}
 		else {
 			statelessSessionAwareRunnable.run( null );
