@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.mapper.orm.batchindexing;
+package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Fail.fail;
 
@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.integrationtest.mapper.orm.query.projection.LoadingProjectionIT;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
 import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
@@ -32,7 +31,7 @@ import org.junit.Test;
 /**
  * Very basic test to probe an use of {@link MassIndexer} api.
  */
-public class BasicBatchIndexingIT {
+public class BasicMassIndexingIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -51,7 +50,7 @@ public class BasicBatchIndexingIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( LoadingProjectionIT.Book.INDEX );
+		backendMock.expectAnySchema( Book.INDEX );
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
 				.withPropertyRadical( SearchOrmSettings.Radicals.INDEXING_STRATEGY, IndexingStrategyConfiguration.MANUAL )
@@ -70,7 +69,7 @@ public class BasicBatchIndexingIT {
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
-			backendMock.expectWorksAnyOrder( LoadingProjectionIT.Book.INDEX )
+			backendMock.expectWorksAnyOrder( Book.INDEX )
 					.add( "1", b -> b
 							.field( "title", TITLE_1 )
 							.field( "author", AUTHOR_1 )
@@ -87,7 +86,7 @@ public class BasicBatchIndexingIT {
 
 			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectWorks( LoadingProjectionIT.Book.INDEX )
+			backendMock.expectWorks( Book.INDEX )
 					.purge( ftSession.getTenantIdentifier() )
 					.optimize()
 					.optimize()
@@ -116,7 +115,7 @@ public class BasicBatchIndexingIT {
 
 	@Entity
 	@Table(name = "book")
-	@Indexed(index = LoadingProjectionIT.Book.INDEX)
+	@Indexed(index = Book.INDEX)
 	public static class Book {
 
 		public static final String INDEX = "Book";
