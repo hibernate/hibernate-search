@@ -163,7 +163,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
 			RootBuildContext rootBuildContext = new RootBuildContext( serviceManager, failureCollector );
 
-			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( rootBuildContext, propertySource );
+			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanProvider, propertySource, rootBuildContext );
 
 			// First phase: collect configuration for all mappings
 			for ( Map.Entry<MappingKey<?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
