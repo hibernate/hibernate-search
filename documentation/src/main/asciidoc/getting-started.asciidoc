@@ -296,6 +296,17 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 ====
 
+It is possible to get just the result size, using `getResultSize()` method.
+
+.Using Hibernate Search to count the indexes
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=counting]
+----
+<1> Fetch the result size.
+====
+
 [[getting-started-analysis]]
 === Analysis
 

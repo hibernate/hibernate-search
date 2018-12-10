@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.gettingstarted.withhsearch.withoutanalysis;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -140,6 +141,27 @@ public class GettingStartedWithoutAnalysisIT {
 
 			assertThat( result ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			// tag::counting[]
+			// Not shown: get the entity manager and open a transaction
+			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+
+			FullTextQuery<Book> query = fullTextEntityManager.search( Book.class ).query()
+					.asEntity()
+					.predicate( factory -> factory.match()
+							.onFields( "title", "authors.name" )
+							.matching( "Refactoring: Improving the Design of Existing Code" )
+							.toPredicate()
+					)
+					.build();
+
+			long resultSize = query.getResultSize(); // <1>
+			// Not shown: commit the transaction and close the entity manager
+			// end::counting[]
+
+			assertEquals( 1L, resultSize );
 		} );
 	}
 
