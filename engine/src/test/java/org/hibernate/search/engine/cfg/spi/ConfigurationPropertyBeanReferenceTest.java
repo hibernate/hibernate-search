@@ -19,6 +19,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.test.util.AbstractBeanProviderPartialMock;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
@@ -29,13 +30,7 @@ import org.easymock.EasyMockSupport;
 public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 
 	private final ConfigurationPropertySource sourceMock = createMock( ConfigurationPropertySource.class );
-	/*
-	  * Use a partial mock, so that getBean(BeanReference) just uses its default implementation.
-	  *
-	  * Note we have to mock using an abstract class, otherwise we get an exception
-	  * with message "Partial mocking doesn't make sense for interface"
-	  */
-	private final BeanProvider beanProviderMock = partialMockBuilder( AbstractBeanProviderMock.class ).createMock();
+	private final BeanProvider beanProviderMock = partialMockBuilder( AbstractBeanProviderPartialMock.class ).createMock();
 
 	@Test
 	public void withDefault() {
@@ -374,6 +369,4 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 	private class SimulatedFailure extends RuntimeException {
 	}
 
-	private abstract class AbstractBeanProviderMock implements BeanProvider {
-	}
 }

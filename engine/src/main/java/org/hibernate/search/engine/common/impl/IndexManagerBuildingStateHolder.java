@@ -46,17 +46,19 @@ class IndexManagerBuildingStateHolder {
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
 			ConfigurationProperty.forKey( "type" ).asBeanReference( BackendFactory.class ).build();
 
-	private final RootBuildContext rootBuildContext;
+	private final BeanProvider beanProvider;
 	private final ConfigurationPropertySource propertySource;
+	private final RootBuildContext rootBuildContext;
 	private final ConfigurationPropertySource defaultIndexPropertySource;
 
 	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new HashMap<>();
 	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
 
-	IndexManagerBuildingStateHolder(RootBuildContext rootBuildContext,
-			ConfigurationPropertySource propertySource) {
-		this.rootBuildContext = rootBuildContext;
+	IndexManagerBuildingStateHolder(BeanProvider beanProvider, ConfigurationPropertySource propertySource,
+			RootBuildContext rootBuildContext) {
+		this.beanProvider = beanProvider;
 		this.propertySource = propertySource;
+		this.rootBuildContext = rootBuildContext;
 		this.defaultIndexPropertySource = propertySource.withMask( "indexes.default" );
 	}
 
@@ -107,7 +109,6 @@ class IndexManagerBuildingStateHolder {
 
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
-		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,
