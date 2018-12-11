@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -27,6 +29,7 @@ import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBi
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 
@@ -34,6 +37,8 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  * @author Yoann Rodiere
  */
 class IndexManagerBuildingStateHolder {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<String> INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( "backend" ).asString().build();
@@ -58,8 +63,14 @@ class IndexManagerBuildingStateHolder {
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
 		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName )
 				.withFallback( defaultIndexPropertySource );
-		// TODO HSEARCH-3442 more checks on the backend name (is non-null, non-empty) => use INDEX_BACKEND_NAME.getOrThrow?
-		String backendName = INDEX_BACKEND_NAME.get( indexPropertySource ).get();
+		String backendName = INDEX_BACKEND_NAME.getOrThrow(
+				indexPropertySource,
+				key -> log.indexBackendCannotBeNullOrEmpty(
+						indexName, key,
+						// Retrieve the resolved *default* key (*.indexes.default.backend) from the default source
+						INDEX_BACKEND_NAME.resolveOrRaw( defaultIndexPropertySource )
+				)
+		);
 		BackendBuildingState<?> backendBuildingstate =
 				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
 
@@ -97,9 +108,12 @@ class IndexManagerBuildingStateHolder {
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource = propertySource.withMask( "backends." + backendName );
 		BeanProvider beanProvider = rootBuildContext.getServiceManager().getBeanProvider();
-		// TODO HSEARCH-3442 properly check that there is a value before calling get() => use BACKEND_TYPE.getOrThrow;
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
-				BACKEND_TYPE.getAndMap( backendPropertySource, beanProvider::getBean ).get() ) {
+				BACKEND_TYPE.getAndMapOrThrow(
+						backendPropertySource,
+						beanProvider::getBean,
+						key -> log.backendTypeCannotBeNullOrEmpty( backendName, key )
+				) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
 			BackendImplementor<?> backend = backendFactoryHolder.get()

@@ -238,4 +238,16 @@ public interface Log extends BasicLogger {
 	SearchException invalidBeanType(
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualType);
+
+	@Message(id = ID_OFFSET_2 + 49,
+			value = "Missing backend type for backend '%1$s'."
+					+ " Set the property '%2$s' to a supported value."
+	)
+	SearchException backendTypeCannotBeNullOrEmpty(String backendName, String key);
+
+	@Message(id = ID_OFFSET_2 + 50,
+			value = "Missing backend reference for index '%1$s'."
+					+ " Set the property '%2$s' to a supported value or set '%3$s' to set a default value for all indexes."
+	)
+	SearchException indexBackendCannotBeNullOrEmpty(String indexName, String key, String defaultKey);
 }

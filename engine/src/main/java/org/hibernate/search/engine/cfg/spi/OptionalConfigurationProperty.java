@@ -24,6 +24,8 @@ public interface OptionalConfigurationProperty<T> extends ConfigurationProperty<
 	 * such as the {@link #resolveOrRaw(ConfigurationPropertySource) resolved key} for this property.
 	 *
 	 * @param source A configuration source.
+	 * @param transform A transform function to be applied to the value of this configuration property
+	 * before returning the result.
 	 * @return The value of this property according to the given source.
 	 */
 	<R> Optional<R> getAndMap(ConfigurationPropertySource source, Function<T, R> transform);
@@ -37,5 +39,21 @@ public interface OptionalConfigurationProperty<T> extends ConfigurationProperty<
 	 * @return The value of this property according to the given source.
 	 */
 	T getOrThrow(ConfigurationPropertySource source, Function<String, RuntimeException> exceptionFunction);
+
+	/**
+	 * Get and transform the value of this configuration property, throwing an exception if the value is not present.
+	 * <p>
+	 * Any exception occurring during transformation will be wrapped in another exception adding some context,
+	 * such as the {@link #resolveOrRaw(ConfigurationPropertySource) resolved key} for this property.
+	 *
+	 * @param source A configuration source.
+	 * @param transform A transform function to be applied to the value of this configuration property
+	 * before returning the result.
+	 * @param exceptionFunction A function that will be called with the property key as a parameter
+	 * to create an exception if the value is missing.
+	 * @return The value of this property according to the given source.
+	 */
+	<R> R getAndMapOrThrow(ConfigurationPropertySource source, Function<T, R> transform,
+			Function<String, RuntimeException> exceptionFunction);
 
 }
