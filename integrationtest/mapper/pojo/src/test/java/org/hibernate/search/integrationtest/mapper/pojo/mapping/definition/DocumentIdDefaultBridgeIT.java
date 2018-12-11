@@ -12,7 +12,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -23,9 +26,14 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
+import org.easymock.Capture;
 
 /**
  * Test default identifier bridges for the {@code @DocumentId} annotation.
@@ -158,7 +166,8 @@ public class DocumentIdDefaultBridgeIT {
 	private <E, I> void doTestBridge(Class<E> entityType,
 			Function<I, E> newEntityFunction, I identifierValue, String identifierAsString) {
 		// Schema
-		backendMock.expectSchema( INDEX_NAME, b -> { } );
+		Capture<StubIndexSchemaNode> schemaCapture = Capture.newInstance();
+		backendMock.expectSchema( INDEX_NAME, b -> { }, schemaCapture );
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
 		backendMock.verifyExpectationsMet();
 
@@ -195,6 +204,33 @@ public class DocumentIdDefaultBridgeIT {
 					.hasHitsExactOrder( new PojoReferenceImpl( entityType, identifierValue ) );
 		}
 		backendMock.verifyExpectationsMet();
+
+		// DSL converter (to be used by the backend)
+		StubIndexSchemaNode rootSchemaNode = schemaCapture.getValue();
+		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
+		@SuppressWarnings("unchecked")
+		ToIndexIdValueConverter<I> dslToIndexConverter =
+				(ToIndexIdValueConverter<I>) rootSchemaNode.getIdDslConverter();
+		ToIndexIdValueConvertContextImpl convertContext =
+				new ToIndexIdValueConvertContextImpl( new JavaBeanMappingContext() );
+		// isCompatibleWith must return true when appropriate
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		// convert and convertUnknown must behave appropriately on valid input
+		Assertions.assertThat(
+				dslToIndexConverter.convert( identifierValue, convertContext )
+		)
+				.isEqualTo( identifierAsString );
+		Assertions.assertThat(
+				dslToIndexConverter.convertUnknown( identifierValue, convertContext )
+		)
+				.isEqualTo( identifierAsString );
+		// convertUnknown must throw a runtime exception on invalid input
+		SubTest.expectException(
+				"convertUnknown on invalid input",
+				() -> dslToIndexConverter.convertUnknown( new Object(), convertContext )
+		)
+				.assertThrown()
+				.isInstanceOf( RuntimeException.class );
 	}
 
 }

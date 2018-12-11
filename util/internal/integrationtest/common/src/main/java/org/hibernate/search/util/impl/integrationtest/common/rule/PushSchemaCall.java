@@ -11,14 +11,24 @@ import java.util.Objects;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeNodeAssert;
 
+import org.easymock.Capture;
+
 class PushSchemaCall extends Call<PushSchemaCall> {
 
 	private final String indexName;
 	private final StubIndexSchemaNode schemaNode;
+	private final Capture<StubIndexSchemaNode> capture;
 
 	PushSchemaCall(String indexName, StubIndexSchemaNode schemaNode) {
 		this.indexName = indexName;
 		this.schemaNode = schemaNode;
+		this.capture = null;
+	}
+
+	PushSchemaCall(String indexName, StubIndexSchemaNode schemaNode, Capture<StubIndexSchemaNode> capture) {
+		this.indexName = indexName;
+		this.schemaNode = schemaNode;
+		this.capture = capture;
 	}
 
 	public Void verify(PushSchemaCall actualCall) {
@@ -26,6 +36,7 @@ class PushSchemaCall extends Call<PushSchemaCall> {
 			StubTreeNodeAssert.assertThat( actualCall.schemaNode )
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
 					.matches( schemaNode );
+			capture.setValue( actualCall.schemaNode );
 		}
 		return null;
 	}

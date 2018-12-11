@@ -31,6 +31,8 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
+import org.easymock.Capture;
+
 public class BackendMock implements TestRule {
 
 	private final String backendName;
@@ -87,10 +89,15 @@ public class BackendMock implements TestRule {
 	}
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor) {
+		return expectSchema( indexName, contributor, Capture.newInstance() );
+	}
+
+	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
+			Capture<StubIndexSchemaNode> capture) {
 		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
-		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, builder.build() ) );
+		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, builder.build(), capture ) );
 		return this;
 	}
 
