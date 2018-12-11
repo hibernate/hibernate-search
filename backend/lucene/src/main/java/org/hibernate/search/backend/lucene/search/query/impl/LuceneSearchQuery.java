@@ -8,8 +8,6 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import java.util.Set;
 
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
@@ -17,6 +15,9 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
+
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
 
 
 /**
@@ -83,12 +84,12 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public long executeCount() {
-		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<T>(
-				indexNames,
-				readerProviders,
-				luceneQuery, luceneSort,
-				firstResultIndex, 0L,
-				luceneCollectorProvider, searchResultExtractor ) );
+		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<>(
+				indexNames, readerProviders, luceneQuery, luceneSort, firstResultIndex, 0L,
+				// do not add any TopDocs collector
+				( luceneCollectorBuilder -> { } ),
+				searchResultExtractor
+		) );
 		return queryOrchestrator.submit( work ).join().getHitCount();
 	}
 }
