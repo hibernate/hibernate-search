@@ -8,16 +8,16 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-public class LuceneIntegerFieldSortBuilderFactory<F>
-		extends AbstractLuceneStandardFieldSortBuilderFactory<F, LuceneStandardFieldCodec<F, Integer>> {
+public class LuceneNumericFieldSortBuilderFactory<F, E>
+		extends AbstractLuceneStandardFieldSortBuilderFactory<F, LuceneNumericFieldCodec<F, E>> {
 
-	public LuceneIntegerFieldSortBuilderFactory(boolean sortable,
+	public LuceneNumericFieldSortBuilderFactory(boolean sortable,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			LuceneStandardFieldCodec<F, Integer> codec) {
+			LuceneNumericFieldCodec<F, E> codec) {
 		super( sortable, converter, codec );
 	}
 
@@ -26,6 +26,6 @@ public class LuceneIntegerFieldSortBuilderFactory<F>
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new LuceneIntegerFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+		return new LuceneNumericFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

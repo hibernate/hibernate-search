@@ -14,7 +14,7 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneBooleanFieldCodec implements LuceneStandardFieldCodec<Boolean, Integer> {
+public final class LuceneBooleanFieldCodec implements LuceneNumericFieldCodec<Boolean, Integer> {
 
 	private final boolean projectable;
 
@@ -73,6 +73,11 @@ public final class LuceneBooleanFieldCodec implements LuceneStandardFieldCodec<B
 	@Override
 	public Integer encode(Boolean value) {
 		return value ? 1 : 0;
+	}
+
+	@Override
+	public LuceneNumericDomain<Integer> getDomain() {
+		return LuceneNumericDomain.INTEGER;
 	}
 
 }

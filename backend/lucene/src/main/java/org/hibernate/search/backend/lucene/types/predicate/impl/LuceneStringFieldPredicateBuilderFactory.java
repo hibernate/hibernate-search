@@ -11,7 +11,6 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 

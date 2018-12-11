@@ -13,7 +13,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneIntegerFieldCodec implements LuceneStandardFieldCodec<Integer, Integer> {
+public final class LuceneIntegerFieldCodec implements LuceneNumericFieldCodec<Integer, Integer> {
 
 	private final boolean projectable;
 
@@ -70,5 +70,10 @@ public final class LuceneIntegerFieldCodec implements LuceneStandardFieldCodec<I
 	@Override
 	public Integer encode(Integer value) {
 		return value;
+	}
+
+	@Override
+	public LuceneNumericDomain<Integer> getDomain() {
+		return LuceneNumericDomain.INTEGER;
 	}
 }

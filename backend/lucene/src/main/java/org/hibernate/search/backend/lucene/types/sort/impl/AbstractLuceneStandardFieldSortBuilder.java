@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractLuceneStandardFieldSortBuilder<F, C extends LuceneStandardFieldCodec<F, ?>>
+abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 		extends AbstractLuceneSearchSortBuilder
 		implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
