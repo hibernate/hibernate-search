@@ -54,8 +54,8 @@ public class LuceneIntegerIndexSchemaFieldContext
 				parentNode,
 				getRelativeFieldName(),
 				codec,
-				new LuceneIntegerFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
-				new LuceneIntegerFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneIntegerFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new LuceneIntegerFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 

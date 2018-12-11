@@ -10,23 +10,22 @@ import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneStringFieldSortBuilder
-		extends AbstractLuceneStandardFieldSortBuilder<String, LuceneTextFieldCodec<String>> {
+public class LuceneStringFieldSortBuilder<F>
+		extends AbstractLuceneStandardFieldSortBuilder<F, LuceneTextFieldCodec<F>> {
 
 	LuceneStringFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends String> converter,
-			LuceneTextFieldCodec<String> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneTextFieldCodec<F> codec) {
 		super( searchContext, absoluteFieldPath, converter, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}
 
 	@Override
-	protected Object encodeMissingAs(String converted) {
+	protected Object encodeMissingAs(F converted) {
 		return codec.normalize( absoluteFieldPath, codec.encode( converted ) );
 	}
 

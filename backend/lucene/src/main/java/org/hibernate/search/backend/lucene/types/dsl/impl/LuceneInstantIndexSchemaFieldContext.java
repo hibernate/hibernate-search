@@ -14,9 +14,9 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneInstantFieldCodec;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneInstantFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLongFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneInstantFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLongFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
@@ -54,8 +54,8 @@ public class LuceneInstantIndexSchemaFieldContext
 				parentNode,
 				getRelativeFieldName(),
 				codec,
-				new LuceneInstantFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
-				new LuceneInstantFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneLongFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new LuceneLongFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 

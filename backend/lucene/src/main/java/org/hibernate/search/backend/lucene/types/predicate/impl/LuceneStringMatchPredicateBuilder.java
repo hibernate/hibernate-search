@@ -13,25 +13,24 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneMatchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneStringMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<String> {
-
-	private final LuceneStringFieldCodec codec;
+class LuceneStringMatchPredicateBuilder<F>
+		extends AbstractLuceneStandardMatchPredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
 	private final QueryBuilder queryBuilder;
 
 	LuceneStringMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends String> converter,
-			LuceneStringFieldCodec codec,
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
-		super( searchContext, absoluteFieldPath, converter );
-		this.codec = codec;
+		super( searchContext, absoluteFieldPath, converter, codec );
 		this.queryBuilder = queryBuilder;
 	}
 

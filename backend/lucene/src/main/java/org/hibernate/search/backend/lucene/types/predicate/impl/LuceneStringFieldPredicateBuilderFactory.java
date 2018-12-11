@@ -11,16 +11,17 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-public final class LuceneStringFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<String, LuceneStringFieldCodec> {
+public final class LuceneStringFieldPredicateBuilderFactory<F>
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
 	private final QueryBuilder queryBuilder;
 
-	public LuceneStringFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends String> converter,
-			LuceneStringFieldCodec codec,
+	public LuceneStringFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
 		super( converter, codec );
 		this.queryBuilder = queryBuilder;
@@ -31,19 +32,19 @@ public final class LuceneStringFieldPredicateBuilderFactory
 		if ( !super.isDslCompatibleWith( other ) ) {
 			return false;
 		}
-		LuceneStringFieldPredicateBuilderFactory castedOther = (LuceneStringFieldPredicateBuilderFactory) other;
+		LuceneStringFieldPredicateBuilderFactory<?> castedOther = (LuceneStringFieldPredicateBuilderFactory<?>) other;
 		return Objects.equals( queryBuilder, castedOther.queryBuilder );
 	}
 
 	@Override
-	public LuceneStringMatchPredicateBuilder createMatchPredicateBuilder(
+	public LuceneStringMatchPredicateBuilder<?> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, codec, queryBuilder );
+		return new LuceneStringMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec, queryBuilder );
 	}
 
 	@Override
-	public LuceneStringRangePredicateBuilder createRangePredicateBuilder(
+	public LuceneStringRangePredicateBuilder<?> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringRangePredicateBuilder( searchContext, absoluteFieldPath, converter, codec );
+		return new LuceneStringRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

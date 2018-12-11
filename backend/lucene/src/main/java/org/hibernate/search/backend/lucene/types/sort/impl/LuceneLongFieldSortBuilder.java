@@ -14,13 +14,13 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 import org.apache.lucene.search.SortField;
 
-public class LuceneLongFieldSortBuilder
-		extends AbstractLuceneStandardFieldSortBuilder<Long, LuceneStandardFieldCodec<Long, ?>> {
+public class LuceneLongFieldSortBuilder<F>
+		extends AbstractLuceneStandardFieldSortBuilder<F, LuceneStandardFieldCodec<F, Long>> {
 
 	LuceneLongFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends Long> converter,
-			LuceneStandardFieldCodec<Long, ?> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneStandardFieldCodec<F, Long> codec) {
 		super( searchContext, absoluteFieldPath, converter, codec, Long.MIN_VALUE, Long.MAX_VALUE );
 	}
 

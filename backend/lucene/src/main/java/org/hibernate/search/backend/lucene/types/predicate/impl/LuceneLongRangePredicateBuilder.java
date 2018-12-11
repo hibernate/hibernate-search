@@ -7,20 +7,23 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 
-class LuceneLongRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<Long> {
+class LuceneLongRangePredicateBuilder<F>
+		extends AbstractLuceneStandardRangePredicateBuilder<F, Long, LuceneStandardFieldCodec<F, Long>> {
 
 	LuceneLongRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends Long> converter) {
-		super( searchContext, absoluteFieldPath, converter );
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneStandardFieldCodec<F, Long> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override

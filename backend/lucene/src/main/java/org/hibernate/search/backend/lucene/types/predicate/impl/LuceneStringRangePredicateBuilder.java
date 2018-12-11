@@ -10,22 +10,21 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneStringRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<String> {
-
-	private final LuceneStringFieldCodec codec;
+class LuceneStringRangePredicateBuilder<F>
+		extends AbstractLuceneStandardRangePredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
 	LuceneStringRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends String> converter,
-			LuceneStringFieldCodec codec) {
-		super( searchContext, absoluteFieldPath, converter );
-		this.codec = codec;
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneTextFieldCodec<F> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override
