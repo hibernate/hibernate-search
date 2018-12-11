@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -56,14 +56,14 @@ public class ElasticsearchSearchTargetModel {
 		return indexModels;
 	}
 
-	public ToIndexIdValueConverter<?> getIdDslConverter() {
+	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
 		ElasticsearchIndexModel indexModelForSelectedIdConverter = iterator.next();
-		ToIndexIdValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
+		ToDocumentIdentifierValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
 
 		while ( iterator.hasNext() ) {
 			ElasticsearchIndexModel indexModel = iterator.next();
-			ToIndexIdValueConverter<?> idConverter = indexModel.getIdDslConverter();
+			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
 				throw log.conflictingIdentifierTypesForPredicate(
 						selectedIdConverter, idConverter,

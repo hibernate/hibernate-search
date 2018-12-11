@@ -19,8 +19,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
-import org.hibernate.search.engine.backend.document.converter.spi.StringToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -32,7 +32,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private RoutingType routing = null;
-	private ToIndexIdValueConverter<?> idDslConverter;
+	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(String hibernateSearchIndexName,
 			MultiTenancyStrategy multiTenancyStrategy) {
@@ -52,7 +52,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public void idDslConverter(ToIndexIdValueConverter<?> idDslConverter) {
+	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
 		this.idDslConverter = idDslConverter;
 	}
 
@@ -91,7 +91,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 				elasticsearchIndexName,
 				settingsBuilder,
 				mapping,
-				idDslConverter == null ? new StringToIndexIdValueConverter() : idDslConverter,
+				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodes,
 				fieldNodes
 		);

@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -410,6 +410,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 68,
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
-	SearchException conflictingIdentifierTypesForPredicate(ToIndexIdValueConverter<?> component1,
-			ToIndexIdValueConverter<?> component2, @Param EventContext context);
+	SearchException conflictingIdentifierTypesForPredicate(ToDocumentIdentifierValueConverter<?> component1,
+			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 }

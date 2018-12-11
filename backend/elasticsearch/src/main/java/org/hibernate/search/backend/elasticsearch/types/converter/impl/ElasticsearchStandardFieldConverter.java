@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.converter.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 
 import com.google.gson.JsonElement;
 
 public final class ElasticsearchStandardFieldConverter<F> implements ElasticsearchFieldConverter {
 
-	private final UserIndexFieldConverter<F> userConverter;
+	private final UserDocumentFieldConverter<F> userConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
-	public ElasticsearchStandardFieldConverter(UserIndexFieldConverter<F> userConverter, ElasticsearchFieldCodec<F> codec) {
+	public ElasticsearchStandardFieldConverter(UserDocumentFieldConverter<F> userConverter, ElasticsearchFieldCodec<F> codec) {
 		this.userConverter = userConverter;
 		this.codec = codec;
 	}
@@ -29,13 +29,13 @@ public final class ElasticsearchStandardFieldConverter<F> implements Elasticsear
 	}
 
 	@Override
-	public JsonElement convertDslToIndex(Object value, ToIndexFieldValueConvertContext context) {
+	public JsonElement convertDslToIndex(Object value, ToDocumentFieldValueConvertContext context) {
 		F rawValue = userConverter.convertDslToIndex( value, context );
 		return codec.encode( rawValue );
 	}
 
 	@Override
-	public Object convertIndexToProjection(JsonElement element, FromIndexFieldValueConvertContext context) {
+	public Object convertIndexToProjection(JsonElement element, FromDocumentFieldValueConvertContext context) {
 		F rawValue = codec.decode( element );
 		return userConverter.convertIndexToProjection( rawValue, context );
 	}

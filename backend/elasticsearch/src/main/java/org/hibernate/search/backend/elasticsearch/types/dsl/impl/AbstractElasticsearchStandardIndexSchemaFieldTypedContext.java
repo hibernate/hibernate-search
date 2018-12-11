@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
@@ -35,14 +35,14 @@ public abstract class AbstractElasticsearchStandardIndexSchemaFieldTypedContext<
 
 	@Override
 	public S dslConverter(
-			ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+			ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
 	public S projectionConverter(
-			FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+			FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return thisAsS();
 	}

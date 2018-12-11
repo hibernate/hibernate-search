@@ -20,8 +20,8 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -56,14 +56,14 @@ public class ElasticsearchJsonStringIndexSchemaFieldContext implements
 
 	@Override
 	public ElasticsearchJsonStringIndexSchemaFieldContext dslConverter(
-			ToIndexFieldValueConverter<?, ? extends String> toIndexConverter) {
+			ToDocumentFieldValueConverter<?, ? extends String> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return this;
 	}
 
 	@Override
 	public ElasticsearchJsonStringIndexSchemaFieldContext projectionConverter(
-			FromIndexFieldValueConverter<? super String, ?> fromIndexConverter) {
+			FromDocumentFieldValueConverter<? super String, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return this;
 	}

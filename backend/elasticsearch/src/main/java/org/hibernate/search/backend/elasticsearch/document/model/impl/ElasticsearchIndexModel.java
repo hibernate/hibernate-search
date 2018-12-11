@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 
@@ -26,14 +26,14 @@ public class ElasticsearchIndexModel {
 	private final RootTypeMapping mapping;
 	private final IndexSettings settings;
 
-	private final ToIndexIdValueConverter<?> idDslConverter;
+	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
 
 	public ElasticsearchIndexModel(String hibernateSearchIndexName,
 			URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
-			RootTypeMapping mapping, ToIndexIdValueConverter<?> idDslConverter,
+			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
 			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
@@ -65,7 +65,7 @@ public class ElasticsearchIndexModel {
 		return settings;
 	}
 
-	public ToIndexIdValueConverter<?> getIdDslConverter() {
+	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
 	}
 

@@ -10,10 +10,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
@@ -92,7 +92,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void toIndexValueConverter() {
-		ToIndexFieldValueConvertContext context = new ToIndexFieldValueConvertContextImpl( mappingContext );
+		ToDocumentFieldValueConvertContext context = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
@@ -101,7 +101,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void fromIndexValueConverter() {
-		FromIndexFieldValueConvertContext context = new FromIndexFieldValueConvertContextImpl( sessionContext );
+		FromDocumentFieldValueConvertContext context = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );

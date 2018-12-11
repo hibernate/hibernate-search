@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -339,7 +339,7 @@ public class BackendMock implements TestRule {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-				FromIndexFieldValueConvertContext convertContext,
+				FromDocumentFieldValueConvertContext convertContext,
 				ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 			return searchCalls.verify(
 					new SearchWorkCall<>( indexNames, work, convertContext, projectionHitMapper, rootProjection ),

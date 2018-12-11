@@ -10,15 +10,15 @@ import java.util.Objects;
 
 import org.apache.lucene.analysis.Analyzer;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
 public final class LuceneStringFieldConverter extends AbstractLuceneFieldConverter<String, String> {
 
 	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldConverter(UserIndexFieldConverter<String> userConverter, Analyzer analyzerOrNormalizer) {
+	public LuceneStringFieldConverter(UserDocumentFieldConverter<String> userConverter, Analyzer analyzerOrNormalizer) {
 		super( userConverter );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
@@ -30,7 +30,7 @@ public final class LuceneStringFieldConverter extends AbstractLuceneFieldConvert
 
 	@Override
 	public String convertDslToIndex(Object value,
-			ToIndexFieldValueConvertContext context) {
+			ToDocumentFieldValueConvertContext context) {
 		return userConverter.convertDslToIndex( value, context );
 	}
 

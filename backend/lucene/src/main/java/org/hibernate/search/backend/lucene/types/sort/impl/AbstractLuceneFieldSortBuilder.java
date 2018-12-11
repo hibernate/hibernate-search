@@ -60,7 +60,7 @@ abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBu
 	@Override
 	public void missingAs(Object value) {
 		try {
-			missingValue = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			missingValue = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

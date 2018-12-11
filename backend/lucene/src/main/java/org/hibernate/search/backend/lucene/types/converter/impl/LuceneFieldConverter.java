@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 /**
  * Defines how a given value will be converted when performing search queries.
@@ -27,37 +27,37 @@ public interface LuceneFieldConverter<F, T> {
 	 * @return A value of the type used internally when querying this field.
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
-	T convertDslToIndex(Object value, ToIndexFieldValueConvertContext context);
+	T convertDslToIndex(Object value, ToDocumentFieldValueConvertContext context);
 
 	/**
 	 * @param indexValue The projected value returned by the codec.
 	 * @param context The context to use when converting.
 	 * @return A value of the type expected by users when projecting.
 	 */
-	Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context);
+	Object convertIndexToProjection(F indexValue, FromDocumentFieldValueConvertContext context);
 
 	/**
-	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertDslToIndexCompatibleWith(UserIndexFieldConverter)
+	 * @see UserDocumentFieldConverter#isConvertDslToIndexCompatibleWith(UserDocumentFieldConverter)
 	 *
 	 * @param other Another {@link LuceneFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
 	boolean isConvertDslToIndexCompatibleWith(LuceneFieldConverter<?, ?> other);
 
 	/**
-	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)}
 	 * method is compatible with this one's.
 	 * <p>
-	 * @see org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter#isConvertIndexToProjectionCompatibleWith(UserIndexFieldConverter)
+	 * @see UserDocumentFieldConverter#isConvertIndexToProjectionCompatibleWith(UserDocumentFieldConverter)
 	 *
 	 * @param other Another {@link LuceneFieldConverter}, never {@code null}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
 	boolean isConvertIndexToProjectionCompatibleWith(LuceneFieldConverter<?, ?> other);

@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 abstract class AbstractLuceneFieldConverter<F, T> implements LuceneFieldConverter<F, T> {
 
-	final UserIndexFieldConverter<F> userConverter;
+	final UserDocumentFieldConverter<F> userConverter;
 
-	AbstractLuceneFieldConverter(UserIndexFieldConverter<F> userConverter) {
+	AbstractLuceneFieldConverter(UserDocumentFieldConverter<F> userConverter) {
 		this.userConverter = userConverter;
 	}
 
@@ -23,7 +23,7 @@ abstract class AbstractLuceneFieldConverter<F, T> implements LuceneFieldConverte
 	}
 
 	@Override
-	public Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context) {
+	public Object convertIndexToProjection(F indexValue, FromDocumentFieldValueConvertContext context) {
 		return userConverter.convertIndexToProjection( indexValue, context );
 	}
 

@@ -8,41 +8,41 @@ package org.hibernate.search.integrationtest.backend.tck.util;
 
 import java.util.Objects;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
 
 /**
  * A value wrapper used when testing
- * {@link IndexSchemaFieldTypedContext#dslConverter(ToIndexFieldValueConverter) DSL converters}
- * and {@link IndexSchemaFieldTypedContext#projectionConverter(FromIndexFieldValueConverter) projection converters}.
+ * {@link IndexSchemaFieldTypedContext#dslConverter(ToDocumentFieldValueConverter) DSL converters}
+ * and {@link IndexSchemaFieldTypedContext#projectionConverter(FromDocumentFieldValueConverter) projection converters}.
  */
 public final class ValueWrapper<T> {
-	public static <T> ToIndexFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
-		return new ToIndexFieldValueConverter<ValueWrapper<T>, T>() {
+	public static <T> ToDocumentFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
+		return new ToDocumentFieldValueConverter<ValueWrapper<T>, T>() {
 
 			@Override
-			public T convert(ValueWrapper<T> value, ToIndexFieldValueConvertContext context) {
+			public T convert(ValueWrapper<T> value, ToDocumentFieldValueConvertContext context) {
 				return value.getValue();
 			}
 
 			@SuppressWarnings("unchecked")
 			@Override
-			public T convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
+			public T convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
 				return ( (ValueWrapper<T>) value ).getValue();
 			}
 
 			@Override
-			public boolean isCompatibleWith(ToIndexFieldValueConverter<?, ?> other) {
+			public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
 				return other != null && getClass().equals( other.getClass() );
 			}
 		};
 	}
 
-	public static <T> FromIndexFieldValueConverter<T, ValueWrapper<T>> fromIndexFieldConverter() {
-		return new FromIndexFieldValueConverter<T, ValueWrapper<T>>() {
+	public static <T> FromDocumentFieldValueConverter<T, ValueWrapper<T>> fromIndexFieldConverter() {
+		return new FromDocumentFieldValueConverter<T, ValueWrapper<T>>() {
 			@Override
 			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
 				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
@@ -50,12 +50,12 @@ public final class ValueWrapper<T> {
 
 			@Override
 			public ValueWrapper<T> convert(T indexedValue,
-					FromIndexFieldValueConvertContext context) {
+					FromDocumentFieldValueConvertContext context) {
 				return new ValueWrapper<>( indexedValue );
 			}
 
 			@Override
-			public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+			public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 				return other != null && getClass().equals( other.getClass() );
 			}
 		};

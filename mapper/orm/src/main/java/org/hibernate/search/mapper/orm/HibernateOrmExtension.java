@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.orm;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
@@ -36,8 +36,8 @@ public final class HibernateOrmExtension
 		TypeBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		PropertyBridgeWriteContextExtension<HibernateOrmSessionContext>,
 		ValueBridgeToIndexedValueContextExtension<HibernateOrmMappingContext>,
-		ToIndexFieldValueConvertContextExtension<HibernateOrmMappingContext>,
-		FromIndexFieldValueConvertContextExtension<HibernateOrmSessionContext> {
+		ToDocumentFieldValueConvertContextExtension<HibernateOrmMappingContext>,
+		FromDocumentFieldValueConvertContextExtension<HibernateOrmSessionContext> {
 
 	private static final HibernateOrmExtension INSTANCE = new HibernateOrmExtension();
 
@@ -107,7 +107,7 @@ public final class HibernateOrmExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<HibernateOrmMappingContext> extendOptional(ToIndexFieldValueConvertContext original,
+	public Optional<HibernateOrmMappingContext> extendOptional(ToDocumentFieldValueConvertContext original,
 			MappingContextImplementor mappingContext) {
 		return extendToOrmMappingContext( mappingContext );
 	}
@@ -116,7 +116,7 @@ public final class HibernateOrmExtension
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<HibernateOrmSessionContext> extendOptional(FromIndexFieldValueConvertContext original,
+	public Optional<HibernateOrmSessionContext> extendOptional(FromDocumentFieldValueConvertContext original,
 			SessionContextImplementor sessionContext) {
 		return extendToOrmSessionContext( sessionContext );
 	}

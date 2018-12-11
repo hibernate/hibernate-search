@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -39,7 +39,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			ProjectionHitMapper<?, O> projectionHitMapper) {
 		return new StubSearchQueryBuilder<>(
 				backend, targetModel, StubSearchWork.ResultType.OBJECTS,
-				new FromIndexFieldValueConvertContextImpl( sessionContext ),
+				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				StubObjectSearchProjection.get()
 		);
@@ -50,7 +50,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			ProjectionHitMapper<?, ?> projectionHitMapper) {
 		return new StubSearchQueryBuilder<>(
 				backend, targetModel, StubSearchWork.ResultType.REFERENCES,
-				new FromIndexFieldValueConvertContextImpl( sessionContext ),
+				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				StubReferenceSearchProjection.get()
 		);
@@ -61,7 +61,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<T> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, targetModel, StubSearchWork.ResultType.PROJECTIONS,
-				new FromIndexFieldValueConvertContextImpl( sessionContext ),
+				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				(StubSearchProjection<T>) projection
 		);
@@ -72,7 +72,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, targetModel, StubSearchWork.ResultType.PROJECTIONS,
-				new FromIndexFieldValueConvertContextImpl( sessionContext ),
+				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				createRootProjection( projections )
 		);

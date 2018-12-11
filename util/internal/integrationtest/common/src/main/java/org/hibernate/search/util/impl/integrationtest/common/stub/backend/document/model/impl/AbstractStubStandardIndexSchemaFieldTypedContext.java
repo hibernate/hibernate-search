@@ -7,8 +7,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
@@ -35,13 +35,13 @@ abstract class AbstractStubStandardIndexSchemaFieldTypedContext<S extends Abstra
 	abstract S thisAsS();
 
 	@Override
-	public S dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter) {
+	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
-	public S projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter) {
+	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return thisAsS();
 	}

@@ -17,8 +17,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
-import org.hibernate.search.engine.backend.document.converter.spi.StringToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
@@ -28,7 +28,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	private final String indexName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private ToIndexIdValueConverter<?> idDslConverter;
+	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public LuceneIndexSchemaRootNodeBuilder(String indexName,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
@@ -48,7 +48,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public void idDslConverter(ToIndexIdValueConverter<?> idDslConverter) {
+	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
 		this.idDslConverter = idDslConverter;
 	}
 
@@ -90,7 +90,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		return new LuceneIndexModel(
 				indexName,
-				idDslConverter == null ? new StringToIndexIdValueConverter() : idDslConverter,
+				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodesBuilder,
 				fieldNodesBuilder,
 				scopedAnalyzerBuilder.build()

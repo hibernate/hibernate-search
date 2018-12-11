@@ -103,7 +103,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			bridge.bind( new IdentifierBridgeBindingContextImpl<>(
 					new PojoModelValueElement<>( typeModel )
 			) );
-			bindingContext.idDslConverter( new PojoIdentifierBridgeToIndexIdValueConverter( bridge ) );
+			bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter( bridge ) );
 			return bridgeHolder;
 		}
 		catch (RuntimeException e) {
@@ -301,7 +301,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		// Then register the bridge itself as a converter to use in the DSL
 		typedFieldContext.dslConverter(
-				new PojoValueBridgeToIndexFieldValueConverter<>( bridge )
+				new PojoValueBridgeToDocumentFieldValueConverter<>( bridge )
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)

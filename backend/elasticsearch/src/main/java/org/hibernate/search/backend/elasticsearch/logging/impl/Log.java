@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -333,6 +333,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 49,
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
-	SearchException conflictingIdentifierTypesForPredicate(ToIndexIdValueConverter<?> component1,
-			ToIndexIdValueConverter<?> component2, @Param EventContext context);
+	SearchException conflictingIdentifierTypesForPredicate(ToDocumentIdentifierValueConverter<?> component1,
+			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
 }

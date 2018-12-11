@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 public class StubFieldConverter<F> {
 	private final Class<F> type;
-	private final UserIndexFieldConverter<F> userConverter;
+	private final UserDocumentFieldConverter<F> userConverter;
 
-	public StubFieldConverter(Class<F> type, UserIndexFieldConverter<F> userConverter) {
+	public StubFieldConverter(Class<F> type, UserDocumentFieldConverter<F> userConverter) {
 		this.type = type;
 		this.userConverter = userConverter;
 	}
 
-	public Object convertIndexToProjection(Object indexValue, FromIndexFieldValueConvertContext context) {
+	public Object convertIndexToProjection(Object indexValue, FromDocumentFieldValueConvertContext context) {
 		return userConverter.convertIndexToProjection( type.cast( indexValue ), context );
 	}
 

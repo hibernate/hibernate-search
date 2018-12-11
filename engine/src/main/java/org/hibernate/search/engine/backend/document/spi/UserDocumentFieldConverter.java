@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.backend.document.spi;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
 
 /**
  * A helper class allowing to convert values between the type expected by the user
@@ -22,14 +22,14 @@ import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFie
  *
  * @param <F> The type of the "raw" field.
  */
-public final class UserIndexFieldConverter<F> {
+public final class UserDocumentFieldConverter<F> {
 
 	private final Class<F> indexFieldType;
-	private final ToIndexFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private final FromIndexFieldValueConverter<? super F, ?> indexToProjectionConverter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 
-	UserIndexFieldConverter(Class<F> indexFieldType, ToIndexFieldValueConverter<?,? extends F> dslToIndexConverter,
-			FromIndexFieldValueConverter<? super F,?> indexToProjectionConverter) {
+	UserDocumentFieldConverter(Class<F> indexFieldType, ToDocumentFieldValueConverter<?,? extends F> dslToIndexConverter,
+			FromDocumentFieldValueConverter<? super F,?> indexToProjectionConverter) {
 		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = dslToIndexConverter;
 		this.indexToProjectionConverter = indexToProjectionConverter;
@@ -43,11 +43,11 @@ public final class UserIndexFieldConverter<F> {
 				+ "]";
 	}
 
-	public F convertDslToIndex(Object value, ToIndexFieldValueConvertContext context) {
+	public F convertDslToIndex(Object value, ToDocumentFieldValueConvertContext context) {
 		return dslToIndexConverter.convertUnknown( value, context );
 	}
 
-	public Object convertIndexToProjection(F indexValue, FromIndexFieldValueConvertContext context) {
+	public Object convertIndexToProjection(F indexValue, FromDocumentFieldValueConvertContext context) {
 		if ( indexToProjectionConverter == null ) {
 			// FIXME detect this when the projection is configured and throw an exception with an explicit message instead. A converter set to null means we don't want to enable projections.
 			return indexValue;
@@ -56,20 +56,20 @@ public final class UserIndexFieldConverter<F> {
 	}
 
 	/**
-	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)}
 	 * method is compatible with this one's,
 	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
-	 * e.g. two objects that implement {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} differently,
-	 * but still implement {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} in a compatible way.
+	 * e.g. two objects that implement {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)} in a compatible way.
 	 *
-	 * @param other Another {@link UserIndexFieldConverter}.
+	 * @param other Another {@link UserDocumentFieldConverter}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	public boolean isConvertDslToIndexCompatibleWith(UserIndexFieldConverter<?> other) {
+	public boolean isConvertDslToIndexCompatibleWith(UserDocumentFieldConverter<?> other) {
 		if ( other == null ) {
 			return false;
 		}
@@ -77,20 +77,20 @@ public final class UserIndexFieldConverter<F> {
 	}
 
 	/**
-	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)}
+	 * Determine whether another converter's {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)}
 	 * method is compatible with this one's,
 	 * i.e. the method is guaranteed to always return the same value as this converter's when given the same input.
 	 * <p>
 	 * Note: this method is separate from {@link #equals(Object)} because it might return {@code true} for two different objects,
-	 * e.g. two objects that implement {@link #convertDslToIndex(Object, ToIndexFieldValueConvertContext)} differently,
-	 * but still implement {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} in a compatible way.
+	 * e.g. two objects that implement {@link #convertDslToIndex(Object, ToDocumentFieldValueConvertContext)} differently,
+	 * but still implement {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)} in a compatible way.
 	 *
-	 * @param other Another {@link UserIndexFieldConverter}.
+	 * @param other Another {@link UserDocumentFieldConverter}.
 	 * @return {@code true} if the given converter's
-	 * {@link #convertIndexToProjection(Object, FromIndexFieldValueConvertContext)} method is compatible.
+	 * {@link #convertIndexToProjection(Object, FromDocumentFieldValueConvertContext)} method is compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	public boolean isConvertIndexToProjectionCompatibleWith(UserIndexFieldConverter<?> other) {
+	public boolean isConvertIndexToProjectionCompatibleWith(UserDocumentFieldConverter<?> other) {
 		if ( other == null ) {
 			return false;
 		}

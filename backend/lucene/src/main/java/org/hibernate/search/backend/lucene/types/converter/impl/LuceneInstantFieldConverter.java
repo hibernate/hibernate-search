@@ -8,18 +8,18 @@ package org.hibernate.search.backend.lucene.types.converter.impl;
 
 import java.time.Instant;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 public final class LuceneInstantFieldConverter extends AbstractLuceneFieldConverter<Instant, Long> {
 
-	public LuceneInstantFieldConverter(UserIndexFieldConverter<Instant> userConverter) {
+	public LuceneInstantFieldConverter(UserDocumentFieldConverter<Instant> userConverter) {
 		super( userConverter );
 	}
 
 	@Override
 	public Long convertDslToIndex(Object value,
-			ToIndexFieldValueConvertContext context) {
+			ToDocumentFieldValueConvertContext context) {
 		Instant rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;

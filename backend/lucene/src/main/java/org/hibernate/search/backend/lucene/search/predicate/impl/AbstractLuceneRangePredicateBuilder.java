@@ -46,7 +46,7 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			lowerLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			lowerLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -63,7 +63,7 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			upperLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			upperLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

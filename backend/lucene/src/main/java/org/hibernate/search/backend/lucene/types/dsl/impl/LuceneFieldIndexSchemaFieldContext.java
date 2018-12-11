@@ -17,8 +17,8 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCode
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -30,15 +30,15 @@ import org.hibernate.search.util.AssertionFailure;
 public class LuceneFieldIndexSchemaFieldContext<F>
 		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
 
-	private static final ToIndexFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
-			new ToIndexFieldValueConverter<Object, Object>() {
+	private static final ToDocumentFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
+			new ToDocumentFieldValueConverter<Object, Object>() {
 				@Override
-				public Object convert(Object value, ToIndexFieldValueConvertContext context) {
+				public Object convert(Object value, ToDocumentFieldValueConvertContext context) {
 					return value;
 				}
 
 				@Override
-				public Object convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
+				public Object convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
 					throw new AssertionFailure(
 							"Attempt to perform an unsafe conversion on a field with native type;"
 							+ " this should not have happened since the DSL is disabled for such fields."
@@ -48,8 +48,8 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 			};
 
 	@SuppressWarnings("unchecked") // This instance works for any F
-	private static <F> ToIndexFieldValueConverter<F, F> getToIndexFieldValueConverter() {
-		return (ToIndexFieldValueConverter<F, F>) TO_INDEX_FIELD_VALUE_CONVERTER;
+	private static <F> ToDocumentFieldValueConverter<F, F> getToIndexFieldValueConverter() {
+		return (ToDocumentFieldValueConverter<F, F>) TO_INDEX_FIELD_VALUE_CONVERTER;
 	}
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;

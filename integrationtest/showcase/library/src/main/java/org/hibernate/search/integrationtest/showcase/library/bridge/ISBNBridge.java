@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -21,7 +21,7 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
 		return context.getIndexSchemaFieldContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
-				.projectionConverter( ISBNFromIndexFieldValueConverter.INSTANCE );
+				.projectionConverter( ISBNFromDocumentFieldValueConverter.INSTANCE );
 	}
 
 	@Override
@@ -40,10 +40,10 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class ISBNFromIndexFieldValueConverter implements FromIndexFieldValueConverter<String, ISBN> {
+	private static class ISBNFromDocumentFieldValueConverter implements FromDocumentFieldValueConverter<String, ISBN> {
 
-		private static final ISBNFromIndexFieldValueConverter INSTANCE =
-				new ISBNFromIndexFieldValueConverter();
+		private static final ISBNFromDocumentFieldValueConverter INSTANCE =
+				new ISBNFromDocumentFieldValueConverter();
 
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
@@ -51,12 +51,12 @@ public class ISBNBridge implements ValueBridge<ISBN, String> {
 		}
 
 		@Override
-		public ISBN convert(String indexedValue, FromIndexFieldValueConvertContext context) {
+		public ISBN convert(String indexedValue, FromDocumentFieldValueConvertContext context) {
 			return indexedValue == null ? null : new ISBN( indexedValue );
 		}
 
 		@Override
-		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 			return INSTANCE.equals( other );
 		}
 	}

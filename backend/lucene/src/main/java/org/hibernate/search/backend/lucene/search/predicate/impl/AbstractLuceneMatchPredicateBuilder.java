@@ -38,7 +38,7 @@ public abstract class AbstractLuceneMatchPredicateBuilder<F, T> extends Abstract
 	@Override
 	public void value(Object value) {
 		try {
-			this.value = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.value = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -34,7 +34,7 @@ public interface IndexModelBindingContext {
 	 */
 	void explicitRouting();
 
-	void idDslConverter(ToIndexIdValueConverter<?> idConverter);
+	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
 
 	Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);

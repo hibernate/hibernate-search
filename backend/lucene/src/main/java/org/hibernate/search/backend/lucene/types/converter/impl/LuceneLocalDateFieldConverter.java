@@ -8,18 +8,18 @@ package org.hibernate.search.backend.lucene.types.converter.impl;
 
 import java.time.LocalDate;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 public final class LuceneLocalDateFieldConverter extends AbstractLuceneFieldConverter<LocalDate, Long> {
 
-	public LuceneLocalDateFieldConverter(UserIndexFieldConverter<LocalDate> userConverter) {
+	public LuceneLocalDateFieldConverter(UserDocumentFieldConverter<LocalDate> userConverter) {
 		super( userConverter );
 	}
 
 	@Override
 	public Long convertDslToIndex(Object value,
-			ToIndexFieldValueConvertContext context) {
+			ToDocumentFieldValueConvertContext context) {
 		LocalDate rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;

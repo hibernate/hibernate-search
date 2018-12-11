@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.function.TriFunction;
@@ -34,7 +34,7 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements 
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromIndexFieldValueConvertContext context) {
+			FromDocumentFieldValueConvertContext context) {
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
 		Object[] extractedElements = new Object[] {

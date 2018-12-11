@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
@@ -21,7 +21,7 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final String indexName;
 
-	private final ToIndexIdValueConverter<?> idDslConverter;
+	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	private final Map<String, LuceneIndexSchemaObjectNode> objectNodes;
 
@@ -30,7 +30,7 @@ public class LuceneIndexModel implements AutoCloseable {
 	private final ScopedAnalyzer scopedAnalyzer;
 
 	public LuceneIndexModel(String indexName,
-			ToIndexIdValueConverter<?> idDslConverter,
+			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
 			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
 			ScopedAnalyzer scopedAnalyzer) {
@@ -54,7 +54,7 @@ public class LuceneIndexModel implements AutoCloseable {
 		return EventContexts.fromIndexName( indexName );
 	}
 
-	public ToIndexIdValueConverter<?> getIdDslConverter() {
+	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
 	}
 
