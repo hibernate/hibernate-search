@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.document.model.impl;
+package org.hibernate.search.backend.lucene.analysis.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 /**
  * @author Guillaume Smet
  */
-public class ScopedAnalyzer extends AnalyzerWrapper {
+public final class ScopedAnalyzer extends AnalyzerWrapper {
 
 	private final Analyzer globalAnalyzer;
 
@@ -39,21 +39,21 @@ public class ScopedAnalyzer extends AnalyzerWrapper {
 		return analyzer;
 	}
 
-	static class Builder {
+	public static class Builder {
 
 		private final Analyzer globalAnalyzer;
 
 		private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
 
-		Builder(Analyzer globalAnalyzer) {
+		public Builder(Analyzer globalAnalyzer) {
 			this.globalAnalyzer = globalAnalyzer;
 		}
 
-		void setAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
+		public void setAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
 			this.scopedAnalyzers.put( absoluteFieldPath, analyzer );
 		}
 
-		ScopedAnalyzer build() {
+		public ScopedAnalyzer build() {
 			return new ScopedAnalyzer( globalAnalyzer, scopedAnalyzers );
 		}
 	}

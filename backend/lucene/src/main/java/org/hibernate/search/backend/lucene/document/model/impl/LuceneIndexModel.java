@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.document.model.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.CollectionHelper;
