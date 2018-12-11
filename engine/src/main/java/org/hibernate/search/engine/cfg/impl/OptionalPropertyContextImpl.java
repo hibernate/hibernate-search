@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.cfg.impl;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -19,9 +18,9 @@ import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
 final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T> {
 
 	private final String key;
-	private final Function<Object, Optional<T>> converter;
+	private final Function<Object, T> converter;
 
-	OptionalPropertyContextImpl(String key, Function<Object, Optional<T>> converter) {
+	OptionalPropertyContextImpl(String key, Function<Object, T> converter) {
 		this.key = key;
 		this.converter = converter;
 	}

@@ -9,11 +9,10 @@ package org.hibernate.search.engine.cfg.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -35,17 +34,15 @@ public final class ConvertUtils {
 	 * @param expectedType the expected type
 	 * @param parser a parser from String to the expected type
 	 * @param value the value to convert (a String)
-	 * @param value the value to convert (a String)
 	 * @return the converted value
 	 * @throws SearchException for invalid values.
 	 */
-	public static <T> Optional<T> convert(Class<T> expectedType, Function<String, T> parser, Object value) {
+	public static <T> T convert(Class<T> expectedType, Function<String, T> parser, Object value) {
 		if ( expectedType.isInstance( value ) ) {
-			return Optional.of( expectedType.cast( value ) );
+			return expectedType.cast( value );
 		}
 		try {
-			return optionalTrimmedNonEmpty( (String) value )
-					.map( parser );
+			return parser.apply( (String) value );
 		}
 		catch (RuntimeException e) {
 			throw log.invalidPropertyValue( expectedType, e.getMessage(), e );
@@ -59,22 +56,19 @@ public final class ConvertUtils {
 	 * @return true if value is "true", false if value is "false"
 	 * @throws SearchException for invalid format or values.
 	 */
-	public static Optional<Boolean> convertBoolean(Object value) {
+	public static Boolean convertBoolean(Object value) {
 		try {
 			if ( value instanceof Boolean ) {
-				return Optional.of( (Boolean) value );
+				return (Boolean) value;
 			}
 			if ( value instanceof String ) {
-				Optional<String> optionalCleaned = optionalTrimmedNonEmpty( (String) value );
-				if ( optionalCleaned.isPresent() ) {
-					String cleaned = optionalCleaned.get();
-					// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
-					if ( "false".equalsIgnoreCase( cleaned ) ) {
-						return Optional.of( false );
-					}
-					else if ( "true".equalsIgnoreCase( cleaned ) ) {
-						return Optional.of( true );
-					}
+				String string = (String) value;
+				// avoiding Boolean.valueOf() to have more checks: makes it easy to spot wrong type in cfg.
+				if ( "false".equalsIgnoreCase( string ) ) {
+					return false;
+				}
+				else if ( "true".equalsIgnoreCase( string ) ) {
+					return true;
 				}
 			}
 		}
@@ -92,14 +86,13 @@ public final class ConvertUtils {
 	 * @return the converted integer
 	 * @throws SearchException for invalid format or values.
 	 */
-	public static Optional<Integer> convertInteger(Object value) {
+	public static Integer convertInteger(Object value) {
 		try {
 			if ( value instanceof Number ) {
-				return Optional.of( ( (Number) value ).intValue() );
+				return ( (Number) value ).intValue();
 			}
 			if ( value instanceof String ) {
-				return optionalTrimmedNonEmpty( (String) value )
-						.map( Integer::parseInt );
+				return Integer.parseInt( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -116,14 +109,13 @@ public final class ConvertUtils {
 	 * @return the converted long
 	 * @throws SearchException for invalid format or values.
 	 */
-	public static Optional<Long> convertLong(Object value) {
+	public static Long convertLong(Object value) {
 		try {
 			if ( value instanceof Number ) {
-				return Optional.of( ( (Number) value ).longValue() );
+				return ( (Number) value ).longValue();
 			}
 			if ( value instanceof String ) {
-				return optionalTrimmedNonEmpty( (String) value )
-						.map( Long::parseLong );
+				return Long.parseLong( (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -133,13 +125,13 @@ public final class ConvertUtils {
 		throw log.invalidLongPropertyValue( "", null );
 	}
 
-	public static <T> Optional<BeanReference<? extends T>> convertBeanReference(Class<T> expectedType, Object value) {
+	public static <T> BeanReference<? extends T> convertBeanReference(Class<T> expectedType, Object value) {
 		try {
 			if ( expectedType.isInstance( value ) ) {
-				return Optional.of( BeanReference.ofInstance( expectedType.cast( value ) ) );
+				return BeanReference.ofInstance( expectedType.cast( value ) );
 			}
 			if ( value instanceof BeanReference ) {
-				return Optional.of( ( (BeanReference<?>) value ).asSubTypeOf( expectedType ) );
+				return ( (BeanReference<?>) value ).asSubTypeOf( expectedType );
 			}
 			if ( value instanceof Class ) {
 				Class<?> castedValue = (Class<?>) value;
@@ -148,11 +140,10 @@ public final class ConvertUtils {
 				}
 				@SuppressWarnings("unchecked") // Checked using reflection just above
 				Class<? extends T> castedValueAsChildType = (Class<? extends T>) value;
-				return Optional.of( BeanReference.of( castedValueAsChildType ) );
+				return BeanReference.of( castedValueAsChildType );
 			}
 			if ( value instanceof String ) {
-				return optionalTrimmedNonEmpty( (String) value )
-						.map( name -> BeanReference.of( expectedType, name ) );
+				return BeanReference.of( expectedType, (String) value );
 			}
 		}
 		catch (RuntimeException e) {
@@ -162,37 +153,35 @@ public final class ConvertUtils {
 		throw log.invalidBeanReferencePropertyValue( expectedType, "", null );
 	}
 
-	public static <T> Optional<List<T>> convertMultiValue(Pattern separatorPattern,
-			Function<Object, Optional<T>> elementConverter, Object value) {
+	public static <T> List<T> convertMultiValue(Pattern separatorPattern,
+			Function<Object, T> elementConverter, Object value) {
 		if ( value instanceof Collection ) {
-			List<T> result = ( (Collection<?>) value ).stream()
+			return ( (Collection<?>) value ).stream()
+					.map( ConvertUtils::trimIfString )
+					.filter( Objects::nonNull )
 					.map( elementConverter )
-					.filter( Optional::isPresent )
-					.map( Optional::get )
 					.collect( Collectors.toList() );
-			return Optional.of( result );
 		}
 		else if ( value instanceof String ) {
-			List<T> result = optionalTrimmedNonEmpty( (String) value )
-					.map( separatorPattern::splitAsStream ).orElse( Stream.empty() )
+			return separatorPattern.splitAsStream( (String) value )
+					.map( ConvertUtils::trimIfString )
+					.filter( Objects::nonNull )
 					.map( elementConverter )
-					.filter( Optional::isPresent )
-					.map( Optional::get )
 					.collect( Collectors.toList() );
-			return result.isEmpty() ? Optional.empty() : Optional.of( result );
 		}
 		else {
 			throw log.invalidMultiPropertyValue();
 		}
 	}
 
-	private static Optional<String> optionalTrimmedNonEmpty(String value) {
-		if ( value != null && !value.isEmpty() ) {
-			String trimmed = value.trim();
-			if ( !trimmed.isEmpty() ) {
-				return Optional.of( value );
-			}
+	static Object trimIfString(Object value) {
+		if ( value instanceof String ) {
+			String stringValue = (String) value;
+			String trimmed = stringValue.trim();
+			return trimmed.isEmpty() ? null : trimmed;
 		}
-		return Optional.empty();
+		else {
+			return value;
+		}
 	}
 }

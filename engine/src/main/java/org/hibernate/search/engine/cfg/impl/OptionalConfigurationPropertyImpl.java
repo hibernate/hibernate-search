@@ -15,9 +15,9 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 final class OptionalConfigurationPropertyImpl<T> extends AbstractConfigurationProperty<Optional<T>>
 		implements OptionalConfigurationProperty<T> {
 
-	private final Function<Object, Optional<T>> converter;
+	private final Function<Object, T> converter;
 
-	OptionalConfigurationPropertyImpl(String key, Function<Object, Optional<T>> converter) {
+	OptionalConfigurationPropertyImpl(String key, Function<Object, T> converter) {
 		super( key );
 		this.converter = converter;
 	}
@@ -34,7 +34,7 @@ final class OptionalConfigurationPropertyImpl<T> extends AbstractConfigurationPr
 
 	@Override
 	<R> R convert(Optional<?> rawValue, Function<Optional<T>, R> transform) {
-		return transform.apply( rawValue.flatMap( converter ) );
+		return transform.apply( rawValue.map( converter ) );
 	}
 
 }

@@ -38,7 +38,7 @@ abstract class AbstractConfigurationProperty<T> implements ConfigurationProperty
 	abstract <R> R convert(Optional<?> rawValue, Function<T, R> transform);
 
 	<R> R doGet(ConfigurationPropertySource source, Function<T, R> transform) {
-		Optional<?> rawValue = source.get( key );
+		Optional<?> rawValue = source.get( key ).map( ConvertUtils::trimIfString );
 		try {
 			return convert( rawValue, transform );
 		}

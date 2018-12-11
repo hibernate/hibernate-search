@@ -12,10 +12,10 @@ import java.util.function.Supplier;
 
 final class DefaultedConfigurationProperty<T> extends AbstractConfigurationProperty<T> {
 
-	private final Function<Object, Optional<T>> converter;
+	private final Function<Object, T> converter;
 	private final Supplier<T> defaultValueSupplier;
 
-	DefaultedConfigurationProperty(String key, Function<Object, Optional<T>> converter, Supplier<T> defaultValueSupplier) {
+	DefaultedConfigurationProperty(String key, Function<Object, T> converter, Supplier<T> defaultValueSupplier) {
 		super( key );
 		this.converter = converter;
 		this.defaultValueSupplier = defaultValueSupplier;
@@ -23,7 +23,7 @@ final class DefaultedConfigurationProperty<T> extends AbstractConfigurationPrope
 
 	@Override
 	<R> R convert(Optional<?> rawValue, Function<T, R> transform) {
-		T defaultedValue = rawValue.flatMap( converter ).orElseGet( defaultValueSupplier );
+		T defaultedValue = rawValue.map( converter ).orElseGet( defaultValueSupplier );
 		return transform.apply( defaultedValue );
 	}
 }
