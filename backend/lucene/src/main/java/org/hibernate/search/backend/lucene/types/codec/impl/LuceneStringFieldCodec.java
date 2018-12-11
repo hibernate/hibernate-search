@@ -17,18 +17,18 @@ import org.apache.lucene.util.BytesRef;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerUtils;
 
-public final class LuceneStringFieldCodec implements LuceneFieldCodec<String> {
+public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String> {
 
 	private final boolean sortable;
 
 	private final FieldType fieldType;
 
-	private final Analyzer normalizer;
+	private final Analyzer analyzerOrNormalizer;
 
-	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, Analyzer normalizer) {
+	public LuceneStringFieldCodec(boolean sortable, FieldType fieldType, Analyzer analyzerOrNormalizer) {
 		this.sortable = sortable;
 		this.fieldType = fieldType;
-		this.normalizer = normalizer;
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
@@ -42,9 +42,7 @@ public final class LuceneStringFieldCodec implements LuceneFieldCodec<String> {
 		if ( sortable ) {
 			documentBuilder.addField( new SortedDocValuesField(
 					absoluteFieldPath,
-					new BytesRef(
-							normalizer != null ? AnalyzerUtils.normalize( normalizer, absoluteFieldPath, value ) :
-									value )
+					new BytesRef( normalize( absoluteFieldPath, value ) )
 			) );
 		}
 	}
@@ -67,6 +65,22 @@ public final class LuceneStringFieldCodec implements LuceneFieldCodec<String> {
 
 		return ( sortable == other.sortable ) &&
 				Objects.equals( fieldType, other.fieldType ) &&
-				Objects.equals( normalizer, other.normalizer );
+				Objects.equals( analyzerOrNormalizer, other.analyzerOrNormalizer );
+	}
+
+	@Override
+	public String encode(String value) {
+		return value;
+	}
+
+	@Override
+	public String normalize(String absoluteFieldPath, String value) {
+		if ( value == null ) {
+			return null;
+		}
+
+		return analyzerOrNormalizer != null
+				? AnalyzerUtils.normalize( analyzerOrNormalizer, absoluteFieldPath, value )
+				: value;
 	}
 }

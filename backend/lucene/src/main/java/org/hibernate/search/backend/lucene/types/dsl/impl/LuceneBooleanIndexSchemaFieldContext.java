@@ -12,10 +12,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBooleanFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneBooleanFieldConverter;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneIntegerFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneBooleanFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.lucene.types.sort.impl.LuceneIntegerFieldSortBuilderFactory;
+import org.hibernate.search.backend.lucene.types.sort.impl.LuceneBooleanFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -40,17 +41,19 @@ public class LuceneBooleanIndexSchemaFieldContext
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		LuceneBooleanFieldConverter converter = new LuceneBooleanFieldConverter( helper.createUserIndexFieldConverter() );
+		ToDocumentFieldValueConverter<?, ? extends Boolean> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super Boolean, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
 		LuceneBooleanFieldCodec codec = new LuceneBooleanFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<Boolean> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
 				codec,
-				new LuceneIntegerFieldPredicateBuilderFactory( converter ),
-				new LuceneIntegerFieldSortBuilderFactory( resolvedSortable, converter ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneBooleanFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
+				new LuceneBooleanFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

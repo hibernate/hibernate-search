@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import java.util.Optional;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -20,19 +23,24 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchFieldProjection<T> implements ElasticsearchSearchProjection<T, T> {
+class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjection<T, T> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
-	private final ElasticsearchFieldConverter converter;
 
-	ElasticsearchFieldProjection(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final ElasticsearchFieldCodec<F> codec;
+
+	ElasticsearchFieldProjection(String absoluteFieldPath,
+			FromDocumentFieldValueConverter<? super F, T> converter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.hitFieldValueAccessor = HIT_SOURCE_ACCESSOR.path( absoluteFieldPath );
 		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
@@ -53,9 +61,15 @@ class ElasticsearchFieldProjection<T> implements ElasticsearchSearchProjection<T
 	@Override
 	public T extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
+		Optional<JsonElement> fieldValue = hitFieldValueAccessor.get( hit );
 		FromDocumentFieldValueConvertContext context = searchProjectionExecutionContext.getFromDocumentFieldValueConvertContext();
-		return (T) converter.convertIndexToProjection( fieldValue, context );
+		if ( fieldValue.isPresent() ) {
+			F rawValue = codec.decode( fieldValue.get() );
+			return converter.convert( rawValue, context );
+		}
+		else {
+			return converter.convert( null, context );
+		}
 	}
 
 	@Override

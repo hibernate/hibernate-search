@@ -14,43 +14,18 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.util.AssertionFailure;
 
 /**
  * @author Guillaume Smet
  */
 public class LuceneFieldIndexSchemaFieldContext<F>
 		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
-
-	private static final ToDocumentFieldValueConverter<Object, Object> TO_INDEX_FIELD_VALUE_CONVERTER =
-			new ToDocumentFieldValueConverter<Object, Object>() {
-				@Override
-				public Object convert(Object value, ToDocumentFieldValueConvertContext context) {
-					return value;
-				}
-
-				@Override
-				public Object convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-					throw new AssertionFailure(
-							"Attempt to perform an unsafe conversion on a field with native type;"
-							+ " this should not have happened since the DSL is disabled for such fields."
-							+ " There is a bug in Hibernate Search, please report it."
-					);
-				}
-			};
-
-	@SuppressWarnings("unchecked") // This instance works for any F
-	private static <F> ToDocumentFieldValueConverter<F, F> getToIndexFieldValueConverter() {
-		return (ToDocumentFieldValueConverter<F, F>) TO_INDEX_FIELD_VALUE_CONVERTER;
-	}
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 	private final String relativeFieldName;
@@ -60,8 +35,7 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 	public LuceneFieldIndexSchemaFieldContext(IndexSchemaContext schemaContext, String relativeFieldName,
 			Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType,
-				getToIndexFieldValueConverter() );
+		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType );
 		this.relativeFieldName = relativeFieldName;
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
@@ -74,17 +48,17 @@ public class LuceneFieldIndexSchemaFieldContext<F>
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		LuceneStandardFieldConverter<F> converter = new LuceneStandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
 
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				relativeFieldName,
-				converter,
 				codec,
 				null,
 				null,
-				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, codec, converter )
+				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, indexToProjectionConverter, codec )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

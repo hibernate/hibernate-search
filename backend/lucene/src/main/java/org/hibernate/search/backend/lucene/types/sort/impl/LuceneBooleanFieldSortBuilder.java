@@ -6,29 +6,27 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import java.time.LocalDate;
-
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneLocalDateFieldSortBuilder
-		extends AbstractLuceneStandardFieldSortBuilder<LocalDate, LuceneStandardFieldCodec<LocalDate, ?>> {
+import org.apache.lucene.search.SortField;
 
-	LuceneLocalDateFieldSortBuilder(LuceneSearchContext searchContext,
+public class LuceneBooleanFieldSortBuilder
+		extends AbstractLuceneStandardFieldSortBuilder<Boolean, LuceneStandardFieldCodec<Boolean, ?>> {
+
+	LuceneBooleanFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends LocalDate> converter,
-			LuceneStandardFieldCodec<LocalDate, ?> codec) {
-		super( searchContext, absoluteFieldPath, converter, codec, Long.MIN_VALUE, Long.MAX_VALUE );
+			ToDocumentFieldValueConverter<?, ? extends Boolean> converter,
+			LuceneStandardFieldCodec<Boolean, ?> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.LONG, order == SortOrder.DESC );
+		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.INT, order == SortOrder.DESC );
 		setEffectiveMissingValue( sortField, missingValue, order );
 
 		collector.collectSortField( sortField );

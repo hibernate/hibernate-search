@@ -15,19 +15,23 @@ import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneStringMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<String, String> {
+class LuceneStringMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<String> {
 
-	private final LuceneStringFieldConverter converter;
+	private final LuceneStringFieldCodec codec;
 
 	private final QueryBuilder queryBuilder;
 
 	LuceneStringMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneStringFieldConverter converter, QueryBuilder queryBuilder) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends String> converter,
+			LuceneStringFieldCodec codec,
+			QueryBuilder queryBuilder) {
 		super( searchContext, absoluteFieldPath, converter );
-		this.converter = converter;
+		this.codec = codec;
 		this.queryBuilder = queryBuilder;
 	}
 
@@ -47,7 +51,7 @@ class LuceneStringMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuil
 			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
 			// the queryBuilder case above
 
-			return new TermQuery( new Term( absoluteFieldPath, converter.normalize( absoluteFieldPath, value ) ) );
+			return new TermQuery( new Term( absoluteFieldPath, codec.normalize( absoluteFieldPath, value ) ) );
 		}
 	}
 }

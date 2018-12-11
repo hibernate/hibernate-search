@@ -6,28 +6,36 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.time.LocalDate;
+
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneLocalDateFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneLocalDateRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<Long> {
+class LuceneLocalDateRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<LocalDate> {
+
+	private final LuceneLocalDateFieldCodec codec;
 
 	LuceneLocalDateRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneLocalDateFieldConverter converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends LocalDate> converter,
+			LuceneLocalDateFieldCodec codec) {
 		super( searchContext, absoluteFieldPath, converter );
+		this.codec = codec;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return LongPoint.newRangeQuery(
 				absoluteFieldPath,
-				getLowerValue( lowerLimit, excludeLowerLimit ),
-				getUpperValue( upperLimit, excludeUpperLimit )
+				getLowerValue( codec.encode( lowerLimit ), excludeLowerLimit ),
+				getUpperValue( codec.encode( upperLimit ), excludeUpperLimit )
 		);
 	}
 

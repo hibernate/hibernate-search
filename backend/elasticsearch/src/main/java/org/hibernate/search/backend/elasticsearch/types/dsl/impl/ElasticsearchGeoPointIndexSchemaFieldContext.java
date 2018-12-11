@@ -14,10 +14,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -44,16 +44,15 @@ public class ElasticsearchGeoPointIndexSchemaFieldContext
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchStandardFieldConverter<GeoPoint> converter = new ElasticsearchStandardFieldConverter<>(
-				helper.createUserIndexFieldConverter(),
-				ElasticsearchGeoPointFieldCodec.INSTANCE
-		);
+		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
+		ElasticsearchGeoPointFieldCodec codec = ElasticsearchGeoPointFieldCodec.INSTANCE;
 
 		ElasticsearchIndexSchemaFieldNode<GeoPoint> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, ElasticsearchGeoPointFieldCodec.INSTANCE,
+				parentNode, codec,
 				ElasticsearchGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, converter )
+				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

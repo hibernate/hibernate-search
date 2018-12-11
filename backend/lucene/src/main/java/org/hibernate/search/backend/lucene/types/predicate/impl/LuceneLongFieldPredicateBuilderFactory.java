@@ -7,13 +7,15 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLongFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 public final class LuceneLongFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<LuceneStandardFieldConverter<Long>> {
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<Long, LuceneLongFieldCodec> {
 
-	public LuceneLongFieldPredicateBuilderFactory(LuceneStandardFieldConverter<Long> converter) {
-		super( converter );
+	public LuceneLongFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends Long> converter,
+			LuceneLongFieldCodec codec) {
+		super( converter, codec );
 	}
 
 	@Override

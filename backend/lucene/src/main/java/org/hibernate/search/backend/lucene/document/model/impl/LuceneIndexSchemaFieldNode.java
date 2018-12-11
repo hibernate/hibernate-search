@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
@@ -31,8 +30,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final String absoluteFieldPath;
 
-	private final LuceneFieldConverter<F, ?> converter;
-
 	private final LuceneFieldCodec<F> codec;
 
 	private final LuceneFieldPredicateBuilderFactory predicateBuilderFactory;
@@ -42,7 +39,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 	private final LuceneFieldProjectionBuilderFactory projectionBuilderFactory;
 
 	public LuceneIndexSchemaFieldNode(LuceneIndexSchemaObjectNode parent, String relativeFieldName,
-			LuceneFieldConverter<F, ?> converter,
 			LuceneFieldCodec<F> codec,
 			LuceneFieldPredicateBuilderFactory predicateBuilderFactory,
 			LuceneFieldSortBuilderFactory sortBuilderFactory,
@@ -50,7 +46,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
-		this.converter = converter;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
 		this.sortBuilderFactory = sortBuilderFactory;
@@ -67,10 +62,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	public String getAbsoluteFieldPath() {
 		return absoluteFieldPath;
-	}
-
-	public LuceneFieldConverter<F, ?> getConverter() {
-		return converter;
 	}
 
 	public LuceneFieldCodec<F> getCodec() {
@@ -103,7 +94,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() ).append( "[" )
 				.append( "parent=" ).append( parent )
 				.append( ", relativeFieldName=" ).append( relativeFieldName )
-				.append( ", converter=" ).append( converter )
 				.append( ", codec=" ).append( codec )
 				.append( ", predicateBuilderFactory=" ).append( predicateBuilderFactory )
 				.append( ", sortContributor=" ).append( sortBuilderFactory )

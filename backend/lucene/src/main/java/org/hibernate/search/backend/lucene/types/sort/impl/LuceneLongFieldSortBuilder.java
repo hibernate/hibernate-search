@@ -8,16 +8,20 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 import org.apache.lucene.search.SortField;
 
-public class LuceneLongFieldSortBuilder extends AbstractLuceneFieldSortBuilder {
+public class LuceneLongFieldSortBuilder
+		extends AbstractLuceneStandardFieldSortBuilder<Long, LuceneStandardFieldCodec<Long, ?>> {
 
 	LuceneLongFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
-		super( searchContext, absoluteFieldPath, converter, Long.MIN_VALUE, Long.MAX_VALUE );
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends Long> converter,
+			LuceneStandardFieldCodec<Long, ?> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec, Long.MIN_VALUE, Long.MAX_VALUE );
 	}
 
 	@Override

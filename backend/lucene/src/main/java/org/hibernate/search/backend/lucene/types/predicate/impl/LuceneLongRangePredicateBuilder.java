@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
@@ -18,7 +18,8 @@ class LuceneLongRangePredicateBuilder extends AbstractLuceneRangePredicateBuilde
 
 	LuceneLongRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, Long> converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends Long> converter) {
 		super( searchContext, absoluteFieldPath, converter );
 	}
 

@@ -11,18 +11,18 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 public final class LuceneStringFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<LuceneStringFieldConverter> {
-
-	private final boolean tokenized;
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<String, LuceneStringFieldCodec> {
 
 	private final QueryBuilder queryBuilder;
 
-	public LuceneStringFieldPredicateBuilderFactory(LuceneStringFieldConverter converter, boolean tokenized, QueryBuilder queryBuilder) {
-		super( converter );
-		this.tokenized = tokenized;
+	public LuceneStringFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends String> converter,
+			LuceneStringFieldCodec codec,
+			QueryBuilder queryBuilder) {
+		super( converter, codec );
 		this.queryBuilder = queryBuilder;
 	}
 
@@ -32,19 +32,18 @@ public final class LuceneStringFieldPredicateBuilderFactory
 			return false;
 		}
 		LuceneStringFieldPredicateBuilderFactory castedOther = (LuceneStringFieldPredicateBuilderFactory) other;
-		return tokenized == castedOther.tokenized
-				&& Objects.equals( queryBuilder, castedOther.queryBuilder );
+		return Objects.equals( queryBuilder, castedOther.queryBuilder );
 	}
 
 	@Override
 	public LuceneStringMatchPredicateBuilder createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, queryBuilder );
+		return new LuceneStringMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, codec, queryBuilder );
 	}
 
 	@Override
 	public LuceneStringRangePredicateBuilder createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneStringRangePredicateBuilder( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

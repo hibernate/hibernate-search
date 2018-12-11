@@ -12,7 +12,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -23,7 +24,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -38,7 +39,8 @@ public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSea
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
-	private final ElasticsearchFieldConverter converter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement lowerLimit;
 	private boolean excludeLowerLimit = false;
@@ -46,16 +48,20 @@ public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSea
 	private boolean excludeUpperLimit = false;
 
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.converter = converter;
+		this.dslToIndexConverter = dslToIndexConverter;
+		this.codec = codec;
 	}
 
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			this.lowerLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			this.lowerLimit = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -72,7 +78,8 @@ public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSea
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			this.upperLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			this.upperLimit = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

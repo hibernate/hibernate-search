@@ -10,14 +10,18 @@ import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneIntegerFieldSortBuilder extends AbstractLuceneFieldSortBuilder {
+public class LuceneIntegerFieldSortBuilder
+		extends AbstractLuceneStandardFieldSortBuilder<Integer, LuceneStandardFieldCodec<Integer, ?>> {
 
 	LuceneIntegerFieldSortBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, Integer> converter) {
-		super( searchContext, absoluteFieldPath, converter, Integer.MIN_VALUE, Integer.MAX_VALUE );
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends Integer> converter,
+			LuceneStandardFieldCodec<Integer, ?> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 
 	@Override

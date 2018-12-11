@@ -6,25 +6,30 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.time.Instant;
+
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneInstantFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneInstantFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 public final class LuceneInstantFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<LuceneInstantFieldConverter> {
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<Instant, LuceneInstantFieldCodec> {
 
-	public LuceneInstantFieldPredicateBuilderFactory(LuceneInstantFieldConverter converter) {
-		super( converter );
+	public LuceneInstantFieldPredicateBuilderFactory(
+			ToDocumentFieldValueConverter<?, ? extends Instant> converter,
+			LuceneInstantFieldCodec codec) {
+		super( converter, codec );
 	}
 
 	@Override
 	public LuceneInstantMatchPredicateBuilder createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneInstantMatchPredicateBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneInstantMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override
 	public LuceneInstantRangePredicateBuilder createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneInstantRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneInstantRangePredicateBuilder( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

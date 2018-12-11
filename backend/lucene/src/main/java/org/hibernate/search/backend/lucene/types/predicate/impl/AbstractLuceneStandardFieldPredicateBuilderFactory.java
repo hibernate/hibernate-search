@@ -10,7 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -18,16 +19,24 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<C extends LuceneFieldConverter<?, ?>>
+/**
+ * @param <F> The index field type
+ * @param <C> The codec type
+ */
+abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends LuceneFieldCodec<F>>
 		implements LuceneFieldPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	final C converter;
+	final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	final C codec;
 
-	AbstractLuceneStandardFieldPredicateBuilderFactory(C converter) {
+	AbstractLuceneStandardFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+			C codec) {
 		Contracts.assertNotNull( converter, "converter" );
+		Contracts.assertNotNull( codec, "codec" );
 		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
@@ -35,9 +44,10 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<C extends Luce
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		AbstractLuceneStandardFieldPredicateBuilderFactory<?> castedOther =
-				(AbstractLuceneStandardFieldPredicateBuilderFactory<?>) other;
-		return converter.isConvertDslToIndexCompatibleWith( castedOther.converter );
+		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
+				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
+		return converter.isCompatibleWith( castedOther.converter )
+				&& codec.isCompatibleWith( castedOther.codec );
 	}
 
 	@Override

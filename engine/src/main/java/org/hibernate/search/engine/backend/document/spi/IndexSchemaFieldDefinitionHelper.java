@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.logging.impl.Log;
@@ -37,17 +38,10 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	private boolean accessorCreated = false;
 
-	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext,
-			Class<F> indexFieldType) {
-		this( schemaContext, indexFieldType, new PassThroughToDocumentFieldValueConverter<>( indexFieldType ) );
-	}
-
-	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext,
-			Class<F> indexFieldType,
-			ToDocumentFieldValueConverter<F, ? extends F> identityToIndexConverter) {
+	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext, Class<F> indexFieldType) {
 		this.schemaContext = schemaContext;
 		this.indexFieldType = indexFieldType;
-		this.dslToIndexConverter = identityToIndexConverter;
+		this.dslToIndexConverter = null;
 		this.indexToProjectionConverter = null;
 	}
 
@@ -77,16 +71,28 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	}
 
 	/**
-	 * @return The user-configured converter for this field definition.
+	 * @return The user-configured converter for this field definition, or a default converter if none was configured.
 	 * @see org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext#dslConverter(ToDocumentFieldValueConverter)
 	 */
-	public UserDocumentFieldConverter<F> createUserIndexFieldConverter() {
+	public ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
 		checkAccessorCreated();
-		return new UserDocumentFieldConverter<>(
-				indexFieldType,
-				dslToIndexConverter,
-				indexToProjectionConverter
-		);
+		return dslToIndexConverter == null ? new PassThroughToDocumentFieldValueConverter<>( indexFieldType )
+				: dslToIndexConverter;
+	}
+
+	/**
+	 * @return The user-configured converter for this field definition, or a default converter if none was configured.
+	 * @see org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext#projectionConverter(FromDocumentFieldValueConverter)
+	 */
+	public FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
+		checkAccessorCreated();
+		/*
+		 * TODO HSEARCH-3257 when no projection converter is configured, create a projection converter that will throw an exception
+		 * with an explicit message.
+		 * Currently we create a pass-through converter because users have no way to bypass the converter.
+		 */
+		return indexToProjectionConverter == null ? new PassThroughFromDocumentFieldValueConverter<>( indexFieldType )
+				: indexToProjectionConverter;
 	}
 
 	/**

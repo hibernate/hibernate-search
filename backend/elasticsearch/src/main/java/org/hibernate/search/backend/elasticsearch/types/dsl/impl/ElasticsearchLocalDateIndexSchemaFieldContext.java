@@ -25,10 +25,11 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -66,15 +67,16 @@ public class ElasticsearchLocalDateIndexSchemaFieldContext
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchStandardFieldConverter<LocalDate> converter = new ElasticsearchStandardFieldConverter<>(
-				helper.createUserIndexFieldConverter(),
-				codec
-		);
+		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
+
 		ElasticsearchIndexSchemaFieldNode<LocalDate> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
-				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
+				parentNode, codec,
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

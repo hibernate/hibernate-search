@@ -18,6 +18,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
  * <p>
  * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
  * and returns decoded values to the hit extractor when projecting in a search query.
+ *
+ * @param <F> The field type as declared on
  */
 public interface LuceneFieldCodec<F> {
 

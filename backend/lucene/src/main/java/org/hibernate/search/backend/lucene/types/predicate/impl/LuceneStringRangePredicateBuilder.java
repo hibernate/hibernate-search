@@ -12,17 +12,20 @@ import org.apache.lucene.search.TermRangeQuery;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 class LuceneStringRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<String> {
 
-	private final LuceneStringFieldConverter stringConverter;
+	private final LuceneStringFieldCodec codec;
 
 	LuceneStringRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneStringFieldConverter stringConverter) {
-		super( searchContext, absoluteFieldPath, stringConverter );
-		this.stringConverter = stringConverter;
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends String> converter,
+			LuceneStringFieldCodec codec) {
+		super( searchContext, absoluteFieldPath, converter );
+		this.codec = codec;
 	}
 
 	@Override
@@ -33,8 +36,8 @@ class LuceneStringRangePredicateBuilder extends AbstractLuceneRangePredicateBuil
 
 		return TermRangeQuery.newStringRange(
 				absoluteFieldPath,
-				stringConverter.normalize( absoluteFieldPath, lowerLimit ),
-				stringConverter.normalize( absoluteFieldPath, upperLimit ),
+				codec.normalize( absoluteFieldPath, lowerLimit ),
+				codec.normalize( absoluteFieldPath, upperLimit ),
 				// we force the true value if the limit is null because of some Lucene checks down the hill
 				lowerLimit == null ? true : !excludeLowerLimit,
 				upperLimit == null ? true : !excludeUpperLimit

@@ -6,44 +6,49 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.apache.lucene.document.IntPoint;
-import org.apache.lucene.search.Query;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBooleanFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneIntegerRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<Integer> {
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.search.Query;
 
-	LuceneIntegerRangePredicateBuilder(
+class LuceneBooleanRangePredicateBuilder extends AbstractLuceneRangePredicateBuilder<Boolean> {
+
+	private final LuceneBooleanFieldCodec codec;
+
+	LuceneBooleanRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends Integer> converter) {
+			ToDocumentFieldValueConverter<?, ? extends Boolean> converter,
+			LuceneBooleanFieldCodec codec) {
 		super( searchContext, absoluteFieldPath, converter );
+		this.codec = codec;
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return IntPoint.newRangeQuery(
 				absoluteFieldPath,
-				getLowerValue( lowerLimit, excludeLowerLimit ),
-				getUpperValue( upperLimit, excludeUpperLimit )
+				getLowerValue( codec.encode( lowerLimit ), excludeLowerLimit ),
+				getUpperValue( codec.encode( upperLimit ), excludeUpperLimit )
 		);
 	}
 
-	private static int getLowerValue(Integer lowerLimit, boolean excludeLowerLimit) {
+	private int getLowerValue(Integer lowerLimit, boolean excludeLowerLimit) {
 		if ( lowerLimit == null ) {
-			return Integer.MIN_VALUE;
+			return excludeLowerLimit ? Math.addExact( Integer.MIN_VALUE, 1 ) : Integer.MIN_VALUE;
 		}
 		else {
 			return excludeLowerLimit ? Math.addExact( lowerLimit, 1 ) : lowerLimit;
 		}
 	}
 
-	private static int getUpperValue(Integer upperLimit, boolean excludeUpperLimit) {
+	private int getUpperValue(Integer upperLimit, boolean excludeUpperLimit) {
 		if ( upperLimit == null ) {
-			return Integer.MAX_VALUE;
+			return excludeUpperLimit ? Math.addExact( Integer.MAX_VALUE, -1 ) : Integer.MAX_VALUE;
 		}
 		else {
 			return excludeUpperLimit ? Math.addExact( upperLimit, -1 ) : upperLimit;

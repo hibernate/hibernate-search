@@ -6,24 +6,29 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
 
-public class ElasticsearchFieldProjectionBuilder<T> implements FieldProjectionBuilder<T> {
+public class ElasticsearchFieldProjectionBuilder<F, T> implements FieldProjectionBuilder<T> {
 
 	private final String absoluteFieldPath;
 
-	private final ElasticsearchFieldConverter converter;
+	private final FromDocumentFieldValueConverter<? super F, T> converter;
+	private final ElasticsearchFieldCodec<F> codec;
 
-	public ElasticsearchFieldProjectionBuilder(String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+	public ElasticsearchFieldProjectionBuilder(String absoluteFieldPath,
+			FromDocumentFieldValueConverter<? super F, T> converter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
 	public SearchProjection<T> build() {
-		return new ElasticsearchFieldProjection<>( absoluteFieldPath, converter );
+		return new ElasticsearchFieldProjection<>( absoluteFieldPath, converter, codec );
 	}
 }

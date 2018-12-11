@@ -67,7 +67,11 @@ abstract class AbstractStubStandardIndexSchemaFieldTypedContext<S extends Abstra
 		else {
 			helper.initialize( new StubExcludedIndexFieldAccessor<>( builder.getAbsolutePath(), builder.getRelativeName() ) );
 		}
-		builder.converter( new StubFieldConverter<>( inputType, helper.createUserIndexFieldConverter() ) );
+		builder.converter( new StubFieldConverter<>(
+				inputType,
+				helper.createDslToIndexConverter(),
+				helper.createIndexToProjectionConverter()
+		) );
 		return accessor;
 	}
 

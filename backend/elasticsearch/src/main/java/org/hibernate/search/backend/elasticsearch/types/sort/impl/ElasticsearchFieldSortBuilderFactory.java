@@ -8,7 +8,8 @@ package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -41,8 +42,9 @@ public interface ElasticsearchFieldSortBuilderFactory {
 	 * Determine whether another sort builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see ElasticsearchFieldConverter#isConvertDslToIndexCompatibleWith(ElasticsearchFieldConverter)
-	 *
+	 * @see org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
+	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
+	 * *
 	 * @param other Another {@link ElasticsearchFieldSortBuilderFactory}, never {@code null}.
 	 * @return {@code true} if the given sort builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.

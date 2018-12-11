@@ -14,7 +14,7 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneLongFieldCodec implements LuceneFieldCodec<Long> {
+public final class LuceneLongFieldCodec implements LuceneStandardFieldCodec<Long, Long> {
 
 	private final boolean projectable;
 
@@ -66,5 +66,10 @@ public final class LuceneLongFieldCodec implements LuceneFieldCodec<Long> {
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );
+	}
+
+	@Override
+	public Long encode(Long value) {
+		return value;
 	}
 }

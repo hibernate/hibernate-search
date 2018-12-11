@@ -13,13 +13,15 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBuilder
+abstract class AbstractLuceneStandardFieldSortBuilder<F, C extends LuceneStandardFieldCodec<F, ?>>
+		extends AbstractLuceneSearchSortBuilder
 		implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -28,7 +30,8 @@ abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBu
 
 	protected final String absoluteFieldPath;
 
-	protected final LuceneFieldConverter<?, ?> converter;
+	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	protected final C codec;
 
 	protected Object missingValue;
 
@@ -36,13 +39,16 @@ abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBu
 
 	private Object sortMissingValueLastPlaceholder;
 
-	protected AbstractLuceneFieldSortBuilder(
+	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, ?> converter,
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
+		this.codec = codec;
 		this.sortMissingValueFirstPlaceholder = sortMissingValueFirstPlaceholder;
 		this.sortMissingValueLastPlaceholder = sortMissingValueLastPlaceholder;
 	}
@@ -60,13 +66,18 @@ abstract class AbstractLuceneFieldSortBuilder extends AbstractLuceneSearchSortBu
 	@Override
 	public void missingAs(Object value) {
 		try {
-			missingValue = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			missingValue = encodeMissingAs( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
+	}
+
+	protected Object encodeMissingAs(F converted) {
+		return codec.encode( converted );
 	}
 
 	protected void setEffectiveMissingValue(SortField sortField, Object missingValue, SortOrder order) {
