@@ -327,7 +327,7 @@ public class SearchResultLoadingOrTransformingIT {
 	}
 
 	@Test
-	public void count() {
+	public void countQuery() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
@@ -339,6 +339,25 @@ public class SearchResultLoadingOrTransformingIT {
 
 		query = searchTarget.query()
 				.asReference()
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ).toPredicate() )
+				.build();
+
+		assertEquals( 1L, query.executeCount() );
+	}
+
+	@Test
+	public void countQueryWithProjection() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<String> query = searchTarget.query()
+				.asProjection( f -> f.field( "string", String.class ).toProjection() )
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		assertEquals( 2L, query.executeCount() );
+
+		query = searchTarget.query()
+				.asProjection( f -> f.field( "string", String.class ).toProjection() )
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ).toPredicate() )
 				.build();
 

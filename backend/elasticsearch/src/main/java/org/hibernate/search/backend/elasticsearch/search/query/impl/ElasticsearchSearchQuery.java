@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -77,11 +79,13 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public long executeCount() {
-		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
-				indexNames, routingKeys,
-				payload, searchResultExtractor,
-				firstResultIndex, 0L );
-		SearchResult<T> executeNoHits = queryOrchestrator.submit( work ).join();
-		return executeNoHits.getHitCount();
+		JsonObject filteredPayload = new JsonObject();
+		Optional<JsonObject> querySubTree = JsonAccessor.root().property( "query" ).asObject().get( payload );
+		if ( querySubTree.isPresent() ) {
+			filteredPayload.add( "query", querySubTree.get() );
+		}
+
+		ElasticsearchWork<Long> work = workFactory.count( indexNames, routingKeys, filteredPayload );
+		return queryOrchestrator.submit( work ).join();
 	}
 }

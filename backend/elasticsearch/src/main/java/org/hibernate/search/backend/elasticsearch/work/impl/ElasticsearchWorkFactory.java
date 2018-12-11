@@ -42,4 +42,6 @@ public interface ElasticsearchWorkFactory {
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);
 
+	ElasticsearchWork<Long> count(Set<URLEncodedString> indexNames, Set<String> routingKeys, JsonObject payload);
+
 }

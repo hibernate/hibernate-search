@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
@@ -171,5 +172,19 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 		*/
 
 		return new ElasticsearchStubWork<>( builder.build(), searchResultExtractor::extract );
+	}
+
+	@Override
+	public ElasticsearchWork<Long> count(Set<URLEncodedString> indexNames, Set<String> routingKeys, JsonObject payload) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.multiValuedPathComponent( indexNames )
+				.pathComponent( Paths._COUNT )
+				.body( payload );
+
+		if ( !routingKeys.isEmpty() ) {
+			builder.param( "_routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+		}
+
+		return new ElasticsearchStubWork<>( builder.build(), JsonAccessor.root().property( "count" ).asLong() );
 	}
 }

@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;
 
@@ -30,6 +31,11 @@ public class ElasticsearchStubWork<T> implements ElasticsearchWork<T> {
 	public ElasticsearchStubWork(ElasticsearchRequest request, Function<JsonObject, T> resultFunction) {
 		this.request = request;
 		this.resultFunction = resultFunction;
+	}
+
+	public ElasticsearchStubWork(ElasticsearchRequest request, JsonAccessor<T> accessor) {
+		this.request = request;
+		this.resultFunction = response -> accessor.get( response ).get();
 	}
 
 	@Override
