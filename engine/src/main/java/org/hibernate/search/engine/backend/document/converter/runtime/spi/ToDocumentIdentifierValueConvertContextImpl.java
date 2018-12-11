@@ -6,20 +6,18 @@
  */
 package org.hibernate.search.engine.backend.document.converter.runtime.spi;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContextExtension;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
-public class ToIndexFieldValueConvertContextImpl implements ToIndexFieldValueConvertContext {
+public class ToDocumentIdentifierValueConvertContextImpl implements ToDocumentIdentifierValueConvertContext {
 	private final MappingContextImplementor mappingContext;
 
-	public ToIndexFieldValueConvertContextImpl(MappingContextImplementor mappingContext) {
+	public ToDocumentIdentifierValueConvertContextImpl(MappingContextImplementor mappingContext) {
 		this.mappingContext = mappingContext;
 	}
 
 	@Override
-	public <T> T extension(ToIndexFieldValueConvertContextExtension<T> extension) {
+	public <T> T extension(ToDocumentIdentifierValueConvertContextExtension<T> extension) {
 		return DslExtensionState.returnIfSupported( extension, extension.extendOptional( this, mappingContext ) );
 	}
 }

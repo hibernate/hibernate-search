@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -26,7 +26,7 @@ public class StubCompositeFunctionSearchProjection<P, T> implements StubComposit
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromIndexFieldValueConvertContext context) {
+			FromDocumentFieldValueConvertContext context) {
 		return projection.extract( projectionHitMapper, projectionFromIndex, context );
 	}
 

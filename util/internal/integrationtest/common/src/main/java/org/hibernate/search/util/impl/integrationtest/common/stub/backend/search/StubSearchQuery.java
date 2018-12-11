@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.List;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -20,12 +20,12 @@ final class StubSearchQuery<T> implements SearchQuery<T> {
 	private final StubBackend backend;
 	private final List<String> indexNames;
 	private final StubSearchWork.Builder workBuilder;
-	private final FromIndexFieldValueConvertContext convertContext;
+	private final FromDocumentFieldValueConvertContext convertContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final StubSearchProjection<T> rootProjection;
 
 	StubSearchQuery(StubBackend backend, List<String> indexNames, StubSearchWork.Builder workBuilder,
-			FromIndexFieldValueConvertContext convertContext,
+			FromDocumentFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.indexNames = indexNames;

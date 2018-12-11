@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -24,14 +24,14 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 	private final List<String> indexNames;
 	private final StubSearchWork work;
-	private final FromIndexFieldValueConvertContext convertContext;
+	private final FromDocumentFieldValueConvertContext convertContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final StubSearchProjection<T> rootProjection;
 	private final StubSearchWorkBehavior<?> behavior;
 
 	SearchWorkCall(List<String> indexNames,
 			StubSearchWork work,
-			FromIndexFieldValueConvertContext convertContext,
+			FromDocumentFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			StubSearchProjection<T> rootProjection) {
 		this.indexNames = indexNames;
@@ -72,7 +72,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 
-	private static <U> List<U> getResults(FromIndexFieldValueConvertContext actualConvertContext,
+	private static <U> List<U> getResults(FromDocumentFieldValueConvertContext actualConvertContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<U> actualRootProjection,
 			List<?> rawHits) {

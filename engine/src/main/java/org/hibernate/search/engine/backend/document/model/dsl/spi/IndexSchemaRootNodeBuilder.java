@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 
@@ -17,6 +17,6 @@ public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder
 	 */
 	void explicitRouting();
 
-	void idDslConverter(ToIndexIdValueConverter<?> idConverter);
+	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
 
 }

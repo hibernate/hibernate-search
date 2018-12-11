@@ -12,8 +12,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextImpl;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
@@ -209,10 +209,10 @@ public class DocumentIdDefaultBridgeIT {
 		StubIndexSchemaNode rootSchemaNode = schemaCapture.getValue();
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		ToIndexIdValueConverter<I> dslToIndexConverter =
-				(ToIndexIdValueConverter<I>) rootSchemaNode.getIdDslConverter();
-		ToIndexIdValueConvertContextImpl convertContext =
-				new ToIndexIdValueConvertContextImpl( new JavaBeanMappingContext() );
+		ToDocumentIdentifierValueConverter<I> dslToIndexConverter =
+				(ToDocumentIdentifierValueConverter<I>) rootSchemaNode.getIdDslConverter();
+		ToDocumentIdentifierValueConvertContextImpl convertContext =
+				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanMappingContext() );
 		// isCompatibleWith must return true when appropriate
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
 		// convert and convertUnknown must behave appropriately on valid input

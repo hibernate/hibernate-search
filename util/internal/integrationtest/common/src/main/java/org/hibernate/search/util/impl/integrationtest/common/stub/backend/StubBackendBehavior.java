@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -54,7 +54,7 @@ public abstract class StubBackendBehavior {
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-				FromIndexFieldValueConvertContext convertContext,
+				FromDocumentFieldValueConvertContext convertContext,
 				ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
 					+ indexNames + "': " + work );
@@ -105,7 +105,7 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> prepareAndExecuteWork(String indexName, StubIndexWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
-			FromIndexFieldValueConvertContext convertContext,
+			FromDocumentFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection);
 
 	public abstract CompletableFuture<?> executeBulkWork(String indexName, StubIndexWork work);

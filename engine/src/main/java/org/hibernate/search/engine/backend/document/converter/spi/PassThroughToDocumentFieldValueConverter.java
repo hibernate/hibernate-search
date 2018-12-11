@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.engine.backend.document.converter.spi;
 
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.util.impl.common.Contracts;
 
-public final class PassThroughToIndexFieldValueConverter<F> implements ToIndexFieldValueConverter<F, F> {
+public final class PassThroughToDocumentFieldValueConverter<F> implements ToDocumentFieldValueConverter<F, F> {
 	private final Class<F> valueType;
 
-	public PassThroughToIndexFieldValueConverter(Class<F> valueType) {
+	public PassThroughToDocumentFieldValueConverter(Class<F> valueType) {
 		Contracts.assertNotNull( valueType, "valueType" );
 		this.valueType = valueType;
 	}
@@ -24,21 +24,21 @@ public final class PassThroughToIndexFieldValueConverter<F> implements ToIndexFi
 	}
 
 	@Override
-	public F convert(F value, ToIndexFieldValueConvertContext context) {
+	public F convert(F value, ToDocumentFieldValueConvertContext context) {
 		return value;
 	}
 
 	@Override
-	public F convertUnknown(Object value, ToIndexFieldValueConvertContext context) {
+	public F convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
 		return valueType.cast( value );
 	}
 
 	@Override
-	public boolean isCompatibleWith(ToIndexFieldValueConverter<?, ?> other) {
+	public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PassThroughToIndexFieldValueConverter<?> castedOther = (PassThroughToIndexFieldValueConverter<?>) other;
+		PassThroughToDocumentFieldValueConverter<?> castedOther = (PassThroughToDocumentFieldValueConverter<?>) other;
 		return valueType.equals( castedOther.valueType );
 	}
 }

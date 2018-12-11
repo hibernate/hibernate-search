@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -18,7 +18,7 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
-	private ToIndexIdValueConverter<?> idConverter;
+	private ToDocumentIdentifierValueConverter<?> idConverter;
 
 	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
 		this( backendBehavior, indexName, StubIndexSchemaNode.schema() );
@@ -37,7 +37,7 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public void idDslConverter(ToIndexIdValueConverter<?> idConverter) {
+	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter) {
 		builder.idDslConverter( idConverter );
 	}
 

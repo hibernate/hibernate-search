@@ -6,18 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.types.converter.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserIndexFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 public final class LuceneBooleanFieldConverter extends AbstractLuceneFieldConverter<Boolean, Integer> {
 
-	public LuceneBooleanFieldConverter(UserIndexFieldConverter<Boolean> userConverter) {
+	public LuceneBooleanFieldConverter(UserDocumentFieldConverter<Boolean> userConverter) {
 		super( userConverter );
 	}
 
 	@Override
 	public Integer convertDslToIndex(Object value,
-			ToIndexFieldValueConvertContext context) {
+			ToDocumentFieldValueConvertContext context) {
 		Boolean rawValue = userConverter.convertDslToIndex( value, context );
 		if ( value == null ) {
 			return null;

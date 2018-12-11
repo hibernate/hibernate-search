@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -28,7 +28,7 @@ public class StubCompositeListSearchProjection<T> implements StubCompositeSearch
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromIndexFieldValueConvertContext context) {
+			FromDocumentFieldValueConvertContext context) {
 		List<Object> extractedData = new ArrayList<>();
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 

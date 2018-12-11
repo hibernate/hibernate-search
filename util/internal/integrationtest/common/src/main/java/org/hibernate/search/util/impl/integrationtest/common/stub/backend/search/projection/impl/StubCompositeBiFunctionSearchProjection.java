@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import java.util.List;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -30,7 +30,7 @@ public class StubCompositeBiFunctionSearchProjection<P1, P2, T> implements StubC
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, Object projectionFromIndex,
-			FromIndexFieldValueConvertContext context) {
+			FromDocumentFieldValueConvertContext context) {
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
 		Object[] extractedElements = new Object[] {

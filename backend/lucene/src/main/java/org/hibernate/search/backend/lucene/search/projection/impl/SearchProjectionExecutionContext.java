@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromIndexFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 public class SearchProjectionExecutionContext {
 
-	private final FromIndexFieldValueConvertContext fromIndexFieldValueConvertContext;
+	private final FromDocumentFieldValueConvertContext fromDocumentFieldValueConvertContext;
 
 	public SearchProjectionExecutionContext(SessionContextImplementor sessionContext) {
-		this.fromIndexFieldValueConvertContext = new FromIndexFieldValueConvertContextImpl( sessionContext );
+		this.fromDocumentFieldValueConvertContext = new FromDocumentFieldValueConvertContextImpl( sessionContext );
 	}
 
-	FromIndexFieldValueConvertContext getFromIndexFieldValueConvertContext() {
-		return fromIndexFieldValueConvertContext;
+	FromDocumentFieldValueConvertContext getFromDocumentFieldValueConvertContext() {
+		return fromDocumentFieldValueConvertContext;
 	}
 }

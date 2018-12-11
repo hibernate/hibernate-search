@@ -17,8 +17,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
@@ -26,17 +26,18 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 
 	private List<String> values = new ArrayList<>();
 	private final LuceneSearchContext searchContext;
-	private final ToIndexIdValueConverter<?> idDslConverter;
+	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
-	public LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext, ToIndexIdValueConverter<?> idDslConverter) {
+	public LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext,
+			ToDocumentIdentifierValueConverter<?> idDslConverter) {
 		this.searchContext = searchContext;
 		this.idDslConverter = idDslConverter;
 	}
 
 	@Override
 	public void value(Object value) {
-		ToIndexIdValueConvertContext toIndexIdValueConvertContext = searchContext.getToIndexIdValueConvertContext();
-		values.add( idDslConverter.convertUnknown( value, toIndexIdValueConvertContext ) );
+		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext = searchContext.getToDocumentIdentifierValueConvertContext();
+		values.add( idDslConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
 	}
 
 	@Override

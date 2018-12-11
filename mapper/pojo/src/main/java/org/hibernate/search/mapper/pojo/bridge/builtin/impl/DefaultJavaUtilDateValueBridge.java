@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 import java.time.Instant;
 import java.util.Date;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -27,7 +27,7 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 	public StandardIndexSchemaFieldTypedContext<?, Instant> bind(ValueBridgeBindingContext<Date> context) {
 		return context.getIndexSchemaFieldContext().asInstant()
-				.projectionConverter( PojoDefaultDateFromIndexFieldValueConverter.INSTANCE );
+				.projectionConverter( PojoDefaultDateFromDocumentFieldValueConverter.INSTANCE );
 	}
 
 	@Override
@@ -48,8 +48,9 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 		return true;
 	}
 
-	private static class PojoDefaultDateFromIndexFieldValueConverter implements FromIndexFieldValueConverter<Instant, Date> {
-		private static final PojoDefaultDateFromIndexFieldValueConverter INSTANCE = new PojoDefaultDateFromIndexFieldValueConverter();
+	private static class PojoDefaultDateFromDocumentFieldValueConverter
+			implements FromDocumentFieldValueConverter<Instant, Date> {
+		private static final PojoDefaultDateFromDocumentFieldValueConverter INSTANCE = new PojoDefaultDateFromDocumentFieldValueConverter();
 
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
@@ -57,12 +58,12 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 		}
 
 		@Override
-		public Date convert(Instant value, FromIndexFieldValueConvertContext context) {
+		public Date convert(Instant value, FromDocumentFieldValueConvertContext context) {
 			return value == null ? null : Date.from( value );
 		}
 
 		@Override
-		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 			return INSTANCE.equals( other );
 		}
 	}

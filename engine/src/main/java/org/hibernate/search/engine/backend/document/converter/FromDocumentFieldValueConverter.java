@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.converter;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContextExtension;
 
 /**
  * A converter from a source index field value to a different value.
@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexF
  * @param <F> The type of source, index field values.
  * @param <V> The type of target values.
  */
-public interface FromIndexFieldValueConverter<F, V> {
+public interface FromDocumentFieldValueConverter<F, V> {
 
 	/**
 	 * Check whether converted values can be assigned to the given type.
@@ -31,20 +31,20 @@ public interface FromIndexFieldValueConverter<F, V> {
 	/**
 	 * @param value The index field value to convert.
 	 * @param context A context that can be
-	 * {@link FromIndexFieldValueConvertContext#extension(FromIndexFieldValueConvertContextExtension) extended}
+	 * {@link FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension) extended}
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The converted value.
 	 */
-	V convert(F value, FromIndexFieldValueConvertContext context);
+	V convert(F value, FromDocumentFieldValueConvertContext context);
 
 	/**
-	 * @param other Another {@link ToIndexFieldValueConverter}, never {@code null}.
+	 * @param other Another {@link ToDocumentFieldValueConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
-	 * i.e. its {@link #isConvertedTypeAssignableTo(Class)} and {@link #convert(Object, FromIndexFieldValueConvertContext)}
+	 * i.e. its {@link #isConvertedTypeAssignableTo(Class)} and {@link #convert(Object, FromDocumentFieldValueConvertContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */
-	default boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+	default boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 		return equals( other );
 	}
 

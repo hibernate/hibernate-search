@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -21,13 +21,13 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	private final StubBackend backend;
 	private final StubSearchTargetModel searchTargetModel;
 	private final StubSearchWork.Builder workBuilder;
-	private final FromIndexFieldValueConvertContext convertContext;
+	private final FromDocumentFieldValueConvertContext convertContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final StubSearchProjection<T> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubSearchTargetModel searchTargetModel,
 			StubSearchWork.ResultType resultType,
-			FromIndexFieldValueConvertContext convertContext,
+			FromDocumentFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
 		this.searchTargetModel = searchTargetModel;

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 /**
  * @param <S> The concrete type of this context.
@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.document.converter.ToIndexFieldValueC
  */
 public interface IndexSchemaFieldTypedContext<S extends IndexSchemaFieldTypedContext<? extends S, F>, F> {
 
-	S dslConverter(ToIndexFieldValueConverter<?, ? extends F> toIndexConverter);
+	S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter);
 
-	S projectionConverter(FromIndexFieldValueConverter<? super F, ?> fromIndexConverter);
+	S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter);
 
 }

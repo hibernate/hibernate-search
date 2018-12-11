@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.document.converter.runtime;
 
-public interface ToIndexFieldValueConvertContext {
+public interface ToDocumentFieldValueConvertContext {
 
-	<T> T extension(ToIndexFieldValueConvertContextExtension<T> extension);
+	<T> T extension(ToDocumentFieldValueConvertContextExtension<T> extension);
 
 }

@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.engine.backend.document.converter.spi;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 
-public final class PassThroughFromIndexFieldValueConverter<F> implements FromIndexFieldValueConverter<F, F> {
+public final class PassThroughFromDocumentFieldValueConverter<F> implements FromDocumentFieldValueConverter<F, F> {
 
 	private final Class<F> fieldType;
 
-	public PassThroughFromIndexFieldValueConverter(Class<F> fieldType) {
+	public PassThroughFromDocumentFieldValueConverter(Class<F> fieldType) {
 		this.fieldType = fieldType;
 	}
 
 	@Override
-	public F convert(F value, FromIndexFieldValueConvertContext context) {
+	public F convert(F value, FromDocumentFieldValueConvertContext context) {
 		return value;
 	}
 
@@ -28,11 +28,11 @@ public final class PassThroughFromIndexFieldValueConverter<F> implements FromInd
 	}
 
 	@Override
-	public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+	public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		PassThroughFromIndexFieldValueConverter<?> castedOther = (PassThroughFromIndexFieldValueConverter<?>) other;
+		PassThroughFromDocumentFieldValueConverter<?> castedOther = (PassThroughFromDocumentFieldValueConverter<?>) other;
 		return fieldType.equals( castedOther.fieldType );
 	}
 }

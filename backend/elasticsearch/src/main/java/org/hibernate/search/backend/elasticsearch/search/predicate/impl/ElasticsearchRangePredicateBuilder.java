@@ -55,7 +55,7 @@ public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSea
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			this.lowerLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.lowerLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -72,7 +72,7 @@ public class ElasticsearchRangePredicateBuilder extends AbstractElasticsearchSea
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			this.upperLimit = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			this.upperLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

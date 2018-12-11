@@ -12,8 +12,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.spi.ToIndexIdValueConverter;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -46,14 +46,14 @@ public class MatchIdWithConverterSearchPredicateIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	private static final ToIndexIdValueConverter<Integer> ID_CONVERTER = new ToIndexIdValueConverter<Integer>() {
+	private static final ToDocumentIdentifierValueConverter<Integer> ID_CONVERTER = new ToDocumentIdentifierValueConverter<Integer>() {
 		@Override
-		public String convert(Integer value, ToIndexIdValueConvertContext context) {
+		public String convert(Integer value, ToDocumentIdentifierValueConvertContext context) {
 			return "document" + value;
 		}
 
 		@Override
-		public String convertUnknown(Object value, ToIndexIdValueConvertContext context) {
+		public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
 			return convert( (Integer) value, context );
 		}
 	};

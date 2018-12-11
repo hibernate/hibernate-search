@@ -12,7 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
- * An extension to {@link FromIndexFieldValueConvertContext}, allowing to access non-standard context
+ * An extension to {@link FromDocumentFieldValueConvertContext}, allowing to access non-standard context
  * specific to a given mapper.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
@@ -22,20 +22,20 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
  *
  * @param <T> The type of extended contexts.
  *
- * @see FromIndexFieldValueConvertContext#extension(FromIndexFieldValueConvertContextExtension)
+ * @see FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension)
  */
-public interface FromIndexFieldValueConvertContextExtension<T> {
+public interface FromDocumentFieldValueConvertContextExtension<T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link FromIndexFieldValueConvertContext}.
+	 * @param original The original, non-extended {@link FromDocumentFieldValueConvertContext}.
 	 * @param sessionContext A {@link SessionContextImplementor}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(FromIndexFieldValueConvertContext original, SessionContextImplementor sessionContext);
+	Optional<T> extendOptional(FromDocumentFieldValueConvertContext original, SessionContextImplementor sessionContext);
 
 }

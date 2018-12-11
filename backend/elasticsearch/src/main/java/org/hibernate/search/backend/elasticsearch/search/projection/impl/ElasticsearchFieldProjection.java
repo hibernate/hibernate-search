@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -54,7 +54,7 @@ class ElasticsearchFieldProjection<T> implements ElasticsearchSearchProjection<T
 	public T extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExecutionContext searchProjectionExecutionContext) {
 		JsonElement fieldValue = hitFieldValueAccessor.get( hit ).orElse( null );
-		FromIndexFieldValueConvertContext context = searchProjectionExecutionContext.getFromIndexFieldValueConvertContext();
+		FromDocumentFieldValueConvertContext context = searchProjectionExecutionContext.getFromDocumentFieldValueConvertContext();
 		return (T) converter.convertIndexToProjection( fieldValue, context );
 	}
 

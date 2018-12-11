@@ -19,8 +19,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -723,14 +723,15 @@ public class FieldSearchProjectionIT {
 							.map( root, "converted_" + name );
 		}
 
-		private class IncompatibleProjectionConverter<F> implements FromIndexFieldValueConverter<F, ValueWrapper<F>> {
+		private class IncompatibleProjectionConverter<F> implements
+				FromDocumentFieldValueConverter<F, ValueWrapper<F>> {
 			@Override
 			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
 				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
 			}
 
 			@Override
-			public ValueWrapper<F> convert(F value, FromIndexFieldValueConvertContext context) {
+			public ValueWrapper<F> convert(F value, FromDocumentFieldValueConvertContext context) {
 				return null;
 			}
 		}

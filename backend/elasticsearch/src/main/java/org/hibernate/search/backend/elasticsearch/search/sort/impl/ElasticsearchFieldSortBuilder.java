@@ -55,7 +55,7 @@ public class ElasticsearchFieldSortBuilder extends AbstractElasticsearchSearchSo
 	public void missingAs(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertDslToIndex( value, searchContext.getToIndexFieldValueConvertContext() );
+			element = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -51,7 +51,7 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 	public T extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExecutionContext context) {
 		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
-		FromIndexFieldValueConvertContext convertContext = context.getFromIndexFieldValueConvertContext();
+		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
 		return (T) converter.convertIndexToProjection( rawValue, convertContext );
 	}
 

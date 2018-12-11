@@ -6,28 +6,28 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToIndexFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToIndexIdValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
 public final class ElasticsearchSearchContext {
 
-	private final ToIndexIdValueConvertContext toIndexIdValueConvertContext;
+	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
 
-	private final ToIndexFieldValueConvertContext toIndexFieldValueConvertContext;
+	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
 
 	public ElasticsearchSearchContext(MappingContextImplementor mappingContext) {
-		this.toIndexIdValueConvertContext = new ToIndexIdValueConvertContextImpl( mappingContext );
-		this.toIndexFieldValueConvertContext = new ToIndexFieldValueConvertContextImpl( mappingContext );
+		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
+		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 	}
 
-	public ToIndexIdValueConvertContext getToIndexIdValueConvertContext() {
-		return toIndexIdValueConvertContext;
+	public ToDocumentIdentifierValueConvertContext getToDocumentIdentifierValueConvertContext() {
+		return toDocumentIdentifierValueConvertContext;
 	}
 
-	public ToIndexFieldValueConvertContext getToIndexFieldValueConvertContext() {
-		return toIndexFieldValueConvertContext;
+	public ToDocumentFieldValueConvertContext getToDocumentFieldValueConvertContext() {
+		return toDocumentFieldValueConvertContext;
 	}
 }

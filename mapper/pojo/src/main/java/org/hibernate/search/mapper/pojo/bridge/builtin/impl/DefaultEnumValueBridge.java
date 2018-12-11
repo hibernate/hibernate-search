@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.engine.backend.document.converter.FromIndexFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromIndexFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -27,7 +27,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getIndexSchemaFieldContext().asString()
-				.projectionConverter( new PojoDefaultEnumFromIndexFieldValueConverter( enumType ) );
+				.projectionConverter( new PojoDefaultEnumFromDocumentFieldValueConverter( enumType ) );
 	}
 
 	@Override
@@ -50,12 +50,12 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		return enumType.equals( castedOther.enumType );
 	}
 
-	private static class PojoDefaultEnumFromIndexFieldValueConverter<V extends Enum<V>>
-			implements FromIndexFieldValueConverter<String, V> {
+	private static class PojoDefaultEnumFromDocumentFieldValueConverter<V extends Enum<V>>
+			implements FromDocumentFieldValueConverter<String, V> {
 
 		private final Class<V> enumType;
 
-		private PojoDefaultEnumFromIndexFieldValueConverter(Class<V> enumType) {
+		private PojoDefaultEnumFromDocumentFieldValueConverter(Class<V> enumType) {
 			this.enumType = enumType;
 		}
 
@@ -65,16 +65,16 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 		}
 
 		@Override
-		public V convert(String indexedValue, FromIndexFieldValueConvertContext context) {
+		public V convert(String indexedValue, FromDocumentFieldValueConvertContext context) {
 			return indexedValue == null ? null : Enum.valueOf( enumType, indexedValue );
 		}
 
 		@Override
-		public boolean isCompatibleWith(FromIndexFieldValueConverter<?, ?> other) {
+		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 			if ( !getClass().equals( other.getClass() ) ) {
 				return false;
 			}
-			PojoDefaultEnumFromIndexFieldValueConverter<?> castedOther = (PojoDefaultEnumFromIndexFieldValueConverter<?>) other;
+			PojoDefaultEnumFromDocumentFieldValueConverter<?> castedOther = (PojoDefaultEnumFromDocumentFieldValueConverter<?>) other;
 			return enumType.equals( castedOther.enumType );
 		}
 	}
