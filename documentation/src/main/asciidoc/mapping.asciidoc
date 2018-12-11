@@ -741,7 +741,7 @@ benefiting from the full text index speed and feature richness.
 An associated object can itself (but does not have to) be `@Indexed`
 ====
 
-When `@IndexedEmbedded` points to an entity, the association has to be directional and the other side
+When `@IndexedEmbedded` points to an entity, the association has to be bi-directional and the other side
 has to be annotated with `@ContainedIn`. If not, Hibernate Search has
 no way to update the root index when the associated entity is updated (in our example, a `Place`
 index document has to be updated when the associated `Address` instance is updated).
