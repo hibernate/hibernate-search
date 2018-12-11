@@ -24,7 +24,7 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneLocalDateFieldCodec implements LuceneStandardFieldCodec<LocalDate, Long> {
+public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<LocalDate, Long> {
 
 	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
@@ -97,5 +97,10 @@ public final class LuceneLocalDateFieldCodec implements LuceneStandardFieldCodec
 	@Override
 	public Long encode(LocalDate value) {
 		return value == null ? null : value.toEpochDay();
+	}
+
+	@Override
+	public LuceneNumericDomain<Long> getDomain() {
+		return LuceneNumericDomain.LONG;
 	}
 }

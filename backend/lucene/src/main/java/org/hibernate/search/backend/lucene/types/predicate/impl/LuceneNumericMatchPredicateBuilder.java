@@ -9,25 +9,24 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
 
-class LuceneLongMatchPredicateBuilder<F>
-		extends AbstractLuceneStandardMatchPredicateBuilder<F, Long, LuceneStandardFieldCodec<F, Long>> {
+class LuceneNumericMatchPredicateBuilder<F, E>
+		extends AbstractLuceneStandardMatchPredicateBuilder<F, E, LuceneNumericFieldCodec<F, E>> {
 
-	LuceneLongMatchPredicateBuilder(
+	LuceneNumericMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			LuceneStandardFieldCodec<F, Long> codec) {
+			LuceneNumericFieldCodec<F, E> codec) {
 		super( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		return LongPoint.newExactQuery( absoluteFieldPath, value );
+		return codec.getDomain().createExactQuery( absoluteFieldPath, value );
 	}
 }

@@ -10,24 +10,32 @@ import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneIntegerFieldSortBuilder<F>
-		extends AbstractLuceneStandardFieldSortBuilder<F, LuceneStandardFieldCodec<F, Integer>> {
+public class LuceneNumericFieldSortBuilder<F, E>
+		extends AbstractLuceneStandardFieldSortBuilder<F, E, LuceneNumericFieldCodec<F, E>> {
 
-	LuceneIntegerFieldSortBuilder(LuceneSearchContext searchContext,
+	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			LuceneStandardFieldCodec<F, Integer> codec) {
-		super( searchContext, absoluteFieldPath, converter, codec, Integer.MIN_VALUE, Integer.MAX_VALUE );
+			LuceneNumericFieldCodec<F, E> codec) {
+		super(
+				searchContext, absoluteFieldPath,
+				converter, codec,
+				codec.getDomain().getMinValue(),
+				codec.getDomain().getMaxValue()
+		);
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		SortField sortField = new SortField( absoluteFieldPath, SortField.Type.INT,
-				order == SortOrder.DESC );
+		SortField sortField = new SortField(
+				absoluteFieldPath,
+				codec.getDomain().getSortFieldType(),
+				order == SortOrder.DESC
+		);
 		setEffectiveMissingValue( sortField, missingValue, order );
 
 		collector.collectSortField( sortField );

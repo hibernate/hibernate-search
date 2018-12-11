@@ -6,50 +6,51 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardRangePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericDomain;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneIntegerRangePredicateBuilder<F>
-		extends AbstractLuceneStandardRangePredicateBuilder<F, Integer, LuceneStandardFieldCodec<F, Integer>> {
+class LuceneNumericRangePredicateBuilder<F, E>
+		extends AbstractLuceneStandardRangePredicateBuilder<F, E, LuceneNumericFieldCodec<F, E>> {
 
-	LuceneIntegerRangePredicateBuilder(
+	LuceneNumericRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,
-			LuceneStandardFieldCodec<F, Integer> codec) {
+			LuceneNumericFieldCodec<F, E> codec) {
 		super( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		return IntPoint.newRangeQuery(
+		LuceneNumericDomain<E> domain = codec.getDomain();
+		return domain.createRangeQuery(
 				absoluteFieldPath,
-				getLowerValue( lowerLimit, excludeLowerLimit ),
-				getUpperValue( upperLimit, excludeUpperLimit )
+				getLowerValue( domain, lowerLimit, excludeLowerLimit ),
+				getUpperValue( domain, upperLimit, excludeUpperLimit )
 		);
 	}
 
-	private static int getLowerValue(Integer lowerLimit, boolean excludeLowerLimit) {
+	private static <E> E getLowerValue(LuceneNumericDomain<E> domain, E lowerLimit, boolean excludeLowerLimit) {
 		if ( lowerLimit == null ) {
-			return Integer.MIN_VALUE;
+			return domain.getMinValue();
 		}
 		else {
-			return excludeLowerLimit ? Math.addExact( lowerLimit, 1 ) : lowerLimit;
+			return excludeLowerLimit ? domain.getNextValue( lowerLimit ) : lowerLimit;
 		}
 	}
 
-	private static int getUpperValue(Integer upperLimit, boolean excludeUpperLimit) {
+	private static <E> E getUpperValue(LuceneNumericDomain<E> domain, E upperLimit, boolean excludeUpperLimit) {
 		if ( upperLimit == null ) {
-			return Integer.MAX_VALUE;
+			return domain.getMaxValue();
 		}
 		else {
-			return excludeUpperLimit ? Math.addExact( upperLimit, -1 ) : upperLimit;
+			return excludeUpperLimit ? domain.getPreviousValue( upperLimit ) : upperLimit;
 		}
 	}
 }

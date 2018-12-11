@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldVal
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
 public class LuceneStringFieldSortBuilder<F>
-		extends AbstractLuceneStandardFieldSortBuilder<F, LuceneTextFieldCodec<F>> {
+		extends AbstractLuceneStandardFieldSortBuilder<F, String, LuceneTextFieldCodec<F>> {
 
 	LuceneStringFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
