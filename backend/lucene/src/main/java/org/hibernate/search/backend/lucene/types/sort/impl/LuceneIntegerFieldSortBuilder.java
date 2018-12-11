@@ -14,13 +14,13 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldC
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneIntegerFieldSortBuilder
-		extends AbstractLuceneStandardFieldSortBuilder<Integer, LuceneStandardFieldCodec<Integer, ?>> {
+public class LuceneIntegerFieldSortBuilder<F>
+		extends AbstractLuceneStandardFieldSortBuilder<F, LuceneStandardFieldCodec<F, Integer>> {
 
 	LuceneIntegerFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends Integer> converter,
-			LuceneStandardFieldCodec<Integer, ?> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneStandardFieldCodec<F, Integer> codec) {
 		super( searchContext, absoluteFieldPath, converter, codec, Integer.MIN_VALUE, Integer.MAX_VALUE );
 	}
 

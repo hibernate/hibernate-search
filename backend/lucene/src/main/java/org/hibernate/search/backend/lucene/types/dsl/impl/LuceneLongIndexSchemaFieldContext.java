@@ -51,8 +51,8 @@ public class LuceneLongIndexSchemaFieldContext
 				parentNode,
 				getRelativeFieldName(),
 				codec,
-				new LuceneLongFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
-				new LuceneLongFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneLongFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new LuceneLongFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 

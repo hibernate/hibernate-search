@@ -10,17 +10,20 @@ import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneMatchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneIntegerMatchPredicateBuilder extends AbstractLuceneMatchPredicateBuilder<Integer> {
+class LuceneIntegerMatchPredicateBuilder<F>
+		extends AbstractLuceneStandardMatchPredicateBuilder<F, Integer, LuceneStandardFieldCodec<F, Integer>> {
 
 	LuceneIntegerMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends Integer> converter) {
-		super( searchContext, absoluteFieldPath, converter );
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneStandardFieldCodec<F, Integer> codec) {
+		super( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override

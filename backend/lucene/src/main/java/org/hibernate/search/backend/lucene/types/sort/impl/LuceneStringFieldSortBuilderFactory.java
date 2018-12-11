@@ -12,12 +12,12 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-public class LuceneStringFieldSortBuilderFactory
-		extends AbstractLuceneStandardFieldSortBuilderFactory<String, LuceneTextFieldCodec<String>> {
+public class LuceneStringFieldSortBuilderFactory<F>
+		extends AbstractLuceneStandardFieldSortBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
 	public LuceneStringFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends String> converter,
-			LuceneTextFieldCodec<String> codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneTextFieldCodec<F> codec) {
 		super( sortable, converter, codec );
 	}
 
@@ -26,6 +26,6 @@ public class LuceneStringFieldSortBuilderFactory
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		checkSortable( absoluteFieldPath );
 
-		return new LuceneStringFieldSortBuilder( searchContext, absoluteFieldPath, converter, codec );
+		return new LuceneStringFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

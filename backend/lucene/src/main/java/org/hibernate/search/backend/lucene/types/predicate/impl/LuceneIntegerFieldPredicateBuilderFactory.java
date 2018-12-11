@@ -7,27 +7,32 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-public final class LuceneIntegerFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<Integer, LuceneIntegerFieldCodec> {
+/**
+ * A predicate factory for fields encoded as an integer.
+ *
+ * @param <F> The field type.
+ */
+public final class LuceneIntegerFieldPredicateBuilderFactory<F>
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneStandardFieldCodec<F, Integer>> {
 
 	public LuceneIntegerFieldPredicateBuilderFactory(
-			ToDocumentFieldValueConverter<?, ? extends Integer> converter,
-			LuceneIntegerFieldCodec codec) {
+			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			LuceneStandardFieldCodec<F, Integer> codec) {
 		super( converter, codec );
 	}
 
 	@Override
-	public LuceneIntegerMatchPredicateBuilder createMatchPredicateBuilder(
+	public LuceneIntegerMatchPredicateBuilder<F> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneIntegerMatchPredicateBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneIntegerMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 
 	@Override
-	public LuceneIntegerRangePredicateBuilder createRangePredicateBuilder(
+	public LuceneIntegerRangePredicateBuilder<?> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneIntegerRangePredicateBuilder( searchContext, absoluteFieldPath, converter );
+		return new LuceneIntegerRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

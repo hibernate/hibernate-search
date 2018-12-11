@@ -110,8 +110,8 @@ public class LuceneStringIndexSchemaFieldContext
 				parentNode,
 				getRelativeFieldName(),
 				codec,
-				new LuceneStringFieldPredicateBuilderFactory( dslToIndexConverter, codec, queryBuilder ),
-				new LuceneStringFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneStringFieldPredicateBuilderFactory<>( dslToIndexConverter, codec, queryBuilder ),
+				new LuceneStringFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
