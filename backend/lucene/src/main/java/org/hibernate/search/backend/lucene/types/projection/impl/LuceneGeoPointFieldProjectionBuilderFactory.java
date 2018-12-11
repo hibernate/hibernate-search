@@ -12,41 +12,42 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjectionBuilder;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjectionBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class LuceneGeoPointFieldProjectionBuilderFactory<T> implements LuceneFieldProjectionBuilderFactory {
+public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean projectable;
 
-	private final LuceneFieldCodec<T> codec;
+	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> converter;
+	private final LuceneFieldCodec<GeoPoint> codec;
 
-	private final LuceneFieldConverter<T, ?> converter;
-
-	public LuceneGeoPointFieldProjectionBuilderFactory(boolean projectable, LuceneFieldCodec<T> codec,
-			LuceneFieldConverter<T, ?> converter) {
+	public LuceneGeoPointFieldProjectionBuilderFactory(boolean projectable,
+			LuceneFieldCodec<GeoPoint> codec,
+			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter) {
 		this.projectable = projectable;
-		this.codec = codec;
 		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
-	public <U> FieldProjectionBuilder<U> createFieldValueProjectionBuilder(String absoluteFieldPath,
-			Class<U> expectedType) {
+	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
+	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
+			Class<T> expectedType) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
+		if ( !converter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return new LuceneFieldProjectionBuilder<>( absoluteFieldPath, codec, converter );
+		return (FieldProjectionBuilder<T>) new LuceneFieldProjectionBuilder<>( absoluteFieldPath, converter, codec );
 	}
 
 	@Override
@@ -66,11 +67,11 @@ public class LuceneGeoPointFieldProjectionBuilderFactory<T> implements LuceneFie
 			return false;
 		}
 
-		LuceneGeoPointFieldProjectionBuilderFactory<?> other = (LuceneGeoPointFieldProjectionBuilderFactory<?>) obj;
+		LuceneGeoPointFieldProjectionBuilderFactory other = (LuceneGeoPointFieldProjectionBuilderFactory) obj;
 
-		return projectable == other.projectable &&
-				codec.isCompatibleWith( other.codec ) &&
-				converter.isConvertIndexToProjectionCompatibleWith( other.converter );
+		return projectable == other.projectable
+				&& converter.isCompatibleWith( other.converter )
+				&& codec.isCompatibleWith( other.codec );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

@@ -10,37 +10,43 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public class ElasticsearchStandardFieldProjectionBuilderFactory implements ElasticsearchFieldProjectionBuilderFactory {
+public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements ElasticsearchFieldProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final boolean projectable;
 
-	private final ElasticsearchFieldConverter converter;
+	private final FromDocumentFieldValueConverter<? super F, ?> converter;
+	private final ElasticsearchFieldCodec<F> codec;
 
-	public ElasticsearchStandardFieldProjectionBuilderFactory(boolean projectable, ElasticsearchFieldConverter converter) {
+	public ElasticsearchStandardFieldProjectionBuilderFactory(boolean projectable,
+			FromDocumentFieldValueConverter<? super F, ?> converter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
+		this.codec = codec;
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
 	public <T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
 			Class<T> expectedType) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		if ( !converter.isProjectionCompatibleWith( expectedType ) ) {
+		if ( !converter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 
-		return new ElasticsearchFieldProjectionBuilder<>( absoluteFieldPath, converter );
+		return (FieldProjectionBuilder<T>) new ElasticsearchFieldProjectionBuilder<>( absoluteFieldPath, converter, codec );
 	}
 
 	@Override
@@ -60,10 +66,11 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory implements Elast
 			return false;
 		}
 
-		ElasticsearchStandardFieldProjectionBuilderFactory other = (ElasticsearchStandardFieldProjectionBuilderFactory) obj;
+		ElasticsearchStandardFieldProjectionBuilderFactory<?> other = (ElasticsearchStandardFieldProjectionBuilderFactory<?>) obj;
 
-		return projectable == other.projectable &&
-				converter.isConvertIndexToProjectionCompatibleWith( other.converter );
+		return projectable == other.projectable
+				&& converter.isCompatibleWith( other.converter )
+				&& codec.isCompatibleWith( other.codec );
 	}
 
 	private static void checkProjectable(String absoluteFieldPath, boolean projectable) {

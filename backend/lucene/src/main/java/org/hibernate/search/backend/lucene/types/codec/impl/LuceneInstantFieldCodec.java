@@ -16,7 +16,7 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneInstantFieldCodec implements LuceneFieldCodec<Instant> {
+public final class LuceneInstantFieldCodec implements LuceneStandardFieldCodec<Instant, Long> {
 
 	private final boolean projectable;
 
@@ -33,7 +33,8 @@ public final class LuceneInstantFieldCodec implements LuceneFieldCodec<Instant> 
 			return;
 		}
 
-		long time = value.toEpochMilli();
+		long time = encode( value );
+
 		if ( projectable ) {
 			documentBuilder.addField( new StoredField( absoluteFieldPath, time ) );
 		}
@@ -70,5 +71,10 @@ public final class LuceneInstantFieldCodec implements LuceneFieldCodec<Instant> 
 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );
+	}
+
+	@Override
+	public Long encode(Instant value) {
+		return value == null ? null : value.toEpochMilli();
 	}
 }

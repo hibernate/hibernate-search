@@ -11,7 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -20,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchFieldSortBuilder extends AbstractElasticsearchSearchSortBuilder
+public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearchSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -32,13 +33,17 @@ public class ElasticsearchFieldSortBuilder extends AbstractElasticsearchSearchSo
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
-	private final ElasticsearchFieldConverter converter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.converter = converter;
+		this.dslToIndexConverter = dslToIndexConverter;
+		this.codec = codec;
 	}
 
 	@Override
@@ -55,7 +60,8 @@ public class ElasticsearchFieldSortBuilder extends AbstractElasticsearchSearchSo
 	public void missingAs(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			element = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

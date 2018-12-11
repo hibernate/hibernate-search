@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -25,7 +25,7 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 
 	protected final String absoluteFieldPath;
 
-	protected final LuceneFieldConverter<?, F> converter;
+	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
 
 	protected F lowerLimit;
 
@@ -37,7 +37,8 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 
 	protected AbstractLuceneRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneFieldConverter<?, F> converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends F> converter) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
@@ -46,7 +47,7 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 	@Override
 	public void lowerLimit(Object value) {
 		try {
-			lowerLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			lowerLimit = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
@@ -63,7 +64,7 @@ public abstract class AbstractLuceneRangePredicateBuilder<F> extends AbstractLuc
 	@Override
 	public void upperLimit(Object value) {
 		try {
-			upperLimit = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			upperLimit = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

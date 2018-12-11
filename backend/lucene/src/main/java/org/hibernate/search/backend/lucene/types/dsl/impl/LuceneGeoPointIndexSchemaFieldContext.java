@@ -12,10 +12,10 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -44,19 +44,20 @@ public class LuceneGeoPointIndexSchemaFieldContext
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		LuceneStandardFieldConverter<GeoPoint> converter = new LuceneStandardFieldConverter<>(
-				helper.createUserIndexFieldConverter() );
-		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec( parentNode.getAbsolutePath( getRelativeFieldName() ),
-				resolvedProjectable, resolvedSortable );
+		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
+		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
+				parentNode.getAbsolutePath( getRelativeFieldName() ),
+				resolvedProjectable, resolvedSortable
+		);
 
 		LuceneIndexSchemaFieldNode<GeoPoint> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
 				codec,
 				LuceneGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new LuceneGeoPointFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

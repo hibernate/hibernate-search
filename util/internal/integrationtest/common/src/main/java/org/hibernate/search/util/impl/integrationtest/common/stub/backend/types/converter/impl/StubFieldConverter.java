@@ -6,23 +6,28 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl;
 
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.spi.UserDocumentFieldConverter;
 
 public class StubFieldConverter<F> {
 	private final Class<F> type;
-	private final UserDocumentFieldConverter<F> userConverter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 
-	public StubFieldConverter(Class<F> type, UserDocumentFieldConverter<F> userConverter) {
+	public StubFieldConverter(Class<F> type,
+			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
+			FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter) {
 		this.type = type;
-		this.userConverter = userConverter;
+		this.dslToIndexConverter = dslToIndexConverter;
+		this.indexToProjectionConverter = indexToProjectionConverter;
 	}
 
 	public Object convertIndexToProjection(Object indexValue, FromDocumentFieldValueConvertContext context) {
-		return userConverter.convertIndexToProjection( type.cast( indexValue ), context );
+		return indexToProjectionConverter.convert( type.cast( indexValue ), context );
 	}
 
 	public boolean isConvertIndexToProjectionCompatibleWith(StubFieldConverter<?> other) {
-		return userConverter.isConvertIndexToProjectionCompatibleWith( other.userConverter );
+		return indexToProjectionConverter.isCompatibleWith( other.indexToProjectionConverter );
 	}
 }

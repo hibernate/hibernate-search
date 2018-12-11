@@ -12,10 +12,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLongFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStandardFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLongFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLongFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -40,17 +41,19 @@ public class LuceneLongIndexSchemaFieldContext
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		LuceneStandardFieldConverter<Long> converter = new LuceneStandardFieldConverter<>( helper.createUserIndexFieldConverter() );
+		ToDocumentFieldValueConverter<?, ? extends Long> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super Long, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
 		LuceneLongFieldCodec codec = new LuceneLongFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<Long> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
 				codec,
-				new LuceneLongFieldPredicateBuilderFactory( converter ),
-				new LuceneLongFieldSortBuilderFactory( resolvedSortable, converter ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneLongFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
+				new LuceneLongFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

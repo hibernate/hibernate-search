@@ -7,13 +7,16 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
 public final class LuceneIntegerFieldPredicateBuilderFactory
-		extends AbstractLuceneStandardFieldPredicateBuilderFactory<LuceneFieldConverter<?, Integer>> {
+		extends AbstractLuceneStandardFieldPredicateBuilderFactory<Integer, LuceneIntegerFieldCodec> {
 
-	public LuceneIntegerFieldPredicateBuilderFactory(LuceneFieldConverter<?, Integer> converter) {
-		super( converter );
+	public LuceneIntegerFieldPredicateBuilderFactory(
+			ToDocumentFieldValueConverter<?, ? extends Integer> converter,
+			LuceneIntegerFieldCodec codec) {
+		super( converter, codec );
 	}
 
 	@Override

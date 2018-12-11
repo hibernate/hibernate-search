@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
@@ -16,9 +19,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchIntegerFieldCodec;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchStandardFieldConverter;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 
 import com.google.gson.JsonElement;
@@ -43,16 +44,17 @@ public class ElasticsearchIntegerIndexSchemaFieldContext
 			ElasticsearchIndexSchemaObjectNode parentNode) {
 		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
 
-		ElasticsearchStandardFieldConverter<Integer> converter = new ElasticsearchStandardFieldConverter<>(
-				helper.createUserIndexFieldConverter(),
-				ElasticsearchIntegerFieldCodec.INSTANCE
-		);
+		ToDocumentFieldValueConverter<?, ? extends Integer> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super Integer, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
+		ElasticsearchIntegerFieldCodec codec = ElasticsearchIntegerFieldCodec.INSTANCE;
 
 		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, converter, ElasticsearchIntegerFieldCodec.INSTANCE,
-				new ElasticsearchStandardFieldPredicateBuilderFactory( converter ),
-				new ElasticsearchStandardFieldSortBuilderFactory( resolvedSortable, converter ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory( resolvedProjectable, converter )
+				parentNode, codec,
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );

@@ -12,7 +12,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.types.converter.impl.ElasticsearchFieldConverter;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -23,7 +24,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchMatchPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -35,20 +36,25 @@ public class ElasticsearchMatchPredicateBuilder extends AbstractElasticsearchSea
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
-	private final ElasticsearchFieldConverter converter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath, ElasticsearchFieldConverter converter) {
+			String absoluteFieldPath,
+			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
+			ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.converter = converter;
+		this.dslToIndexConverter = dslToIndexConverter;
+		this.codec = codec;
 	}
 
 	@Override
 	public void value(Object value) {
 		JsonElement element;
 		try {
-			element = converter.convertDslToIndex( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			element = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(

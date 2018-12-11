@@ -11,7 +11,7 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneFieldConverter;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -22,10 +22,10 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 
 	private final LuceneFieldCodec<F> codec;
 
-	private final LuceneFieldConverter<F, ?> converter;
+	private final FromDocumentFieldValueConverter<? super F, T> converter;
 
 	LuceneFieldProjection(String absoluteFieldPath, LuceneFieldCodec<F> codec,
-			LuceneFieldConverter<F, ?> converter) {
+			FromDocumentFieldValueConverter<? super F, T> converter) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
 		this.converter = converter;
@@ -52,7 +52,7 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 			SearchProjectionExecutionContext context) {
 		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
 		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
-		return (T) converter.convertIndexToProjection( rawValue, convertContext );
+		return converter.convert( rawValue, convertContext );
 	}
 
 	@Override

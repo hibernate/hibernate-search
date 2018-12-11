@@ -14,10 +14,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneLocalDateFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneLocalDateFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneLocalDateFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
@@ -45,17 +46,19 @@ public class LuceneLocalDateIndexSchemaFieldContext
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-		LuceneLocalDateFieldConverter converter = new LuceneLocalDateFieldConverter( helper.createUserIndexFieldConverter() );
+		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
 		LuceneLocalDateFieldCodec codec = new LuceneLocalDateFieldCodec( resolvedProjectable, resolvedSortable );
 
 		LuceneIndexSchemaFieldNode<LocalDate> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
 				codec,
-				new LuceneLocalDateFieldPredicateBuilderFactory( converter ),
-				new LuceneLocalDateFieldSortBuilderFactory( resolvedSortable, converter ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneLocalDateFieldPredicateBuilderFactory( dslToIndexConverter, codec ),
+				new LuceneLocalDateFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );

@@ -14,7 +14,7 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneBooleanFieldCodec implements LuceneFieldCodec<Boolean> {
+public final class LuceneBooleanFieldCodec implements LuceneStandardFieldCodec<Boolean, Integer> {
 
 	private final boolean projectable;
 
@@ -30,7 +30,7 @@ public final class LuceneBooleanFieldCodec implements LuceneFieldCodec<Boolean> 
 		if ( value == null ) {
 			return;
 		}
-		Integer intValue = ( value ) ? 1 : 0;
+		Integer intValue = encode( value );
 
 		if ( projectable ) {
 			documentBuilder.addField( new StoredField( absoluteFieldPath, intValue ) );
@@ -69,4 +69,10 @@ public final class LuceneBooleanFieldCodec implements LuceneFieldCodec<Boolean> 
 		return ( projectable == other.projectable ) &&
 				( sortable == other.sortable );
 	}
+
+	@Override
+	public Integer encode(Boolean value) {
+		return value ? 1 : 0;
+	}
+
 }

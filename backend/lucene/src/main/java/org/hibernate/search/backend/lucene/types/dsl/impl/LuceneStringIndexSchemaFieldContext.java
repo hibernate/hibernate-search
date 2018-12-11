@@ -20,10 +20,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
-import org.hibernate.search.backend.lucene.types.converter.impl.LuceneStringFieldConverter;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneStringFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneStringFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -95,10 +96,10 @@ public class LuceneStringIndexSchemaFieldContext
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
-		LuceneStringFieldConverter converter = new LuceneStringFieldConverter(
-				helper.createUserIndexFieldConverter(),
-				analyzerOrNormalizer
-		);
+		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
+				helper.createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
+				helper.createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSortable,
 				getFieldType( resolvedProjectable, analyzer != null ),
@@ -108,11 +109,10 @@ public class LuceneStringIndexSchemaFieldContext
 		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
 				getRelativeFieldName(),
-				converter,
 				codec,
-				new LuceneStringFieldPredicateBuilderFactory( converter, analyzer != null, queryBuilder ),
-				new LuceneStringFieldSortBuilderFactory( resolvedSortable, converter ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, codec, converter )
+				new LuceneStringFieldPredicateBuilderFactory( dslToIndexConverter, codec, queryBuilder ),
+				new LuceneStringFieldSortBuilderFactory( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 
 		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
