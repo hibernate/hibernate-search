@@ -29,6 +29,8 @@ public interface ConfigurationProperty<T> {
 	 * such as the {@link #resolveOrRaw(ConfigurationPropertySource) resolved key} for this property.
 	 *
 	 * @param source A configuration source.
+	 * @param transform A transform function to be applied to the value of this configuration property
+	 * before returning the result.
 	 * @return The value of this property according to the given source.
 	 */
 	<R> R getAndTransform(ConfigurationPropertySource source, Function<T, R> transform);

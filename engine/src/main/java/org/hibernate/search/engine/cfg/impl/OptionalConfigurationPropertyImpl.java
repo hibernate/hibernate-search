@@ -33,6 +33,13 @@ final class OptionalConfigurationPropertyImpl<T> extends AbstractConfigurationPr
 	}
 
 	@Override
+	public <R> R getAndMapOrThrow(ConfigurationPropertySource source, Function<T, R> transform,
+			Function<String, RuntimeException> exceptionFunction) {
+		return getAndTransform( source, optional -> optional.map( transform ) )
+				.orElseThrow( () -> exceptionFunction.apply( resolveOrRaw( source ) ) );
+	}
+
+	@Override
 	<R> R convert(Optional<?> rawValue, Function<Optional<T>, R> transform) {
 		return transform.apply( rawValue.map( converter ) );
 	}
