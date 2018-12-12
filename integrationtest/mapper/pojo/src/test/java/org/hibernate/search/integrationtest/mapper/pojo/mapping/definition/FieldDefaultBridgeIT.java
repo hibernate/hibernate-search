@@ -16,17 +16,22 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -456,6 +461,41 @@ public class FieldDefaultBridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( RuntimeException.class );
+
+		// Projection converter (to be used by the backend)
+		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
+		@SuppressWarnings("unchecked")
+		FromDocumentFieldValueConverter<F, P> indexToProjectionConverter =
+				(FromDocumentFieldValueConverter<F, P>) fieldSchemaNode.getConverter().getIndexToProjectionConverter();
+		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
+				new FromDocumentFieldValueConvertContextImpl(
+						new JavaBeanSessionContext(
+								new JavaBeanMappingContext(),
+								null,
+								PojoRuntimeIntrospector.noProxy()
+						)
+				);
+		// isCompatibleWith must return true when appropriate
+		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
+		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
+		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();
+		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( propertyType ) ).isTrue();
+		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( IncompatibleType.class ) ).isFalse();
+		// convert must behave appropriately on valid input
+		Assertions.assertThat(
+				indexToProjectionConverter.convert( null, fromDocumentConvertContext )
+		)
+				.isNull();
+		Assertions.assertThat(
+				indexToProjectionConverter.convert( indexedFieldValue, fromDocumentConvertContext )
+		)
+				.isEqualTo( propertyValue );
+	}
+
+	/**
+	 * A type that is clearly not a supertype of any type with a default bridge.
+	 */
+	private static final class IncompatibleType {
 	}
 
 }
