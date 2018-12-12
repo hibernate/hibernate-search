@@ -48,7 +48,8 @@ import org.easymock.Capture;
  */
 public class FieldDefaultBridgeIT {
 
-	private static final String INDEX_NAME = "IndexName";
+	private static final String INDEX1_NAME = "Index1Name";
+	private static final String INDEX2_NAME = "Index2Name";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -58,8 +59,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void string() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			String myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			String myProperty;
 			@DocumentId
@@ -72,9 +86,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -86,8 +101,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void boxedInteger() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			Integer myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Integer getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			Integer myProperty;
 			@DocumentId
@@ -100,9 +128,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -114,8 +143,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void primitiveInteger() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			int myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public int getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			int myProperty;
 			@DocumentId
@@ -128,9 +170,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -142,8 +185,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void boxedLong() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			Long myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Long getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			Long myProperty;
 			@DocumentId
@@ -156,9 +212,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -170,8 +227,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void primitiveLong() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			long myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public long getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			long myProperty;
 			@DocumentId
@@ -184,9 +254,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -198,8 +269,17 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void boxedBoolean() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			Boolean myProperty;
+			@DocumentId
+			public Integer getId() { return id; }
+			@GenericField
+			public Boolean getMyProperty() { return myProperty; }
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			Boolean myProperty;
 			@DocumentId
@@ -208,9 +288,10 @@ public class FieldDefaultBridgeIT {
 			public Boolean getMyProperty() { return myProperty; }
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -222,8 +303,17 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void primitiveBoolean() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			boolean myProperty;
+			@DocumentId
+			public Integer getId() { return id; }
+			@GenericField
+			public boolean getMyProperty() { return myProperty; }
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			boolean myProperty;
 			@DocumentId
@@ -232,9 +322,10 @@ public class FieldDefaultBridgeIT {
 			public boolean getMyProperty() { return myProperty; }
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -246,8 +337,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void localDate() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			LocalDate myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public LocalDate getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			LocalDate myProperty;
 			@DocumentId
@@ -260,9 +364,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -274,8 +379,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void instant() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			Instant myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Instant getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			Instant myProperty;
 			@DocumentId
@@ -288,9 +406,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestPassThroughBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -302,8 +421,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void javaUtilDate() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			Date myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public Date getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			Date myProperty;
 			@DocumentId
@@ -317,9 +449,10 @@ public class FieldDefaultBridgeIT {
 		}
 		Instant instant = Instant.parse( "1970-01-09T13:28:59.00Z" );
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -331,8 +464,21 @@ public class FieldDefaultBridgeIT {
 
 	@Test
 	public void myEnum() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			MyEnum myProperty;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public MyEnum getMyProperty() {
+				return myProperty;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			MyEnum myProperty;
 			@DocumentId
@@ -345,9 +491,10 @@ public class FieldDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				(id, propertyValue) -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					entity.myProperty = propertyValue;
 					return entity;
@@ -362,30 +509,36 @@ public class FieldDefaultBridgeIT {
 		VALUE2
 	}
 
-	private <E, P> void doTestPassThroughBridge(Class<E> entityType,
+	private <E, P> void doTestPassThroughBridge(Class<E> entityType1, Class<?> entityType2,
 			BiFunction<Integer, P, E> newEntityFunction,
 			Class<P> propertyAndIndexFieldType,
 			P propertyAndIndexedFieldValue) {
 		doTestBridge(
-				entityType,
+				entityType1, entityType2,
 				newEntityFunction,
 				propertyAndIndexFieldType, propertyAndIndexFieldType,
 				propertyAndIndexedFieldValue, propertyAndIndexedFieldValue
 		);
 	}
 
-	private <E, P, F> void doTestBridge(Class<E> entityType,
+	private <E, P, F> void doTestBridge(Class<E> entityType1, Class<?> entityType2,
 			BiFunction<Integer, P, E> newEntityFunction,
 			Class<P> propertyType, Class<F> indexedFieldType,
 			P propertyValue, F indexedFieldValue) {
 		// Schema
-		Capture<StubIndexSchemaNode> schemaCapture = Capture.newInstance();
+		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
+		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
-				INDEX_NAME,
+				INDEX1_NAME,
 				b -> b.field( "myProperty", indexedFieldType ),
-				schemaCapture
+				schemaCapture1
 		);
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
+		backendMock.expectSchema(
+				INDEX2_NAME,
+				b -> b.field( "myProperty", indexedFieldType ),
+				schemaCapture2
+		);
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType1, entityType2 );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -394,7 +547,7 @@ public class FieldDefaultBridgeIT {
 
 			manager.getMainWorkPlan().add( entity1 );
 
-			backendMock.expectWorks( INDEX_NAME )
+			backendMock.expectWorks( INDEX1_NAME )
 					.add( "1", b -> b
 							.field( "myProperty", indexedFieldValue )
 					)
@@ -404,13 +557,13 @@ public class FieldDefaultBridgeIT {
 
 		// Searching
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<P> query = manager.search( entityType ).query()
+			SearchQuery<P> query = manager.search( entityType1 ).query()
 					.asProjection( f -> f.field( "myProperty", propertyType ).toProjection() )
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 
 			backendMock.expectSearchProjection(
-					Collections.singletonList( INDEX_NAME ),
+					Collections.singletonList( INDEX1_NAME ),
 					b -> {
 					},
 					StubSearchWorkBehavior.of(
@@ -428,15 +581,21 @@ public class FieldDefaultBridgeIT {
 		}
 
 		// DSL converter (to be used by the backend)
-		StubIndexSchemaNode fieldSchemaNode = schemaCapture.getValue().getChildren().get( "myProperty" ).get( 0 );
+		StubIndexSchemaNode index1FieldSchemaNode = schemaCapture1.getValue().getChildren().get( "myProperty" ).get( 0 );
+		StubIndexSchemaNode index2FieldSchemaNode = schemaCapture1.getValue().getChildren().get( "myProperty" ).get( 0 );
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ToDocumentFieldValueConverter<P, ?> dslToIndexConverter =
-				(ToDocumentFieldValueConverter<P, ?>) fieldSchemaNode.getConverter().getDslToIndexConverter();
+				(ToDocumentFieldValueConverter<P, ?>) index1FieldSchemaNode.getConverter().getDslToIndexConverter();
+		ToDocumentFieldValueConverter<?, ?> compatibleDslToIndexConverter =
+				index2FieldSchemaNode.getConverter().getDslToIndexConverter();
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
 				new ToDocumentFieldValueConvertContextImpl( new JavaBeanMappingContext() );
 		// isCompatibleWith must return true when appropriate
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentFieldValueConverter() ) )
+				.isFalse();
 		// convert and convertUnknown must behave appropriately on valid input
 		Assertions.assertThat(
 				dslToIndexConverter.convert( null, toDocumentConvertContext )
@@ -466,7 +625,9 @@ public class FieldDefaultBridgeIT {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		FromDocumentFieldValueConverter<F, P> indexToProjectionConverter =
-				(FromDocumentFieldValueConverter<F, P>) fieldSchemaNode.getConverter().getIndexToProjectionConverter();
+				(FromDocumentFieldValueConverter<F, P>) index1FieldSchemaNode.getConverter().getIndexToProjectionConverter();
+		FromDocumentFieldValueConverter<?, ?> compatibleIndexToProjectionConverter =
+				index2FieldSchemaNode.getConverter().getIndexToProjectionConverter();
 		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
 				new FromDocumentFieldValueConvertContextImpl(
 						new JavaBeanSessionContext(
@@ -477,6 +638,10 @@ public class FieldDefaultBridgeIT {
 				);
 		// isCompatibleWith must return true when appropriate
 		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
+		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( compatibleIndexToProjectionConverter ) )
+				.isTrue();
+		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( new IncompatibleFromDocumentFieldValueConverter() ) )
+				.isFalse();
 		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
 		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();
 		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( propertyType ) ).isTrue();
@@ -498,4 +663,34 @@ public class FieldDefaultBridgeIT {
 	private static final class IncompatibleType {
 	}
 
+	private static class IncompatibleToDocumentFieldValueConverter
+			implements ToDocumentFieldValueConverter<Object, Object> {
+		@Override
+		public Object convert(Object value, ToDocumentFieldValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+	}
+
+	private static class IncompatibleFromDocumentFieldValueConverter
+			implements FromDocumentFieldValueConverter<Object, Object> {
+		@Override
+		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Object convert(Object value, FromDocumentFieldValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
+			throw new UnsupportedOperationException();
+		}
+	}
 }
