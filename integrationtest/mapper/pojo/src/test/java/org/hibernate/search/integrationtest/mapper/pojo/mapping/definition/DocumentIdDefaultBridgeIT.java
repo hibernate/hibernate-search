@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -40,7 +41,8 @@ import org.easymock.Capture;
  */
 public class DocumentIdDefaultBridgeIT {
 
-	private static final String INDEX_NAME = "IndexName";
+	private static final String INDEX1_NAME = "Index1Name";
+	private static final String INDEX2_NAME = "Index2Name";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -50,8 +52,16 @@ public class DocumentIdDefaultBridgeIT {
 
 	@Test
 	public void boxedInteger() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Integer id;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Integer id;
 			@DocumentId
 			public Integer getId() {
@@ -59,9 +69,10 @@ public class DocumentIdDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				id -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					return entity;
 				},
@@ -72,8 +83,16 @@ public class DocumentIdDefaultBridgeIT {
 
 	@Test
 	public void primitiveInteger() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			int id;
+			@DocumentId
+			public int getId() {
+				return id;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			int id;
 			@DocumentId
 			public int getId() {
@@ -81,9 +100,10 @@ public class DocumentIdDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				id -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					return entity;
 				},
@@ -94,8 +114,16 @@ public class DocumentIdDefaultBridgeIT {
 
 	@Test
 	public void boxedLong() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			Long id;
+			@DocumentId
+			public Long getId() {
+				return id;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			Long id;
 			@DocumentId
 			public Long getId() {
@@ -103,9 +131,10 @@ public class DocumentIdDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				id -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					return entity;
 				},
@@ -116,8 +145,16 @@ public class DocumentIdDefaultBridgeIT {
 
 	@Test
 	public void primitiveLong() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			long id;
+			@DocumentId
+			public long getId() {
+				return id;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			long id;
 			@DocumentId
 			public long getId() {
@@ -125,9 +162,10 @@ public class DocumentIdDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				id -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					return entity;
 				},
@@ -138,8 +176,16 @@ public class DocumentIdDefaultBridgeIT {
 
 	@Test
 	public void myEnum() {
-		@Indexed(index = INDEX_NAME)
-		class IndexedEntity {
+		@Indexed(index = INDEX1_NAME)
+		class IndexedEntity1 {
+			MyEnum id;
+			@DocumentId
+			public MyEnum getId() {
+				return id;
+			}
+		}
+		@Indexed(index = INDEX2_NAME)
+		class IndexedEntity2 {
 			MyEnum id;
 			@DocumentId
 			public MyEnum getId() {
@@ -147,9 +193,10 @@ public class DocumentIdDefaultBridgeIT {
 			}
 		}
 		doTestBridge(
-				IndexedEntity.class,
+				IndexedEntity1.class,
+				IndexedEntity2.class,
 				id -> {
-					IndexedEntity entity = new IndexedEntity();
+					IndexedEntity1 entity = new IndexedEntity1();
 					entity.id = id;
 					return entity;
 				},
@@ -163,12 +210,14 @@ public class DocumentIdDefaultBridgeIT {
 		VALUE2
 	}
 
-	private <E, I> void doTestBridge(Class<E> entityType,
+	private <E, I> void doTestBridge(Class<E> entityType1, Class<?> entityType2,
 			Function<I, E> newEntityFunction, I identifierValue, String identifierAsString) {
 		// Schema
-		Capture<StubIndexSchemaNode> schemaCapture = Capture.newInstance();
-		backendMock.expectSchema( INDEX_NAME, b -> { }, schemaCapture );
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
+		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
+		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
+		backendMock.expectSchema( INDEX1_NAME, b -> { }, schemaCapture1 );
+		backendMock.expectSchema( INDEX2_NAME, b -> { }, schemaCapture2 );
+		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType1, entityType2 );
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -177,7 +226,7 @@ public class DocumentIdDefaultBridgeIT {
 
 			manager.getMainWorkPlan().add( entity1 );
 
-			backendMock.expectWorks( INDEX_NAME )
+			backendMock.expectWorks( INDEX1_NAME )
 					.add( identifierAsString, b -> { } )
 					.preparedThenExecuted();
 		}
@@ -186,35 +235,41 @@ public class DocumentIdDefaultBridgeIT {
 		// Searching
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			backendMock.expectSearchReferences(
-					Collections.singletonList( INDEX_NAME ),
+					Collections.singletonList( INDEX1_NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							StubBackendUtils.reference( INDEX_NAME, identifierAsString )
+							StubBackendUtils.reference( INDEX1_NAME, identifierAsString )
 					)
 			);
 
-			SearchQuery<PojoReference> query = manager.search( entityType )
+			SearchQuery<PojoReference> query = manager.search( entityType1 )
 					.query()
 					.asReference()
 					.predicate( f -> f.matchAll().toPredicate() )
 					.build();
 
 			assertThat( query )
-					.hasHitsExactOrder( new PojoReferenceImpl( entityType, identifierValue ) );
+					.hasHitsExactOrder( new PojoReferenceImpl( entityType1, identifierValue ) );
 		}
 		backendMock.verifyExpectationsMet();
 
 		// DSL converter (to be used by the backend)
-		StubIndexSchemaNode rootSchemaNode = schemaCapture.getValue();
+		StubIndexSchemaNode rootSchemaNode1 = schemaCapture1.getValue();
+		StubIndexSchemaNode rootSchemaNode2 = schemaCapture2.getValue();
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ToDocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(ToDocumentIdentifierValueConverter<I>) rootSchemaNode.getIdDslConverter();
+				(ToDocumentIdentifierValueConverter<I>) rootSchemaNode1.getIdDslConverter();
+		ToDocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
+				rootSchemaNode2.getIdDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanMappingContext() );
 		// isCompatibleWith must return true when appropriate
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentIdentifierValueConverter() ) )
+				.isFalse();
 		// convert and convertUnknown must behave appropriately on valid input
 		Assertions.assertThat(
 				dslToIndexConverter.convert( identifierValue, convertContext )
@@ -233,4 +288,21 @@ public class DocumentIdDefaultBridgeIT {
 				.isInstanceOf( RuntimeException.class );
 	}
 
+	private static class IncompatibleToDocumentIdentifierValueConverter
+			implements ToDocumentIdentifierValueConverter<Object> {
+		@Override
+		public String convert(Object value, ToDocumentIdentifierValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String convertUnknown(Object value, ToDocumentIdentifierValueConvertContext context) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean isCompatibleWith(ToDocumentIdentifierValueConverter<?> other) {
+			throw new UnsupportedOperationException();
+		}
+	}
 }
