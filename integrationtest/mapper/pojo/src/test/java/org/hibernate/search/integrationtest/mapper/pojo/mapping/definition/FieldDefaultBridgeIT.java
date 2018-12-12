@@ -16,17 +16,27 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.function.BiFunction;
 
+import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
+import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.assertj.core.api.Assertions;
+import org.easymock.Capture;
 
 /**
  * Test default value bridges for the {@code @GenericField} annotation.
@@ -364,8 +374,11 @@ public class FieldDefaultBridgeIT {
 			Class<P> propertyType, Class<F> indexedFieldType,
 			P propertyValue, F indexedFieldValue) {
 		// Schema
-		backendMock.expectSchema( INDEX_NAME, b -> b
-				.field( "myProperty", indexedFieldType )
+		Capture<StubIndexSchemaNode> schemaCapture = Capture.newInstance();
+		backendMock.expectSchema(
+				INDEX_NAME,
+				b -> b.field( "myProperty", indexedFieldType ),
+				schemaCapture
 		);
 		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType );
 		backendMock.verifyExpectationsMet();
@@ -408,6 +421,41 @@ public class FieldDefaultBridgeIT {
 							propertyValue
 					);
 		}
+
+		// DSL converter (to be used by the backend)
+		StubIndexSchemaNode fieldSchemaNode = schemaCapture.getValue().getChildren().get( "myProperty" ).get( 0 );
+		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
+		@SuppressWarnings("unchecked")
+		ToDocumentFieldValueConverter<P, ?> dslToIndexConverter =
+				(ToDocumentFieldValueConverter<P, ?>) fieldSchemaNode.getConverter().getDslToIndexConverter();
+		ToDocumentFieldValueConvertContext toDocumentConvertContext =
+				new ToDocumentFieldValueConvertContextImpl( new JavaBeanMappingContext() );
+		// isCompatibleWith must return true when appropriate
+		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		// convert and convertUnknown must behave appropriately on valid input
+		Assertions.assertThat(
+				dslToIndexConverter.convert( null, toDocumentConvertContext )
+		)
+				.isNull();
+		Assertions.assertThat(
+				dslToIndexConverter.convertUnknown( null, toDocumentConvertContext )
+		)
+				.isNull();
+		Assertions.assertThat(
+				dslToIndexConverter.convert( propertyValue, toDocumentConvertContext )
+		)
+				.isEqualTo( indexedFieldValue );
+		Assertions.assertThat(
+				dslToIndexConverter.convertUnknown( propertyValue, toDocumentConvertContext )
+		)
+				.isEqualTo( indexedFieldValue );
+		// convertUnknown must throw a runtime exception on invalid input
+		SubTest.expectException(
+				"convertUnknown on invalid input",
+				() -> dslToIndexConverter.convertUnknown( new Object(), toDocumentConvertContext )
+		)
+				.assertThrown()
+				.isInstanceOf( RuntimeException.class );
 	}
 
 }

@@ -30,4 +30,12 @@ public class StubFieldConverter<F> {
 	public boolean isConvertIndexToProjectionCompatibleWith(StubFieldConverter<?> other) {
 		return indexToProjectionConverter.isCompatibleWith( other.indexToProjectionConverter );
 	}
+
+	public ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter() {
+		return dslToIndexConverter;
+	}
+
+	public FromDocumentFieldValueConverter<? super F, ?> getIndexToProjectionConverter() {
+		return indexToProjectionConverter;
+	}
 }
