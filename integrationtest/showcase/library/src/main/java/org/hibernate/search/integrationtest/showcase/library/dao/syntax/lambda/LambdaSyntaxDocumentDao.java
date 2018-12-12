@@ -46,6 +46,19 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 	}
 
 	@Override
+	public long count() {
+		FullTextSession fullTextSession = entityManager.unwrap( FullTextSession.class );
+
+		FullTextQuery<Book> query =
+				fullTextSession.search( Book.class ).query()
+						.asEntity()
+						.predicate( f -> f.matchAll().toPredicate() )
+						.build();
+
+		return query.getResultSize();
+	}
+
+	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextQuery<Book> query = entityManager.search( Book.class ).query()
 				.asEntity()

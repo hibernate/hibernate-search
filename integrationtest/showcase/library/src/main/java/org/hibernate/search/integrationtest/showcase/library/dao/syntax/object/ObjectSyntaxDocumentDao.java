@@ -52,6 +52,20 @@ class ObjectSyntaxDocumentDao extends DocumentDao {
 	}
 
 	@Override
+	public long count() {
+		FullTextSession fullTextSession = entityManager.unwrap( FullTextSession.class );
+
+		FullTextSearchTarget<Book> target = fullTextSession.search( Book.class );
+
+		FullTextQuery<Book> query = target.query()
+						.asEntity()
+						.predicate( target.predicate().matchAll().toPredicate() )
+						.build();
+
+		return query.getResultSize();
+	}
+
+	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		FullTextSearchTarget<Book> target = entityManager.search( Book.class );
 		BooleanJunctionPredicateContext booleanBuilder = target.predicate().bool();

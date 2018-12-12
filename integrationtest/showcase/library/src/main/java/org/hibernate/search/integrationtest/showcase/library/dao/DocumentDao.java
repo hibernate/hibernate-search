@@ -81,6 +81,8 @@ public abstract class DocumentDao {
 
 	public abstract Optional<Book> getByIsbn(String isbnAsString);
 
+	public abstract long count();
+
 	public abstract List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit);
 
 	public abstract List<Document<?>> searchAroundMe(String terms, String tags,

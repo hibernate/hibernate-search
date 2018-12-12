@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.concurrent.CompletableFuture;
@@ -25,6 +24,8 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
@@ -123,13 +124,13 @@ public class IndexWorkExecutorIT {
 		CompletableFuture.allOf( tasks ).join();
 	}
 
-	private void assertBookNumberIsEqualsTo(Integer bookNumber, StubSessionContext sessionContext) {
+	private void assertBookNumberIsEqualsTo(long bookNumber, StubSessionContext sessionContext) {
 		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query( sessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( query ).hasHitCount( bookNumber );
+		Assertions.assertThat( query.executeCount() ).isEqualTo( bookNumber );
 	}
 
 	private static class IndexAccessors {

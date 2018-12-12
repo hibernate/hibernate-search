@@ -152,12 +152,13 @@ public class ManualIndexingIT {
 		assertThat( books ).hasSize( 0 );
 	}
 
-	public void checkEverythingIsIndexed(Session session) {
+	private void checkEverythingIsIndexed(Session session) {
 		DocumentDao dao = daoFactory.createDocumentDao( session );
+
+		assertThat( dao.count() ).isEqualTo( NUMBER_OF_BOOKS );
 
 		Optional<Book> book = dao.getByIsbn( "973-0-00-000007-3" );
 		assertTrue( book.isPresent() );
 		assertThat( book.get() ).isEqualTo( session.get( Book.class, 7 ) );
-		// TODO HSEARCH-3351 Use getResultSize() to fetch the total number of indexed documents and check that it's equal to NUMBER_OF_BOOKS
 	}
 }

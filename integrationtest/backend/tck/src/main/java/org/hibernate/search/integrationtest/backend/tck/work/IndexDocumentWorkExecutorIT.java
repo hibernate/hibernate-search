@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.concurrent.CompletableFuture;
@@ -25,13 +24,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import org.assertj.core.api.Assertions;
+
 /**
  * Verify that the {@link IndexDocumentWorkExecutor}, provided by a backend, is working properly, storing correctly the indexes.
  */
 public class IndexDocumentWorkExecutorIT {
 
 	private static final String INDEX_NAME = "lordOfTheRingsChapters";
-	public static final int NUMBER_OF_BOOKS = 200;
+	private static final int NUMBER_OF_BOOKS = 200;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -71,7 +72,7 @@ public class IndexDocumentWorkExecutorIT {
 				.predicate( f -> f.matchAll().toPredicate() )
 				.build();
 
-		assertThat( query ).hasHitCount( NUMBER_OF_BOOKS );
+		Assertions.assertThat( query.executeCount() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 
 	private static class IndexAccessors {
