@@ -9,13 +9,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -27,14 +26,14 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.TckConfiguration;
@@ -49,7 +48,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class SearchSortByFieldIT {
+public class FieldSearchSortIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -232,7 +231,7 @@ public class SearchSortByFieldIT {
 	public void error_unsortable() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsortableSupportedFieldModels ) {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedNonSortableFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException( () -> {
@@ -414,7 +413,7 @@ public class SearchSortByFieldIT {
 		final List<ByTypeFieldModel<?>> supportedFieldModels;
 		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
-		final List<ByTypeFieldModel<?>> unsortableSupportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedNonSortableFieldModels;
 
 		final MainFieldModel identicalForFirstTwo;
 		final MainFieldModel identicalForLastTwo;
@@ -423,12 +422,22 @@ public class SearchSortByFieldIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
-			supportedFieldWithDslConverterModels = mapSupportedFields(
-					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", ignored -> { },
+					FieldSortExpectations::isFieldSortSupported
 			);
-			unsupportedFieldModels = mapUnsupportedFields( root );
-			unsortableSupportedFieldModels = mapSupportedFields( root, "unsortable_", c -> c.sortable( Sortable.NO ) );
+			supportedFieldWithDslConverterModels = mapByTypeFields(
+					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					FieldSortExpectations::isFieldSortSupported
+			);
+			unsupportedFieldModels = mapByTypeFields(
+					root, "unsupported_", ignored -> { },
+					e -> !e.isFieldSortSupported()
+			);
+			supportedNonSortableFieldModels = mapByTypeFields(
+					root, "supported_nonSortable_", c -> c.sortable( Sortable.NO ),
+					FieldSortExpectations::isFieldSortSupported
+			);
 
 			identicalForFirstTwo = MainFieldModel.mapper(
 					"aaron", "aaron", "zach"
@@ -454,75 +463,35 @@ public class SearchSortByFieldIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.createAccessor();
-			supportedFieldModels = mapSupportedFields( objectField, "", ignored -> { } );
-			unsupportedFieldModels = mapUnsupportedFields( objectField );
+			supportedFieldModels = mapByTypeFields(
+					objectField, "supported_", ignored -> { },
+					FieldSortExpectations::isFieldSortSupported
+			);
+			unsupportedFieldModels = mapByTypeFields(
+					objectField, "unsupported_", ignored -> { },
+					e -> !e.isFieldSortSupported()
+			);
 		}
 	}
 
-	private static List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-		return Arrays.asList(
-				ByTypeFieldModel
-						// Mix capitalized and non-capitalized text on purpose
-						.mapper(
-								String.class,
-								c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ),
-								"Aaron", "george", "Zach",
-								// TODO Fix HSEARCH-3387, then mix capitalization here
-								"aaaaa", "bastian", "marco", "zzzz"
-						)
-						.map( root, prefix + "normalizedString", additionalConfiguration ),
-				ByTypeFieldModel.mapper( String.class, "aaron", "george", "zach",
-						"aaaa", "bastian", "marc", "zzzz"
+	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration,
+			Predicate<FieldSortExpectations<?>> predicate) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter(
+						typeDescriptor -> typeDescriptor.getFieldSortExpectations().isPresent()
+								&& predicate.test( typeDescriptor.getFieldSortExpectations().get() )
 				)
-						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
-				ByTypeFieldModel.mapper( Integer.class, 1, 3, 5,
-						Integer.MIN_VALUE, 2, 4, Integer.MAX_VALUE
-				)
-						.map( root, prefix + "integer", additionalConfiguration ),
-				ByTypeFieldModel.mapper( Long.class, 1L, 3L, 5L,
-						Long.MIN_VALUE, 2L, 4L, Long.MAX_VALUE
-				)
-						.map( root, prefix + "long", additionalConfiguration ),
-				ByTypeFieldModel.mapper(
-						LocalDate.class,
-						LocalDate.of( 2018, 2, 1 ),
-						LocalDate.of( 2018, 3, 1 ),
-						LocalDate.of( 2018, 4, 1 ),
-						LocalDate.of( 2018, 1, 1 ),
-						LocalDate.of( 2018, 2, 15 ),
-						LocalDate.of( 2018, 3, 15 ),
-						LocalDate.of( 2018, 5, 1 )
-				)
-						.map( root, prefix + "localDate", additionalConfiguration ),
-				ByTypeFieldModel.mapper(
-						Instant.class,
-						Instant.parse( "2018-02-01T10:15:30.00Z" ),
-						Instant.parse( "2018-03-01T10:15:30.00Z" ),
-						Instant.parse( "2018-04-01T10:15:30.00Z" ),
-						Instant.parse( "2018-01-01T10:15:30.00Z" ),
-						Instant.parse( "2018-02-15T10:15:30.00Z" ),
-						Instant.parse( "2018-03-15T10:15:30.00Z" ),
-						Instant.parse( "2018-05-01T10:15:30.00Z" )
-				)
-						.map( root, prefix + "instant", additionalConfiguration )
-		);
+				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
+				.collect( Collectors.toList() );
 	}
 
-	private static List<ByTypeFieldModel<?>> mapUnsupportedFields(IndexSchemaElement root) {
-		return Arrays.asList(
-				ByTypeFieldModel.mapper(
-						GeoPoint.class,
-						GeoPoint.of( 40, 70 ),
-						GeoPoint.of( 40, 75 ),
-						GeoPoint.of( 40, 80 ),
-						GeoPoint.of( 0, 0 ),
-						GeoPoint.of( 40, 72 ),
-						GeoPoint.of( 40, 77 ),
-						GeoPoint.of( 89, 89 )
-				)
-						.map( root, "geoPoint" )
-		);
+	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		FieldSortExpectations<F> expectations = typeDescriptor.getFieldSortExpectations().get(); // Safe, see caller
+		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
 	}
 
 	private static class ValueModel<F> {
@@ -565,36 +534,6 @@ public class SearchSortByFieldIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
-				F document1Value, F document2Value, F document3Value,
-				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
-			return mapper(
-					type,
-					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
-					document1Value, document2Value, document3Value,
-					before1Value, between1And2Value, between2And3Value, after3Value
-			);
-		}
-
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(
-				Class<F> type,
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
-				F document1Value, F document2Value, F document3Value,
-				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
-			return (parent, name, additionalConfiguration) -> {
-				IndexSchemaFieldContext untypedContext = parent.field( name );
-				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
-				context.sortable( Sortable.YES );
-				additionalConfiguration.accept( context );
-				IndexFieldAccessor<F> accessor = context.createAccessor();
-				return new ByTypeFieldModel<>(
-						accessor, name, type,
-						document1Value, document2Value, document3Value,
-						before1Value, between1And2Value, between2And3Value, after3Value
-				);
-			};
-		}
-
 		final String relativeFieldName;
 		final Class<F> type;
 
@@ -607,18 +546,23 @@ public class SearchSortByFieldIT {
 		final F between2And3Value;
 		final F after3Value;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName, Class<F> type,
-				F document1Value, F document2Value, F document3Value,
-				F before1Value, F between1And2Value, F between2And3Value, F after3Value) {
+		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
+				FieldTypeDescriptor<F> typeDescriptor, FieldSortExpectations<F> expectations,
+				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			IndexSchemaFieldContext untypedContext = parent.field( relativeFieldName );
+			StandardIndexSchemaFieldTypedContext<?, F> context = typeDescriptor.configure( untypedContext );
+			context.sortable( Sortable.YES );
+			additionalConfiguration.accept( context );
+			IndexFieldAccessor<F> accessor = context.createAccessor();
 			this.relativeFieldName = relativeFieldName;
-			this.type = type;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
-			this.document3Value = new ValueModel<>( accessor, document3Value );
-			this.before1Value = before1Value;
-			this.between1And2Value = between1And2Value;
-			this.between2And3Value = between2And3Value;
-			this.after3Value = after3Value;
+			this.type = typeDescriptor.getJavaType();
+			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
+			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
+			this.document3Value = new ValueModel<>( accessor, expectations.getDocument3Value() );
+			this.before1Value = expectations.getBeforeDocument1Value();
+			this.between1And2Value = expectations.getBetweenDocument1And2Value();
+			this.between2And3Value = expectations.getBetweenDocument2And3Value();
+			this.after3Value = expectations.getAfterDocument3Value();
 		}
 	}
 }

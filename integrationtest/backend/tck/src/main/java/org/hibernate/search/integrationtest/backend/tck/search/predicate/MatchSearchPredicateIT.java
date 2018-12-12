@@ -9,13 +9,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -23,6 +22,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.MatchPredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
@@ -33,7 +34,6 @@ import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHel
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -425,17 +425,17 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel analyzedStringField;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root, "supported_", ignored -> { } );
-			supportedFieldWithDslConverterModels = mapSupportedFields(
-					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", ignored -> { },
+					MatchPredicateExpectations::isMatchPredicateSupported
 			);
-			unsupportedFieldModels = Arrays.asList(
-					ByTypeFieldModel.mapper(
-							GeoPoint.class,
-							GeoPoint.of( 40, 70 ),
-							GeoPoint.of( 45, 98 )
-					)
-							.map( root, "geoPoint" )
+			supportedFieldWithDslConverterModels = mapByTypeFields(
+					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					MatchPredicateExpectations::isMatchPredicateSupported
+			);
+			unsupportedFieldModels = mapByTypeFields(
+					root, "supported_converted_", ignored -> { },
+					e -> !e.isMatchPredicateSupported()
 			);
 			string1Field = MainFieldModel.mapper(
 					"Irving", "Auster", "Coe"
@@ -455,39 +455,26 @@ public class MatchSearchPredicateIT {
 			)
 					.map( root, "analyzedString" );
 		}
+	}
 
-		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-			return Arrays.asList(
-					ByTypeFieldModel.mapper(
-							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
-							"irving and company", "Auster", "Irving"
-					)
-							.map(
-									root, prefix + "analyzedString", additionalConfiguration
-							),
-					ByTypeFieldModel.mapper( String.class, "Irving", "Auster" )
-							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
-					ByTypeFieldModel.mapper( Integer.class, 42, 67 )
-							.map( root, prefix + "integer", additionalConfiguration ),
-					ByTypeFieldModel.mapper( Long.class, 7L, 39L )
-							.map( root, prefix + "long", additionalConfiguration ),
-					ByTypeFieldModel.mapper( Boolean.class, false, true )
-							.map( root, prefix + "boolean", additionalConfiguration ),
-					ByTypeFieldModel.mapper(
-							LocalDate.class,
-							LocalDate.of( 1980, 10, 11 ),
-							LocalDate.of( 1984, 10, 7 )
-					)
-							.map( root, prefix + "localDate", additionalConfiguration ),
-					ByTypeFieldModel.mapper(
-							Instant.class,
-							Instant.parse( "1980-10-11T10:15:30.00Z" ),
-							Instant.parse( "1984-10-07T10:15:30.00Z" )
-					)
-							.map( root, prefix + "instant", additionalConfiguration )
-			);
-		}
+	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration,
+			Predicate<MatchPredicateExpectations<?>> predicate) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter(
+						typeDescriptor -> typeDescriptor.getMatchPredicateExpectations().isPresent()
+						&& predicate.test( typeDescriptor.getMatchPredicateExpectations().get() )
+				)
+				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get(); // Safe, see caller
+		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
 	}
 
 	private static class ValueModel<F> {
@@ -536,40 +523,23 @@ public class MatchSearchPredicateIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
-				F document1Value, F document2Value) {
-			return mapper(
-					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
-					document1Value, document2Value, document1Value
-			);
-		}
-
-		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
-				F document1Value, F document2Value, F predicateParameterValue) {
-			return (parent, name, additionalConfiguration) -> {
-				IndexSchemaFieldContext untypedContext = parent.field( name );
-				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
-				additionalConfiguration.accept( context );
-				IndexFieldAccessor<F> accessor = context.createAccessor();
-				return new ByTypeFieldModel<>(
-						accessor, name, document1Value, document2Value, predicateParameterValue
-				);
-			};
-		}
-
 		final String relativeFieldName;
 		final ValueModel<F> document1Value;
 		final ValueModel<F> document2Value;
 
 		final F predicateParameterValue;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
-				F document1Value, F document2Value, F predicateParameterValue) {
+		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
+				FieldTypeDescriptor<F> typeDescriptor, MatchPredicateExpectations<F> expectations,
+				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			IndexSchemaFieldContext untypedContext = parent.field( relativeFieldName );
+			StandardIndexSchemaFieldTypedContext<?, F> context = typeDescriptor.configure( untypedContext );
+			additionalConfiguration.accept( context );
+			IndexFieldAccessor<F> accessor = context.createAccessor();
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
-			this.predicateParameterValue = predicateParameterValue;
+			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
+			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
+			this.predicateParameterValue = expectations.getMatchingDocument1Value();
 		}
 	}
 }
