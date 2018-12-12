@@ -10,16 +10,17 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.function.Function;
+import java.util.Iterator;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.integrationtest.mapper.pojo.test.types.expectations.DefaultIdentifierBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.test.types.PropertyTypeDescriptor;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
@@ -30,19 +31,28 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.Assumptions;
 import org.easymock.Capture;
 
 /**
  * Test default identifier bridges for the {@code @DocumentId} annotation.
  */
-public class DocumentIdDefaultBridgeIT {
+@RunWith(Parameterized.class)
+public class DocumentIdDefaultBridgeIT<I> {
 
-	private static final String INDEX1_NAME = "Index1Name";
-	private static final String INDEX2_NAME = "Index2Name";
+	@Parameterized.Parameters(name = "{0}")
+	public static Object[] types() {
+		return PropertyTypeDescriptor.getAll().stream()
+				.map( type -> new Object[] { type, type.getDefaultIdentifierBridgeExpectations() } )
+				.toArray();
+	}
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -50,235 +60,130 @@ public class DocumentIdDefaultBridgeIT {
 	@Rule
 	public JavaBeanMappingSetupHelper setupHelper = new JavaBeanMappingSetupHelper( MethodHandles.lookup() );
 
-	@Test
-	public void boxedInteger() {
-		@Indexed(index = INDEX1_NAME)
-		class IndexedEntity1 {
-			Integer id;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-		}
-		@Indexed(index = INDEX2_NAME)
-		class IndexedEntity2 {
-			Integer id;
-			@DocumentId
-			public Integer getId() {
-				return id;
-			}
-		}
-		doTestBridge(
-				IndexedEntity1.class,
-				IndexedEntity2.class,
-				id -> {
-					IndexedEntity1 entity = new IndexedEntity1();
-					entity.id = id;
-					return entity;
-				},
-				42,
-				"42"
-		);
+	private DefaultIdentifierBridgeExpectations<I> expectations;
+	private JavaBeanMapping mapping;
+	private StubIndexSchemaNode index1RootSchemaNode;
+	private StubIndexSchemaNode index2RootSchemaNode;
+
+	public DocumentIdDefaultBridgeIT(PropertyTypeDescriptor<I> typeDescriptor,
+			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
+		Assumptions.assumeThat( expectations )
+				.as( "Type " + typeDescriptor + " does not have a default identifier bridge" )
+				.isNotEmpty();
+		this.expectations = expectations.get();
 	}
 
-	@Test
-	public void primitiveInteger() {
-		@Indexed(index = INDEX1_NAME)
-		class IndexedEntity1 {
-			int id;
-			@DocumentId
-			public int getId() {
-				return id;
-			}
-		}
-		@Indexed(index = INDEX2_NAME)
-		class IndexedEntity2 {
-			int id;
-			@DocumentId
-			public int getId() {
-				return id;
-			}
-		}
-		doTestBridge(
-				IndexedEntity1.class,
-				IndexedEntity2.class,
-				id -> {
-					IndexedEntity1 entity = new IndexedEntity1();
-					entity.id = id;
-					return entity;
-				},
-				42,
-				"42"
-		);
-	}
-
-	@Test
-	public void boxedLong() {
-		@Indexed(index = INDEX1_NAME)
-		class IndexedEntity1 {
-			Long id;
-			@DocumentId
-			public Long getId() {
-				return id;
-			}
-		}
-		@Indexed(index = INDEX2_NAME)
-		class IndexedEntity2 {
-			Long id;
-			@DocumentId
-			public Long getId() {
-				return id;
-			}
-		}
-		doTestBridge(
-				IndexedEntity1.class,
-				IndexedEntity2.class,
-				id -> {
-					IndexedEntity1 entity = new IndexedEntity1();
-					entity.id = id;
-					return entity;
-				},
-				73L,
-				"73"
-		);
-	}
-
-	@Test
-	public void primitiveLong() {
-		@Indexed(index = INDEX1_NAME)
-		class IndexedEntity1 {
-			long id;
-			@DocumentId
-			public long getId() {
-				return id;
-			}
-		}
-		@Indexed(index = INDEX2_NAME)
-		class IndexedEntity2 {
-			long id;
-			@DocumentId
-			public long getId() {
-				return id;
-			}
-		}
-		doTestBridge(
-				IndexedEntity1.class,
-				IndexedEntity2.class,
-				id -> {
-					IndexedEntity1 entity = new IndexedEntity1();
-					entity.id = id;
-					return entity;
-				},
-				9L,
-				"9"
-		);
-	}
-
-	@Test
-	public void myEnum() {
-		@Indexed(index = INDEX1_NAME)
-		class IndexedEntity1 {
-			MyEnum id;
-			@DocumentId
-			public MyEnum getId() {
-				return id;
-			}
-		}
-		@Indexed(index = INDEX2_NAME)
-		class IndexedEntity2 {
-			MyEnum id;
-			@DocumentId
-			public MyEnum getId() {
-				return id;
-			}
-		}
-		doTestBridge(
-				IndexedEntity1.class,
-				IndexedEntity2.class,
-				id -> {
-					IndexedEntity1 entity = new IndexedEntity1();
-					entity.id = id;
-					return entity;
-				},
-				MyEnum.VALUE1,
-				"VALUE1"
-		);
-	}
-
-	enum MyEnum {
-		VALUE1,
-		VALUE2
-	}
-
-	private <E, I> void doTestBridge(Class<E> entityType1, Class<?> entityType2,
-			Function<I, E> newEntityFunction, I identifierValue, String identifierAsString) {
-		// Schema
+	@Before
+	public void setup() {
 		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
-		backendMock.expectSchema( INDEX1_NAME, b -> { }, schemaCapture1 );
-		backendMock.expectSchema( INDEX2_NAME, b -> { }, schemaCapture2 );
-		JavaBeanMapping mapping = setupHelper.withBackendMock( backendMock ).setup( entityType1, entityType2 );
+		backendMock.expectSchema(
+				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME,
+				b -> { },
+				schemaCapture1
+		);
+		backendMock.expectSchema(
+				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME,
+				b -> { },
+				schemaCapture2
+		);
+		mapping = setupHelper.withBackendMock( backendMock )
+				.setup( expectations.getTypeWithIdentifierBridge1(), expectations.getTypeWithIdentifierBridge2() );
 		backendMock.verifyExpectationsMet();
+		index1RootSchemaNode = schemaCapture1.getValue();
+		index2RootSchemaNode = schemaCapture2.getValue();
+	}
 
-		// Indexing
+	@Test
+	public void indexing() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			E entity1 = newEntityFunction.apply( identifierValue );
+			for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
+				manager.getMainWorkPlan().add( entity );
+			}
 
-			manager.getMainWorkPlan().add( entity1 );
-
-			backendMock.expectWorks( INDEX1_NAME )
-					.add( identifierAsString, b -> { } )
-					.preparedThenExecuted();
-		}
-		backendMock.verifyExpectationsMet();
-
-		// Searching
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			backendMock.expectSearchReferences(
-					Collections.singletonList( INDEX1_NAME ),
-					b -> { },
-					StubSearchWorkBehavior.of(
-							1L,
-							StubBackendUtils.reference( INDEX1_NAME, identifierAsString )
-					)
+			BackendMock.WorkCallListContext expectationSetter = backendMock.expectWorks(
+					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME
 			);
-
-			SearchQuery<PojoReference> query = manager.search( entityType1 )
-					.query()
-					.asReference()
-					.predicate( f -> f.matchAll().toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasHitsExactOrder( new PojoReferenceImpl( entityType1, identifierValue ) );
+			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+				expectationSetter.add(
+						expectedDocumentIdentifierValue,
+						b -> { }
+				);
+			}
+			expectationSetter.preparedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
+	}
 
-		// DSL converter (to be used by the backend)
-		StubIndexSchemaNode rootSchemaNode1 = schemaCapture1.getValue();
-		StubIndexSchemaNode rootSchemaNode2 = schemaCapture2.getValue();
+	@Test
+	public void projection() {
+		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
+			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
+				I entityIdentifierValue = entityIdentifierIterator.next();
+				backendMock.expectSearchReferences(
+						Collections.singletonList(
+								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME ),
+						b -> {
+						},
+						StubSearchWorkBehavior.of(
+								1L,
+								StubBackendUtils.reference(
+										DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME,
+										documentIdentifierValue
+								)
+						)
+				);
+
+				SearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
+						.query()
+						.asReference()
+						.predicate( f -> f.matchAll().toPredicate() )
+						.build();
+
+				assertThat( query )
+						.hasHitsExactOrder( new PojoReferenceImpl(
+								expectations.getTypeWithIdentifierBridge1(),
+								entityIdentifierValue
+						) );
+			}
+			backendMock.verifyExpectationsMet();
+		}
+	}
+
+	// Test behavior that backends expect from our bridges when using the DSLs
+	@Test
+	public void dslToIndexConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
 		ToDocumentIdentifierValueConverter<I> dslToIndexConverter =
-				(ToDocumentIdentifierValueConverter<I>) rootSchemaNode1.getIdDslConverter();
+				(ToDocumentIdentifierValueConverter<I>) index1RootSchemaNode.getIdDslConverter();
 		ToDocumentIdentifierValueConverter<?> compatibleDslToIndexConverter =
-				rootSchemaNode2.getIdDslConverter();
+				index2RootSchemaNode.getIdDslConverter();
 		ToDocumentIdentifierValueConvertContextImpl convertContext =
 				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanMappingContext() );
+
 		// isCompatibleWith must return true when appropriate
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
 		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentIdentifierValueConverter() ) )
 				.isFalse();
+
 		// convert and convertUnknown must behave appropriately on valid input
-		Assertions.assertThat(
-				dslToIndexConverter.convert( identifierValue, convertContext )
-		)
-				.isEqualTo( identifierAsString );
-		Assertions.assertThat(
-				dslToIndexConverter.convertUnknown( identifierValue, convertContext )
-		)
-				.isEqualTo( identifierAsString );
+		Iterator<String> documentIdentifierIterator = expectations.getDocumentIdentifierValues().iterator();
+		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
+			String documentIdentifierValue = documentIdentifierIterator.next();
+			Assertions.assertThat(
+					dslToIndexConverter.convert( entityIdentifierValue, convertContext )
+			)
+					.isEqualTo( documentIdentifierValue );
+			Assertions.assertThat(
+					dslToIndexConverter.convertUnknown( entityIdentifierValue, convertContext )
+			)
+					.isEqualTo( documentIdentifierValue );
+		}
+
 		// convertUnknown must throw a runtime exception on invalid input
 		SubTest.expectException(
 				"convertUnknown on invalid input",
