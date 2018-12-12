@@ -9,12 +9,12 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -30,8 +30,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchem
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.integrationtest.backend.tck.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.FieldProjectionExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
@@ -234,7 +234,7 @@ public class FieldSearchProjectionIT {
 	public void error_nonProjectable() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		for ( FieldModel<?> fieldModel : indexMapping.nonProjectableSupportedFieldModels ) {
+		for ( FieldModel<?> fieldModel : indexMapping.supportedNonProjectableFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 			Class<?> fieldType = fieldModel.type;
 
@@ -528,7 +528,7 @@ public class FieldSearchProjectionIT {
 	private static class IndexMapping {
 		final List<FieldModel<?>> supportedFieldModels;
 		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels;
-		final List<FieldModel<?>> nonProjectableSupportedFieldModels;
+		final List<FieldModel<?>> supportedNonProjectableFieldModels;
 
 		final FieldModel<String> string1Field;
 
@@ -536,12 +536,15 @@ public class FieldSearchProjectionIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
-			supportedFieldWithProjectionConverterModels = mapSupportedFields(
-					root, "converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", ignored -> { }
 			);
-			nonProjectableSupportedFieldModels = mapSupportedFields( root, "nonProjectable_",
-					c -> c.projectable( Projectable.NO ) );
+			supportedFieldWithProjectionConverterModels = mapByTypeFields(
+					root, "supported_converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
+			);
+			supportedNonProjectableFieldModels = mapByTypeFields(
+					root, "supported_nonProjectable_", c -> c.projectable( Projectable.NO )
+			);
 
 			string1Field = FieldModel.mapper( String.class, "ccc", "mmm", "xxx" )
 					.map( root, "string1" );
@@ -560,49 +563,48 @@ public class FieldSearchProjectionIT {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.createAccessor();
-			supportedFieldModels = mapSupportedFields( objectField, "", ignored -> { } );
+			supportedFieldModels = mapByTypeFields(
+					objectField, "supported_", ignored -> { }
+			);
 		}
 	}
 
-	private static List<FieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
+	private static List<FieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
 			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-		return Arrays.asList(
-				FieldModel
-						// Mix capitalized and non-capitalized text on purpose
-						.mapper( String.class,
-								c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ),
-								"Aaron", "george", "Zach" )
-						.map( root, prefix + "normalizedString", additionalConfiguration ),
-				FieldModel.mapper( String.class, "aaron", "george", "zach" )
-						.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
-				FieldModel.mapper( Integer.class, 1, 3, 5 )
-						.map( root, prefix + "integer", additionalConfiguration ),
-				FieldModel.mapper( Long.class, 1L, 3L, 5L )
-						.map( root, prefix + "long", additionalConfiguration ),
-				FieldModel.mapper( Boolean.class, false, true, false )
-						.map( root, prefix + "boolean", additionalConfiguration ),
-				FieldModel.mapper(
-						LocalDate.class,
-						LocalDate.of( 2018, 2, 1 ),
-						LocalDate.of( 2018, 3, 1 ),
-						LocalDate.of( 2018, 4, 1 )
-				)
-						.map( root, prefix + "localDate", additionalConfiguration ),
-				FieldModel.mapper(
-						Instant.class,
-						Instant.parse( "2018-02-01T10:15:30.00Z" ),
-						Instant.parse( "2018-03-01T10:15:30.00Z" ),
-						Instant.parse( "2018-04-01T10:15:30.00Z" )
-				)
-						.map( root, prefix + "instant", additionalConfiguration ),
-				FieldModel.mapper(
-						GeoPoint.class,
-						GeoPoint.of( 40, 70 ),
-						GeoPoint.of( 40, 75 ),
-						GeoPoint.of( 40, 80 )
-				)
-						.map( root, prefix + "geoPoint", additionalConfiguration )
-		);
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
+				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> FieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		FieldProjectionExpectations<F> expectations = typeDescriptor.getFieldProjectionExpectations().get(); // Safe, see caller
+		return FieldModel.mapper(
+				typeDescriptor.getJavaType(), typeDescriptor::configure,
+				expectations.getDocument1Value(), expectations.getDocument2Value(), expectations.getDocument3Value()
+		)
+				.map( parent, name, additionalConfiguration );
+	}
+
+	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
+			BiFunction<FieldTypeDescriptor<?>, IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> configuration) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
+				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			BiFunction<FieldTypeDescriptor<?>, IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> configuration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		return IncompatibleFieldModel.mapper(
+				context -> configuration.apply( typeDescriptor, context )
+		)
+				.map( parent, name );
 	}
 
 	private static class ValueModel<F> {
@@ -670,25 +672,18 @@ public class FieldSearchProjectionIT {
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
 			 * but with an incompatible type.
 			 */
-			fieldModels = Arrays.asList(
-					mapIncompatibleTypeField( root, "normalizedString", Integer.class ),
-					mapIncompatibleTypeField( root, "nonAnalyzedString", Integer.class ),
-					mapIncompatibleTypeField( root, "integer", Long.class ),
-					mapIncompatibleTypeField( root, "long", Integer.class ),
-					mapIncompatibleTypeField( root, "boolean", Integer.class ),
-					mapIncompatibleTypeField( root, "localDate", String.class ),
-					mapIncompatibleTypeField( root, "instant", Long.class ),
-					mapIncompatibleTypeField( root, "geoPoint", String.class )
+			fieldModels = mapByTypeSupportedIncompatibleFields(
+					root, "supported_",
+					(type, context) -> {
+						// Just try to pick a different, also supported type
+						if ( Integer.class.equals( type.getJavaType() ) ) {
+							return context.as( Long.class ).projectable( Projectable.YES );
+						}
+						else {
+							return context.as( Integer.class ).projectable( Projectable.YES );
+						}
+					}
 			);
-		}
-
-		private <F> IncompatibleFieldModel<F> mapIncompatibleTypeField(IndexSchemaElement root, String name, Class<F> type) {
-			return IncompatibleFieldModel.mapper(
-					type,
-					context -> context.as( type )
-							.projectable( Projectable.YES )
-			)
-					.map( root, name );
 		}
 	}
 
@@ -700,27 +695,14 @@ public class FieldSearchProjectionIT {
 			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexMapping,
 			 * but with an incompatible projection converter.
 			 */
-			fieldModels = Arrays.asList(
-					mapIncompatibleProjectionConverterField( root, "normalizedString", String.class ),
-					mapIncompatibleProjectionConverterField( root, "nonAnalyzedString", String.class ),
-					mapIncompatibleProjectionConverterField( root, "integer", Integer.class ),
-					mapIncompatibleProjectionConverterField( root, "long", Long.class ),
-					mapIncompatibleProjectionConverterField( root, "boolean", Boolean.class ),
-					mapIncompatibleProjectionConverterField( root, "localDate", LocalDate.class ),
-					mapIncompatibleProjectionConverterField( root, "instant", Instant.class ),
-					mapIncompatibleProjectionConverterField( root, "geoPoint", GeoPoint.class )
+			fieldModels = mapByTypeSupportedIncompatibleFields(
+					root, "supported_converted_",
+					(type, context) -> {
+						// Just add a different, incompatible projection converter
+						return type.configure( context )
+								.projectionConverter( new IncompatibleProjectionConverter<>() );
+					}
 			);
-		}
-
-		private <F> IncompatibleFieldModel<F> mapIncompatibleProjectionConverterField(
-				IndexSchemaElement root, String name, Class<F> type) {
-			return IncompatibleFieldModel.mapper(
-							type,
-							context -> context.as( type )
-									.projectable( Projectable.YES )
-									.projectionConverter( new IncompatibleProjectionConverter<>() )
-					)
-							.map( root, "converted_" + name );
 		}
 
 		private class IncompatibleProjectionConverter<F> implements
@@ -740,12 +722,11 @@ public class FieldSearchProjectionIT {
 	private static class IncompatibleFieldModel<F> {
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(Class<F> type) {
 			return mapper(
-					type,
 					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type )
 			);
 		}
 
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(Class<F> type,
+		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
 				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration) {
 			return (parent, name, additionalConfiguration) -> {
 				IndexSchemaFieldContext untypedContext = parent.field( name );
@@ -753,18 +734,14 @@ public class FieldSearchProjectionIT {
 				context.projectable( Projectable.YES );
 				additionalConfiguration.accept( context );
 				context.createAccessor();
-				return new IncompatibleFieldModel<>(
-						name, type
-				);
+				return new IncompatibleFieldModel<>( name );
 			};
 		}
 
 		final String relativeFieldName;
-		final Class<F> type;
 
-		private IncompatibleFieldModel(String relativeFieldName, Class<F> type) {
+		private IncompatibleFieldModel(String relativeFieldName) {
 			this.relativeFieldName = relativeFieldName;
-			this.type = type;
 		}
 	}
 }

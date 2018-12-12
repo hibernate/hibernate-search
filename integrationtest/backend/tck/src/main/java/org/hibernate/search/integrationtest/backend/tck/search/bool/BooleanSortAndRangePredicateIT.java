@@ -26,8 +26,8 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
-import org.hibernate.search.integrationtest.backend.tck.search.sort.SearchSortByFieldIT;
 import org.hibernate.search.integrationtest.backend.tck.util.rule.SearchSetupHelper;
+import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortIT;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 
@@ -39,10 +39,10 @@ import org.junit.rules.ExpectedException;
 /**
  * Tests sorting and ranging behaviour querying a boolean type field
  *
- * @see SearchSortByFieldIT
+ * @see FieldSearchSortIT
  * @see RangeSearchPredicateIT
  */
-public class BooleanSortAndRangeQueryIT {
+public class BooleanSortAndRangePredicateIT {
 
 	public static final String INDEX_NAME = "myIndexName";
 	public static final String FIELD_PATH = "boolean";

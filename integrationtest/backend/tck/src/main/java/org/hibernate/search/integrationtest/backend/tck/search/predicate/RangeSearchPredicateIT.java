@@ -9,17 +9,19 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import java.time.Instant;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -27,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.util.ValueWrapper;
@@ -687,19 +688,17 @@ public class RangeSearchPredicateIT {
 		final MainFieldModel string3Field;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapSupportedFields( root, "", ignored -> { } );
-			supportedFieldWithDslConverterModels = mapSupportedFields(
-					root, "converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() )
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", ignored -> { },
+					RangePredicateExpectations::isRangePredicateSupported
 			);
-			unsupportedFieldModels = Arrays.asList(
-					ByTypeFieldModel.mapper(
-							GeoPoint.class,
-							GeoPoint.of( 40, 70 ),
-							GeoPoint.of( 40, 71 ),
-							GeoPoint.of( 40, 72 ),
-							GeoPoint.of( 30, 60 ), GeoPoint.of( 50, 80 )
-					)
-							.map( root, "geoPoint" )
+			supportedFieldWithDslConverterModels = mapByTypeFields(
+					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					RangePredicateExpectations::isRangePredicateSupported
+			);
+			unsupportedFieldModels = mapByTypeFields(
+					root, "supported_converted_", ignored -> { },
+					e -> !e.isRangePredicateSupported()
 			);
 			string1Field = MainFieldModel.mapper( "ccc", "mmm", "xxx" )
 					.map( root, "string1" );
@@ -708,42 +707,26 @@ public class RangeSearchPredicateIT {
 			string3Field = MainFieldModel.mapper( "eee", "ooo", "zzz" )
 					.map( root, "string3" );
 		}
+	}
 
-		private List<ByTypeFieldModel<?>> mapSupportedFields(IndexSchemaElement root, String prefix,
-				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-			return Arrays.asList(
-					// TODO also test analyzed strings
-					ByTypeFieldModel.mapper( String.class, "ccc", "mmm", "xxx",
-							"ggg", "rrr"
-					)
-							.map( root, prefix + "nonAnalyzedString", additionalConfiguration ),
-					ByTypeFieldModel.mapper( Integer.class, 3, 13, 25,
-							10, 19
-					)
-							.map( root, prefix + "integer", additionalConfiguration ),
-					ByTypeFieldModel.mapper( Long.class, 3L, 13L, 25L,
-							10L, 19L
-					)
-							.map( root, prefix + "long", additionalConfiguration ),
-					ByTypeFieldModel.mapper(
-							LocalDate.class,
-							LocalDate.of( 2003, 6, 3 ),
-							LocalDate.of( 2013, 6, 3 ),
-							LocalDate.of( 2025, 6, 3 ),
-							LocalDate.of( 2010, 6, 8 ), LocalDate.of( 2019, 4, 18 )
-					)
-							.map( root, prefix + "localDate", additionalConfiguration ),
-					ByTypeFieldModel.mapper(
-							Instant.class,
-							Instant.parse( "2003-06-03T10:15:30.00Z" ),
-							Instant.parse( "2013-06-03T10:15:30.00Z" ),
-							Instant.parse( "2025-06-03T10:15:30.00Z" ),
-							Instant.parse( "2010-06-08T10:15:30.00Z" ),
-							Instant.parse( "2019-04-18T10:15:30.00Z" )
-					)
-							.map( root, prefix + "instant", additionalConfiguration )
-			);
-		}
+	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration,
+			Predicate<RangePredicateExpectations<?>> predicate) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter(
+						typeDescriptor -> typeDescriptor.getRangePredicateExpectations().isPresent()
+								&& predicate.test( typeDescriptor.getRangePredicateExpectations().get() )
+				)
+				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		RangePredicateExpectations<F> expectations = typeDescriptor.getRangePredicateExpectations().get(); // Safe, see caller
+		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
 	}
 
 	private static class ValueModel<F> {
@@ -786,21 +769,6 @@ public class RangeSearchPredicateIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
-		public static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(Class<F> type,
-				F document1Value, F document2Value, F document3Value,
-				F predicateLowerBound, F predicateUpperBound) {
-			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<?, F> context = parent.field( name ).as( type );
-				configuration.accept( context );
-				IndexFieldAccessor<F> accessor = context.createAccessor();
-				return new ByTypeFieldModel<>(
-						accessor, name,
-						document1Value, document2Value, document3Value,
-						predicateLowerBound, predicateUpperBound
-				);
-			};
-		}
-
 		final String relativeFieldName;
 		final ValueModel<F> document1Value;
 		final ValueModel<F> document2Value;
@@ -809,15 +777,19 @@ public class RangeSearchPredicateIT {
 		final F predicateLowerBound;
 		final F predicateUpperBound;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
-				F document1Value, F document2Value, F document3Value,
-				F predicateLowerBound, F predicateUpperBound) {
+		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
+				FieldTypeDescriptor<F> typeDescriptor, RangePredicateExpectations<F> expectations,
+				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			IndexSchemaFieldContext untypedContext = parent.field( relativeFieldName );
+			StandardIndexSchemaFieldTypedContext<?, F> context = typeDescriptor.configure( untypedContext );
+			additionalConfiguration.accept( context );
+			IndexFieldAccessor<F> accessor = context.createAccessor();
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
-			this.document3Value = new ValueModel<>( accessor, document3Value );
-			this.predicateLowerBound = predicateLowerBound;
-			this.predicateUpperBound = predicateUpperBound;
+			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
+			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
+			this.document3Value = new ValueModel<>( accessor, expectations.getDocument3Value() );
+			this.predicateLowerBound = expectations.getBetweenDocument1And2Value();
+			this.predicateUpperBound = expectations.getBetweenDocument2And3Value();
 		}
 	}
 }

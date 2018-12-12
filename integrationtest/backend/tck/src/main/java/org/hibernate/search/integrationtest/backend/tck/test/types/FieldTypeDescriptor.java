@@ -1,0 +1,73 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.backend.tck.test.types;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.FieldProjectionExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.FieldSortExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.MatchPredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.test.types.expectations.RangePredicateExpectations;
+
+public abstract class FieldTypeDescriptor<F> {
+
+	private static List<FieldTypeDescriptor<?>> all;
+
+	public static List<FieldTypeDescriptor<?>> getAll() {
+		if ( all == null ) {
+			all = Collections.unmodifiableList( Arrays.asList(
+					new AnalyzedStringFieldTypeDescriptor(),
+					new NormalizedStringFieldTypeDescriptor(),
+					new IntegerFieldTypeDescriptor(),
+					new LongFieldTypeDescriptor(),
+					new BooleanFieldTypeDescriptor(),
+					new InstantFieldTypeDescriptor(),
+					new LocalDateFieldTypeDescriptor(),
+					new GeoPointFieldTypeDescriptor()
+			) );
+		}
+		return all;
+	}
+
+	private final Class<F> javaType;
+	private final String uniqueName;
+
+	protected FieldTypeDescriptor(Class<F> javaType) {
+		this( javaType, javaType.getSimpleName() );
+	}
+
+	protected FieldTypeDescriptor(Class<F> javaType, String uniqueName) {
+		this.javaType = javaType;
+		this.uniqueName = uniqueName;
+	}
+
+	public final Class<F> getJavaType() {
+		return javaType;
+	}
+
+	public final String getUniqueName() {
+		return uniqueName;
+	}
+
+	public StandardIndexSchemaFieldTypedContext<?, F> configure(IndexSchemaFieldContext fieldContext) {
+		return fieldContext.as( javaType );
+	}
+
+	public abstract Optional<MatchPredicateExpectations<F>> getMatchPredicateExpectations();
+
+	public abstract Optional<RangePredicateExpectations<F>> getRangePredicateExpectations();
+
+	public abstract Optional<FieldSortExpectations<F>> getFieldSortExpectations();
+
+	public abstract Optional<FieldProjectionExpectations<F>> getFieldProjectionExpectations();
+
+}
