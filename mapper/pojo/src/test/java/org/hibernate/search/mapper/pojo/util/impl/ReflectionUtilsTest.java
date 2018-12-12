@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.test.util.TypeCapture;
-import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture;
-import org.hibernate.search.mapper.pojo.test.util.WildcardTypeCapture.Of;
+import org.hibernate.search.mapper.pojo.testsupport.util.TypeCapture;
+import org.hibernate.search.mapper.pojo.testsupport.util.WildcardTypeCapture;
+import org.hibernate.search.mapper.pojo.testsupport.util.WildcardTypeCapture.Of;
 
 import org.junit.Test;
 

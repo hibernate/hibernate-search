@@ -10,8 +10,8 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.engine.test.util.AbstractBeanProviderPartialMock;
-import org.hibernate.search.engine.test.util.AbstractConfigurationPropertySourcePartialMock;
+import org.hibernate.search.engine.testsupport.util.AbstractBeanProviderPartialMock;
+import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
 import org.hibernate.search.util.SearchException;
 
 import org.junit.Rule;
