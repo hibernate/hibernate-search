@@ -85,7 +85,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	@Override
 	public long executeCount() {
 		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<>(
-				indexNames, readerProviders, luceneQuery, luceneSort, firstResultIndex, 0L,
+				indexNames, readerProviders, luceneQuery, luceneSort, 0L, 0L,
 				// do not add any TopDocs collector
 				( luceneCollectorBuilder -> { } ),
 				searchResultExtractor

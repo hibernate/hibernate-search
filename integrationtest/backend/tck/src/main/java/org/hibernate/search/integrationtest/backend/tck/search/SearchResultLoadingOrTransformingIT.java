@@ -343,6 +343,19 @@ public class SearchResultLoadingOrTransformingIT {
 				.build();
 
 		assertEquals( 1L, query.executeCount() );
+
+		// Using setFirstResult/setMaxResult should not affect the count
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		query.setFirstResult( 1L );
+		assertEquals( 2L, query.executeCount() );
+
+		query.setFirstResult( 0L );
+		query.setMaxResults( 1L );
+		assertEquals( 2L, query.executeCount() );
 	}
 
 	@Test
