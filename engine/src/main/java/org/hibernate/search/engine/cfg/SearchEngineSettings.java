@@ -27,6 +27,16 @@ public final class SearchEngineSettings {
 	public static final String DEFAULT_BACKEND = "default_backend";
 
 	/**
+	 * The root property whose children are backend names, e.g. "backends.myBackend.type = elasticsearch".
+	 */
+	public static final String BACKENDS = "backends";
+
+	/**
+	 * The root property whose children are index names, e.g. "indexes.myIndex.backend = myBackend".
+	 */
+	public static final String INDEXES = "indexes";
+
+	/**
 	 * The {@link BeanConfigurer} instances
 	 * used to pre-define beans.
 	 * <p>
