@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.cfg.SearchEngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -55,7 +56,7 @@ public class SearchSetupHelper implements TestRule {
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
 
 		return new SetupContext( propertySource )
-				.withProperty( "indexes.default.backend", backendName );
+				.withProperty( SearchEngineSettings.DEFAULT_BACKEND, backendName );
 	}
 
 	@Override

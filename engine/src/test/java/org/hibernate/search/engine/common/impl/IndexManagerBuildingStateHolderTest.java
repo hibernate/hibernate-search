@@ -45,15 +45,15 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( Optional.empty() );
 		EasyMock.expect( configurationSourceMock.resolve( "indexes.indexName.backend" ) )
 				.andReturn( Optional.of( keyPrefix + "indexes.indexName.backend" ) );
-		EasyMock.expect( configurationSourceMock.get( "indexes.default.backend" ) )
+		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
 				.andReturn( Optional.empty() );
-		EasyMock.expect( configurationSourceMock.resolve( "indexes.default.backend" ) )
-				.andReturn( Optional.of( keyPrefix + "indexes.default.backend" ) );
+		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
+				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Missing backend reference for index 'indexName'" );
 		thrown.expectMessage( "Set the property 'somePrefix.indexes.indexName.backend' to a supported value" );
-		thrown.expectMessage( "or set 'somePrefix.indexes.default.backend' to set a default value for all indexes" );
+		thrown.expectMessage( "or set 'somePrefix.default_backend' to set a default value for all indexes" );
 		holder.startBuilding( "indexName", false );
 		verifyAll();
 	}
@@ -66,15 +66,15 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( (Optional) Optional.of( "" ) );
 		EasyMock.expect( configurationSourceMock.resolve( "indexes.indexName.backend" ) )
 				.andReturn( Optional.of( keyPrefix + "indexes.indexName.backend" ) );
-		EasyMock.expect( configurationSourceMock.get( "indexes.default.backend" ) )
+		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
 				.andReturn( (Optional) Optional.of( "" ) );
-		EasyMock.expect( configurationSourceMock.resolve( "indexes.default.backend" ) )
-				.andReturn( Optional.of( keyPrefix + "indexes.default.backend" ) );
+		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
+				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Missing backend reference for index 'indexName'" );
 		thrown.expectMessage( "Set the property 'somePrefix.indexes.indexName.backend' to a supported value" );
-		thrown.expectMessage( "or set 'somePrefix.indexes.default.backend' to set a default value for all indexes" );
+		thrown.expectMessage( "or set 'somePrefix.default_backend' to set a default value for all indexes" );
 		holder.startBuilding( "indexName", false );
 		verifyAll();
 	}

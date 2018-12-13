@@ -28,7 +28,7 @@
             <property name="hibernate.search.backends.myBackend.root_directory"
                       value="some/filesystem/path"/>
              --> <!--3-->
-            <property name="hibernate.search.indexes.default.backend"
+            <property name="hibernate.search.default_backend"
                       value="myBackend"/> <!--4-->
             <!-- end::gettingstarted-configuration-orm_lucene[] -->
 
@@ -59,7 +59,7 @@
             <property name="hibernate.search.backends.myBackend.password"
                       value="j@rV1s"/>
              --> <!--2-->
-            <property name="hibernate.search.indexes.default.backend"
+            <property name="hibernate.search.default_backend"
                       value="myBackend"/> <!--3-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch[] -->
 
@@ -91,7 +91,7 @@
             <property name="hibernate.search.backends.myBackend.analysis_configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyLuceneAnalysisConfigurer"/> <!--5-->
             <!-- end::gettingstarted-configuration-orm_lucene-analysis[] -->
-            <property name="hibernate.search.indexes.default.backend"
+            <property name="hibernate.search.default_backend"
                       value="myBackend"/>
 
             <!--
@@ -116,7 +116,7 @@
             <property name="hibernate.search.backends.myBackend.analysis_configurer"
                       value="org.hibernate.search.documentation.gettingstarted.withhsearch.withanalysis.MyElasticsearchAnalysisConfigurer"/> <!--6-->
             <!-- end::gettingstarted-configuration-orm_elasticsearch-analysis[] -->
-            <property name="hibernate.search.indexes.default.backend"
+            <property name="hibernate.search.default_backend"
                       value="myBackend"/>
 
             <!--

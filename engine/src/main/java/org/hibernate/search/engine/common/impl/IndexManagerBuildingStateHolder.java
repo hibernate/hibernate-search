@@ -9,9 +9,11 @@ package org.hibernate.search.engine.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.cfg.SearchEngineSettings;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -40,6 +42,9 @@ class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final OptionalConfigurationProperty<String> DEFAULT_INDEX_BACKEND_NAME =
+			ConfigurationProperty.forKey( SearchEngineSettings.DEFAULT_BACKEND ).asString().build();
+
 	private static final OptionalConfigurationProperty<String> INDEX_BACKEND_NAME =
 			ConfigurationProperty.forKey( "backend" ).asString().build();
 
@@ -49,7 +54,6 @@ class IndexManagerBuildingStateHolder {
 	private final BeanProvider beanProvider;
 	private final ConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
-	private final ConfigurationPropertySource defaultIndexPropertySource;
 
 	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new HashMap<>();
 	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
@@ -59,20 +63,12 @@ class IndexManagerBuildingStateHolder {
 		this.beanProvider = beanProvider;
 		this.propertySource = propertySource;
 		this.rootBuildContext = rootBuildContext;
-		this.defaultIndexPropertySource = propertySource.withMask( "indexes.default" );
 	}
 
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
-		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName )
-				.withFallback( defaultIndexPropertySource );
-		String backendName = INDEX_BACKEND_NAME.getOrThrow(
-				indexPropertySource,
-				key -> log.indexBackendCannotBeNullOrEmpty(
-						indexName, key,
-						// Retrieve the resolved *default* key (*.indexes.default.backend) from the default source
-						INDEX_BACKEND_NAME.resolveOrRaw( defaultIndexPropertySource )
-				)
-		);
+		ConfigurationPropertySource indexPropertySource = propertySource.withMask( "indexes." + indexName );
+		String backendName = getBackendName( indexName, indexPropertySource );
+
 		BackendBuildingState<?> backendBuildingstate =
 				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
 
@@ -84,6 +80,27 @@ class IndexManagerBuildingStateHolder {
 			indexManagerBuildingStateByName.put( indexName, state );
 		}
 		return state;
+	}
+
+	private String getBackendName(String indexName, ConfigurationPropertySource indexPropertySource) {
+		Optional<String> backendNameOptional = INDEX_BACKEND_NAME.get( indexPropertySource );
+		if ( backendNameOptional.isPresent() ) {
+			return backendNameOptional.get();
+		}
+		else {
+			Optional<String> defaultBackendNameOptional = DEFAULT_INDEX_BACKEND_NAME.get( propertySource );
+			if ( defaultBackendNameOptional.isPresent() ) {
+				return defaultBackendNameOptional.get();
+			}
+			else {
+				throw log.indexBackendCannotBeNullOrEmpty(
+						indexName,
+						INDEX_BACKEND_NAME.resolveOrRaw( indexPropertySource ),
+						// Retrieve the resolved *default* key (*.default_backend) from the global (non-index-scoped) source
+						DEFAULT_INDEX_BACKEND_NAME.resolveOrRaw( propertySource )
+				);
+			}
+		}
 	}
 
 	Map<String, BackendImplementor<?>> getBackendsByName() {
@@ -119,24 +136,30 @@ class IndexManagerBuildingStateHolder {
 
 			BackendImplementor<?> backend = backendFactoryHolder.get()
 					.create( backendName, backendBuildContext, backendPropertySource );
-			return new BackendBuildingState<>( backendBuildContext, backend );
+			return new BackendBuildingState<>( backendBuildContext, backendPropertySource, backend );
 		}
 	}
 
 	private class BackendBuildingState<D extends DocumentElement> {
 		private final BackendBuildContext backendBuildContext;
+		private final ConfigurationPropertySource defaultIndexPropertySource;
 		private final BackendImplementor<D> backend;
 
-		private BackendBuildingState(BackendBuildContext backendBuildContext, BackendImplementor<D> backend) {
+		private BackendBuildingState(BackendBuildContext backendBuildContext,
+				ConfigurationPropertySource backendPropertySource,
+				BackendImplementor<D> backend) {
 			this.backendBuildContext = backendBuildContext;
+			this.defaultIndexPropertySource = backendPropertySource.withMask( "index_defaults" );
 			this.backend = backend;
 		}
 
 		IndexManagerBuildingStateImpl<D> createIndexManagerBuildingState(
 				String indexName, boolean multiTenancyEnabled,
 				ConfigurationPropertySource indexPropertySource) {
+			ConfigurationPropertySource defaultedIndexPropertySource =
+					indexPropertySource.withFallback( defaultIndexPropertySource );
 			IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
-					indexName, multiTenancyEnabled, backendBuildContext, indexPropertySource
+					indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
 			);
 			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 			IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );

@@ -135,7 +135,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 	public void setup() {
 		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "indexes.default.backend", "elasticsearchBackend_1" )
+				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
 						PREFIX + "backends.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
