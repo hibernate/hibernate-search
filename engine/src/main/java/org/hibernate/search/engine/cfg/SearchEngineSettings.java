@@ -22,6 +22,11 @@ public final class SearchEngineSettings {
 	}
 
 	/**
+	 * The name of the default backend to use when none is defined in the index configuration.
+	 */
+	public static final String DEFAULT_BACKEND = "default_backend";
+
+	/**
 	 * The {@link BeanConfigurer} instances
 	 * used to pre-define beans.
 	 * <p>
