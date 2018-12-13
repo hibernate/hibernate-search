@@ -56,12 +56,12 @@ public class LuceneBackendFactory implements BackendFactory {
 					.build();
 
 	private static final OptionalConfigurationProperty<String> DIRECTORY_PROVIDER =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_DIRECTORY_PROVIDER )
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.DIRECTORY_PROVIDER )
 					.asString()
 					.build();
 
 	private static final ConfigurationProperty<Path> ROOT_DIRECTORY =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_ROOT_DIRECTORY )
+			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ROOT_DIRECTORY )
 					.as( Path.class, Paths::get )
 					.withDefault( () -> Paths.get( "." ) )
 					.build();

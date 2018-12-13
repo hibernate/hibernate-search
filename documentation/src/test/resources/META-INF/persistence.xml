@@ -22,10 +22,10 @@
             <!-- tag::gettingstarted-configuration-orm_lucene[] -->
             <property name="hibernate.search.backends.myBackend.type"
                       value="lucene"/> <!--1-->
-            <property name="hibernate.search.backends.myBackend.lucene.directory_provider"
+            <property name="hibernate.search.backends.myBackend.directory_provider"
                       value="local_directory"/> <!--2-->
             <!--
-            <property name="hibernate.search.backends.myBackend.lucene.root_directory"
+            <property name="hibernate.search.backends.myBackend.root_directory"
                       value="some/filesystem/path"/>
              --> <!--3-->
             <property name="hibernate.search.indexes.default.backend"
@@ -38,7 +38,7 @@
                 WARNING: if you update the property name below,
                 take care to also update the name of the commented property just above.
              -->
-            <property name="hibernate.search.backends.myBackend.lucene.root_directory"
+            <property name="hibernate.search.backends.myBackend.root_directory"
                       value="${project.build.directory}/test-indexes/gettingstarted/"/>
         </properties>
     </persistence-unit>
@@ -85,7 +85,7 @@
         <properties>
             <property name="hibernate.search.backends.myBackend.type"
                       value="lucene"/>
-            <property name="hibernate.search.backends.myBackend.lucene.directory_provider"
+            <property name="hibernate.search.backends.myBackend.directory_provider"
                       value="local_directory"/>
             <!-- tag::gettingstarted-configuration-orm_lucene-analysis[] -->
             <property name="hibernate.search.backends.myBackend.analysis_configurer"
@@ -100,7 +100,7 @@
                 WARNING: if you update the property name below,
                 take care to also update the name of the commented property just above.
              -->
-            <property name="hibernate.search.backends.myBackend.lucene.root_directory"
+            <property name="hibernate.search.backends.myBackend.root_directory"
                       value="${project.build.directory}/test-indexes/gettingstarted/"/>
         </properties>
     </persistence-unit>
