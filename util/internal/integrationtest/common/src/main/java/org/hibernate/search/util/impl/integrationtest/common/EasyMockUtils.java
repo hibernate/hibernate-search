@@ -85,4 +85,5 @@ public final class EasyMockUtils {
 		} );
 		return expected;
 	}
+
 }

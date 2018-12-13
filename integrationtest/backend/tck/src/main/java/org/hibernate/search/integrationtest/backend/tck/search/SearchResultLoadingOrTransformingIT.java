@@ -14,11 +14,11 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 import org.easymock.EasyMock;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
@@ -34,6 +34,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.junit.Before;
@@ -150,13 +151,11 @@ public class SearchResultLoadingOrTransformingIT {
 				.andReturn( mainTransformedReference );
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference );
-		EasyMock.expect( objectLoaderMock.load(
-				EasyMock.or(
-						EasyMock.eq( Arrays.asList( mainTransformedReference, emptyTransformedReference ) ),
-						EasyMock.eq( Arrays.asList( emptyTransformedReference, mainTransformedReference ) )
-				)
-		) )
-				.andReturn( Arrays.asList( mainLoadedObject, emptyLoadedObject ) );
+		StubMapperUtils.expectLoad(
+				objectLoaderMock,
+				c -> c.load( mainTransformedReference, mainLoadedObject )
+						.load( emptyTransformedReference, emptyLoadedObject )
+		);
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
 
 		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
@@ -191,13 +190,11 @@ public class SearchResultLoadingOrTransformingIT {
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference )
 				.times( 2 );
-		EasyMock.expect( objectLoaderMock.load(
-				EasyMock.or(
-						EasyMock.eq( Arrays.asList( mainTransformedReference, emptyTransformedReference ) ),
-						EasyMock.eq( Arrays.asList( emptyTransformedReference, mainTransformedReference ) )
-				)
-		) )
-				.andReturn( Arrays.asList( mainLoadedObject, emptyLoadedObject ) );
+		StubMapperUtils.expectLoad(
+				objectLoaderMock,
+				c -> c.load( mainTransformedReference, mainLoadedObject )
+						.load( emptyTransformedReference, emptyLoadedObject )
+		);
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
 
 		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
@@ -289,13 +286,11 @@ public class SearchResultLoadingOrTransformingIT {
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( emptyReference ) ) )
 				.andReturn( emptyTransformedReference )
 				.times( 2 );
-		EasyMock.expect( objectLoaderMock.load(
-				EasyMock.or(
-						EasyMock.eq( Arrays.asList( mainTransformedReference, emptyTransformedReference ) ),
-						EasyMock.eq( Arrays.asList( emptyTransformedReference, mainTransformedReference ) )
-				)
-		) )
-				.andReturn( Arrays.asList( mainLoadedObject, emptyLoadedObject ) );
+		StubMapperUtils.expectLoad(
+				objectLoaderMock,
+				c -> c.load( mainTransformedReference, mainLoadedObject )
+						.load( emptyTransformedReference, emptyLoadedObject )
+		);
 		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject
 		) ) )
