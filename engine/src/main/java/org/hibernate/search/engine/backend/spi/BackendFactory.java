@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.SearchBackendCommonSettings;
 
 /**
  * @author Yoann Rodiere
@@ -19,8 +20,9 @@ public interface BackendFactory {
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
 	 * can be accessed at the root.
-	 * <strong>CAUTION:</strong> the property keys {@code type} and
-	 * {@code index_defaults} are reserved for use by the engine.
+	 * <strong>CAUTION:</strong> the property keys listed in {@link SearchBackendCommonSettings},
+	 * in particular {@value SearchBackendCommonSettings#TYPE} and {@value SearchBackendCommonSettings#INDEX_DEFAULTS},
+	 * are reserved for use by the engine.
 	 * @return A backend.
 	 */
 	BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource);

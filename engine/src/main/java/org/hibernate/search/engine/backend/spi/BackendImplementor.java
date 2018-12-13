@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.SearchIndexCommonSettings;
 
 /**
  * @author Yoann Rodiere
@@ -30,7 +31,9 @@ public interface BackendImplementor<D extends DocumentElement> extends AutoClose
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
 	 * doesn't need to care about Hibernate Search prefixes (hibernate.search.*, etc.). All the properties
 	 * can be accessed at the root.
-	 * <strong>CAUTION:</strong> the property key {@code backend} is reserved for use by the engine.
+	 * <strong>CAUTION:</strong> the property keys listed in {@link SearchIndexCommonSettings},
+	 * in particular {@value SearchIndexCommonSettings#BACKEND},
+	 * are reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
 	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName, boolean multiTenancyEnabled, BackendBuildContext context,
