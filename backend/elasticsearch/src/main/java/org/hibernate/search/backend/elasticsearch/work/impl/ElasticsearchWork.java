@@ -15,4 +15,6 @@ public interface ElasticsearchWork<T> {
 
 	CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context);
 
+	// TODO restore method => void aggregate(ElasticsearchWorkAggregator aggregator);
+
 }
