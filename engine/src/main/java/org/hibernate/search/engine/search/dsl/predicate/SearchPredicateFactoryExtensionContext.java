@@ -22,7 +22,7 @@ public interface SearchPredicateFactoryExtensionContext {
 	 * If the given extension is supported, and none of the previous extensions passed to
 	 * {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
 	 * was supported, extend the current context with this extension,
-	 * and apply the given consumer to the extended context.
+	 * apply the given function to the extended context, and store the resulting predicate for later retrieval.
 	 * <p>
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
@@ -40,18 +40,21 @@ public interface SearchPredicateFactoryExtensionContext {
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
 	 * was supported so far, apply the given consumer to the current (non-extended) {@link SearchPredicateFactoryContext};
-	 * otherwise do nothing.
+	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @param predicateContributor A function that will use the (non-extended) context passed in parameter to create a {@link SearchPredicate},
 	 * if the extension is successfully applied.
 	 * Should generally be a lambda expression.
+	 * @return The created predicate.
 	 */
 	SearchPredicate orElse(Function<SearchPredicateFactoryContext, SearchPredicate> predicateContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchPredicateFactoryContextExtension, Function)}
-	 * was supported so far, throw an exception; otherwise do nothing.
+	 * was supported so far, throw an exception;
+	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *
+	 * @return The created predicate.
 	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
 	 */
 	SearchPredicate orElseFail();

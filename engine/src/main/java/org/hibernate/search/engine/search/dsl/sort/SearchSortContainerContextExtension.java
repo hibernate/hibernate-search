@@ -37,13 +37,12 @@ public interface SearchSortContainerContextExtension<T> {
 	 * @param original The original, non-extended {@link SearchSortContainerContext}.
 	 * @param factory A {@link SearchSortBuilderFactory}.
 	 * @param dslContext A {@link SearchSortDslContext}.
-	 * @param <C> The type of query element collector for the given DSL context.
-	 * @param <B> The implementation type of builders for the given DSL context.
+	 * @param <C> The type of query element collector for the given sort builder factory.
+	 * @param <B> The implementation type of builders for the given sort builder factory.
 	 * @return An optional containing the extended search predicate container context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	<C, B> Optional<T> extendOptional(
-			SearchSortContainerContext original,
+	<C, B> Optional<T> extendOptional(SearchSortContainerContext original,
 			SearchSortBuilderFactory<C, B> factory, SearchSortDslContext<? super B> dslContext);
 
 }

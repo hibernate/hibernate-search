@@ -33,8 +33,8 @@ public interface SearchPredicateFactoryContextExtension<T> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param <C> The type of query element collector for the given DSL context.
-	 * @param <B> The implementation type of builders for the given DSL context.
+	 * @param <C> The type of query element collector for the given predicate builder factory.
+	 * @param <B> The implementation type of builders for the given predicate builder factory.
 	 * @param original The original, non-extended {@link SearchPredicateFactoryContext}.
 	 * @param factory A {@link SearchPredicateBuilderFactory}.
 	 * @return An optional containing the extended search predicate factory context ({@link T}) in case
