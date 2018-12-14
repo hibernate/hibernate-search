@@ -9,8 +9,12 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LatLonPoint;
@@ -26,14 +30,17 @@ import org.assertj.core.api.Assertions;
 
 import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -322,7 +329,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_nativeSort() {
+	public void sort_nativeField_nativeSort() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
@@ -333,6 +340,95 @@ public class LuceneExtensionIT {
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
+	}
+
+	@Test
+	public void projection_document() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Document> query = searchTarget.query()
+				.asProjection(
+						f -> f.extension( LuceneExtension.get() ).document().toProjection()
+				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.build();
+
+		List<Document> result = query.execute().getHits();
+		Assertions.assertThat( result )
+				.hasSize( 5 )
+				.satisfies( containsDocument(
+						FIRST_ID,
+						doc -> doc.hasField( "string", "text 1" )
+								.hasField( "nativeField", "37" )
+								.hasField( "nativeField_unsupportedProjection", "37" )
+								.andOnlyInternalFields()
+				) )
+				.satisfies( containsDocument(
+						SECOND_ID,
+						doc -> doc.hasField( "integer", 2 )
+								.hasField( "nativeField", "78" )
+								.hasField( "nativeField_unsupportedProjection", "78" )
+								.andOnlyInternalFields()
+				) )
+				.satisfies( containsDocument(
+						THIRD_ID,
+						doc -> doc.hasField( "nativeField", "13" )
+								.hasField( "nativeField_unsupportedProjection", "13" )
+								// Geo points are stored as two internal fields
+								.hasInternalField( "geoPoint_latitude", 40.12 )
+								.hasInternalField( "geoPoint_longitude", -71.34 )
+								.andOnlyInternalFields()
+				) )
+				.satisfies( containsDocument(
+						FOURTH_ID,
+						doc -> doc.hasField( "nativeField", "89" )
+								.hasField( "nativeField_unsupportedProjection", "89" )
+								.andOnlyInternalFields()
+				) )
+				.satisfies( containsDocument(
+						FIFTH_ID,
+						doc -> doc.hasField( "string", "text 2" )
+								.hasField( "integer", 1 )
+								.hasField( "nativeField", "53" )
+								.hasField( "nativeField_unsupportedProjection", "53" )
+								// Geo points are stored as two internal fields
+								.hasInternalField( "geoPoint_latitude", 45.12 )
+								.hasInternalField( "geoPoint_longitude", -75.34 )
+								.andOnlyInternalFields()
+				) );
+	}
+
+	/**
+	 * Check that the projection on a document includes all fields,
+	 * even if there is a field projection, which would usually trigger document filtering.
+	 */
+	@Test
+	public void projection_documentAndField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<List<?>> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								f.extension( LuceneExtension.get() ).document().toProjection(),
+								f.field( "string" ).toProjection()
+						)
+						.toProjection()
+				)
+				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.build();
+
+		List<Document> result = query.execute().getHits().stream()
+				.map( list -> (Document) list.get( 0 ) )
+				.collect( Collectors.toList() );
+		Assertions.assertThat( result )
+				.hasSize( 1 )
+				.satisfies( containsDocument(
+						FIRST_ID,
+						doc -> doc.hasField( "string", "text 1" )
+								.hasField( "nativeField", "37" )
+								.hasField( "nativeField_unsupportedProjection", "37" )
+								.andOnlyInternalFields()
+				) );
 	}
 
 	@Test
@@ -453,6 +549,18 @@ public class LuceneExtensionIT {
 		);
 	}
 
+	private static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
+		return allDocuments -> {
+			Optional<? extends Document> found = allDocuments.stream()
+					.filter( doc -> id.equals( doc.get( LuceneFields.idFieldName() ) ) )
+					.findFirst();
+			Assertions.assertThat( found )
+					.as( "Document with ID '" + id + "'" )
+					.isNotEmpty();
+			assertions.accept( new DocumentAssert( found.get() ).as( id ) );
+		};
+	}
+
 	private static class IndexAccessors {
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<String> string;
@@ -468,12 +576,15 @@ public class LuceneExtensionIT {
 		IndexAccessors(IndexSchemaElement root) {
 			integer = root.field( "integer" )
 					.asInteger()
+					.projectable( Projectable.YES )
 					.createAccessor();
 			string = root.field( "string" )
 					.asString()
+					.projectable( Projectable.YES )
 					.createAccessor();
 			geoPoint = root.field( "geoPoint" )
 					.asGeoPoint()
+					.projectable( Projectable.YES )
 					.createAccessor();
 			nativeField = root.field( "nativeField" )
 					.extension( LuceneExtension.get() )
