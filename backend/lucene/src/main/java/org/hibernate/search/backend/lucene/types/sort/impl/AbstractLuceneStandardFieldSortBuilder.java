@@ -20,6 +20,12 @@ import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+/**
+ * @param <F> The field type exposed to the mapper.
+ * @param <E> The encoded type.
+ * @param <C> The codec type.
+ * @see LuceneStandardFieldCodec
+ */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 		extends AbstractLuceneSearchSortBuilder
 		implements FieldSortBuilder<LuceneSearchSortBuilder> {

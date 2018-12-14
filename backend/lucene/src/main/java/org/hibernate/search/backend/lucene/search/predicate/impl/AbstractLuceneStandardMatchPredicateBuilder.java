@@ -16,7 +16,12 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-
+/**
+ * @param <F> The field type exposed to the mapper.
+ * @param <E> The encoded type.
+ * @param <C> The codec type.
+ * @see LuceneStandardFieldCodec
+ */
 public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
 		extends AbstractLuceneSearchPredicateBuilder
 		implements MatchPredicateBuilder<LuceneSearchPredicateBuilder> {

@@ -20,8 +20,9 @@ import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
- * @param <F> The index field type
- * @param <C> The codec type
+ * @param <F> The field type exposed to the mapper.
+ * @param <C> The codec type.
+ * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends LuceneStandardFieldCodec<F, ?>>
 		implements LuceneFieldPredicateBuilderFactory {

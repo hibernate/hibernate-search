@@ -18,6 +18,10 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+/**
+ * @param <F> The field type exposed to the mapper.
+ * @see LuceneFieldCodec
+ */
 public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFieldProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
