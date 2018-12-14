@@ -14,23 +14,24 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
-import org.hibernate.search.integrationtest.mapper.pojo.test.types.expectations.DefaultIdentifierBridgeExpectations;
+import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.test.types.PropertyTypeDescriptor;
+import org.hibernate.search.integrationtest.mapper.pojo.test.types.expectations.DefaultIdentifierBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.integrationtest.mapper.pojo.test.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +39,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Assumptions;
 import org.easymock.Capture;
 
 /**
@@ -67,9 +67,9 @@ public class DocumentIdDefaultBridgeIT<I> {
 
 	public DocumentIdDefaultBridgeIT(PropertyTypeDescriptor<I> typeDescriptor,
 			Optional<DefaultIdentifierBridgeExpectations<I>> expectations) {
-		Assumptions.assumeThat( expectations )
-				.as( "Type " + typeDescriptor + " does not have a default identifier bridge" )
-				.isNotEmpty();
+		Assume.assumeTrue(
+				"Type " + typeDescriptor + " does not have a default identifier bridge", expectations.isPresent()
+		);
 		this.expectations = expectations.get();
 	}
 

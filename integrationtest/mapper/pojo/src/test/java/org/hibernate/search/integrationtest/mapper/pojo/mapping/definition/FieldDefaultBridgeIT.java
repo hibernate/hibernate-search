@@ -34,6 +34,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +42,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.Assumptions;
 import org.easymock.Capture;
 
 /**
@@ -70,9 +70,9 @@ public class FieldDefaultBridgeIT<V, F> {
 	private StubIndexSchemaNode index2FieldSchemaNode;
 
 	public FieldDefaultBridgeIT(PropertyTypeDescriptor<V> typeDescriptor, Optional<DefaultValueBridgeExpectations<V, F>> expectations) {
-		Assumptions.assumeThat( expectations )
-				.as( "Type " + typeDescriptor + " does not have a default value bridge" )
-				.isNotEmpty();
+		Assume.assumeTrue(
+				"Type " + typeDescriptor + " does not have a default value bridge", expectations.isPresent()
+		);
 		this.expectations = expectations.get();
 	}
 
