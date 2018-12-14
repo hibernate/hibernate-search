@@ -52,7 +52,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class ExtensionIT {
+public class LuceneExtensionIT {
 
 	private static final String BACKEND_NAME = "myLuceneBackend";
 	private static final String INDEX_NAME = "IndexName";
@@ -477,15 +477,15 @@ public class ExtensionIT {
 					.createAccessor();
 			nativeField = root.field( "nativeField" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, ExtensionIT::contributeNativeField, ExtensionIT::fromNativeField )
+					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
 					.createAccessor();
 			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, ExtensionIT::contributeNativeField )
+					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
 					.createAccessor();
 			nativeField_invalidFieldPath = root.field( "nativeField_invalidFieldPath" )
 					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, ExtensionIT::contributeNativeFieldInvalidFieldPath )
+					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
 					.createAccessor();
 
 			sort1 = root.field( "sort1" )

@@ -38,7 +38,7 @@ import org.assertj.core.api.Assertions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 
-public class ExtensionIT {
+public class ElasticsearchExtensionIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
