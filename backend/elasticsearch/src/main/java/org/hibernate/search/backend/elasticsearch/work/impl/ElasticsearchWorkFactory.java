@@ -34,8 +34,6 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> flush(URLEncodedString indexName);
 
-	ElasticsearchWork<?> optimize(URLEncodedString indexName);
-
 	<T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);

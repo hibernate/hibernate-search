@@ -122,14 +122,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> optimize(URLEncodedString indexName) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._FORCEMERGE );
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public <T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {

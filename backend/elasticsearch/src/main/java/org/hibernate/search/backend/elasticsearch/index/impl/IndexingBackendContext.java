@@ -95,6 +95,6 @@ public class IndexingBackendContext {
 	}
 
 	IndexWorkExecutor createWorkExecutor(URLEncodedString indexName) {
-		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, streamOrchestrator, indexName, eventContext );
+		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, workBuilderFactory, streamOrchestrator, indexName, eventContext );
 	}
 }
