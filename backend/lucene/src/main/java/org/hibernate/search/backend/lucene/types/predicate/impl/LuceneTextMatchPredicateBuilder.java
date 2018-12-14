@@ -18,12 +18,12 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneStringMatchPredicateBuilder<F>
+class LuceneTextMatchPredicateBuilder<F>
 		extends AbstractLuceneStandardMatchPredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
 	private final QueryBuilder queryBuilder;
 
-	LuceneStringMatchPredicateBuilder(
+	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,

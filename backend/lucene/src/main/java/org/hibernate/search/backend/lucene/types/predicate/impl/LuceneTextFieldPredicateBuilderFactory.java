@@ -14,12 +14,12 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-public final class LuceneStringFieldPredicateBuilderFactory<F>
+public final class LuceneTextFieldPredicateBuilderFactory<F>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
 	private final QueryBuilder queryBuilder;
 
-	public LuceneStringFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
 			LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
 		super( converter, codec );
@@ -31,19 +31,19 @@ public final class LuceneStringFieldPredicateBuilderFactory<F>
 		if ( !super.isDslCompatibleWith( other ) ) {
 			return false;
 		}
-		LuceneStringFieldPredicateBuilderFactory<?> castedOther = (LuceneStringFieldPredicateBuilderFactory<?>) other;
+		LuceneTextFieldPredicateBuilderFactory<?> castedOther = (LuceneTextFieldPredicateBuilderFactory<?>) other;
 		return Objects.equals( queryBuilder, castedOther.queryBuilder );
 	}
 
 	@Override
-	public LuceneStringMatchPredicateBuilder<?> createMatchPredicateBuilder(
+	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec, queryBuilder );
+		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec, queryBuilder );
 	}
 
 	@Override
-	public LuceneStringRangePredicateBuilder<?> createRangePredicateBuilder(
+	public LuceneTextRangePredicateBuilder<?> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneStringRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
 	}
 }

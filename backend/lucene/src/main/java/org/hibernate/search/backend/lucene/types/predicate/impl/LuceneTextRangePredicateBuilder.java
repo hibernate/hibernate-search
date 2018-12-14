@@ -15,10 +15,10 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 
-class LuceneStringRangePredicateBuilder<F>
+class LuceneTextRangePredicateBuilder<F>
 		extends AbstractLuceneStandardRangePredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
 
-	LuceneStringRangePredicateBuilder(
+	LuceneTextRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,

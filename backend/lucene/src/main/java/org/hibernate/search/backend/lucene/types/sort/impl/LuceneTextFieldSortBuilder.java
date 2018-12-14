@@ -14,10 +14,10 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 
-public class LuceneStringFieldSortBuilder<F>
+public class LuceneTextFieldSortBuilder<F>
 		extends AbstractLuceneStandardFieldSortBuilder<F, String, LuceneTextFieldCodec<F>> {
 
-	LuceneStringFieldSortBuilder(LuceneSearchContext searchContext,
+	LuceneTextFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter,
 			LuceneTextFieldCodec<F> codec) {
