@@ -17,6 +17,11 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+/**
+ * @param <F> The field type exposed to the mapper.
+ * @param <C> The codec type.
+ * @see LuceneStandardFieldCodec
+ */
 abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends LuceneStandardFieldCodec<F, ?>>
 		implements LuceneFieldSortBuilderFactory {
 
