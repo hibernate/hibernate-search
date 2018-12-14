@@ -9,7 +9,10 @@ package org.hibernate.search.backend.lucene.search.dsl.projection.impl;
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
+
+import org.apache.lucene.document.Document;
 
 public class LuceneSearchProjectionFactoryContextImpl<R, O>
 		extends DelegatingSearchProjectionFactoryContext<R, O>
@@ -21,5 +24,10 @@ public class LuceneSearchProjectionFactoryContextImpl<R, O>
 			LuceneSearchProjectionBuilderFactory factory) {
 		super( delegate );
 		this.factory = factory;
+	}
+
+	@Override
+	public SearchProjectionTerminalContext<Document> document() {
+		return new LuceneDocumentProjectionContext( factory );
 	}
 }

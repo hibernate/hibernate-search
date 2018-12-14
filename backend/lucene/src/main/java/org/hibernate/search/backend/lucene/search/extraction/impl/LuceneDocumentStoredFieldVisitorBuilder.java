@@ -12,18 +12,33 @@ import java.util.Set;
 
 public class LuceneDocumentStoredFieldVisitorBuilder {
 
+	private boolean entireDocumentRequired = false;
 	private Set<String> explicitlyRequired = new HashSet<>();
 
+	public void addEntireDocument() {
+		entireDocumentRequired = true;
+		explicitlyRequired.clear();
+	}
+
 	public void add(String absoluteFieldPath) {
-		explicitlyRequired.add( absoluteFieldPath );
+		if ( !entireDocumentRequired ) {
+			explicitlyRequired.add( absoluteFieldPath );
+		}
 	}
 
 	public void addAll(Collection<String> absoluteFieldPaths) {
-		explicitlyRequired.addAll( absoluteFieldPaths );
+		if ( !entireDocumentRequired ) {
+			explicitlyRequired.addAll( absoluteFieldPaths );
+		}
 	}
 
 	public ReusableDocumentStoredFieldVisitor build() {
-		return new ReusableDocumentStoredFieldVisitor( explicitlyRequired );
+		if ( entireDocumentRequired ) {
+			return new ReusableDocumentStoredFieldVisitor();
+		}
+		else {
+			return new ReusableDocumentStoredFieldVisitor( explicitlyRequired );
+		}
 	}
 
 }

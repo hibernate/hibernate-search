@@ -7,6 +7,9 @@
 package org.hibernate.search.backend.lucene.search.dsl.projection;
 
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
+
+import org.apache.lucene.document.Document;
 
 /**
  * A DSL context allowing to create a projection, with some Lucene-specific methods.
@@ -16,4 +19,16 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
  * @see SearchProjectionFactoryContext
  */
 public interface LuceneSearchProjectionFactoryContext<R, O> extends SearchProjectionFactoryContext<R, O> {
+
+	/**
+	 * Project to a Lucene {@link Document} containing all the stored fields.
+	 * <p>
+	 * Note that only stored fields are returned: fields that are not marked as
+	 * {@link org.hibernate.search.engine.backend.document.model.dsl.Projectable#YES projectable}
+	 * may be missing.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	SearchProjectionTerminalContext<Document> document();
+
 }

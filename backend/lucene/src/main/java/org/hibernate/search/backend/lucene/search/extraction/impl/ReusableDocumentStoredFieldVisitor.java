@@ -44,6 +44,18 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	//This field needs to be reset to the value of totalFields when the doc field is changed.
 	private int missingFields;
 
+	/**
+	 * Create a visitor that collects all fields.
+	 */
+	public ReusableDocumentStoredFieldVisitor() {
+		this.rootAcceptor = null;
+		this.totalFields = 0; // Shouldn't be used
+		this.missingFields = totalFields;
+	}
+
+	/**
+	 * Create a visitor that collects only some specified fields.
+	 */
 	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad) {
 		FieldAcceptor previous = NOT_ACCEPT;
 		for ( String fieldName : fieldsToLoad ) {
@@ -90,6 +102,10 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 
 	@Override
 	public Status needsField(FieldInfo fieldInfo) throws IOException {
+		if ( rootAcceptor == null ) {
+			// We need all fields
+			return Status.YES;
+		}
 		if ( missingFields == 0 ) {
 			// An aggressive STOP could prevent unnecessary I/O !
 			return Status.STOP;
