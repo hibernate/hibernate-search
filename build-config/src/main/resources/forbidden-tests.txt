@@ -20,6 +20,9 @@ junit.framework.**
 org.jboss.logging.processor.util.Objects
 
 ################################################################################################################
+org.assertj.core.api.Assumptions @ Use JUnit's Assume instead of AssertJ's Assumptions, because the latter use dark reflection magic and do not work with JDK11 as of 2018-12-14
+
+################################################################################################################
 # Various, from our own code.
 # This one needs to be handled with special care to avoid tests breaking out of their isolation (see exclusions):
 org.hibernate.search.spi.SearchIntegratorBuilder#buildSearchIntegrator()
