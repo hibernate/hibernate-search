@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -21,9 +19,9 @@ public final class DocumentReferenceExtractorHelper {
 		luceneCollectorBuilder.requireTopDocsCollector();
 	}
 
-	public static void contributeFields(Set<String> absoluteFieldPaths) {
-		absoluteFieldPaths.add( LuceneFields.indexFieldName() );
-		absoluteFieldPaths.add( LuceneFields.idFieldName() );
+	public static void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		builder.add( LuceneFields.indexFieldName() );
+		builder.add( LuceneFields.idFieldName() );
 	}
 
 	public static DocumentReference extractDocumentReference(LuceneResult documentResult) {

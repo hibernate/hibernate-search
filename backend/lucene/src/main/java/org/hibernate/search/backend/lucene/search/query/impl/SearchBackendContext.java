@@ -6,11 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -52,8 +50,8 @@ public class SearchBackendContext {
 			LuceneSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		Set<String> storedFields = new HashSet<>();
-		rootProjection.contributeFields( storedFields );
+		LuceneDocumentStoredFieldVisitorBuilder storedFieldFilterBuilder = new LuceneDocumentStoredFieldVisitorBuilder();
+		rootProjection.contributeFields( storedFieldFilterBuilder );
 
 		return new LuceneSearchQueryBuilder<>(
 				workFactory,
@@ -61,7 +59,7 @@ public class SearchBackendContext {
 				multiTenancyStrategy,
 				searchTargetModel,
 				sessionContext,
-				new ReusableDocumentStoredFieldVisitor( storedFields ),
+				storedFieldFilterBuilder.build(),
 				projectionHitMapper,
 				rootProjection
 		);

@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -38,8 +37,8 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
-		absoluteFieldPaths.add( absoluteFieldPath );
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		builder.add( absoluteFieldPath );
 	}
 
 	@Override

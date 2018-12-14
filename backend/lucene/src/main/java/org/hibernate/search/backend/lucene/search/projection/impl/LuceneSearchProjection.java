@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -20,9 +19,9 @@ public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, Lucen
 	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
 	 * other fields e.g. if the stored fields have different names.
 	 *
-	 * @param absoluteFieldPaths The set of absolute field paths contributed.
+	 * @param builder The builder allowing to set expectations regarding collected fields.
 	 */
-	void contributeFields(Set<String> absoluteFieldPaths);
+	void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder);
 
 	/**
 	 * Perform hit extraction.

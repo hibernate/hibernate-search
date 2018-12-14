@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -33,8 +32,8 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
-		DocumentReferenceExtractorHelper.contributeFields( absoluteFieldPaths );
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		DocumentReferenceExtractorHelper.contributeFields( builder );
 	}
 
 	@SuppressWarnings("unchecked")

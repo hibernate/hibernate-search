@@ -8,11 +8,11 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
 
-import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -38,9 +38,9 @@ public class LuceneCompositeBiFunctionProjection<P1, P2, T> implements LuceneCom
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
-		projection1.contributeFields( absoluteFieldPaths );
-		projection2.contributeFields( absoluteFieldPaths );
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		projection1.contributeFields( builder );
+		projection2.contributeFields( builder );
 	}
 
 	@Override

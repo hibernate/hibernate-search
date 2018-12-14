@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -37,12 +36,12 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
 		if ( codec.getOverriddenStoredFields().isEmpty() ) {
-			absoluteFieldPaths.add( absoluteFieldPath );
+			builder.add( absoluteFieldPath );
 		}
 		else {
-			absoluteFieldPaths.addAll( codec.getOverriddenStoredFields() );
+			builder.addAll( codec.getOverriddenStoredFields() );
 		}
 	}
 

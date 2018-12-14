@@ -9,10 +9,9 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
 
-import java.util.Set;
-
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.function.TriFunction;
@@ -44,10 +43,10 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements Luce
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
-		projection1.contributeFields( absoluteFieldPaths );
-		projection2.contributeFields( absoluteFieldPaths );
-		projection3.contributeFields( absoluteFieldPaths );
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		projection1.contributeFields( builder );
+		projection2.contributeFields( builder );
+		projection3.contributeFields( builder );
 	}
 
 	@Override

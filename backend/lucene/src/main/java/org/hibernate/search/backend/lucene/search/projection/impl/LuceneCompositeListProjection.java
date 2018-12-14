@@ -10,11 +10,11 @@ import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneS
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -38,9 +38,9 @@ public class LuceneCompositeListProjection<T> implements LuceneCompositeProjecti
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
 		for ( LuceneSearchProjection<?, ?> child : children ) {
-			child.contributeFields( absoluteFieldPaths );
+			child.contributeFields( builder );
 		}
 	}
 

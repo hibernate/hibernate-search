@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
-import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -32,8 +32,8 @@ public class LuceneCompositeFunctionProjection<E, P, T> implements LuceneComposi
 	}
 
 	@Override
-	public void contributeFields(Set<String> absoluteFieldPaths) {
-		projection.contributeFields( absoluteFieldPaths );
+	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
+		projection.contributeFields( builder );
 	}
 
 	@Override
