@@ -10,6 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.ElasticsearchSearchPredicateFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
+import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryContextImpl;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContextExtension;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldContext;
@@ -22,10 +25,13 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilderFactory;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -35,18 +41,27 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
  * all of its methods are considered SPIs and therefore should never be called directly by users.
  * In short, users are only expected to get instances of this type from an API and pass it to another API.
+ *
+ * @param <R> The reference type for projections.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( ElasticsearchExtension.get() }.
+ * @param <O> The loaded object type for projections.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( ElasticsearchExtension.get() }.
  */
-public final class ElasticsearchExtension
+public final class ElasticsearchExtension<R, O>
 		implements SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
+		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
 		IndexSchemaFieldContextExtension<ElasticsearchIndexSchemaFieldContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ElasticsearchExtension INSTANCE = new ElasticsearchExtension();
+	private static final ElasticsearchExtension<Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
-	public static ElasticsearchExtension get() {
-		return INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any R and O
+	public static <R, O> ElasticsearchExtension<R, O> get() {
+		return (ElasticsearchExtension<R, O>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
@@ -78,6 +93,22 @@ public final class ElasticsearchExtension
 			SearchSortDslContext<? super B> dslContext) {
 		if ( factory instanceof ElasticsearchSearchSortBuilderFactory ) {
 			return Optional.of( extendUnsafe( original, (ElasticsearchSearchSortBuilderFactory) factory, dslContext ) );
+		}
+		else {
+			return Optional.empty();
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<ElasticsearchSearchProjectionFactoryContext<R, O>> extendOptional(
+			SearchProjectionFactoryContext<R, O> original, SearchProjectionBuilderFactory factory) {
+		if ( factory instanceof ElasticsearchSearchProjectionBuilderFactory ) {
+			return Optional.of( new ElasticsearchSearchProjectionFactoryContextImpl<>(
+					original, (ElasticsearchSearchProjectionBuilderFactory) factory
+			) );
 		}
 		else {
 			return Optional.empty();

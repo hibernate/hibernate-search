@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.DistanceToFieldProjectionContext;
@@ -19,6 +20,8 @@ import org.hibernate.search.engine.search.dsl.projection.ObjectProjectionContext
 import org.hibernate.search.engine.search.dsl.projection.ReferenceProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.function.TriFunction;
@@ -108,5 +111,17 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 		Contracts.assertNotNull( projection3, "projection3" );
 
 		return new CompositeProjectionContextImpl<>( factory, transformer, projection1, projection2, projection3 );
+	}
+
+	@Override
+	public <T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension) {
+		return DslExtensionState.returnIfSupported(
+				extension, extension.extendOptional( this, factory )
+		);
+	}
+
+	@Override
+	public <T> SearchProjectionFactoryExtensionContext<T, R, O> extension() {
+		return new SearchProjectionFactoryExtensionContextImpl<>( this, factory );
 	}
 }

@@ -212,4 +212,30 @@ public interface SearchProjectionFactoryContext<R, O> {
 				terminalContext1.toProjection(), terminalContext2.toProjection(), terminalContext3.toProjection()
 		);
 	}
+
+	/**
+	 * Extend the current context with the given extension,
+	 * resulting in an extended context offering different types of projections.
+	 *
+	 * @param extension The extension to the projection DSL.
+	 * @param <T> The type of context provided by the extension.
+	 * @return The extended context.
+	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 */
+	<T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension);
+
+	/**
+	 * Create a context allowing to try to apply multiple extensions one after the other,
+	 * failing only if <em>none</em> of the extensions is supported.
+	 * <p>
+	 * If you only need to apply a single extension and fail if it is not supported,
+	 * use the simpler {@link #extension(SearchProjectionFactoryContextExtension)} method instead.
+	 * <p>
+	 * This method is generic, and you should set the generic type explicitly to the expected projected type,
+	 * e.g. {@code .<MyProjectedType>extension()}.
+	 *
+	 * @param <T> The expected projected type.
+	 * @return A context allowing to define the extensions to attempt, and the corresponding projections.
+	 */
+	<T> SearchProjectionFactoryExtensionContext<T, R, O> extension();
 }
