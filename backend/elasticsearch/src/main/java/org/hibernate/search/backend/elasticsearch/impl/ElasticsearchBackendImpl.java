@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
@@ -45,7 +45,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchClient client;
+	private final ElasticsearchClientImplementor client;
 
 	private final String name;
 
@@ -62,7 +62,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	ElasticsearchBackendImpl(ElasticsearchClient client, String name, ElasticsearchWorkFactory workFactory,
+	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, String name, ElasticsearchWorkFactory workFactory,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
@@ -150,7 +150,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
 			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
-			closer.push( ElasticsearchClient::close, client );
+			closer.push( ElasticsearchClientImplementor::close, client );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );

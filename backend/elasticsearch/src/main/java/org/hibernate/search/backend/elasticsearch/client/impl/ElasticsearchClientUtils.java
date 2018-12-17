@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.io.IOException;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.HttpEntity;

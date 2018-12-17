@@ -8,6 +8,9 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 

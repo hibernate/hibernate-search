@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.util.impl.common.Futures;
 
