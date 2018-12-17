@@ -24,4 +24,14 @@ public interface ElasticsearchSearchProjectionFactoryContext<R, O> extends Searc
 	 */
 	SearchProjectionTerminalContext<String> source();
 
+	/**
+	 * Project to a string representing a JSON object describing the score computation for the hit.
+	 * <p>
+	 * This feature is relatively expensive, do not use unless you return a limited
+	 * amount of objects (using pagination).
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	SearchProjectionTerminalContext<String> explanation();
+
 }

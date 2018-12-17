@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
+
 import com.google.gson.Gson;
 
 public class SearchProjectionBackendContext {
@@ -17,6 +19,7 @@ public class SearchProjectionBackendContext {
 	private final ElasticsearchReferenceProjectionBuilder referenceProjectionBuilder;
 	private final ElasticsearchScoreProjectionBuilder scoreProjectionBuilder;
 	private final ElasticsearchSourceProjectionBuilder sourceProjectionBuilder;
+	private final ElasticsearchExplanationProjectionBuilder explanationProjectionBuilder;
 
 	@SuppressWarnings("rawtypes")
 	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper,
@@ -26,6 +29,7 @@ public class SearchProjectionBackendContext {
 		this.referenceProjectionBuilder = new ElasticsearchReferenceProjectionBuilder( documentReferenceExtractorHelper );
 		this.scoreProjectionBuilder = new ElasticsearchScoreProjectionBuilder();
 		this.sourceProjectionBuilder = new ElasticsearchSourceProjectionBuilder( userFacingGson );
+		this.explanationProjectionBuilder = new ElasticsearchExplanationProjectionBuilder( userFacingGson );
 	}
 
 	ElasticsearchDocumentReferenceProjectionBuilder getDocumentReferenceProjectionBuilder() {
@@ -48,5 +52,9 @@ public class SearchProjectionBackendContext {
 
 	ElasticsearchSourceProjectionBuilder getSourceProjectionBuilder() {
 		return sourceProjectionBuilder;
+	}
+
+	public SearchProjectionBuilder<String> getExplanationProjectionBuilder() {
+		return explanationProjectionBuilder;
 	}
 }

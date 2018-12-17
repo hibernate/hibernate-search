@@ -28,4 +28,9 @@ public class ElasticsearchSearchProjectionFactoryContextImpl<R, O>
 	public SearchProjectionTerminalContext<String> source() {
 		return new ElasticsearchSourceProjectionContext( factory );
 	}
+
+	@Override
+	public SearchProjectionTerminalContext<String> explanation() {
+		return new ElasticsearchExplanationProjectionContext( factory );
+	}
 }

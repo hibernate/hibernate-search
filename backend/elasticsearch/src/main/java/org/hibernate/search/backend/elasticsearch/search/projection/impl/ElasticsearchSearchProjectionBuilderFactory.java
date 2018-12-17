@@ -127,6 +127,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		return searchProjectionBackendContext.getSourceProjectionBuilder();
 	}
 
+	public SearchProjectionBuilder<String> explanation() {
+		return searchProjectionBackendContext.getExplanationProjectionBuilder();
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {
