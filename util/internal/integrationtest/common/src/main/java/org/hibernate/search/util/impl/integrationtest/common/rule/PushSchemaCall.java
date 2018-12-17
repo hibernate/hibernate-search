@@ -42,7 +42,7 @@ class PushSchemaCall extends Call<PushSchemaCall> {
 	}
 
 	@Override
-	boolean isSimilarTo(PushSchemaCall other) {
+	protected boolean isSimilarTo(PushSchemaCall other) {
 		return Objects.equals( indexName, other.indexName );
 	}
 

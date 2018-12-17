@@ -35,7 +35,7 @@ public class CountWorkCall extends Call<CountWorkCall> {
 	}
 
 	@Override
-	boolean isSimilarTo(CountWorkCall other) {
+	protected boolean isSimilarTo(CountWorkCall other) {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 }

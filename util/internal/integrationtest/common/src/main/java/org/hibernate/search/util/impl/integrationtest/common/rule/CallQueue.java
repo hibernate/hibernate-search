@@ -11,37 +11,49 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.junit.Assert;
 
 import org.assertj.core.api.Fail;
 
-class CallQueue<C extends Call<? super C>> {
+public class CallQueue<C extends Call<? super C>> {
 
 	private final Deque<C> callsExpectedInOrder = new LinkedList<>();
 	private final List<C> callsExpectedOutOfOrder = new ArrayList<>();
 	private C lastMatchingCall;
 	private AssertionError lastVerifyFailure;
 
-	void reset() {
+	public void reset() {
 		callsExpectedInOrder.clear();
 		callsExpectedOutOfOrder.clear();
 		lastMatchingCall = null;
 	}
 
-	void expectInOrder(C expectedCall) {
+	public void expectInOrder(C expectedCall) {
 		callsExpectedInOrder.addLast( expectedCall );
 	}
 
-	void expectOutOfOrder(C expectedCall) {
+	public void expectOutOfOrder(C expectedCall) {
 		callsExpectedOutOfOrder.add( expectedCall );
 	}
 
-	synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, T> callVerifyFunction) {
+	public <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, T> callVerifyFunction) {
+		return verify(
+				actualCall,
+				callVerifyFunction,
+				call -> {
+					Assert.fail( "No call expected, but got: " + call );
+					// Dead code, we throw an exception above
+					return null;
+				}
+		);
+	}
+
+	public synchronized <C2 extends C, T> T verify(C2 actualCall, BiFunction<C, C2, T> callVerifyFunction,
+			Function<C2, T> noExpectationBehavior) {
 		if ( callsExpectedInOrder.isEmpty() && callsExpectedOutOfOrder.isEmpty() ) {
-			Assert.fail( "No call expected, but got: " + actualCall );
-			// Dead code, we throw an exception above
-			return null;
+			return noExpectationBehavior.apply( actualCall );
 		}
 
 		List<AssertionError> matchingErrors = new ArrayList<>();
@@ -111,7 +123,7 @@ class CallQueue<C extends Call<? super C>> {
 		throw new IllegalStateException( "This should not happen" );
 	}
 
-	synchronized void verifyExpectationsMet() {
+	public synchronized void verifyExpectationsMet() {
 		if ( lastVerifyFailure != null ) {
 			Fail.fail(
 					"A verify error occurred during the test: " + lastVerifyFailure.getMessage(),

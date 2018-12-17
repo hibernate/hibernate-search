@@ -46,7 +46,7 @@ class IndexWorkCall extends Call<IndexWorkCall> {
 	}
 
 	@Override
-	boolean isSimilarTo(IndexWorkCall other) {
+	protected boolean isSimilarTo(IndexWorkCall other) {
 		return Objects.equals( phase, other.phase )
 				&& Objects.equals( indexName, other.indexName )
 				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() )
