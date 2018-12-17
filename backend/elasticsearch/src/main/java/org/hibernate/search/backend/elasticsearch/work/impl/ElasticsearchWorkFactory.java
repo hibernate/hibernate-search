@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.util.impl.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.engine.search.SearchResult;
 

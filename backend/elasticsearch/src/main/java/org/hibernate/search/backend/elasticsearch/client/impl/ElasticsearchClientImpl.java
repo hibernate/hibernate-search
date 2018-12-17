@@ -29,8 +29,12 @@ import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.sniff.Sniffer;
-import org.hibernate.search.backend.elasticsearch.gson.impl.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonLogHelper;
+
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.Closer;

@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 
 import com.google.gson.JsonObject;

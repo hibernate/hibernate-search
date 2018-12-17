@@ -4,9 +4,8 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.client.impl;
+package org.hibernate.search.backend.elasticsearch.client.spi;
 
-import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -14,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  *
  * @author Yoann Rodiere
  */
-public interface ElasticsearchClient extends Closeable {
+public interface ElasticsearchClient {
 
 	/**
 	 * @param request A request to execute asynchronously
