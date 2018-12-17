@@ -45,12 +45,7 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 
 	@Override
 	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		JsonArray source = REQUEST_SOURCE_ACCESSOR.get( requestBody )
-				.orElseGet( () -> {
-					JsonArray newSource = new JsonArray();
-					REQUEST_SOURCE_ACCESSOR.set( requestBody, newSource );
-					return newSource;
-				} );
+		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
 		if ( !source.contains( fieldPathJson ) ) {
 			source.add( fieldPathJson );
