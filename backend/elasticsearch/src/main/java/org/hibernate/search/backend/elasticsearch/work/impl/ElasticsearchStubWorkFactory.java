@@ -34,13 +34,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> dropIndexIfExists(URLEncodedString indexName) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.delete()
-				.pathComponent( indexName );
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName,
 			RootTypeMapping mapping,
 			IndexSettings settings) {

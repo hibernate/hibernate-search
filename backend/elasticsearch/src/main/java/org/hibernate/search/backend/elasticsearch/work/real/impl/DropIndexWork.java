@@ -38,6 +38,15 @@ public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 		}
 
 		@Override
+		public DropIndexWorkBuilder ignoreIndexNotFound() {
+			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
+					.ignoreErrorTypes( "index_not_found_exception" )
+					.build();
+
+			return this;
+		}
+
+		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.delete()

@@ -21,8 +21,6 @@ import com.google.gson.JsonObject;
 // TODO restore the full work factory from Search 5
 public interface ElasticsearchWorkFactory {
 
-	ElasticsearchWork<?> dropIndexIfExists(URLEncodedString indexName);
-
 	ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping,
 			IndexSettings settings);
 

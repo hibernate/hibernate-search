@@ -13,4 +13,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  */
 public interface DropIndexWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
 
+	DropIndexWorkBuilder ignoreIndexNotFound();
+
 }
