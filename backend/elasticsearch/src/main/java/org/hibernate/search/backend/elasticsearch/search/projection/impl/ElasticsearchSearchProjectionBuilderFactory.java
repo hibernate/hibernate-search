@@ -25,6 +25,7 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ObjectProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ReferenceProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
@@ -120,6 +121,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 				new ElasticsearchCompositeTriFunctionProjection<>( transformer, toImplementation( projection1 ),
 						toImplementation( projection2 ), toImplementation( projection3 ) )
 		);
+	}
+
+	public SearchProjectionBuilder<String> source() {
+		return searchProjectionBackendContext.getSourceProjectionBuilder();
 	}
 
 	@SuppressWarnings("unchecked")

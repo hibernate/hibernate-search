@@ -101,7 +101,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
 			client.init( dialectSpecificGsonProvider );
 
-			Gson userFacingGson = new Gson();
+			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
 			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider, multiTenancyStrategy );

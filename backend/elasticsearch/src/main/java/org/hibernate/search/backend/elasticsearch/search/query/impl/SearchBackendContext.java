@@ -50,7 +50,10 @@ public class SearchBackendContext {
 		this.documentReferenceExtractorHelper =
 				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
 
-		this.searchProjectionBackendContext = new SearchProjectionBackendContext( documentReferenceExtractorHelper );
+		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
+				documentReferenceExtractorHelper,
+				userFacingGson
+		);
 	}
 
 	@Override

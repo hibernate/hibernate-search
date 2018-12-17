@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.dsl.projection;
 
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 
 /**
  * A DSL context allowing to create a projection, with some Elasticsearch-specific methods.
@@ -16,4 +17,11 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
  * @see SearchProjectionFactoryContext
  */
 public interface ElasticsearchSearchProjectionFactoryContext<R, O> extends SearchProjectionFactoryContext<R, O> {
+
+	/**
+	 * Project to a string representing the JSON document as stored in Elasticsearch.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	SearchProjectionTerminalContext<String> source();
+
 }
