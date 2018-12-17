@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
@@ -29,11 +28,9 @@ import com.google.gson.JsonObject;
 public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
 	private final GsonProvider gsonProvider;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider, MultiTenancyStrategy multiTenancyStrategy) {
+	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider) {
 		this.gsonProvider = gsonProvider;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
 	@Override
@@ -89,20 +86,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 			builder.param( "routing", routingKey );
 		}
 		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
-	public ElasticsearchWork<?> flush(URLEncodedString indexName) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._FLUSH );
-		ElasticsearchWork<?> flushWork = new ElasticsearchStubWork<>( builder.build() );
-		builder = ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._REFRESH );
-		ElasticsearchWork<Object> refreshWork = new ElasticsearchStubWork<>( builder.build() );
-		return context -> flushWork.execute( context )
-					.thenCompose( ignored -> refreshWork.execute( context ) );
 	}
 
 	@Override

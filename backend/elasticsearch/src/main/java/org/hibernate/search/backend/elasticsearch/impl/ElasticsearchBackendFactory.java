@@ -105,8 +105,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
-			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider, multiTenancyStrategy );
+			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider );
 			ElasticsearchWorkBuilderFactory workBuilderFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
@@ -115,7 +114,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			return new ElasticsearchBackendImpl(
 					client, dialectSpecificGsonProvider, name, workFactory, workBuilderFactory, userFacingGson,
 					analysisDefinitionRegistry,
-					multiTenancyStrategy
+					getMultiTenancyStrategy( name, propertySource )
 			);
 		}
 		catch (RuntimeException e) {
