@@ -100,6 +100,10 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
+		public SetupContext withBackendProperty(String backendName, String keyRadical, Object value) {
+			return withProperty( SearchEngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
+		}
+
 		public SetupContext withIndex(String typeName, String rawIndexName,
 				Consumer<IndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
 			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );
