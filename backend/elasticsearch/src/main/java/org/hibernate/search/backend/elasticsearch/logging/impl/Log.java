@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
@@ -35,6 +37,7 @@ import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
@@ -57,6 +60,33 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_2 = MessageConstants.BACKEND_ES_ID_RANGE_MIN;
+
+	@Message(id = ID_OFFSET_2 + 7,
+			value = "Elasticsearch request failed.\nRequest: %1$s\nResponse: %2$s"
+	)
+	SearchException elasticsearchRequestFailed(
+			@FormatWith( ElasticsearchRequestFormatter.class ) ElasticsearchRequest request,
+			@FormatWith( ElasticsearchResponseFormatter.class ) ElasticsearchResponse response,
+			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 8,
+			// Note: no need to add a '\n' before "Response", since the formatter will always add one
+			value = "Elasticsearch bulked request failed.\nRequest metadata: %1$sResponse: %2$s"
+	)
+	SearchException elasticsearchBulkedRequestFailed(
+			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject requestMetadata,
+			@FormatWith( ElasticsearchJsonObjectFormatter.class ) JsonObject response,
+			@Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 10,
+			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green'" )
+	SearchException elasticsearchRequestTimeout();
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ID_OFFSET_2 + 53,
+			value = "Executing Elasticsearch query on '%s' with parameters '%s': <%s>" )
+	void executingElasticsearchQuery(String path, Map<String, String> parameters,
+			String bodyParts);
 
 	@Message(id = ID_OFFSET_2 + 55,
 			value = "Multiple tokenizer definitions with the same name: '%1$s'. The tokenizer names must be unique.")
@@ -116,6 +146,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 89,
 			value = "Failed to parse Elasticsearch response. Status code was '%1$d', status phrase was '%2$s'.")
 	SearchException failedToParseElasticsearchResponse(int statusCode, String statusPhrase, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 90,
+			value = "Elasticsearch response indicates a failure." )
+	SearchException elasticsearchResponseIndicatesFailure();
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_2 + 93,

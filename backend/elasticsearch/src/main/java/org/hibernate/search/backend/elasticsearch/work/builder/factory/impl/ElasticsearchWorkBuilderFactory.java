@@ -25,6 +25,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSett
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 
 import com.google.gson.JsonObject;
 
@@ -47,11 +48,11 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	// TODO restore method => BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
 
-	<T> SearchWorkBuilder<T> search(JsonObject payload);
+	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload);
 
-	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout);
+	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 
 	ClearScrollWorkBuilder clearScroll(String scrollId);
 

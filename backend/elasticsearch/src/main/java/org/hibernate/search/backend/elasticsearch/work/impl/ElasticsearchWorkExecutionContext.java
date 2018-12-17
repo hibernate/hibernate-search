@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 /**
  * @author Yoann Rodiere
@@ -14,5 +16,9 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 public interface ElasticsearchWorkExecutionContext {
 
 	ElasticsearchClient getClient();
+
+	void setIndexDirty(URLEncodedString indexName);
+
+	GsonProvider getGsonProvider();
 
 }

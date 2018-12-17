@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 
 /**
@@ -23,5 +25,16 @@ public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkE
 	@Override
 	public ElasticsearchClient getClient() {
 		return client;
+	}
+
+	@Override
+	public void setIndexDirty(URLEncodedString indexName) {
+		// TODO scope execution context per request
+	}
+
+	@Override
+	public GsonProvider getGsonProvider() {
+		// TODO add gson provider property
+		return null;
 	}
 }
