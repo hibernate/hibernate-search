@@ -72,7 +72,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 				.body( document );
 		builder.param( "refresh", true );
 		if ( routingKey != null ) {
-			builder.param( "_routing", routingKey );
+			builder.param( "routing", routingKey );
 		}
 		return new ElasticsearchStubWork<>( builder.build() );
 	}
@@ -87,7 +87,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 				.body( document );
 		builder.param( "refresh", true );
 		if ( routingKey != null ) {
-			builder.param( "_routing", routingKey );
+			builder.param( "routing", routingKey );
 		}
 		return new ElasticsearchStubWork<>( builder.build() );
 	}
@@ -101,7 +101,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 				.pathComponent( URLEncodedString.fromString( id ) );
 		builder.param( "refresh", true );
 		if ( routingKey != null ) {
-			builder.param( "_routing", routingKey );
+			builder.param( "routing", routingKey );
 		}
 		return new ElasticsearchStubWork<>( builder.build() );
 	}
@@ -161,7 +161,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 		}
 
 		if ( !routingKeys.isEmpty() ) {
-			builder.param( "_routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+			builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
 		}
 
 		/* TODO scroll
