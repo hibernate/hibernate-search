@@ -312,6 +312,23 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	public void projection_explanation() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<String> query = searchTarget.query()
+				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation().toProjection() )
+				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.build();
+
+		List<String> result = query.execute().getHits();
+		Assertions.assertThat( result ).hasSize( 1 );
+		Assertions.assertThat( result.get( 0 ) )
+				.asString()
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+	}
+
+	@Test
 	public void backend_unwrap() {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
