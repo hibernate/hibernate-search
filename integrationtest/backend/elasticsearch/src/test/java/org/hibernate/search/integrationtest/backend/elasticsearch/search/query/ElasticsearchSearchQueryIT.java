@@ -83,6 +83,31 @@ public class ElasticsearchSearchQueryIT {
 		query.execute();
 	}
 
+	@Test
+	public void routing() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		String routingKey = "someRoutingKey";
+
+		SearchQuery<?> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.matchAll().toPredicate() )
+				.routing( routingKey )
+				.build();
+
+		clientMock.expectNext(
+				ElasticsearchRequest.post()
+						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( Paths._SEARCH )
+						.body( new JsonObject() ) // We don't care about the payload
+						.param( "routing", routingKey )
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+
+		query.execute();
+	}
+
 	private static class IndexAccessors {
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<String> string;
