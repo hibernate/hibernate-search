@@ -29,6 +29,8 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchStubWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -105,12 +107,13 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
 			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider, multiTenancyStrategy );
+			ElasticsearchWorkBuilderFactory workBuilderFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					client, name, workFactory, userFacingGson,
+					client, dialectSpecificGsonProvider, name, workFactory, workBuilderFactory, userFacingGson,
 					analysisDefinitionRegistry,
 					multiTenancyStrategy
 			);

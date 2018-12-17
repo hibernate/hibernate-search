@@ -59,8 +59,8 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	}
 
 	@Override
-	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject document) {
-		return new IndexWork.Builder( indexName, typeName, id, document );
+	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
+		return new IndexWork.Builder( indexName, typeName, id, routingKey, document );
 	}
 
 	@Override

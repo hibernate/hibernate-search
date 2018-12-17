@@ -40,13 +40,15 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final URLEncodedString id;
+		private final String routingKey;
 		private final JsonObject document;
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject document) {
+		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
 			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.id = id;
+			this.routingKey = routingKey;
 			this.document = document;
 		}
 
@@ -57,7 +59,16 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 					.pathComponent( indexName )
 					.pathComponent( typeName )
 					.pathComponent( id )
+
+					// TODO avoid this param using a smart orchestrator
+					.param( "refresh", true )
+
 					.body( document );
+
+			if ( routingKey != null ) {
+				builder.param( "routing", routingKey );
+			}
+
 			return builder.build();
 		}
 

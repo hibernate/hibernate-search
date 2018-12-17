@@ -63,21 +63,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> add(URLEncodedString indexName, URLEncodedString typeName,
-			String id, String routingKey, JsonObject document) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( indexName )
-				.pathComponent( typeName )
-				.pathComponent( URLEncodedString.fromString( id ) )
-				.body( document );
-		builder.param( "refresh", true );
-		if ( routingKey != null ) {
-			builder.param( "routing", routingKey );
-		}
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName,
 			String id, String routingKey, JsonObject document) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
@@ -182,7 +167,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 				.body( payload );
 
 		if ( !routingKeys.isEmpty() ) {
-			builder.param( "_routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+			builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
 		}
 
 		return new ElasticsearchStubWork<>( builder.build(), JsonAccessor.root().property( "count" ).asLong() );

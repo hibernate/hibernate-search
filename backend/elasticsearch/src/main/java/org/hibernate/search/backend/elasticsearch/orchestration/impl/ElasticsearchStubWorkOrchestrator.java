@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.util.impl.common.Futures;
 
@@ -26,8 +27,8 @@ public class ElasticsearchStubWorkOrchestrator implements ElasticsearchWorkOrche
 	// Protected by synchronization on updates
 	private CompletableFuture<?> latestFuture = CompletableFuture.completedFuture( null );
 
-	public ElasticsearchStubWorkOrchestrator(ElasticsearchClient client) {
-		this.context = new ElasticsearchStubWorkExecutionContext( client );
+	public ElasticsearchStubWorkOrchestrator(ElasticsearchClient client, GsonProvider gsonProvider) {
+		this.context = new ElasticsearchStubWorkExecutionContext( client, gsonProvider );
 	}
 
 	@Override

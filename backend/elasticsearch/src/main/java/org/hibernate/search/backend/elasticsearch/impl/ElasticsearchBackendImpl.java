@@ -13,8 +13,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.engine.backend.Backend;
@@ -68,7 +70,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, String name, ElasticsearchWorkFactory workFactory,
+	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, GsonProvider gsonProvider, String name,
+			ElasticsearchWorkFactory workFactory, ElasticsearchWorkBuilderFactory workBuilderFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
@@ -77,12 +80,12 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.userFacingGson = userFacingGson;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.streamOrchestrator = new ElasticsearchStubWorkOrchestrator( client );
-		this.queryOrchestrator = new ElasticsearchStubWorkOrchestrator( client );
+		this.streamOrchestrator = new ElasticsearchStubWorkOrchestrator( client, gsonProvider );
+		this.queryOrchestrator = new ElasticsearchStubWorkOrchestrator( client, gsonProvider );
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				eventContext, client, workFactory, multiTenancyStrategy, streamOrchestrator
+				eventContext, client, gsonProvider, workFactory, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, userFacingGson,

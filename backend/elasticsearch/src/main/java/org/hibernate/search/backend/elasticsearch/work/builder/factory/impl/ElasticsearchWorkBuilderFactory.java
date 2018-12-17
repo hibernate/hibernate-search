@@ -34,7 +34,7 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchWorkBuilderFactory {
 
-	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject document);
+	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document);
 
 	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id);
 

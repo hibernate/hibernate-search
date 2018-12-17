@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -23,14 +23,14 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> {
 
-	private final ElasticsearchWorkFactory factory;
+	private final ElasticsearchWorkBuilderFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
 	private final URLEncodedString typeName;
 	private final String tenantId;
 
-	ElasticsearchIndexDocumentWorkExecutor(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	ElasticsearchIndexDocumentWorkExecutor(ElasticsearchWorkBuilderFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContextImplementor sessionContext) {
@@ -52,7 +52,7 @@ public class ElasticsearchIndexDocumentWorkExecutor implements IndexDocumentWork
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		ElasticsearchWork<?> work = factory.add( indexName, typeName, elasticsearchId, routingKey, document );
+		ElasticsearchWork<Void> work = factory.index( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build();
 		return orchestrator.submit( work );
 	}
 }

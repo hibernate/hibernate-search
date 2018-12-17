@@ -17,9 +17,11 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkExecutionContext {
 
 	private final ElasticsearchClient client;
+	private final GsonProvider gsonProvider;
 
-	public ElasticsearchStubWorkExecutionContext(ElasticsearchClient client) {
+	public ElasticsearchStubWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
 		this.client = client;
+		this.gsonProvider = gsonProvider;
 	}
 
 	@Override
@@ -34,7 +36,6 @@ public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkE
 
 	@Override
 	public GsonProvider getGsonProvider() {
-		// TODO add gson provider property
-		return null;
+		return gsonProvider;
 	}
 }

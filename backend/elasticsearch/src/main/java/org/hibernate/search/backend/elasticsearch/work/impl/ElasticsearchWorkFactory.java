@@ -26,8 +26,6 @@ public interface ElasticsearchWorkFactory {
 	ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping,
 			IndexSettings settings);
 
-	ElasticsearchWork<?> add(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
-
 	ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
 
 	ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey);
