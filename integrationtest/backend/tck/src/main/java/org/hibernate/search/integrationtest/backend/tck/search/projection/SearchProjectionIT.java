@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -25,7 +26,10 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
+import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.search.StubDocumentReferenceTransformer;
 import org.hibernate.search.integrationtest.backend.tck.search.StubLoadedObject;
@@ -276,6 +280,81 @@ public class SearchProjectionIT {
 		} );
 	}
 
+	@Test
+	public void extension() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		SearchQuery<String> query;
+
+		// Mandatory extension
+		query = searchTarget.query()
+				.asProjection( f -> f.extension( new SupportedExtension<>() )
+						.extendedProjection( "string1", String.class )
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_1 ).toPredicate() )
+				.build();
+		assertThat( query )
+				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+
+		// Conditional extensions with orElse - two, both supported
+		query = searchTarget.query()
+				.asProjection( f -> f.<String>extension()
+						// FIXME find some way to forbid using the context passed to the consumers twice... ?
+						.ifSupported(
+								new SupportedExtension<>(),
+								extended -> extended.extendedProjection( "string1", String.class )
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								shouldNotBeCalled()
+						)
+						.orElseFail()
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_1 ).toPredicate() )
+				.build();
+		assertThat( query )
+				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+
+		// Conditional extensions with orElse - two, second supported
+		query = searchTarget.query()
+				.asProjection( root -> root.<String>extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								shouldNotBeCalled()
+						)
+						.ifSupported(
+								new SupportedExtension<>(),
+								extended -> extended.extendedProjection( "string1", String.class )
+						)
+						.orElse(
+								shouldNotBeCalled()
+						)
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_1 ).toPredicate() )
+				.build();
+		assertThat( query )
+				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+
+		// Conditional extensions with orElse - two, both unsupported
+		query = searchTarget.query()
+				.asProjection( root -> root.<String>extension()
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								shouldNotBeCalled()
+						)
+						.ifSupported(
+								new UnSupportedExtension<>(),
+								shouldNotBeCalled()
+						)
+						.orElse(
+								c -> c.field( "string1", String.class ).toProjection()
+						)
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_1 ).toPredicate() )
+				.build();
+		assertThat( query )
+				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -308,6 +387,12 @@ public class SearchProjectionIT {
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+	}
+
+	private static <T, R> Function<T, R> shouldNotBeCalled() {
+		return ignored -> {
+			throw new IllegalStateException( "This should not be called" );
+		};
 	}
 
 	private static class IndexMapping {
@@ -382,6 +467,40 @@ public class SearchProjectionIT {
 			this.document1Value = new ValueModel<>( accessor, document1Value );
 			this.document2Value = new ValueModel<>( accessor, document2Value );
 			this.document3Value = new ValueModel<>( accessor, document3Value );
+		}
+	}
+
+	private static class SupportedExtension<R, O>
+			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, O>, R, O> {
+		@Override
+		public Optional<MyExtendedContext<R, O>> extendOptional(SearchProjectionFactoryContext<R, O> original,
+				SearchProjectionBuilderFactory factory) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			return Optional.of( new MyExtendedContext<>( original ) );
+		}
+	}
+
+	private static class UnSupportedExtension<R, O>
+			implements SearchProjectionFactoryContextExtension<MyExtendedContext<R, O>, R, O> {
+		@Override
+		public Optional<MyExtendedContext<R, O>> extendOptional(SearchProjectionFactoryContext<R, O> original,
+				SearchProjectionBuilderFactory factory) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( factory ).isNotNull();
+			return Optional.empty();
+		}
+	}
+
+	private static class MyExtendedContext<R, O> {
+		private final SearchProjectionFactoryContext<R, O> delegate;
+
+		MyExtendedContext(SearchProjectionFactoryContext<R, O> delegate) {
+			this.delegate = delegate;
+		}
+
+		public <T> SearchProjection<T> extendedProjection(String fieldName, Class<T> type) {
+			return delegate.field( fieldName, type ).toProjection();
 		}
 	}
 }
