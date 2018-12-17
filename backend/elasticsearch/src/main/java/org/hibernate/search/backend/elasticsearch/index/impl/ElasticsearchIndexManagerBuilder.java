@@ -20,6 +20,9 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
  */
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
+	// Exposed for tests
+	public static final String TYPE_NAME = "typeName";
+
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
@@ -56,7 +59,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	public ElasticsearchIndexManagerImpl build() {
 		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
 		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
-		URLEncodedString encodedTypeName = URLEncodedString.fromString( "typeName" );
+		URLEncodedString encodedTypeName = URLEncodedString.fromString( TYPE_NAME );
 
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
