@@ -22,6 +22,7 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
@@ -429,6 +430,22 @@ public class LuceneExtensionIT {
 								.hasField( "nativeField_unsupportedProjection", "37" )
 								.andOnlyInternalFields()
 				) );
+	}
+
+	@Test
+	public void projection_explanation() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<Explanation> query = searchTarget.query()
+				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation().toProjection() )
+				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.build();
+
+		List<Explanation> result = query.execute().getHits();
+		Assertions.assertThat( result ).hasSize( 1 );
+		Assertions.assertThat( result.get( 0 ) ).isInstanceOf( Explanation.class );
+		Assertions.assertThat( result.get( 0 ).toString() )
+				.contains( LuceneFields.idFieldName() );
 	}
 
 	@Test
