@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
 import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.SearchBackendElasticsearchSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
@@ -68,6 +68,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
+	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
+			ConfigurationProperty.forKey( SearchBackendElasticsearchSpiSettings.CLIENT_FACTORY )
+					.asBeanReference( ElasticsearchClientFactory.class )
+					.withDefault( SearchBackendElasticsearchSpiSettings.Defaults.CLIENT_FACTORY )
+					.build();
+
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
@@ -77,13 +83,17 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
-		ElasticsearchClientFactory clientFactory = new ElasticsearchClientFactoryImpl();
-
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
-		ElasticsearchClientImplementor client = clientFactory.create( propertySource, initialGsonProvider );
+		ElasticsearchClientImplementor client = null;
 		try {
+			BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+			try ( BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder =
+					CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean ) ) {
+				client = clientFactoryHolder.get().create( propertySource, initialGsonProvider );
+			}
+
 			// TODO implement and detect dialects
 			// Assume ES5 for now
 			GsonProvider dialectSpecificGsonProvider =
