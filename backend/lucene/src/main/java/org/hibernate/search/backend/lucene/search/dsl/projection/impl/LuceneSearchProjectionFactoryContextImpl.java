@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.projection.spi.DelegatingSearchProjectionFactoryContext;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionFactoryContextImpl<R, O>
 		extends DelegatingSearchProjectionFactoryContext<R, O>
@@ -29,5 +30,10 @@ public class LuceneSearchProjectionFactoryContextImpl<R, O>
 	@Override
 	public SearchProjectionTerminalContext<Document> document() {
 		return new LuceneDocumentProjectionContext( factory );
+	}
+
+	@Override
+	public SearchProjectionTerminalContext<Explanation> explanation() {
+		return new LuceneExplanationProjectionContext( factory );
 	}
 }

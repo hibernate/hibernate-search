@@ -10,10 +10,13 @@ import java.io.IOException;
 
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.TopDocs;
+
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.engine.search.SearchResult;
 
 public interface LuceneSearchResultExtractor<T> {
 
-	SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs) throws IOException;
+	SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+			SearchProjectionExecutionContext projectionExecutionContext) throws IOException;
 
 }

@@ -34,6 +34,7 @@ import org.hibernate.search.util.function.TriFunction;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Explanation;
 
 public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
@@ -131,6 +132,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	public SearchProjectionBuilder<Document> document() {
 		return LuceneDocumentProjectionBuilder.get();
+	}
+
+	public SearchProjectionBuilder<Explanation> explanation() {
+		return LuceneExplanationProjectionBuilder.get();
 	}
 
 	private static class ProjectionBuilderFactoryRetrievalStrategy

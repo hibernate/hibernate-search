@@ -10,6 +10,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Explanation;
 
 /**
  * A DSL context allowing to create a projection, with some Lucene-specific methods.
@@ -30,5 +31,15 @@ public interface LuceneSearchProjectionFactoryContext<R, O> extends SearchProjec
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	SearchProjectionTerminalContext<Document> document();
+
+	/**
+	 * Project to a Lucene {@link Explanation} describing the score computation for the hit.
+	 * <p>
+	 * This feature is relatively expensive, do not use unless you return a limited
+	 * amount of objects (using pagination).
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	SearchProjectionTerminalContext<Explanation> explanation();
 
 }

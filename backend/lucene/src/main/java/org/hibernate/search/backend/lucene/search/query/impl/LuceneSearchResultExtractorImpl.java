@@ -31,22 +31,19 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 	private final LuceneSearchProjection<?, T> rootProjection;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 
-	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
-
 	LuceneSearchResultExtractorImpl(
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, T> rootProjection,
-			ProjectionHitMapper<?, ?> projectionHitMapper,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			ProjectionHitMapper<?, ?> projectionHitMapper) {
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
 		this.projectionHitMapper = projectionHitMapper;
-		this.searchProjectionExecutionContext = searchProjectionExecutionContext;
 	}
 
 	@Override
-	public SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs) throws IOException {
-		List<T> finalHits = extractHits( indexSearcher, topDocs );
+	public SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
+		List<T> finalHits = extractHits( indexSearcher, topDocs, projectionExecutionContext );
 
 		return new SearchResult<T>() {
 
@@ -63,7 +60,8 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<T> extractHits(IndexSearcher indexSearcher, TopDocs topDocs) throws IOException {
+	private List<T> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
+			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
@@ -75,7 +73,7 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 			Document document = storedFieldVisitor.getDocumentAndReset();
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
-			hits.add( rootProjection.extract( projectionHitMapper, luceneResult, searchProjectionExecutionContext ) );
+			hits.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExecutionContext ) );
 		}
 
 		LoadingResult<?> loadingResult = projectionHitMapper.load();

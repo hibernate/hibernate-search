@@ -17,7 +17,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -72,22 +71,22 @@ class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQ
 	}
 
 	private SearchQuery<T> build() {
-		SearchProjectionExecutionContext projectionExecutionContext =
-				new SearchProjectionExecutionContext( sessionContext );
-
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
-				storedFieldVisitor, rootProjection, projectionHitMapper, projectionExecutionContext
+				storedFieldVisitor, rootProjection, projectionHitMapper
 		);
 
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
 
-		return new LuceneSearchQuery<>( queryOrchestrator, workFactory,
+		return new LuceneSearchQuery<>(
+				queryOrchestrator, workFactory,
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),
+				sessionContext,
 				multiTenancyStrategy.decorateLuceneQuery( luceneQueryBuilder.build(), sessionContext.getTenantIdentifier() ),
 				elementCollector.toLuceneSort(),
-				rootProjection, searchResultExtractor );
+				rootProjection, searchResultExtractor
+		);
 	}
 
 	@Override

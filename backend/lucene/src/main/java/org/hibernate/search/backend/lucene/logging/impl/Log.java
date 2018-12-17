@@ -412,4 +412,8 @@ public interface Log extends BasicLogger {
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
 	SearchException conflictingIdentifierTypesForPredicate(ToDocumentIdentifierValueConverter<?> component1,
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 69,
+			value = "An IOException occurred while generating an Explanation.")
+	SearchException ioExceptionOnExplain(@Cause IOException e);
 }

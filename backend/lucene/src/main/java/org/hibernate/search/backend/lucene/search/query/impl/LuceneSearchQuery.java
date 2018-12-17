@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrc
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -29,6 +30,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	private final LuceneWorkFactory workFactory;
 	private final Set<String> indexNames;
 	private final Set<ReaderProvider> readerProviders;
+	private final SessionContextImplementor sessionContext;
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneCollectorProvider luceneCollectorProvider;
@@ -39,12 +41,14 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	public LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
+			SessionContextImplementor sessionContext,
 			Query luceneQuery, Sort luceneSort,
 			LuceneCollectorProvider luceneCollectorProvider, LuceneSearchResultExtractor<T> searchResultExtractor) {
 		this.queryOrchestrator = queryOrchestrator;
 		this.workFactory = workFactory;
 		this.indexNames = indexNames;
 		this.readerProviders = readerProviders;
+		this.sessionContext = sessionContext;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.luceneCollectorProvider = luceneCollectorProvider;
@@ -73,23 +77,33 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<T>(
-				indexNames,
-				readerProviders,
-				luceneQuery, luceneSort,
-				firstResultIndex, maxResultsCount,
-				luceneCollectorProvider, searchResultExtractor ) );
+		LuceneQueryWork<SearchResult<T>> work = workFactory.search(
+				new LuceneSearcher<>(
+						indexNames,
+						readerProviders,
+						luceneQuery, luceneSort,
+						firstResultIndex, maxResultsCount,
+						luceneCollectorProvider, searchResultExtractor
+				),
+				sessionContext
+		);
 		return queryOrchestrator.submit( work ).join();
 	}
 
 	@Override
 	public long executeCount() {
-		LuceneQueryWork<SearchResult<T>> work = workFactory.search( new LuceneSearcher<>(
-				indexNames, readerProviders, luceneQuery, luceneSort, 0L, 0L,
-				// do not add any TopDocs collector
-				( luceneCollectorBuilder -> { } ),
-				searchResultExtractor
-		) );
+		LuceneQueryWork<SearchResult<T>> work = workFactory.search(
+				new LuceneSearcher<>(
+						indexNames,
+						readerProviders,
+						luceneQuery, luceneSort,
+						0L, 0L,
+						// do not add any TopDocs collector
+						( luceneCollectorBuilder -> { } ),
+						searchResultExtractor
+				),
+				sessionContext
+		);
 		return queryOrchestrator.submit( work ).join().getHitCount();
 	}
 }
