@@ -92,22 +92,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> deleteAll(URLEncodedString indexName, String tenantId) {
-		JsonObject matchAll = new JsonObject();
-		matchAll.add( "match_all", new JsonObject() );
-		JsonObject document = new JsonObject();
-		document.add( "query", multiTenancyStrategy.decorateJsonQuery( matchAll, tenantId ) );
-
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
-				.pathComponent( indexName )
-				.pathComponent( Paths._DELETE_BY_QUERY )
-				.param( "conflicts", "proceed" )
-				.param( "refresh", true )
-				.body( document );
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public ElasticsearchWork<?> flush(URLEncodedString indexName) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
 				.pathComponent( indexName )

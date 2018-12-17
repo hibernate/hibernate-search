@@ -16,6 +16,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFac
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.util.EventContext;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
 
 	private final ElasticsearchWorkFactory workFactory;
@@ -44,7 +46,12 @@ public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
 	@Override
 	public CompletableFuture<?> purge(String tenantId) {
 		multiTenancyStrategy.checkTenantId( tenantId, eventContext );
-		return orchestrator.submit( workFactory.deleteAll( indexName, tenantId ) );
+		JsonObject matchAll = new JsonObject();
+		matchAll.add( "match_all", new JsonObject() );
+		JsonObject document = new JsonObject();
+		document.add( "query", multiTenancyStrategy.decorateJsonQuery( matchAll, tenantId ) );
+
+		return orchestrator.submit( workBuilderFactory.deleteByQuery( indexName, document ).build() );
 	}
 
 	@Override
