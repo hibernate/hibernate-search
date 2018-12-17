@@ -28,7 +28,8 @@ public class ElasticsearchSearchTargetContext
 			MappingContextImplementor mappingContext,
 			SearchBackendContext searchBackendContext,
 			ElasticsearchSearchTargetModel searchTargetModel) {
-		ElasticsearchSearchContext searchContext = new ElasticsearchSearchContext( mappingContext );
+		ElasticsearchSearchContext searchContext =
+				new ElasticsearchSearchContext( mappingContext, searchBackendContext.getUserFacingGson() );
 		this.searchTargetModel = searchTargetModel;
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
 		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext, searchTargetModel );

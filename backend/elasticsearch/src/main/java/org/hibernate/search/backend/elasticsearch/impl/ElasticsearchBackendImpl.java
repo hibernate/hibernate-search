@@ -36,6 +36,8 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+import com.google.gson.Gson;
+
 
 /**
  * @author Yoann Rodiere
@@ -63,6 +65,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final SearchBackendContext searchContext;
 
 	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, String name, ElasticsearchWorkFactory workFactory,
+			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
@@ -77,7 +80,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, client, workFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory,
+				eventContext, workFactory, userFacingGson,
 				new Function<String, String>() {
 					@Override
 					public String apply(String elasticsearchIndexName) {

@@ -28,8 +28,6 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 /**
@@ -39,8 +37,6 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final Gson GSON = new GsonBuilder().create();
 
 	private static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new PredicateBuilderFactoryRetrievalStrategy();
@@ -135,7 +131,9 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ElasticsearchSearchPredicateBuilder fromJsonString(String jsonString) {
-		return new ElasticsearchUserProvidedJsonPredicateContributor( GSON.fromJson( jsonString, JsonObject.class ) );
+		return new ElasticsearchUserProvidedJsonPredicateContributor(
+				searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class )
+		);
 	}
 
 	private static class PredicateBuilderFactoryRetrievalStrategy

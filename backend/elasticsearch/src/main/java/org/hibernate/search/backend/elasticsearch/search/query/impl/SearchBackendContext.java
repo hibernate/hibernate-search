@@ -20,10 +20,13 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.EventContext;
 
+import com.google.gson.Gson;
+
 public class SearchBackendContext {
 	private final EventContext eventContext;
 
 	private final ElasticsearchWorkFactory workFactory;
+	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
@@ -34,11 +37,13 @@ public class SearchBackendContext {
 
 	public SearchBackendContext(EventContext eventContext,
 			ElasticsearchWorkFactory workFactory,
+			Gson userFacingGson,
 			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
+		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 
@@ -55,6 +60,10 @@ public class SearchBackendContext {
 
 	public EventContext getEventContext() {
 		return eventContext;
+	}
+
+	Gson getUserFacingGson() {
+		return userFacingGson;
 	}
 
 	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper() {

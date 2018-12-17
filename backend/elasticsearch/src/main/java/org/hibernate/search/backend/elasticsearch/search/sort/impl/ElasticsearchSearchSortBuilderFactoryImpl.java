@@ -26,8 +26,6 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 /**
@@ -37,8 +35,6 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchSearchSortBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final Gson GSON = new GsonBuilder().create();
 
 	private static final SortBuilderFactoryRetrievalStrategy SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new SortBuilderFactoryRetrievalStrategy();
@@ -103,7 +99,9 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public ElasticsearchSearchSortBuilder fromJsonString(String jsonString) {
-		return new ElasticsearchUserProvidedJsonSortBuilder( GSON.fromJson( jsonString, JsonObject.class ) );
+		return new ElasticsearchUserProvidedJsonSortBuilder(
+				searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class )
+		);
 	}
 
 	private static class SortBuilderFactoryRetrievalStrategy

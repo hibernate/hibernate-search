@@ -46,6 +46,7 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 
@@ -100,6 +101,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
 			client.init( dialectSpecificGsonProvider );
 
+			Gson userFacingGson = new Gson();
+
 			MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( name, propertySource );
 			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider, multiTenancyStrategy );
 
@@ -107,7 +110,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					client, name, workFactory,
+					client, name, workFactory, userFacingGson,
 					analysisDefinitionRegistry,
 					multiTenancyStrategy
 			);

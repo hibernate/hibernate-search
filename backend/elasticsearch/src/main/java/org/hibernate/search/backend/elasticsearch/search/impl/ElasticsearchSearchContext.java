@@ -12,15 +12,20 @@ import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocu
 import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
+import com.google.gson.Gson;
+
 public final class ElasticsearchSearchContext {
 
 	private final ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext;
 
 	private final ToDocumentFieldValueConvertContext toDocumentFieldValueConvertContext;
 
-	public ElasticsearchSearchContext(MappingContextImplementor mappingContext) {
+	private final Gson userFacingGson;
+
+	public ElasticsearchSearchContext(MappingContextImplementor mappingContext, Gson userFacingGson) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
+		this.userFacingGson = userFacingGson;
 	}
 
 	public ToDocumentIdentifierValueConvertContext getToDocumentIdentifierValueConvertContext() {
@@ -29,5 +34,9 @@ public final class ElasticsearchSearchContext {
 
 	public ToDocumentFieldValueConvertContext getToDocumentFieldValueConvertContext() {
 		return toDocumentFieldValueConvertContext;
+	}
+
+	public Gson getUserFacingGson() {
+		return userFacingGson;
 	}
 }
