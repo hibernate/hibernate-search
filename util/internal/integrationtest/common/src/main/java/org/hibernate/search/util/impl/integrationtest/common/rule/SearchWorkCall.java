@@ -68,7 +68,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	}
 
 	@Override
-	boolean isSimilarTo(SearchWorkCall<?> other) {
+	protected boolean isSimilarTo(SearchWorkCall<?> other) {
 		return Objects.equals( indexNames, other.indexNames );
 	}
 
