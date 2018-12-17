@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
@@ -37,6 +40,9 @@ import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
+import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONAssert;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchExtensionIT {
 
@@ -241,6 +247,68 @@ public class ElasticsearchExtensionIT {
 				.build();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+	}
+
+	@Test
+	public void projection_document() throws JSONException {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<String> query = searchTarget.query()
+				.asProjection(
+						f -> f.extension( ElasticsearchExtension.get() ).source().toProjection()
+				)
+				.predicate( f -> f.id().matching( FIFTH_ID ).toPredicate() )
+				.build();
+
+		List<String> result = query.execute().getHits();
+		Assertions.assertThat( result ).hasSize( 1 );
+		JSONAssert.assertEquals(
+				"{"
+						+ "'string': 'text 2',"
+						+ "'integer': 1,"
+						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "'yearDays': '2018:025',"
+						+ "'sort5': 'z'"
+						+ "}",
+				result.get( 0 ),
+				JSONCompareMode.STRICT
+		);
+	}
+
+	/**
+	 * Check that the projection on source includes all fields,
+	 * even if there is a field projection, which would usually trigger source filtering.
+	 */
+	@Test
+	public void projection_documentAndField() throws JSONException {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<List<?>> query = searchTarget.query()
+				.asProjection( f ->
+						f.composite(
+								f.extension( ElasticsearchExtension.get() ).source().toProjection(),
+								f.field( "string" ).toProjection()
+						)
+						.toProjection()
+				)
+				.predicate( f -> f.id().matching( FIFTH_ID ).toPredicate() )
+				.build();
+
+		List<String> result = query.execute().getHits().stream()
+				.map( list -> (String) list.get( 0 ) )
+				.collect( Collectors.toList() );
+		Assertions.assertThat( result ).hasSize( 1 );
+		JSONAssert.assertEquals(
+				"{"
+						+ "'string': 'text 2',"
+						+ "'integer': 1,"
+						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "'yearDays': '2018:025',"
+						+ "'sort5': 'z'"
+						+ "}",
+				result.get( 0 ),
+				JSONCompareMode.STRICT
+		);
 	}
 
 	@Test
