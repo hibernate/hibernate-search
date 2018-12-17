@@ -8,10 +8,8 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 
 import com.google.gson.JsonObject;
 
@@ -20,9 +18,6 @@ import com.google.gson.JsonObject;
  */
 // TODO restore the full work factory from Search 5
 public interface ElasticsearchWorkFactory {
-
-	ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping,
-			IndexSettings settings);
 
 	ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
 

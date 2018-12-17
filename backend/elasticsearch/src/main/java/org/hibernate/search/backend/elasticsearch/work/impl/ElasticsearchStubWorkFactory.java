@@ -12,13 +12,9 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
@@ -27,29 +23,7 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
-	private final GsonProvider gsonProvider;
-
-	public ElasticsearchStubWorkFactory(GsonProvider gsonProvider) {
-		this.gsonProvider = gsonProvider;
-	}
-
-	@Override
-	public ElasticsearchWork<?> createIndex(URLEncodedString indexName, URLEncodedString typeName,
-			RootTypeMapping mapping,
-			IndexSettings settings) {
-		Gson gson = gsonProvider.getGsonNoSerializeNulls();
-
-		JsonObject mappingMap = new JsonObject();
-		mappingMap.add( typeName.original, gson.toJsonTree( mapping ) );
-
-		JsonObject payload = new JsonObject();
-		payload.add( "mappings", mappingMap );
-		payload.add( "settings", gson.toJsonTree( settings ) );
-
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( indexName )
-				.body( payload );
-		return new ElasticsearchStubWork<>( builder.build() );
+	public ElasticsearchStubWorkFactory() {
 	}
 
 	@Override

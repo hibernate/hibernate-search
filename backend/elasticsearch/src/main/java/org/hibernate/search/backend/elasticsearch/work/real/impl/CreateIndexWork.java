@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.real.impl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -46,7 +47,7 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 			implements CreateIndexWorkBuilder {
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;
-		private JsonObject payload;
+		private JsonObject payload = new JsonObject();
 
 		public Builder(GsonProvider gsonProvider, URLEncodedString indexName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -56,14 +57,22 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 
 		@Override
 		public Builder settings(IndexSettings settings) {
-			if ( settings != null ) {
-				/*
-				 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
-				 * We better not include the null fields.
-				 */
-				Gson gson = gsonProvider.getGsonNoSerializeNulls();
-				this.payload = gson.toJsonTree( settings ).getAsJsonObject();
-			}
+			/*
+			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
+			 * We better not include the null fields.
+			 */
+			Gson gson = gsonProvider.getGsonNoSerializeNulls();
+			payload.add( "settings", gson.toJsonTree( settings ) );
+			return this;
+		}
+
+		@Override
+		public Builder mapping(URLEncodedString typeName, RootTypeMapping mapping) {
+			Gson gson = gsonProvider.getGsonNoSerializeNulls();
+
+			JsonObject typeMapping = new JsonObject();
+			typeMapping.add( typeName.original, gson.toJsonTree( mapping ) );
+			payload.add( "mappings", typeMapping );
 			return this;
 		}
 
@@ -81,10 +90,9 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 					ElasticsearchRequest.put()
 					.pathComponent( indexName );
 
-			if ( payload != null ) {
+			if ( payload.size() > 0 ) {
 				builder.body( payload );
 			}
-
 			return builder.build();
 		}
 

@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -63,10 +64,11 @@ public class IndexingBackendContext {
 	CompletableFuture<?> initializeIndex(URLEncodedString indexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		ElasticsearchWork<?> dropWork = workBuilderFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
-		ElasticsearchWork<?> createWork = workFactory.createIndex(
-				indexName, typeName,
-				model.getMapping(), model.getSettings()
-		);
+		ElasticsearchWork<CreateIndexResult> createWork = workBuilderFactory.createIndex( indexName )
+				.settings( model.getSettings() )
+				.mapping( typeName, model.getMapping() )
+				.build();
+
 		return streamOrchestrator.submit( Arrays.asList( dropWork, createWork ) );
 	}
 

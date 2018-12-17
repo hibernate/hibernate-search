@@ -105,7 +105,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory( dialectSpecificGsonProvider );
+			ElasticsearchWorkFactory workFactory = new ElasticsearchStubWorkFactory();
 			ElasticsearchWorkBuilderFactory workBuilderFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
