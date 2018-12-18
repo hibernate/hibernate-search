@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import static org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection.transformUnsafe;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,8 +15,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
-import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 import com.google.gson.JsonArray;
@@ -51,43 +47,27 @@ public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchS
 	}
 
 	@Override
-	public SearchResult<T> extract(JsonObject responseBody) {
+	public ElasticsearchLoadableSearchResult<T> extract(JsonObject responseBody) {
 		Long hitCount = HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
 
-		final List<T> finalHits = hitCount > 0 ? extractHits( responseBody ) : Collections.emptyList();
+		final List<Object> extractedData = hitCount > 0 ? extractHits( responseBody ) : Collections.emptyList();
 
-		return new SearchResult<T>() {
-			@Override
-			public long getHitCount() {
-				return hitCount;
-			}
-
-			@Override
-			public List<T> getHits() {
-				return finalHits;
-			}
-		};
+		return new ElasticsearchLoadableSearchResult<>( projectionHitMapper, rootProjection, hitCount, extractedData );
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<T> extractHits(JsonObject responseBody) {
+	private List<Object> extractHits(JsonObject responseBody) {
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 
-		List<Object> hits = new ArrayList<>( jsonHits.size() );
+		List<Object> extractedData = new ArrayList<>( jsonHits.size() );
 
 		for ( JsonElement hit : jsonHits ) {
 			JsonObject hitObject = hit.getAsJsonObject();
 
-			hits.add( rootProjection.extract( projectionHitMapper, responseBody, hitObject,
+			extractedData.add( rootProjection.extract( projectionHitMapper, responseBody, hitObject,
 					searchProjectionExecutionContext ) );
 		}
 
-		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
-
-		for ( int i = 0; i < hits.size(); i++ ) {
-			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );
-		}
-
-		return Collections.unmodifiableList( (List<T>) hits );
+		return extractedData;
 	}
 }

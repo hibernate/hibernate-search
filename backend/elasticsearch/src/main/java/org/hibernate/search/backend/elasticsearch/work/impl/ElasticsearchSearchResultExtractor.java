@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchResultExtractor<T> {
 
-	SearchResult<T> extract(JsonObject responseBody);
+	ElasticsearchLoadableSearchResult<T> extract(JsonObject responseBody);
 
 }

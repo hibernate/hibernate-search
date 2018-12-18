@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.SearchResult;
 
 public interface LuceneSearchResultExtractor<T> {
 
-	SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+	LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
 			SearchProjectionExecutionContext projectionExecutionContext) throws IOException;
 
 }

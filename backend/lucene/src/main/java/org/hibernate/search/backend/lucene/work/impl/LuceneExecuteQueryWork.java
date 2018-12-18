@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchResult;
@@ -20,7 +21,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * @author Guillaume Smet
  */
-public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<SearchResult<T>> {
+public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<LuceneLoadableSearchResult<T>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -34,12 +35,12 @@ public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<SearchResult<T
 	}
 
 	@Override
-	public CompletableFuture<SearchResult<T>> execute(LuceneQueryWorkExecutionContext context) {
+	public CompletableFuture<LuceneLoadableSearchResult<T>> execute(LuceneQueryWorkExecutionContext context) {
 		// FIXME for now everything is blocking here, we need a non blocking wrapper on top of the IndexWriter
 		return Futures.create( () -> CompletableFuture.completedFuture( executeQuery( searcher ) ) );
 	}
 
-	private SearchResult<T> executeQuery(LuceneSearcher<T> searcher) {
+	private LuceneLoadableSearchResult<T> executeQuery(LuceneSearcher<T> searcher) {
 		try {
 			return searcher.execute( sessionContext );
 		}
