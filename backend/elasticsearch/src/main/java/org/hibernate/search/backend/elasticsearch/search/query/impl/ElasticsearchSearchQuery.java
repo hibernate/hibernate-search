@@ -70,11 +70,19 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		ElasticsearchWork<SearchResult<T>> work = workFactory.search(
+		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search(
 				indexNames, routingKeys,
 				payload, searchResultExtractor,
 				firstResultIndex, maxResultsCount );
-		return queryOrchestrator.submit( work ).join();
+		return queryOrchestrator.submit( work ).join()
+				/*
+				 * WARNING: the following call must run in the user thread.
+				 * If we introduce async query execution, we will have to add a loadAsync method here,
+				 * as well as in ProjectionHitMapper and ObjectLoader.
+				 * This method may not be easy to implement for blocking mappers,
+				 * so we may choose to throw exceptions for those.
+				 */
+				.loadBlocking();
 	}
 
 	@Override

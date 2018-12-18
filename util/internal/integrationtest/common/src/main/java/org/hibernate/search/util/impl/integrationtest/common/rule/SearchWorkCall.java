@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.FromDocume
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.spi.SimpleSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
@@ -63,8 +64,15 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 		long totalHitCount = behavior.getTotalHitCount();
 
-		return new SearchResultFromMock<>( totalHitCount, getResults( actualCall.convertContext,
-				actualCall.projectionHitMapper, actualCall.rootProjection, behavior.getRawHits() ) );
+		return new SimpleSearchResult<>(
+				totalHitCount,
+				getResults(
+						actualCall.convertContext,
+						actualCall.projectionHitMapper,
+						actualCall.rootProjection,
+						behavior.getRawHits()
+				)
+		);
 	}
 
 	@Override
@@ -97,35 +105,6 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	@Override
 	public String toString() {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
-	}
-
-	private static final class SearchResultFromMock<T> implements SearchResult<T> {
-
-		private final long totalHitCount;
-		private final List<T> hits;
-
-		public SearchResultFromMock(long totalHitCount, List<T> hits) {
-			this.totalHitCount = totalHitCount;
-			this.hits = hits;
-		}
-
-		@Override
-		public long getHitCount() {
-			return totalHitCount;
-		}
-
-		@Override
-		public List<T> getHits() {
-			return hits;
-		}
-
-		@Override
-		public String toString() {
-			return getClass().getSimpleName() + "{" +
-					"totalHitCount=" + totalHitCount +
-					", hits=" + hits +
-					'}';
-		}
 	}
 
 }

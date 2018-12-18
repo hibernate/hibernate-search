@@ -77,7 +77,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		LuceneQueryWork<SearchResult<T>> work = workFactory.search(
+		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
 						readerProviders,
@@ -87,12 +87,20 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 				),
 				sessionContext
 		);
-		return queryOrchestrator.submit( work ).join();
+		return queryOrchestrator.submit( work ).join()
+				/*
+				 * WARNING: the following call must run in the user thread.
+				 * If we introduce async processing, we will have to add a loadAsync method here,
+				 * as well as in ProjectionHitMapper and ObjectLoader.
+				 * This method may not be easy to implement for blocking mappers,
+				 * so we may choose to throw exceptions for those.
+				 */
+				.loadBlocking();
 	}
 
 	@Override
 	public long executeCount() {
-		LuceneQueryWork<SearchResult<T>> work = workFactory.search(
+		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
 						readerProviders,

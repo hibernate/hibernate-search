@@ -58,7 +58,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
-	public SearchResult<T> execute(SessionContextImplementor sessionContext) throws IOException {
+	public LuceneLoadableSearchResult<T> execute(SessionContextImplementor sessionContext) throws IOException {
 		// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
 
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs() );

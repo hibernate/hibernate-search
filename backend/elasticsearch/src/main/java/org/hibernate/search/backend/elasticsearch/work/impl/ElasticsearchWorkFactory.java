@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.engine.search.SearchResult;
 
 import com.google.gson.JsonObject;
 
@@ -38,7 +38,7 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> optimize(URLEncodedString indexName);
 
-	<T> ElasticsearchWork<SearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
+	<T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);
 

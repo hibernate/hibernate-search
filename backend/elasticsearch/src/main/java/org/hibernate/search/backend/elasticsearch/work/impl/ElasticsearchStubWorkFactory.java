@@ -14,10 +14,10 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.engine.search.SearchResult;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -145,7 +145,7 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public <T> ElasticsearchWork<SearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
+	public <T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()

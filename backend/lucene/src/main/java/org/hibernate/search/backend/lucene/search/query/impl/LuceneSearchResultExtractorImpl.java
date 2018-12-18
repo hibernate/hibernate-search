@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
-import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,8 +19,6 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
-import org.hibernate.search.engine.search.SearchResult;
-import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<T> {
@@ -41,47 +37,33 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 	}
 
 	@Override
-	public SearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
+	public LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
 			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
-		List<T> finalHits = extractHits( indexSearcher, topDocs, projectionExecutionContext );
+		List<Object> extractedData = extractHits( indexSearcher, topDocs, projectionExecutionContext );
 
-		return new SearchResult<T>() {
-
-			@Override
-			public long getHitCount() {
-				return totalHits;
-			}
-
-			@Override
-			public List<T> getHits() {
-				return finalHits;
-			}
-		};
+		return new LuceneLoadableSearchResult<>(
+				projectionHitMapper, rootProjection,
+				totalHits, extractedData
+		);
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<T> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
+	private List<Object> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
 			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}
 
-		List<Object> hits = new ArrayList<>( topDocs.scoreDocs.length );
+		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
 
 		for ( ScoreDoc hit : topDocs.scoreDocs ) {
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
 			Document document = storedFieldVisitor.getDocumentAndReset();
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
-			hits.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExecutionContext ) );
+			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExecutionContext ) );
 		}
 
-		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
-
-		for ( int i = 0; i < hits.size(); i++ ) {
-			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );
-		}
-
-		return Collections.unmodifiableList( (List<T>) hits );
+		return extractedData;
 	}
 }
