@@ -36,7 +36,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document);
 
-	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id);
+	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey);
 
 	DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload);
 

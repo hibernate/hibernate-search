@@ -87,7 +87,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
 		String routingKey = referenceProvider.getRoutingKey();
 
-		collect( factory.delete( indexName, typeName, elasticsearchId, routingKey ) );
+		collect( builderFactory.delete( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey ).build() );
 	}
 
 	@Override

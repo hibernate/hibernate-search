@@ -21,8 +21,6 @@ public interface ElasticsearchWorkFactory {
 
 	ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
 
-	ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey);
-
 	<T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);

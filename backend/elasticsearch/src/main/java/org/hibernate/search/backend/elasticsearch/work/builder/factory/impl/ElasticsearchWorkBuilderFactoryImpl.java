@@ -64,8 +64,8 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	}
 
 	@Override
-	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
-		return new DeleteWork.Builder( indexName, typeName, id );
+	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
+		return new DeleteWork.Builder( indexName, typeName, id, routingKey );
 	}
 
 	@Override

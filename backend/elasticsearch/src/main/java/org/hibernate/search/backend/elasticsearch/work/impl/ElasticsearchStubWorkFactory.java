@@ -42,20 +42,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> delete(URLEncodedString indexName, URLEncodedString typeName,
-			String id, String routingKey) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.delete()
-				.pathComponent( indexName )
-				.pathComponent( typeName )
-				.pathComponent( URLEncodedString.fromString( id ) );
-		builder.param( "refresh", true );
-		if ( routingKey != null ) {
-			builder.param( "routing", routingKey );
-		}
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public <T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {

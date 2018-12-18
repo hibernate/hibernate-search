@@ -44,12 +44,14 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final URLEncodedString id;
+		private final String routingKey;
 
-		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
+		public Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
 			super( indexName, SUCCESS_ASSESSOR );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.id = id;
+			this.routingKey = routingKey;
 		}
 
 		@Override
@@ -59,6 +61,14 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 					.pathComponent( indexName )
 					.pathComponent( typeName )
 					.pathComponent( id );
+
+			// TODO avoid this param using a smart orchestrator
+			builder.param( "refresh", true );
+
+			if ( routingKey != null ) {
+				builder.param( "routing", routingKey );
+			}
+
 			return builder.build();
 		}
 
