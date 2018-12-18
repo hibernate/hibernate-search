@@ -85,7 +85,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext(
-				eventContext, client, gsonProvider, workFactory, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
+				eventContext, client, gsonProvider, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, userFacingGson,

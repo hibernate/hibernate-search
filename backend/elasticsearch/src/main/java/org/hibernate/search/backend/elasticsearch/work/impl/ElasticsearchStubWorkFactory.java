@@ -27,21 +27,6 @@ public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 	}
 
 	@Override
-	public ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName,
-			String id, String routingKey, JsonObject document) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( indexName )
-				.pathComponent( typeName )
-				.pathComponent( URLEncodedString.fromString( id ) )
-				.body( document );
-		builder.param( "refresh", true );
-		if ( routingKey != null ) {
-			builder.param( "routing", routingKey );
-		}
-		return new ElasticsearchStubWork<>( builder.build() );
-	}
-
-	@Override
 	public <T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit) {

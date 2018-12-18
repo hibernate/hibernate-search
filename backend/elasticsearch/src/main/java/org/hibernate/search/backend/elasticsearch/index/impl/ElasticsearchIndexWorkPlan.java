@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.index.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
@@ -30,9 +29,8 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDocumentObjectBuilder> {
 
-	private final ElasticsearchWorkFactory factory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkBuilderFactory builderFactory;
+	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
 	private final URLEncodedString typeName;
@@ -40,14 +38,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
 
-	ElasticsearchIndexWorkPlan(ElasticsearchWorkFactory factory, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkBuilderFactory builderFactory,
+	ElasticsearchIndexWorkPlan(ElasticsearchWorkBuilderFactory builderFactory,
+			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContextImplementor sessionContext) {
-		this.factory = factory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.builderFactory = builderFactory;
+		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
 		this.typeName = typeName;
@@ -79,7 +76,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		collect( factory.update( indexName, typeName, elasticsearchId, routingKey, document ) );
+		collect( builderFactory.index( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build() );
 	}
 
 	@Override

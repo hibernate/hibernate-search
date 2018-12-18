@@ -19,8 +19,6 @@ import com.google.gson.JsonObject;
 // TODO restore the full work factory from Search 5
 public interface ElasticsearchWorkFactory {
 
-	ElasticsearchWork<?> update(URLEncodedString indexName, URLEncodedString typeName, String id, String routingKey, JsonObject document);
-
 	<T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
 			Long offset, Long limit);

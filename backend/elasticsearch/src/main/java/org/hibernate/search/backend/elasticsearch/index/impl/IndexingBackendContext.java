@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -32,7 +31,6 @@ public class IndexingBackendContext {
 
 	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
-	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -40,14 +38,13 @@ public class IndexingBackendContext {
 
 	public IndexingBackendContext(EventContext eventContext,
 			ElasticsearchClient client, GsonProvider gsonProvider,
-			ElasticsearchWorkFactory workFactory, ElasticsearchWorkBuilderFactory workBuilderFactory,
+			ElasticsearchWorkBuilderFactory workBuilderFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator streamOrchestrator) {
 		this.eventContext = eventContext;
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.workFactory = workFactory;
 		this.workBuilderFactory = workBuilderFactory;
 		this.streamOrchestrator = streamOrchestrator;
 	}
@@ -82,8 +79,7 @@ public class IndexingBackendContext {
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexWorkPlan( workFactory, multiTenancyStrategy, workBuilderFactory, orchestrator,
-				indexName, typeName, sessionContext );
+		return new ElasticsearchIndexWorkPlan( workBuilderFactory, multiTenancyStrategy, orchestrator, indexName, typeName, sessionContext );
 	}
 
 	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
