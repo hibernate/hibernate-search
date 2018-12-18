@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionTransformContext;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -44,11 +46,13 @@ public class ElasticsearchLoadableSearchResult<T> {
 		this.extractedData = extractedData;
 	}
 
-	SearchResult<T> loadBlocking() {
+	SearchResult<T> loadBlocking(SessionContextImplementor sessionContext) {
+		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
+
 		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
 
 		for ( int i = 0; i < extractedData.size(); i++ ) {
-			T transformed = transformUnsafe( rootProjection, loadingResult, extractedData.get( i ) );
+			T transformed = transformUnsafe( rootProjection, loadingResult, extractedData.get( i ), transformContext );
 			extractedData.set( i, transformed );
 		}
 

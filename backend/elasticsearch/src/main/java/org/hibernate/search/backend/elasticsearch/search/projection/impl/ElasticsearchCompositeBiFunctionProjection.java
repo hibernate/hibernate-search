@@ -33,25 +33,26 @@ public class ElasticsearchCompositeBiFunctionProjection<P1, P2, T> implements
 
 	@Override
 	public void contributeRequest(JsonObject requestBody,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		projection1.contributeRequest( requestBody, searchProjectionExecutionContext );
-		projection2.contributeRequest( requestBody, searchProjectionExecutionContext );
+			SearchProjectionExtractContext context) {
+		projection1.contributeRequest( requestBody, context );
+		projection2.contributeRequest( requestBody, context );
 	}
 
 	@Override
 	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		return new Object[] {
-				projection1.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ),
-				projection2.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext )
+				projection1.extract( projectionHitMapper, responseBody, hit, context ),
+				projection2.extract( projectionHitMapper, responseBody, hit, context )
 		};
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+			SearchProjectionTransformContext context) {
 		return transformer.apply(
-				transformUnsafe( projection1, loadingResult, extractedData[0] ),
-				transformUnsafe( projection2, loadingResult, extractedData[1] )
+				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
+				transformUnsafe( projection2, loadingResult, extractedData[1], context )
 		);
 	}
 

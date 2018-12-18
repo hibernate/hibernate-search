@@ -84,8 +84,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 						luceneQuery, luceneSort,
 						firstResultIndex, maxResultsCount,
 						luceneCollectorProvider, searchResultExtractor
-				),
-				sessionContext
+				)
 		);
 		return queryOrchestrator.submit( work ).join()
 				/*
@@ -95,7 +94,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 				 * This method may not be easy to implement for blocking mappers,
 				 * so we may choose to throw exceptions for those.
 				 */
-				.loadBlocking();
+				.loadBlocking( sessionContext );
 	}
 
 	@Override
@@ -109,8 +108,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 						// do not add any TopDocs collector
 						( luceneCollectorBuilder -> { } ),
 						searchResultExtractor
-				),
-				sessionContext
+				)
 		);
 		return queryOrchestrator.submit( work ).join().getHitCount();
 	}

@@ -16,11 +16,9 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
 import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.util.EventContext;
 
 /**
@@ -58,7 +56,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
-	public LuceneLoadableSearchResult<T> execute(SessionContextImplementor sessionContext) throws IOException {
+	public LuceneLoadableSearchResult<T> execute() throws IOException {
 		// TODO GSM implement timeout handling by wrapping the collector with the timeout limiting one
 
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( luceneSort, getMaxDocs() );
@@ -67,8 +65,8 @@ public class LuceneSearcher<T> implements AutoCloseable {
 
 		indexSearcher.search( luceneQuery, luceneCollectors.getCompositeCollector() );
 
-		SearchProjectionExecutionContext projectionExecutionContext =
-				new SearchProjectionExecutionContext( sessionContext, indexSearcher, luceneQuery );
+		SearchProjectionExtractContext projectionExecutionContext =
+				new SearchProjectionExtractContext( indexSearcher, luceneQuery );
 
 		return searchResultExtractor.extract(
 				indexSearcher, luceneCollectors.getTotalHits(),

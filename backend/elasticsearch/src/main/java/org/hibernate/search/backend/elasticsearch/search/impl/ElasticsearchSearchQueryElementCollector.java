@@ -9,10 +9,9 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext.DistanceSortKey;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
@@ -69,7 +68,7 @@ public class ElasticsearchSearchQueryElementCollector
 		return jsonSort;
 	}
 
-	public SearchProjectionExecutionContext toSearchProjectionExecutionContext(SessionContextImplementor sessionContext) {
-		return new SearchProjectionExecutionContext( sessionContext, distanceSorts );
+	public SearchProjectionExtractContext toSearchProjectionExecutionContext() {
+		return new SearchProjectionExtractContext( distanceSorts );
 	}
 }

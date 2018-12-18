@@ -18,7 +18,7 @@ import org.apache.lucene.search.TopDocs;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
 class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<T> {
@@ -38,7 +38,7 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 
 	@Override
 	public LuceneLoadableSearchResult<T> extract(IndexSearcher indexSearcher, long totalHits, TopDocs topDocs,
-			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
+			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
 		List<Object> extractedData = extractHits( indexSearcher, topDocs, projectionExecutionContext );
 
 		return new LuceneLoadableSearchResult<>(
@@ -49,7 +49,7 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 
 	@SuppressWarnings("unchecked")
 	private List<Object> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
-			SearchProjectionExecutionContext projectionExecutionContext) throws IOException {
+			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
 		if ( topDocs == null ) {
 			return Collections.emptyList();
 		}

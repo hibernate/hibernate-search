@@ -26,20 +26,21 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		REQUEST_EXPLAIN_ACCESSOR.set( requestBody, true );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		// We expect the optional to always be non-empty.
 		return gson.toJson( HIT_EXPLANATION_ACCESSOR.get( hit ).get() );
 	}
 
 	@Override
-	public String transform(LoadingResult<?> loadingResult, String extractedData) {
+	public String transform(LoadingResult<?> loadingResult, String extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

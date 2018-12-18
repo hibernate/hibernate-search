@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
@@ -85,8 +85,8 @@ class ElasticsearchSearchQueryBuilder<T>
 			payload.add( "sort", jsonSort );
 		}
 
-		SearchProjectionExecutionContext searchProjectionExecutionContext = elementCollector
-				.toSearchProjectionExecutionContext( sessionContext );
+		SearchProjectionExtractContext searchProjectionExecutionContext = elementCollector
+				.toSearchProjectionExecutionContext();
 
 		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
@@ -95,7 +95,7 @@ class ElasticsearchSearchQueryBuilder<T>
 
 		return new ElasticsearchSearchQuery<>(
 				workFactory, queryOrchestrator,
-				indexNames, routingKeys,
+				indexNames, sessionContext, routingKeys,
 				payload,
 				searchResultExtractor
 		);

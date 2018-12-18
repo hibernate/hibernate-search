@@ -51,7 +51,7 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements Luce
 
 	@Override
 	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, luceneResult, context ),
 				projection2.extract( projectionHitMapper, luceneResult, context ),
@@ -60,11 +60,12 @@ public class LuceneCompositeTriFunctionProjection<P1, P2, P3, T> implements Luce
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+			SearchProjectionTransformContext context) {
 		return transformer.apply(
-				transformUnsafe( projection1, loadingResult, extractedData[0] ),
-				transformUnsafe( projection2, loadingResult, extractedData[1] ),
-				transformUnsafe( projection3, loadingResult, extractedData[2] )
+				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
+				transformUnsafe( projection2, loadingResult, extractedData[1], context ),
+				transformUnsafe( projection3, loadingResult, extractedData[2], context )
 		);
 	}
 

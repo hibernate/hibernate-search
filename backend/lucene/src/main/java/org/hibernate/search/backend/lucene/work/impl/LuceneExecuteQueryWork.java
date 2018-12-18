@@ -13,8 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneLoadableSearchResult;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -26,12 +24,9 @@ public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<LuceneLoadable
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearcher<T> searcher;
-	private final SessionContextImplementor sessionContext;
 
-	public LuceneExecuteQueryWork(LuceneSearcher<T> searcher,
-			SessionContextImplementor sessionContext) {
+	public LuceneExecuteQueryWork(LuceneSearcher<T> searcher) {
 		this.searcher = searcher;
-		this.sessionContext = sessionContext;
 	}
 
 	@Override
@@ -42,7 +37,7 @@ public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<LuceneLoadable
 
 	private LuceneLoadableSearchResult<T> executeQuery(LuceneSearcher<T> searcher) {
 		try {
-			return searcher.execute( sessionContext );
+			return searcher.execute();
 		}
 		catch (IOException e) {
 			throw log.ioExceptionOnQueryExecution( searcher.getLuceneQuery(), searcher.getEventContext(), e );
@@ -57,7 +52,6 @@ public class LuceneExecuteQueryWork<T> implements LuceneQueryWork<LuceneLoadable
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "searcher=" ).append( searcher )
-				.append( ", sessionContext=" ).append( sessionContext )
 				.append( "]" );
 		return sb.toString();
 	}

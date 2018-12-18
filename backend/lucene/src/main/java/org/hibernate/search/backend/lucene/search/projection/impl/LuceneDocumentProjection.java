@@ -37,12 +37,13 @@ class LuceneDocumentProjection implements LuceneSearchProjection<Document, Docum
 
 	@Override
 	public Document extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return documentResult.getDocument();
 	}
 
 	@Override
-	public Document transform(LoadingResult<?> loadingResult, Document extractedData) {
+	public Document transform(LoadingResult<?> loadingResult, Document extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

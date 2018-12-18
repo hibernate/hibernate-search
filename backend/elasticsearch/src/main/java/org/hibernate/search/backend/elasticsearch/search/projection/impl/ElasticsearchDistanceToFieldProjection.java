@@ -44,8 +44,8 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		if ( searchProjectionExecutionContext.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
+		if ( context.getDistanceSortIndex( absoluteFieldPath, center ) == null ) {
 			// we rely on a script to compute the distance
 			SCRIPT_FIELDS_ACCESSOR
 					.property( scriptFieldName ).asObject()
@@ -56,10 +56,10 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		Optional<Double> distance;
 
-		Integer distanceSortIndex = searchProjectionExecutionContext.getDistanceSortIndex( absoluteFieldPath, center );
+		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );
 
 		if ( distanceSortIndex == null ) {
 			// we extract the value from the fields computed by the script_fields
@@ -89,7 +89,8 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
-	public Double transform(LoadingResult<?> loadingResult, Double extractedData) {
+	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

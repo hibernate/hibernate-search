@@ -46,7 +46,7 @@ public class LuceneCompositeListProjection<T> implements LuceneCompositeProjecti
 
 	@Override
 	public List<Object> extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		List<Object> extractedData = new ArrayList<>( children.size() );
 
 		for ( LuceneSearchProjection<?, ?> child : children ) {
@@ -57,9 +57,10 @@ public class LuceneCompositeListProjection<T> implements LuceneCompositeProjecti
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData) {
+	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData,
+			SearchProjectionTransformContext context) {
 		for ( int i = 0; i < extractedData.size(); i++ ) {
-			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ) ) );
+			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ), context ) );
 		}
 
 		return transformer.apply( extractedData );

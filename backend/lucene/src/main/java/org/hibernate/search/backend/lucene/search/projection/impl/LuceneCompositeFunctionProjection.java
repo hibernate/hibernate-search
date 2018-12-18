@@ -38,13 +38,14 @@ public class LuceneCompositeFunctionProjection<E, P, T> implements LuceneComposi
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return projection.extract( projectionHitMapper, luceneResult, context );
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, E extractedData) {
-		return transformer.apply( projection.transform( loadingResult, extractedData ) );
+	public T transform(LoadingResult<?> loadingResult, E extractedData,
+			SearchProjectionTransformContext context) {
+		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
 	}
 
 	@Override

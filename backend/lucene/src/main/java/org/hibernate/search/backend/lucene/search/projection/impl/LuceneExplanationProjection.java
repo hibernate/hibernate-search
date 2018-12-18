@@ -37,12 +37,13 @@ class LuceneExplanationProjection implements LuceneSearchProjection<Explanation,
 
 	@Override
 	public Explanation extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return context.explain( documentResult.getDocId() );
 	}
 
 	@Override
-	public Explanation transform(LoadingResult<?> loadingResult, Explanation extractedData) {
+	public Explanation transform(LoadingResult<?> loadingResult, Explanation extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

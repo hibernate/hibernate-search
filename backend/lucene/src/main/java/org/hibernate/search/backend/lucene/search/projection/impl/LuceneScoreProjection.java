@@ -35,12 +35,13 @@ class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 
 	@Override
 	public Float extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return documentResult.getScore();
 	}
 
 	@Override
-	public Float transform(LoadingResult<?> loadingResult, Float extractedData) {
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

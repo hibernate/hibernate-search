@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
  * @author Guillaume Smet
@@ -30,5 +29,5 @@ public interface LuceneWorkFactory {
 
 	LuceneIndexWork<?> optimize(String indexName);
 
-	<T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher, SessionContextImplementor sessionContext);
+	<T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher);
 }
