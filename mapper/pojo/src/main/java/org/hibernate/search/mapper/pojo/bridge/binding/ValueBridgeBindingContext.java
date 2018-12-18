@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 
@@ -23,6 +23,6 @@ public interface ValueBridgeBindingContext<V> {
 	/**
 	 * @return An entry point allowing to declare expectations regarding the index schema.
 	 */
-	IndexSchemaFieldContext getIndexSchemaFieldContext();
+	IndexFieldTypeFactoryContext getIndexFieldTypeFactoryContext();
 
 }

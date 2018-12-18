@@ -13,9 +13,9 @@ import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.ElasticsearchSearchProjectionFactoryContext;
 import org.hibernate.search.backend.elasticsearch.search.dsl.projection.impl.ElasticsearchSearchProjectionFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContextExtension;
-import org.hibernate.search.backend.elasticsearch.document.model.dsl.ElasticsearchIndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.dsl.predicate.impl.ElasticsearchSearchPredicateFactoryContextImpl;
 import org.hibernate.search.backend.elasticsearch.search.dsl.sort.ElasticsearchSearchSortContainerContext;
@@ -53,7 +53,7 @@ public final class ElasticsearchExtension<R, O>
 		implements SearchPredicateFactoryContextExtension<ElasticsearchSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<ElasticsearchSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<ElasticsearchSearchProjectionFactoryContext<R, O>, R, O>,
-		IndexSchemaFieldContextExtension<ElasticsearchIndexSchemaFieldContext> {
+		IndexFieldTypeFactoryContextExtension<ElasticsearchIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -119,9 +119,9 @@ public final class ElasticsearchExtension<R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ElasticsearchIndexSchemaFieldContext extendOrFail(IndexSchemaFieldContext original) {
-		if ( original instanceof ElasticsearchIndexSchemaFieldContext ) {
-			return (ElasticsearchIndexSchemaFieldContext) original;
+	public ElasticsearchIndexFieldTypeFactoryContext extendOrFail(IndexFieldTypeFactoryContext original) {
+		if ( original instanceof ElasticsearchIndexFieldTypeFactoryContext ) {
+			return (ElasticsearchIndexFieldTypeFactoryContext) original;
 		}
 		else {
 			throw log.elasticsearchExtensionOnUnknownType( original );

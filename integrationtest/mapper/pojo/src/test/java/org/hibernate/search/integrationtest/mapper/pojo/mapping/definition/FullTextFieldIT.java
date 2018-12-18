@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
@@ -162,7 +162,7 @@ public class FullTextFieldIT {
 						.failure(
 								"This property is mapped to a full-text field, but with a value bridge that creates a non-String or otherwise incompatible field",
 								"bind() method returned context '",
-								"expected '" + StringIndexSchemaFieldTypedContext.class.getName() + "'"
+								"expected '" + StringIndexFieldTypeContext.class.getName() + "'"
 						)
 						.build()
 				);
@@ -194,7 +194,7 @@ public class FullTextFieldIT {
 						.failure(
 								"This property is mapped to a full-text field, but with a value bridge that creates a non-String or otherwise incompatible field",
 								"bind() method returned context '",
-								"expected '" + StringIndexSchemaFieldTypedContext.class.getName() + "'"
+								"expected '" + StringIndexFieldTypeContext.class.getName() + "'"
 						)
 						.build()
 				);
@@ -240,8 +240,8 @@ public class FullTextFieldIT {
 
 	public static class ValidExplicitBindingBridge implements ValueBridge<WrappedValue, String> {
 		@Override
-		public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<WrappedValue> context) {
-			return context.getIndexSchemaFieldContext().asString();
+		public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<WrappedValue> context) {
+			return context.getIndexFieldTypeFactoryContext().asString();
 		}
 		@Override
 		public String toIndexedValue(WrappedValue value,
@@ -260,8 +260,8 @@ public class FullTextFieldIT {
 
 	public static class InvalidExplicitBindingBridge implements ValueBridge<String, Integer> {
 		@Override
-		public StandardIndexSchemaFieldTypedContext<?, Integer> bind(ValueBridgeBindingContext<String> context) {
-			return context.getIndexSchemaFieldContext().asInteger();
+		public StandardIndexFieldTypeContext<?, Integer> bind(ValueBridgeBindingContext<String> context) {
+			return context.getIndexFieldTypeFactoryContext().asInteger();
 		}
 		@Override
 		public Integer toIndexedValue(String value,

@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -458,7 +458,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration,
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
 			Predicate<MatchPredicateExpectations<?>> predicate) {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter(
@@ -471,7 +471,7 @@ public class MatchSearchPredicateIT {
 
 	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
 		String name = prefix + typeDescriptor.getUniqueName();
 		MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get(); // Safe, see caller
 		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
@@ -498,10 +498,10 @@ public class MatchSearchPredicateIT {
 		}
 
 		static StandardFieldMapper<String, MainFieldModel> mapper(
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, String>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration,
 				String document1Value, String document2Value, String document3Value) {
 			return (parent, name, additionalConfiguration) -> {
-				StandardIndexSchemaFieldTypedContext<?, String> context = configuration.apply( parent.field( name ) );
+				StandardIndexFieldTypeContext<?, String> context = configuration.apply( parent.field( name ) );
 				additionalConfiguration.accept( context );
 				IndexFieldAccessor<String> accessor = context.createAccessor();
 				return new MainFieldModel( accessor, name, document1Value, document3Value, document2Value );
@@ -531,9 +531,9 @@ public class MatchSearchPredicateIT {
 
 		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
 				FieldTypeDescriptor<F> typeDescriptor, MatchPredicateExpectations<F> expectations,
-				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-			IndexSchemaFieldContext untypedContext = parent.field( relativeFieldName );
-			StandardIndexSchemaFieldTypedContext<?, F> context = typeDescriptor.configure( untypedContext );
+				Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
+			IndexFieldTypeFactoryContext untypedContext = parent.field( relativeFieldName );
+			StandardIndexFieldTypeContext<?, F> context = typeDescriptor.configure( untypedContext );
 			additionalConfiguration.accept( context );
 			IndexFieldAccessor<F> accessor = context.createAccessor();
 			this.relativeFieldName = relativeFieldName;

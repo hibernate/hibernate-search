@@ -14,9 +14,9 @@ import org.hibernate.search.backend.lucene.search.dsl.predicate.impl.LuceneSearc
 import org.hibernate.search.backend.lucene.search.dsl.projection.LuceneSearchProjectionFactoryContext;
 import org.hibernate.search.backend.lucene.search.dsl.projection.impl.LuceneSearchProjectionFactoryContextImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContextExtension;
-import org.hibernate.search.backend.lucene.document.model.dsl.LuceneIndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContextExtension;
+import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.dsl.sort.LuceneSearchSortContainerContext;
 import org.hibernate.search.backend.lucene.search.dsl.sort.impl.LuceneSearchSortContainerContextImpl;
@@ -53,7 +53,7 @@ public final class LuceneExtension<R, O>
 		implements SearchPredicateFactoryContextExtension<LuceneSearchPredicateFactoryContext>,
 		SearchSortContainerContextExtension<LuceneSearchSortContainerContext>,
 		SearchProjectionFactoryContextExtension<LuceneSearchProjectionFactoryContext<R, O>, R, O>,
-		IndexSchemaFieldContextExtension<LuceneIndexSchemaFieldContext> {
+		IndexFieldTypeFactoryContextExtension<LuceneIndexFieldTypeFactoryContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -119,9 +119,9 @@ public final class LuceneExtension<R, O>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public LuceneIndexSchemaFieldContext extendOrFail(IndexSchemaFieldContext original) {
-		if ( original instanceof LuceneIndexSchemaFieldContext ) {
-			return (LuceneIndexSchemaFieldContext) original;
+	public LuceneIndexFieldTypeFactoryContext extendOrFail(IndexFieldTypeFactoryContext original) {
+		if ( original instanceof LuceneIndexFieldTypeFactoryContext ) {
+			return (LuceneIndexFieldTypeFactoryContext) original;
 		}
 		else {
 			throw log.luceneExtensionOnUnknownType( original );

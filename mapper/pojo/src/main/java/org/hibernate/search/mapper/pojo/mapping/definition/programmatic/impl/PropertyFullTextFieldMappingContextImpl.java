@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StringIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFullTextFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 class PropertyFullTextFieldMappingContextImpl
-		extends AbstractPropertyFieldMappingContext<PropertyFullTextFieldMappingContext, StringIndexSchemaFieldTypedContext<?>>
+		extends AbstractPropertyFieldMappingContext<PropertyFullTextFieldMappingContext, StringIndexFieldTypeContext<?>>
 		implements PropertyFullTextFieldMappingContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -42,13 +42,13 @@ class PropertyFullTextFieldMappingContextImpl
 		return thisAsS();
 	}
 
-	private static StringIndexSchemaFieldTypedContext<?> convertFieldTypedContext(StandardIndexSchemaFieldTypedContext<?,?> context) {
-		if ( context instanceof StringIndexSchemaFieldTypedContext ) {
-			return (StringIndexSchemaFieldTypedContext<?>) context;
+	private static StringIndexFieldTypeContext<?> convertFieldTypedContext(StandardIndexFieldTypeContext<?,?> context) {
+		if ( context instanceof StringIndexFieldTypeContext ) {
+			return (StringIndexFieldTypeContext<?>) context;
 		}
 		else {
 			throw log.invalidFieldEncodingForFullTextFieldMapping(
-					context, StringIndexSchemaFieldTypedContext.class
+					context, StringIndexFieldTypeContext.class
 			);
 		}
 	}

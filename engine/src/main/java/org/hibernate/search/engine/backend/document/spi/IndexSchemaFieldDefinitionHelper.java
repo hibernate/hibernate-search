@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldV
 import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.Contracts;
@@ -72,7 +73,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	/**
 	 * @return The user-configured converter for this field definition, or a default converter if none was configured.
-	 * @see org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext#dslConverter(ToDocumentFieldValueConverter)
+	 * @see IndexFieldTypeConverterContext#dslConverter(ToDocumentFieldValueConverter)
 	 */
 	public ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
 		checkAccessorCreated();
@@ -82,7 +83,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	/**
 	 * @return The user-configured converter for this field definition, or a default converter if none was configured.
-	 * @see org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext#projectionConverter(FromDocumentFieldValueConverter)
+	 * @see IndexFieldTypeConverterContext#projectionConverter(FromDocumentFieldValueConverter)
 	 */
 	public FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
 		checkAccessorCreated();

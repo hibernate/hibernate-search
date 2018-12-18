@@ -107,7 +107,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		return null;
 	}
 
-	EventContext getIndexEventContext() {
+	public EventContext getIndexEventContext() {
 		return EventContexts.fromIndexName( hibernateSearchIndexName );
 	}
 }

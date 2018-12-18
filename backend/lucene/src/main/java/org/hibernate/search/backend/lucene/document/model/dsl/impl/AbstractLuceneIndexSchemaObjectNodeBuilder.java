@@ -10,7 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryContextImpl;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -36,16 +37,16 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	}
 
 	@Override
-	public IndexSchemaFieldContext addField(String relativeFieldName) {
-		LuceneIndexSchemaFieldContextImpl fieldContext =
-				new LuceneIndexSchemaFieldContextImpl( this, relativeFieldName );
+	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
+		LuceneIndexFieldTypeFactoryContextImpl fieldContext =
+				new LuceneIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
 		putProperty( relativeFieldName, fieldContext );
 		return fieldContext;
 	}
 
 	@Override
-	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
-		return new LuceneIndexSchemaFieldContextImpl( this, relativeFieldName );
+	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
+		return new LuceneIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
 	}
 
 	@Override

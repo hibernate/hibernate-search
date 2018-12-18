@@ -7,12 +7,14 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+
 /**
  * @author Yoann Rodiere
  */
 public interface IndexSchemaElement {
 
-	IndexSchemaFieldContext field(String relativeFieldName);
+	IndexFieldTypeFactoryContext field(String relativeFieldName);
 
 	default IndexSchemaObjectField objectField(String relativeFieldName) {
 		return objectField( relativeFieldName, ObjectFieldStorage.DEFAULT );

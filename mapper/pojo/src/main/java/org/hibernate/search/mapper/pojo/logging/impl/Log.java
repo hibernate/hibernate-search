@@ -12,7 +12,7 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
@@ -269,7 +269,7 @@ public interface Log extends BasicLogger {
 					+ " Details: the value bridge's bind() method returned context '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForFullTextFieldMapping(IndexSchemaFieldTypedContext<?, ?> context,
+	SearchException invalidFieldEncodingForFullTextFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 32,
@@ -279,7 +279,7 @@ public interface Log extends BasicLogger {
 					+ " Details: the value bridge's bind() method returned context '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForKeywordFieldMapping(IndexSchemaFieldTypedContext<?, ?> context,
+	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeContext<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 33, value = "Exception while invoking '%1$s' on '%2$s'.")

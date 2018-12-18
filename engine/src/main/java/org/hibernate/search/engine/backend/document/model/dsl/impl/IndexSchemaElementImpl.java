@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -41,7 +41,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public IndexSchemaFieldContext field(String relativeFieldName) {
+	public IndexFieldTypeFactoryContext field(String relativeFieldName) {
 		checkRelativeFieldName( relativeFieldName );
 		return nestingContext.nest(
 				relativeFieldName,

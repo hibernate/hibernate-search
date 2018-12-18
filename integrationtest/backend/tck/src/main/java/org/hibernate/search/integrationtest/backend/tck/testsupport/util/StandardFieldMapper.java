@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 
 @FunctionalInterface
 public interface StandardFieldMapper<F, M> {
@@ -18,6 +18,6 @@ public interface StandardFieldMapper<F, M> {
 		return map( parent, name, ignored -> { } );
 	}
 
-	M map(IndexSchemaElement parent, String name, Consumer<? super StandardIndexSchemaFieldTypedContext<?, F>> additionalConfiguration);
+	M map(IndexSchemaElement parent, String name, Consumer<? super StandardIndexFieldTypeContext<?, F>> additionalConfiguration);
 
 }

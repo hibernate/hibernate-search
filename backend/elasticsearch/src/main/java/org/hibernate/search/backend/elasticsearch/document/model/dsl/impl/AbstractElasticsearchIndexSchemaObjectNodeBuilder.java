@@ -10,7 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -22,7 +23,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
+public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -38,16 +39,16 @@ abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements Inde
 	}
 
 	@Override
-	public IndexSchemaFieldContext addField(String relativeFieldName) {
-		ElasticsearchIndexSchemaFieldContextImpl fieldContext =
-				new ElasticsearchIndexSchemaFieldContextImpl( this, relativeFieldName );
+	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
+		ElasticsearchIndexFieldTypeFactoryContextImpl fieldContext =
+				new ElasticsearchIndexFieldTypeFactoryContextImpl( getRootNodeBuilder(), getAbsolutePath(), relativeFieldName );
 		putProperty( relativeFieldName, fieldContext );
 		return fieldContext;
 	}
 
 	@Override
-	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
-		return new ElasticsearchIndexSchemaFieldContextImpl( this, relativeFieldName );
+	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
+		return new ElasticsearchIndexFieldTypeFactoryContextImpl( getRootNodeBuilder(), getAbsolutePath(), relativeFieldName );
 	}
 
 	@Override

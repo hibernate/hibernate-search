@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.showcase.library.bridge;
 
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 public class ISBNBridge implements ValueBridge<ISBN, String> {
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
-		return context.getIndexSchemaFieldContext().asString()
+	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<ISBN> context) {
+		return context.getIndexFieldTypeFactoryContext().asString()
 				.normalizer( LibraryAnalysisConfigurer.NORMALIZER_ISBN )
 				.projectionConverter( ISBNFromDocumentFieldValueConverter.INSTANCE );
 	}

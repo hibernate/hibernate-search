@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 public interface IndexSchemaObjectNodeBuilder extends IndexSchemaContext {
@@ -17,7 +17,7 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaContext {
 	 * @param relativeFieldName The relative name of the new field
 	 * @return A context allowing to define the new field
 	 */
-	IndexSchemaFieldContext addField(String relativeFieldName);
+	IndexFieldTypeFactoryContext addField(String relativeFieldName);
 
 	/**
 	 * Create a new field, but do not add it to the current builder.
@@ -28,7 +28,7 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaContext {
 	 * @param relativeFieldName The relative name of the new field
 	 * @return A context allowing to define the new field
 	 */
-	IndexSchemaFieldContext createExcludedField(String relativeFieldName);
+	IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName);
 
 	/**
 	 * Create a new object field and add it to the current builder.
