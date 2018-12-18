@@ -32,7 +32,7 @@ public class NoLoadingProjectionHitMapper<R> implements ProjectionHitMapper<R, V
 	}
 
 	@Override
-	public LoadingResult<Void> load() {
+	public LoadingResult<Void> loadBlocking() {
 		return UnusableLoadingResult.INSTANCE;
 	}
 

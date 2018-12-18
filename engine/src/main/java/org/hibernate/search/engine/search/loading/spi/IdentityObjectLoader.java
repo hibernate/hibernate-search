@@ -18,7 +18,7 @@ class IdentityObjectLoader<T> implements ObjectLoader<T, T> {
 	}
 
 	@Override
-	public List<T> load(List<T> references) {
+	public List<T> loadBlocking(List<T> references) {
 		return references;
 	}
 }

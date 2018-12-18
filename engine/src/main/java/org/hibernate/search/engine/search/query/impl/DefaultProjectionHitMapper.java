@@ -41,8 +41,8 @@ public class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapper<R, 
 	}
 
 	@Override
-	public LoadingResult<O> load() {
-		return new DefaultLoadingResult<>( objectLoader.load( referencesToLoad ) );
+	public LoadingResult<O> loadBlocking() {
+		return new DefaultLoadingResult<>( objectLoader.loadBlocking( referencesToLoad ) );
 	}
 
 	private static class DefaultLoadingResult<O> implements LoadingResult<O> {

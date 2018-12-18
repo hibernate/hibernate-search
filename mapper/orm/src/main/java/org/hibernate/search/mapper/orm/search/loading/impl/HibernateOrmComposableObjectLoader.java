@@ -22,7 +22,8 @@ interface HibernateOrmComposableObjectLoader<R, O> extends ObjectLoader<R, O> {
 
 	/**
 	 * For each reference in the given list,
-	 * loads the corresponding object and puts it as a value in the given map.
+	 * loads the corresponding object and puts it as a value in the given map,
+	 * blocking the current thread while doing so.
 	 * <p>
 	 * When an object cannot be found, the map is not altered.
 	 *
@@ -30,6 +31,6 @@ interface HibernateOrmComposableObjectLoader<R, O> extends ObjectLoader<R, O> {
 	 * @param objectsByReference A map with references as keys and objects as values.
 	 * Initial values are undefined and the loader must not rely on them.
 	 */
-	void load(List<R> references, Map<? super R, ? super O> objectsByReference);
+	void loadBlocking(List<R> references, Map<? super R, ? super O> objectsByReference);
 
 }

@@ -82,7 +82,7 @@ public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchS
 					searchProjectionExecutionContext ) );
 		}
 
-		LoadingResult<?> loadingResult = projectionHitMapper.load();
+		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
 
 		for ( int i = 0; i < hits.size(); i++ ) {
 			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );

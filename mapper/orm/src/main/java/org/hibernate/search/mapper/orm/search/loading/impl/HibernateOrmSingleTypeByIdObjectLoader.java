@@ -38,7 +38,7 @@ class HibernateOrmSingleTypeByIdObjectLoader<O, T> implements HibernateOrmCompos
 	}
 
 	@Override
-	public List<T> load(List<PojoReference> references) {
+	public List<T> loadBlocking(List<PojoReference> references) {
 		List<O> loadedObjects = loadEntities( references );
 
 		// TODO avoid creating this list when the transformer is the identity; maybe cast the list in that case, or tranform in-place all the time?
@@ -46,7 +46,7 @@ class HibernateOrmSingleTypeByIdObjectLoader<O, T> implements HibernateOrmCompos
 	}
 
 	@Override
-	public void load(List<PojoReference> references, Map<? super PojoReference, ? super T> objectsByReference) {
+	public void loadBlocking(List<PojoReference> references, Map<? super PojoReference, ? super T> objectsByReference) {
 		List<O> loadedObjects = loadEntities( references );
 		Iterator<PojoReference> referencesIterator = references.iterator();
 		Iterator<O> loadedObjectIterator = loadedObjects.iterator();

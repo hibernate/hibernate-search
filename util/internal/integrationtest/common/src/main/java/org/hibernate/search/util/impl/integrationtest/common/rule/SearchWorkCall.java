@@ -83,7 +83,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 					actualRootProjection.extract( actualProjectionHitMapper, rawHit, actualConvertContext ) );
 		}
 
-		LoadingResult<?> loadingResult = actualProjectionHitMapper.load();
+		LoadingResult<?> loadingResult = actualProjectionHitMapper.loadBlocking();
 
 		List<U> results = new ArrayList<>( rawHits.size() );
 

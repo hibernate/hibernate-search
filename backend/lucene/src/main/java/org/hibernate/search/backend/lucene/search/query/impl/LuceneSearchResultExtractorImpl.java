@@ -76,7 +76,7 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 			hits.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExecutionContext ) );
 		}
 
-		LoadingResult<?> loadingResult = projectionHitMapper.load();
+		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
 
 		for ( int i = 0; i < hits.size(); i++ ) {
 			hits.set( i, transformUnsafe( rootProjection, loadingResult, hits.get( i ) ) );

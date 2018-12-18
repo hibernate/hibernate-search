@@ -29,7 +29,7 @@ public class HibernateOrmByTypeObjectLoader<O, T> implements ObjectLoader<PojoRe
 	}
 
 	@Override
-	public List<T> load(List<PojoReference> references) {
+	public List<T> loadBlocking(List<PojoReference> references) {
 		LinkedHashMap<PojoReference, T> objectsByReference = new LinkedHashMap<>( references.size() );
 		Map<HibernateOrmComposableObjectLoader<PojoReference, ? extends T>, List<PojoReference>> referencesByDelegate = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class HibernateOrmByTypeObjectLoader<O, T> implements ObjectLoader<PojoRe
 				referencesByDelegate.entrySet() ) {
 			HibernateOrmComposableObjectLoader<PojoReference, ? extends T> delegate = entry.getKey();
 			List<PojoReference> referencesForDelegate = entry.getValue();
-			delegate.load( referencesForDelegate, objectsByReference );
+			delegate.loadBlocking( referencesForDelegate, objectsByReference );
 		}
 
 		// Re-create the list of objects in the same order
