@@ -17,11 +17,13 @@ import java.util.List;
 public interface ObjectLoader<R, O> {
 
 	/**
+	 * Loads the entities corresponding to the given references, blocking the current thread while doing so.
+	 *
 	 * @param references A list of references to the objects to load.
 	 * @return A list of loaded objects, in the same order the references were given.
 	 * {@code null} is inserted when an object is not found.
 	 */
-	List<O> load(List<R> references);
+	List<O> loadBlocking(List<R> references);
 
 	static <T> ObjectLoader<T, T> identity() {
 		return IdentityObjectLoader.get();

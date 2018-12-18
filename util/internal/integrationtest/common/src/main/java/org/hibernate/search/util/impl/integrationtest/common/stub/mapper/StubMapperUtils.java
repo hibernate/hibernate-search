@@ -43,7 +43,7 @@ public final class StubMapperUtils {
 		LoadingDefinitionContext<R, O> context = new LoadingDefinitionContext<>();
 		loadingDefinition.accept( context );
 
-		EasyMock.expect( objectLoaderMock.load(
+		EasyMock.expect( objectLoaderMock.loadBlocking(
 				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
 		) )
 				.andAnswer(

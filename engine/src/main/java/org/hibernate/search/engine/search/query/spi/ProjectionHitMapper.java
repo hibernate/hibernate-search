@@ -30,9 +30,9 @@ public interface ProjectionHitMapper<R, O> {
 	Object planLoading(DocumentReference reference);
 
 	/**
-	 * Loads the entities planned for loading in one go.
+	 * Loads the entities planned for loading in one go, blocking the current thread while doing so.
 	 *
 	 * @return The loaded entities.
 	 */
-	LoadingResult<O> load();
+	LoadingResult<O> loadBlocking();
 }
