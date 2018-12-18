@@ -13,7 +13,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExecutionContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
@@ -35,12 +35,12 @@ public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchS
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
-	private final SearchProjectionExecutionContext searchProjectionExecutionContext;
+	private final SearchProjectionExtractContext searchProjectionExecutionContext;
 
 	public ElasticsearchSearchResultExtractorImpl(
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext searchProjectionExecutionContext) {
 		this.projectionHitMapper = projectionHitMapper;
 		this.rootProjection = rootProjection;
 		this.searchProjectionExecutionContext = searchProjectionExecutionContext;

@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.converter.runtime.FromDocume
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 
-class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
+class LuceneFieldProjection<F, T> implements LuceneSearchProjection<F, T> {
 
 	private final String absoluteFieldPath;
 
@@ -47,16 +47,16 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<T, T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
-		F rawValue = codec.decode( documentResult.getDocument(), absoluteFieldPath );
-		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
-		return converter.convert( rawValue, convertContext );
+	public F extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
+			SearchProjectionExtractContext context) {
+		return codec.decode( documentResult.getDocument(), absoluteFieldPath );
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, T extractedData) {
-		return extractedData;
+	public T transform(LoadingResult<?> loadingResult, F extractedData,
+			SearchProjectionTransformContext context) {
+		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
+		return converter.convert( extractedData, convertContext );
 	}
 
 	@Override

@@ -39,12 +39,13 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 	@SuppressWarnings("unchecked")
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return (R) mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
 	}
 
 	@Override
-	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+	public R transform(LoadingResult<?> loadingResult, R extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

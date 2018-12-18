@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjection<T, T> {
+class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjection<F, T> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
@@ -44,7 +44,7 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
 		if ( !source.contains( fieldPathJson ) ) {
@@ -54,22 +54,21 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public T extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+			SearchProjectionExtractContext context) {
 		Optional<JsonElement> fieldValue = hitFieldValueAccessor.get( hit );
-		FromDocumentFieldValueConvertContext context = searchProjectionExecutionContext.getFromDocumentFieldValueConvertContext();
 		if ( fieldValue.isPresent() ) {
-			F rawValue = codec.decode( fieldValue.get() );
-			return converter.convert( rawValue, context );
+			return codec.decode( fieldValue.get() );
 		}
 		else {
-			return converter.convert( null, context );
+			return null;
 		}
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, T extractedData) {
-		return extractedData;
+	public T transform(LoadingResult<?> loadingResult, F extractedData, SearchProjectionTransformContext context) {
+		FromDocumentFieldValueConvertContext convertContext = context.getFromDocumentFieldValueConvertContext();
+		return converter.convert( extractedData, convertContext );
 	}
 
 	@Override

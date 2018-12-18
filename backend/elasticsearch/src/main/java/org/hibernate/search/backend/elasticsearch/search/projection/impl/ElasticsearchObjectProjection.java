@@ -20,19 +20,20 @@ public class ElasticsearchObjectProjection<O> implements ElasticsearchSearchProj
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		helper.contributeRequest( requestBody );
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		return projectionHitMapper.planLoading( helper.extractDocumentReference( hit ) );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public O transform(LoadingResult<?> loadingResult, Object extractedData,
+			SearchProjectionTransformContext context) {
 		return (O) loadingResult.getLoaded( extractedData );
 	}
 

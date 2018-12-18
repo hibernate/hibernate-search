@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearcher;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 
 /**
@@ -60,7 +59,7 @@ public class LuceneStubWorkFactory implements LuceneWorkFactory {
 	}
 
 	@Override
-	public <T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher, SessionContextImplementor sessionContext) {
-		return new LuceneExecuteQueryWork<>( luceneSearcher, sessionContext );
+	public <T> LuceneExecuteQueryWork<T> search(LuceneSearcher<T> luceneSearcher) {
+		return new LuceneExecuteQueryWork<>( luceneSearcher );
 	}
 }

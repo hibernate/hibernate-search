@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 
@@ -29,6 +30,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
+	private final SessionContextImplementor sessionContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
@@ -38,11 +40,14 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	public ElasticsearchSearchQuery(ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
-			Set<URLEncodedString> indexNames, Set<String> routingKeys,
+			Set<URLEncodedString> indexNames,
+			SessionContextImplementor sessionContext,
+			Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
+		this.sessionContext = sessionContext;
 		this.routingKeys = routingKeys;
 		this.payload = payload;
 		this.searchResultExtractor = searchResultExtractor;
@@ -82,7 +87,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 				 * This method may not be easy to implement for blocking mappers,
 				 * so we may choose to throw exceptions for those.
 				 */
-				.loadBlocking();
+				.loadBlocking( sessionContext );
 	}
 
 	@Override

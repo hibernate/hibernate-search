@@ -45,7 +45,7 @@ public class LuceneCompositeBiFunctionProjection<P1, P2, T> implements LuceneCom
 
 	@Override
 	public Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, LuceneResult luceneResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return new Object[] {
 				projection1.extract( projectionHitMapper, luceneResult, context ),
 				projection2.extract( projectionHitMapper, luceneResult, context )
@@ -53,10 +53,11 @@ public class LuceneCompositeBiFunctionProjection<P1, P2, T> implements LuceneCom
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, Object[] extractedData) {
+	public T transform(LoadingResult<?> loadingResult, Object[] extractedData,
+			SearchProjectionTransformContext context) {
 		return transformer.apply(
-				transformUnsafe( projection1, loadingResult, extractedData[0] ),
-				transformUnsafe( projection2, loadingResult, extractedData[1] )
+				transformUnsafe( projection1, loadingResult, extractedData[0], context ),
+				transformUnsafe( projection2, loadingResult, extractedData[1], context )
 		);
 	}
 

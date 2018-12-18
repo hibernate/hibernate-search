@@ -20,19 +20,20 @@ public class ElasticsearchReferenceProjection<R> implements ElasticsearchSearchP
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		helper.contributeRequest( requestBody );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		return (R) projectionHitMapper.convertReference( helper.extractDocumentReference( hit ) );
 	}
 
 	@Override
-	public R transform(LoadingResult<?> loadingResult, R extractedData) {
+	public R transform(LoadingResult<?> loadingResult, R extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

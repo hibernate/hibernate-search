@@ -31,29 +31,30 @@ public class ElasticsearchCompositeListProjection<T> implements ElasticsearchCom
 
 	@Override
 	public void contributeRequest(JsonObject requestBody,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
-			child.contributeRequest( requestBody, searchProjectionExecutionContext );
+			child.contributeRequest( requestBody, context );
 		}
 	}
 
 	@Override
 	public List<Object> extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		List<Object> extractedData = new ArrayList<>( children.size() );
 
 		for ( ElasticsearchSearchProjection<?, ?> child : children ) {
 			extractedData
-					.add( child.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext ) );
+					.add( child.extract( projectionHitMapper, responseBody, hit, context ) );
 		}
 
 		return extractedData;
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData) {
+	public T transform(LoadingResult<?> loadingResult, List<Object> extractedData,
+			SearchProjectionTransformContext context) {
 		for ( int i = 0; i < extractedData.size(); i++ ) {
-			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ) ) );
+			extractedData.set( i, transformUnsafe( children.get( i ), loadingResult, extractedData.get( i ), context ) );
 		}
 
 		return transformer.apply( extractedData );

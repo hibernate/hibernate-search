@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
-import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.junit.Test;
@@ -32,12 +31,10 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 		JsonObject requestBody = new JsonObject();
 
-		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
-
 		resetAll();
 		replayAll();
-		SearchProjectionExecutionContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext( sessionContext );
+		SearchProjectionExtractContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext();
 		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
 		verifyAll();
 
@@ -56,12 +53,10 @@ public class DistanceToFieldSearchProjectionTest extends EasyMockSupport {
 
 		JsonObject requestBody = new JsonObject();
 
-		SessionContextImplementor sessionContext = createMock( SessionContextImplementor.class );
-
 		resetAll();
 		replayAll();
-		SearchProjectionExecutionContext searchProjectionExecutionContext =
-				elementCollector.toSearchProjectionExecutionContext( sessionContext );
+		SearchProjectionExtractContext searchProjectionExecutionContext =
+				elementCollector.toSearchProjectionExecutionContext();
 		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
 		verifyAll();
 

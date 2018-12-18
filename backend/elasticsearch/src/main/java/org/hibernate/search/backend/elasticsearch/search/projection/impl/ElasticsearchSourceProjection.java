@@ -32,7 +32,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
 		if ( !source.contains( WILDCARD_ALL ) ) {
 			source.add( WILDCARD_ALL );
@@ -42,7 +42,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	@SuppressWarnings("unchecked")
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		Optional<JsonObject> sourceElement = HIT_SOURCE_ACCESSOR.get( hit );
 		if ( sourceElement.isPresent() ) {
 			return gson.toJson( sourceElement.get() );
@@ -53,7 +53,8 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	}
 
 	@Override
-	public String transform(LoadingResult<?> loadingResult, String extractedData) {
+	public String transform(LoadingResult<?> loadingResult, String extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

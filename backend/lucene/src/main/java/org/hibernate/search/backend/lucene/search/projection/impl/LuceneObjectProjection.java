@@ -38,13 +38,14 @@ public class LuceneObjectProjection<O> implements LuceneSearchProjection<Object,
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return mapper.planLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public O transform(LoadingResult<?> loadingResult, Object extractedData) {
+	public O transform(LoadingResult<?> loadingResult, Object extractedData,
+			SearchProjectionTransformContext context) {
 		return (O) loadingResult.getLoaded( extractedData );
 	}
 

@@ -43,12 +43,13 @@ class LuceneDistanceToFieldProjection implements LuceneSearchProjection<Double, 
 
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
-			SearchProjectionExecutionContext context) {
+			SearchProjectionExtractContext context) {
 		return unit.fromMeters( distanceCollector.getDistance( documentResult.getDocId() ) );
 	}
 
 	@Override
-	public Double transform(LoadingResult<?> loadingResult, Double extractedData) {
+	public Double transform(LoadingResult<?> loadingResult, Double extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

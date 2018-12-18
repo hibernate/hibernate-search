@@ -21,18 +21,19 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 	}
 
 	@Override
-	public void contributeRequest(JsonObject requestBody, SearchProjectionExecutionContext searchProjectionExecutionContext) {
+	public void contributeRequest(JsonObject requestBody, SearchProjectionExtractContext context) {
 		TRACK_SCORES_ACCESSOR.set( requestBody, true );
 	}
 
 	@Override
 	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
+			SearchProjectionExtractContext context) {
 		return hit.get( "_score" ).getAsFloat();
 	}
 
 	@Override
-	public Float transform(LoadingResult<?> loadingResult, Float extractedData) {
+	public Float transform(LoadingResult<?> loadingResult, Float extractedData,
+			SearchProjectionTransformContext context) {
 		return extractedData;
 	}
 

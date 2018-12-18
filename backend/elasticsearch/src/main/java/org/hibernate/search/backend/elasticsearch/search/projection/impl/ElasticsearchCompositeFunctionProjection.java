@@ -27,19 +27,19 @@ public class ElasticsearchCompositeFunctionProjection<E, P, T> implements Elasti
 
 	@Override
 	public void contributeRequest(JsonObject requestBody,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		projection.contributeRequest( requestBody, searchProjectionExecutionContext );
+			SearchProjectionExtractContext context) {
+		projection.contributeRequest( requestBody, context );
 	}
 
 	@Override
 	public E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
-			SearchProjectionExecutionContext searchProjectionExecutionContext) {
-		return projection.extract( projectionHitMapper, responseBody, hit, searchProjectionExecutionContext );
+			SearchProjectionExtractContext context) {
+		return projection.extract( projectionHitMapper, responseBody, hit, context );
 	}
 
 	@Override
-	public T transform(LoadingResult<?> loadingResult, E extractedData) {
-		return transformer.apply( projection.transform( loadingResult, extractedData ) );
+	public T transform(LoadingResult<?> loadingResult, E extractedData, SearchProjectionTransformContext context) {
+		return transformer.apply( projection.transform( loadingResult, extractedData, context ) );
 	}
 
 	@Override
