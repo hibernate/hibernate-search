@@ -1,6 +1,12 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.0.Final (18-12-2018)
+-------------------------
+
+** Task
+    * HSEARCH-3433 Upgrade to Hibernate ORM 5.4.0.Final
+
 5.11.0.CR1 (04-12-2018)
 -------------------------
 
