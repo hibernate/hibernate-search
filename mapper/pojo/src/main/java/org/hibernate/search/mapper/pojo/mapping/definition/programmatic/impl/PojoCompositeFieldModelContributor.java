@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 
-class PojoCompositeFieldModelContributor<C extends StandardIndexSchemaFieldTypedContext<?, ?>>
+class PojoCompositeFieldModelContributor<C extends StandardIndexFieldTypeContext<?, ?>>
 		implements FieldModelContributor {
-	private final Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter;
+	private final Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter;
 	private final List<Consumer<C>> delegates = new ArrayList<>();
 
-	PojoCompositeFieldModelContributor(Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
+	PojoCompositeFieldModelContributor(Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter) {
 		this.contextConverter = contextConverter;
 	}
 
@@ -28,7 +28,7 @@ class PojoCompositeFieldModelContributor<C extends StandardIndexSchemaFieldTyped
 	}
 
 	@Override
-	public void contribute(StandardIndexSchemaFieldTypedContext<?, ?> context) {
+	public void contribute(StandardIndexFieldTypeContext<?, ?> context) {
 		C convertedContext = contextConverter.apply( context );
 		delegates.forEach( c -> c.accept( convertedContext ) );
 	}

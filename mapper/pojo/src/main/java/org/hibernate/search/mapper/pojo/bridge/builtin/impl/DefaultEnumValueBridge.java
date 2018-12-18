@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -24,9 +24,9 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexSchemaFieldTypedContext<?, String> bind(ValueBridgeBindingContext<V> context) {
+	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
-		return context.getIndexSchemaFieldContext().asString()
+		return context.getIndexFieldTypeFactoryContext().asString()
 				.projectionConverter( new PojoDefaultEnumFromDocumentFieldValueConverter( enumType ) );
 	}
 

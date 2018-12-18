@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import org.hibernate.search.engine.backend.document.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
@@ -18,7 +18,7 @@ import org.hibernate.search.util.impl.common.Contracts;
  * A pass-through value bridge, i.e. a bridge that passes the input value as-is to the underlying backend.
  * <p>
  * This bridge will not work for any type: only types supported by the backend
- * through {@link IndexSchemaFieldContext#as(Class)} will work.
+ * through {@link IndexFieldTypeFactoryContext#as(Class)} will work.
  *
  * @param <F> The type of input values, as well as the type of the index field.
  */
@@ -37,8 +37,8 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<?, F> bind(ValueBridgeBindingContext<F> context) {
-		return context.getIndexSchemaFieldContext().as( fieldType )
+	public StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<F> context) {
+		return context.getIndexFieldTypeFactoryContext().as( fieldType )
 				.projectionConverter( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
 	}
 

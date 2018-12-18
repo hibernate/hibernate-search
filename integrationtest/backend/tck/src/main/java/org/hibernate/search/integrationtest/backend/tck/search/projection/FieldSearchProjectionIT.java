@@ -22,11 +22,11 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -570,7 +570,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static List<FieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
 				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
@@ -579,7 +579,7 @@ public class FieldSearchProjectionIT {
 
 	private static <F> FieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
 		String name = prefix + typeDescriptor.getUniqueName();
 		FieldProjectionExpectations<F> expectations = typeDescriptor.getFieldProjectionExpectations().get(); // Safe, see caller
 		return FieldModel.mapper(
@@ -590,7 +590,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
-			BiFunction<FieldTypeDescriptor<?>, IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> configuration) {
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
 				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
@@ -599,7 +599,7 @@ public class FieldSearchProjectionIT {
 
 	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
-			BiFunction<FieldTypeDescriptor<?>, IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, ?>> configuration) {
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
 		String name = prefix + typeDescriptor.getUniqueName();
 		return IncompatibleFieldModel.mapper(
 				context -> configuration.apply( typeDescriptor, context )
@@ -626,17 +626,17 @@ public class FieldSearchProjectionIT {
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
 					type,
-					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
+					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return (parent, name, additionalConfiguration) -> {
-				IndexSchemaFieldContext untypedContext = parent.field( name );
-				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
+				IndexFieldTypeFactoryContext untypedContext = parent.field( name );
+				StandardIndexFieldTypeContext<?, F> context = configuration.apply( untypedContext );
 				context.projectable( Projectable.YES );
 				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();
@@ -722,15 +722,15 @@ public class FieldSearchProjectionIT {
 	private static class IncompatibleFieldModel<F> {
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(Class<F> type) {
 			return mapper(
-					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type )
+					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type )
 			);
 		}
 
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration) {
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
 			return (parent, name, additionalConfiguration) -> {
-				IndexSchemaFieldContext untypedContext = parent.field( name );
-				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
+				IndexFieldTypeFactoryContext untypedContext = parent.field( name );
+				StandardIndexFieldTypeContext<?, F> context = configuration.apply( untypedContext );
 				context.projectable( Projectable.YES );
 				additionalConfiguration.accept( context );
 				context.createAccessor();

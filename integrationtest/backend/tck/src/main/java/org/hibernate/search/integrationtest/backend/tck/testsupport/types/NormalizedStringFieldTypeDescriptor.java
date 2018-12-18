@@ -8,8 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
@@ -23,7 +23,7 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	}
 
 	@Override
-	public StandardIndexSchemaFieldTypedContext<?, String> configure(IndexSchemaFieldContext fieldContext) {
+	public StandardIndexFieldTypeContext<?, String> configure(IndexFieldTypeFactoryContext fieldContext) {
 		return fieldContext.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name );
 	}
 

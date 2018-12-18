@@ -102,7 +102,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		return null;
 	}
 
-	EventContext getIndexEventContext() {
+	public EventContext getIndexEventContext() {
 		return EventContexts.fromIndexName( indexName );
 	}
 }

@@ -11,8 +11,8 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
@@ -282,12 +282,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				(BeanHolder<? extends ValueBridge<? super V, F>>) bridgeHolder;
 
 		// Then give the bridge a chance to contribute to the index schema
-		IndexSchemaFieldContext fieldContext = schemaElement.field( relativeFieldName );
+		IndexFieldTypeFactoryContext fieldContext = schemaElement.field( relativeFieldName );
 		ValueBridgeBindingContextImpl<V2> bridgeBindingContext = new ValueBridgeBindingContextImpl<>(
 				new PojoModelValueElement<>( castedValueTypeModel ),
 				fieldContext
 		);
-		StandardIndexSchemaFieldTypedContext<?, ? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
+		StandardIndexFieldTypeContext<?, ? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
 
 		// If the bridge did not contribute anything, infer the field type and define it automatically
 		if ( typedFieldContext == null ) {

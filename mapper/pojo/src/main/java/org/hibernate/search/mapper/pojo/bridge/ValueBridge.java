@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
@@ -32,11 +32,11 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * It allows the bridge to:
 	 * <ul>
 	 *     <li>Declare its expectations regarding the index field (type, storage options, ...)
-	 *     using {@link ValueBridgeBindingContext#getIndexSchemaFieldContext()}.
+	 *     using {@link ValueBridgeBindingContext#getIndexFieldTypeFactoryContext()}.
 	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge
 	 *     using {@link ValueBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Define a reverse function to apply to projections on the field value
-	 *     using {@link ValueBridgeBindingContext#getIndexSchemaFieldContext()}.
+	 *     using {@link ValueBridgeBindingContext#getIndexFieldTypeFactoryContext()}.
 	 * </ul>
 	 *
 	 * @param context An entry point allowing to perform the operations listed above.
@@ -44,7 +44,7 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
-	default StandardIndexSchemaFieldTypedContext<?, F> bind(ValueBridgeBindingContext<V> context) {
+	default StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<V> context) {
 		return null; // Auto-detect the return type and use default encoding
 	}
 

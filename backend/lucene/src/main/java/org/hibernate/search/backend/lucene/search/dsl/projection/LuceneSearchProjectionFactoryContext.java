@@ -25,7 +25,7 @@ public interface LuceneSearchProjectionFactoryContext<R, O> extends SearchProjec
 	 * Project to a Lucene {@link Document} containing all the stored fields.
 	 * <p>
 	 * Note that only stored fields are returned: fields that are not marked as
-	 * {@link org.hibernate.search.engine.backend.document.model.dsl.Projectable#YES projectable}
+	 * {@link org.hibernate.search.engine.backend.types.Projectable#YES projectable}
 	 * may be missing.
 	 *
 	 * @return A context allowing to define the projection more precisely.

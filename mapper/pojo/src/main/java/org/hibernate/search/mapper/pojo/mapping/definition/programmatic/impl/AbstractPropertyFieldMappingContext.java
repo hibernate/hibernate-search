@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>, C extends StandardIndexSchemaFieldTypedContext<?, ?>>
+abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappingContext<?>, C extends StandardIndexFieldTypeContext<?, ?>>
 		extends DelegatingPropertyMappingContext
 		implements PojoPropertyMetadataContributor, PropertyFieldMappingContext<S> {
 
@@ -35,7 +35,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
 
 	AbstractPropertyFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
-			Function<StandardIndexSchemaFieldTypedContext<?, ?>, C> contextConverter) {
+			Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter) {
 		super( parent );
 		this.relativeFieldName = relativeFieldName;
 		this.fieldModelContributor = new PojoCompositeFieldModelContributor<>( contextConverter );

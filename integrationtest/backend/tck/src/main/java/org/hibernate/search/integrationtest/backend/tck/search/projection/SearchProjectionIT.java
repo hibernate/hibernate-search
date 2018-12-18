@@ -18,9 +18,9 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -432,17 +432,17 @@ public class SearchProjectionIT {
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
 					type,
-					c -> (StandardIndexSchemaFieldTypedContext<?, F>) c.as( type ),
+					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
 
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
-				Function<IndexSchemaFieldContext, StandardIndexSchemaFieldTypedContext<?, F>> configuration,
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return (parent, name, additionalConfiguration) -> {
-				IndexSchemaFieldContext untypedContext = parent.field( name );
-				StandardIndexSchemaFieldTypedContext<?, F> context = configuration.apply( untypedContext );
+				IndexFieldTypeFactoryContext untypedContext = parent.field( name );
+				StandardIndexFieldTypeContext<?, F> context = configuration.apply( untypedContext );
 				context.projectable( Projectable.YES );
 				additionalConfiguration.accept( context );
 				IndexFieldAccessor<F> accessor = context.createAccessor();

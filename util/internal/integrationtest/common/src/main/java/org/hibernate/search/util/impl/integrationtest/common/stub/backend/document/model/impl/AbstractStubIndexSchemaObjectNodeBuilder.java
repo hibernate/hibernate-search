@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactoryContext;
 
 abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
@@ -21,20 +22,20 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	}
 
 	@Override
-	public IndexSchemaFieldContext addField(String relativeFieldName) {
+	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
 		getRootNodeBuilder().getBackendBehavior().onAddField(
 				getRootNodeBuilder().getIndexName(),
 				childBuilder.getAbsolutePath()
 		);
 		builder.child( childBuilder );
-		return new StubIndexSchemaFieldContext( childBuilder, true );
+		return new StubIndexFieldTypeFactoryContext( childBuilder, true );
 	}
 
 	@Override
-	public IndexSchemaFieldContext createExcludedField(String relativeFieldName) {
+	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
-		return new StubIndexSchemaFieldContext( childBuilder, false );
+		return new StubIndexFieldTypeFactoryContext( childBuilder, false );
 	}
 
 	@Override

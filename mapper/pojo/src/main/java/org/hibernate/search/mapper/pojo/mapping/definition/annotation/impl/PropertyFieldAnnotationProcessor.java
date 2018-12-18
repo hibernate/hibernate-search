@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.backend.document.model.dsl.Projectable;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;

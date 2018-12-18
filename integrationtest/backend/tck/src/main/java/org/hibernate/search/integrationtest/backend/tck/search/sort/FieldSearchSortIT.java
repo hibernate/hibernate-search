@@ -20,11 +20,11 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldContext;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.document.model.dsl.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -475,7 +475,7 @@ public class FieldSearchSortIT {
 	}
 
 	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration,
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
 			Predicate<FieldSortExpectations<?>> predicate) {
 		return FieldTypeDescriptor.getAll().stream()
 				.filter(
@@ -488,7 +488,7 @@ public class FieldSearchSortIT {
 
 	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
 		String name = prefix + typeDescriptor.getUniqueName();
 		FieldSortExpectations<F> expectations = typeDescriptor.getFieldSortExpectations().get(); // Safe, see caller
 		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
@@ -512,7 +512,7 @@ public class FieldSearchSortIT {
 		static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
 			return (parent, name, configuration) -> {
-				StandardIndexSchemaFieldTypedContext<?, String> context = parent.field( name ).asString();
+				StandardIndexFieldTypeContext<?, String> context = parent.field( name ).asString();
 				configuration.accept( context );
 				IndexFieldAccessor<String> accessor = context.createAccessor();
 				return new MainFieldModel( accessor, name, document1Value, document2Value, document3Value );
@@ -548,9 +548,9 @@ public class FieldSearchSortIT {
 
 		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
 				FieldTypeDescriptor<F> typeDescriptor, FieldSortExpectations<F> expectations,
-				Consumer<StandardIndexSchemaFieldTypedContext<?, ?>> additionalConfiguration) {
-			IndexSchemaFieldContext untypedContext = parent.field( relativeFieldName );
-			StandardIndexSchemaFieldTypedContext<?, F> context = typeDescriptor.configure( untypedContext );
+				Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
+			IndexFieldTypeFactoryContext untypedContext = parent.field( relativeFieldName );
+			StandardIndexFieldTypeContext<?, F> context = typeDescriptor.configure( untypedContext );
 			context.sortable( Sortable.YES );
 			additionalConfiguration.accept( context );
 			IndexFieldAccessor<F> accessor = context.createAccessor();

@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import org.hibernate.search.engine.backend.document.model.dsl.StandardIndexSchemaFieldTypedContext;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 
 public interface FieldModelContributor {
 
-	void contribute(StandardIndexSchemaFieldTypedContext<?, ?> context);
+	void contribute(StandardIndexFieldTypeContext<?, ?> context);
 
 }
