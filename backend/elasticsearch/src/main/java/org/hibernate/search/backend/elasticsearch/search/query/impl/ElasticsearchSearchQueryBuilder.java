@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -30,7 +29,6 @@ import com.google.gson.JsonObject;
 class ElasticsearchSearchQueryBuilder<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
-	private final ElasticsearchWorkFactory workFactory;
 	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -44,7 +42,6 @@ class ElasticsearchSearchQueryBuilder<T>
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	ElasticsearchSearchQueryBuilder(
-			ElasticsearchWorkFactory workFactory,
 			ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -52,7 +49,6 @@ class ElasticsearchSearchQueryBuilder<T>
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
-		this.workFactory = workFactory;
 		this.workBuilderFactory = workBuilderFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -98,7 +94,7 @@ class ElasticsearchSearchQueryBuilder<T>
 				new ElasticsearchSearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
 		return new ElasticsearchSearchQuery<>(
-				workFactory, workBuilderFactory, queryOrchestrator,
+				workBuilderFactory, queryOrchestrator,
 				indexNames, sessionContext, routingKeys,
 				payload,
 				searchResultExtractor

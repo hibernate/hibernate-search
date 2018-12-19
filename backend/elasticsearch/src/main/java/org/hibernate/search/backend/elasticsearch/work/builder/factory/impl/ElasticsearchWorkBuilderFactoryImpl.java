@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteByQueryWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
@@ -29,6 +32,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBu
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.real.impl.ClearScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.real.impl.CloseIndexWork;
+import org.hibernate.search.backend.elasticsearch.work.real.impl.CountWork;
 import org.hibernate.search.backend.elasticsearch.work.real.impl.CreateIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.real.impl.DeleteByQueryWork;
 import org.hibernate.search.backend.elasticsearch.work.real.impl.DeleteWork;
@@ -93,6 +97,11 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	@Override
 	public <T> SearchWorkBuilder search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		return new SearchWork.Builder( payload, searchResultExtractor );
+	}
+
+	@Override
+	public CountWorkBuilder count(Set<URLEncodedString> indexNames) {
+		return new CountWork.Builder( indexNames );
 	}
 
 	@Override

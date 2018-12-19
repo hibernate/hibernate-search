@@ -6,10 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteByQueryWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
@@ -49,6 +52,8 @@ public interface ElasticsearchWorkBuilderFactory {
 	// TODO restore method => BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
+
+	CountWorkBuilder count(Set<URLEncodedString> indexNames);
 
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload);
 

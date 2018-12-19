@@ -29,7 +29,6 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -70,7 +69,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final SearchBackendContext searchContext;
 
 	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, GsonProvider gsonProvider, String name,
-			ElasticsearchWorkFactory workFactory, ElasticsearchWorkBuilderFactory workBuilderFactory,
+			ElasticsearchWorkBuilderFactory workBuilderFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
@@ -87,7 +86,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, client, gsonProvider, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory, workBuilderFactory, userFacingGson,
+				eventContext, workBuilderFactory, userFacingGson,
 				( String elasticsearchIndexName ) -> {
 					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 					if ( result == null ) {
