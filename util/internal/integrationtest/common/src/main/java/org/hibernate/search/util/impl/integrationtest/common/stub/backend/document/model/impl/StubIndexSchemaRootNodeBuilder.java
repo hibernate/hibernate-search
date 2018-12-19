@@ -18,7 +18,6 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	private final StubBackendBehavior backendBehavior;
 	private final String indexName;
-	private ToDocumentIdentifierValueConverter<?> idConverter;
 
 	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
 		this( backendBehavior, indexName, StubIndexSchemaNode.schema() );
