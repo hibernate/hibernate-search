@@ -36,8 +36,6 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 	}
 
-	// TODO restore method =>  public void aggregate(ElasticsearchWorkAggregator aggregator) { aggregator.addBulkable( this ); }
-
 	@Override
 	public JsonObject getBulkableActionMetadata() {
 		return bulkableActionMetadata;
@@ -69,6 +67,10 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 		 * this method is not used when the work is bulked
 		 */
 		return super.beforeExecute( executionContext, request );
+	}
+
+	public void aggregate(ElasticsearchWorkAggregator aggregator) {
+		aggregator.addBulkable( this );
 	}
 
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
