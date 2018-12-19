@@ -4,21 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.work.real.impl;
+package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.backend.elasticsearch.work.real.accessor.impl.DefaultElasticsearchRequestSuccessAssessor;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
 
-/**
- * @author Yoann Rodiere
- */
-public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
+public class CloseIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 
-	protected DropIndexWork(Builder builder) {
+	protected CloseIndexWork(Builder builder) {
 		super( builder );
 	}
 
@@ -29,7 +25,8 @@ public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	public static class Builder
 			extends AbstractSimpleElasticsearchWork.Builder<Builder>
-			implements DropIndexWorkBuilder {
+			implements CloseIndexWorkBuilder {
+
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
@@ -38,26 +35,18 @@ public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public DropIndexWorkBuilder ignoreIndexNotFound() {
-			this.resultAssessor = DefaultElasticsearchRequestSuccessAssessor.builder()
-					.ignoreErrorTypes( "index_not_found_exception" )
-					.build();
-
-			return this;
-		}
-
-		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.delete()
-					.pathComponent( indexName );
+					ElasticsearchRequest.post()
+					.pathComponent( indexName )
+					.pathComponent( Paths._CLOSE );
 
 			return builder.build();
 		}
 
 		@Override
-		public DropIndexWork build() {
-			return new DropIndexWork( this );
+		public CloseIndexWork build() {
+			return new CloseIndexWork( this );
 		}
 	}
 }
