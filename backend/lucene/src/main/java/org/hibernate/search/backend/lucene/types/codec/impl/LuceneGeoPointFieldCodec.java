@@ -8,9 +8,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import static org.hibernate.search.backend.lucene.util.impl.LuceneFields.internalFieldName;
 
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LatLonDocValuesField;
@@ -19,7 +17,6 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.impl.common.CollectionHelper;
 
 public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint> {
 
@@ -29,25 +26,9 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	private final boolean projectable;
 	private final boolean sortable;
 
-	private final String latitudeAbsoluteFieldPath;
-	private final String longitudeAbsoluteFieldPath;
-
-	private final Set<String> storedFields;
-
-	public LuceneGeoPointFieldCodec(String absoluteFieldPath, boolean projectable, boolean sortable) {
+	public LuceneGeoPointFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
-
-		if ( projectable ) {
-			latitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LATITUDE );
-			longitudeAbsoluteFieldPath = internalFieldName( absoluteFieldPath, LONGITUDE );
-			storedFields = CollectionHelper.asSet( latitudeAbsoluteFieldPath, longitudeAbsoluteFieldPath );
-		}
-		else {
-			latitudeAbsoluteFieldPath = null;
-			longitudeAbsoluteFieldPath = null;
-			storedFields = Collections.emptySet();
-		}
 	}
 
 	@Override
@@ -57,8 +38,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		}
 
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( latitudeAbsoluteFieldPath, value.getLatitude() ) );
-			documentBuilder.addField( new StoredField( longitudeAbsoluteFieldPath, value.getLongitude() ) );
+			documentBuilder.addField( new StoredField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLatitude() ) );
+			documentBuilder.addField( new StoredField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), value.getLongitude() ) );
 		}
 
 		// doc values fields are required for predicates, distance projections and distance sorts
@@ -68,8 +49,8 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 
 	@Override
 	public GeoPoint decode(Document document, String absoluteFieldPath) {
-		IndexableField latitudeField = document.getField( latitudeAbsoluteFieldPath );
-		IndexableField longitudeField = document.getField( longitudeAbsoluteFieldPath );
+		IndexableField latitudeField = document.getField( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
+		IndexableField longitudeField = document.getField( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
 
 		if ( latitudeField == null || longitudeField == null ) {
 			return null;
@@ -79,8 +60,9 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public Set<String> getOverriddenStoredFields() {
-		return storedFields;
+	public void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
+		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
+		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -95,8 +77,14 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 		LuceneGeoPointFieldCodec other = (LuceneGeoPointFieldCodec) obj;
 
 		return ( projectable == other.projectable ) &&
-				( sortable == other.sortable ) &&
-				Objects.equals( latitudeAbsoluteFieldPath, other.latitudeAbsoluteFieldPath ) &&
-				Objects.equals( longitudeAbsoluteFieldPath, other.longitudeAbsoluteFieldPath );
+				( sortable == other.sortable );
+	}
+
+	private String getLatitudeAbsoluteFieldPath(String absoluteFieldPath) {
+		return internalFieldName( absoluteFieldPath, LATITUDE );
+	}
+
+	private String getLongitudeAbsoluteFieldPath(String absoluteFieldPath) {
+		return internalFieldName( absoluteFieldPath, LONGITUDE );
 	}
 }

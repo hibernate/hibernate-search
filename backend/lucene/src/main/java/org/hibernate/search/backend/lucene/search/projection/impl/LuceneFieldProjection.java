@@ -37,12 +37,7 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<F, T> {
 
 	@Override
 	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		if ( codec.getOverriddenStoredFields().isEmpty() ) {
-			builder.add( absoluteFieldPath );
-		}
-		else {
-			builder.addAll( codec.getOverriddenStoredFields() );
-		}
+		codec.contributeStoredFields( absoluteFieldPath, builder::add );
 	}
 
 	@SuppressWarnings("unchecked")
