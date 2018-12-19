@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,12 +22,6 @@ public class LuceneDocumentStoredFieldVisitorBuilder {
 	public void add(String absoluteFieldPath) {
 		if ( !entireDocumentRequired ) {
 			explicitlyRequired.add( absoluteFieldPath );
-		}
-	}
-
-	public void addAll(Collection<String> absoluteFieldPaths) {
-		if ( !entireDocumentRequired ) {
-			explicitlyRequired.addAll( absoluteFieldPaths );
 		}
 	}
 

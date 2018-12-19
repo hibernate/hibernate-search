@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.lucene.document.Document;
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * Defines how a given value will be encoded in the Lucene document and how it will be decoded.
@@ -33,13 +31,14 @@ public interface LuceneFieldCodec<F> {
 	void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, F value);
 
 	/**
-	 * If not empty, override the fields extracted from the document when doing a projection. Typically used to return
-	 * the latitude and longitude fields when dealing with {@link GeoPoint}s.
+	 * Assuming a field is stored, add the absolute paths of (sub-)fields that should be extracted from a document
+	 * to later {@link #decode(Document, String)} the value of the field.
 	 *
-	 * @return The set of stored fields overriding the default field.
+	 * @param absoluteFieldPath The path of the field whose value is assumed to be stored.
+	 * @param collector A collector of absolute field paths to be extracted from the document.
 	 */
-	default Set<String> getOverriddenStoredFields() {
-		return Collections.emptySet();
+	default void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
+		collector.accept( absoluteFieldPath );
 	}
 
 	/**

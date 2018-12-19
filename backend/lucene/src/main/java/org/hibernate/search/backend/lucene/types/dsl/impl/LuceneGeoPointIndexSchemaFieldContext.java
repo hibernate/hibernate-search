@@ -47,7 +47,6 @@ public class LuceneGeoPointIndexSchemaFieldContext
 		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
 				helper.createIndexToProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
-				parentNode.getAbsolutePath( getRelativeFieldName() ),
 				resolvedProjectable, resolvedSortable
 		);
 
