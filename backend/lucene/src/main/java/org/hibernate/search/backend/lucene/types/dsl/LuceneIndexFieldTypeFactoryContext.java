@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.types.dsl;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 
 
 /**

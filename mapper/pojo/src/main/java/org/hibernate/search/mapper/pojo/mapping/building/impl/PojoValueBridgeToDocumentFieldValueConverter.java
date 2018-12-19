@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;

@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;

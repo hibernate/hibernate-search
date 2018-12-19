@@ -9,10 +9,10 @@ package org.hibernate.search.engine.backend.document.spi;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
 import org.hibernate.search.engine.logging.impl.Log;
