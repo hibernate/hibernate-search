@@ -12,6 +12,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
@@ -28,6 +29,7 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
 	private final SessionContextImplementor sessionContext;
@@ -38,13 +40,14 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
-	public ElasticsearchSearchQuery(ElasticsearchWorkFactory workFactory,
+	public ElasticsearchSearchQuery(ElasticsearchWorkFactory workFactory, ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		this.workFactory = workFactory;
+		this.workBuilderFactory = workBuilderFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
 		this.sessionContext = sessionContext;
@@ -75,10 +78,12 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search(
-				indexNames, routingKeys,
-				payload, searchResultExtractor,
-				firstResultIndex, maxResultsCount );
+		// TODO restore scrolling support
+		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workBuilderFactory.search( payload, searchResultExtractor )
+				.indexes( indexNames )
+				.paging( firstResultIndex, maxResultsCount )
+				.routingKeys( routingKeys ).build();
+
 		return queryOrchestrator.submit( work ).join()
 				/*
 				 * WARNING: the following call must run in the user thread.

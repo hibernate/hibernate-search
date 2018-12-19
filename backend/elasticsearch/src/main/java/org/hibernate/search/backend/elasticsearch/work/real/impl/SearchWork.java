@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -63,10 +64,11 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		private final ElasticsearchSearchResultExtractor<T> resultExtractor;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
-		private Integer from;
-		private Integer size;
-		private Integer scrollSize;
+		private Long from;
+		private Long size;
+		private Long scrollSize;
 		private String scrollTimeout;
+		private Set<String> routingKeys;
 
 		public Builder(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -81,16 +83,22 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public Builder<T> paging(int firstResult, int size) {
+		public Builder<T> paging(Long firstResult, Long size) {
 			this.from = firstResult;
 			this.size = size;
 			return this;
 		}
 
 		@Override
-		public Builder<T> scrolling(int scrollSize, String scrollTimeout) {
+		public Builder<T> scrolling(long scrollSize, String scrollTimeout) {
 			this.scrollSize = scrollSize;
 			this.scrollTimeout = scrollTimeout;
+			return this;
+		}
+
+		@Override
+		public SearchWorkBuilder<T> routingKeys(Set<String> routingKeys) {
+			this.routingKeys = routingKeys;
 			return this;
 		}
 
@@ -102,14 +110,21 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 					.pathComponent( Paths._SEARCH )
 					.body( payload );
 
-			if ( from != null && size != null ) {
+			if ( from != null ) {
 				builder.param( "from", from );
+			}
+
+			if ( size != null ) {
 				builder.param( "size", size );
 			}
 
 			if ( scrollSize != null && scrollTimeout != null ) {
 				builder.param( "size", scrollSize );
 				builder.param( "scroll", scrollTimeout );
+			}
+
+			if ( !routingKeys.isEmpty() ) {
+				builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
 			}
 
 			return builder.build();

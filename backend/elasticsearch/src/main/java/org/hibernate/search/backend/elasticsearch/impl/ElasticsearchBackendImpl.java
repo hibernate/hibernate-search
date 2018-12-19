@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -88,16 +87,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, client, gsonProvider, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
 		);
 		this.searchContext = new SearchBackendContext(
-				eventContext, workFactory, userFacingGson,
-				new Function<String, String>() {
-					@Override
-					public String apply(String elasticsearchIndexName) {
-						String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
-						if ( result == null ) {
-							throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName, eventContext );
-						}
-						return result;
+				eventContext, workFactory, workBuilderFactory, userFacingGson,
+				( String elasticsearchIndexName ) -> {
+					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
+					if ( result == null ) {
+						throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName, eventContext );
 					}
+					return result;
 				},
 				multiTenancyStrategy, queryOrchestrator
 		);

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
@@ -24,36 +23,6 @@ import com.google.gson.JsonObject;
 public class ElasticsearchStubWorkFactory implements ElasticsearchWorkFactory {
 
 	public ElasticsearchStubWorkFactory() {
-	}
-
-	@Override
-	public <T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
-			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
-			Long offset, Long limit) {
-		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
-				.multiValuedPathComponent( indexNames )
-				.pathComponent( Paths._SEARCH )
-				.body( payload );
-
-		if ( offset != null ) {
-			builder.param( "from", offset );
-		}
-		if ( limit != null ) {
-			builder.param( "size", limit );
-		}
-
-		if ( !routingKeys.isEmpty() ) {
-			builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
-		}
-
-		/* TODO scroll
-		if ( scrollSize != null && scrollTimeout != null ) {
-			builder.param( "size", scrollSize );
-			builder.param( "scroll", scrollTimeout );
-		}
-		*/
-
-		return new ElasticsearchStubWork<>( builder.build(), searchResultExtractor::extract );
 	}
 
 	@Override

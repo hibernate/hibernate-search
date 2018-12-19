@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 import com.google.gson.JsonObject;
@@ -18,10 +17,6 @@ import com.google.gson.JsonObject;
  */
 // TODO restore the full work factory from Search 5
 public interface ElasticsearchWorkFactory {
-
-	<T> ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> search(Set<URLEncodedString> indexNames, Set<String> routingKeys,
-			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor,
-			Long offset, Long limit);
 
 	ElasticsearchWork<Long> count(Set<URLEncodedString> indexNames, Set<String> routingKeys, JsonObject payload);
 

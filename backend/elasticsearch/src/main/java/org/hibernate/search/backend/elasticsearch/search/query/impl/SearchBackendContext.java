@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Documen
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
@@ -26,6 +27,7 @@ public class SearchBackendContext {
 	private final EventContext eventContext;
 
 	private final ElasticsearchWorkFactory workFactory;
+	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -36,13 +38,14 @@ public class SearchBackendContext {
 	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
 
 	public SearchBackendContext(EventContext eventContext,
-			ElasticsearchWorkFactory workFactory,
+			ElasticsearchWorkFactory workFactory, ElasticsearchWorkBuilderFactory workBuilderFactory,
 			Gson userFacingGson,
 			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
+		this.workBuilderFactory = workBuilderFactory;
 		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
@@ -84,7 +87,7 @@ public class SearchBackendContext {
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
-				workFactory, orchestrator, multiTenancyStrategy,
+				workFactory, workBuilderFactory, orchestrator, multiTenancyStrategy,
 				indexNames, sessionContext, projectionHitMapper, rootProjection
 		);
 	}
