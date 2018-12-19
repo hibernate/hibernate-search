@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.ERROR;
 import org.hibernate.search.util.impl.common.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
@@ -24,7 +25,8 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		// Exceptions for legacy messages from Search 5
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5.
 		@ValidIdRange(min = 17, max = 17),
-		@ValidIdRange(min = 18, max = 18)
+		@ValidIdRange(min = 18, max = 18),
+		@ValidIdRange(min = 58, max = 58)
 })
 public interface Log extends BasicLogger {
 
@@ -35,8 +37,12 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	@LogMessage(level = ERROR)
-	@Message(id = 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
+	@Message(id = ID_OFFSET_1 + 17, value = "Work discarded, thread was interrupted while waiting for space to schedule: %1$s")
 	void interruptedWorkError(Runnable r);
+
+	@LogMessage(level = ERROR)
+	@Message(id = ID_OFFSET_1 + 58, value = "%1$s")
+	void exceptionOccurred(String errorMsg, @Cause Throwable exceptionThatOccurred);
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 
