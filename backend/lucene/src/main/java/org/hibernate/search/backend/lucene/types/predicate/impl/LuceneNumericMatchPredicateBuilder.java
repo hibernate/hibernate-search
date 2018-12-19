@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneStandardMatchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 import org.apache.lucene.search.Query;
 

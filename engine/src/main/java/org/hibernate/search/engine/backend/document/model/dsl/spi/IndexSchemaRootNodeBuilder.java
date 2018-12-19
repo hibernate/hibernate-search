@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
 

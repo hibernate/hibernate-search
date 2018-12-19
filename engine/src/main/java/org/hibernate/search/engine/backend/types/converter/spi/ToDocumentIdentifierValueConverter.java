@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.document.converter.spi;
+package org.hibernate.search.engine.backend.types.converter.spi;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextExtension;
 
 /**
  * A converter from a source identifier value to a target value that should be used as a document identifier.

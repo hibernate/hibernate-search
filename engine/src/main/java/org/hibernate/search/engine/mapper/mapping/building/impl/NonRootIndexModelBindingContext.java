@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.util.AssertionFailure;
 

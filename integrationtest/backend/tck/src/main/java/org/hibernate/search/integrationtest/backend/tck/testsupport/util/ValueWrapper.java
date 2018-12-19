@@ -8,10 +8,10 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 import java.util.Objects;
 
-import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
 
 /**

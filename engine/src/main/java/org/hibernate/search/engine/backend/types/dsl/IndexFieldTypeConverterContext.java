@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
-import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 /**
  * @param <S> The concrete type of this context.

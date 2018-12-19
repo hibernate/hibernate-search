@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
-import org.hibernate.search.engine.backend.document.converter.spi.PassThroughFromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;

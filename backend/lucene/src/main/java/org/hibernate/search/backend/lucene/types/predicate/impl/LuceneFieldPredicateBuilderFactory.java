@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -38,7 +38,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 	 * Determine whether another predicate builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
+	 * @see ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
 	 * @see org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldPredicateBuilderFactory}, never {@code null}.

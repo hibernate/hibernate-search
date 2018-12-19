@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.document.converter;
+package org.hibernate.search.engine.backend.types.converter;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
 
 /**
  * A converter from a source value to a target value that should be indexed.

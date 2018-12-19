@@ -17,8 +17,8 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.backend.document.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder

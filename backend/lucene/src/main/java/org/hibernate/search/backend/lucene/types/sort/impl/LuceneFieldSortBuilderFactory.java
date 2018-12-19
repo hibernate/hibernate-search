@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -42,7 +42,7 @@ public interface LuceneFieldSortBuilderFactory {
 	 * Determine whether another sort builder factory is DSL-compatible with this one,
 	 * i.e. whether it creates builders that behave the same way.
 	 *
-	 * @see org.hibernate.search.engine.backend.document.converter.ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
+	 * @see ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
 	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldSortBuilderFactory}, never {@code null}.

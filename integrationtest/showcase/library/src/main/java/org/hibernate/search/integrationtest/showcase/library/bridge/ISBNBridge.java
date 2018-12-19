@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import org.hibernate.search.engine.backend.document.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;

@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import org.hibernate.search.engine.backend.document.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.backend.document.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 
 public final class LuceneSearchContext {

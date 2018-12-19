@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
 
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldContributor;
-import org.hibernate.search.backend.lucene.document.model.LuceneFieldValueExtractor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
+import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
@@ -19,14 +19,6 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneBooleanIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneFieldIndexSchemaFieldContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneGeoPointIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneInstantIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIntegerIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLocalDateIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneLongIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneStringIndexFieldTypeContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;

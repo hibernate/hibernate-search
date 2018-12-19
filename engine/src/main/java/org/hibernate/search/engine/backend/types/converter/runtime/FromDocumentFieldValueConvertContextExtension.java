@@ -4,15 +4,15 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.document.converter.runtime;
+package org.hibernate.search.engine.backend.types.converter.runtime;
 
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
 /**
- * An extension to {@link ToDocumentFieldValueConvertContext}, allowing to access non-standard context
+ * An extension to {@link FromDocumentFieldValueConvertContext}, allowing to access non-standard context
  * specific to a given mapper.
  * <p>
  * <strong>WARNING:</strong> while this type is API, because instances should be manipulated by users,
@@ -22,20 +22,20 @@ import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImpl
  *
  * @param <T> The type of extended contexts.
  *
- * @see ToDocumentFieldValueConvertContext#extension(ToDocumentFieldValueConvertContextExtension)
+ * @see FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension)
  */
-public interface ToDocumentFieldValueConvertContextExtension<T> {
+public interface FromDocumentFieldValueConvertContextExtension<T> {
 
 	/**
 	 * Attempt to extend a given context, returning an empty {@link Optional} in case of failure.
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link ToDocumentFieldValueConvertContext}.
-	 * @param mappingContext A {@link MappingContextImplementor}.
+	 * @param original The original, non-extended {@link FromDocumentFieldValueConvertContext}.
+	 * @param sessionContext A {@link SessionContextImplementor}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(ToDocumentFieldValueConvertContext original, MappingContextImplementor mappingContext);
+	Optional<T> extendOptional(FromDocumentFieldValueConvertContext original, SessionContextImplementor sessionContext);
 
 }
