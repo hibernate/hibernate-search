@@ -15,14 +15,9 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT = new LuceneIndexSchemaObjectNode( null, null, null );
-	private static final LuceneIndexSchemaObjectNode ID = new LuceneIndexSchemaObjectNode( null, null, null );
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
-	}
-
-	public static LuceneIndexSchemaObjectNode id() {
-		return ID;
 	}
 
 	private final LuceneIndexSchemaObjectNode parent;
