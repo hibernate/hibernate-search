@@ -18,7 +18,7 @@ import org.hibernate.search.backend.elasticsearch.types.predicate.impl.Elasticse
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -33,7 +33,7 @@ public class ElasticsearchGeoPointIndexFieldTypeContext
 
 	private final String relativeFieldName;
 
-	public ElasticsearchGeoPointIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchGeoPointIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, GeoPoint.class, DataType.GEO_POINT );
 		this.relativeFieldName = relativeFieldName;
 	}

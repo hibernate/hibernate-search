@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
@@ -60,7 +60,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		return converter;
 	}
 
-	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaContext {
+	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaBuildContext {
 		private StubFieldConverter<?> converter;
 		private ToDocumentIdentifierValueConverter<?> idDslConverter;
 

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.types.projection.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 import com.google.gson.JsonElement;
@@ -29,7 +29,7 @@ public class ElasticsearchBooleanIndexFieldTypeContext
 
 	private final String relativeFieldName;
 
-	public ElasticsearchBooleanIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchBooleanIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, Boolean.class, DataType.BOOLEAN );
 		this.relativeFieldName = relativeFieldName;
 	}

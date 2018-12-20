@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 
-public interface LuceneIndexSchemaContext extends IndexSchemaContext {
+public interface LuceneIndexBuildContext {
 
-	LuceneIndexSchemaRootContext getRoot();
+	LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry();
 
 }

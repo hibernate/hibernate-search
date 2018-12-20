@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class ElasticsearchStringIndexFieldTypeContext
 	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public ElasticsearchStringIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchStringIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 	}

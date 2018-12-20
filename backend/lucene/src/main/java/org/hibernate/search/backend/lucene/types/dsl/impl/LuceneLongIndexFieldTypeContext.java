@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -25,7 +25,7 @@ public class LuceneLongIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneLongIndexFieldTypeContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName) {
+	public LuceneLongIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, relativeFieldName, Long.class );
 	}
 

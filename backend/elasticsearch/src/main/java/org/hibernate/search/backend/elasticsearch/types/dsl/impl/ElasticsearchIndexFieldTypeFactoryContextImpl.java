@@ -13,16 +13,9 @@ import java.time.LocalDate;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchBooleanIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchGeoPointIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchInstantIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIntegerIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLocalDateIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchLongIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchStringIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
@@ -40,7 +33,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  */
 public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		implements ElasticsearchIndexFieldTypeFactoryContext, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>,
-				IndexSchemaContext {
+		IndexSchemaBuildContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

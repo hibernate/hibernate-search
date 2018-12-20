@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -33,7 +33,7 @@ public class ElasticsearchIntegerIndexFieldTypeContext
 
 	private final String relativeFieldName;
 
-	public ElasticsearchIntegerIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchIntegerIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, Integer.class, DataType.INTEGER );
 		this.relativeFieldName = relativeFieldName;
 	}

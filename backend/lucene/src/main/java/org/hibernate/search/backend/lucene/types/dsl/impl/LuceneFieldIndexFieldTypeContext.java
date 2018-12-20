@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardF
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
@@ -32,7 +32,7 @@ public class LuceneFieldIndexFieldTypeContext<F>
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	public LuceneFieldIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName,
+	public LuceneFieldIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName,
 			Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType );

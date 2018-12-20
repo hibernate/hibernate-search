@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.Contracts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -27,7 +27,7 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final IndexSchemaContext schemaContext;
+	private final IndexSchemaBuildContext schemaContext;
 
 	private final DeferredInitializationIndexFieldAccessor<F> deferredInitializationAccessor =
 			new DeferredInitializationIndexFieldAccessor<>();
@@ -39,14 +39,14 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 
 	private boolean accessorCreated = false;
 
-	public IndexSchemaFieldDefinitionHelper(IndexSchemaContext schemaContext, Class<F> indexFieldType) {
+	public IndexSchemaFieldDefinitionHelper(IndexSchemaBuildContext schemaContext, Class<F> indexFieldType) {
 		this.schemaContext = schemaContext;
 		this.indexFieldType = indexFieldType;
 		this.dslToIndexConverter = null;
 		this.indexToProjectionConverter = null;
 	}
 
-	public IndexSchemaContext getSchemaContext() {
+	public IndexSchemaBuildContext getSchemaContext() {
 		return schemaContext;
 	}
 

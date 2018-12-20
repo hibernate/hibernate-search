@@ -24,7 +24,7 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder, LuceneIndexSchemaRootContext {
+		implements IndexSchemaRootNodeBuilder, LuceneIndexBuildContext, LuceneIndexSchemaBuildContext {
 
 	private final String indexName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;

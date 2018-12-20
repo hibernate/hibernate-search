@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -28,7 +28,7 @@ import org.hibernate.search.util.AssertionFailure;
 public abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuceneStandardIndexFieldTypeContext<? extends S, F>, F>
 		implements LuceneStandardIndexFieldTypeContext<S, F>, LuceneIndexSchemaNodeContributor {
 
-	private final LuceneIndexSchemaContext schemaContext;
+	private final LuceneIndexSchemaBuildContext schemaContext;
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
@@ -36,7 +36,7 @@ public abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends Abst
 
 	protected Projectable projectable = Projectable.DEFAULT;
 
-	protected AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexSchemaContext schemaContext, String relativeFieldName,
+	protected AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName,
 			Class<F> fieldType) {
 		this.schemaContext = schemaContext;
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
@@ -82,7 +82,7 @@ public abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends Abst
 		return relativeFieldName;
 	}
 
-	protected final LuceneIndexSchemaContext getSchemaContext() {
+	protected final LuceneIndexSchemaBuildContext getSchemaContext() {
 		return schemaContext;
 	}
 

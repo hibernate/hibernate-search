@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 import com.google.gson.Gson;
@@ -46,7 +46,7 @@ public class ElasticsearchJsonStringIndexFieldTypeContext implements
 
 	private final String mappingJsonString;
 
-	public ElasticsearchJsonStringIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName, String mappingJsonString) {
+	public ElasticsearchJsonStringIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName, String mappingJsonString) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;

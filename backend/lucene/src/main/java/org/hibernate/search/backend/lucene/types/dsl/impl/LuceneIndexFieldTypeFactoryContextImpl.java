@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaContext;
+import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -34,7 +34,8 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  * @author Guillaume Smet
  */
 public class LuceneIndexFieldTypeFactoryContextImpl
-		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexSchemaNodeContributor, LuceneIndexSchemaContext {
+		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexSchemaNodeContributor,
+		LuceneIndexSchemaBuildContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
