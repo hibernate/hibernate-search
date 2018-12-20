@@ -7,6 +7,8 @@
 
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
+import static org.jboss.logging.Logger.Level.WARN;
+
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -43,6 +45,7 @@ import com.google.gson.JsonObject;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.BACKEND_ES_ID_RANGE_MIN, max = MessageConstants.BACKEND_ES_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5 (engine module)
+		@ValidIdRange(min = 49, max = 49),
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5 (engine module).
 })
 public interface Log extends BasicLogger {
@@ -54,6 +57,10 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 (engine module) here
+	@LogMessage(level = WARN)
+	@Message(id = ID_OFFSET_1 + 49,
+			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
+	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	// -----------------------------------
 	// Pre-existing messages from Search 5 (ES module)
@@ -150,6 +157,16 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 90,
 			value = "Elasticsearch response indicates a failure." )
 	SearchException elasticsearchResponseIndicatesFailure();
+
+	@Message(id = ID_OFFSET_2 + 91,
+			value = "The thread was interrupted while a changeset was being submitted to '%1$s'."
+					+ " The changeset has been discarded." )
+	SearchException threadInterruptedWhileSubmittingChangeset(String orchestratorName);
+
+	@Message(id = ID_OFFSET_2 + 92,
+			value = "A changeset was submitted after Hibernate Search shutdown was requested to '%1$s'."
+					+ " The changeset has been discarded." )
+	SearchException orchestratorShutDownBeforeSubmittingChangeset(String orchestratorName);
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_2 + 93,
