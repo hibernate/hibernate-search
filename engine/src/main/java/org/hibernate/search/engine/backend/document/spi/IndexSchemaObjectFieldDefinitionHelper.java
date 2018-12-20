@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.spi;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -20,18 +20,18 @@ public final class IndexSchemaObjectFieldDefinitionHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final IndexSchemaContext schemaContext;
+	private final IndexSchemaBuildContext schemaContext;
 
 	private final DeferredInitializationIndexObjectFieldAccessor rawAccessor =
 			new DeferredInitializationIndexObjectFieldAccessor();
 
 	private boolean accessorCreated = false;
 
-	public IndexSchemaObjectFieldDefinitionHelper(IndexSchemaContext schemaContext) {
+	public IndexSchemaObjectFieldDefinitionHelper(IndexSchemaBuildContext schemaContext) {
 		this.schemaContext = schemaContext;
 	}
 
-	public IndexSchemaContext getSchemaContext() {
+	public IndexSchemaBuildContext getSchemaContext() {
 		return schemaContext;
 	}
 

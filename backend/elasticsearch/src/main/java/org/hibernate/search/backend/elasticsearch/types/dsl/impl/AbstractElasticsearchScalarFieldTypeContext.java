@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.D
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
@@ -29,7 +29,7 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	private Projectable projectable = Projectable.DEFAULT;
 	protected boolean resolvedProjectable;
 
-	AbstractElasticsearchScalarFieldTypeContext(IndexSchemaContext schemaContext,
+	AbstractElasticsearchScalarFieldTypeContext(IndexSchemaBuildContext schemaContext,
 			Class<F> fieldType, DataType dataType) {
 		super( schemaContext, fieldType );
 		this.dataType = dataType;

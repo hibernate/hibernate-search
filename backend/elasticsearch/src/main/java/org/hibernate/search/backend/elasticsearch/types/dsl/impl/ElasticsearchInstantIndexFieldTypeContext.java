@@ -22,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.types.projection.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 import com.google.gson.JsonElement;
@@ -32,7 +32,7 @@ public class ElasticsearchInstantIndexFieldTypeContext
 
 	private final String relativeFieldName;
 
-	public ElasticsearchInstantIndexFieldTypeContext(IndexSchemaContext schemaContext, String relativeFieldName) {
+	public ElasticsearchInstantIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
 		super( schemaContext, Instant.class, DataType.DATE );
 		this.relativeFieldName = relativeFieldName;
 	}

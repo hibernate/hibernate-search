@@ -9,7 +9,7 @@ package org.hibernate.search.engine.backend.document.model.dsl.spi;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
-public interface IndexSchemaObjectNodeBuilder extends IndexSchemaContext {
+public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 
 	/**
 	 * Create a new field and add it to the current builder.

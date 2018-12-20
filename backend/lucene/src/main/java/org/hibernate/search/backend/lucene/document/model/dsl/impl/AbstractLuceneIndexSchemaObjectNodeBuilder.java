@@ -21,7 +21,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder, LuceneIndexSchemaContext {
+abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder,
+		LuceneIndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration

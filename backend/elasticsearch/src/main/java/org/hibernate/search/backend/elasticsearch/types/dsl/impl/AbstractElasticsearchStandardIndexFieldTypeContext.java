@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.AssertionFailure;
 
@@ -29,7 +29,7 @@ public abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S exten
 
 	private final IndexSchemaFieldDefinitionHelper<F> helper;
 
-	AbstractElasticsearchStandardIndexFieldTypeContext(IndexSchemaContext schemaContext, Class<F> fieldType) {
+	AbstractElasticsearchStandardIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, Class<F> fieldType) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
 	}
 
@@ -64,7 +64,7 @@ public abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S exten
 
 	protected abstract S thisAsS();
 
-	protected final IndexSchemaContext getSchemaContext() {
+	protected final IndexSchemaBuildContext getSchemaContext() {
 		return helper.getSchemaContext();
 	}
 
