@@ -29,11 +29,6 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private List<ElasticsearchSearchPredicateBuilder> mustClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> mustNotClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> shouldClauseBuilders;
-	private List<ElasticsearchSearchPredicateBuilder> filterClauseBuilders;
-
 	private static final JsonAccessor<JsonObject> MUST = JsonAccessor.root().property( "must" ).asObject();
 	private static final JsonAccessor<JsonObject> MUST_NOT = JsonAccessor.root().property( "must_not" ).asObject();
 	private static final JsonAccessor<JsonObject> SHOULD = JsonAccessor.root().property( "should" ).asObject();
@@ -41,6 +36,11 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 
 	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
+
+	private List<ElasticsearchSearchPredicateBuilder> mustClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> mustNotClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> shouldClauseBuilders;
+	private List<ElasticsearchSearchPredicateBuilder> filterClauseBuilders;
 
 	private Map<Integer, MinimumShouldMatchConstraint> minimumShouldMatchConstraints;
 
