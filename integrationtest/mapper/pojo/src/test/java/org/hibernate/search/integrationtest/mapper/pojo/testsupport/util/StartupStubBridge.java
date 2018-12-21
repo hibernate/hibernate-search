@@ -84,15 +84,21 @@ public class StartupStubBridge
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field( "startupStubBridgeFieldFromPropertyBridge" )
-				.asString().createAccessor();
+		context.getIndexSchemaElement().field(
+				"startupStubBridgeFieldFromPropertyBridge",
+				f -> f.asString().toIndexFieldType()
+		)
+				.createAccessor();
 	}
 
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
 		// Add at least one field so that the bridge is not removed
-		context.getIndexSchemaElement().field( "startupStubBridgeFieldFromTypeBridge" )
-				.asString().createAccessor();
+		context.getIndexSchemaElement().field(
+				"startupStubBridgeFieldFromTypeBridge",
+				f -> f.asString().toIndexFieldType()
+		)
+				.createAccessor();
 	}
 
 	@Override

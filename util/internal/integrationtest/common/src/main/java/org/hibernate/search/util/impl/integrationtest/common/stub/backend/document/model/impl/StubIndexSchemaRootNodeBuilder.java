@@ -8,15 +8,18 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactoryContext;
 
 public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
 
 	private final StubBackendBehavior backendBehavior;
+	private final StubIndexFieldTypeFactoryContext typeFactoryContext = new StubIndexFieldTypeFactoryContext();
 	private final String indexName;
 
 	public StubIndexSchemaRootNodeBuilder(StubBackendBehavior backendBehavior, String indexName) {
@@ -28,6 +31,11 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 		super( builder );
 		this.backendBehavior = backendBehavior;
 		this.indexName = indexName;
+	}
+
+	@Override
+	public IndexFieldTypeFactoryContext getTypeFactory() {
+		return typeFactoryContext;
 	}
 
 	@Override

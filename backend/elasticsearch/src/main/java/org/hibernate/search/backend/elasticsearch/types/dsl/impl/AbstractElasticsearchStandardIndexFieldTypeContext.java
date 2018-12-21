@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchStandardIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.AssertionFailure;
@@ -20,21 +18,10 @@ abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S extends Abst
 		extends AbstractElasticsearchIndexFieldTypeConverterContext<S, F>
 		implements ElasticsearchStandardIndexFieldTypeContext<S, F> {
 
-	private final ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference;
-
 	AbstractElasticsearchStandardIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType,
-			ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+			Class<F> fieldType) {
 		super( buildContext, fieldType );
-		this.fieldDslBackReference = fieldDslBackReference;
 	}
-
-	@Override
-	public IndexFieldAccessor<F> createAccessor() {
-		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
-	}
-
-	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType();
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {

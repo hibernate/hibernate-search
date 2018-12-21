@@ -15,6 +15,8 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
+import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -131,10 +133,16 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			);
 		}
 
+		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
+
+		ElasticsearchIndexFieldTypeFactoryContext typeFactoryContext =
+				new ElasticsearchIndexFieldTypeFactoryContextImpl( indexEventContext );
+
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
-						hibernateSearchIndexName,
-						multiTenancyStrategy
+						indexEventContext,
+						multiTenancyStrategy,
+						typeFactoryContext
 				);
 
 		ElasticsearchIndexSettingsBuilder settingsBuilder =

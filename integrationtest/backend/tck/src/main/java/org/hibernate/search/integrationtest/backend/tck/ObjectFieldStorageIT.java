@@ -341,7 +341,7 @@ public class ObjectFieldStorageIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
+			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
 			flattenedObject = new ObjectAccessors( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
@@ -358,11 +358,14 @@ public class ObjectFieldStorageIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string" ).asString().createAccessor();
-			string_analyzed = objectField.field( "string_analyzed" ).asString()
-					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).createAccessor();
-			integer = objectField.field( "integer" ).asInteger().createAccessor();
-			localDate = objectField.field( "localDate" ).asLocalDate().createAccessor();
+			string = objectField.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			string_analyzed = objectField.field(
+					"string_analyzed",
+					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).toIndexFieldType()
+			)
+					.createAccessor();
+			integer = objectField.field( "integer", f -> f.asInteger().toIndexFieldType() ).createAccessor();
+			localDate = objectField.field( "localDate", f -> f.asLocalDate().toIndexFieldType() ).createAccessor();
 		}
 	}
 }

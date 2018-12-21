@@ -591,42 +591,48 @@ public class LuceneExtensionIT {
 		final IndexFieldAccessor<String> sort3;
 
 		IndexAccessors(IndexSchemaElement root) {
-			integer = root.field( "integer" )
-					.asInteger()
-					.projectable( Projectable.YES )
+			integer = root.field(
+					"integer",
+					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
-			string = root.field( "string" )
-					.asString()
-					.projectable( Projectable.YES )
+			string = root.field(
+					"string",
+					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
-			geoPoint = root.field( "geoPoint" )
-					.asGeoPoint()
-					.projectable( Projectable.YES )
+			geoPoint = root.field(
+					"geoPoint",
+					f -> f.asGeoPoint().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
-			nativeField = root.field( "nativeField" )
-					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+			nativeField = root.field(
+					"nativeField",
+					f -> f.extension( LuceneExtension.get() )
+							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+							.toIndexFieldType()
+			)
 					.createAccessor();
-			nativeField_unsupportedProjection = root.field( "nativeField_unsupportedProjection" )
-					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
+			nativeField_unsupportedProjection = root.field(
+					"nativeField_unsupportedProjection",
+					f -> f.extension( LuceneExtension.get() )
+							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
+							.toIndexFieldType()
+			)
 					.createAccessor();
-			nativeField_invalidFieldPath = root.field( "nativeField_invalidFieldPath" )
-					.extension( LuceneExtension.get() )
-					.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
+			nativeField_invalidFieldPath = root.field(
+					"nativeField_invalidFieldPath",
+					f -> f.extension( LuceneExtension.get() )
+							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
+							.toIndexFieldType()
+			)
 					.createAccessor();
 
-			sort1 = root.field( "sort1" )
-					.asString()
-					.sortable( Sortable.YES )
+			sort1 = root.field( "sort1", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
 					.createAccessor();
-			sort2 = root.field( "sort2" )
-					.asString()
-					.sortable( Sortable.YES )
+			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
 					.createAccessor();
-			sort3 = root.field( "sort3" )
-					.asString()
-					.sortable( Sortable.YES )
+			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
 					.createAccessor();
 		}
 	}

@@ -26,7 +26,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
-		return context.getIndexFieldTypeFactoryContext().asString()
+		return context.getTypeFactory().asString()
 				.projectionConverter( new PojoDefaultEnumFromDocumentFieldValueConverter( enumType ) );
 	}
 

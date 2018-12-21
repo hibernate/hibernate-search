@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-
 /**
- * @param <F> The type of field values.
+ * @param <A> The accessor type.
  */
-public interface IndexSchemaFieldTerminalContext<F> {
+public interface IndexSchemaFieldTerminalContext<A> {
 
-	IndexFieldAccessor<F> createAccessor();
+	A createAccessor();
 
 }

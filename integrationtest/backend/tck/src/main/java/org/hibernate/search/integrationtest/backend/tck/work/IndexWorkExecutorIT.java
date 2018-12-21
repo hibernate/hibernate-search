@@ -137,7 +137,8 @@ public class IndexWorkExecutorIT {
 		final IndexFieldAccessor<String> title;
 
 		IndexAccessors(IndexSchemaElement root) {
-			title = root.field( "title" ).asString().createAccessor();
+			title = root.field( "title", f -> f.asString().toIndexFieldType() )
+					.createAccessor();
 		}
 	}
 }

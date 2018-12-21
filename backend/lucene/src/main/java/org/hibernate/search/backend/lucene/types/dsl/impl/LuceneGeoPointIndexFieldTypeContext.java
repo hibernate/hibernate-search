@@ -23,9 +23,8 @@ class LuceneGeoPointIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	LuceneGeoPointIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
-			LuceneIndexSchemaFieldDslBackReference<GeoPoint> fieldDslBackReference) {
-		super( buildContext, GeoPoint.class, fieldDslBackReference );
+	LuceneGeoPointIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, GeoPoint.class );
 	}
 
 	@Override
@@ -35,7 +34,7 @@ class LuceneGeoPointIndexFieldTypeContext
 	}
 
 	@Override
-	protected LuceneIndexFieldType<GeoPoint> toIndexFieldType() {
+	public LuceneIndexFieldType<GeoPoint> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 

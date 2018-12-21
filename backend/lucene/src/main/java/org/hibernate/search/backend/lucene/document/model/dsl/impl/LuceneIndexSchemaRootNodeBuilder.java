@@ -11,12 +11,13 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.KeywordAnalyzer;
-import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
+import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -24,21 +25,27 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.EventContext;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder, LuceneIndexBuildContext, LuceneIndexSchemaBuildContext {
+		implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
 
-	private final String indexName;
-	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final EventContext indexEventContext;
+	private final LuceneIndexFieldTypeFactoryContext typeFactory;
+
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
-	public LuceneIndexSchemaRootNodeBuilder(String indexName,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
-		this.indexName = indexName;
-		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
+			LuceneIndexFieldTypeFactoryContext typeFactory) {
+		this.indexEventContext = indexEventContext;
+		this.typeFactory = typeFactory;
 	}
 
 	@Override
 	public EventContext getEventContext() {
 		return getIndexEventContext().append( EventContexts.indexSchemaRoot() );
+	}
+
+	@Override
+	public LuceneIndexFieldTypeFactoryContext getTypeFactory() {
+		return typeFactory;
 	}
 
 	@Override
@@ -53,12 +60,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
-		return analysisDefinitionRegistry;
-	}
-
-	@Override
-	public LuceneIndexSchemaRootNodeBuilder getRoot() {
+	public LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
 		return this;
 	}
 
@@ -102,7 +104,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		return null;
 	}
 
-	public EventContext getIndexEventContext() {
-		return EventContexts.fromIndexName( indexName );
+	EventContext getIndexEventContext() {
+		return indexEventContext;
 	}
 }

@@ -47,9 +47,8 @@ class ElasticsearchLocalDateIndexFieldTypeContext
 
 	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<LocalDate> fieldDslBackReference) {
-		super( buildContext, LocalDate.class, DataType.DATE, fieldDslBackReference );
+	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, LocalDate.class, DataType.DATE );
 	}
 
 	@Override

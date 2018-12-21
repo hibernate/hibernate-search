@@ -21,8 +21,8 @@ public interface ValueBridgeBindingContext<V> {
 	PojoModelValue<V> getBridgedElement();
 
 	/**
-	 * @return An entry point allowing to declare expectations regarding the index schema.
+	 * @return An entry point allowing to define a new field type.
 	 */
-	IndexFieldTypeFactoryContext getIndexFieldTypeFactoryContext();
+	IndexFieldTypeFactoryContext getTypeFactory();
 
 }

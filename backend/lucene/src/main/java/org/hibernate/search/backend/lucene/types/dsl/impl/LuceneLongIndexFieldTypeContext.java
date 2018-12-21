@@ -20,9 +20,8 @@ class LuceneLongIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	LuceneLongIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
-			LuceneIndexSchemaFieldDslBackReference<Long> fieldDslBackReference) {
-		super( buildContext, Long.class, fieldDslBackReference );
+	LuceneLongIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Long.class );
 	}
 
 	@Override
@@ -32,7 +31,7 @@ class LuceneLongIndexFieldTypeContext
 	}
 
 	@Override
-	protected LuceneIndexFieldType<Long> toIndexFieldType() {
+	public LuceneIndexFieldType<Long> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 

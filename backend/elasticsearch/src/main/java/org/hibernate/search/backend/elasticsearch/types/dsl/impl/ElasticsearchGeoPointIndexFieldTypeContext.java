@@ -23,9 +23,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 class ElasticsearchGeoPointIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchGeoPointIndexFieldTypeContext, GeoPoint> {
 
-	ElasticsearchGeoPointIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<GeoPoint> fieldDslBackReference) {
-		super( buildContext, GeoPoint.class, DataType.GEO_POINT, fieldDslBackReference );
+	ElasticsearchGeoPointIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, GeoPoint.class, DataType.GEO_POINT );
 	}
 
 	@Override

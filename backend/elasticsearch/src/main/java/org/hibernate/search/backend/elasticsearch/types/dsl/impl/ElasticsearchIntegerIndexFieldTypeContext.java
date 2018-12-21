@@ -23,9 +23,8 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 class ElasticsearchIntegerIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchIntegerIndexFieldTypeContext, Integer> {
 
-	ElasticsearchIntegerIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<Integer> fieldDslBackReference) {
-		super( buildContext, Integer.class, DataType.INTEGER, fieldDslBackReference );
+	ElasticsearchIntegerIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Integer.class, DataType.INTEGER );
 	}
 
 	@Override

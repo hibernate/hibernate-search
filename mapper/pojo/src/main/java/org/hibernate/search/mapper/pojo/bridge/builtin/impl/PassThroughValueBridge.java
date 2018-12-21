@@ -38,7 +38,7 @@ public final class PassThroughValueBridge<F> implements ValueBridge<F, F> {
 
 	@Override
 	public StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<F> context) {
-		return context.getIndexFieldTypeFactoryContext().as( fieldType )
+		return context.getTypeFactory().as( fieldType )
 				.projectionConverter( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
 	}
 

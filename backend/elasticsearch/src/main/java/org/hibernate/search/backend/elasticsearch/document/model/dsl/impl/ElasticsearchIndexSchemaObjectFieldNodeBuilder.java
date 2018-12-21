@@ -57,10 +57,8 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public void contribute(
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode,
-			AbstractTypeMapping parentMapping) {
+	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
+			ElasticsearchIndexSchemaObjectNode parentNode, AbstractTypeMapping parentMapping) {
 		ElasticsearchIndexSchemaObjectNode node =
 				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
 		collector.collect( absoluteFieldPath, node );

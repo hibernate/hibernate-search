@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.lucene.types.dsl;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 
 
 /**
@@ -26,7 +26,7 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	<F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> valueType,
+	<F> IndexFieldTypeTerminalContext<F> asLuceneField(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor);
 
@@ -38,7 +38,7 @@ public interface LuceneIndexFieldTypeFactoryContext extends IndexFieldTypeFactor
 	 * @param <F> The type of the value.
 	 * @return The DSL context.
 	 */
-	default <F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> valueType,
+	default <F> IndexFieldTypeTerminalContext<F> asLuceneField(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor) {
 		return asLuceneField( valueType, fieldContributor, null );
 	}

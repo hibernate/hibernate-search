@@ -11,10 +11,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -55,7 +57,7 @@ public class DocumentModelDslIT {
 				"Null field name on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( null );
+					root.field( null, this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -70,7 +72,8 @@ public class DocumentModelDslIT {
 				"Null field name on non-root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.objectField( "nonRoot" ).field( null );
+					root.objectField( "nonRoot" )
+							.field( null, this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -118,7 +121,7 @@ public class DocumentModelDslIT {
 				"empty field name on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "" );
+					root.field( "", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -133,7 +136,7 @@ public class DocumentModelDslIT {
 				"empty field name on non-root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.objectField( "nonRoot" ).field( "" );
+					root.objectField( "nonRoot" ).field( "", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -181,7 +184,7 @@ public class DocumentModelDslIT {
 				"field name containing a dot on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "foo.bar" );
+					root.field( "foo.bar", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -199,7 +202,7 @@ public class DocumentModelDslIT {
 				"field name containing a dot on non-root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.objectField( "nonRoot" ).field( "foo.bar" );
+					root.objectField( "nonRoot" ).field( "foo.bar", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -256,8 +259,8 @@ public class DocumentModelDslIT {
 				"Name collision between two fields on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "field1" );
-					root.field( "field1" );
+					root.field( "field1", f -> f.asString().toIndexFieldType() );
+					root.field( "field1", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -274,8 +277,8 @@ public class DocumentModelDslIT {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
-					objectField2.field( "field1" );
-					objectField2.field( "field1" );
+					objectField2.field( "field1", f -> f.asString().toIndexFieldType() );
+					objectField2.field( "field1", this::irrelevantTypeContributor );
 				} )
 		)
 				.assertThrown()
@@ -330,7 +333,7 @@ public class DocumentModelDslIT {
 				"Name collision between two fields on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "field1" );
+					root.field( "field1", f -> f.asString().toIndexFieldType() );
 					root.objectField( "field1" );
 				} )
 		)
@@ -348,7 +351,7 @@ public class DocumentModelDslIT {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
-					objectField2.field( "field1" );
+					objectField2.field( "field1", f -> f.asString().toIndexFieldType() );
 					objectField2.objectField( "field1" );
 				} )
 		)
@@ -367,9 +370,13 @@ public class DocumentModelDslIT {
 				"Setting an analyzer on sortable field",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField" ).asString()
-							.sortable( Sortable.YES )
-							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+					root.field(
+							"myField",
+							f -> f.asString()
+									.sortable( Sortable.YES )
+									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+									.toIndexFieldType()
+					)
 							.createAccessor();
 				} )
 		)
@@ -379,8 +386,7 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "Use a normalizer instead" )
 				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexName( INDEX_NAME ),
-						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+						EventContexts.fromIndexName( INDEX_NAME )
 				) );
 	}
 
@@ -390,9 +396,13 @@ public class DocumentModelDslIT {
 				"Setting an analyzer and a normalizer on the same field",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField" ).asString()
-							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
-							.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
+					root.field(
+							"myField",
+							f -> f.asString()
+									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
+									.toIndexFieldType()
+					)
 							.createAccessor();
 				} )
 		)
@@ -402,8 +412,7 @@ public class DocumentModelDslIT {
 				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD.name + "'" )
 				.hasMessageContaining( "'" + DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name + "'" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexName( INDEX_NAME ),
-						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+						EventContexts.fromIndexName( INDEX_NAME )
 				) );
 	}
 
@@ -414,9 +423,7 @@ public class DocumentModelDslIT {
 					"Missing createAccessor() call after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						typedContextFunction.apply(
-								root.field( "myField" )
-						);
+						root.field( "myField", f -> typedContextFunction.apply( f ).toIndexFieldType() );
 					} )
 			)
 					.assertThrown()
@@ -450,8 +457,9 @@ public class DocumentModelDslIT {
 					"Multiple createAccessor() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						StandardIndexFieldTypeContext<?, ?> context = typedContextFunction.apply(
-								root.field( "myField" )
+						IndexSchemaFieldTerminalContext<?> context = root.field(
+								"myField",
+								f -> typedContextFunction.apply( f ).toIndexFieldType()
 						);
 						context.createAccessor();
 						context.createAccessor();
@@ -481,6 +489,10 @@ public class DocumentModelDslIT {
 						EventContexts.fromIndexName( INDEX_NAME ),
 						EventContexts.fromIndexFieldAbsolutePath( "myField" )
 				) );
+	}
+
+	private IndexFieldType<String> irrelevantTypeContributor(IndexFieldTypeFactoryContext factoryContext) {
+		return factoryContext.asString().toIndexFieldType();
 	}
 
 	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {

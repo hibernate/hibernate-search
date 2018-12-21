@@ -10,8 +10,9 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -20,6 +21,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
@@ -38,23 +40,30 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
-		ElasticsearchIndexFieldTypeFactoryContextImpl fieldContext =
-				new ElasticsearchIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
-		putProperty( relativeFieldName, fieldContext );
-		return fieldContext;
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> addField(
+			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
+		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
+				this, relativeFieldName, elasticsearchIndexFieldType
+		);
+		putField( relativeFieldName, childBuilder );
+		return childBuilder;
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
-		return new ElasticsearchIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> createExcludedField(
+			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
+		return new ElasticsearchIndexSchemaFieldNodeBuilder<>(
+				this, relativeFieldName, elasticsearchIndexFieldType
+		);
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		putProperty( relativeFieldName, objectFieldBuilder );
+		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
@@ -75,7 +84,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	abstract String getAbsolutePath();
 
-	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
+	private void putField(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );

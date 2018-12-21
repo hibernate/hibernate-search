@@ -290,7 +290,7 @@ public class SearchPredicateIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
+			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
 		}
 	}
 

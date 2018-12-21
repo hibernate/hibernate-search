@@ -14,10 +14,13 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 
 public interface IndexModelBindingContext {
+
+	IndexFieldTypeFactoryContext getTypeFactory();
 
 	Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
 

@@ -211,7 +211,8 @@ public class BooleanSortAndRangePredicateIT {
 		final IndexFieldAccessor<Boolean> bool;
 
 		IndexAccessors(IndexSchemaElement root) {
-			bool = root.field( FIELD_PATH ).asBoolean().sortable( Sortable.YES ).createAccessor();
+			bool = root.field( FIELD_PATH, f -> f.asBoolean().sortable( Sortable.YES ).toIndexFieldType() )
+					.createAccessor();
 		}
 	}
 }

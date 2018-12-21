@@ -8,8 +8,7 @@ package org.hibernate.search.engine.backend.document.model.dsl;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 
-public interface IndexSchemaObjectField extends IndexSchemaElement {
-
-	IndexObjectFieldAccessor createAccessor();
+public interface IndexSchemaObjectField
+		extends IndexSchemaElement, IndexSchemaFieldTerminalContext<IndexObjectFieldAccessor> {
 
 }

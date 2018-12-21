@@ -634,17 +634,13 @@ public class FieldSearchProjectionIT {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
-			return (parent, name, additionalConfiguration) -> {
-				IndexFieldTypeFactoryContext untypedContext = parent.field( name );
-				StandardIndexFieldTypeContext<?, F> context = configuration.apply( untypedContext );
-				context.projectable( Projectable.YES );
-				additionalConfiguration.accept( context );
-				IndexFieldAccessor<F> accessor = context.createAccessor();
-				return new FieldModel<>(
-						accessor, name, type,
-						document1Value, document2Value, document3Value
-				);
-			};
+			return StandardFieldMapper.of(
+					configuration,
+					c -> c.projectable( Projectable.YES ),
+					(accessor, name) -> new FieldModel<>(
+							accessor, name, type, document1Value, document2Value, document3Value
+					)
+			);
 		}
 
 		final String relativeFieldName;
@@ -728,14 +724,11 @@ public class FieldSearchProjectionIT {
 
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
-			return (parent, name, additionalConfiguration) -> {
-				IndexFieldTypeFactoryContext untypedContext = parent.field( name );
-				StandardIndexFieldTypeContext<?, F> context = configuration.apply( untypedContext );
-				context.projectable( Projectable.YES );
-				additionalConfiguration.accept( context );
-				context.createAccessor();
-				return new IncompatibleFieldModel<>( name );
-			};
+			return StandardFieldMapper.of(
+					configuration,
+					c -> c.projectable( Projectable.YES ),
+					(accessor, name) -> new IncompatibleFieldModel<>( name )
+			);
 		}
 
 		final String relativeFieldName;

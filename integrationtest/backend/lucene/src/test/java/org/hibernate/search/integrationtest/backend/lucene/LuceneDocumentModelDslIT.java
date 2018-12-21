@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.lucene;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -31,8 +30,7 @@ public class LuceneDocumentModelDslIT {
 		SubTest.expectException(
 				"Referencing an unknown analyzer",
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField" ).asString()
+					ctx.getTypeFactory().asString()
 							.analyzer( "someNameThatIsClearlyNotAssignedToADefinition" );
 				} )
 		)
@@ -40,8 +38,7 @@ public class LuceneDocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown analyzer" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexName( INDEX_NAME ),
-						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+						EventContexts.fromIndexName( INDEX_NAME )
 				) );
 	}
 
@@ -50,8 +47,7 @@ public class LuceneDocumentModelDslIT {
 		SubTest.expectException(
 				"Referencing an unknown analyzer",
 				() -> setup( ctx -> {
-					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "myField" ).asString()
+					ctx.getTypeFactory().asString()
 							.normalizer( "someNameThatIsClearlyNotAssignedToADefinition" );
 				} )
 		)
@@ -59,8 +55,7 @@ public class LuceneDocumentModelDslIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown normalizer" )
 				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexName( INDEX_NAME ),
-						EventContexts.fromIndexFieldAbsolutePath( "myField" )
+						EventContexts.fromIndexName( INDEX_NAME )
 				) );
 	}
 

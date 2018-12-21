@@ -26,7 +26,7 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
 	public StandardIndexFieldTypeContext<?, Instant> bind(ValueBridgeBindingContext<Date> context) {
-		return context.getIndexFieldTypeFactoryContext().asInstant()
+		return context.getTypeFactory().asInstant()
 				.projectionConverter( PojoDefaultDateFromDocumentFieldValueConverter.INSTANCE );
 	}
 

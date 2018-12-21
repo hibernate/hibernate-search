@@ -297,7 +297,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 					.createAccessor( String.class );
 			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "firstBridge" );
 			objectFieldAccessor = objectField.createAccessor();
-			valueTargetAccessor = objectField.field( "value" ).asString().createAccessor();
+			valueTargetAccessor = objectField.field( "value", f -> f.asString().toIndexFieldType() )
+					.createAccessor();
 		}
 
 		@Override
@@ -326,7 +327,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 					.createAccessor( String.class );
 			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "secondBridge" );
 			objectFieldAccessor = objectField.createAccessor();
-			valueTargetAccessor = objectField.field( "value" ).asString().createAccessor();
+			valueTargetAccessor = objectField.field( "value", f -> f.asString().toIndexFieldType() )
+					.createAccessor();
 		}
 
 		@Override

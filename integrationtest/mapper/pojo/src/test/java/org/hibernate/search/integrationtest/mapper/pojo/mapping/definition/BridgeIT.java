@@ -92,8 +92,10 @@ public class BridgeIT {
 								pojoPropertyAccessor = context.getBridgedElement()
 										.property( "stringProperty" )
 										.createAccessor( String.class );
-								indexFieldAccessor = context.getIndexSchemaElement().field( "someField" ).asString()
-										.analyzer( "myAnalyzer" )
+								indexFieldAccessor = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString().analyzer( "myAnalyzer" ).toIndexFieldType()
+								)
 										.createAccessor();
 							}
 
@@ -155,8 +157,10 @@ public class BridgeIT {
 							public void bind(PropertyBridgeBindingContext context) {
 								pojoPropertyAccessor = context.getBridgedElement()
 										.createAccessor( String.class );
-								indexFieldAccessor = context.getIndexSchemaElement().field( "someField" ).asString()
-										.analyzer( "myAnalyzer" )
+								indexFieldAccessor = context.getIndexSchemaElement().field(
+										"someField",
+										f -> f.asString().analyzer( "myAnalyzer" ).toIndexFieldType()
+								)
 										.createAccessor();
 							}
 

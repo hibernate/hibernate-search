@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -101,7 +102,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			throw log.missingFieldNameForGeoPointBridgeOnType( context.getBridgedElement().toString() );
 		}
 
-		bind( fieldName, context.getIndexSchemaElement(), context.getBridgedElement() );
+		bind( fieldName, context.getTypeFactory(), context.getIndexSchemaElement(), context.getBridgedElement() );
 	}
 
 	@Override
@@ -114,12 +115,17 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 			defaultedFieldName = context.getBridgedElement().getName();
 		}
 
-		bind( defaultedFieldName, context.getIndexSchemaElement(), context.getBridgedElement() );
+		bind( defaultedFieldName, context.getTypeFactory(), context.getIndexSchemaElement(), context.getBridgedElement() );
 	}
 
-	private void bind(String defaultedFieldName, IndexSchemaElement indexSchemaElement,
+	private void bind(String defaultedFieldName, IndexFieldTypeFactoryContext typeFactoryContext,
+			IndexSchemaElement indexSchemaElement,
 			PojoModelCompositeElement bridgedPojoModelElement) {
-		fieldAccessor = indexSchemaElement.field( defaultedFieldName ).asGeoPoint().projectable( projectable ).createAccessor();
+		fieldAccessor = indexSchemaElement.field(
+				defaultedFieldName,
+				typeFactoryContext.asGeoPoint().projectable( projectable ).toIndexFieldType()
+		)
+				.createAccessor();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
 			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );

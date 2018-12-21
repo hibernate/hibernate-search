@@ -20,9 +20,8 @@ class LuceneBooleanIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	LuceneBooleanIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
-			LuceneIndexSchemaFieldDslBackReference<Boolean> fieldDslBackReference) {
-		super( buildContext, Boolean.class, fieldDslBackReference );
+	LuceneBooleanIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Boolean.class );
 	}
 
 	@Override
@@ -32,7 +31,7 @@ class LuceneBooleanIndexFieldTypeContext
 	}
 
 	@Override
-	protected LuceneIndexFieldType<Boolean> toIndexFieldType() {
+	public LuceneIndexFieldType<Boolean> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 

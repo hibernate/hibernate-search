@@ -472,9 +472,13 @@ public class MatchSearchPredicateIT {
 	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
 			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-		String name = prefix + typeDescriptor.getUniqueName();
 		MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get(); // Safe, see caller
-		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
+		return StandardFieldMapper.of(
+				typeDescriptor::configure,
+				additionalConfiguration,
+				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
+		)
+				.map( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
 	private static class ValueModel<F> {
@@ -500,12 +504,10 @@ public class MatchSearchPredicateIT {
 		static StandardFieldMapper<String, MainFieldModel> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration,
 				String document1Value, String document2Value, String document3Value) {
-			return (parent, name, additionalConfiguration) -> {
-				StandardIndexFieldTypeContext<?, String> context = configuration.apply( parent.field( name ) );
-				additionalConfiguration.accept( context );
-				IndexFieldAccessor<String> accessor = context.createAccessor();
-				return new MainFieldModel( accessor, name, document1Value, document3Value, document2Value );
-			};
+			return StandardFieldMapper.of(
+					configuration,
+					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+			);
 		}
 
 		final String relativeFieldName;
@@ -529,13 +531,8 @@ public class MatchSearchPredicateIT {
 
 		final F predicateParameterValue;
 
-		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
-				FieldTypeDescriptor<F> typeDescriptor, MatchPredicateExpectations<F> expectations,
-				Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-			IndexFieldTypeFactoryContext untypedContext = parent.field( relativeFieldName );
-			StandardIndexFieldTypeContext<?, F> context = typeDescriptor.configure( untypedContext );
-			additionalConfiguration.accept( context );
-			IndexFieldAccessor<F> accessor = context.createAccessor();
+		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+				MatchPredicateExpectations<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
 			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
 			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );

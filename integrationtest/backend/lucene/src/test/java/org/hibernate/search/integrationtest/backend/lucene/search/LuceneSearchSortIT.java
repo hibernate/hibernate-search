@@ -106,7 +106,11 @@ public class LuceneSearchSortIT {
 		final IndexFieldAccessor<GeoPoint> geoPoint;
 
 		IndexAccessors(IndexSchemaElement root) {
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().sortable( Sortable.YES ).createAccessor();
+			geoPoint = root.field(
+					"geoPoint",
+					f -> f.asGeoPoint().sortable( Sortable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 		}
 	}
 }

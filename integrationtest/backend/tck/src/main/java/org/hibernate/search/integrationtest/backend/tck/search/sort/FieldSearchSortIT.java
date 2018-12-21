@@ -20,7 +20,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -489,9 +488,13 @@ public class FieldSearchSortIT {
 	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
 			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-		String name = prefix + typeDescriptor.getUniqueName();
 		FieldSortExpectations<F> expectations = typeDescriptor.getFieldSortExpectations().get(); // Safe, see caller
-		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
+		return StandardFieldMapper.of(
+				typeDescriptor::configure,
+				c -> c.sortable( Sortable.YES ),
+				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, typeDescriptor.getJavaType(), expectations )
+		)
+				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 	}
 
 	private static class ValueModel<F> {
@@ -511,12 +514,12 @@ public class FieldSearchSortIT {
 	private static class MainFieldModel {
 		static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
-			return (parent, name, configuration) -> {
-				StandardIndexFieldTypeContext<?, String> context = parent.field( name ).asString();
-				configuration.accept( context );
-				IndexFieldAccessor<String> accessor = context.createAccessor();
-				return new MainFieldModel( accessor, name, document1Value, document2Value, document3Value );
-			};
+			return StandardFieldMapper.of(
+					f -> f.asString(),
+					(accessor, name) -> new MainFieldModel(
+							accessor, name, document1Value, document2Value, document3Value
+					)
+			);
 		}
 
 		final String relativeFieldName;
@@ -546,16 +549,10 @@ public class FieldSearchSortIT {
 		final F between2And3Value;
 		final F after3Value;
 
-		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
-				FieldTypeDescriptor<F> typeDescriptor, FieldSortExpectations<F> expectations,
-				Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-			IndexFieldTypeFactoryContext untypedContext = parent.field( relativeFieldName );
-			StandardIndexFieldTypeContext<?, F> context = typeDescriptor.configure( untypedContext );
-			context.sortable( Sortable.YES );
-			additionalConfiguration.accept( context );
-			IndexFieldAccessor<F> accessor = context.createAccessor();
+		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+				Class<F> type, FieldSortExpectations<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
-			this.type = typeDescriptor.getJavaType();
+			this.type = type;
 			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
 			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
 			this.document3Value = new ValueModel<>( accessor, expectations.getDocument3Value() );

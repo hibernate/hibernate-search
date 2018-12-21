@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactoryContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexFieldType;
 
 abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
 
@@ -22,20 +24,24 @@ abstract class AbstractStubIndexSchemaObjectNodeBuilder implements IndexSchemaOb
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> addField(String relativeFieldName,
+			IndexFieldType<F> indexFieldType) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
 		getRootNodeBuilder().getBackendBehavior().onAddField(
 				getRootNodeBuilder().getIndexName(),
 				childBuilder.getAbsolutePath()
 		);
+		StubIndexFieldType<F> stubIndexFieldType = (StubIndexFieldType<F>) indexFieldType;
+		stubIndexFieldType.addField( childBuilder );
 		builder.child( childBuilder );
-		return new StubIndexFieldTypeFactoryContext( childBuilder, true );
+		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, true );
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> createExcludedField(String relativeFieldName,
+			IndexFieldType<F> indexFieldType) {
 		StubIndexSchemaNode.Builder childBuilder = StubIndexSchemaNode.field( builder, relativeFieldName );
-		return new StubIndexFieldTypeFactoryContext( childBuilder, false );
+		return new StubIndexSchemaFieldNodeBuilder<>( childBuilder, false );
 	}
 
 	@Override

@@ -7,14 +7,13 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubStringIndexFieldTypeContext
 		extends AbstractStubStandardIndexFieldTypeContext<StubStringIndexFieldTypeContext, String>
 		implements StringIndexFieldTypeContext<StubStringIndexFieldTypeContext> {
 
-	StubStringIndexFieldTypeContext(StubIndexSchemaNode.Builder builder, boolean included) {
-		super( builder, String.class, included );
+	StubStringIndexFieldTypeContext() {
+		super( String.class );
 	}
 
 	@Override
@@ -24,13 +23,13 @@ class StubStringIndexFieldTypeContext
 
 	@Override
 	public StubStringIndexFieldTypeContext analyzer(String analyzerName) {
-		builder.analyzerName( analyzerName );
+		modifiers.add( b -> b.analyzerName( analyzerName ) );
 		return this;
 	}
 
 	@Override
 	public StubStringIndexFieldTypeContext normalizer(String normalizerName) {
-		builder.normalizerName( normalizerName );
+		modifiers.add( b -> b.normalizerName( normalizerName ) );
 		return this;
 	}
 
