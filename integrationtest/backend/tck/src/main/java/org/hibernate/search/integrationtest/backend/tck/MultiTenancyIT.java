@@ -26,6 +26,8 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -107,6 +109,37 @@ public class MultiTenancyIT {
 						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
+				.build();
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
+	}
+
+	// In Elasticsearch, we used to expect the user to provide the ID already prefixed with the tenant ID, which is wrong
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3421")
+	public void id_predicate_takes_tenantId_into_account() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.field( "integer", Integer.class )
+						)
+								.toProjection()
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ).toPredicate() )
+				.build();
+		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
+
+		query = searchTarget.query( tenant2SessionContext )
+				.asProjection( f ->
+						f.composite(
+								f.field( "string", String.class ),
+								f.field( "integer", Integer.class )
+						)
+								.toProjection()
+				)
+				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ).toPredicate() )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
