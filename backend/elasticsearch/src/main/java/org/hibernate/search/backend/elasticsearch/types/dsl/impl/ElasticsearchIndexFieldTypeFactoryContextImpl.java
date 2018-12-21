@@ -117,7 +117,7 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public ElasticsearchJsonStringIndexFieldTypeContext asJsonString(String mappingJsonString) {
-		return setDelegate( new org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchJsonStringIndexFieldTypeContext( this, relativeFieldName, mappingJsonString ) );
+		return setDelegate( new ElasticsearchJsonStringIndexFieldTypeContextImpl( this, relativeFieldName, mappingJsonString ) );
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
@@ -31,8 +32,8 @@ import com.google.gson.JsonElement;
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchJsonStringIndexFieldTypeContext implements
-		org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext,
+public class ElasticsearchJsonStringIndexFieldTypeContextImpl implements
+		ElasticsearchJsonStringIndexFieldTypeContext,
 		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
 
 	private static final Gson GSON = new GsonBuilder().create();
@@ -46,21 +47,21 @@ public class ElasticsearchJsonStringIndexFieldTypeContext implements
 
 	private final String mappingJsonString;
 
-	public ElasticsearchJsonStringIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName, String mappingJsonString) {
+	public ElasticsearchJsonStringIndexFieldTypeContextImpl(IndexSchemaBuildContext schemaContext, String relativeFieldName, String mappingJsonString) {
 		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, String.class );
 		this.relativeFieldName = relativeFieldName;
 		this.mappingJsonString = mappingJsonString;
 	}
 
 	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContext dslConverter(
+	public ElasticsearchJsonStringIndexFieldTypeContextImpl dslConverter(
 			ToDocumentFieldValueConverter<?, ? extends String> toIndexConverter) {
 		helper.dslConverter( toIndexConverter );
 		return this;
 	}
 
 	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContext projectionConverter(
+	public ElasticsearchJsonStringIndexFieldTypeContextImpl projectionConverter(
 			FromDocumentFieldValueConverter<? super String, ?> fromIndexConverter) {
 		helper.projectionConverter( fromIndexConverter );
 		return this;
