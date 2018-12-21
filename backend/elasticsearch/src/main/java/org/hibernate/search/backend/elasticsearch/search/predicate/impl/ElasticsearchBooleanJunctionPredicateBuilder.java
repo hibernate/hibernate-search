@@ -105,9 +105,7 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject innerObject = getInnerObject();
-
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
 		contributeClauses( innerObject, MUST, mustClauseBuilders );
 		contributeClauses( innerObject, MUST_NOT, mustNotClauseBuilders );
 		contributeClauses( innerObject, SHOULD, shouldClauseBuilders );
@@ -120,7 +118,6 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 			);
 		}
 
-		JsonObject outerObject = getOuterObject();
 		outerObject.add( "bool", innerObject );
 
 		return outerObject;

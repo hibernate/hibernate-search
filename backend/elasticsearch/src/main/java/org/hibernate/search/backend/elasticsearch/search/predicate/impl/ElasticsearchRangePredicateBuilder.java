@@ -94,8 +94,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject innerObject = getInnerObject();
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
 		JsonAccessor<JsonElement> accessor;
 		if ( lowerLimit != null ) {
 			accessor = excludeLowerLimit ? GT : GTE;
@@ -106,7 +105,6 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 			accessor.set( innerObject, upperLimit );
 		}
 
-		JsonObject outerObject = getOuterObject();
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
 		RANGE.set( outerObject, middleObject );

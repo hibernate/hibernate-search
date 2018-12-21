@@ -39,6 +39,8 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
+	private JsonElement value;
+
 	public ElasticsearchMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
@@ -51,24 +53,24 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 
 	@Override
 	public void value(Object value) {
-		JsonElement element;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			element = codec.encode( converted );
+			this.value = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
-		QUERY.set( getInnerObject(), element );
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject outerObject = getOuterObject();
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+		QUERY.set( innerObject, value );
+
 		JsonObject middleObject = new JsonObject();
-		middleObject.add( absoluteFieldPath, getInnerObject() );
+		middleObject.add( absoluteFieldPath, innerObject );
+
 		MATCH.set( outerObject, middleObject );
 		return outerObject;
 	}

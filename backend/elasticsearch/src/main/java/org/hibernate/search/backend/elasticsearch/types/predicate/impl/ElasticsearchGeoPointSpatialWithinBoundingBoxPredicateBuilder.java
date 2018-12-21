@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBox
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
@@ -30,6 +31,9 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends Abst
 
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
+	private JsonElement topLeft;
+	private JsonElement bottomRight;
+
 	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
@@ -37,22 +41,20 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends Abst
 
 	@Override
 	public void boundingBox(GeoBoundingBox boundingBox) {
-		getInnerObject().add( absoluteFieldPath, toBoundingBoxObject( boundingBox ) );
+		this.topLeft = codec.encode( boundingBox.getTopLeft() );
+		this.bottomRight = codec.encode( boundingBox.getBottomRight() );
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject outerObject = getOuterObject();
-		GEO_BOUNDING_BOX.set( outerObject, getInnerObject() );
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+		JsonObject boundingBoxObject = new JsonObject();
+		boundingBoxObject.add( TOP_LEFT, topLeft );
+		boundingBoxObject.add( BOTTOM_RIGHT, bottomRight );
+
+		innerObject.add( absoluteFieldPath, boundingBoxObject );
+
+		GEO_BOUNDING_BOX.set( outerObject, innerObject );
 		return outerObject;
 	}
 
-	private JsonObject toBoundingBoxObject(GeoBoundingBox boundingBox) {
-		JsonObject boundingBoxObject = new JsonObject();
-
-		boundingBoxObject.add( TOP_LEFT, codec.encode( boundingBox.getTopLeft() ) );
-		boundingBoxObject.add( BOTTOM_RIGHT, codec.encode( boundingBox.getBottomRight() ) );
-
-		return boundingBoxObject;
-	}
 }
