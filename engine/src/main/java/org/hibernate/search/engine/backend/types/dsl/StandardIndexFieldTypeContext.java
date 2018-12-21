@@ -6,12 +6,11 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
 public interface StandardIndexFieldTypeContext<S extends StandardIndexFieldTypeContext<? extends S, F>, F>
-		extends IndexFieldTypeConverterContext<S, F>, IndexSchemaFieldTerminalContext<F> {
+		extends IndexFieldTypeConverterContext<S, F>, IndexFieldTypeTerminalContext<F> {
 
 	S projectable(Projectable projectable);
 

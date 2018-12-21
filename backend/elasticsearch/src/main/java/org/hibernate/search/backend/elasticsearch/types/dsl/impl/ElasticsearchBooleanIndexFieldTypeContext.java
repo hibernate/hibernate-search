@@ -19,9 +19,8 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 class ElasticsearchBooleanIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchBooleanIndexFieldTypeContext, Boolean> {
 
-	ElasticsearchBooleanIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<Boolean> fieldDslBackReference) {
-		super( buildContext, Boolean.class, DataType.BOOLEAN, fieldDslBackReference );
+	ElasticsearchBooleanIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Boolean.class, DataType.BOOLEAN );
 	}
 
 	@Override

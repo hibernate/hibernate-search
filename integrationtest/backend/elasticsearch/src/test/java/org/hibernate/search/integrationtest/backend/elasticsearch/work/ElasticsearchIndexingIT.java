@@ -118,8 +118,7 @@ public class ElasticsearchIndexingIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" )
-					.asString()
+			string = root.field( "string", f -> f.asString().toIndexFieldType() )
 					.createAccessor();
 		}
 	}

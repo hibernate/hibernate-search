@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
@@ -15,7 +14,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterCont
 import org.hibernate.search.util.impl.common.Contracts;
 
 abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends AbstractElasticsearchIndexFieldTypeConverterContext<? extends S, F>, F>
-		implements IndexFieldTypeConverterContext<S, F>, IndexSchemaFieldTerminalContext<F> {
+		implements IndexFieldTypeConverterContext<S, F> {
 	private final ElasticsearchIndexFieldTypeBuildContext buildContext;
 	private final Class<F> fieldType;
 

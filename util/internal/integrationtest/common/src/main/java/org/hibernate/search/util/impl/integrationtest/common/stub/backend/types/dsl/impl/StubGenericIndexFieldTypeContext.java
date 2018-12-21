@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-
 class StubGenericIndexFieldTypeContext<F>
 		extends AbstractStubStandardIndexFieldTypeContext<StubGenericIndexFieldTypeContext<F>, F> {
 
-	StubGenericIndexFieldTypeContext(StubIndexSchemaNode.Builder builder, Class<F> inputType, boolean included) {
-		super( builder, inputType, included );
+	StubGenericIndexFieldTypeContext(Class<F> inputType) {
+		super( inputType );
 	}
 
 	@Override

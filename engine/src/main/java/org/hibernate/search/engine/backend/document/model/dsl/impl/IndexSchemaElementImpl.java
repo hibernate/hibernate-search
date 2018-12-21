@@ -7,13 +7,17 @@
 package org.hibernate.search.engine.backend.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
@@ -21,11 +25,13 @@ import org.hibernate.search.util.impl.common.StringHelper;
 public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final IndexFieldTypeFactoryContext typeFactoryContext;
 	final B objectNodeBuilder;
 	private final IndexSchemaNestingContext nestingContext;
 
-	public IndexSchemaElementImpl(B objectNodeBuilder,
-			IndexSchemaNestingContext nestingContext) {
+	public IndexSchemaElementImpl(IndexFieldTypeFactoryContext typeFactoryContext,
+			B objectNodeBuilder, IndexSchemaNestingContext nestingContext) {
+		this.typeFactoryContext = typeFactoryContext;
 		this.objectNodeBuilder = objectNodeBuilder;
 		this.nestingContext = nestingContext;
 	}
@@ -41,15 +47,22 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext field(String relativeFieldName) {
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> field(
+			String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
 		return nestingContext.nest(
 				relativeFieldName,
 				// If the field is included
-				objectNodeBuilder::addField,
+				prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
 				// If the field is filtered out
-				objectNodeBuilder::createExcludedField
+				prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
 		);
+	}
+
+	@Override
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> field(String relativeFieldName,
+			Function<IndexFieldTypeFactoryContext, IndexFieldType<F>> typeContributor) {
+		return field( relativeFieldName, typeContributor.apply( typeFactoryContext ) );
 	}
 
 	@Override
@@ -61,13 +74,13 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( objectFieldBuilder, filter );
+					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter );
 				},
 				// If the field is filtered out
 				(prefixedName, filter) -> {
 					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( objectFieldBuilder, filter );
+					return new IndexSchemaObjectFieldImpl( typeFactoryContext, objectFieldBuilder, filter );
 				}
 		);
 	}

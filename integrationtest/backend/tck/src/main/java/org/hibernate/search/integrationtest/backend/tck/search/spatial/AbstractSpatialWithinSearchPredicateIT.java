@@ -114,14 +114,38 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			geoPoint_1 = root.field( "geoPoint_1" ).asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			geoPoint_2 = root.field( "geoPoint_2" ).asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			geoPoint_with_longName = root.field( "geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name" )
-					.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			nonProjectableGeoPoint = root.field( "nonProjectableGeoPoint" ).asGeoPoint().projectable( Projectable.NO ).createAccessor();
-			unsortableGeoPoint = root.field( "unsortableGeoPoint" ).asGeoPoint().sortable( Sortable.NO ).createAccessor();
-			string = root.field( "string" ).asString().projectable( Projectable.YES ).sortable( Sortable.YES ).createAccessor();
+			geoPoint = root.field(
+					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			geoPoint_1 = root.field(
+					"geoPoint_1", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			geoPoint_2 = root.field(
+					"geoPoint_2", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			geoPoint_with_longName = root.field(
+					"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
+					f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			nonProjectableGeoPoint = root.field(
+					"nonProjectableGeoPoint",
+					f -> f.asGeoPoint().projectable( Projectable.NO ).toIndexFieldType()
+			)
+					.createAccessor();
+			unsortableGeoPoint = root.field(
+					"unsortableGeoPoint",
+					f -> f.asGeoPoint().sortable( Sortable.NO ).toIndexFieldType()
+			)
+					.createAccessor();
+			string = root.field(
+					"string",
+					f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 		}
 	}
 }

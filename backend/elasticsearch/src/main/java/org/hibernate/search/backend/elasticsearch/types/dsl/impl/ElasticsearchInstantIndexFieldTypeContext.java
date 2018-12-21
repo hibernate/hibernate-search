@@ -22,9 +22,8 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 class ElasticsearchInstantIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchInstantIndexFieldTypeContext, Instant> {
 
-	ElasticsearchInstantIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<Instant> fieldDslBackReference) {
-		super( buildContext, Instant.class, DataType.DATE, fieldDslBackReference );
+	ElasticsearchInstantIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Instant.class, DataType.DATE );
 	}
 
 	@Override

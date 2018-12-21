@@ -25,9 +25,8 @@ class LuceneLocalDateIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	LuceneLocalDateIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
-			LuceneIndexSchemaFieldDslBackReference<LocalDate> fieldDslBackReference) {
-		super( buildContext, LocalDate.class, fieldDslBackReference );
+	LuceneLocalDateIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, LocalDate.class );
 	}
 
 	@Override
@@ -37,7 +36,7 @@ class LuceneLocalDateIndexFieldTypeContext
 	}
 
 	@Override
-	protected LuceneIndexFieldType<LocalDate> toIndexFieldType() {
+	public LuceneIndexFieldType<LocalDate> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 

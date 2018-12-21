@@ -13,17 +13,8 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryContext {
-
-	private final StubIndexSchemaNode.Builder builder;
-	private final boolean included;
-
-	public StubIndexFieldTypeFactoryContext(StubIndexSchemaNode.Builder builder, boolean included) {
-		this.builder = builder;
-		this.included = included;
-	}
 
 	@Override
 	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> inputType) {
@@ -31,13 +22,13 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 			return (StandardIndexFieldTypeContext<?, F>) asString();
 		}
 		else {
-			return new StubGenericIndexFieldTypeContext<>( builder, inputType, included );
+			return new StubGenericIndexFieldTypeContext<>( inputType );
 		}
 	}
 
 	@Override
 	public StringIndexFieldTypeContext<?> asString() {
-		return new StubStringIndexFieldTypeContext( builder, included );
+		return new StubStringIndexFieldTypeContext();
 	}
 
 	@Override

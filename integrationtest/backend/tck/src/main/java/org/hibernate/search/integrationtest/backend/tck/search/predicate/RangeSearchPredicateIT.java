@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -689,9 +688,13 @@ public class RangeSearchPredicateIT {
 	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
 			FieldTypeDescriptor<F> typeDescriptor,
 			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-		String name = prefix + typeDescriptor.getUniqueName();
 		RangePredicateExpectations<F> expectations = typeDescriptor.getRangePredicateExpectations().get(); // Safe, see caller
-		return new ByTypeFieldModel<>( parent, name, typeDescriptor, expectations, additionalConfiguration );
+		return StandardFieldMapper.of(
+				typeDescriptor::configure,
+				additionalConfiguration,
+				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
+		)
+				.map( parent, prefix + typeDescriptor.getUniqueName() );
 	}
 
 	private static class ValueModel<F> {
@@ -711,12 +714,10 @@ public class RangeSearchPredicateIT {
 	private static class MainFieldModel {
 		public static StandardFieldMapper<String, MainFieldModel> mapper(
 				String document1Value, String document2Value, String document3Value) {
-			return (parent, name, configuration) -> {
-				StandardIndexFieldTypeContext<?, String> context = parent.field( name ).asString();
-				configuration.accept( context );
-				IndexFieldAccessor<String> accessor = context.createAccessor();
-				return new MainFieldModel( accessor, name, document1Value, document2Value, document3Value );
-			};
+			return StandardFieldMapper.of(
+					f -> f.asString(),
+					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+			);
 		}
 
 		final String relativeFieldName;
@@ -742,13 +743,8 @@ public class RangeSearchPredicateIT {
 		final F predicateLowerBound;
 		final F predicateUpperBound;
 
-		private ByTypeFieldModel(IndexSchemaElement parent, String relativeFieldName,
-				FieldTypeDescriptor<F> typeDescriptor, RangePredicateExpectations<F> expectations,
-				Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-			IndexFieldTypeFactoryContext untypedContext = parent.field( relativeFieldName );
-			StandardIndexFieldTypeContext<?, F> context = typeDescriptor.configure( untypedContext );
-			additionalConfiguration.accept( context );
-			IndexFieldAccessor<F> accessor = context.createAccessor();
+		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+				RangePredicateExpectations<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
 			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
 			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );

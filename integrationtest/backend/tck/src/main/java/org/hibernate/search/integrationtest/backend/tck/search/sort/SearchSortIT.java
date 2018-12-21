@@ -482,11 +482,19 @@ public class SearchSortIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().sortable( Sortable.YES ).createAccessor();
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().sortable( Sortable.YES ).createAccessor();
-			string_analyzed_forScore = root.field( "string_analyzed_forScore" ).asString()
-					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).createAccessor();
-			unsortable = root.field( "unsortable" ).asString().sortable( Sortable.NO ).createAccessor();
+			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+					.createAccessor();
+			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).toIndexFieldType() )
+					.createAccessor();
+			string_analyzed_forScore = root.field(
+					"string_analyzed_forScore" ,
+					f -> f.asString()
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.toIndexFieldType()
+			)
+					.createAccessor();
+			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ).toIndexFieldType() )
+					.createAccessor();
 
 			IndexSchemaObjectField flattenedObjectField =
 					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
@@ -504,8 +512,10 @@ public class SearchSortIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string" ).asString().sortable( Sortable.YES ).createAccessor();
-			integer = objectField.field( "integer" ).asInteger().sortable( Sortable.YES ).createAccessor();
+			string = objectField.field( "string", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+					.createAccessor();
+			integer = objectField.field( "integer", f -> f.asInteger().sortable( Sortable.YES ).toIndexFieldType() )
+					.createAccessor();
 		}
 	}
 

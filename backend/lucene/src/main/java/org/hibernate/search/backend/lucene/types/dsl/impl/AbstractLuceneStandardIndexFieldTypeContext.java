@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeContext;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -30,17 +29,13 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	private final LuceneIndexFieldTypeBuildContext buildContext;
 	private final Class<F> fieldType;
 
-	private final LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference;
-
 	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
 
-	AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
-			LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+	AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
 		this.buildContext = buildContext;
 		this.fieldType = fieldType;
-		this.fieldDslBackReference = fieldDslBackReference;
 	}
 
 	@Override
@@ -64,11 +59,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	}
 
 	@Override
-	public IndexFieldAccessor<F> createAccessor() {
-		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
-	}
-
-	protected abstract LuceneIndexFieldType<F> toIndexFieldType();
+	public abstract LuceneIndexFieldType<F> toIndexFieldType();
 
 	protected abstract S thisAsS();
 

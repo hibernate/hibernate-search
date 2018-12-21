@@ -26,7 +26,7 @@ public class ValueBridgeBindingContextImpl<T> implements ValueBridgeBindingConte
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext getIndexFieldTypeFactoryContext() {
+	public IndexFieldTypeFactoryContext getTypeFactory() {
 		return indexFieldTypeFactoryContext;
 	}
 

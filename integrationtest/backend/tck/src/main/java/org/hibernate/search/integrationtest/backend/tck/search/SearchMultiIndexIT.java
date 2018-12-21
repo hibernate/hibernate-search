@@ -372,10 +372,22 @@ public class SearchMultiIndexIT {
 		final IndexFieldAccessor<String> sortField;
 
 		IndexAccessors_1_1(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
-			additionalField = root.field( "additionalField" ).asString().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			differentTypesField = root.field( "differentTypesField" ).asString().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			sortField = root.field( "sortField" ).asString().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
+			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			additionalField = root.field(
+					"additionalField",
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			differentTypesField = root.field(
+					"differentTypesField",
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			sortField = root.field(
+					"sortField",
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 		}
 	}
 
@@ -385,9 +397,21 @@ public class SearchMultiIndexIT {
 		final IndexFieldAccessor<String> sortField;
 
 		IndexAccessors_1_2(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
-			differentTypesField = root.field( "differentTypesField" ).asInteger().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
-			sortField = root.field( "sortField" ).asString().sortable( Sortable.YES ).projectable( Projectable.YES ).createAccessor();
+			string = root.field(
+					"string",
+					f -> f.asString().toIndexFieldType()
+			)
+					.createAccessor();
+			differentTypesField = root.field(
+					"differentTypesField",
+					f -> f.asInteger().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			sortField = root.field(
+					"sortField",
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 		}
 	}
 
@@ -395,7 +419,7 @@ public class SearchMultiIndexIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors_2_1(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().createAccessor();
+			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
 		}
 	}
 }

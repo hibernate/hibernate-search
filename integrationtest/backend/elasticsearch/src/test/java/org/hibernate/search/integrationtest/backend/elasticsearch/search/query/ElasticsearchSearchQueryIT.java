@@ -113,13 +113,15 @@ public class ElasticsearchSearchQueryIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
-			integer = root.field( "integer" )
-					.asInteger()
-					.projectable( Projectable.YES )
+			integer = root.field(
+					"integer",
+					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
-			string = root.field( "string" )
-					.asString()
-					.projectable( Projectable.YES )
+			string = root.field(
+					"string",
+					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
 		}
 	}

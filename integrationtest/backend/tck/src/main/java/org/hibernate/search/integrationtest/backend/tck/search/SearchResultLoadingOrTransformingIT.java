@@ -416,14 +416,34 @@ public class SearchResultLoadingOrTransformingIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
-			string_analyzed = root.field( "string_analyzed" ).asString()
-					.projectable( Projectable.YES )
-					.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+			string = root.field(
+					"string",
+					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+			)
 					.createAccessor();
-			integer = root.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
-			localDate = root.field( "localDate" ).asLocalDate().projectable( Projectable.YES ).createAccessor();
-			geoPoint = root.field( "geoPoint" ).asGeoPoint().projectable( Projectable.YES ).createAccessor();
+			string_analyzed = root.field(
+					"string_analyzed",
+					f -> f.asString()
+							.projectable( Projectable.YES )
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
+							.toIndexFieldType()
+			)
+					.createAccessor();
+			integer = root.field(
+					"integer",
+					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			localDate = root.field(
+					"localDate",
+					f -> f.asLocalDate().projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			geoPoint = root.field(
+					"geoPoint",
+					f -> f.asGeoPoint().projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 			IndexSchemaObjectField flattenedObjectField =
 					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
 			flattenedObject = new ObjectAccessors( flattenedObjectField );
@@ -440,8 +460,16 @@ public class SearchResultLoadingOrTransformingIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string" ).asString().projectable( Projectable.YES ).createAccessor();
-			integer = objectField.field( "integer" ).asInteger().projectable( Projectable.YES ).createAccessor();
+			string = objectField.field(
+					"string",
+					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
+			integer = objectField.field(
+					"integer",
+					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+			)
+					.createAccessor();
 		}
 	}
 

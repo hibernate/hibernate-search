@@ -31,17 +31,18 @@ public interface ValueBridge<V, F> extends AutoCloseable {
 	 * This method is called exactly once for each bridge instance, before any other method.
 	 * It allows the bridge to:
 	 * <ul>
-	 *     <li>Declare its expectations regarding the index field (type, storage options, ...)
-	 *     using {@link ValueBridgeBindingContext#getIndexFieldTypeFactoryContext()}.
+	 *     <li>Declare its expectations regarding the index field type
+	 *     using {@link ValueBridgeBindingContext#getTypeFactory()}.
 	 *     <li>Inspect the type of values extracted from the POJO model that will be passed to this bridge
 	 *     using {@link ValueBridgeBindingContext#getBridgedElement()}.
 	 *     <li>Define a reverse function to apply to projections on the field value
-	 *     using {@link ValueBridgeBindingContext#getIndexFieldTypeFactoryContext()}.
+	 *     using {@link ValueBridgeBindingContext#getTypeFactory()}.
 	 * </ul>
 	 *
 	 * @param context An entry point allowing to perform the operations listed above.
-	 * @return The result provided by {@code fieldContext} after setting the expectations regarding the index field
-	 * (for instance {@code return fieldContext.asString()}). {@code null} to let Hibernate Search derive the expectations
+	 * @return The result of calling {@code context.getTypeFactory()} and setting the expectations regarding the index field type
+	 * (for instance {@code return context.getTypeFactory().asString()}).
+	 * {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 */
 	default StandardIndexFieldTypeContext<?, F> bind(ValueBridgeBindingContext<V> context) {

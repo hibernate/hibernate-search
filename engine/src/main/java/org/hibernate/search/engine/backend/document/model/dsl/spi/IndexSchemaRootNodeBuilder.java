@@ -7,8 +7,11 @@
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 
 public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder {
+
+	IndexFieldTypeFactoryContext getTypeFactory();
 
 	/**
 	 * Inform the model collector that documents will always be provided along
@@ -18,5 +21,4 @@ public interface IndexSchemaRootNodeBuilder extends IndexSchemaObjectNodeBuilder
 	void explicitRouting();
 
 	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
-
 }

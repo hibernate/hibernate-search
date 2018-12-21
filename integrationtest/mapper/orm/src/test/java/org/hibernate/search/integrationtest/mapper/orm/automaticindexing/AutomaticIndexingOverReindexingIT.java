@@ -318,8 +318,10 @@ public class AutomaticIndexingOverReindexingIT {
 					.property( "level3" )
 					.property( "property1" )
 					.createAccessor( String.class );
-			typeBridgeFieldAccessor = context.getIndexSchemaElement().field( "property1FromBridge" )
-					.asString().createAccessor();
+			typeBridgeFieldAccessor = context.getIndexSchemaElement().field(
+					"property1FromBridge", f -> f.asString().toIndexFieldType()
+			)
+					.createAccessor();
 		}
 
 		@Override

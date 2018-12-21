@@ -11,6 +11,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.P
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 /**
  * @author Yoann Rodiere
@@ -27,9 +28,8 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	protected boolean resolvedProjectable;
 
 	AbstractElasticsearchScalarFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType, DataType dataType,
-			ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
-		super( buildContext, fieldType, fieldDslBackReference );
+			Class<F> fieldType, DataType dataType) {
+		super( buildContext, fieldType );
 		this.dataType = dataType;
 	}
 
@@ -46,7 +46,7 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	}
 
 	@Override
-	protected final ElasticsearchIndexFieldType<F> toIndexFieldType() {
+	public final IndexFieldType<F> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
 		mapping.setType( dataType );

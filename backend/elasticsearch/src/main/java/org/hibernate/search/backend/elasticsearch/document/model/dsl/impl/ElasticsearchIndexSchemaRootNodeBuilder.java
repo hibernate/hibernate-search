@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.R
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RoutingType;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
@@ -28,22 +29,30 @@ import org.hibernate.search.util.EventContext;
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {
 
-	private final String hibernateSearchIndexName;
+	private final EventContext indexEventContext;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final ElasticsearchIndexFieldTypeFactoryContext typeFactory;
 
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
-	public ElasticsearchIndexSchemaRootNodeBuilder(String hibernateSearchIndexName,
-			MultiTenancyStrategy multiTenancyStrategy) {
-		this.hibernateSearchIndexName = hibernateSearchIndexName;
+	public ElasticsearchIndexSchemaRootNodeBuilder(EventContext indexEventContext,
+			MultiTenancyStrategy multiTenancyStrategy,
+			ElasticsearchIndexFieldTypeFactoryContext typeFactory) {
+		this.indexEventContext = indexEventContext;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.typeFactory = typeFactory;
 	}
 
 	@Override
 	public EventContext getEventContext() {
 		return getIndexEventContext()
 				.append( EventContexts.indexSchemaRoot() );
+	}
+
+	@Override
+	public ElasticsearchIndexFieldTypeFactoryContext getTypeFactory() {
+		return typeFactory;
 	}
 
 	@Override
@@ -107,7 +116,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		return null;
 	}
 
-	public EventContext getIndexEventContext() {
-		return EventContexts.fromIndexName( hibernateSearchIndexName );
+	EventContext getIndexEventContext() {
+		return indexEventContext;
 	}
 }

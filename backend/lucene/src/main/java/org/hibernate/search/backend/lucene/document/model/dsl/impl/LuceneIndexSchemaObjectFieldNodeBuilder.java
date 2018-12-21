@@ -37,7 +37,7 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 
 	@Override
 	public EventContext getEventContext() {
-		return getRoot().getIndexEventContext()
+		return getRootNodeBuilder().getIndexEventContext()
 				.append( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
@@ -57,8 +57,8 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public LuceneIndexSchemaRootNodeBuilder getRoot() {
-		return parent.getRoot();
+	public LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder() {
+		return parent.getRootNodeBuilder();
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -38,9 +39,8 @@ class ElasticsearchStringIndexFieldTypeContext
 	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	ElasticsearchStringIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference) {
-		super( buildContext, String.class, fieldDslBackReference );
+	ElasticsearchStringIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, String.class );
 	}
 
 	@Override
@@ -68,7 +68,7 @@ class ElasticsearchStringIndexFieldTypeContext
 	}
 
 	@Override
-	public ElasticsearchIndexFieldType<String> toIndexFieldType() {
+	public IndexFieldType<String> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
 		boolean resolvedSortable = resolveDefault( sortable );

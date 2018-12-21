@@ -148,6 +148,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 					new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 			bridgeHolder.get().bind( new TypeBridgeBindingContextImpl(
 					pojoModelRootElement,
+					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
@@ -182,6 +183,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 					new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
 			bridgeHolder.get().bind( new PropertyBridgeBindingContextImpl(
 					pojoModelRootElement,
+					bindingContext.getTypeFactory(),
 					bindingContext.getSchemaElement( listener )
 			) );
 
@@ -234,6 +236,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			 */
 			@SuppressWarnings({"unchecked", "rawtypes"})
 			BoundValueBridge<V, ?> boundValueBridge = bindValueBridge(
+					bindingContext.getTypeFactory(),
 					schemaElement, valueTypeModel,
 					(BeanHolder<? extends ValueBridge>) bridgeHolder,
 					relativeFieldName, contributor
@@ -260,6 +263,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	private <V, V2, F, B extends ValueBridge<V2, F>> BoundValueBridge<V, ?> bindValueBridge(
+			IndexFieldTypeFactoryContext indexFieldTypeFactory,
 			IndexSchemaElement schemaElement, PojoGenericTypeModel<V> valueTypeModel,
 			BeanHolder<? extends B> bridgeHolder,
 			String relativeFieldName, FieldModelContributor contributor) {
@@ -282,32 +286,32 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 				(BeanHolder<? extends ValueBridge<? super V, F>>) bridgeHolder;
 
 		// Then give the bridge a chance to contribute to the index schema
-		IndexFieldTypeFactoryContext fieldContext = schemaElement.field( relativeFieldName );
 		ValueBridgeBindingContextImpl<V2> bridgeBindingContext = new ValueBridgeBindingContextImpl<>(
 				new PojoModelValueElement<>( castedValueTypeModel ),
-				fieldContext
+				indexFieldTypeFactory
 		);
-		StandardIndexFieldTypeContext<?, ? super F> typedFieldContext = bridge.bind( bridgeBindingContext );
+		StandardIndexFieldTypeContext<?, ? super F> fieldTypeContext = bridge.bind( bridgeBindingContext );
 
 		// If the bridge did not contribute anything, infer the field type and define it automatically
-		if ( typedFieldContext == null ) {
+		if ( fieldTypeContext == null ) {
 			@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
 			Class<? super F> returnType =
 					(Class<? super F>) bridgeTypeContext.resolveTypeArgument( ValueBridge.class, 1 )
 					.map( ReflectionUtils::getRawType )
 					.orElseThrow( () -> log.unableToInferValueBridgeIndexFieldType( bridge ) );
-			typedFieldContext = fieldContext.as( returnType );
+			fieldTypeContext = indexFieldTypeFactory.as( returnType );
 		}
 
 		// Then register the bridge itself as a converter to use in the DSL
-		typedFieldContext.dslConverter(
+		fieldTypeContext.dslConverter(
 				new PojoValueBridgeToDocumentFieldValueConverter<>( bridge )
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)
-		contributor.contribute( typedFieldContext );
+		contributor.contribute( fieldTypeContext );
 
-		IndexFieldAccessor<? super F> indexFieldAccessor = typedFieldContext.createAccessor();
+		IndexFieldAccessor<? super F> indexFieldAccessor = schemaElement.field( relativeFieldName, fieldTypeContext )
+				.createAccessor();
 
 		return new BoundValueBridge<>( castedBridgeHolder, indexFieldAccessor );
 	}

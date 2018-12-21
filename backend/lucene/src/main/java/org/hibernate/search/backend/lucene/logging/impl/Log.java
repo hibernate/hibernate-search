@@ -391,9 +391,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 62, value = "Cannot guess field type for input type: '%1$s'.")
 	SearchException cannotGuessFieldType(@FormatWith(ClassFormatter.class) Class<?> inputType, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 63, value = "You cannot set the type of a field more than once.")
-	SearchException tryToSetFieldTypeMoreThanOnce(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 64, value = "Unexpected index: documentId '%1$s' was not collected." )
 	SearchException documentIdNotCollected(Integer documentId);
 

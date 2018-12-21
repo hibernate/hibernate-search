@@ -19,9 +19,8 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 class ElasticsearchLongIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLongIndexFieldTypeContext, Long> {
 
-	ElasticsearchLongIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			ElasticsearchIndexSchemaFieldDslBackReference<Long> fieldDslBackReference) {
-		super( buildContext, Long.class, DataType.LONG, fieldDslBackReference );
+	ElasticsearchLongIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Long.class, DataType.LONG );
 	}
 
 	@Override

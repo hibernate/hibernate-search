@@ -23,9 +23,8 @@ class LuceneIntegerIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	LuceneIntegerIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
-			LuceneIndexSchemaFieldDslBackReference<Integer> fieldDslBackReference) {
-		super( buildContext, Integer.class, fieldDslBackReference );
+	LuceneIntegerIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Integer.class );
 	}
 
 	@Override
@@ -35,7 +34,7 @@ class LuceneIntegerIndexFieldTypeContext
 	}
 
 	@Override
-	protected LuceneIndexFieldType<Integer> toIndexFieldType() {
+	public LuceneIndexFieldType<Integer> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 

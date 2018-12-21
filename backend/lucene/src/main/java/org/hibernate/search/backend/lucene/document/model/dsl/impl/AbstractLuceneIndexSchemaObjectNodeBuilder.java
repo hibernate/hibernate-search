@@ -10,19 +10,22 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryContextImpl;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder,
-		LuceneIndexSchemaBuildContext {
+abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
+		implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -38,23 +41,30 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
-		LuceneIndexFieldTypeFactoryContextImpl fieldContext =
-				new LuceneIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
-		putProperty( relativeFieldName, fieldContext );
-		return fieldContext;
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> addField(
+			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
+		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
+				this, relativeFieldName, luceneIndexFieldType
+		);
+		putField( relativeFieldName, childBuilder );
+		return childBuilder;
 	}
 
 	@Override
-	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
-		return new LuceneIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> createExcludedField(
+			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
+		return new LuceneIndexSchemaFieldNodeBuilder<>(
+				this, relativeFieldName, luceneIndexFieldType
+		);
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
 		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
 				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
-		putProperty( relativeFieldName, objectFieldBuilder );
+		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
 
@@ -63,8 +73,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 		return new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 	}
 
-	@Override
-	public abstract LuceneIndexSchemaRootNodeBuilder getRoot();
+	public abstract LuceneIndexSchemaRootNodeBuilder getRootNodeBuilder();
 
 	abstract String getAbsolutePath();
 
@@ -74,7 +83,7 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder implements IndexSchema
 		}
 	}
 
-	private void putProperty(String name, LuceneIndexSchemaNodeContributor contributor) {
+	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );

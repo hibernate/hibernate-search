@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.util.AssertionFailure;
@@ -18,10 +19,11 @@ class NonRootIndexModelBindingContext
 		extends AbstractIndexModelBindingContext<IndexSchemaObjectNodeBuilder> {
 	private final Collection<IndexObjectFieldAccessor> parentObjectAccessors;
 
-	NonRootIndexModelBindingContext(IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
+	NonRootIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
 			Collection<IndexObjectFieldAccessor> parentObjectAccessors,
 			ConfiguredIndexSchemaNestingContext nestingContext) {
-		super( indexSchemaObjectNodeBuilder, nestingContext );
+		super( indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, nestingContext );
 		this.parentObjectAccessors = Collections.unmodifiableCollection( parentObjectAccessors );
 	}
 

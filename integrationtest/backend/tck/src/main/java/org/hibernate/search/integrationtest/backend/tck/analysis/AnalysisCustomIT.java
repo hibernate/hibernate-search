@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
@@ -223,20 +224,24 @@ public class AnalysisCustomIT {
 	}
 
 	private void setupWithAnalyzer(AnalysisDefinitions analysisDefinition) {
-		setup( "fieldWithAnalyzer", c -> c.analyzer( analysisDefinition.name ).createAccessor() );
+		setup( "fieldWithAnalyzer", c -> c.analyzer( analysisDefinition.name ) );
 	}
 
 	private void setupWithNormalizer(AnalysisDefinitions analysisDefinition) {
-		setup( "fieldWithNormalizer", c -> c.normalizer( analysisDefinition.name ).createAccessor() );
+		setup( "fieldWithNormalizer", c -> c.normalizer( analysisDefinition.name ) );
 	}
 
-	private void setup(String fieldName, Function<StringIndexFieldTypeContext<?>, IndexFieldAccessor<String>> fieldMapping) {
+	private void setup(String fieldName,
+			Function<StringIndexFieldTypeContext<?>, IndexFieldTypeTerminalContext<String>> typeContributor) {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						"MappedType", INDEX_NAME,
 						ctx -> {
-							IndexFieldAccessor<String> accessor =
-									fieldMapping.apply( ctx.getSchemaElement().field( fieldName ).asString() );
+							IndexFieldAccessor<String> accessor = ctx.getSchemaElement().field(
+									fieldName,
+									f -> typeContributor.apply( f.asString() ).toIndexFieldType()
+							)
+									.createAccessor();
 							MainFieldModel fieldModel = new MainFieldModel( accessor, fieldName );
 							this.indexMapping = new IndexMapping( fieldModel );
 						},

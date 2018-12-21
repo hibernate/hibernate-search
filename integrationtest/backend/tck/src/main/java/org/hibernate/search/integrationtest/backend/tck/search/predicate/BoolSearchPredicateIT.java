@@ -936,11 +936,11 @@ public class BoolSearchPredicateIT {
 		final IndexFieldAccessor<Integer> field5;
 
 		IndexAccessors(IndexSchemaElement root) {
-			field1 = root.field( "field1" ).asString().createAccessor();
-			field2 = root.field( "field2" ).asInteger().createAccessor();
-			field3 = root.field( "field3" ).asInteger().createAccessor();
-			field4 = root.field( "field4" ).asInteger().createAccessor();
-			field5 = root.field( "field5" ).asInteger().createAccessor();
+			field1 = root.field( "field1", f -> f.asString().toIndexFieldType() ).createAccessor();
+			field2 = root.field( "field2", f -> f.asInteger().toIndexFieldType() ).createAccessor();
+			field3 = root.field( "field3", f -> f.asInteger().toIndexFieldType() ).createAccessor();
+			field4 = root.field( "field4", f -> f.asInteger().toIndexFieldType() ).createAccessor();
+			field5 = root.field( "field5", f -> f.asInteger().toIndexFieldType() ).createAccessor();
 		}
 	}
 }

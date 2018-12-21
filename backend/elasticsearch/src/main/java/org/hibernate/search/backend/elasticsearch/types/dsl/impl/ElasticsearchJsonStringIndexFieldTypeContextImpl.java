@@ -13,9 +13,9 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -33,21 +33,12 @@ class ElasticsearchJsonStringIndexFieldTypeContextImpl
 	// Must be a singleton so that equals() works as required by the interface
 	private static final ElasticsearchJsonStringFieldCodec CODEC = new ElasticsearchJsonStringFieldCodec( GSON );
 
-	private final ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference;
-
 	private final String mappingJsonString;
 
 	ElasticsearchJsonStringIndexFieldTypeContextImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			String mappingJsonString,
-			ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference) {
+			String mappingJsonString) {
 		super( buildContext, String.class );
-		this.fieldDslBackReference = fieldDslBackReference;
 		this.mappingJsonString = mappingJsonString;
-	}
-
-	@Override
-	public IndexFieldAccessor<String> createAccessor() {
-		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
 	}
 
 	@Override
@@ -55,7 +46,8 @@ class ElasticsearchJsonStringIndexFieldTypeContextImpl
 		return this;
 	}
 
-	private ElasticsearchIndexFieldType<String> toIndexFieldType() {
+	@Override
+	public IndexFieldType<String> toIndexFieldType() {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =

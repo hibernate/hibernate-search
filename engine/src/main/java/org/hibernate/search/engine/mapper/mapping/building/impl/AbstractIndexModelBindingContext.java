@@ -17,6 +17,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.model.spi.SearchModel;
@@ -24,13 +26,16 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexModelBindingContext {
 
+	private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 	final B indexSchemaObjectNodeBuilder;
 	private final ConfiguredIndexSchemaNestingContext nestingContext;
 	private final SearchModel searchModel = new SearchModel() {
 		// TODO provide an actual implementation when the interface defines methods
 	};
 
-	AbstractIndexModelBindingContext(B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
+	AbstractIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
+		this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 		this.indexSchemaObjectNodeBuilder = indexSchemaObjectNodeBuilder;
 		this.nestingContext = nestingContext;
 	}
@@ -46,8 +51,14 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 	}
 
 	@Override
+	public IndexFieldTypeFactoryContext getTypeFactory() {
+		return indexSchemaRootNodeBuilder.getTypeFactory();
+	}
+
+	@Override
 	public IndexSchemaElement getSchemaElement() {
 		return new IndexSchemaElementImpl<>(
+				getTypeFactory(),
 				indexSchemaObjectNodeBuilder,
 				nestingContext
 		);
@@ -56,6 +67,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 	@Override
 	public IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener) {
 		return new IndexSchemaElementImpl<>(
+				getTypeFactory(),
 				indexSchemaObjectNodeBuilder,
 				new NotifyingNestingContext( nestingContext, listener )
 		);
@@ -71,18 +83,21 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths) {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				parentTypeModel, relativePrefix, maxDepth, includePaths,
-				new NestedContextBuilderImpl( indexSchemaObjectNodeBuilder, storage )
+				new NestedContextBuilderImpl( indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, storage )
 		);
 	}
 
 	private static class NestedContextBuilderImpl
 			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexModelBindingContext> {
 
+		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
 		private final ObjectFieldStorage storage;
 		private final List<IndexObjectFieldAccessor> parentObjectAccessors = new ArrayList<>();
 
-		private NestedContextBuilderImpl(IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage) {
+		private NestedContextBuilderImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+				IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage) {
+			this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 			this.currentNodeBuilder = currentNodeBuilder;
 			this.storage = storage;
 		}
@@ -98,6 +113,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		@Override
 		public IndexModelBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
 			return new NonRootIndexModelBindingContext(
+					indexSchemaRootNodeBuilder,
 					currentNodeBuilder, parentObjectAccessors, nestingContext
 			);
 		}
