@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 
@@ -30,8 +31,8 @@ public class ElasticsearchSearchQueryElementCollector
 
 	private Map<DistanceSortKey, Integer> distanceSorts;
 
-	public ElasticsearchSearchQueryElementCollector() {
-		this.rootPredicateContext = new ElasticsearchSearchPredicateContext();
+	public ElasticsearchSearchQueryElementCollector(SessionContextImplementor sessionContext) {
+		this.rootPredicateContext = new ElasticsearchSearchPredicateContext( sessionContext );
 	}
 
 	@Override
