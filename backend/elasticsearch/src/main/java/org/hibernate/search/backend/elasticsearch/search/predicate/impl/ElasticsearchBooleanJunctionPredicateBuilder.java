@@ -105,11 +105,12 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 	}
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
-		contributeClauses( innerObject, MUST, mustClauseBuilders );
-		contributeClauses( innerObject, MUST_NOT, mustNotClauseBuilders );
-		contributeClauses( innerObject, SHOULD, shouldClauseBuilders );
-		contributeClauses( innerObject, FILTER, filterClauseBuilders );
+	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
+		contributeClauses( context, innerObject, MUST, mustClauseBuilders );
+		contributeClauses( context, innerObject, MUST_NOT, mustNotClauseBuilders );
+		contributeClauses( context, innerObject, SHOULD, shouldClauseBuilders );
+		contributeClauses( context, innerObject, FILTER, filterClauseBuilders );
 
 		if ( minimumShouldMatchConstraints != null ) {
 			MINIMUM_SHOULD_MATCH.set(
@@ -123,7 +124,7 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 		return outerObject;
 	}
 
-	private void contributeClauses(JsonObject innerObject,
+	private void contributeClauses(ElasticsearchSearchPredicateContext context, JsonObject innerObject,
 			JsonAccessor<JsonObject> occurAccessor,
 			List<ElasticsearchSearchPredicateBuilder> clauseBuilders) {
 		if ( clauseBuilders == null ) {
@@ -131,7 +132,7 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 		}
 
 		for ( ElasticsearchSearchPredicateBuilder clauseBuilder : clauseBuilders ) {
-			occurAccessor.add( innerObject, clauseBuilder.build() );
+			occurAccessor.add( innerObject, clauseBuilder.build( context ) );
 		}
 	}
 

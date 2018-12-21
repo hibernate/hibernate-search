@@ -65,7 +65,8 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
 		QUERY.set( innerObject, value );
 
 		JsonObject middleObject = new JsonObject();
