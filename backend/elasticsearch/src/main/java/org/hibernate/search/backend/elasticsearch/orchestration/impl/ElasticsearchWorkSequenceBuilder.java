@@ -50,7 +50,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 *
 	 * @param work The work to be executed
 	 */
-	<T> void addNonBulkExecution(ElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work);
 
 	/**
 	 * Add a step to execute a bulk work.

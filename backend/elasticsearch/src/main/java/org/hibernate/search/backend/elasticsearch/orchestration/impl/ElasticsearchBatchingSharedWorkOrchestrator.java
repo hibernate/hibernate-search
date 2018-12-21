@@ -17,13 +17,10 @@ import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.Executors;
-import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-
 
 /**
  * An orchestrator sharing context across multiple threads,
@@ -100,12 +97,9 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 	}
 
 	@Override
-	protected CompletableFuture<?> doSubmit(List<ElasticsearchWork<?>> works)
-			throws InterruptedException {
-		CompletableFuture<Object> future = new CompletableFuture<>();
-		changesetQueue.put( new Changeset( works, future ) );
+	protected void doSubmit(Changeset changeset) throws InterruptedException {
+		changesetQueue.put( changeset );
 		ensureProcessingScheduled();
-		return future;
 	}
 
 	private void ensureProcessingScheduled() {
@@ -211,11 +205,10 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 
 					for ( Changeset changeset : changesetBuffer ) {
 						try {
-							delegate.submit( changeset.works )
-									.whenComplete( Futures.copyHandler( changeset.future ) );
+							changeset.applyToDelegate( delegate );
 						}
 						catch (Throwable e) {
-							changeset.future.completeExceptionally( e );
+							changeset.getFuture().completeExceptionally( e );
 							throw e;
 						}
 					}
@@ -278,16 +271,6 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 		}
 	}
 
-	private static class Changeset {
-		private final List<ElasticsearchWork<?>> works;
-		private final CompletableFuture<Object> future;
-
-		public Changeset(List<ElasticsearchWork<?>> works, CompletableFuture<Object> future) {
-			this.works = works;
-			this.future = future;
-		}
-	}
-
 	private class ChildOrchestrator extends AbstractElasticsearchBarrierWorkOrchestrator
 			implements ElasticsearchBarrierWorkOrchestrator {
 
@@ -296,8 +279,8 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 		}
 
 		@Override
-		protected CompletableFuture<?> doSubmit(List<ElasticsearchWork<?>> works) {
-			return ElasticsearchBatchingSharedWorkOrchestrator.this.submit( works );
+		protected void doSubmit(Changeset changeset) throws InterruptedException {
+			ElasticsearchBatchingSharedWorkOrchestrator.this.submit( changeset );
 		}
 
 		@Override

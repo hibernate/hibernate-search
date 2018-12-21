@@ -48,7 +48,13 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		throw new UnsupportedOperationException( "Single work execution is not supported yet!" );
+		aggregator.initSequence();
+		CompletableFuture<T> futureWithReturn = aggregator.addWithReturn( work );
+		aggregator.flushSequence();
+
+		// return the future of addWithReturn operation
+		// it could be not in sync with the future of flushSequence operation
+		return futureWithReturn;
 	}
 
 	@Override
@@ -123,6 +129,17 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 			bulker.reset();
 			rootFuture = CompletableFuture.completedFuture( null );
 			sequenceBuilder.init( rootFuture );
+		}
+
+		// TODO temporary treating single work as NOT bulked, eventually it must be treated as a bulked for very critical performance reasons!
+		public <T> CompletableFuture<T> addWithReturn(ElasticsearchWork<T> work) {
+			if ( bulker.flushBulked() ) {
+				/*
+				 * Same reason as in addNonBulkable
+				 */
+				currentBulkIsUsableInSameSequence = false;
+			}
+			return sequenceBuilder.addNonBulkExecution( work );
 		}
 	}
 }

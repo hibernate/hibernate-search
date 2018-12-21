@@ -48,7 +48,14 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchFlus
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		throw new UnsupportedOperationException( "Single work execution is not supported yet!" );
+		aggregator.init( future );
+		CompletableFuture<T> futureWithReturn = aggregator.addWithReturn( work );
+		CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
+		future = sequenceFuture;
+
+		// return the future of addWithReturn operation
+		// it could be not in sync with the flushSequence of flush operation
+		return futureWithReturn;
 	}
 
 	@Override
@@ -109,6 +116,18 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchFlus
 
 		public void reset() {
 			bulker.reset();
+		}
+
+		// TODO temporary treating single work as NOT bulked, eventually it must be treated as a bulked for very critical performance reasons!
+		public <T> CompletableFuture<T> addWithReturn(ElasticsearchWork<T> work) {
+			if ( bulker.flushBulked() ) {
+				/*
+				 * Same reason as in addNonBulkable
+				 */
+				bulker.flushBulk();
+			}
+
+			return sequenceBuilder.addNonBulkExecution( work );
 		}
 	}
 }

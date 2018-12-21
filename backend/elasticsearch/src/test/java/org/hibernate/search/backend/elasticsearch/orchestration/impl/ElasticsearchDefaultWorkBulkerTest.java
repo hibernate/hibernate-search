@@ -31,7 +31,7 @@ import org.easymock.EasyMock;
 /**
  * @author Yoann Rodiere
  */
-public class DefaultElasticsearchWorkBulkerTest {
+public class ElasticsearchDefaultWorkBulkerTest {
 
 	private static final int DEFAULT_MIN_BULK_SIZE = 1;
 
@@ -112,7 +112,7 @@ public class DefaultElasticsearchWorkBulkerTest {
 		verify();
 
 		reset();
-		sequenceBuilderMock.addNonBulkExecution( work1 );
+		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( new CompletableFuture<>() );
 		replay();
 		bulker.flushBulked();
 		verify();

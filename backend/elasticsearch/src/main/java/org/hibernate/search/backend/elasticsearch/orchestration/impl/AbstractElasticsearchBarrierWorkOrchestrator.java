@@ -14,8 +14,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-
 
 /**
  * An abstract base for {@link ElasticsearchBarrierWorkOrchestrator} implementations,
@@ -43,32 +43,17 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 
 	@Override
 	public CompletableFuture<?> submit(List<ElasticsearchWork<?>> works) {
-		if ( !shutdownLock.readLock().tryLock() ) {
-			// The orchestrator is shutting down: abort.
-			throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
-		}
-		try {
-			if ( !open ) {
-				// The orchestrator has shut down: abort.
-				throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
-			}
-			return doSubmit( works );
-		}
-		catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			throw log.threadInterruptedWhileSubmittingChangeset( name );
-		}
-		finally {
-			shutdownLock.readLock().unlock();
-		}
+		CompletableFuture<Object> future = new CompletableFuture<>();
+		submit( new MultipleWorkChangeset( works, future ) );
+		return future;
 	}
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		throw new UnsupportedOperationException( "Single work execution is not supported yet!" );
+		CompletableFuture<T> future = new CompletableFuture<>();
+		submit( new SingleWorkChangeset<>( work, future ) );
+		return future;
 	}
-
-	protected abstract CompletableFuture<?> doSubmit(List<ElasticsearchWork<?>> works) throws InterruptedException;
 
 	@Override
 	public void close() {
@@ -85,6 +70,74 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 		}
 	}
 
+	protected abstract void doSubmit(Changeset changeset) throws InterruptedException;
+
 	protected abstract void doClose();
+
+	void submit(Changeset changeset) {
+		if ( !shutdownLock.readLock().tryLock() ) {
+			// The orchestrator is shutting down: abort.
+			throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
+		}
+		try {
+			if ( !open ) {
+				// The orchestrator has shut down: abort.
+				throw log.orchestratorShutDownBeforeSubmittingChangeset( name );
+			}
+			doSubmit( changeset );
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw log.threadInterruptedWhileSubmittingChangeset( name );
+		}
+		finally {
+			shutdownLock.readLock().unlock();
+		}
+	}
+
+	interface Changeset {
+		void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate);
+		CompletableFuture<?> getFuture();
+	};
+
+	static class MultipleWorkChangeset implements Changeset {
+		private final List<ElasticsearchWork<?>> works;
+		private final CompletableFuture<Object> future;
+
+		MultipleWorkChangeset(List<ElasticsearchWork<?>> works, CompletableFuture<Object> future) {
+			this.works = works;
+			this.future = future;
+		}
+
+		@Override
+		public void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate) {
+			delegate.submit( works ).whenComplete( Futures.copyHandler( future ) );
+		}
+
+		@Override
+		public CompletableFuture<?> getFuture() {
+			return future;
+		}
+	}
+
+	static class SingleWorkChangeset<T> implements Changeset {
+		private final ElasticsearchWork<T> work;
+		private final CompletableFuture<T> future;
+
+		SingleWorkChangeset(ElasticsearchWork<T> work, CompletableFuture<T> future) {
+			this.work = work;
+			this.future = future;
+		}
+
+		@Override
+		public void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate) {
+			delegate.submit( work ).whenComplete( Futures.copyHandler( future ) );
+		}
+
+		@Override
+		public CompletableFuture<?> getFuture() {
+			return future;
+		}
+	}
 
 }
