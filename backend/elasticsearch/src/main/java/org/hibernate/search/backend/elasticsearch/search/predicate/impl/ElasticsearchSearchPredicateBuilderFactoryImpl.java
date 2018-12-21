@@ -53,7 +53,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SearchPredicate toSearchPredicate(ElasticsearchSearchPredicateBuilder builder) {
-		return new ElasticsearchSearchPredicate( builder.build() );
+		return new ElasticsearchSearchPredicate( builder );
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector,
 			ElasticsearchSearchPredicateBuilder builder) {
-		collector.collectPredicate( builder.build() );
+		collector.collectPredicate( builder.build( collector.getRootPredicateContext() ) );
 	}
 
 	@Override

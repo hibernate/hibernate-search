@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
@@ -44,7 +45,9 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends Abstract
 	}
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doBuild(
+			ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
 		JsonObject pointsObject = new JsonObject();
 		pointsObject.add( POINTS, pointsArray );
 

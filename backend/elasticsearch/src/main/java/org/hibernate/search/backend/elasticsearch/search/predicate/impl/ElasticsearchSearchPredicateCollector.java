@@ -19,6 +19,8 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchSearchPredicateCollector {
 
+	ElasticsearchSearchPredicateContext getRootPredicateContext();
+
 	void collectPredicate(JsonObject jsonQuery);
 
 }

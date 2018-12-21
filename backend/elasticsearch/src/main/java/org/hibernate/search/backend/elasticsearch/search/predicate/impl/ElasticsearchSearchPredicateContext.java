@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import com.google.gson.JsonObject;
+public class ElasticsearchSearchPredicateContext {
 
-public interface ElasticsearchSearchPredicateBuilder {
-
-	JsonObject build(ElasticsearchSearchPredicateContext context);
+	public ElasticsearchSearchPredicateContext() {
+	}
 
 }

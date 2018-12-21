@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.impl;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateCollector;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
@@ -22,10 +23,21 @@ import com.google.gson.JsonObject;
 public class ElasticsearchSearchQueryElementCollector
 		implements ElasticsearchSearchPredicateCollector, ElasticsearchSearchSortCollector {
 
+	private final ElasticsearchSearchPredicateContext rootPredicateContext;
+
 	private JsonObject jsonPredicate;
 	private JsonArray jsonSort;
 
 	private Map<DistanceSortKey, Integer> distanceSorts;
+
+	public ElasticsearchSearchQueryElementCollector() {
+		this.rootPredicateContext = new ElasticsearchSearchPredicateContext();
+	}
+
+	@Override
+	public ElasticsearchSearchPredicateContext getRootPredicateContext() {
+		return rootPredicateContext;
+	}
 
 	@Override
 	public void collectPredicate(JsonObject jsonQuery) {

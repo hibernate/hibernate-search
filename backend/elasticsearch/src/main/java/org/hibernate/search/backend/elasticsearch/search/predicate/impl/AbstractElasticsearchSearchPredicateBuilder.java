@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
-import org.hibernate.search.util.AssertionFailure;
 
 import com.google.gson.JsonObject;
 
@@ -35,7 +34,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	}
 
 	@Override
-	public final JsonObject build() {
+	public final JsonObject build(ElasticsearchSearchPredicateContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -43,8 +42,9 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 			BOOST.set( innerObject, boost );
 		}
 
-		return doBuild( outerObject, innerObject );
+		return doBuild( context, outerObject, innerObject );
 	}
 
-	protected abstract JsonObject doBuild(JsonObject outerObject, JsonObject innerObject);
+	protected abstract JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject);
 }

@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -44,7 +45,9 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractE
 	}
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doBuild(
+			ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
 		DISTANCE.set( innerObject, distanceInMeters );
 		innerObject.add( absoluteFieldPath, center );
 

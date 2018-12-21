@@ -13,15 +13,15 @@ import com.google.gson.JsonObject;
 class ElasticsearchSearchPredicate
 		implements SearchPredicate, ElasticsearchSearchPredicateBuilder {
 
-	private final JsonObject jsonObject;
+	private final ElasticsearchSearchPredicateBuilder delegate;
 
-	ElasticsearchSearchPredicate(JsonObject jsonObject) {
-		this.jsonObject = jsonObject;
+	ElasticsearchSearchPredicate(ElasticsearchSearchPredicateBuilder delegate) {
+		this.delegate = delegate;
 	}
 
 	@Override
-	public JsonObject build() {
-		return jsonObject;
+	public JsonObject build(ElasticsearchSearchPredicateContext context) {
+		return delegate.build( context );
 	}
 
 }

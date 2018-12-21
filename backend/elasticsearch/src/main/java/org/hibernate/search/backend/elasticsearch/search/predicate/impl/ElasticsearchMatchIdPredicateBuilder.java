@@ -64,7 +64,8 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 	}
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
 		JsonArray array = convert( values );
 
 		VALUES.set( innerObject, array );

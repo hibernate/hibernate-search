@@ -21,7 +21,8 @@ class ElasticsearchMatchAllPredicateBuilder extends AbstractElasticsearchSearchP
 	private static final JsonObjectAccessor MATCH_ALL = JsonAccessor.root().property( "match_all" ).asObject();
 
 	@Override
-	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
+			JsonObject outerObject, JsonObject innerObject) {
 		MATCH_ALL.set( outerObject, innerObject );
 		return outerObject;
 	}

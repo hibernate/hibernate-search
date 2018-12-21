@@ -18,7 +18,8 @@ class ElasticsearchUserProvidedJsonPredicateContributor implements Elasticsearch
 	}
 
 	@Override
-	public JsonObject build() {
+	public JsonObject build(
+			ElasticsearchSearchPredicateContext context) {
 		return json;
 	}
 
