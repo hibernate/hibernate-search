@@ -57,7 +57,7 @@ class ElasticsearchSearchQueryBuilder<T>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.elementCollector = new ElasticsearchSearchQueryElementCollector();
+		this.elementCollector = new ElasticsearchSearchQueryElementCollector( sessionContext );
 		this.projectionHitMapper = projectionHitMapper;
 		this.rootProjection = rootProjection;
 	}

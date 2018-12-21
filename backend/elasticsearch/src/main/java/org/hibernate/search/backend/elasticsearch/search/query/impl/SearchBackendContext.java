@@ -11,11 +11,13 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.EventContext;
@@ -65,16 +67,16 @@ public class SearchBackendContext {
 		return eventContext;
 	}
 
-	Gson getUserFacingGson() {
-		return userFacingGson;
-	}
-
 	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper() {
 		return documentReferenceExtractorHelper;
 	}
 
 	SearchProjectionBackendContext getSearchProjectionBackendContext() {
 		return searchProjectionBackendContext;
+	}
+
+	ElasticsearchSearchContext createSearchContext(MappingContextImplementor mappingContext) {
+		return new ElasticsearchSearchContext( mappingContext, userFacingGson, multiTenancyStrategy );
 	}
 
 	<T> ElasticsearchSearchQueryBuilder<T> createSearchQueryBuilder(

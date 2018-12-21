@@ -6,9 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
+
 public class ElasticsearchSearchPredicateContext {
 
-	public ElasticsearchSearchPredicateContext() {
+	private final SessionContextImplementor sessionContext;
+
+	public ElasticsearchSearchPredicateContext(SessionContextImplementor sessionContext) {
+		this.sessionContext = sessionContext;
+	}
+
+	String getTenantId() {
+		return sessionContext.getTenantIdentifier();
 	}
 
 }

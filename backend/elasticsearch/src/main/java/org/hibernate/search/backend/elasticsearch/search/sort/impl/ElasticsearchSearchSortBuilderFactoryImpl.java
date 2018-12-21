@@ -51,7 +51,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
-		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector();
+		// FIXME we should not pass null here... it works but it's dodgy.
+		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector( null );
 		for ( ElasticsearchSearchSortBuilder builder : builders ) {
 			builder.buildAndAddTo( collector );
 		}

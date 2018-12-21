@@ -66,7 +66,7 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		JsonArray array = convert( values );
+		JsonArray array = convert( values, context.getTenantId() );
 
 		VALUES.set( innerObject, array );
 
@@ -74,10 +74,10 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 		return outerObject;
 	}
 
-	private JsonArray convert(List<String> list) {
+	private JsonArray convert(List<String> list, String tenantId) {
 		JsonArray jsonArray = new JsonArray( list.size() );
 		for ( String value : list ) {
-			jsonArray.add( value );
+			jsonArray.add( searchContext.toElasticsearchId( tenantId, value ) );
 		}
 		return jsonArray;
 	}
