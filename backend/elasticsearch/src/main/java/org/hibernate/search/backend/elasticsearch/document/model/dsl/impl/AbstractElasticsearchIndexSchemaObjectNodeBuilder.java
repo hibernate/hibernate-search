@@ -19,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
@@ -27,7 +26,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> content = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor> content = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
@@ -41,14 +40,14 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	@Override
 	public IndexFieldTypeFactoryContext addField(String relativeFieldName) {
 		ElasticsearchIndexFieldTypeFactoryContextImpl fieldContext =
-				new ElasticsearchIndexFieldTypeFactoryContextImpl( getRootNodeBuilder(), getAbsolutePath(), relativeFieldName );
+				new ElasticsearchIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
 		putProperty( relativeFieldName, fieldContext );
 		return fieldContext;
 	}
 
 	@Override
 	public IndexFieldTypeFactoryContext createExcludedField(String relativeFieldName) {
-		return new ElasticsearchIndexFieldTypeFactoryContextImpl( getRootNodeBuilder(), getAbsolutePath(), relativeFieldName );
+		return new ElasticsearchIndexFieldTypeFactoryContextImpl( getRoot(), getAbsolutePath(), relativeFieldName );
 	}
 
 	@Override
@@ -66,11 +65,9 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
 			ElasticsearchIndexSchemaNodeCollector collector) {
-		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor<PropertyMapping>> entry : content.entrySet() ) {
-			String propertyName = entry.getKey();
-			ElasticsearchIndexSchemaNodeContributor<PropertyMapping> propertyContributor = entry.getValue();
-			PropertyMapping propertyMapping = propertyContributor.contribute( collector, node );
-			mapping.addProperty( propertyName, propertyMapping );
+		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : content.entrySet() ) {
+			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
+			propertyContributor.contribute( collector, node, mapping );
 		}
 	}
 
@@ -78,7 +75,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	abstract String getAbsolutePath();
 
-	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> contributor) {
+	private void putProperty(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );

@@ -13,13 +13,9 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.QueryBuilder;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTextFieldSortBuilderFactory;
@@ -27,13 +23,12 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * @author Guillaume Smet
  */
-public class LuceneStringIndexFieldTypeContext
+class LuceneStringIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneStringIndexFieldTypeContext, String>
 		implements StringIndexFieldTypeContext<LuceneStringIndexFieldTypeContext> {
 
@@ -46,8 +41,9 @@ public class LuceneStringIndexFieldTypeContext
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneStringIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, String.class );
+	LuceneStringIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
+			LuceneIndexSchemaFieldDslBackReference<String> fieldDslBackReference) {
+		super( buildContext, String.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -55,7 +51,7 @@ public class LuceneStringIndexFieldTypeContext
 		this.analyzerName = analyzerName;
 		this.analyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( analyzerName );
 		if ( analyzer == null ) {
-			throw log.unknownAnalyzer( analyzerName, getSchemaContext().getEventContext() );
+			throw log.unknownAnalyzer( analyzerName, getBuildContext().getEventContext() );
 		}
 		return this;
 	}
@@ -65,7 +61,7 @@ public class LuceneStringIndexFieldTypeContext
 		this.normalizerName = normalizerName;
 		this.normalizer = getAnalysisDefinitionRegistry().getNormalizerDefinition( normalizerName );
 		if ( normalizer == null ) {
-			throw log.unknownNormalizer( normalizerName, getSchemaContext().getEventContext() );
+			throw log.unknownNormalizer( normalizerName, getBuildContext().getEventContext() );
 		}
 		return this;
 	}
@@ -77,18 +73,17 @@ public class LuceneStringIndexFieldTypeContext
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<String> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	protected LuceneIndexFieldType<String> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
 		if ( analyzer != null ) {
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getBuildContext().getEventContext() );
 			}
 
 			if ( normalizer != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
 			}
 		}
 
@@ -97,31 +92,22 @@ public class LuceneStringIndexFieldTypeContext
 		QueryBuilder queryBuilder = analyzerOrNormalizer != null ? new QueryBuilder( analyzerOrNormalizer ) : null;
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSortable,
 				getFieldType( resolvedProjectable, analyzer != null ),
 				analyzerOrNormalizer
 		);
 
-		LuceneIndexSchemaFieldNode<String> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				getRelativeFieldName(),
+		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>( dslToIndexConverter, codec, queryBuilder ),
 				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
+				analyzerOrNormalizer
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
-
-		if ( analyzerOrNormalizer != null ) {
-			collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
-		}
 	}
 
 	@Override
@@ -130,7 +116,7 @@ public class LuceneStringIndexFieldTypeContext
 	}
 
 	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
-		return getSchemaContext().getRoot().getAnalysisDefinitionRegistry();
+		return getBuildContext().getAnalysisDefinitionRegistry();
 	}
 
 	private static FieldType getFieldType(boolean projectable, boolean analyzed) {

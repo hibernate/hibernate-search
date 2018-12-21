@@ -6,96 +6,70 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchJsonStringIndexFieldTypeContextImpl implements
-		ElasticsearchJsonStringIndexFieldTypeContext,
-		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+class ElasticsearchJsonStringIndexFieldTypeContextImpl
+		extends AbstractElasticsearchIndexFieldTypeConverterContext<ElasticsearchJsonStringIndexFieldTypeContextImpl, String>
+		implements ElasticsearchJsonStringIndexFieldTypeContext<ElasticsearchJsonStringIndexFieldTypeContextImpl> {
 
 	private static final Gson GSON = new GsonBuilder().create();
 
 	// Must be a singleton so that equals() works as required by the interface
 	private static final ElasticsearchJsonStringFieldCodec CODEC = new ElasticsearchJsonStringFieldCodec( GSON );
 
-	private final IndexSchemaFieldDefinitionHelper<String> helper;
-
-	private final String relativeFieldName;
+	private final ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference;
 
 	private final String mappingJsonString;
 
-	public ElasticsearchJsonStringIndexFieldTypeContextImpl(IndexSchemaBuildContext schemaContext, String relativeFieldName, String mappingJsonString) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, String.class );
-		this.relativeFieldName = relativeFieldName;
+	ElasticsearchJsonStringIndexFieldTypeContextImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			String mappingJsonString,
+			ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference) {
+		super( buildContext, String.class );
+		this.fieldDslBackReference = fieldDslBackReference;
 		this.mappingJsonString = mappingJsonString;
 	}
 
 	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContextImpl dslConverter(
-			ToDocumentFieldValueConverter<?, ? extends String> toIndexConverter) {
-		helper.dslConverter( toIndexConverter );
-		return this;
-	}
-
-	@Override
-	public ElasticsearchJsonStringIndexFieldTypeContextImpl projectionConverter(
-			FromDocumentFieldValueConverter<? super String, ?> fromIndexConverter) {
-		helper.projectionConverter( fromIndexConverter );
-		return this;
-	}
-
-	@Override
 	public IndexFieldAccessor<String> createAccessor() {
-		return helper.createAccessor();
+		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
 	}
 
 	@Override
-	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
+	protected ElasticsearchJsonStringIndexFieldTypeContextImpl thisAsS() {
+		return this;
+	}
+
+	private ElasticsearchIndexFieldType<String> toIndexFieldType() {
 		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		ElasticsearchJsonStringFieldCodec codec = CODEC;
 
-		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, codec,
+		return new ElasticsearchIndexFieldType<>(
+				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslToIndexConverter, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, indexToProjectionConverter, codec )
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, indexToProjectionConverter, codec ),
+				mapping
 		);
-
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-
-		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-		collector.collect( absoluteFieldPath, node );
-
-		return mapping;
 	}
 }

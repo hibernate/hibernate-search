@@ -6,14 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
+import org.hibernate.search.engine.backend.types.Sortable;
 
 /**
  * @author Yoann Rodiere
@@ -29,9 +26,10 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	private Projectable projectable = Projectable.DEFAULT;
 	protected boolean resolvedProjectable;
 
-	AbstractElasticsearchScalarFieldTypeContext(IndexSchemaBuildContext schemaContext,
-			Class<F> fieldType, DataType dataType) {
-		super( schemaContext, fieldType );
+	AbstractElasticsearchScalarFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			Class<F> fieldType, DataType dataType,
+			ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+		super( buildContext, fieldType, fieldDslBackReference );
 		this.dataType = dataType;
 	}
 
@@ -48,10 +46,7 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 	}
 
 	@Override
-	protected PropertyMapping contribute(
-			IndexSchemaFieldDefinitionHelper<F> helper,
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
+	protected final ElasticsearchIndexFieldType<F> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
 		mapping.setType( dataType );
@@ -62,7 +57,9 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 		mapping.setStore( resolvedProjectable );
 		mapping.setDocValues( resolvedSortable );
 
-		return mapping;
+		return toIndexFieldType( mapping );
 	}
+
+	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping);
 
 }

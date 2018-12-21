@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -24,7 +25,7 @@ import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 
 class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+		implements IndexSchemaObjectFieldNodeBuilder, ElasticsearchIndexSchemaNodeContributor {
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
@@ -56,9 +57,10 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public PropertyMapping contribute(
+	public void contribute(
 			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
+			ElasticsearchIndexSchemaObjectNode parentNode,
+			AbstractTypeMapping parentMapping) {
 		ElasticsearchIndexSchemaObjectNode node =
 				new ElasticsearchIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
 		collector.collect( absoluteFieldPath, node );
@@ -84,9 +86,9 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		// TODO allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
 		mapping.setDynamic( DynamicType.STRICT );
 
-		contributeChildren( mapping, node, collector );
+		parentMapping.addProperty( relativeFieldName, mapping );
 
-		return mapping;
+		contributeChildren( mapping, node, collector );
 	}
 
 	@Override

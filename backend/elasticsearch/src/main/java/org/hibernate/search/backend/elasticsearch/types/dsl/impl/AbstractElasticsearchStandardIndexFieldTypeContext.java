@@ -7,66 +7,34 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchStandardIndexFieldTypeContext;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.AssertionFailure;
 
 /**
  * @author Yoann Rodiere
  */
-public abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S extends AbstractElasticsearchStandardIndexFieldTypeContext<? extends S, F>, F>
-		implements ElasticsearchStandardIndexFieldTypeContext<S, F>,
-		ElasticsearchIndexSchemaNodeContributor<PropertyMapping> {
+abstract class AbstractElasticsearchStandardIndexFieldTypeContext<S extends AbstractElasticsearchStandardIndexFieldTypeContext<? extends S, F>, F>
+		extends AbstractElasticsearchIndexFieldTypeConverterContext<S, F>
+		implements ElasticsearchStandardIndexFieldTypeContext<S, F> {
 
-	private final IndexSchemaFieldDefinitionHelper<F> helper;
+	private final ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference;
 
-	AbstractElasticsearchStandardIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, Class<F> fieldType) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
-	}
-
-	@Override
-	public S dslConverter(
-			ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
-		helper.dslConverter( toIndexConverter );
-		return thisAsS();
-	}
-
-	@Override
-	public S projectionConverter(
-			FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
-		helper.projectionConverter( fromIndexConverter );
-		return thisAsS();
+	AbstractElasticsearchStandardIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			Class<F> fieldType,
+			ElasticsearchIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+		super( buildContext, fieldType );
+		this.fieldDslBackReference = fieldDslBackReference;
 	}
 
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
-		return helper.createAccessor();
+		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
 	}
 
-	@Override
-	public PropertyMapping contribute(ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
-		return contribute( helper, collector, parentNode );
-	}
-
-	protected abstract PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<F> helper,
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode);
-
-	protected abstract S thisAsS();
-
-	protected final IndexSchemaBuildContext getSchemaContext() {
-		return helper.getSchemaContext();
-	}
+	protected abstract ElasticsearchIndexFieldType<F> toIndexFieldType();
 
 	protected static boolean resolveDefault(Projectable projectable) {
 		switch ( projectable ) {

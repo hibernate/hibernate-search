@@ -6,27 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneBooleanFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-public class LuceneBooleanIndexFieldTypeContext
+class LuceneBooleanIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneBooleanIndexFieldTypeContext, Boolean> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneBooleanIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Boolean.class );
+	LuceneBooleanIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
+			LuceneIndexSchemaFieldDslBackReference<Boolean> fieldDslBackReference) {
+		super( buildContext, Boolean.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -36,29 +32,22 @@ public class LuceneBooleanIndexFieldTypeContext
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Boolean> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	protected LuceneIndexFieldType<Boolean> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
 		ToDocumentFieldValueConverter<?, ? extends Boolean> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Boolean, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		LuceneBooleanFieldCodec codec = new LuceneBooleanFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Boolean> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				getRelativeFieldName(),
+		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}
 
 	@Override

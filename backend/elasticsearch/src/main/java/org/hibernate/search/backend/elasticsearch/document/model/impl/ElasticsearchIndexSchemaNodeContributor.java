@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
+
 /**
  * @author Yoann Rodiere
  */
-public interface ElasticsearchIndexSchemaNodeContributor<T> {
+public interface ElasticsearchIndexSchemaNodeContributor {
 
-	T contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexSchemaObjectNode parentNode);
+	void contribute(ElasticsearchIndexSchemaNodeCollector collector, ElasticsearchIndexSchemaObjectNode parentNode,
+			AbstractTypeMapping parentMapping);
 
 }

@@ -7,17 +7,16 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTypeContext;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Contracts;
 
 /**
  * @param <S> The concrete type of this context.
@@ -25,50 +24,38 @@ import org.hibernate.search.util.AssertionFailure;
  *
  * @author Guillaume Smet
  */
-public abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuceneStandardIndexFieldTypeContext<? extends S, F>, F>
-		implements LuceneStandardIndexFieldTypeContext<S, F>, LuceneIndexSchemaNodeContributor {
+abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuceneStandardIndexFieldTypeContext<? extends S, F>, F>
+		implements LuceneStandardIndexFieldTypeContext<S, F> {
 
-	private final LuceneIndexSchemaBuildContext schemaContext;
+	private final LuceneIndexFieldTypeBuildContext buildContext;
+	private final Class<F> fieldType;
 
-	private final IndexSchemaFieldDefinitionHelper<F> helper;
+	private final LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference;
 
-	private final String relativeFieldName;
-
+	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
 
-	protected AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName,
-			Class<F> fieldType) {
-		this.schemaContext = schemaContext;
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, fieldType );
-		this.relativeFieldName = relativeFieldName;
+	AbstractLuceneStandardIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType,
+			LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+		this.buildContext = buildContext;
+		this.fieldType = fieldType;
+		this.fieldDslBackReference = fieldDslBackReference;
 	}
 
 	@Override
-	public S dslConverter(
-			ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
-		helper.dslConverter( toIndexConverter );
+	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
+		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
+		this.dslToIndexConverter = toIndexConverter;
 		return thisAsS();
 	}
 
 	@Override
-	public S projectionConverter(
-			FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
-		helper.projectionConverter( fromIndexConverter );
+	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
+		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
+		this.indexToProjectionConverter = fromIndexConverter;
 		return thisAsS();
 	}
-
-	@Override
-	public IndexFieldAccessor<F> createAccessor() {
-		return helper.createAccessor();
-	}
-
-	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		contribute( helper, collector, parentNode );
-	}
-
-	protected abstract void contribute(IndexSchemaFieldDefinitionHelper<F> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode);
 
 	@Override
 	public S projectable(Projectable projectable) {
@@ -76,14 +63,32 @@ public abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends Abst
 		return thisAsS();
 	}
 
-	protected abstract S thisAsS();
-
-	protected String getRelativeFieldName() {
-		return relativeFieldName;
+	@Override
+	public IndexFieldAccessor<F> createAccessor() {
+		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
 	}
 
-	protected final LuceneIndexSchemaBuildContext getSchemaContext() {
-		return schemaContext;
+	protected abstract LuceneIndexFieldType<F> toIndexFieldType();
+
+	protected abstract S thisAsS();
+
+	protected final LuceneIndexFieldTypeBuildContext getBuildContext() {
+		return buildContext;
+	}
+
+	protected final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
+		return dslToIndexConverter == null ? new PassThroughToDocumentFieldValueConverter<>( fieldType )
+				: dslToIndexConverter;
+	}
+
+	protected final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
+		/*
+		 * TODO HSEARCH-3257 when no projection converter is configured, create a projection converter that will throw an exception
+		 * with an explicit message.
+		 * Currently we create a pass-through converter because users have no way to bypass the converter.
+		 */
+		return indexToProjectionConverter == null ? new PassThroughFromDocumentFieldValueConverter<>( fieldType )
+				: indexToProjectionConverter;
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {

@@ -6,63 +6,50 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
+import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 
 /**
  * @author Guillaume Smet
  */
-public class LuceneFieldIndexFieldTypeContext<F>
-		implements IndexSchemaFieldTerminalContext<F>, LuceneIndexSchemaNodeContributor {
+class LuceneFieldIndexFieldTypeContext<F>
+		implements IndexSchemaFieldTerminalContext<F> {
 
-	private final IndexSchemaFieldDefinitionHelper<F> helper;
-	private final String relativeFieldName;
+	private final FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
-	public LuceneFieldIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName,
-			Class<F> indexFieldType,
-			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( schemaContext, indexFieldType );
-		this.relativeFieldName = relativeFieldName;
+	private final LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference;
+
+	LuceneFieldIndexFieldTypeContext(Class<F> fieldType,
+			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor,
+			LuceneIndexSchemaFieldDslBackReference<F> fieldDslBackReference) {
+		this.indexToProjectionConverter = new PassThroughFromDocumentFieldValueConverter<>( fieldType );
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
+		this.fieldDslBackReference = fieldDslBackReference;
 	}
 
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
-		return helper.createAccessor();
+		return fieldDslBackReference.onCreateAccessor( toIndexFieldType() );
 	}
 
-	@Override
-	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
-		FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+	private LuceneIndexFieldType<F> toIndexFieldType() {
 		LuceneFieldFieldCodec<F> codec = new LuceneFieldFieldCodec<>( fieldContributor, fieldValueExtractor );
 
-		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				relativeFieldName,
+		return new LuceneIndexFieldType<>(
 				codec,
 				null,
 				null,
 				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, indexToProjectionConverter, codec )
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}
 }
