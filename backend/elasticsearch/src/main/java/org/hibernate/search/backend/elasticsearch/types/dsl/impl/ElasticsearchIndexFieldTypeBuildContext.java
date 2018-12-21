@@ -8,8 +8,12 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.util.EventContext;
 
+import com.google.gson.Gson;
+
 public interface ElasticsearchIndexFieldTypeBuildContext {
 
 	EventContext getEventContext();
+
+	Gson getUserFacingGson();
 
 }

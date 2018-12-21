@@ -19,6 +19,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
+import com.google.gson.Gson;
+
 
 /**
  * @author Yoann Rodiere
@@ -29,9 +31,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
+	private final Gson userFacingGson;
 
-	public ElasticsearchIndexFieldTypeFactoryContextImpl(EventContext eventContext) {
+	public ElasticsearchIndexFieldTypeFactoryContextImpl(EventContext eventContext, Gson userFacingGson) {
 		this.eventContext = eventContext;
+		this.userFacingGson = userFacingGson;
 	}
 
 	@Override
@@ -109,4 +113,8 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		return eventContext;
 	}
 
+	@Override
+	public Gson getUserFacingGson() {
+		return userFacingGson;
+	}
 }

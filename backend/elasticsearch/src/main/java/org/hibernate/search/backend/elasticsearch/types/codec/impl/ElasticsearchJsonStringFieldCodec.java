@@ -39,10 +39,11 @@ public class ElasticsearchJsonStringFieldCodec implements ElasticsearchFieldCode
 		if ( other == this ) {
 			return true;
 		}
-		if ( other == null ) {
+		if ( other == null || !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 
-		return other.getClass() == getClass();
+		ElasticsearchJsonStringFieldCodec castedOther = (ElasticsearchJsonStringFieldCodec) other;
+		return gson.equals( castedOther.gson );
 	}
 }

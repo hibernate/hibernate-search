@@ -53,6 +53,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final String name;
 
+	private final Gson userFacingGson;
+
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -72,6 +74,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
+		this.userFacingGson = userFacingGson;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.streamOrchestrator = new ElasticsearchStubWorkOrchestrator( client );
@@ -136,7 +139,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
 		ElasticsearchIndexFieldTypeFactoryContext typeFactoryContext =
-				new ElasticsearchIndexFieldTypeFactoryContextImpl( indexEventContext );
+				new ElasticsearchIndexFieldTypeFactoryContextImpl( indexEventContext, userFacingGson );
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(

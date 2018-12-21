@@ -18,7 +18,6 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * @author Yoann Rodiere
@@ -27,11 +26,6 @@ import com.google.gson.GsonBuilder;
 class ElasticsearchJsonStringIndexFieldTypeContextImpl
 		extends AbstractElasticsearchIndexFieldTypeConverterContext<ElasticsearchJsonStringIndexFieldTypeContextImpl, String>
 		implements ElasticsearchJsonStringIndexFieldTypeContext<ElasticsearchJsonStringIndexFieldTypeContextImpl> {
-
-	private static final Gson GSON = new GsonBuilder().create();
-
-	// Must be a singleton so that equals() works as required by the interface
-	private static final ElasticsearchJsonStringFieldCodec CODEC = new ElasticsearchJsonStringFieldCodec( GSON );
 
 	private final String mappingJsonString;
 
@@ -48,13 +42,14 @@ class ElasticsearchJsonStringIndexFieldTypeContextImpl
 
 	@Override
 	public IndexFieldType<String> toIndexFieldType() {
-		PropertyMapping mapping = GSON.fromJson( mappingJsonString, PropertyMapping.class );
+		Gson gson = getBuildContext().getUserFacingGson();
+		PropertyMapping mapping = gson.fromJson( mappingJsonString, PropertyMapping.class );
 
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
 				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
-		ElasticsearchJsonStringFieldCodec codec = CODEC;
+		ElasticsearchJsonStringFieldCodec codec = new ElasticsearchJsonStringFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
