@@ -6,64 +6,43 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchIntegerFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-
-import com.google.gson.JsonElement;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchIntegerIndexFieldTypeContext
+class ElasticsearchIntegerIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchIntegerIndexFieldTypeContext, Integer> {
 
-	private final String relativeFieldName;
-
-	public ElasticsearchIntegerIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, Integer.class, DataType.INTEGER );
-		this.relativeFieldName = relativeFieldName;
+	ElasticsearchIntegerIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			ElasticsearchIndexSchemaFieldDslBackReference<Integer> fieldDslBackReference) {
+		super( buildContext, Integer.class, DataType.INTEGER, fieldDslBackReference );
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Integer> helper,
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
-		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
-
+	protected ElasticsearchIndexFieldType<Integer> toIndexFieldType(PropertyMapping mapping) {
 		ToDocumentFieldValueConverter<?, ? extends Integer> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Integer, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		ElasticsearchIntegerFieldCodec codec = ElasticsearchIntegerFieldCodec.INSTANCE;
 
-		ElasticsearchIndexSchemaFieldNode<Integer> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, codec,
+		return new ElasticsearchIndexFieldType<>(
+				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
+				mapping
 		);
-
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-
-		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-		collector.collect( absoluteFieldPath, node );
-
-		return mapping;
 	}
 
 	@Override

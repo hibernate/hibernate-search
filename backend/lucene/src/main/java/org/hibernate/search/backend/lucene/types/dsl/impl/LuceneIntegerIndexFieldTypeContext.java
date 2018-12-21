@@ -6,30 +6,26 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneIntegerFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
 /**
  * @author Guillaume Smet
  */
-public class LuceneIntegerIndexFieldTypeContext
+class LuceneIntegerIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneIntegerIndexFieldTypeContext, Integer> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneIntegerIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Integer.class );
+	LuceneIntegerIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
+			LuceneIndexSchemaFieldDslBackReference<Integer> fieldDslBackReference) {
+		super( buildContext, Integer.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -39,29 +35,22 @@ public class LuceneIntegerIndexFieldTypeContext
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Integer> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	protected LuceneIndexFieldType<Integer> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
 		ToDocumentFieldValueConverter<?, ? extends Integer> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Integer, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		LuceneIntegerFieldCodec codec = new LuceneIntegerFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Integer> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				getRelativeFieldName(),
+		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}
 
 	@Override

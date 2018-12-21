@@ -8,27 +8,23 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.time.Instant;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneInstantFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-public class LuceneInstantIndexFieldTypeContext
+class LuceneInstantIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneInstantIndexFieldTypeContext, Instant> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneInstantIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Instant.class );
+	LuceneInstantIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
+			LuceneIndexSchemaFieldDslBackReference<Instant> fieldDslBackReference) {
+		super( buildContext, Instant.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -38,30 +34,22 @@ public class LuceneInstantIndexFieldTypeContext
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Instant> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	protected LuceneIndexFieldType<Instant> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
-
 		ToDocumentFieldValueConverter<?, ? extends Instant> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Instant, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		LuceneInstantFieldCodec codec = new LuceneInstantFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Instant> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				getRelativeFieldName(),
+		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}
 
 	@Override

@@ -9,61 +9,41 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.Instant;
 import java.util.Arrays;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchInstantFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-import com.google.gson.JsonElement;
-
-public class ElasticsearchInstantIndexFieldTypeContext
+class ElasticsearchInstantIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchInstantIndexFieldTypeContext, Instant> {
 
-	private final String relativeFieldName;
-
-	public ElasticsearchInstantIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, Instant.class, DataType.DATE );
-		this.relativeFieldName = relativeFieldName;
+	ElasticsearchInstantIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			ElasticsearchIndexSchemaFieldDslBackReference<Instant> fieldDslBackReference) {
+		super( buildContext, Instant.class, DataType.DATE, fieldDslBackReference );
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<Instant> helper,
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
-		PropertyMapping mapping = super.contribute( helper, collector, parentNode );
-
-		ToDocumentFieldValueConverter<?, ? extends Instant> dslToIndexConverter =
-				helper.createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super Instant, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
-		ElasticsearchInstantFieldCodec codec = ElasticsearchInstantFieldCodec.INSTANCE;
-
-		ElasticsearchIndexSchemaFieldNode<Instant> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
-		);
-
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
+	protected ElasticsearchIndexFieldType<Instant> toIndexFieldType(PropertyMapping mapping) {
 		mapping.setFormat( Arrays.asList( "epoch_millis" ) );
 
-		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-		collector.collect( absoluteFieldPath, node );
+		ToDocumentFieldValueConverter<?, ? extends Instant> dslToIndexConverter =
+				createDslToIndexConverter();
+		FromDocumentFieldValueConverter<? super Instant, ?> indexToProjectionConverter =
+				createIndexToProjectionConverter();
+		ElasticsearchInstantFieldCodec codec = ElasticsearchInstantFieldCodec.INSTANCE;
 
-		return mapping;
+		return new ElasticsearchIndexFieldType<>(
+				codec,
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
+				mapping
+		);
 	}
 
 	@Override

@@ -8,48 +8,39 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-
-import com.google.gson.JsonElement;
 
 /**
  * @author Yoann Rodiere
  * @author Guillaume Smet
  */
-public class ElasticsearchStringIndexFieldTypeContext
+class ElasticsearchStringIndexFieldTypeContext
 		extends AbstractElasticsearchStandardIndexFieldTypeContext<ElasticsearchStringIndexFieldTypeContext, String>
 		implements StringIndexFieldTypeContext<ElasticsearchStringIndexFieldTypeContext> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String relativeFieldName;
 	private String analyzerName;
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public ElasticsearchStringIndexFieldTypeContext(IndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, String.class );
-		this.relativeFieldName = relativeFieldName;
+	ElasticsearchStringIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext,
+			ElasticsearchIndexSchemaFieldDslBackReference<String> fieldDslBackReference) {
+		super( buildContext, String.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -77,9 +68,7 @@ public class ElasticsearchStringIndexFieldTypeContext
 	}
 
 	@Override
-	protected PropertyMapping contribute(IndexSchemaFieldDefinitionHelper<String> helper,
-			ElasticsearchIndexSchemaNodeCollector collector,
-			ElasticsearchIndexSchemaObjectNode parentNode) {
+	public ElasticsearchIndexFieldType<String> toIndexFieldType() {
 		PropertyMapping mapping = new PropertyMapping();
 
 		boolean resolvedSortable = resolveDefault( sortable );
@@ -91,11 +80,11 @@ public class ElasticsearchStringIndexFieldTypeContext
 			mapping.setAnalyzer( analyzerName );
 
 			if ( normalizerName != null ) {
-				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getSchemaContext().getEventContext() );
+				throw log.cannotApplyAnalyzerAndNormalizer( analyzerName, normalizerName, getBuildContext().getEventContext() );
 			}
 
 			if ( resolvedSortable ) {
-				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getSchemaContext().getEventContext() );
+				throw log.cannotUseAnalyzerOnSortableField( analyzerName, getBuildContext().getEventContext() );
 			}
 		}
 		else {
@@ -106,27 +95,19 @@ public class ElasticsearchStringIndexFieldTypeContext
 
 		mapping.setStore( resolvedProjectable );
 
-
 		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
-		ElasticsearchIndexSchemaFieldNode<String> node = new ElasticsearchIndexSchemaFieldNode<>(
-				parentNode, codec,
+		return new ElasticsearchIndexFieldType<>(
+				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
-				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
+				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
+				mapping
 		);
-
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		helper.initialize( new ElasticsearchIndexFieldAccessor<>( jsonAccessor, node ) );
-
-		String absoluteFieldPath = parentNode.getAbsolutePath( relativeFieldName );
-		collector.collect( absoluteFieldPath, node );
-
-		return mapping;
 	}
 
 	@Override

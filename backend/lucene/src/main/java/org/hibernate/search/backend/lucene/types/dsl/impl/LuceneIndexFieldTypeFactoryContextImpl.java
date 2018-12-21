@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
@@ -19,8 +20,11 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
+import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -31,11 +35,15 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
 /**
+ * FIXME: This class is a bit of a hack: it is the bridge between the index field type DSL and the index field DSL.
+ * If you look at it and find it ugly and confusing, it's just because it is.
+ * We will clean it up when we properly split the index field type and index field DSLs in the next commits.
+ *
  * @author Guillaume Smet
  */
 public class LuceneIndexFieldTypeFactoryContextImpl
-		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexSchemaNodeContributor,
-		LuceneIndexSchemaBuildContext {
+		implements LuceneIndexFieldTypeFactoryContext, LuceneIndexFieldTypeBuildContext,
+		LuceneIndexSchemaNodeContributor, LuceneIndexSchemaBuildContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -84,37 +92,37 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public StringIndexFieldTypeContext<?> asString() {
-		return setDelegate( new LuceneStringIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneStringIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, Integer> asInteger() {
-		return setDelegate( new LuceneIntegerIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneIntegerIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, Long> asLong() {
-		return setDelegate( new LuceneLongIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneLongIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
-		return setDelegate( new LuceneBooleanIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneBooleanIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
-		return setDelegate( new LuceneLocalDateIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneLocalDateIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
-		return setDelegate( new LuceneInstantIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneInstantIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
 	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
-		return setDelegate( new LuceneGeoPointIndexFieldTypeContext( this, relativeFieldName ) );
+		return new LuceneGeoPointIndexFieldTypeContext( this, initDelegate() );
 	}
 
 	@Override
@@ -128,9 +136,10 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	public <F> IndexSchemaFieldTerminalContext<F> asLuceneField(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return setDelegate( new LuceneFieldIndexFieldTypeContext<>(
-				this, relativeFieldName, indexFieldType, fieldContributor, fieldValueExtractor
-		) );
+		return new LuceneFieldIndexFieldTypeContext<>(
+				indexFieldType, fieldContributor, fieldValueExtractor,
+				initDelegate()
+		);
 	}
 
 	@Override
@@ -140,15 +149,49 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	}
 
 	@Override
+	public LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry() {
+		return getRoot().getAnalysisDefinitionRegistry();
+	}
+
+	@Override
 	public LuceneIndexSchemaRootNodeBuilder getRoot() {
 		return root;
 	}
 
-	private <T extends LuceneIndexSchemaNodeContributor> T setDelegate(T context) {
+	private <F> LuceneIndexSchemaFieldDslBackReference<F> initDelegate() {
 		if ( delegate != null ) {
 			throw log.tryToSetFieldTypeMoreThanOnce( getEventContext() );
 		}
-		delegate = context;
-		return context;
+		IndexSchemaFieldDslAdapter<F> adapter = new IndexSchemaFieldDslAdapter<>();
+		this.delegate = adapter;
+		return adapter;
+	}
+
+	private class IndexSchemaFieldDslAdapter<F>
+			implements LuceneIndexSchemaNodeContributor, LuceneIndexSchemaFieldDslBackReference<F> {
+		private final IndexSchemaFieldDefinitionHelper<F> helper;
+		private LuceneIndexFieldType<F> type;
+
+		private IndexSchemaFieldDslAdapter() {
+			this.helper = new IndexSchemaFieldDefinitionHelper<>(
+					LuceneIndexFieldTypeFactoryContextImpl.this
+			);
+		}
+
+		@Override
+		public IndexFieldAccessor<F> onCreateAccessor(LuceneIndexFieldType<F> type) {
+			this.type = type;
+			return helper.createAccessor();
+		}
+
+		@Override
+		public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
+			IndexFieldAccessor<F> accessor = null;
+			// FIXME this is weird, but we need it to pass the tests. It will disappear in the next commit.
+			if ( type != null ) {
+				accessor = type.addField( collector, parentNode, relativeFieldName );
+			}
+			helper.initialize( accessor );
+		}
 	}
 }

@@ -6,27 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
-import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaBuildContext;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLongFieldCodec;
+import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 
-public class LuceneLongIndexFieldTypeContext
+class LuceneLongIndexFieldTypeContext
 		extends AbstractLuceneStandardIndexFieldTypeContext<LuceneLongIndexFieldTypeContext, Long> {
 
 	private Sortable sortable = Sortable.DEFAULT;
 
-	public LuceneLongIndexFieldTypeContext(LuceneIndexSchemaBuildContext schemaContext, String relativeFieldName) {
-		super( schemaContext, relativeFieldName, Long.class );
+	LuceneLongIndexFieldTypeContext(LuceneIndexFieldTypeBuildContext buildContext,
+			LuceneIndexSchemaFieldDslBackReference<Long> fieldDslBackReference) {
+		super( buildContext, Long.class, fieldDslBackReference );
 	}
 
 	@Override
@@ -36,29 +32,22 @@ public class LuceneLongIndexFieldTypeContext
 	}
 
 	@Override
-	protected void contribute(IndexSchemaFieldDefinitionHelper<Long> helper, LuceneIndexSchemaNodeCollector collector,
-			LuceneIndexSchemaObjectNode parentNode) {
+	protected LuceneIndexFieldType<Long> toIndexFieldType() {
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
 
 		ToDocumentFieldValueConverter<?, ? extends Long> dslToIndexConverter =
-				helper.createDslToIndexConverter();
+				createDslToIndexConverter();
 		FromDocumentFieldValueConverter<? super Long, ?> indexToProjectionConverter =
-				helper.createIndexToProjectionConverter();
+				createIndexToProjectionConverter();
 		LuceneLongFieldCodec codec = new LuceneLongFieldCodec( resolvedProjectable, resolvedSortable );
 
-		LuceneIndexSchemaFieldNode<Long> schemaNode = new LuceneIndexSchemaFieldNode<>(
-				parentNode,
-				getRelativeFieldName(),
+		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
-
-		helper.initialize( new LuceneIndexFieldAccessor<>( schemaNode ) );
-
-		collector.collectFieldNode( schemaNode.getAbsoluteFieldPath(), schemaNode );
 	}
 
 	@Override
