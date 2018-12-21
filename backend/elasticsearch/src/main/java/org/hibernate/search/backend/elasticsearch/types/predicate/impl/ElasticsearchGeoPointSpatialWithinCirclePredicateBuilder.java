@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
@@ -28,6 +29,9 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractE
 
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
+	private double distanceInMeters;
+	private JsonElement center;
+
 	ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.codec = codec;
@@ -35,14 +39,16 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractE
 
 	@Override
 	public void circle(GeoPoint center, double radius, DistanceUnit unit) {
-		DISTANCE.set( getInnerObject(), unit.toMeters( radius ) );
-		getInnerObject().add( absoluteFieldPath, codec.encode( center ) );
+		this.distanceInMeters = unit.toMeters( radius );
+		this.center = codec.encode( center );
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject outerObject = getOuterObject();
-		GEO_DISTANCE.set( outerObject, getInnerObject() );
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
+		DISTANCE.set( innerObject, distanceInMeters );
+		innerObject.add( absoluteFieldPath, center );
+
+		GEO_DISTANCE.set( outerObject, innerObject );
 		return outerObject;
 	}
 

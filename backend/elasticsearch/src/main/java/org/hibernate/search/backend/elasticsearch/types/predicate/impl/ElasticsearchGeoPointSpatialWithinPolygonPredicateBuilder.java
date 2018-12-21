@@ -26,36 +26,30 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends Abstract
 
 	private final String absoluteFieldPath;
 
+	private JsonArray pointsArray;
+
 	ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 
 	@Override
 	public void polygon(GeoPolygon polygon) {
-		getInnerObject().add( absoluteFieldPath, toPointsObject( polygon ) );
-	}
-
-	@Override
-	protected JsonObject doBuild() {
-		JsonObject outerObject = getOuterObject();
-		GEO_POLYGON.set( outerObject, getInnerObject() );
-		return outerObject;
-	}
-
-	private JsonObject toPointsObject(GeoPolygon polygon) {
-		JsonArray pointsArray = new JsonArray();
-
+		this.pointsArray = new JsonArray();
 		for ( GeoPoint point : polygon.getPoints() ) {
 			JsonArray pointArray = new JsonArray();
 			pointArray.add( point.getLongitude() );
 			pointArray.add( point.getLatitude() );
-
 			pointsArray.add( pointArray );
 		}
+	}
 
+	@Override
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
 		JsonObject pointsObject = new JsonObject();
 		pointsObject.add( POINTS, pointsArray );
 
-		return pointsObject;
+		innerObject.add( absoluteFieldPath, pointsObject );
+		GEO_POLYGON.set( outerObject, innerObject );
+		return outerObject;
 	}
 }

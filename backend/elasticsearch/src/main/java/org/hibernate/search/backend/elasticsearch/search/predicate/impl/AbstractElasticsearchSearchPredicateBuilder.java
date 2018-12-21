@@ -22,15 +22,11 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 
 	private static final JsonAccessor<Float> BOOST = JsonAccessor.root().property( "boost" ).asFloat();
 
-	private final JsonObject outerObject = new JsonObject();
-
-	private final JsonObject innerObject = new JsonObject();
-
-	private boolean built;
+	private Float boost;
 
 	@Override
 	public void boost(float boost) {
-		BOOST.set( getInnerObject(), boost );
+		this.boost = boost;
 	}
 
 	@Override
@@ -40,23 +36,15 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 
 	@Override
 	public final JsonObject build() {
-		if ( built ) {
-			// we must never call a builder twice. Building may have side-effects.
-			throw new AssertionFailure(
-					"A predicate builder was called twice. There is a bug in Hibernate Search, please report it."
-			);
+		JsonObject outerObject = new JsonObject();
+		JsonObject innerObject = new JsonObject();
+
+		if ( boost != null ) {
+			BOOST.set( innerObject, boost );
 		}
-		built = true;
-		return doBuild();
+
+		return doBuild( outerObject, innerObject );
 	}
 
-	protected final JsonObject getInnerObject() {
-		return innerObject;
-	}
-
-	protected final JsonObject getOuterObject() {
-		return outerObject;
-	}
-
-	protected abstract JsonObject doBuild();
+	protected abstract JsonObject doBuild(JsonObject outerObject, JsonObject innerObject);
 }

@@ -35,12 +35,10 @@ class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPre
 	}
 
 	@Override
-	protected JsonObject doBuild() {
-		JsonObject outerObject = getOuterObject();
-		JsonObject innerObject = getInnerObject();
+	protected JsonObject doBuild(JsonObject outerObject, JsonObject innerObject) {
 		PATH.set( innerObject, absoluteFieldPath );
 		QUERY.set( innerObject, nestedBuilder.build() );
-		outerObject.add( "nested", getInnerObject() );
+		outerObject.add( "nested", innerObject );
 		return outerObject;
 	}
 
