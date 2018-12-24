@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
@@ -29,6 +31,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSett
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
@@ -92,7 +96,10 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 		return new OptimizeWork.Builder();
 	}
 
-	// TODO restore method => BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
+	@Override
+	public BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks) {
+		return new BulkWork.Builder( bulkableWorks );
+	}
 
 	@Override
 	public <T> SearchWorkBuilder search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
@@ -110,7 +117,7 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	}
 
 	@Override
-	public <T> ScrollWorkBuilder scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
 		return new ScrollWork.Builder( scrollId, scrollTimeout, searchResultExtractor );
 	}
 

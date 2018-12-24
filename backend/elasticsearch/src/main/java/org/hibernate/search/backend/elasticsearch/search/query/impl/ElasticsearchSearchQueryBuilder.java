@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 class ElasticsearchSearchQueryBuilder<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
-	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
+	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -42,14 +42,14 @@ class ElasticsearchSearchQueryBuilder<T>
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	ElasticsearchSearchQueryBuilder(
-			ElasticsearchWorkBuilderFactory workBuilderFactory,
+			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
-		this.workBuilderFactory = workBuilderFactory;
+		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
@@ -94,7 +94,7 @@ class ElasticsearchSearchQueryBuilder<T>
 				new ElasticsearchSearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
 		return new ElasticsearchSearchQuery<>(
-				workBuilderFactory, queryOrchestrator,
+				workFactory, queryOrchestrator,
 				indexNames, sessionContext, routingKeys,
 				payload,
 				searchResultExtractor

@@ -6,20 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 
-/**
- * @author Yoann Rodiere
- */
-public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkExecutionContext {
+class ElasticsearchIgnoreDirtyWorkExecutionContext implements ElasticsearchFlushableWorkExecutionContext {
 
 	private final ElasticsearchClient client;
+
 	private final GsonProvider gsonProvider;
 
-	public ElasticsearchStubWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
+	public ElasticsearchIgnoreDirtyWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 	}
@@ -30,12 +29,17 @@ public class ElasticsearchStubWorkExecutionContext implements ElasticsearchWorkE
 	}
 
 	@Override
-	public void setIndexDirty(URLEncodedString indexName) {
-		// TODO scope execution context per request
+	public GsonProvider getGsonProvider() {
+		return gsonProvider;
 	}
 
 	@Override
-	public GsonProvider getGsonProvider() {
-		return gsonProvider;
+	public void setIndexDirty(URLEncodedString indexName) {
+		// Ignored
+	}
+
+	@Override
+	public CompletableFuture<Void> flush() {
+		return CompletableFuture.completedFuture( null );
 	}
 }

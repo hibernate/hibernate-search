@@ -4,23 +4,25 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.work.impl;
+package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.LuceneWork;
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
-import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
-import org.hibernate.search.elasticsearch.client.impl.Paths;
-import org.hibernate.search.elasticsearch.client.impl.URLEncodedString;
-import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.elasticsearch.work.impl.builder.BulkWorkBuilder;
-import org.hibernate.search.util.impl.Futures;
-import org.hibernate.search.util.impl.Throwables;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
+import org.hibernate.search.util.impl.common.Futures;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.Throwables;
+
 import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonArray;
@@ -31,7 +33,7 @@ import com.google.gson.JsonObject;
  */
 public class BulkWork implements ElasticsearchWork<BulkResult> {
 
-	private static final Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 
@@ -74,7 +76,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 				.thenApply( this::generateResult )
 				.exceptionally( Futures.handler(
 						throwable -> {
-							throw LOG.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
+							throw log.elasticsearchRequestFailed( request, null, Throwables.expectException( throwable ) ); }
 				) );
 	}
 
@@ -84,17 +86,17 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	}
 
 	@Override
-	public LuceneWork getLuceneWork() {
+	public Object getInfo() {
 		return null;
 	}
 
 	private BulkResult generateResult(ElasticsearchResponse response) {
 		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
-		return new BulkResultImpl( resultItems, refreshInAPICall );
+		return new BulkResultDefualt( resultItems, refreshInAPICall );
 	}
 
-	private static class NoIndexDirtyBulkExecutionContext extends ForwardingElasticsearchWorkExecutionContext {
+	private static class NoIndexDirtyBulkExecutionContext extends ElasticsearchForwardingWorkExecutionContext {
 
 		public NoIndexDirtyBulkExecutionContext(ElasticsearchWorkExecutionContext delegate) {
 			super( delegate );
@@ -143,11 +145,11 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		}
 	}
 
-	private static class BulkResultImpl implements BulkResult {
+	private static class BulkResultDefualt implements BulkResult {
 		private final JsonArray results;
 		private final boolean refreshInAPICall;
 
-		public BulkResultImpl(JsonArray results, boolean refreshInAPICall) {
+		public BulkResultDefualt(JsonArray results, boolean refreshInAPICall) {
 			super();
 			this.results = results;
 			this.refreshInAPICall = refreshInAPICall;

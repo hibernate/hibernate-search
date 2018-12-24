@@ -89,6 +89,9 @@ public interface Log extends BasicLogger {
 			value = "Elasticsearch connection time-out; check the cluster status, it should be 'green'" )
 	SearchException elasticsearchRequestTimeout();
 
+	@Message(id = ID_OFFSET_2 + 12, value = "Interrupted while waiting for requests to be processed.")
+	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
+
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 53,
 			value = "Executing Elasticsearch query on '%s' with parameters '%s': <%s>" )

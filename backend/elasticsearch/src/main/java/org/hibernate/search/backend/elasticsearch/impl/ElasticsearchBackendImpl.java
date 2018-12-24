@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
@@ -28,11 +29,11 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchStubWorkOrchestrator;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.common.Closer;
@@ -52,6 +53,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchClientImplementor client;
 
 	private final String name;
+	private final ElasticsearchWorkProcessor workProcessor;
 
 	private final Gson userFacingGson;
 
@@ -69,24 +71,25 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final SearchBackendContext searchContext;
 
 	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, GsonProvider gsonProvider, String name,
-			ElasticsearchWorkBuilderFactory workBuilderFactory,
+			ElasticsearchWorkBuilderFactory workFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
+
+		// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
+		this.workProcessor = new ElasticsearchWorkProcessor( new LogErrorHandler(), client, gsonProvider, workFactory );
 		this.userFacingGson = userFacingGson;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.streamOrchestrator = new ElasticsearchStubWorkOrchestrator( client, gsonProvider );
-		this.queryOrchestrator = new ElasticsearchStubWorkOrchestrator( client, gsonProvider );
+		this.streamOrchestrator = workProcessor.createStreamOrchestrator( name );
+		this.queryOrchestrator = workProcessor.createStreamOrchestrator( name );
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext(
-				eventContext, client, gsonProvider, workBuilderFactory, multiTenancyStrategy, streamOrchestrator
-		);
+		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, workProcessor, streamOrchestrator );
 		this.searchContext = new SearchBackendContext(
-				eventContext, workBuilderFactory, userFacingGson,
+				eventContext, workFactory, userFacingGson,
 				( String elasticsearchIndexName ) -> {
 					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 					if ( result == null ) {
@@ -161,7 +164,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
 			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
-			// Close the index writer after the orchestrators, when we're sure all works have been performed
+			closer.push( ElasticsearchWorkProcessor::close, workProcessor );
+			// Close the index writer after the orchestrators and work processor, when we're sure all works have been performed
 			closer.push( ElasticsearchClientImplementor::close, client );
 		}
 		catch (IOException | RuntimeException e) {

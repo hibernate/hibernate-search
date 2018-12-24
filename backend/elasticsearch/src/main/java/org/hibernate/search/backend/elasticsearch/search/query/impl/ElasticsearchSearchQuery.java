@@ -27,7 +27,7 @@ import com.google.gson.JsonObject;
  */
 public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
-	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
+	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final Set<URLEncodedString> indexNames;
 	private final SessionContextImplementor sessionContext;
@@ -38,13 +38,13 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
-	public ElasticsearchSearchQuery(ElasticsearchWorkBuilderFactory workBuilderFactory,
+	public ElasticsearchSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
 			Set<String> routingKeys,
 			JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		this.workBuilderFactory = workBuilderFactory;
+		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.indexNames = indexNames;
 		this.sessionContext = sessionContext;
@@ -75,8 +75,8 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> execute() {
-		// TODO restore scrolling support
-		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workBuilderFactory.search( payload, searchResultExtractor )
+		// TODO restore scrolling support. See HSEARCH-3323
+		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
 				.paging( firstResultIndex, maxResultsCount )
 				.routingKeys( routingKeys ).build();
@@ -100,7 +100,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		ElasticsearchWork<Long> work = workBuilderFactory.count( indexNames ).query( filteredPayload ).routingKeys( routingKeys ).build();
+		ElasticsearchWork<Long> work = workFactory.count( indexNames ).query( filteredPayload ).routingKeys( routingKeys ).build();
 		return queryOrchestrator.submit( work ).join();
 	}
 }

@@ -4,13 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.common.impl;
+package org.hibernate.search.engine.common.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.engine.common.spi.ErrorContext;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.logging.Log;
 

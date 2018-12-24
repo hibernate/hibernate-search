@@ -103,13 +103,13 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			ElasticsearchWorkBuilderFactory workBuilderFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
+			ElasticsearchWorkBuilderFactory workFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					client, dialectSpecificGsonProvider, name, workBuilderFactory, userFacingGson,
+					client, dialectSpecificGsonProvider, name, workFactory, userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource )
 			);

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBuilder;
@@ -28,6 +30,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSett
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 
 import com.google.gson.JsonObject;
@@ -49,7 +52,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	OptimizeWorkBuilder optimize();
 
-	// TODO restore method => BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
+	BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 

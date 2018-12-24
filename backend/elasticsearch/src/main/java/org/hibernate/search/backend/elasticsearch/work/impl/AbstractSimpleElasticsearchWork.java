@@ -40,6 +40,12 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	}
 
 	@Override
+	public Object getInfo() {
+		// TODO extract immutable work relevant info. We need to think about it. See HSEARCH-3110.
+		return this;
+	}
+
+	@Override
 	public String toString() {
 		return new StringBuilder()
 				.append( getClass().getSimpleName() )

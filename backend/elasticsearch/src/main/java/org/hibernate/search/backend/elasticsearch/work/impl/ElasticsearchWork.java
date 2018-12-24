@@ -17,4 +17,5 @@ public interface ElasticsearchWork<T> {
 
 	void aggregate(ElasticsearchWorkAggregator aggregator);
 
+	Object getInfo();
 }

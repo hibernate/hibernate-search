@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -98,14 +99,14 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 	interface Changeset {
 		void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate);
 		CompletableFuture<?> getFuture();
-	};
+	}
 
 	static class MultipleWorkChangeset implements Changeset {
 		private final List<ElasticsearchWork<?>> works;
 		private final CompletableFuture<Object> future;
 
 		MultipleWorkChangeset(List<ElasticsearchWork<?>> works, CompletableFuture<Object> future) {
-			this.works = works;
+			this.works = new ArrayList<>( works );
 			this.future = future;
 		}
 
