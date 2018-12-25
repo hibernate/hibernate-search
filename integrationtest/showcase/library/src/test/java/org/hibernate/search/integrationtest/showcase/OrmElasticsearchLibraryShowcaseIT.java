@@ -138,6 +138,10 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
+						// TODO remove this and use an explicit refresh after initializing data instead
+						PREFIX + "backends.elasticsearchBackend_1.refresh_after_write", true
+				)
+				.applySetting(
 						PREFIX + "backends.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
 						new LibraryAnalysisConfigurer()
 				)

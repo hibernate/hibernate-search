@@ -74,7 +74,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			ElasticsearchWorkBuilderFactory workFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			MultiTenancyStrategy multiTenancyStrategy) {
+			Boolean refreshAfterWrite, MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
 
@@ -87,7 +87,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.queryOrchestrator = workProcessor.createStreamOrchestrator( name );
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, workProcessor, streamOrchestrator );
+		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, workProcessor, refreshAfterWrite, streamOrchestrator );
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, userFacingGson,
 				( String elasticsearchIndexName ) -> {

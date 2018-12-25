@@ -59,9 +59,6 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 					.pathComponent( typeName )
 					.pathComponent( id );
 
-			// TODO avoid this param using a smart orchestrator
-			builder.param( "refresh", true );
-
 			if ( routingKey != null ) {
 				builder.param( "routing", routingKey );
 			}

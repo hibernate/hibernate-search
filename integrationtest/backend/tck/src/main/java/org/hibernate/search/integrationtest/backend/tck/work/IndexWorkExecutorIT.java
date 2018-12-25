@@ -65,10 +65,11 @@ public class IndexWorkExecutorIT {
 				)
 				.setup();
 
-		createBookIndexes( noTenantSessionContext );
-		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
-
 		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
+		createBookIndexes( noTenantSessionContext );
+
+		workExecutor.flush().join();
+		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		workExecutor.optimize().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
@@ -91,12 +92,14 @@ public class IndexWorkExecutorIT {
 				.withMultiTenancy()
 				.setup();
 
+		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
+
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
+		workExecutor.flush().join();
+
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
-
-		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 
 		workExecutor.optimize().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );

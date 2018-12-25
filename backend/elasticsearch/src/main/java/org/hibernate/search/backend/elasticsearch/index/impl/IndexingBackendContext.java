@@ -30,14 +30,16 @@ public class IndexingBackendContext {
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkProcessor workProcessor;
+	private final Boolean refreshAfterWrite;
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public IndexingBackendContext(EventContext eventContext, ElasticsearchWorkBuilderFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkProcessor workProcessor, ElasticsearchWorkOrchestrator streamOrchestrator) {
+			ElasticsearchWorkProcessor workProcessor, Boolean refreshAfterWrite, ElasticsearchWorkOrchestrator streamOrchestrator) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.workProcessor = workProcessor;
+		this.refreshAfterWrite = refreshAfterWrite;
 		this.streamOrchestrator = streamOrchestrator;
 	}
 
@@ -62,7 +64,7 @@ public class IndexingBackendContext {
 	}
 
 	ElasticsearchWorkOrchestrator createWorkPlanOrchestrator(String indexName) {
-		return workProcessor.createNonStreamOrchestrator( indexName, true );
+		return workProcessor.createNonStreamOrchestrator( indexName, refreshAfterWrite );
 	}
 
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(

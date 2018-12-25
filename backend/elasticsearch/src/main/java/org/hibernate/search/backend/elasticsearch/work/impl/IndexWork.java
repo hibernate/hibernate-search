@@ -57,10 +57,6 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 					.pathComponent( indexName )
 					.pathComponent( typeName )
 					.pathComponent( id )
-
-					// TODO avoid this param using a smart orchestrator
-					.param( "refresh", true )
-
 					.body( document );
 
 			if ( routingKey != null ) {

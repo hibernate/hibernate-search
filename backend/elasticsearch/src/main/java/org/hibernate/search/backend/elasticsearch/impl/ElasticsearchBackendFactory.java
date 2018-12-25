@@ -80,6 +80,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
 					.build();
 
+	private static final ConfigurationProperty<Boolean> REFRESH_AFTER_WRITE =
+			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.REFRESH_AFTER_WRITE )
+					.asBoolean()
+					.withDefault( SearchBackendElasticsearchSettings.Defaults.REFRESH_AFTER_WRITE )
+					.build();
+
 	@Override
 	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
@@ -110,7 +116,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			return new ElasticsearchBackendImpl(
 					client, dialectSpecificGsonProvider, name, workFactory, userFacingGson,
-					analysisDefinitionRegistry,
+					analysisDefinitionRegistry, REFRESH_AFTER_WRITE.get( propertySource ),
 					getMultiTenancyStrategy( name, propertySource )
 			);
 		}

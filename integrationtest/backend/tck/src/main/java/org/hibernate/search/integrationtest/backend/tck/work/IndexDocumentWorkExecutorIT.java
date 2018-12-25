@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -55,9 +56,10 @@ public class IndexDocumentWorkExecutorIT {
 	}
 
 	@Test
-	public void checkAllDocumentsAreSearchable() throws Exception {
+	public void checkAllDocumentsAreSearchable() {
 		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor();
 		CompletableFuture[] tasks = new CompletableFuture[NUMBER_OF_BOOKS];
+		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
@@ -66,6 +68,7 @@ public class IndexDocumentWorkExecutorIT {
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
+		workExecutor.flush().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
 				.asReference()
