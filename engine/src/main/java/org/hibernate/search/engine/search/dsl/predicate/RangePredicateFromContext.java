@@ -26,7 +26,7 @@ public interface RangePredicateFromContext {
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to set the upper bound of the range.
 	 */
-	SearchPredicateTerminalContext to(Object value, RangeBoundInclusion inclusion);
+	RangePredicateTerminalContext to(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
@@ -42,8 +42,10 @@ public interface RangePredicateFromContext {
 	 *
 	 * @see #to(Object, RangeBoundInclusion)
 	 */
-	default SearchPredicateTerminalContext to(Object value) {
+	default RangePredicateTerminalContext to(Object value) {
 		return to( value, RangeBoundInclusion.INCLUDED );
 	}
+
+	RangePredicateFromContext excludeLimit();
 
 }
