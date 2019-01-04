@@ -43,34 +43,19 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * Require at least one of the targeted fields to be "higher than" the given value,
 	 * and "lower than" another value (to be provided in following calls).
 	 * <p>
-	 * This syntax is essentially used like this: {@code .from( lowerBound, ... ).to( upperBound, ... )}.
+	 * This syntax is essentially used like this: {@code .from( lowerBound ).to( upperBound )}.
 	 *
 	 * @param value The lower bound of the range. May be null, in which case the range has no lower bound
 	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
-	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
-	 * @return A context allowing to set the upper bound of the range.
-	 */
-	RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion);
-
-	/**
-	 * Require at least one of the targeted fields to be "higher than or equal to" the given value,
-	 * and "lower than" another value (to be provided in following calls).
-	 * <p>
-	 * Calling this method is equivalent to calling
-	 * <code>{@link #from(Object, RangeBoundInclusion) from(value, RangeBoundInclusion.INCLUDED)}</code>.
 	 *
-	 * @param value The lower bound of the range (included)
-	 * (see {@link #from(Object, RangeBoundInclusion)} for details about null-ness and type).
-	 * @return A context allowing to set the upper bound of the range.
+	 * Lower bound is included by default in the range.
 	 *
-	 * @see #from(Object, RangeBoundInclusion)
+	 * @return A context allowing to exclude the lower bound from the range or to set the upper bound of the range.
 	 */
-	default RangePredicateFromContext from(Object value) {
-		return from( value, RangeBoundInclusion.INCLUDED );
-	}
+	RangePredicateFromContext from(Object value);
 
 	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
@@ -80,27 +65,12 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
-	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
-	 * @return A context allowing to get the resulting predicate.
-	 */
-	RangePredicateTerminalContext above(Object value, RangeBoundInclusion inclusion);
-
-	/**
-	 * Require at least one of the targeted fields to be "higher than or equal to" the given value,
-	 * with no limit as to how high it can be.
-	 * <p>
-	 * Calling this method is equivalent to calling
-	 * <code>{@link #above(Object, RangeBoundInclusion) above(value, RangeBoundInclusion.INCLUDED)}</code>.
 	 *
-	 * @param value The lower bound of the range (included)
-	 * (see {@link #above(Object, RangeBoundInclusion)} for details about null-ness and type).
-	 * @return A context allowing to get the resulting predicate.
+	 * Lower bound is included by default in the range.
 	 *
-	 * @see #above(Object, RangeBoundInclusion)
+	 * @return A context allowing to exclude the lower bound from the range or to get the resulting predicate.
 	 */
-	default RangePredicateTerminalContext above(Object value) {
-		return above( value, RangeBoundInclusion.INCLUDED );
-	}
+	RangePredicateTerminalContext above(Object value);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
@@ -110,26 +80,11 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
-	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
-	 * @return A context allowing to get the resulting predicate.
-	 */
-	RangePredicateTerminalContext below(Object value, RangeBoundInclusion inclusion);
-
-	/**
-	 * Require at least one of the targeted fields to be "lower than or equal to" the given value,
-	 * with no limit as to how low it can be.
-	 * <p>
-	 * Calling this method is equivalent to calling
-	 * <code>{@link #below(Object, RangeBoundInclusion) below(value, RangeBoundInclusion.INCLUDED)}</code>.
 	 *
-	 * @param value The upper bound of the range (included)
-	 * (see {@link #below(Object, RangeBoundInclusion)} for details about null-ness and type).
-	 * @return A context allowing to get the resulting predicate.
+	 * Upper bound is included by default in the range.
 	 *
-	 * @see #below(Object, RangeBoundInclusion)
+	 * @return A context allowing to exclude the upper bound from the range or to get the resulting predicate.
 	 */
-	default RangePredicateTerminalContext below(Object value) {
-		return below( value, RangeBoundInclusion.INCLUDED );
-	}
+	RangePredicateTerminalContext below(Object value);
 
 }

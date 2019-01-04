@@ -8,6 +8,14 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 public interface RangePredicateTerminalContext extends SearchPredicateTerminalContext {
 
+	/**
+	 * Exclude the limit bound from the range.
+	 *
+	 * After a {@link RangePredicateFieldSetContext#below(Object)} or {@link RangePredicateFromContext#to(Object)} will exclude the upper bound from the range.
+	 * After a {@link RangePredicateFieldSetContext#above(Object)} will exclude the lower bound.
+	 *
+	 * @return A context to get the resulting predicate.
+	 */
 	SearchPredicateTerminalContext excludeLimit();
 
 }

@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateTerminalContext;
-import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
@@ -59,18 +58,18 @@ class RangePredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion) {
-		return fromContext.from( value, inclusion );
+	public RangePredicateFromContext from(Object value) {
+		return fromContext.from( value );
 	}
 
 	@Override
-	public RangePredicateTerminalContext above(Object value, RangeBoundInclusion inclusion) {
-		return commonState.above( value, inclusion );
+	public RangePredicateTerminalContext above(Object value) {
+		return commonState.above( value );
 	}
 
 	@Override
-	public RangePredicateTerminalContext below(Object value, RangeBoundInclusion inclusion) {
-		return commonState.below( value, inclusion );
+	public RangePredicateTerminalContext below(Object value) {
+		return commonState.below( value );
 	}
 
 	@Override
@@ -105,35 +104,21 @@ class RangePredicateFieldSetContextImpl<B>
 			return super.toImplementation();
 		}
 
-		RangePredicateTerminalContext above(Object value, RangeBoundInclusion inclusion) {
+		RangePredicateTerminalContext above(Object value) {
 			excludeUpperLimit = false;
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
 			}
-			switch ( inclusion ) {
-				case EXCLUDED:
-					getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
-					break;
-				case INCLUDED:
-					break;
-			}
 			checkHasNonNullBound();
 			return this;
 		}
 
-		RangePredicateTerminalContext below(Object value, RangeBoundInclusion inclusion) {
+		RangePredicateTerminalContext below(Object value) {
 			excludeUpperLimit = true;
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
-			}
-			switch ( inclusion ) {
-				case EXCLUDED:
-					getQueryBuilders().forEach( RangePredicateBuilder::excludeUpperLimit );
-					break;
-				case INCLUDED:
-					break;
 			}
 			checkHasNonNullBound();
 			return this;
@@ -165,8 +150,8 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public RangePredicateTerminalContext to(Object value, RangeBoundInclusion inclusion) {
-			return delegate.below( value, inclusion );
+		public RangePredicateTerminalContext to(Object value) {
+			return delegate.below( value );
 		}
 
 		@Override
@@ -175,17 +160,10 @@ class RangePredicateFieldSetContextImpl<B>
 			return this;
 		}
 
-		RangePredicateFromContext from(Object value, RangeBoundInclusion inclusion) {
+		RangePredicateFromContext from(Object value) {
 			if ( value != null ) {
 				delegate.hasNonNullBound = true;
 				delegate.getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
-			}
-			switch ( inclusion ) {
-				case EXCLUDED:
-					delegate.getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
-					break;
-				case INCLUDED:
-					break;
 			}
 			return this;
 		}
