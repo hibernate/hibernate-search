@@ -83,7 +83,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param inclusion Whether the lower bound should be included in or excluded from the range.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext above(Object value, RangeBoundInclusion inclusion);
+	RangePredicateTerminalContext above(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "higher than or equal to" the given value,
@@ -98,7 +98,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @see #above(Object, RangeBoundInclusion)
 	 */
-	default SearchPredicateTerminalContext above(Object value) {
+	default RangePredicateTerminalContext above(Object value) {
 		return above( value, RangeBoundInclusion.INCLUDED );
 	}
 
@@ -113,7 +113,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * @param inclusion Whether the upper bound should be included in or excluded from the range.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext below(Object value, RangeBoundInclusion inclusion);
+	RangePredicateTerminalContext below(Object value, RangeBoundInclusion inclusion);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than or equal to" the given value,
@@ -128,7 +128,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @see #below(Object, RangeBoundInclusion)
 	 */
-	default SearchPredicateTerminalContext below(Object value) {
+	default RangePredicateTerminalContext below(Object value) {
 		return below( value, RangeBoundInclusion.INCLUDED );
 	}
 
