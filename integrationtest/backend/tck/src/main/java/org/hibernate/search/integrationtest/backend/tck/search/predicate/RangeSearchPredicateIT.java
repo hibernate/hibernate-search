@@ -28,7 +28,6 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.dsl.predicate.RangeBoundInclusion;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -123,46 +122,6 @@ public class RangeSearchPredicateIT {
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-			// explicit inclusion
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
-
-			// explicit exclusion
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
-		}
-	}
-
-	@Test
-	public void above_include_exclude_excludeLimit() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
-			Object lowerValueToMatch = fieldModel.document2Value.indexedValue;
-
-			// Default is inclusion
-
-			SearchQuery<DocumentReference> query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
-
 			// explicit exclusion
 
 			query = searchTarget.query()
@@ -213,46 +172,6 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void below_include_exclude() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
-			Object upperValueToMatch = fieldModel.document2Value.indexedValue;
-
-			// Default is inclusion
-
-			SearchQuery<DocumentReference> query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
-
-			// explicit inclusion
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.INCLUDED ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
-
-			// explicit exclusion
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch, RangeBoundInclusion.EXCLUDED ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
-		}
-	}
-
-	@Test
-	public void below_include_exclude_excludeLimit() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -321,84 +240,6 @@ public class RangeSearchPredicateIT {
 
 	@Test
 	public void fromTo_include_exclude() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
-			Object value1ToMatch = fieldModel.document1Value.indexedValue;
-			Object value2ToMatch = fieldModel.document2Value.indexedValue;
-			Object value3ToMatch = fieldModel.document3Value.indexedValue;
-
-			// Default is inclusion
-
-			SearchQuery<DocumentReference> query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ).toPredicate() )
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
-
-			// explicit inclusion
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath )
-							.from( value1ToMatch, RangeBoundInclusion.INCLUDED )
-							.to( value2ToMatch, RangeBoundInclusion.INCLUDED )
-							.toPredicate()
-					)
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
-
-			// explicit exclusion for the from clause
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath )
-							.from( value1ToMatch, RangeBoundInclusion.EXCLUDED )
-							.to( value2ToMatch, RangeBoundInclusion.INCLUDED )
-							.toPredicate()
-					)
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
-
-			// explicit exclusion for the to clause
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath )
-							.from( value1ToMatch, RangeBoundInclusion.INCLUDED )
-							.to( value2ToMatch, RangeBoundInclusion.EXCLUDED )
-							.toPredicate()
-					)
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
-
-			// explicit exclusion for both clauses
-
-			query = searchTarget.query()
-					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath )
-							.from( value1ToMatch, RangeBoundInclusion.EXCLUDED )
-							.to( value3ToMatch, RangeBoundInclusion.EXCLUDED )
-							.toPredicate()
-					)
-					.build();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
-		}
-	}
-
-	@Test
-	public void fromTo_include_exclude_excludeLimit() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
