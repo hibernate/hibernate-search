@@ -12,7 +12,6 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -24,13 +23,13 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
 import org.junit.Before;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
+public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMockSupport {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -42,14 +41,10 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 	private ElasticsearchWorkSequenceBuilder sequenceBuilderMock;
 	private ElasticsearchWorkBulker bulkerMock;
 
-	private final List<Object> mocks = new ArrayList<>();
-
 	@Before
 	public void initMocks() {
-		sequenceBuilderMock = EasyMock.createStrictMock( ElasticsearchWorkSequenceBuilder.class );
-		mocks.add( sequenceBuilderMock );
-		bulkerMock = EasyMock.createStrictMock( ElasticsearchWorkBulker.class );
-		mocks.add( bulkerMock );
+		sequenceBuilderMock = createStrictMock( ElasticsearchWorkSequenceBuilder.class );
+		bulkerMock = createStrictMock( ElasticsearchWorkBulker.class );
 	}
 
 	@Test
@@ -60,12 +55,12 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
-		replay();
+		replayAll();
 		ElasticsearchParallelChangesetsWorkOrchestrator orchestrator =
 				new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work1 ) );
@@ -76,16 +71,16 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		bulkerMock.add( work2 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequenceFuture = orchestrator.submit( changeset1 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequenceFuture ).isSameAs( sequenceFuture );
 
-		reset();
+		resetAll();
 		bulkerMock.flushBulk();
-		replay();
+		replayAll();
 		CompletableFuture<Void> futureAll = orchestrator.flush();
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 		sequenceFuture.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
@@ -102,12 +97,12 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
-		replay();
+		replayAll();
 		ElasticsearchParallelChangesetsWorkOrchestrator orchestrator =
 				new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work1 ) );
@@ -115,28 +110,28 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
 		bulkerMock.add( work2 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
-		reset();
+		resetAll();
 		bulkerMock.flushBulk();
-		replay();
+		replayAll();
 		CompletableFuture<Void> futureAll = orchestrator.flush();
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 		sequence2Future.complete( null );
 		assertThat( futureAll ).isPending();
@@ -155,52 +150,52 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
-		replay();
+		replayAll();
 		ElasticsearchParallelChangesetsWorkOrchestrator orchestrator =
 				new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
 		bulkerMock.add( work1 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
 		bulkerMock.add( work2 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
-		reset();
+		resetAll();
 		bulkerMock.flushBulk();
-		replay();
+		replayAll();
 		CompletableFuture<Void> futureAll = orchestrator.flush();
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		sequence2Future.complete( null );
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		sequence1Future.complete( null );
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
@@ -213,12 +208,12 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
-		replay();
+		replayAll();
 		ElasticsearchParallelChangesetsWorkOrchestrator orchestrator =
 				new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
@@ -233,22 +228,22 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		bulkerMock.add( work3 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
-		reset();
+		resetAll();
 		bulkerMock.flushBulk();
-		replay();
+		replayAll();
 		CompletableFuture<Void> futureAll = orchestrator.flush();
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		sequence1Future.complete( null );
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
@@ -263,24 +258,24 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
-		replay();
+		replayAll();
 		ElasticsearchParallelChangesetsWorkOrchestrator orchestrator =
 				new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilderMock, bulkerMock );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
 		bulkerMock.add( work1 );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence1Future = orchestrator.submit( changeset1 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
-		reset();
+		resetAll();
 		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work2 ) );
@@ -292,53 +287,37 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest {
 		bulkerMock.add( work3 );
 		expect( bulkerMock.flushBulked() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		replay();
+		replayAll();
 		CompletableFuture<Void> returnedSequence2Future = orchestrator.submit( changeset2 );
-		verify();
+		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
-		reset();
+		resetAll();
 		bulkerMock.flushBulk();
-		replay();
+		replayAll();
 		CompletableFuture<Void> futureAll = orchestrator.flush();
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		sequence2Future.complete( null );
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isPending();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		sequence1Future.complete( null );
-		verify();
+		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
-	private void reset() {
-		EasyMock.reset( mocks.toArray() );
-	}
-
-	private void replay() {
-		EasyMock.replay( mocks.toArray() );
-	}
-
-	private void verify() {
-		EasyMock.verify( mocks.toArray() );
-	}
-
 	private ElasticsearchWork<?> work(int index) {
-		ElasticsearchWork<?> mock = EasyMock.createStrictMock( "work" + index, ElasticsearchWork.class );
-		mocks.add( mock );
-		return mock;
+		return createStrictMock( "work" + index, ElasticsearchWork.class );
 	}
 
 	private BulkableElasticsearchWork<?> bulkableWork(int index) {
-		BulkableElasticsearchWork<?> mock = EasyMock.createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
-		mocks.add( mock );
-		return mock;
+		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
 	}
 
 	private IAnswer<Void> nonBulkableAggregateAnswer(ElasticsearchWork<?> mock) {

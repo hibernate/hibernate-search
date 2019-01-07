@@ -10,10 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.newCapture;
-import static org.easymock.EasyMock.createMock;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.common.spi.ErrorContext;
@@ -23,14 +19,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.easymock.Capture;
-import org.easymock.EasyMock;
+import org.easymock.EasyMockSupport;
 
 /**
  * @author Yoann Rodiere
  */
-public class DefaultContextualErrorHandlerTest {
-
-	private final List<Object> mocks = new ArrayList<>();
+public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 
 	private ErrorHandler errorHandlerMock;
 
@@ -44,8 +38,7 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Before
 	public void initMocks() {
-		errorHandlerMock = EasyMock.createStrictMock( ErrorHandler.class );
-		mocks.add( errorHandlerMock );
+		errorHandlerMock = createStrictMock( ErrorHandler.class );
 
 		work1 = work( 1 );
 		work2 = work( 2 );
@@ -60,28 +53,28 @@ public class DefaultContextualErrorHandlerTest {
 	public void singleError() {
 		Capture<ErrorContext> capture = newCapture();
 
-		replay();
+		replayAll();
 		DefaultContextualErrorHandler handler =
 				new DefaultContextualErrorHandler( errorHandlerMock );
-		verify();
+		verifyAll();
 
 		Throwable throwable = new Throwable();
 
-		reset();
+		resetAll();
 		expect( work1.getInfo() ).andReturn( workInfo1 );
 		expect( work2.getInfo() ).andReturn( workInfo2 );
 		expect( work3.getInfo() ).andReturn( workInfo3 );
-		replay();
+		replayAll();
 		handler.markAsFailed( work1, throwable );
 		handler.markAsSkipped( work2 );
 		handler.markAsSkipped( work3 );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		errorHandlerMock.handle( capture( capture ) );
-		replay();
+		replayAll();
 		handler.handle();
-		verify();
+		verifyAll();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
 		assertThat( errorContext.getOperationAtFault() ).isSameAs( workInfo1 );
@@ -90,48 +83,48 @@ public class DefaultContextualErrorHandlerTest {
 
 	@Test
 	public void noError() {
-		replay();
+		replayAll();
 		DefaultContextualErrorHandler handler =
 				new DefaultContextualErrorHandler( errorHandlerMock );
-		verify();
+		verifyAll();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		handler.handle();
-		verify();
+		verifyAll();
 	}
 
 	@Test
 	public void nonWorkError() {
 		Capture<ErrorContext> capture = newCapture();
 
-		replay();
+		replayAll();
 		DefaultContextualErrorHandler handler =
 				new DefaultContextualErrorHandler( errorHandlerMock );
-		verify();
+		verifyAll();
 
 		Throwable throwable = new Throwable();
 
-		reset();
+		resetAll();
 		expect( work1.getInfo() ).andReturn( workInfo1 );
 		expect( work2.getInfo() ).andReturn( workInfo2 );
 		expect( work3.getInfo() ).andReturn( workInfo3 );
-		replay();
+		replayAll();
 		handler.markAsSkipped( work1 );
 		handler.markAsSkipped( work2 );
 		handler.markAsSkipped( work3 );
-		verify();
+		verifyAll();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		handler.addThrowable( throwable );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		errorHandlerMock.handle( capture( capture ) );
-		replay();
+		replayAll();
 		handler.handle();
-		verify();
+		verifyAll();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
 		assertThat( errorContext.getOperationAtFault() ).isNull();
@@ -142,29 +135,29 @@ public class DefaultContextualErrorHandlerTest {
 	public void multipleErrors_works() {
 		Capture<ErrorContext> capture = newCapture();
 
-		replay();
+		replayAll();
 		DefaultContextualErrorHandler handler =
 				new DefaultContextualErrorHandler( errorHandlerMock );
-		verify();
+		verifyAll();
 
 		Throwable throwable1 = new Throwable();
 		Throwable throwable2 = new Throwable();
 
-		reset();
+		resetAll();
 		expect( work1.getInfo() ).andReturn( workInfo1 );
 		expect( work2.getInfo() ).andReturn( workInfo2 );
 		expect( work3.getInfo() ).andReturn( workInfo3 );
-		replay();
+		replayAll();
 		handler.markAsFailed( work1, throwable1 );
 		handler.markAsFailed( work2, throwable2 );
 		handler.markAsSkipped( work3 );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		errorHandlerMock.handle( capture( capture ) );
-		replay();
+		replayAll();
 		handler.handle();
-		verify();
+		verifyAll();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
@@ -176,34 +169,34 @@ public class DefaultContextualErrorHandlerTest {
 	public void multipleErrors_workAndNotWork() {
 		Capture<ErrorContext> capture = newCapture();
 
-		replay();
+		replayAll();
 		DefaultContextualErrorHandler handler =
 				new DefaultContextualErrorHandler( errorHandlerMock );
-		verify();
+		verifyAll();
 
 		Throwable throwable1 = new Throwable();
 		Throwable throwable2 = new Throwable();
 
-		reset();
+		resetAll();
 		expect( work1.getInfo() ).andReturn( workInfo1 );
 		expect( work2.getInfo() ).andReturn( workInfo2 );
 		expect( work3.getInfo() ).andReturn( workInfo3 );
-		replay();
+		replayAll();
 		handler.markAsFailed( work1, throwable1 );
 		handler.markAsSkipped( work2 );
 		handler.markAsSkipped( work3 );
-		verify();
+		verifyAll();
 
-		reset();
-		replay();
+		resetAll();
+		replayAll();
 		handler.addThrowable( throwable2 );
-		verify();
+		verifyAll();
 
-		reset();
+		resetAll();
 		errorHandlerMock.handle( capture( capture ) );
-		replay();
+		replayAll();
 		handler.handle();
-		verify();
+		verifyAll();
 		ErrorContext errorContext = capture.getValue();
 		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
@@ -211,27 +204,13 @@ public class DefaultContextualErrorHandlerTest {
 		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
-	private void reset() {
-		EasyMock.reset( mocks.toArray() );
-	}
-
-	private void replay() {
-		EasyMock.replay( mocks.toArray() );
-	}
-
-	private void verify() {
-		EasyMock.verify( mocks.toArray() );
-	}
-
 	private ElasticsearchWork<?> work(int index) {
 		ElasticsearchWork<?> mock = createMock( "work" + index, ElasticsearchWork.class );
-		mocks.add( mock );
 		return mock;
 	}
 
 	private Object workInfo(int index) {
 		Object mock = createMock( "workInfo" + index, Object.class );
-		mocks.add( mock );
 		return mock;
 	}
 }
