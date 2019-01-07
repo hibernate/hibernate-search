@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.cfg.SearchIndexElasticsearchSettings;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
@@ -33,6 +34,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.util.EventContext;
 import org.hibernate.search.engine.logging.spi.EventContexts;
@@ -49,6 +51,12 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final ConfigurationProperty<Boolean> REFRESH_AFTER_WRITE =
+			ConfigurationProperty.forKey( SearchIndexElasticsearchSettings.REFRESH_AFTER_WRITE )
+					.asBoolean()
+					.withDefault( SearchIndexElasticsearchSettings.Defaults.REFRESH_AFTER_WRITE )
+					.build();
 
 	private final ElasticsearchClientImplementor client;
 
@@ -74,7 +82,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			ElasticsearchWorkBuilderFactory workFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			Boolean refreshAfterWrite, MultiTenancyStrategy multiTenancyStrategy) {
+			MultiTenancyStrategy multiTenancyStrategy) {
 		this.client = client;
 		this.name = name;
 
@@ -87,7 +95,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.queryOrchestrator = workProcessor.createStreamOrchestrator( name );
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, workProcessor, refreshAfterWrite, streamOrchestrator );
+		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, workProcessor, streamOrchestrator );
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, userFacingGson,
 				( String elasticsearchIndexName ) -> {
@@ -152,10 +160,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchIndexSettingsBuilder settingsBuilder =
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
+		boolean refreshAfterWrite = REFRESH_AFTER_WRITE.get( propertySource );
+
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
-				indexSchemaRootNodeBuilder, settingsBuilder
+				indexSchemaRootNodeBuilder, settingsBuilder,
+				refreshAfterWrite
 		);
 	}
 

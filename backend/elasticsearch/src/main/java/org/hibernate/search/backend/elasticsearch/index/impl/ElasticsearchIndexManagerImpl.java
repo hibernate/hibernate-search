@@ -44,18 +44,21 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
+	private final boolean refreshAfterWrite;
 	private final ElasticsearchWorkOrchestrator workPlanOrchestrator;
 
 	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
-			ElasticsearchIndexModel model) {
+			ElasticsearchIndexModel model,
+			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.typeName = typeName;
 		this.model = model;
-		this.workPlanOrchestrator = indexingBackendContext.createWorkPlanOrchestrator( elasticsearchIndexName.encoded );
+		this.refreshAfterWrite = refreshAfterWrite;
+		this.workPlanOrchestrator = indexingBackendContext.createWorkPlanOrchestrator( elasticsearchIndexName.encoded, refreshAfterWrite );
 	}
 
 	@Override
@@ -70,7 +73,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkPlan( workPlanOrchestrator, elasticsearchIndexName, typeName, sessionContext );
+		return indexingBackendContext.createWorkPlan(
+				workPlanOrchestrator,
+				elasticsearchIndexName, typeName,
+				refreshAfterWrite,
+				sessionContext
+		);
 	}
 
 	@Override

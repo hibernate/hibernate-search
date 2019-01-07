@@ -30,12 +30,14 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
+	private final boolean refreshAfterWrite;
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
-			ElasticsearchIndexSettingsBuilder settingsBuilder) {
+			ElasticsearchIndexSettingsBuilder settingsBuilder,
+			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
@@ -43,6 +45,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
+		this.refreshAfterWrite = refreshAfterWrite;
 	}
 
 	@Override
@@ -71,7 +74,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		return new ElasticsearchIndexManagerImpl(
 				indexingBackendContext, searchBackendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				encodedTypeName, model
+				encodedTypeName, model,
+				refreshAfterWrite
 		);
 	}
 

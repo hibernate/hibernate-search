@@ -47,8 +47,6 @@ public final class SearchBackendElasticsearchSettings {
 
 	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
 
-	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";
-
 	/**
 	 * Default values for the different settings if no values are given.
 	 */
@@ -68,6 +66,5 @@ public final class SearchBackendElasticsearchSettings {
 		public static final String DISCOVERY_SCHEME = "http";
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		public static final MultiTenancyStrategyConfiguration MULTI_TENANCY_STRATEGY = MultiTenancyStrategyConfiguration.NONE;
-		public static final boolean REFRESH_AFTER_WRITE = false;
 	}
 }
