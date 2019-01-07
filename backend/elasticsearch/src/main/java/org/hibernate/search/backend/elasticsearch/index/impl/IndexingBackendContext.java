@@ -73,7 +73,12 @@ public class IndexingBackendContext {
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexWorkPlan( workFactory, multiTenancyStrategy, orchestrator, indexName, typeName, sessionContext );
+		return new ElasticsearchIndexWorkPlan(
+				workFactory, multiTenancyStrategy, orchestrator,
+				indexName, typeName,
+				refreshAfterWrite,
+				sessionContext
+		);
 	}
 
 	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(

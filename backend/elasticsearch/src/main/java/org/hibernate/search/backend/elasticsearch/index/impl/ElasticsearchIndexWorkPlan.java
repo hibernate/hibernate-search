@@ -34,6 +34,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
 	private final URLEncodedString typeName;
+	private final boolean refreshAfterWrite;
 	private final String tenantId;
 
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
@@ -42,12 +43,14 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
+			boolean refreshAfterWrite,
 			SessionContextImplementor sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
 		this.typeName = typeName;
+		this.refreshAfterWrite = refreshAfterWrite;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
@@ -62,7 +65,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		collect( builderFactory.index( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build() );
+		collect(
+				builderFactory.index(
+						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+				)
+						.markIndexDirty( refreshAfterWrite )
+						.build()
+		);
 	}
 
 	@Override
@@ -76,7 +85,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		collect( builderFactory.index( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build() );
+		collect(
+				builderFactory.index(
+						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+				)
+						.markIndexDirty( refreshAfterWrite )
+						.build()
+		);
 	}
 
 	@Override
@@ -84,7 +99,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
 		String routingKey = referenceProvider.getRoutingKey();
 
-		collect( builderFactory.delete( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey ).build() );
+		collect(
+				builderFactory.delete(
+						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey
+				)
+						.markIndexDirty( refreshAfterWrite )
+						.build()
+		);
 	}
 
 	@Override
