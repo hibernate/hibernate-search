@@ -16,16 +16,18 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.impl.common.Futures;
 
 class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
-	private final Function<List<BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory;
+	private final Function<List<? extends BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory;
 	private final int minBulkSize;
 	private final int maxBulkSize;
 
-	private final List<BulkableElasticsearchWork<?>> currentBulkWorks;
-	private int currentBulkFirstUnflushedWork;
+	private final List<BulkableElasticsearchWork<?>> currentBulkItems;
+	private final List<CompletableFuture<?>> currentBulkItemsFutures;
+	private int currentBulkFirstUnflushedItem;
 	private CompletableFuture<ElasticsearchWork<BulkResult>> currentBulkWorkFuture;
 	private CompletableFuture<BulkResult> currentBulkResultFuture;
 
@@ -40,43 +42,48 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	 * to the underlying sequence builder.
 	 */
 	public ElasticsearchDefaultWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
-			Function<List<BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory,
+			Function<List<? extends BulkableElasticsearchWork<?>>, ElasticsearchWork<BulkResult>> bulkWorkFactory,
 			int minBulkSize, int maxBulkSize) {
 		this.sequenceBuilder = sequenceBuilder;
 		this.bulkWorkFactory = bulkWorkFactory;
 		this.minBulkSize = minBulkSize;
 		this.maxBulkSize = maxBulkSize;
 
-		this.currentBulkWorks = new ArrayList<>();
-		this.currentBulkFirstUnflushedWork = 0;
+		this.currentBulkItems = new ArrayList<>();
+		this.currentBulkItemsFutures = new ArrayList<>();
+		this.currentBulkFirstUnflushedItem = 0;
 		this.currentBulkWorkFuture = null;
 		this.currentBulkResultFuture = null;
 	}
 
 	@Override
-	public void add(BulkableElasticsearchWork<?> work) {
-		currentBulkWorks.add( work );
-		if ( currentBulkWorks.size() >= maxBulkSize ) {
+	public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> work) {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		currentBulkItems.add( work );
+		currentBulkItemsFutures.add( future );
+		if ( currentBulkItems.size() >= maxBulkSize ) {
 			flushBulked();
 			flushBulk();
 		}
+		return future;
 	}
 
 	@Override
 	public boolean flushBulked() {
-		int currentBulkWorksSize = currentBulkWorks.size();
-		if ( currentBulkWorksSize <= currentBulkFirstUnflushedWork ) {
+		int currentBulkWorksSize = currentBulkItems.size();
+		if ( currentBulkWorksSize <= currentBulkFirstUnflushedItem ) {
 			// No work to flush
 			return false;
 		}
-		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstUnflushedWork == 0 ) {
+		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstUnflushedItem == 0 ) {
 			/*
 			 * Not enough works in the bulk, and no work has been flushed yet.
 			 * We'll just flush the works without bulking them,
 			 * and start a new bulk.
 			 */
-			for ( ElasticsearchWork<?> work : currentBulkWorks ) {
-				sequenceBuilder.addNonBulkExecution( work );
+			for ( int i = 0; i < currentBulkWorksSize ; ++i ) {
+				BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
+				addAndConnectNonBulkedWorkExecution( work, i );
 			}
 			reset();
 			return false;
@@ -88,19 +95,18 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		}
 
 		BulkResultExtractionStep extractionStep = sequenceBuilder.startBulkResultExtraction( currentBulkResultFuture );
-		for ( int i = currentBulkFirstUnflushedWork ; i < currentBulkWorksSize ; ++i ) {
-			int bulkedWorkIndex = i;
-			BulkableElasticsearchWork<?> bulkedWork = currentBulkWorks.get( bulkedWorkIndex );
-			extractionStep.add( bulkedWork, bulkedWorkIndex );
+		for ( int i = currentBulkFirstUnflushedItem; i < currentBulkWorksSize ; ++i ) {
+			BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
+			addAndConnectBulkedWorkExtraction( extractionStep, work, i );
 		}
-		currentBulkFirstUnflushedWork = currentBulkWorksSize;
+		currentBulkFirstUnflushedItem = currentBulkWorksSize;
 
 		return true;
 	}
 
 	@Override
 	public void flushBulk() {
-		if ( currentBulkWorks.size() != currentBulkFirstUnflushedWork ) {
+		if ( currentBulkItems.size() != currentBulkFirstUnflushedItem ) {
 			throw new AssertionFailure( "Some works haven't been flushed to the sequence builder" );
 		}
 
@@ -109,16 +115,32 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 			return;
 		}
 
-		ElasticsearchWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkWorks );
+		ElasticsearchWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkItems );
 		currentBulkWorkFuture.complete( bulkWork );
 		reset();
 	}
 
 	@Override
 	public void reset() {
-		this.currentBulkWorks.clear();
-		this.currentBulkFirstUnflushedWork = 0;
+		this.currentBulkItems.clear();
+		this.currentBulkItemsFutures.clear();
+		this.currentBulkFirstUnflushedItem = 0;
 		this.currentBulkWorkFuture = null;
 		this.currentBulkResultFuture = null;
+	}
+
+	private <T> void addAndConnectNonBulkedWorkExecution(BulkableElasticsearchWork<T> work, int index) {
+		@SuppressWarnings("unchecked") // The type T of the future matches the one of the work with the same index; see add()
+		CompletableFuture<T> future = (CompletableFuture<T>) currentBulkItemsFutures.get( index );
+		sequenceBuilder.addNonBulkExecution( work )
+				.whenComplete( Futures.copyHandler( future ) );
+	}
+
+	private <T> void addAndConnectBulkedWorkExtraction(BulkResultExtractionStep extractionStep,
+			BulkableElasticsearchWork<T> work, int index) {
+		@SuppressWarnings("unchecked") // The type T of the future matches the one of the work with the same index; see add()
+		CompletableFuture<T> future = (CompletableFuture<T>) currentBulkItemsFutures.get( index );
+		extractionStep.add( work, index )
+				.whenComplete( Futures.copyHandler( future ) );
 	}
 }

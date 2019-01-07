@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 
 /**
@@ -20,8 +22,9 @@ public interface ElasticsearchWorkBulker {
 
 	/**
 	 * @param work A work to add to the current bulk
+	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	void add(BulkableElasticsearchWork<?> work);
+	<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> work);
 
 	/**
 	 * Ensure that all bulked works that haven't been added to a sequence yet

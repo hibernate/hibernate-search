@@ -49,6 +49,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * as failed.
 	 *
 	 * @param work The work to be executed
+	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
 	<T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work);
 
@@ -90,8 +91,9 @@ interface ElasticsearchWorkSequenceBuilder {
 		 *
 		 * @param bulkedWork The work whose result will be extracted.
 		 * @param index The index of the bulked work in the bulk.
+		 * @return A future that will ultimately contain the result of extracting the work result, or an exception.
 		 */
-		<T> void add(BulkableElasticsearchWork<T> bulkedWork, int index);
+		<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index);
 
 	}
 

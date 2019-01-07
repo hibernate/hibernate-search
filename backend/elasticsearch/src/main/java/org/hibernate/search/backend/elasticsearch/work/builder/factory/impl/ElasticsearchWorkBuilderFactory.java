@@ -52,7 +52,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	OptimizeWorkBuilder optimize();
 
-	BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks);
+	BulkWorkBuilder bulk(List<? extends BulkableElasticsearchWork<?>> bulkableWorks);
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 

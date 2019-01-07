@@ -79,9 +79,9 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response);
 
 	@Override
-	public void aggregate(ElasticsearchWorkAggregator aggregator) {
+	public CompletableFuture<R> aggregate(ElasticsearchWorkAggregator aggregator) {
 		// May be overridden by subclasses
-		aggregator.addNonBulkable( this );
+		return aggregator.addNonBulkable( this );
 	}
 
 	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {

@@ -49,12 +49,15 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.initSequence();
-		CompletableFuture<T> futureWithReturn = aggregator.addWithReturn( work );
+		CompletableFuture<T> workFuture = work.aggregate( aggregator );
 		aggregator.flushSequence();
 
-		// return the future of addWithReturn operation
-		// it could be not in sync with the future of flushSequence operation
-		return futureWithReturn;
+		/*
+		 * Return a future that does not wait for the index refreshes:
+		 * when we call this method, we do explicit flushes/refreshes afterwards.
+		 * TODO This is dodgy. Try to either implement refreshes efficiently in this case, or to make the behavior more obvious in the interfaces.
+		 */
+		return workFuture;
 	}
 
 	@Override
@@ -93,16 +96,16 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 		}
 
 		@Override
-		public void addBulkable(BulkableElasticsearchWork<?> work) {
+		public <T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work) {
 			if ( !currentBulkIsUsableInSameSequence ) {
 				bulker.flushBulk();
 				currentBulkIsUsableInSameSequence = true;
 			}
-			bulker.add( work );
+			return bulker.add( work );
 		}
 
 		@Override
-		public void addNonBulkable(ElasticsearchWork<?> work) {
+		public <T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work) {
 			if ( bulker.flushBulked() ) {
 				/*
 				 * A non-bulkable work follows bulked works,
@@ -111,7 +114,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 				 */
 				currentBulkIsUsableInSameSequence = false;
 			}
-			sequenceBuilder.addNonBulkExecution( work );
+			return sequenceBuilder.addNonBulkExecution( work );
 		}
 
 		public CompletableFuture<Void> flushSequence() {
@@ -129,17 +132,6 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 			bulker.reset();
 			rootFuture = CompletableFuture.completedFuture( null );
 			sequenceBuilder.init( rootFuture );
-		}
-
-		// TODO temporary treating single work as NOT bulked, eventually it must be treated as a bulked for very critical performance reasons!
-		public <T> CompletableFuture<T> addWithReturn(ElasticsearchWork<T> work) {
-			if ( bulker.flushBulked() ) {
-				/*
-				 * Same reason as in addNonBulkable
-				 */
-				currentBulkIsUsableInSameSequence = false;
-			}
-			return sequenceBuilder.addNonBulkExecution( work );
 		}
 	}
 }

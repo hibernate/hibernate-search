@@ -68,7 +68,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
@@ -119,7 +119,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
@@ -159,7 +159,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -171,7 +171,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequenceBuilderMock.init( anyObject() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
@@ -217,7 +217,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
@@ -225,7 +225,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		work3.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.flushBulk();
-		bulkerMock.add( work3 );
+		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -267,7 +267,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -284,7 +284,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		work3.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.flushBulk();
-		bulkerMock.add( work3 );
+		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
@@ -312,11 +312,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		assertThat( futureAll ).isSuccessful( (Void) null );
 	}
 
-	private ElasticsearchWork<?> work(int index) {
+	private <T> ElasticsearchWork<T> work(int index) {
 		return createStrictMock( "work" + index, ElasticsearchWork.class );
 	}
 
-	private BulkableElasticsearchWork<?> bulkableWork(int index) {
+	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
 		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
 	}
 

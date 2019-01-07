@@ -69,8 +69,9 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 		return super.beforeExecute( executionContext, request );
 	}
 
-	public void aggregate(ElasticsearchWorkAggregator aggregator) {
-		aggregator.addBulkable( this );
+	@Override
+	public CompletableFuture<R> aggregate(ElasticsearchWorkAggregator aggregator) {
+		return aggregator.addBulkable( this );
 	}
 
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);

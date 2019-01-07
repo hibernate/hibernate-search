@@ -97,7 +97,7 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	}
 
 	@Override
-	public BulkWorkBuilder bulk(List<BulkableElasticsearchWork<?>> bulkableWorks) {
+	public BulkWorkBuilder bulk(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
 		return new BulkWork.Builder( bulkableWorks );
 	}
 

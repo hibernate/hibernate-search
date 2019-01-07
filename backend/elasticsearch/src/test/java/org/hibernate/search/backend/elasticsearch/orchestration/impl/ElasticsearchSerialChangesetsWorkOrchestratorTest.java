@@ -68,7 +68,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
@@ -117,7 +117,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		sequenceBuilderMock.init( sequence1Future );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
@@ -134,7 +134,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 	}
 
 	@Test
-	public void reuseBulkAccrossSequences() {
+	public void reuseBulkAcrossSequences() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
 
@@ -153,7 +153,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -165,7 +165,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		sequenceBuilderMock.init( sequence1Future );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
-		bulkerMock.add( work2 );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
@@ -199,7 +199,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		work2.aggregate( anyObject() );
 		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
@@ -207,7 +207,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		work3.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.flushBulk();
-		bulkerMock.add( work3 );
+		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -224,7 +224,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 	}
 
 	@Test
-	public void newBulkIfNonBulkable_differenceChangesets() {
+	public void newBulkIfNonBulkable_differentChangesets() {
 		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> changeset1 = Arrays.asList( work1 );
 		ElasticsearchWork<?> work2 = work( 2 );
@@ -243,7 +243,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		sequenceBuilderMock.init( anyObject() );
 		work1.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
-		bulkerMock.add( work1 );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
@@ -260,7 +260,7 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		work3.aggregate( anyObject() );
 		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.flushBulk();
-		bulkerMock.add( work3 );
+		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.flushBulked() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();

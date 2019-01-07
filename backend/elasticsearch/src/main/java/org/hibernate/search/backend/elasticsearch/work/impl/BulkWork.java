@@ -81,8 +81,8 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	}
 
 	@Override
-	public void aggregate(ElasticsearchWorkAggregator aggregator) {
-		aggregator.addNonBulkable( this );
+	public CompletableFuture<BulkResult> aggregate(ElasticsearchWorkAggregator aggregator) {
+		return aggregator.addNonBulkable( this );
 	}
 
 	@Override
@@ -109,10 +109,10 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	}
 
 	public static class Builder implements BulkWorkBuilder {
-		private final List<BulkableElasticsearchWork<?>> bulkableWorks;
+		private final List<? extends BulkableElasticsearchWork<?>> bulkableWorks;
 		private boolean refreshInBulkAPICall;
 
-		public Builder(List<BulkableElasticsearchWork<?>> bulkableWorks) {
+		public Builder(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
 			this.bulkableWorks = bulkableWorks;
 		}
 

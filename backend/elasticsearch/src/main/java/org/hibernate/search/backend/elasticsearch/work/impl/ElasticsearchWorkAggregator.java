@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 /**
  * @author Yoann Rodiere
  */
 public interface ElasticsearchWorkAggregator {
 
-	void addBulkable(BulkableElasticsearchWork<?> work);
+	<T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work);
 
-	void addNonBulkable(ElasticsearchWork<?> work);
+	<T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work);
 
 }

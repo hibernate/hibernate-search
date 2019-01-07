@@ -15,7 +15,7 @@ public interface ElasticsearchWork<T> {
 
 	CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context);
 
-	void aggregate(ElasticsearchWorkAggregator aggregator);
+	CompletableFuture<T> aggregate(ElasticsearchWorkAggregator aggregator);
 
 	Object getInfo();
 }

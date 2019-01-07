@@ -177,11 +177,14 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 
 		@Override
-		public <T> void add(BulkableElasticsearchWork<T> bulkedWork, int index) {
+		public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index) {
 			CompletableFuture<T> bulkedWorkResultFuture = chain( extractorFuture, bulkedWork,
 					extractor -> extractor.extract( bulkedWork, index ) );
-			ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture =
-					CompletableFuture.allOf( ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture, bulkedWorkResultFuture );
+			ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture = CompletableFuture.allOf(
+					ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture,
+					bulkedWorkResultFuture
+			);
+			return bulkedWorkResultFuture;
 		}
 
 	}
