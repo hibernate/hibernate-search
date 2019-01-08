@@ -30,15 +30,13 @@ public class IndexingBackendContext {
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestratorFactory orchestratorFactory;
-	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public IndexingBackendContext(EventContext eventContext, ElasticsearchWorkBuilderFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkOrchestratorFactory orchestratorFactory, ElasticsearchWorkOrchestrator streamOrchestrator) {
+			ElasticsearchWorkOrchestratorFactory orchestratorFactory) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestratorFactory = orchestratorFactory;
-		this.streamOrchestrator = streamOrchestrator;
 	}
 
 	@Override
@@ -50,7 +48,7 @@ public class IndexingBackendContext {
 		return eventContext;
 	}
 
-	CompletableFuture<?> initializeIndex(URLEncodedString indexName, URLEncodedString typeName,
+	CompletableFuture<?> initializeIndex(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
 		ElasticsearchWork<?> dropWork = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
 		ElasticsearchWork<CreateIndexResult> createWork = workFactory.createIndex( indexName )
@@ -58,11 +56,19 @@ public class IndexingBackendContext {
 				.mapping( typeName, model.getMapping() )
 				.build();
 
-		return streamOrchestrator.submit( Arrays.asList( dropWork, createWork ) );
+		return orchestrator.submit( Arrays.asList( dropWork, createWork ) );
 	}
 
 	ElasticsearchWorkOrchestrator createWorkPlanOrchestrator(String indexName, boolean refreshAfterWrite) {
-		return orchestratorFactory.createNonStreamOrchestrator( indexName, refreshAfterWrite );
+		return orchestratorFactory.createNonStreamOrchestrator(
+				"Elasticsearch non-stream work orchestrator for index " + indexName, refreshAfterWrite
+		);
+	}
+
+	ElasticsearchWorkOrchestrator createStreamOrchestrator(String indexName) {
+		return orchestratorFactory.createStreamOrchestrator(
+				"Elasticsearch stream work orchestrator for index " + indexName
+		);
 	}
 
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(
@@ -81,15 +87,16 @@ public class IndexingBackendContext {
 	}
 
 	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
+			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName, URLEncodedString typeName,
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, streamOrchestrator,
+		return new ElasticsearchIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
 				indexName, typeName, sessionContext );
 	}
 
-	IndexWorkExecutor createWorkExecutor(URLEncodedString indexName) {
-		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, streamOrchestrator, indexName, eventContext );
+	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName) {
+		return new ElasticsearchIndexWorkExecutor( workFactory, multiTenancyStrategy, orchestrator, indexName, eventContext );
 	}
 }

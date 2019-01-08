@@ -382,8 +382,11 @@ public interface Log extends BasicLogger {
 			value = "Sorting is not enabled for field '%1$s'. Make sure the field is marked as sortable.")
 	SearchException unsortableField(String absoluteFieldPath, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 49,
+	@Message(id = ID_OFFSET_3 + 49,
 			value = "Multiple conflicting types for identifier: '%1$s' vs. '%2$s'.")
 	SearchException conflictingIdentifierTypesForPredicate(ToDocumentIdentifierValueConverter<?> component1,
 			ToDocumentIdentifierValueConverter<?> component2, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")
+	SearchException failedToShutdownIndexManager(String indexName, @Cause Exception cause, @Param EventContext context);
 }

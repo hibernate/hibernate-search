@@ -113,10 +113,10 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 	 * Works submitted to this orchestrator
 	 * will only be bulked with subsequent works (possibly of a different changeset).
 	 *
-	 * @param indexName The name of the index that all submitted works will target.
+	 * @param name The name of the orchestrator to create.
 	 * @return the orchestrator for synchronous, non-stream background works.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createNonStreamOrchestrator(String indexName, boolean refreshAfterWrite) {
+	public ElasticsearchBarrierWorkOrchestrator createNonStreamOrchestrator(String name, boolean refreshAfterWrite) {
 		/*
 		 * Since works are applied in order, refreshing the index after changesets
 		 * is actually an option, and if enabled we use refreshing execution contexts.
@@ -145,7 +145,7 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 				createSerialOrchestrator( contextSupplier, NON_STREAM_MIN_BULK_SIZE, refreshInBulkApiCall );
 
 		return createBatchingSharedOrchestrator(
-				"Elasticsearch non-stream work orchestrator for index " + indexName,
+				name,
 				NON_STREAM_MAX_CHANGESETS_PER_BATCH,
 				true /* enqueue changesets in the order they were submitted */,
 				delegate
@@ -166,13 +166,11 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 	 * targeting different indexes, submitted to a different stream orchestrator
 	 * relying on the same internal resources.
 	 *
-	 * @param indexName The name of the index that all submitted works will target.
+	 * @param name The name of the orchestrator to create.
 	 * @return the orchestrator for stream background works.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createStreamOrchestrator(String indexName) {
-		return streamOrchestrator.createChild(
-				"Elasticsearch stream work orchestrator for index " + indexName
-		);
+	public ElasticsearchBarrierWorkOrchestrator createStreamOrchestrator(String name) {
+		return streamOrchestrator.createChild( name );
 	}
 
 	private ElasticsearchBatchingSharedWorkOrchestrator createBatchingSharedOrchestrator(

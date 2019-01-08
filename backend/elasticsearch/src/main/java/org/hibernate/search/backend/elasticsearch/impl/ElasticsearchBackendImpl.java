@@ -69,7 +69,6 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
-	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
 	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
@@ -91,11 +90,10 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.userFacingGson = userFacingGson;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.streamOrchestrator = orchestratorFactory.createStreamOrchestrator( name );
-		this.queryOrchestrator = orchestratorFactory.createStreamOrchestrator( name );
+		this.queryOrchestrator = orchestratorFactory.createStreamOrchestrator( "Elasticsearch query orchestrator for backend " + name );
 
 		this.eventContext = EventContexts.fromBackendName( name );
-		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, orchestratorFactory, streamOrchestrator );
+		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy, orchestratorFactory );
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, userFacingGson,
 				( String elasticsearchIndexName ) -> {
@@ -173,7 +171,6 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
 			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorFactory::close, orchestratorFactory );
 			// Close the index writer after the orchestrators and work processor, when we're sure all works have been performed

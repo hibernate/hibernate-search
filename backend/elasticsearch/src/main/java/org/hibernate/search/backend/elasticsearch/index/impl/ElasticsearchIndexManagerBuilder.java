@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -67,11 +68,15 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
+		// create a stream orchestrator instance for each index,
+		// it is supposed to be closed by the index manager we're building now
+		ElasticsearchWorkOrchestrator streamOrchestrator = indexingBackendContext.createStreamOrchestrator( elasticsearchIndexName );
+
 		// TODO make sure index initialization is performed in parallel for all indexes?
-		indexingBackendContext.initializeIndex( encodedElasticsearchIndexName, encodedTypeName, model )
+		indexingBackendContext.initializeIndex( streamOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
 				.join();
 
-		return new ElasticsearchIndexManagerImpl(
+		return new ElasticsearchIndexManagerImpl( streamOrchestrator,
 				indexingBackendContext, searchBackendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
 				encodedTypeName, model,

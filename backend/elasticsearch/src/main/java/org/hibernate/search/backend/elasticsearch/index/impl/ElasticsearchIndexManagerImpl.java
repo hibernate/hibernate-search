@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -25,6 +26,7 @@ import org.hibernate.search.engine.logging.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 
@@ -46,8 +48,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private final boolean refreshAfterWrite;
 	private final ElasticsearchWorkOrchestrator workPlanOrchestrator;
+	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
-	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
+	ElasticsearchIndexManagerImpl(ElasticsearchWorkOrchestrator streamOrchestrator, IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model,
 			boolean refreshAfterWrite) {
@@ -59,12 +62,19 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.model = model;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.workPlanOrchestrator = indexingBackendContext.createWorkPlanOrchestrator( elasticsearchIndexName.encoded, refreshAfterWrite );
+		this.streamOrchestrator = streamOrchestrator;
 	}
 
 	@Override
 	public void close() {
-		// Index managers own the work plan context, but not the stream context (which is shared)
-		workPlanOrchestrator.close();
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			// Index managers own the work plan context, but not the stream context (which is shared)
+			closer.push( ElasticsearchWorkOrchestrator::close, workPlanOrchestrator );
+			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
+		}
+		catch (IOException e) {
+			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, indexingBackendContext.getEventContext() );
+		}
 	}
 
 	public ElasticsearchIndexModel getModel() {
@@ -83,12 +93,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( elasticsearchIndexName, typeName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor( streamOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( elasticsearchIndexName );
+		return indexingBackendContext.createWorkExecutor( streamOrchestrator, elasticsearchIndexName );
 	}
 
 	@Override
