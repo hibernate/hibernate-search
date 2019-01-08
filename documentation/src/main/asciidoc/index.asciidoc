@@ -20,13 +20,13 @@ include::configuration.asciidoc[]
 
 include::mapper-pojo.asciidoc[]
 
+include::mapper-orm-indexing.asciidoc[]
+
 include::analysis.asciidoc[]
 
 include::mapper-orm-query.asciidoc[]
 
 include::search-dsl.asciidoc[]
-
-include::manual-index.asciidoc[]
 
 include::backend-lucene.asciidoc[]
 

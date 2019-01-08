@@ -1,0 +1,28 @@
+[[mapper-orm-indexing]]
+== Indexing
+
+[[mapper-orm-indexing-automatic]]
+=== Automatic indexing
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-indexing-automatic-synchronization]]
+==== Synchronization with the index
+
+include::todo-placeholder.asciidoc[]
+
+// TODO explain in transaction/post transaction synchronizations, when they can be used and what they mean
+
+// TODO explain how to configure how transactions should synchronize with the index (i.e. how they should wait for changes to propagate):
+// - HSEARCH-3316 completion handler (sync/async, refresh request?, flush request?)
+// - refresh_after_write setting (maybe we'll want to make that a mapper setting, forwarded to the work plan?)
+// - (experts) HSEARCH-3305 explicit flush/refresh
+// TODO Also link to the ES backend documentation, to a section explaining near-real-time and how to configure it
+// Link to ES doc explaining near-real-time: https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-concepts.html#_near_realtime_nrt
+
+[[mapper-orm-indexing-explicit]]
+=== Explicit indexing
+// Search 5 anchors backward compatibility
+[[manual-index-changes]]
+
+include::todo-placeholder.asciidoc[]
