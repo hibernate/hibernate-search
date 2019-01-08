@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorFactory;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -29,15 +29,15 @@ public class IndexingBackendContext {
 	private final EventContext eventContext;
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final ElasticsearchWorkProcessor workProcessor;
+	private final ElasticsearchWorkOrchestratorFactory orchestratorFactory;
 	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
 	public IndexingBackendContext(EventContext eventContext, ElasticsearchWorkBuilderFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkProcessor workProcessor, ElasticsearchWorkOrchestrator streamOrchestrator) {
+			ElasticsearchWorkOrchestratorFactory orchestratorFactory, ElasticsearchWorkOrchestrator streamOrchestrator) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.workProcessor = workProcessor;
+		this.orchestratorFactory = orchestratorFactory;
 		this.streamOrchestrator = streamOrchestrator;
 	}
 
@@ -62,7 +62,7 @@ public class IndexingBackendContext {
 	}
 
 	ElasticsearchWorkOrchestrator createWorkPlanOrchestrator(String indexName, boolean refreshAfterWrite) {
-		return workProcessor.createNonStreamOrchestrator( indexName, refreshAfterWrite );
+		return orchestratorFactory.createNonStreamOrchestrator( indexName, refreshAfterWrite );
 	}
 
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(

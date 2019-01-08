@@ -18,12 +18,13 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
- * The execution context used in {@link ElasticsearchWorkProcessor}
+ * The execution context used in {@link ElasticsearchWorkOrchestratorFactory}
  * when there's a need for indexing monitor buffering *and* for dirty index refresh.
  * <p>
  * This context is mutable and is not thread-safe.
@@ -42,19 +43,18 @@ class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlusha
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 
-	private final ElasticsearchWorkProcessor workProcessor;
-
 	private final Set<URLEncodedString> dirtyIndexes = new HashSet<>();
+
+	private final ElasticsearchWorkExecutionContext flushExecutionContext;
 
 	public ElasticsearchRefreshingWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
-			ElasticsearchWorkProcessor workProcessor,
 			ErrorHandler errorHandler) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.errorHandler = errorHandler;
 		this.workFactory = workFactory;
-		this.workProcessor = workProcessor;
+		this.flushExecutionContext = new ElasticsearchImmutableWorkExecutionContext( client, gsonProvider );
 	}
 
 	@Override
@@ -96,7 +96,7 @@ class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlusha
 		}
 		ElasticsearchWork<?> work = builder.build();
 
-		return workProcessor.executeAsyncUnsafe( work )
+		return work.execute( flushExecutionContext )
 				.handle( Futures.handler(
 						(result, throwable) -> {
 							if ( throwable != null ) {

@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
@@ -16,10 +14,8 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.impl.common.LoggerFactory;
-import org.hibernate.search.util.impl.common.Throwables;
 
 /**
  * Executes single or multiple {@link ElasticsearchWork}s against the Elasticsearch server.
@@ -32,7 +28,7 @@ import org.hibernate.search.util.impl.common.Throwables;
  *
  * @author Gunnar Morling
  */
-public class ElasticsearchWorkProcessor implements AutoCloseable {
+public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 
 	private static final int NON_STREAM_MIN_BULK_SIZE = 2;
 	/*
@@ -69,18 +65,14 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkBuilderFactory workFactory;
 
-	private final ElasticsearchWorkExecutionContext parallelWorkExecutionContext;
 	private final ElasticsearchBatchingSharedWorkOrchestrator streamOrchestrator;
 
-	public ElasticsearchWorkProcessor(ErrorHandler errorHandler,
+	public ElasticsearchWorkOrchestratorFactory(ErrorHandler errorHandler,
 			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory) {
 		this.errorHandler = errorHandler;
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.workFactory = workFactory;
-
-		this.parallelWorkExecutionContext =
-				new ElasticsearchImmutableWorkExecutionContext( client, gsonProvider );
 
 		/*
 		 * The following orchestrator doesn't require a strict execution ordering
@@ -110,35 +102,6 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 		finally {
 			streamOrchestrator.close();
 		}
-	}
-
-	/**
-	 * Execute a single work synchronously,
-	 * potentially throwing exceptions (the error handler isn't used).
-	 *
-	 * @param work The work to be executed.
-	 * @return The result of the given work.
-	 */
-	public <T> T executeSyncUnsafe(ElasticsearchWork<T> work) {
-		try {
-			// Note: timeout is handled by the client, so this "join" will not last forever
-			return executeAsyncUnsafe( work ).join();
-		}
-		catch (CompletionException e) {
-			throw Throwables.expectRuntimeException( e.getCause() );
-		}
-	}
-
-	/**
-	 * Execute a single work asynchronously,
-	 * without bulking it with other asynchronous works,
-	 * and potentially throwing exceptions (the error handler isn't used).
-	 *
-	 * @param work The work to be executed.
-	 * @return The result of the given work.
-	 */
-	public <T> CompletableFuture<T> executeAsyncUnsafe(ElasticsearchWork<T> work) {
-		return work.execute( parallelWorkExecutionContext );
 	}
 
 	/**
@@ -254,7 +217,7 @@ public class ElasticsearchWorkProcessor implements AutoCloseable {
 
 	private ElasticsearchFlushableWorkExecutionContext createRefreshingWorkExecutionContext() {
 		return new ElasticsearchRefreshingWorkExecutionContext(
-				client, gsonProvider, workFactory, ElasticsearchWorkProcessor.this, errorHandler );
+				client, gsonProvider, workFactory, errorHandler );
 	}
 
 }

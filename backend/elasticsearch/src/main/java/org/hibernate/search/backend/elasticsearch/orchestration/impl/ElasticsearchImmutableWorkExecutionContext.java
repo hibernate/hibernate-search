@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 import org.hibernate.search.util.AssertionFailure;
 
 /**
- * The execution context used in {@link ElasticsearchWorkProcessor}
+ * The execution context used in {@link ElasticsearchWorkOrchestratorFactory}
  * when the context must be shared by multiple threads.
  * <p>
  * This context is immutable and thread-safe, but doesn't support
@@ -46,7 +46,7 @@ class ElasticsearchImmutableWorkExecutionContext implements ElasticsearchWorkExe
 	public void setIndexDirty(URLEncodedString indexName) {
 		throw new AssertionFailure( "Unexpected dirty index with a default context."
 				+ " Works that may alter index content should be executed"
-				+ " through the " + ElasticsearchWorkProcessor.class.getName()
+				+ " through the " + ElasticsearchWorkOrchestratorFactory.class.getName()
 				+ ", using an appropriate context." );
 	}
 
