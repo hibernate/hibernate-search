@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
@@ -41,8 +41,8 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProviderMock =
 			createMock( PojoTypeAdditionalMetadataProvider.class );
-	private final ContainerValueExtractorBinder extractorBinderMock =
-			createMock( ContainerValueExtractorBinder.class );
+	private final ContainerExtractorBinder extractorBinderMock =
+			createMock( ContainerExtractorBinder.class );
 
 	@Test
 	@SuppressWarnings( "unchecked" )
@@ -83,7 +83,7 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 				.andStubReturn( originalSideEntityTypeAdditionalMetadataMock );
 		EasyMock.expect( originalSideEntityTypeAdditionalMetadataMock.getPropertyAdditionalMetadata( originalSidePropertyName ) )
 				.andStubReturn( originalSidePropertyAdditionalMetadataMock );
-		EasyMock.expect( originalSidePropertyAdditionalMetadataMock.getValueAdditionalMetadata( ContainerValueExtractorPath.noExtractors() ) )
+		EasyMock.expect( originalSidePropertyAdditionalMetadataMock.getValueAdditionalMetadata( ContainerExtractorPath.noExtractors() ) )
 				.andStubReturn( originalSideValueAdditionalMetadataMock );
 		EasyMock.expect( originalSideValueAdditionalMetadataMock.getInverseSidePath() )
 				.andStubReturn( Optional.empty() );
@@ -157,26 +157,26 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		// Let's not complicate things any further: assume that all extractor paths are noExtractors() paths
 		EasyMock.expect( extractorBinderMock.bindPath(
 				EasyMock.anyObject(),
-				EasyMock.eq( ContainerValueExtractorPath.noExtractors() )
+				EasyMock.eq( ContainerExtractorPath.noExtractors() )
 		) )
 				.andStubAnswer( (IAnswer) () -> {
 					PojoGenericTypeModel<?> sourceType =
 							(PojoGenericTypeModel<?>) EasyMock.getCurrentArguments()[0];
-					return BoundContainerValueExtractorPath.noExtractors( sourceType );
+					return BoundContainerExtractorPath.noExtractors( sourceType );
 				} );
 
 		replayAll();
 		BoundPojoModelPathValueNode<?, ?, ?> boundPathToInvert =
 				BoundPojoModelPathValueNode.root( originalSideEntityTypeMock )
 						.property( originalSidePropertyHandleMock )
-						.value( (BoundContainerValueExtractorPath) BoundContainerValueExtractorPath.noExtractors(
+						.value( (BoundContainerExtractorPath) BoundContainerExtractorPath.noExtractors(
 								originalSidePropertyTypeMock
 						) );
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite embedded recursion involving path '"
-				+ PojoModelPath.fromRoot( inverseSideProperty1Name ).value( ContainerValueExtractorPath.noExtractors() )
-						.property( inverseSideProperty2Name ).value( ContainerValueExtractorPath.noExtractors() )
-						.property( inverseSideProperty3Name ).value( ContainerValueExtractorPath.noExtractors() )
+				+ PojoModelPath.fromRoot( inverseSideProperty1Name ).value( ContainerExtractorPath.noExtractors() )
+						.property( inverseSideProperty2Name ).value( ContainerExtractorPath.noExtractors() )
+						.property( inverseSideProperty3Name ).value( ContainerExtractorPath.noExtractors() )
 						.toPathString()
 				+ "' on type '" + inverseSideEntityTypeMock.getName() + "'" );
 		try {
@@ -212,8 +212,8 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 		Map<String, PojoPropertyAdditionalMetadata> properties = new HashMap<>();
 		properties.put( propertyName, propertyAdditionalMetadataMock );
-		Map<ContainerValueExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
-		values.put( ContainerValueExtractorPath.noExtractors(), valueAdditionalMetadataMock );
+		Map<ContainerExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
+		values.put( ContainerExtractorPath.noExtractors(), valueAdditionalMetadataMock );
 
 		EasyMock.expect( typeAdditionalMetadata.getPropertiesAdditionalMetadata() )
 				.andStubReturn( properties );

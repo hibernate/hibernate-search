@@ -24,8 +24,8 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
@@ -206,18 +206,18 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		return inverseSideValuePath;
 	}
 
-	private ContainerValueExtractorPath getExtractorPath(Value value) {
+	private ContainerExtractorPath getExtractorPath(Value value) {
 		if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collectionValue = (org.hibernate.mapping.Collection) value;
-			Class<? extends ContainerValueExtractor> extractorClass = getExtractorClass( collectionValue );
-			return ContainerValueExtractorPath.explicitExtractor( extractorClass );
+			Class<? extends ContainerExtractor> extractorClass = getExtractorClass( collectionValue );
+			return ContainerExtractorPath.explicitExtractor( extractorClass );
 		}
 		else {
-			return ContainerValueExtractorPath.noExtractors();
+			return ContainerExtractorPath.noExtractors();
 		}
 	}
 
-	private Class<? extends ContainerValueExtractor> getExtractorClass(org.hibernate.mapping.Collection collectionValue) {
+	private Class<? extends ContainerExtractor> getExtractorClass(org.hibernate.mapping.Collection collectionValue) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			// Caution if you add other if ( ... instanceof ) branches: Array extends List!
 			return ArrayElementExtractor.class;

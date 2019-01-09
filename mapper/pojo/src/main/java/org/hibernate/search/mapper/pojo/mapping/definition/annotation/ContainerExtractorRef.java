@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
 /**
  * @author Yoann Rodiere
@@ -21,13 +21,13 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ContainerExtractorRef {
 
-	Class<? extends ContainerValueExtractor> type();
+	Class<? extends ContainerExtractor> type();
 
 	/**
 	 * Class used as a marker for the default value of attributes of type {@link ContainerExtractorRef}
 	 * in other annotations.
 	 */
-	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
+	abstract class DefaultExtractors implements ContainerExtractor<Object, Object> {
 		private DefaultExtractors() {
 		}
 	}

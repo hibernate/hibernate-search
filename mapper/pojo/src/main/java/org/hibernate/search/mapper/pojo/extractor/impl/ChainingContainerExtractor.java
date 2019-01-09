@@ -8,15 +8,15 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-class ChainingContainerValueExtractor<C, U, V> implements ContainerValueExtractor<C, V> {
+class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 
-	private final ContainerValueExtractor<C, U> parent;
-	private final ContainerValueExtractor<? super U, V> chained;
+	private final ContainerExtractor<C, U> parent;
+	private final ContainerExtractor<? super U, V> chained;
 
-	ChainingContainerValueExtractor(ContainerValueExtractor<C, U> parent,
-			ContainerValueExtractor<? super U, V> chained) {
+	ChainingContainerExtractor(ContainerExtractor<C, U> parent,
+			ContainerExtractor<? super U, V> chained) {
 		this.parent = parent;
 		this.chained = chained;
 	}
@@ -26,7 +26,7 @@ class ChainingContainerValueExtractor<C, U, V> implements ContainerValueExtracto
 		return parent.extract( container ).flatMap( chained::extract );
 	}
 
-	public ContainerValueExtractor<C, U> getParent() {
+	public ContainerExtractor<C, U> getParent() {
 		return parent;
 	}
 
@@ -38,9 +38,9 @@ class ChainingContainerValueExtractor<C, U, V> implements ContainerValueExtracto
 		return builder.toString();
 	}
 
-	private void appendToString(StringBuilder builder, ContainerValueExtractor<?, ?> extractor, boolean first) {
-		if ( extractor instanceof ChainingContainerValueExtractor ) {
-			ChainingContainerValueExtractor<?, ?, ?> chaining = (ChainingContainerValueExtractor<?, ?, ?>) extractor;
+	private void appendToString(StringBuilder builder, ContainerExtractor<?, ?> extractor, boolean first) {
+		if ( extractor instanceof ChainingContainerExtractor ) {
+			ChainingContainerExtractor<?, ?, ?> chaining = (ChainingContainerExtractor<?, ?, ?>) extractor;
 			appendToString( builder, chaining.parent, first );
 			appendToString( builder, chaining.chained, false );
 		}

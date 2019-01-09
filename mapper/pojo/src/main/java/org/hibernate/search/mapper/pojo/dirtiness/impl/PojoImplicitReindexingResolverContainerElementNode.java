@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -30,10 +30,10 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 		extends PojoImplicitReindexingResolverNode<C, S> {
 
-	private final ContainerValueExtractorHolder<C, V> extractorHolder;
+	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes;
 
-	public PojoImplicitReindexingResolverContainerElementNode(ContainerValueExtractorHolder<C, V> extractorHolder,
+	public PojoImplicitReindexingResolverContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			Collection<PojoImplicitReindexingResolverNode<V, S>> nestedNodes) {
 		this.extractorHolder = extractorHolder;
 		this.nestedNodes = nestedNodes;
@@ -42,7 +42,7 @@ public class PojoImplicitReindexingResolverContainerElementNode<C, S, V>
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ContainerValueExtractorHolder::close, extractorHolder );
+			closer.push( ContainerExtractorHolder::close, extractorHolder );
 			closer.pushAll( PojoImplicitReindexingResolverNode::close, nestedNodes );
 		}
 	}

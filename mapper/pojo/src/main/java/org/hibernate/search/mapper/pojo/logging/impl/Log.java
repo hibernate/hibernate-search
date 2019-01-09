@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -144,24 +144,24 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> rawSuperType, int typeArgumentIndex);
 
 	@Message(id = ID_OFFSET_2 + 15,
-			value = "Cannot interpret the type arguments to the ContainerValueExtractor interface in "
-					+ " implementation '%1$s'. Only the following implementations of ContainerValueExtractor are valid: "
+			value = "Cannot interpret the type arguments to the ContainerExtractor interface in "
+					+ " implementation '%1$s'. Only the following implementations of ContainerExtractor are valid: "
 					+ " 1) implementations setting both type parameters to *raw* types,"
-					+ " e.g. class MyExtractor implements ContainerValueExtractor<MyBean, String>;"
+					+ " e.g. class MyExtractor implements ContainerExtractor<MyBean, String>;"
 					+ " 2) implementations setting the first type parameter to an array of an unbounded type variable,"
 					+ " and setting the second parameter to the same type variable,"
-					+ " e.g. MyExtractor<T> implements ContainerValueExtractor<T[], T>"
+					+ " e.g. MyExtractor<T> implements ContainerExtractor<T[], T>"
 					+ " 3) implementations setting the first type parameter to a parameterized type"
 					+ " with one argument set to an unbounded type variable and the other to unbounded wildcards,"
 					+ " and setting the second type parameter to the same type variable,"
-					+ " e.g. MyExtractor<T> implements ContainerValueExtractor<MyParameterizedBean<?, T, ?>, T>")
-	SearchException cannotInferContainerValueExtractorClassTypePattern(
+					+ " e.g. MyExtractor<T> implements ContainerExtractor<MyParameterizedBean<?, T, ?>, T>")
+	SearchException cannotInferContainerExtractorClassTypePattern(
 			@FormatWith(ClassFormatter.class) Class<?> extractorClass);
 
 	@Message(id = ID_OFFSET_2 + 16,
 			value = "Cannot apply the requested container value extractor '%1$s' to type '%2$s'")
-	SearchException invalidContainerValueExtractorForType(
-			@FormatWith(ClassFormatter.class) Class<? extends ContainerValueExtractor> extractorClass,
+	SearchException invalidContainerExtractorForType(
+			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> extractorClass,
 			@FormatWith(PojoTypeModelFormatter.class) PojoGenericTypeModel<?> extractedType);
 
 	@LogMessage(level = Logger.Level.DEBUG)

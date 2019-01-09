@@ -9,14 +9,14 @@ package org.hibernate.search.mapper.pojo.extractor.impl;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.util.impl.common.Closer;
 
-public class ContainerValueExtractorHolder<C, V> implements AutoCloseable {
-	private final ContainerValueExtractor<? super C, V> chain;
+public class ContainerExtractorHolder<C, V> implements AutoCloseable {
+	private final ContainerExtractor<? super C, V> chain;
 	private final List<BeanHolder<?>> chainElementBeanHolders;
 
-	ContainerValueExtractorHolder(ContainerValueExtractor<? super C, V> chain,
+	ContainerExtractorHolder(ContainerExtractor<? super C, V> chain,
 			List<BeanHolder<?>> chainElementBeanHolders) {
 		this.chain = chain;
 		this.chainElementBeanHolders = chainElementBeanHolders;
@@ -29,7 +29,7 @@ public class ContainerValueExtractorHolder<C, V> implements AutoCloseable {
 		}
 	}
 
-	public ContainerValueExtractor<? super C, V> get() {
+	public ContainerExtractor<? super C, V> get() {
 		return chain;
 	}
 }

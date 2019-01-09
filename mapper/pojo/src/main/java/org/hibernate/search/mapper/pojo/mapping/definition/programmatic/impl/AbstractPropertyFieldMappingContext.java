@@ -14,7 +14,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.impl.BeanBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
@@ -32,7 +32,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 
 	final PojoCompositeFieldModelContributor<C> fieldModelContributor;
 
-	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
+	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	AbstractPropertyFieldMappingContext(PropertyMappingContext parent, String relativeFieldName,
 			Function<StandardIndexFieldTypeContext<?, ?>, C> contextConverter) {
@@ -77,7 +77,7 @@ abstract class AbstractPropertyFieldMappingContext<S extends PropertyFieldMappin
 	}
 
 	@Override
-	public S withExtractors(ContainerValueExtractorPath extractorPath) {
+	public S withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return thisAsS();
 	}

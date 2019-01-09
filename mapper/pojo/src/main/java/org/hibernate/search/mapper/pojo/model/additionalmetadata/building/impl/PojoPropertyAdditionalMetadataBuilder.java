@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
@@ -27,7 +27,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private final String propertyName;
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<ContainerValueExtractorPath, PojoValueAdditionalMetadataBuilder> valueBuilders =
+	private final Map<ContainerExtractorPath, PojoValueAdditionalMetadataBuilder> valueBuilders =
 			new LinkedHashMap<>();
 	private final Map<Class<?>, List<?>> markers = new LinkedHashMap<>();
 
@@ -44,7 +44,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	}
 
 	@Override
-	public PojoAdditionalMetadataCollectorValueNode value(ContainerValueExtractorPath extractorPath) {
+	public PojoAdditionalMetadataCollectorValueNode value(ContainerExtractorPath extractorPath) {
 		return valueBuilders.computeIfAbsent(
 				extractorPath,
 				path -> new PojoValueAdditionalMetadataBuilder( rootBuilder, propertyName, extractorPath )
@@ -67,8 +67,8 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	}
 
 	PojoPropertyAdditionalMetadata build() {
-		Map<ContainerValueExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
-		for ( Map.Entry<ContainerValueExtractorPath, PojoValueAdditionalMetadataBuilder> entry : valueBuilders.entrySet() ) {
+		Map<ContainerExtractorPath, PojoValueAdditionalMetadata> values = new HashMap<>();
+		for ( Map.Entry<ContainerExtractorPath, PojoValueAdditionalMetadataBuilder> entry : valueBuilders.entrySet() ) {
 			values.put( entry.getKey(), entry.getValue().build() );
 		}
 		return new PojoPropertyAdditionalMetadata( values, markers );

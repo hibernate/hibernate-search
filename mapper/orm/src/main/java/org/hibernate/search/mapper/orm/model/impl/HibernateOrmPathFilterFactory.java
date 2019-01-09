@@ -23,8 +23,8 @@ import org.hibernate.mapping.SimpleValue;
 import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
@@ -208,7 +208,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 
 		Value baseValue = property.getValue();
 
-		ContainerValueExtractorPath extractorPath = path.getExtractorPath();
+		ContainerExtractorPath extractorPath = path.getExtractorPath();
 		if ( extractorPath.isDefault() ) {
 			throw new AssertionFailure(
 					"Expected a non-default extractor path as per the "
@@ -253,9 +253,9 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
 			}
 
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses =
+			List<? extends Class<? extends ContainerExtractor>> extractorClasses =
 					extractorPath.getExplicitExtractorClasses();
-			Iterator<? extends Class<? extends ContainerValueExtractor>> extractorClassIterator =
+			Iterator<? extends Class<? extends ContainerExtractor>> extractorClassIterator =
 					extractorClasses.iterator();
 
 			Value containedValue = baseValue;
@@ -294,7 +294,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue,
-			Class<? extends ContainerValueExtractor> extractorClass) {
+			Class<? extends ContainerExtractor> extractorClass) {
 		if ( ArrayElementExtractor.class.equals( extractorClass ) ) {
 			if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 				return collectionValue.getElement();
@@ -318,7 +318,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			return collectionValue.getElement();
 		}
 
-		throw log.invalidContainerValueExtractorForDirtyChecking( collectionValue.getClass(), extractorClass );
+		throw log.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorClass );
 	}
 
 	private Property resolveProperty(PersistentClass persistentClass, PojoModelPathPropertyNode propertyNode) {

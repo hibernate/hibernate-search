@@ -10,8 +10,8 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 
 /**
  * @param <S> The "self" type, i.e. the type to return from methods.
@@ -41,14 +41,14 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	S valueBridge(BridgeBuilder<? extends ValueBridge<?, ?>> builder);
 
 	default S withExtractor(
-			Class<? extends ContainerValueExtractor> extractorClass) {
-		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
+			Class<? extends ContainerExtractor> extractorClass) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
 	default S withoutExtractors() {
-		return withExtractors( ContainerValueExtractorPath.noExtractors() );
+		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
-	S withExtractors(ContainerValueExtractorPath extractorPath);
+	S withExtractors(ContainerExtractorPath extractorPath);
 
 }

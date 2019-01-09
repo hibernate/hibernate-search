@@ -21,9 +21,9 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoIdentityMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
@@ -53,7 +53,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
 	// Use a LinkedHashMap for deterministic iteration
-	private Map<ContainerValueExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
+	private Map<ContainerExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
 			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoIndexingProcessorPropertyNodeBuilder(
@@ -88,17 +88,17 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	}
 
 	@Override
-	public PojoMappingCollectorValueNode value(ContainerValueExtractorPath extractorPath) {
+	public PojoMappingCollectorValueNode value(ContainerExtractorPath extractorPath) {
 		if ( !extractorPath.isEmpty() ) {
 			PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?> containerElementNodeBuilder =
 					containerElementNodeBuilders.get( extractorPath );
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
-				BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+				BoundContainerExtractorPath<P, ?> boundExtractorPath =
 						mappingHelper.getIndexModelBinder().bindExtractorPath(
 								modelPath.getPropertyModel().getTypeModel(),
 								extractorPath
 						);
-				ContainerValueExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
+				ContainerExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
 				if ( !explicitExtractorPath.isEmpty() ) {
 					// Check whether the path was already encountered as an explicit path
 					containerElementNodeBuilder = containerElementNodeBuilders.get( explicitExtractorPath );
@@ -121,9 +121,9 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	 * that the extracted type and extractor have compatible generic arguments.
 	 */
 	private <V> PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, V> createContainerElementNodeBuilder(
-			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
+			BoundContainerExtractorPath<P, V> boundExtractorPath) {
 		BoundPojoModelPathValueNode<T, P, V> containerElementPath = modelPath.value( boundExtractorPath );
-		ContainerValueExtractorHolder<P, V> extractorHolder =
+		ContainerExtractorHolder<P, V> extractorHolder =
 				mappingHelper.getIndexModelBinder().createExtractors( boundExtractorPath );
 		return new PojoIndexingProcessorContainerElementNodeBuilder<>(
 				containerElementPath, extractorHolder,

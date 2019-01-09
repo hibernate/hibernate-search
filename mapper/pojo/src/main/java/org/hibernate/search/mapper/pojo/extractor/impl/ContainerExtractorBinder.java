@@ -17,8 +17,8 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.IterableElementExtractor;
@@ -37,10 +37,10 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
- * Binds {@link ContainerValueExtractorPath}s to a given input type,
- * and allows to create extractors for a given {@link BoundContainerValueExtractorPath}.
+ * Binds {@link ContainerExtractorPath}s to a given input type,
+ * and allows to create extractors for a given {@link BoundContainerExtractorPath}.
  * <p>
- * The {@link ContainerValueExtractorPath} is independent from the input type.
+ * The {@link ContainerExtractorPath} is independent from the input type.
  * This means in particular that the path needs to "bound" to an input type before it can be useful:
  * <ul>
  *     <li>First to check that the path applies correctly: {@link CollectionElementExtractor}
@@ -54,15 +54,15 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  *     For a {@code Map<String, Collection<Integer>>} the default path will be resolved
  *     to {@code [MapValueExtractor.class, CollectionElementExtractor.class]}.
  * </ul>
- * This "binding" results in a {@link BoundContainerValueExtractorPath},
- * which carries both a {@link ContainerValueExtractorPath}
- * (which is an explicit list of classes, and never {@link ContainerValueExtractorPath#defaultExtractors()},
+ * This "binding" results in a {@link BoundContainerExtractorPath},
+ * which carries both a {@link ContainerExtractorPath}
+ * (which is an explicit list of classes, and never {@link ContainerExtractorPath#defaultExtractors()},
  * since the default path was resolved) and the resulting value type.
  * <p>
- * From this "bound path", the {@link ContainerValueExtractorBinder} is able to later create
- * a {@link ContainerValueExtractor}, which can be used at runtime to extract values from a container.
+ * From this "bound path", the {@link ContainerExtractorBinder} is able to later create
+ * a {@link ContainerExtractor}, which can be used at runtime to extract values from a container.
  */
-public class ContainerValueExtractorBinder {
+public class ContainerExtractorBinder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -73,10 +73,10 @@ public class ContainerValueExtractorBinder {
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
 	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
-	private Map<Class<? extends ContainerValueExtractor>, ExtractorContributor> extractorContributorCache =
+	private Map<Class<? extends ContainerExtractor>, ExtractorContributor> extractorContributorCache =
 			new HashMap<>();
 
-	public ContainerValueExtractorBinder(MappingBuildContext buildContext,
+	public ContainerExtractorBinder(MappingBuildContext buildContext,
 			TypePatternMatcherFactory typePatternMatcherFactory) {
 		this.beanProvider = buildContext.getServiceManager().getBeanProvider();
 		this.typePatternMatcherFactory = typePatternMatcherFactory;
@@ -92,7 +92,7 @@ public class ContainerValueExtractorBinder {
 
 	/**
 	 * Try to bind a container extractor path to a given source type,
-	 * i.e. to resolve the possibly implicit extractor path ({@link ContainerValueExtractorPath#defaultExtractors()})
+	 * i.e. to resolve the possibly implicit extractor path ({@link ContainerExtractorPath#defaultExtractors()})
 	 * and to validate that all extractors in the path can be applied.
 	 *
 	 * @param sourceType A model of the source type to apply extractors to.
@@ -102,14 +102,14 @@ public class ContainerValueExtractorBinder {
 	 * one of the extractors in the path cannot be applied.
 	 */
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C> Optional<BoundContainerValueExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
-			ContainerValueExtractorPath extractorPath) {
+	public <C> Optional<BoundContainerExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
+			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( Class<? extends ContainerValueExtractor> extractorClass
+			for ( Class<? extends ContainerExtractor> extractorClass
 					: extractorPath.getExplicitExtractorClasses() ) {
 				ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
 				if ( !extractorContributor.tryAppend( state ) ) {
@@ -126,7 +126,7 @@ public class ContainerValueExtractorBinder {
 
 	/**
 	 * Bind a container extractor path to a given source type,
-	 * i.e. resolve the possibly implicit extractor path ({@link ContainerValueExtractorPath#defaultExtractors()})
+	 * i.e. resolve the possibly implicit extractor path ({@link ContainerExtractorPath#defaultExtractors()})
 	 * and validate that all extractors in the path can be applied,
 	 * or fail.
 	 *
@@ -138,18 +138,18 @@ public class ContainerValueExtractorBinder {
 	 * one of the extractors in the path cannot be applied.
 	 */
 	@SuppressWarnings("unchecked") // Checks are implemented using reflection
-	public <C> BoundContainerValueExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
-			ContainerValueExtractorPath extractorPath) {
+	public <C> BoundContainerExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
+			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
 		if ( extractorPath.isDefault() ) {
 			firstMatchingExtractorContributor.tryAppend( state );
 		}
 		else {
-			for ( Class<? extends ContainerValueExtractor> extractorClass
+			for ( Class<? extends ContainerExtractor> extractorClass
 					: extractorPath.getExplicitExtractorClasses() ) {
 				ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
 				if ( !extractorContributor.tryAppend( state ) ) {
-					throw log.invalidContainerValueExtractorForType( extractorClass, state.extractedType );
+					throw log.invalidContainerExtractorForType( extractorClass, state.extractedType );
 				}
 			}
 		}
@@ -167,31 +167,31 @@ public class ContainerValueExtractorBinder {
 	 */
 	// Checks are performed using reflection when building the resolved path
 	@SuppressWarnings( {"rawtypes", "unchecked"} )
-	public <C, V> ContainerValueExtractorHolder<C, V> create(BoundContainerValueExtractorPath<C, V> boundPath) {
+	public <C, V> ContainerExtractorHolder<C, V> create(BoundContainerExtractorPath<C, V> boundPath) {
 		if ( boundPath.getExtractorPath().isEmpty() ) {
 			throw new AssertionFailure(
 					"Received a request to create extractors, but the extractor path was empty."
 							+ " There is probably a bug in Hibernate Search."
 			);
 		}
-		ContainerValueExtractor<? super C, ?> extractor = null;
+		ContainerExtractor<? super C, ?> extractor = null;
 		List<BeanHolder<?>> beanHolders = new ArrayList<>();
 		try {
-			for ( Class<? extends ContainerValueExtractor> extractorClass :
+			for ( Class<? extends ContainerExtractor> extractorClass :
 					boundPath.getExtractorPath().getExplicitExtractorClasses() ) {
-				BeanHolder<? extends ContainerValueExtractor> newExtractorHolder =
+				BeanHolder<? extends ContainerExtractor> newExtractorHolder =
 						beanProvider.getBean( extractorClass );
 				beanHolders.add( newExtractorHolder );
 				if ( extractor == null ) {
 					// First extractor: must be able to process type C
-					extractor = (ContainerValueExtractor<? super C, ?>) newExtractorHolder.get();
+					extractor = (ContainerExtractor<? super C, ?>) newExtractorHolder.get();
 				}
 				else {
-					extractor = new ChainingContainerValueExtractor( extractor, newExtractorHolder.get() );
+					extractor = new ChainingContainerExtractor( extractor, newExtractorHolder.get() );
 				}
 			}
-			return new ContainerValueExtractorHolder<>(
-					(ContainerValueExtractor<? super C, V>) extractor, beanHolders
+			return new ContainerExtractorHolder<>(
+					(ContainerExtractor<? super C, V>) extractor, beanHolders
 			);
 		}
 		catch (RuntimeException e) {
@@ -200,11 +200,11 @@ public class ContainerValueExtractorBinder {
 		}
 	}
 
-	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerValueExtractorPath extractorPath) {
-		Optional<? extends BoundContainerValueExtractorPath<?, ?>> boundDefaultExtractorPathOptional =
+	public boolean isDefaultExtractorPath(PojoGenericTypeModel<?> sourceType, ContainerExtractorPath extractorPath) {
+		Optional<? extends BoundContainerExtractorPath<?, ?>> boundDefaultExtractorPathOptional =
 				tryBindPath(
 						sourceType,
-						ContainerValueExtractorPath.defaultExtractors()
+						ContainerExtractorPath.defaultExtractors()
 				);
 		return boundDefaultExtractorPathOptional.isPresent() && extractorPath.equals(
 				boundDefaultExtractorPathOptional.get().getExtractorPath()
@@ -212,31 +212,31 @@ public class ContainerValueExtractorBinder {
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
-	private void addDefaultExtractor(Class<? extends ContainerValueExtractor> extractorClass) {
+	private void addDefaultExtractor(Class<? extends ContainerExtractor> extractorClass) {
 		ExtractorContributor extractorContributor = getExtractorContributorForClass( extractorClass );
 		firstMatchingExtractorContributor.addCandidate( extractorContributor );
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private ExtractorContributor getExtractorContributorForClass(
-			Class<? extends ContainerValueExtractor> extractorClass) {
+			Class<? extends ContainerExtractor> extractorClass) {
 		return extractorContributorCache.computeIfAbsent( extractorClass, this::createExtractorContributorForClass );
 	}
 
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private ExtractorContributor createExtractorContributorForClass(
-			Class<? extends ContainerValueExtractor> extractorClass) {
+			Class<? extends ContainerExtractor> extractorClass) {
 		GenericTypeContext typeContext = new GenericTypeContext( extractorClass );
-		Type typePattern = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 0 )
-				.orElseThrow( () -> log.cannotInferContainerValueExtractorClassTypePattern( extractorClass ) );
-		Type typeToExtract = typeContext.resolveTypeArgument( ContainerValueExtractor.class, 1 )
-				.orElseThrow( () -> log.cannotInferContainerValueExtractorClassTypePattern( extractorClass ) );
+		Type typePattern = typeContext.resolveTypeArgument( ContainerExtractor.class, 0 )
+				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass ) );
+		Type typeToExtract = typeContext.resolveTypeArgument( ContainerExtractor.class, 1 )
+				.orElseThrow( () -> log.cannotInferContainerExtractorClassTypePattern( extractorClass ) );
 		ExtractingTypePatternMatcher typePatternMatcher;
 		try {
 			typePatternMatcher = typePatternMatcherFactory.createExtractingMatcher( typePattern, typeToExtract );
 		}
 		catch (UnsupportedOperationException e) {
-			throw log.cannotInferContainerValueExtractorClassTypePattern( extractorClass );
+			throw log.cannotInferContainerExtractorClassTypePattern( extractorClass );
 		}
 		return new SingleExtractorContributor( typePatternMatcher, extractorClass );
 	}
@@ -255,10 +255,10 @@ public class ContainerValueExtractorBinder {
 	@SuppressWarnings( "rawtypes" ) // Checks are implemented using reflection
 	private class SingleExtractorContributor implements ExtractorContributor {
 		private final ExtractingTypePatternMatcher typePatternMatcher;
-		private final Class<? extends ContainerValueExtractor> extractorClass;
+		private final Class<? extends ContainerExtractor> extractorClass;
 
 		SingleExtractorContributor(ExtractingTypePatternMatcher typePatternMatcher,
-				Class<? extends ContainerValueExtractor> extractorClass) {
+				Class<? extends ContainerExtractor> extractorClass) {
 			this.typePatternMatcher = typePatternMatcher;
 			this.extractorClass = extractorClass;
 		}
@@ -300,7 +300,7 @@ public class ContainerValueExtractorBinder {
 	@SuppressWarnings({ "unchecked", "rawtypes" }) // Checks are implemented using reflection
 	private static class ExtractorResolutionState<C> {
 
-		private final List<Class<? extends ContainerValueExtractor>> extractorClasses = new ArrayList<>();
+		private final List<Class<? extends ContainerExtractor>> extractorClasses = new ArrayList<>();
 		private final PojoGenericTypeModel<C> sourceType;
 		private PojoGenericTypeModel<?> extractedType;
 
@@ -309,15 +309,15 @@ public class ContainerValueExtractorBinder {
 			this.extractedType = sourceType;
 		}
 
-		void append(Class<? extends ContainerValueExtractor> extractorClass, PojoGenericTypeModel<?> extractedType) {
+		void append(Class<? extends ContainerExtractor> extractorClass, PojoGenericTypeModel<?> extractedType) {
 			extractorClasses.add( extractorClass );
 			this.extractedType = extractedType;
 		}
 
-		BoundContainerValueExtractorPath<C, ?> build() {
-			return new BoundContainerValueExtractorPath<>(
+		BoundContainerExtractorPath<C, ?> build() {
+			return new BoundContainerExtractorPath<>(
 					sourceType,
-					ContainerValueExtractorPath.explicitExtractors( extractorClasses ),
+					ContainerExtractorPath.explicitExtractors( extractorClasses ),
 					extractedType
 			);
 		}

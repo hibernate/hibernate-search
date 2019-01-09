@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -29,12 +29,12 @@ import org.hibernate.search.util.impl.common.Closer;
 class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extends AbstractPojoProcessorNodeBuilder {
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
-	private final ContainerValueExtractorHolder<C, V> extractorHolder;
+	private final ContainerExtractorHolder<C, V> extractorHolder;
 
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, V> valueNodeProcessorCollectionBuilder;
 
 	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, P, V> modelPath,
-			ContainerValueExtractorHolder<C, V> extractorHolder,
+			ContainerExtractorHolder<C, V> extractorHolder,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
 		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
@@ -58,7 +58,7 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 	@Override
 	void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( ContainerValueExtractorHolder::close, extractorHolder );
+			closer.pushAll( ContainerExtractorHolder::close, extractorHolder );
 			closer.pushAll(
 					PojoIndexingProcessorValueNodeBuilderDelegate::closeOnFailure,
 					valueNodeProcessorCollectionBuilder

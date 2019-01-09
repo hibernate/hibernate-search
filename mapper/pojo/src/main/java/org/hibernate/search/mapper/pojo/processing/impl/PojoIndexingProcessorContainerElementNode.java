@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
@@ -24,10 +24,10 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexingProcessor<C> {
 
-	private final ContainerValueExtractorHolder<C, V> extractorHolder;
+	private final ContainerExtractorHolder<C, V> extractorHolder;
 	private final Collection<PojoIndexingProcessor<? super V>> nestedNodes;
 
-	public PojoIndexingProcessorContainerElementNode(ContainerValueExtractorHolder<C, V> extractorHolder,
+	public PojoIndexingProcessorContainerElementNode(ContainerExtractorHolder<C, V> extractorHolder,
 			Collection<PojoIndexingProcessor<? super V>> nestedNodes) {
 		this.extractorHolder = extractorHolder;
 		this.nestedNodes = nestedNodes;
@@ -36,7 +36,7 @@ public class PojoIndexingProcessorContainerElementNode<C, V> extends PojoIndexin
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ContainerValueExtractorHolder::close, extractorHolder );
+			closer.push( ContainerExtractorHolder::close, extractorHolder );
 			closer.pushAll( PojoIndexingProcessor::close, nestedNodes );
 		}
 	}

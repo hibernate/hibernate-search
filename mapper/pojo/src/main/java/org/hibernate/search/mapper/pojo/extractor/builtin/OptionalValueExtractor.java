@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class OptionalValueExtractor<T> implements ContainerValueExtractor<Optional<T>, T> {
+public class OptionalValueExtractor<T> implements ContainerExtractor<Optional<T>, T> {
 	@Override
 	public Stream<T> extract(Optional<T> container) {
 		return container == null ? Stream.empty() : container.map( Stream::of ).orElseGet( Stream::empty );

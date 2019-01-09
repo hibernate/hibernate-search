@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
@@ -22,7 +22,7 @@ import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorValueNode {
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
 	private final String propertyName;
-	private final ContainerValueExtractorPath extractorPath;
+	private final ContainerExtractorPath extractorPath;
 
 	private PojoModelPathValueNode inverseSidePath;
 	private boolean associationEmbedded = false;
@@ -30,7 +30,7 @@ class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollec
 	private Set<PojoModelPathValueNode> derivedFrom = Collections.emptySet();
 
 	PojoValueAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder, String propertyName,
-			ContainerValueExtractorPath extractorPath) {
+			ContainerExtractorPath extractorPath) {
 		this.rootBuilder = rootBuilder;
 		this.propertyName = propertyName;
 		this.extractorPath = extractorPath;

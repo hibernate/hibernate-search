@@ -24,16 +24,16 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 /**
  * Test implicit container value extractors for the {@code @GenericField} annotation.
  * <p>
- * Error cases are not tested here but in {@link FieldContainerValueExtractorBaseIT}.
+ * Error cases are not tested here but in {@link FieldContainerExtractorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContainerValueExtractorIT {
+public class FieldContainerExtractorImplicitIT extends AbstractFieldContainerExtractorIT {
 
-	public FieldContainerValueExtractorImplicitIT() {
-		super( new ImplicitContainerValueExtractorTestModelProvider() );
+	public FieldContainerExtractorImplicitIT() {
+		super( new ImplicitContainerExtractorTestModelProvider() );
 	}
 
-	private static final class ImplicitContainerValueExtractorTestModelProvider implements TestModelProvider {
+	private static final class ImplicitContainerExtractorTestModelProvider implements TestModelProvider {
 
 		@Override
 		public TestModel<?, String[]> objectArray() {

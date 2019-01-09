@@ -36,7 +36,7 @@ import org.junit.Test;
 /**
  * Test default value bridges for the {@code @GenericField} annotation.
  */
-public abstract class AbstractFieldContainerValueExtractorIT {
+public abstract class AbstractFieldContainerExtractorIT {
 
 	static final String INDEX_NAME = "IndexName";
 
@@ -55,7 +55,7 @@ public abstract class AbstractFieldContainerValueExtractorIT {
 
 	private final TestModelProvider testModelProvider;
 
-	AbstractFieldContainerValueExtractorIT(TestModelProvider testModelProvider) {
+	AbstractFieldContainerExtractorIT(TestModelProvider testModelProvider) {
 		this.testModelProvider = testModelProvider;
 	}
 

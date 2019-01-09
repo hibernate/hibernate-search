@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyIndexedEmbeddedMappingContext;
@@ -30,7 +30,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 
 	private final Set<String> includePaths = new HashSet<>();
 
-	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
+	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	PropertyIndexedEmbeddedMappingContextImpl(PropertyMappingContext parent) {
 		super( parent );
@@ -77,7 +77,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public PropertyIndexedEmbeddedMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+	public PropertyIndexedEmbeddedMappingContext withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

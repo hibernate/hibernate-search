@@ -8,14 +8,14 @@ package org.hibernate.search.mapper.pojo.model.path;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 
 public final class PojoModelPathValueNode extends PojoModelPath {
 
 	private final PojoModelPathPropertyNode parent;
-	private final ContainerValueExtractorPath extractorPath;
+	private final ContainerExtractorPath extractorPath;
 
-	PojoModelPathValueNode(PojoModelPathPropertyNode parent, ContainerValueExtractorPath extractorPath) {
+	PojoModelPathValueNode(PojoModelPathPropertyNode parent, ContainerExtractorPath extractorPath) {
 		this.parent = parent;
 		this.extractorPath = extractorPath;
 	}
@@ -47,9 +47,9 @@ public final class PojoModelPathValueNode extends PojoModelPath {
 
 	/**
 	 * @return The extractor path from the parent property to this value.
-	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerValueExtractorPath#defaultExtractors()}).
+	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerExtractorPath#defaultExtractors()}).
 	 */
-	public ContainerValueExtractorPath getExtractorPath() {
+	public ContainerExtractorPath getExtractorPath() {
 		return extractorPath;
 	}
 

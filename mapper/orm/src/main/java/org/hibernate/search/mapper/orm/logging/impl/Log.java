@@ -17,7 +17,7 @@ import java.util.Set;
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -163,8 +163,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 9,
 			value = "Container value extractor of type '%2$s' cannot be applied to"
 					+ " Hibernate ORM metadata node of type '%1$s'.")
-	SearchException invalidContainerValueExtractorForDirtyChecking(Class<?> ormMappingClass,
-			Class<? extends ContainerValueExtractor> extractorClass);
+	SearchException invalidContainerExtractorForDirtyChecking(Class<?> ormMappingClass,
+			Class<? extends ContainerExtractor> extractorClass);
 
 	@Message(id = ID_OFFSET_2 + 10,
 			value = "Unable to find a readable property '%2$s' on type '%1$s'.")

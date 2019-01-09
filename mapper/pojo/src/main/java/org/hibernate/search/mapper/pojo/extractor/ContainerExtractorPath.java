@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 /**
- * ContainerValueExtractorPath represents a list of container value extractor to be applied to a property.
+ * ContainerExtractorPath represents a list of container value extractor to be applied to a property.
  * <p>
  * The extractors are either represented:
  * <ul>
@@ -25,38 +25,38 @@ import java.util.StringJoiner;
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.
  * </ul>
  */
-public class ContainerValueExtractorPath {
+public class ContainerExtractorPath {
 
-	private static final ContainerValueExtractorPath DEFAULT = new ContainerValueExtractorPath(
+	private static final ContainerExtractorPath DEFAULT = new ContainerExtractorPath(
 			true, Collections.emptyList()
 	);
-	private static final ContainerValueExtractorPath NONE = new ContainerValueExtractorPath(
+	private static final ContainerExtractorPath NONE = new ContainerExtractorPath(
 			false, Collections.emptyList()
 	);
 
-	public static ContainerValueExtractorPath defaultExtractors() {
+	public static ContainerExtractorPath defaultExtractors() {
 		return DEFAULT;
 	}
 
-	public static ContainerValueExtractorPath noExtractors() {
+	public static ContainerExtractorPath noExtractors() {
 		return NONE;
 	}
 
-	public static ContainerValueExtractorPath explicitExtractor(
-			Class<? extends ContainerValueExtractor> extractorClass) {
-		return new ContainerValueExtractorPath(
+	public static ContainerExtractorPath explicitExtractor(
+			Class<? extends ContainerExtractor> extractorClass) {
+		return new ContainerExtractorPath(
 				false,
 				Collections.singletonList( extractorClass )
 		);
 	}
 
-	public static ContainerValueExtractorPath explicitExtractors(
-			List<? extends Class<? extends ContainerValueExtractor>> extractorClasses) {
+	public static ContainerExtractorPath explicitExtractors(
+			List<? extends Class<? extends ContainerExtractor>> extractorClasses) {
 		if ( extractorClasses.isEmpty() ) {
 			return noExtractors();
 		}
 		else {
-			return new ContainerValueExtractorPath(
+			return new ContainerExtractorPath(
 					false,
 					Collections.unmodifiableList( new ArrayList<>( extractorClasses ) )
 			);
@@ -64,20 +64,20 @@ public class ContainerValueExtractorPath {
 	}
 
 	private final boolean applyDefaultExtractors;
-	private final List<? extends Class<? extends ContainerValueExtractor>> explicitExtractorClasses;
+	private final List<? extends Class<? extends ContainerExtractor>> explicitExtractorClasses;
 
-	private ContainerValueExtractorPath(boolean applyDefaultExtractors,
-			List<? extends Class<? extends ContainerValueExtractor>> explicitExtractorClasses) {
+	private ContainerExtractorPath(boolean applyDefaultExtractors,
+			List<? extends Class<? extends ContainerExtractor>> explicitExtractorClasses) {
 		this.applyDefaultExtractors = applyDefaultExtractors;
 		this.explicitExtractorClasses = explicitExtractorClasses;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if ( ! ( obj instanceof ContainerValueExtractorPath ) ) {
+		if ( ! ( obj instanceof ContainerExtractorPath ) ) {
 			return false;
 		}
-		ContainerValueExtractorPath other = (ContainerValueExtractorPath) obj;
+		ContainerExtractorPath other = (ContainerExtractorPath) obj;
 		return applyDefaultExtractors == other.applyDefaultExtractors
 				&& Objects.equals( explicitExtractorClasses, other.explicitExtractorClasses );
 	}
@@ -97,7 +97,7 @@ public class ContainerValueExtractorPath {
 		}
 		else {
 			StringJoiner joiner = new StringJoiner( ", ", "<", ">" );
-			for ( Class<? extends ContainerValueExtractor> extractorClass : explicitExtractorClasses ) {
+			for ( Class<? extends ContainerExtractor> extractorClass : explicitExtractorClasses ) {
 				joiner.add( extractorClass.getName() );
 			}
 			return joiner.toString();
@@ -112,7 +112,7 @@ public class ContainerValueExtractorPath {
 		return !isDefault() && explicitExtractorClasses.isEmpty();
 	}
 
-	public List<? extends Class<? extends ContainerValueExtractor>> getExplicitExtractorClasses() {
+	public List<? extends Class<? extends ContainerExtractor>> getExplicitExtractorClasses() {
 		return explicitExtractorClasses;
 	}
 }

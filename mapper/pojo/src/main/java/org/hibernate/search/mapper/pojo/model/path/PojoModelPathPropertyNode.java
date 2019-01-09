@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.path;
 
 import java.util.Objects;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 
 public final class PojoModelPathPropertyNode extends PojoModelPath {
 
@@ -42,7 +42,7 @@ public final class PojoModelPathPropertyNode extends PojoModelPath {
 		return parent;
 	}
 
-	public PojoModelPathValueNode value(ContainerValueExtractorPath extractorPath) {
+	public PojoModelPathValueNode value(ContainerExtractorPath extractorPath) {
 		return new PojoModelPathValueNode( this, extractorPath );
 	}
 

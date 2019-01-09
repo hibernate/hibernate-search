@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideMappingContext;
@@ -23,7 +23,7 @@ public class AssociationInverseSideMappingContextImpl
 		implements AssociationInverseSideMappingContext, PojoPropertyMetadataContributor {
 
 	private final PojoModelPathValueNode inversePath;
-	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
+	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	AssociationInverseSideMappingContextImpl(PropertyMappingContext delegate, PojoModelPathValueNode inversePath) {
 		super( delegate );
@@ -41,7 +41,7 @@ public class AssociationInverseSideMappingContextImpl
 	}
 
 	@Override
-	public AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+	public AssociationInverseSideMappingContext withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

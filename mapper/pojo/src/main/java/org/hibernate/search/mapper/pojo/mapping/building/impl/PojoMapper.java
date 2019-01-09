@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -60,7 +60,7 @@ public class PojoMapper<M> implements Mapper<M> {
 	private final boolean implicitProvidedId;
 	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
-	private final ContainerValueExtractorBinder extractorBinder;
+	private final ContainerExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
 
 	// Use a LinkedHashMap for deterministic iteration
@@ -85,7 +85,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		);
 
 		TypePatternMatcherFactory typePatternMatcherFactory = new TypePatternMatcherFactory( introspector );
-		extractorBinder = new ContainerValueExtractorBinder( buildContext, typePatternMatcherFactory );
+		extractorBinder = new ContainerExtractorBinder( buildContext, typePatternMatcherFactory );
 
 		BridgeResolver bridgeResolver = new BridgeResolver( typePatternMatcherFactory );
 		PojoIndexModelBinder indexModelBinder = new PojoIndexModelBinderImpl(

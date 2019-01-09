@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
@@ -51,7 +51,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		);
 		fieldContext.valueBridge( builder );
 
-		ContainerValueExtractorPath extractorPath =
+		ContainerExtractorPath extractorPath =
 				helper.getExtractorPath( getExtractors( annotation ) );
 		fieldContext.withExtractors( extractorPath );
 

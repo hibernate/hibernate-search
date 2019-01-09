@@ -205,13 +205,13 @@ and they provide basic information about mapped types: Java annotations, list of
 "handle" to access each property on an instance of this type, ...
 
 Container value extractor paths::
-`ContainerValueExtractorPath` and `BoundContainerValueExtractorPath` both represent
-a list of `ContainerValueExtractor` to be applied to a property.
+`ContainerExtractorPath` and `BoundContainerExtractorPath` both represent
+a list of `ContainerExtractor` to be applied to a property.
 They allow to represent what will have to be done to get from a property of type `Map<String, List<MyEntity>>`
 to a sequence of `MyEntity`, for example.
 The difference between the "bound" version and the other is that the "bound" version was applied to a POJO model,
 allowing to guarantee that it will work when applied to that model, and allowing to infer the type of extracted values.
-See `ContainerValueExtractorBinder` for more information.
+See `ContainerExtractorBinder` for more information.
 
 Paths::
 POJO paths come in two flavors: `PojoModelPath` and `BoundPojoModelPath`.

@@ -20,10 +20,10 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingCont
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
 /**
  * Binds a mapping to a given entity model and index model
- * by creating the appropriate {@link ContainerValueExtractor extractors} and bridges.
+ * by creating the appropriate {@link ContainerExtractor extractors} and bridges.
  * <p>
  * Also binds the bridges where appropriate:
  * {@link TypeBridge#bind(TypeBridgeBindingContext)},
@@ -45,11 +45,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  */
 public interface PojoIndexModelBinder {
 
-	<C> BoundContainerValueExtractorPath<C, ?> bindExtractorPath(
-			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath);
+	<C> BoundContainerExtractorPath<C, ?> bindExtractorPath(
+			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath);
 
-	<C, V> ContainerValueExtractorHolder<C, V> createExtractors(
-			BoundContainerValueExtractorPath<C, V> boundExtractorPath);
+	<C, V> ContainerExtractorHolder<C, V> createExtractors(
+			BoundContainerExtractorPath<C, V> boundExtractorPath);
 
 	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(IndexModelBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);

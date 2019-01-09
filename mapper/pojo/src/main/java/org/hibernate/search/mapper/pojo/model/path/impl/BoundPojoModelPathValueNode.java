@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.path.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -21,11 +21,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 
 	private final BoundPojoModelPathPropertyNode<T, P> parent;
-	private final BoundContainerValueExtractorPath<P, V> boundExtractorPath;
+	private final BoundContainerExtractorPath<P, V> boundExtractorPath;
 	private BoundPojoModelPathOriginalTypeNode<V> elementTypePathNode;
 
 	BoundPojoModelPathValueNode(BoundPojoModelPathPropertyNode<T, P> parent,
-			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
+			BoundContainerExtractorPath<P, V> boundExtractorPath) {
 		this.parent = parent;
 		this.boundExtractorPath = boundExtractorPath;
 	}
@@ -74,15 +74,15 @@ public class BoundPojoModelPathValueNode<T, P, V> extends BoundPojoModelPath {
 	/**
 	 * @return The bound extractor path from the parent property to this value.
 	 */
-	public BoundContainerValueExtractorPath<P, V> getBoundExtractorPath() {
+	public BoundContainerExtractorPath<P, V> getBoundExtractorPath() {
 		return boundExtractorPath;
 	}
 
 	/**
 	 * @return The extractor path from the parent property to this value.
-	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerValueExtractorPath#defaultExtractors()}).
+	 * The path is guaranteed to be explicit (i.e. it won't be {@link ContainerExtractorPath#defaultExtractors()}).
 	 */
-	public ContainerValueExtractorPath getExtractorPath() {
+	public ContainerExtractorPath getExtractorPath() {
 		return boundExtractorPath.getExtractorPath();
 	}
 

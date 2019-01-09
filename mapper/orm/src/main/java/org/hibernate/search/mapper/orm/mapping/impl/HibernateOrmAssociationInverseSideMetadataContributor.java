@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -15,11 +15,11 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 final class HibernateOrmAssociationInverseSideMetadataContributor implements PojoTypeMetadataContributor {
 	private final String propertyName;
-	private final ContainerValueExtractorPath extractorPath;
+	private final ContainerExtractorPath extractorPath;
 	private final PojoModelPathValueNode inverseSideValuePath;
 
 	HibernateOrmAssociationInverseSideMetadataContributor(String propertyName,
-			ContainerValueExtractorPath extractorPath, PojoModelPathValueNode inverseSideValuePath) {
+			ContainerExtractorPath extractorPath, PojoModelPathValueNode inverseSideValuePath) {
 		this.propertyName = propertyName;
 		this.extractorPath = extractorPath;
 		this.inverseSideValuePath = inverseSideValuePath;

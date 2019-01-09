@@ -16,9 +16,9 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverPropertyNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -31,14 +31,14 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 	private final PojoImplicitReindexingResolverValueNodeBuilderDelegate<P> valueWithoutExtractorsBuilderDelegate;
 	// Use a LinkedHashMap for deterministic iteration
-	private Map<ContainerValueExtractorPath, PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?>>
+	private Map<ContainerExtractorPath, PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?>>
 			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoImplicitReindexingResolverPropertyNodeBuilder(BoundPojoModelPathPropertyNode<T, P> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {
 		super( buildingHelper );
 		this.modelPath = modelPath;
-		BoundContainerValueExtractorPath<P, P> noExtractorsBoundPath = BoundContainerValueExtractorPath.noExtractors(
+		BoundContainerExtractorPath<P, P> noExtractorsBoundPath = BoundContainerExtractorPath.noExtractors(
 				modelPath.getPropertyModel().getTypeModel()
 		);
 		this.valueWithoutExtractorsBuilderDelegate =
@@ -62,17 +62,17 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 		}
 	}
 
-	PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> value(ContainerValueExtractorPath extractorPath) {
+	PojoImplicitReindexingResolverValueNodeBuilderDelegate<?> value(ContainerExtractorPath extractorPath) {
 		if ( !extractorPath.isEmpty() ) {
 			PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?> containerElementNodeBuilder =
 					containerElementNodeBuilders.get( extractorPath );
 			if ( containerElementNodeBuilder == null && !containerElementNodeBuilders.containsKey( extractorPath ) ) {
 				checkNotFrozen();
-				BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+				BoundContainerExtractorPath<P, ?> boundExtractorPath =
 						buildingHelper.bindExtractorPath(
 								modelPath.getPropertyModel().getTypeModel(), extractorPath
 						);
-				ContainerValueExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
+				ContainerExtractorPath explicitExtractorPath = boundExtractorPath.getExtractorPath();
 				if ( !explicitExtractorPath.isEmpty() ) {
 					// Check whether the path was already encountered as an explicit path
 					containerElementNodeBuilder = containerElementNodeBuilders.get( explicitExtractorPath );
@@ -140,8 +140,8 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	 * that the extracted type and extractor have compatible generic arguments.
 	 */
 	private <V> PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, V>
-			createContainerBuilder(BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
-		ContainerValueExtractorHolder<P, V> extractorHolder =
+			createContainerBuilder(BoundContainerExtractorPath<P, V> boundExtractorPath) {
+		ContainerExtractorHolder<P, V> extractorHolder =
 				buildingHelper.createExtractors( boundExtractorPath );
 		BoundPojoModelPathValueNode<T, P, V> containerElementPath = modelPath.value( boundExtractorPath );
 		return new PojoImplicitReindexingResolverContainerElementNodeBuilder<>(

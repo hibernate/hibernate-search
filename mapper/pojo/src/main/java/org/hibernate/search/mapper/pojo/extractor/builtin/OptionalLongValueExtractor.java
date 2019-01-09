@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.OptionalLong;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class OptionalLongValueExtractor implements ContainerValueExtractor<OptionalLong, Long> {
+public class OptionalLongValueExtractor implements ContainerExtractor<OptionalLong, Long> {
 	@Override
 	public Stream<Long> extract(OptionalLong container) {
 		if ( container != null && container.isPresent() ) {

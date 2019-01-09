@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
@@ -43,10 +43,10 @@ public final class PojoAssociationPathInverter {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
-	private final ContainerValueExtractorBinder extractorBinder;
+	private final ContainerExtractorBinder extractorBinder;
 
 	public PojoAssociationPathInverter(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
-			ContainerValueExtractorBinder extractorBinder) {
+			ContainerExtractorBinder extractorBinder) {
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 		this.extractorBinder = extractorBinder;
 	}
@@ -72,9 +72,9 @@ public final class PojoAssociationPathInverter {
 
 	/*
 	 * One might refer to the extractor path of an association in multiple ways:
-	 * - By intension, e.g. ContainerValueExtractorPath.default()
-	 * - By extension, e.g. ContainerValueExtractorPath.noExtractors()
-	 *   or ContainerValueExtractorPath.explicitExtractors( ... )
+	 * - By intension, e.g. ContainerExtractorPath.default()
+	 * - By extension, e.g. ContainerExtractorPath.noExtractors()
+	 *   or ContainerExtractorPath.explicitExtractors( ... )
 	 * We want to match any type of reference, so we have to determine whether this association
 	 * uses the default extractor path, and if so, add it to the list of paths to match.
 	 */
@@ -92,7 +92,7 @@ public final class PojoAssociationPathInverter {
 		BoundPojoModelPathPropertyNode<?, ?> parentPath = boundPathToInvert.getParent();
 		BoundPojoModelPathValueNode<?, ?, ?> parentValuePath = parentPath.getParent().getParent();
 		String propertyName = parentPath.getPropertyHandle().getName();
-		ContainerValueExtractorPath extractorPath = boundPathToInvert.getExtractorPath();
+		ContainerExtractorPath extractorPath = boundPathToInvert.getExtractorPath();
 		boolean isDefaultExtractorPath = isDefaultExtractorPath(
 				parentPath.getPropertyModel(), boundPathToInvert.getBoundExtractorPath()
 		);
@@ -110,7 +110,7 @@ public final class PojoAssociationPathInverter {
 					 * then for each already collected path, add one version using the explicit representation,
 					 * and one version using the implicit representation.
 					 */
-					iterator.add( basePropertyPath.value( ContainerValueExtractorPath.defaultExtractors() ) );
+					iterator.add( basePropertyPath.value( ContainerExtractorPath.defaultExtractors() ) );
 				}
 			}
 		}
@@ -120,13 +120,13 @@ public final class PojoAssociationPathInverter {
 			associationPathsToMatch.add( basePropertyPath.value( extractorPath ) );
 			if ( isDefaultExtractorPath ) {
 				// The may be two versions of this path, similarly to what we do above
-				associationPathsToMatch.add( basePropertyPath.value( ContainerValueExtractorPath.defaultExtractors() ) );
+				associationPathsToMatch.add( basePropertyPath.value( ContainerExtractorPath.defaultExtractors() ) );
 			}
 		}
 	}
 
 	private boolean isDefaultExtractorPath(PojoPropertyModel<?> propertyModel,
-			BoundContainerValueExtractorPath<?, ?> originalSideBoundExtractorPath) {
+			BoundContainerExtractorPath<?, ?> originalSideBoundExtractorPath) {
 		return extractorBinder.isDefaultExtractorPath(
 				propertyModel.getTypeModel(),
 				originalSideBoundExtractorPath.getExtractorPath()
@@ -157,7 +157,7 @@ public final class PojoAssociationPathInverter {
 			 * Since the extractor path was the default one, try to query the additional metadata
 			 * with the implicit default extractor path.
 			 */
-			result = propertyAdditionalMetadata.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
+			result = propertyAdditionalMetadata.getValueAdditionalMetadata( ContainerExtractorPath.defaultExtractors() )
 					.getInverseSidePath();
 		}
 
@@ -194,9 +194,9 @@ public final class PojoAssociationPathInverter {
 					inverseSidePathTypeNode.property( propertyHandle );
 			PojoPropertyAdditionalMetadata inverseSidePropertyAdditionalMetadata = propertyEntry.getValue();
 
-			for ( Map.Entry<ContainerValueExtractorPath, PojoValueAdditionalMetadata> valueEntry :
+			for ( Map.Entry<ContainerExtractorPath, PojoValueAdditionalMetadata> valueEntry :
 					inverseSidePropertyAdditionalMetadata.getValuesAdditionalMetadata().entrySet() ) {
-				ContainerValueExtractorPath inverseSideExtractorPath = valueEntry.getKey();
+				ContainerExtractorPath inverseSideExtractorPath = valueEntry.getKey();
 				BoundPojoModelPathValueNode<?, ?, ?> inverseSidePathValueNode =
 						bindExtractors( inverseSidePathPropertyNode, inverseSideExtractorPath );
 				PojoValueAdditionalMetadata inverseSideValueAdditionalMetadata = valueEntry.getValue();
@@ -269,8 +269,8 @@ public final class PojoAssociationPathInverter {
 
 	private <P> BoundPojoModelPathValueNode<?, P, ?> bindExtractors(
 			BoundPojoModelPathPropertyNode<?, P> inverseSidePathPropertyNode,
-			ContainerValueExtractorPath extractorPath) {
-		BoundContainerValueExtractorPath<P, ?> resolvedExtractorPath =
+			ContainerExtractorPath extractorPath) {
+		BoundContainerExtractorPath<P, ?> resolvedExtractorPath =
 				extractorBinder.bindPath(
 						inverseSidePathPropertyNode.getPropertyModel().getTypeModel(),
 						extractorPath

@@ -29,7 +29,7 @@ import org.junit.Test;
  * <p>
  * Does not test default bridges, which are tested in {@link FieldDefaultBridgeIT}.
  * <p>
- * Does not test uses of container value extractors, which are tested in {@link FieldContainerValueExtractorBaseIT}
+ * Does not test uses of container value extractors, which are tested in {@link FieldContainerExtractorBaseIT}
  * (and others, see javadoc on that class).
  */
 public class FieldBaseIT {
@@ -195,7 +195,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
-	public void error_invalidInputTypeForValueBridge_implicitContainerValueExtractor() {
+	public void error_invalidInputTypeForValueBridge_implicitContainerExtractor() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;

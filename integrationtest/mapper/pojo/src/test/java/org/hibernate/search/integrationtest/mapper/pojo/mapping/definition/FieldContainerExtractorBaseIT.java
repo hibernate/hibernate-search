@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -29,11 +29,11 @@ import org.junit.Test;
 /**
  * Test error cases when applying container value extractors in the {@code @GenericField} annotation.
  * <p>
- * Does not test all container value extractor types, which are tested in {@link FieldContainerValueExtractorImplicitIT}
- * and {@link FieldContainerValueExtractorExplicitIT}.
+ * Does not test all container value extractor types, which are tested in {@link FieldContainerExtractorImplicitIT}
+ * and {@link FieldContainerExtractorExplicitIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerValueExtractorBaseIT {
+public class FieldContainerExtractorBaseIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -47,7 +47,7 @@ public class FieldContainerValueExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extractors = @ContainerExtractorRef(type = RawContainerValueExtractor.class))
+			@GenericField(extractors = @ContainerExtractorRef(type = RawContainerExtractor.class))
 			public Integer getId() {
 				return id;
 			}
@@ -61,15 +61,15 @@ public class FieldContainerValueExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
-								"Cannot interpret the type arguments to the ContainerValueExtractor interface in "
-										+ " implementation '" + RawContainerValueExtractor.class.getName()
-										+ "'. Only the following implementations of ContainerValueExtractor are valid"
+								"Cannot interpret the type arguments to the ContainerExtractor interface in "
+										+ " implementation '" + RawContainerExtractor.class.getName()
+										+ "'. Only the following implementations of ContainerExtractor are valid"
 						)
 						.build()
 				);
 	}
 
-	private static class RawContainerValueExtractor implements ContainerValueExtractor {
+	private static class RawContainerExtractor implements ContainerExtractor {
 		@Override
 		public Stream extract(Object container) {
 			throw new UnsupportedOperationException( "Should not be called" );
@@ -77,7 +77,7 @@ public class FieldContainerValueExtractorBaseIT {
 	}
 
 	@Test
-	public void error_invalidContainerValueExtractorForType() {
+	public void error_invalidContainerExtractorForType() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;

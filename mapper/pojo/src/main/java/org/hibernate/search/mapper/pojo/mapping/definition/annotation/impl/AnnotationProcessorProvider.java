@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
@@ -121,7 +121,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				AssociationInverseSide annotation) {
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			Optional<PojoModelPathValueNode> inversePathOptional =
 					helper.getPojoModelPathValueNode( annotation.inversePath() );
@@ -148,7 +148,7 @@ class AnnotationProcessorProvider {
 		void doProcess(PropertyMappingContext mappingContext,
 				PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 				IndexingDependency annotation) {
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
 
@@ -391,7 +391,7 @@ class AnnotationProcessorProvider {
 				cleanedUpIncludePaths = Collections.emptySet();
 			}
 
-			ContainerValueExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
+			ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extractors() );
 
 			mappingContext.indexedEmbedded()
 					.withExtractors( extractorPath )

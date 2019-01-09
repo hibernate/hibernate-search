@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.dirtiness.building.impl;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 
 /**
@@ -52,7 +52,7 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractP
 	}
 
 	public <V> PojoIndexingDependencyCollectorValueNode<P, V> value(
-			BoundContainerValueExtractorPath<P, V> boundExtractorPath) {
+			BoundContainerExtractorPath<P, V> boundExtractorPath) {
 		return new PojoIndexingDependencyCollectorValueNode<>(
 				this,
 				modelPathFromParentNode.value( boundExtractorPath ),
@@ -64,8 +64,8 @@ public class PojoIndexingDependencyCollectorPropertyNode<T, P> extends AbstractP
 	}
 
 	PojoIndexingDependencyCollectorValueNode<P, ?> value(
-			ContainerValueExtractorPath extractorPath) {
-		BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+			ContainerExtractorPath extractorPath) {
+		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.bindExtractorPath(
 						modelPathFromRootEntityNode.getPropertyModel().getTypeModel(),
 						extractorPath

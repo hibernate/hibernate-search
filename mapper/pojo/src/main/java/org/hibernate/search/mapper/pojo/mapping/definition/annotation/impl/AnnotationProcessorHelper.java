@@ -38,7 +38,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -70,7 +70,7 @@ class AnnotationProcessorHelper {
 		PojoModelPathValueNode inversePath = null;
 		for ( PropertyValue element : inversePathElements ) {
 			String inversePropertyName = element.propertyName();
-			ContainerValueExtractorPath inverseExtractorPath = getExtractorPath(
+			ContainerExtractorPath inverseExtractorPath = getExtractorPath(
 					element.extractors()
 			);
 			if ( inversePath == null ) {
@@ -83,15 +83,15 @@ class AnnotationProcessorHelper {
 		return Optional.ofNullable( inversePath );
 	}
 
-	ContainerValueExtractorPath getExtractorPath(ContainerExtractorRef[] extractors) {
+	ContainerExtractorPath getExtractorPath(ContainerExtractorRef[] extractors) {
 		if ( extractors.length == 0 ) {
-			return ContainerValueExtractorPath.noExtractors();
+			return ContainerExtractorPath.noExtractors();
 		}
 		else if ( extractors.length == 1 && ContainerExtractorRef.DefaultExtractors.class.equals( extractors[0].type() ) ) {
-			return ContainerValueExtractorPath.defaultExtractors();
+			return ContainerExtractorPath.defaultExtractors();
 		}
 		else {
-			return ContainerValueExtractorPath.explicitExtractors(
+			return ContainerExtractorPath.explicitExtractors(
 					Arrays.stream( extractors )
 							.map( ContainerExtractorRef::type )
 							.collect( Collectors.toList() )

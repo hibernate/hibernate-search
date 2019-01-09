@@ -153,7 +153,7 @@ If your container is a custom one, or you need a different behavior than the def
 (extract keys instead of values from a `Map`, for example),
 then you will need to set a custom extractor chain on the `@*Field` annotation.
 All `@*Field` annotations expose an `extractor` attribute to that end.
-See <<mapper-pojo-containervalueextractor>> for more information on available extractors and custom extractors.
+See <<mapper-pojo-containerextractor>> for more information on available extractors and custom extractors.
 2. Otherwise, you will have to rely on a custom component, called a bridge, to extract data from your type.
 See <<mapper-pojo-bridge>> for more information on custom bridges.
 
@@ -242,7 +242,7 @@ TODO The getting started section has a link pointing here and expects the sectio
 include a detailed description of @IndexedEmbedded
 ////
 
-[[mapper-pojo-containervalueextractor]]
+[[mapper-pojo-containerextractor]]
 === Container value extractors
 
 include::todo-placeholder.asciidoc[]

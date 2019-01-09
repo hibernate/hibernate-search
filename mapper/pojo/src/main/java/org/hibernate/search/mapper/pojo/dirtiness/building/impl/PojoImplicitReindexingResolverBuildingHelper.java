@@ -15,10 +15,10 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -30,7 +30,7 @@ import org.hibernate.search.util.impl.common.Closer;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
 
-	private final ContainerValueExtractorBinder extractorBinder;
+	private final ContainerExtractorBinder extractorBinder;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final PojoAssociationPathInverter pathInverter;
 	private final Set<PojoRawTypeModel<?>> entityTypes;
@@ -40,7 +40,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 			new HashMap<>();
 
 	public PojoImplicitReindexingResolverBuildingHelper(
-			ContainerValueExtractorBinder extractorBinder,
+			ContainerExtractorBinder extractorBinder,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider,
 			PojoAssociationPathInverter pathInverter,
 			Set<PojoRawTypeModel<?>> entityTypes) {
@@ -124,18 +124,18 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 		return builder;
 	}
 
-	<T> BoundContainerValueExtractorPath<T, ?> bindExtractorPath(
-			PojoGenericTypeModel<T> typeModel, ContainerValueExtractorPath extractorPath) {
+	<T> BoundContainerExtractorPath<T, ?> bindExtractorPath(
+			PojoGenericTypeModel<T> typeModel, ContainerExtractorPath extractorPath) {
 		return extractorBinder.bindPath( typeModel, extractorPath );
 	}
 
-	<V, T> ContainerValueExtractorHolder<T, V> createExtractors(
-			BoundContainerValueExtractorPath<T, V> boundExtractorPath) {
+	<V, T> ContainerExtractorHolder<T, V> createExtractors(
+			BoundContainerExtractorPath<T, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}
 
 	ReindexOnUpdate getReindexOnUpdate(ReindexOnUpdate parentReindexOnUpdate,
-			PojoTypeModel<?> typeModel, String propertyName, ContainerValueExtractorPath extractorPath) {
+			PojoTypeModel<?> typeModel, String propertyName, ContainerExtractorPath extractorPath) {
 		if ( ReindexOnUpdate.NO.equals( parentReindexOnUpdate ) ) {
 			return ReindexOnUpdate.NO;
 		}
@@ -152,7 +152,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 						extractorPath
 				) ) {
 					reindexOnUpdateOptional = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
-							.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
+							.getValueAdditionalMetadata( ContainerExtractorPath.defaultExtractors() )
 							.getReindexOnUpdate();
 				}
 			}
@@ -162,7 +162,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 	}
 
 	Set<PojoModelPathValueNode> getDerivedFrom(PojoTypeModel<?> typeModel, String propertyName,
-			ContainerValueExtractorPath extractorPath) {
+			ContainerExtractorPath extractorPath) {
 		PojoTypeAdditionalMetadata typeAdditionalMetadata =
 				typeAdditionalMetadataProvider.get( typeModel.getRawType() );
 		Set<PojoModelPathValueNode> derivedFrom =
@@ -175,7 +175,7 @@ public final class PojoImplicitReindexingResolverBuildingHelper {
 					extractorPath
 			) ) {
 				derivedFrom = typeAdditionalMetadata.getPropertyAdditionalMetadata( propertyName )
-						.getValueAdditionalMetadata( ContainerValueExtractorPath.defaultExtractors() )
+						.getValueAdditionalMetadata( ContainerExtractorPath.defaultExtractors() )
 						.getDerivedFrom();
 			}
 		}

@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class ArrayElementExtractor<T> implements ContainerValueExtractor<T[], T> {
+public class ArrayElementExtractor<T> implements ContainerExtractor<T[], T> {
 	@Override
 	public Stream<T> extract(T[] container) {
 		return container == null ? Stream.empty() : Arrays.stream( container );

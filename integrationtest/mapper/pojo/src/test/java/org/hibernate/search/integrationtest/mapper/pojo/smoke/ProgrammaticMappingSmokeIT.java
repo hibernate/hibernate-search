@@ -25,7 +25,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
@@ -157,7 +157,7 @@ public class ProgrammaticMappingSmokeIT {
 							.property( "embedded" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsSingle" )
-													.value( ContainerValueExtractorPath.defaultExtractors() )
+													.value( ContainerExtractorPath.defaultExtractors() )
 									)
 									.bridge(
 											new CustomPropertyBridge.Builder()
@@ -179,13 +179,13 @@ public class ProgrammaticMappingSmokeIT {
 							.property( "embeddedIterable" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsIterable" )
-													.value( ContainerValueExtractorPath.defaultExtractors() )
+													.value( ContainerExtractorPath.defaultExtractors() )
 									)
 									.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
 							.property( "embeddedList" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsList" )
-													.value( ContainerValueExtractorPath.defaultExtractors() )
+													.value( ContainerExtractorPath.defaultExtractors() )
 									)
 									.indexedEmbedded()
 											.prefix( "embeddedList.otherPrefix_" )
@@ -193,13 +193,13 @@ public class ProgrammaticMappingSmokeIT {
 							.property( "embeddedArrayList" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsArrayList" )
-													.value( ContainerValueExtractorPath.defaultExtractors() )
+													.value( ContainerExtractorPath.defaultExtractors() )
 									)
 									.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
 							.property( "embeddedMap" )
 									.associationInverseSide(
 											PojoModelPath.fromRoot( "embeddingAsMap" )
-													.value( ContainerValueExtractorPath.defaultExtractors() )
+													.value( ContainerExtractorPath.defaultExtractors() )
 									)
 									.genericField( "embeddedMapKeys" ).withExtractor( MapKeyExtractor.class )
 									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );

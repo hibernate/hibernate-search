@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 
 public class PojoPropertyAdditionalMetadata {
 
@@ -19,21 +19,21 @@ public class PojoPropertyAdditionalMetadata {
 			Collections.emptyMap(), Collections.emptyMap()
 	);
 
-	private final Map<ContainerValueExtractorPath, PojoValueAdditionalMetadata> valuesAdditionalMetadata;
+	private final Map<ContainerExtractorPath, PojoValueAdditionalMetadata> valuesAdditionalMetadata;
 	private final Map<Class<?>, List<?>> markers;
 
-	public PojoPropertyAdditionalMetadata(Map<ContainerValueExtractorPath,
+	public PojoPropertyAdditionalMetadata(Map<ContainerExtractorPath,
 			PojoValueAdditionalMetadata> valuesAdditionalMetadata,
 			Map<Class<?>, List<?>> markers) {
 		this.valuesAdditionalMetadata = valuesAdditionalMetadata;
 		this.markers = markers;
 	}
 
-	public PojoValueAdditionalMetadata getValueAdditionalMetadata(ContainerValueExtractorPath extractorPath) {
+	public PojoValueAdditionalMetadata getValueAdditionalMetadata(ContainerExtractorPath extractorPath) {
 		return valuesAdditionalMetadata.getOrDefault( extractorPath, PojoValueAdditionalMetadata.EMPTY );
 	}
 
-	public Map<ContainerValueExtractorPath, PojoValueAdditionalMetadata> getValuesAdditionalMetadata() {
+	public Map<ContainerExtractorPath, PojoValueAdditionalMetadata> getValuesAdditionalMetadata() {
 		return valuesAdditionalMetadata;
 	}
 

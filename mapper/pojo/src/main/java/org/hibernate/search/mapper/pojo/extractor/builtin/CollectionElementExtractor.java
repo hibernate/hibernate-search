@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.Collection;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class CollectionElementExtractor<T> implements ContainerValueExtractor<Collection<T>, T> {
+public class CollectionElementExtractor<T> implements ContainerExtractor<Collection<T>, T> {
 	@Override
 	public Stream<T> extract(Collection<T> container) {
 		return container == null ? Stream.empty() : container.stream();

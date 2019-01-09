@@ -37,13 +37,13 @@ import org.junit.Test;
 /**
  * Test explicit container value extractors for the {@code @GenericField} annotation.
  * <p>
- * Error cases are not tested here but in {@link FieldContainerValueExtractorBaseIT}.
+ * Error cases are not tested here but in {@link FieldContainerExtractorBaseIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-2554")
-public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContainerValueExtractorIT {
+public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExtractorIT {
 
-	public FieldContainerValueExtractorExplicitIT() {
-		super( new ExplicitContainerValueExtractorTestModelProvider() );
+	public FieldContainerExtractorExplicitIT() {
+		super( new ExplicitContainerExtractorTestModelProvider() );
 	}
 
 	@Test
@@ -146,7 +146,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 		);
 	}
 
-	private static final class ExplicitContainerValueExtractorTestModelProvider implements TestModelProvider {
+	private static final class ExplicitContainerExtractorTestModelProvider implements TestModelProvider {
 
 		@Override
 		public TestModel<?, String[]> objectArray() {

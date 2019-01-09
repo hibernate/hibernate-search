@@ -17,12 +17,12 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerValueExtractor;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.StartupStubContainerExtractor;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -46,8 +46,8 @@ public class CleanupIT {
 	private static final StartupStubBridge.CounterKeys ROUTING_KEY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys TYPE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 	private static final StartupStubBridge.CounterKeys PROPERTY_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
-	private static final StartupStubContainerValueExtractor.CounterKeys CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS =
-			StartupStubContainerValueExtractor.createKeys();
+	private static final StartupStubContainerExtractor.CounterKeys CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS =
+			StartupStubContainerExtractor.createKeys();
 	private static final StartupStubBridge.CounterKeys VALUE_BRIDGE_COUNTER_KEYS = StartupStubBridge.createKeys();
 
 	@Rule
@@ -78,8 +78,8 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-											StartupStubContainerValueExtractor.class
+									.withExtractors( ContainerExtractorPath.explicitExtractor(
+											StartupStubContainerExtractor.class
 									) );
 		} );
 
@@ -127,8 +127,8 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-											StartupStubContainerValueExtractor.class
+									.withExtractors( ContainerExtractorPath.explicitExtractor(
+											StartupStubContainerExtractor.class
 									) );
 			typeContext.routingKeyBridge( new FailingBridgeBuilder() );
 		} );
@@ -163,8 +163,8 @@ public class CleanupIT {
 							.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 							.genericField( "otherText" )
 									.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-									.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-											StartupStubContainerValueExtractor.class
+									.withExtractors( ContainerExtractorPath.explicitExtractor(
+											StartupStubContainerExtractor.class
 									) );
 			typeContext.bridge( new FailingBridgeBuilder() );
 		} );
@@ -196,8 +196,8 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-										StartupStubContainerValueExtractor.class
+								.withExtractors( ContainerExtractorPath.explicitExtractor(
+										StartupStubContainerExtractor.class
 								) )
 				.property( "id" )
 						.documentId()
@@ -233,8 +233,8 @@ public class CleanupIT {
 				.property( "text" )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-										StartupStubContainerValueExtractor.class
+								.withExtractors( ContainerExtractorPath.explicitExtractor(
+										StartupStubContainerExtractor.class
 								) )
 						.bridge( new FailingBridgeBuilder() )
 		);
@@ -268,13 +268,13 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-										StartupStubContainerValueExtractor.class
+								.withExtractors( ContainerExtractorPath.explicitExtractor(
+										StartupStubContainerExtractor.class
 								) )
 						.genericField( "yetAnotherText" )
 								.valueBridge( new FailingBridgeBuilder() )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-										StartupStubContainerValueExtractor.class
+								.withExtractors( ContainerExtractorPath.explicitExtractor(
+										StartupStubContainerExtractor.class
 								) )
 		);
 
@@ -297,7 +297,7 @@ public class CleanupIT {
 	}
 
 	@Test
-	public void failingContainerValueExtractorBuilding() {
+	public void failingContainerExtractorBuilding() {
 		failingStartup( mappingDefinition -> mappingDefinition.type( OtherIndexedEntity.class )
 				.indexed( OtherIndexedEntity.INDEX )
 				.routingKeyBridge( new SucceedingBridgeBuilder( ROUTING_KEY_BRIDGE_COUNTER_KEYS ) )
@@ -308,14 +308,14 @@ public class CleanupIT {
 						.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
 						.genericField( "otherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-										StartupStubContainerValueExtractor.class
+								.withExtractors( ContainerExtractorPath.explicitExtractor(
+										StartupStubContainerExtractor.class
 								) )
 						.genericField( "yetAnotherText" )
 								.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-								.withExtractors( ContainerValueExtractorPath.explicitExtractors( Arrays.asList(
-										StartupStubContainerValueExtractor.class, // The first one succeeds, but...
-										FailingContainerValueExtractor.class // This one fails.
+								.withExtractors( ContainerExtractorPath.explicitExtractors( Arrays.asList(
+										StartupStubContainerExtractor.class, // The first one succeeds, but...
+										FailingContainerExtractor.class // This one fails.
 								) ) )
 		);
 
@@ -349,7 +349,7 @@ public class CleanupIT {
 	private void startup(Consumer<ProgrammaticMappingDefinitionContext> additionalMappingContributor) {
 		this.mapping = setupHelper.withBackendMock( backendMock )
 				/*
-				 * Make the StartubStubContainerValueExtractor available through a factory
+				 * Make the StartubStubContainerExtractor available through a factory
 				 * that will return a BeanHolder that increments static counters
 				 * (so that we can check the bean holders are properly closed).
 				 */
@@ -358,9 +358,9 @@ public class CleanupIT {
 							@Override
 							public void configure(BeanConfigurationContext context) {
 								context.define(
-										StartupStubContainerValueExtractor.class,
+										StartupStubContainerExtractor.class,
 										creationContext ->
-												StartupStubContainerValueExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS )
+												StartupStubContainerExtractor.create( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS )
 								);
 							}
 						}
@@ -382,14 +382,14 @@ public class CleanupIT {
 									.property( "text" )
 											.genericField()
 													.valueBridge( new SucceedingBridgeBuilder( VALUE_BRIDGE_COUNTER_KEYS ) )
-													.withExtractors( ContainerValueExtractorPath.explicitExtractor(
-															StartupStubContainerValueExtractor.class
+													.withExtractors( ContainerExtractorPath.explicitExtractor(
+															StartupStubContainerExtractor.class
 													) )
 									.property( "embedded" )
 											.associationInverseSide(
 													PojoModelPath.fromRoot( "embedding" )
-															.value( ContainerValueExtractorPath.explicitExtractor(
-																	StartupStubContainerValueExtractor.class
+															.value( ContainerExtractorPath.explicitExtractor(
+																	StartupStubContainerExtractor.class
 															) )
 											)
 											.bridge( new SucceedingBridgeBuilder( PROPERTY_BRIDGE_COUNTER_KEYS ) )
@@ -403,8 +403,8 @@ public class CleanupIT {
 									.property( "otherEmbedded" )
 											.associationInverseSide(
 													PojoModelPath.fromRoot( "otherEmbedding" )
-															.value( ContainerValueExtractorPath.explicitExtractor(
-																	StartupStubContainerValueExtractor.class
+															.value( ContainerExtractorPath.explicitExtractor(
+																	StartupStubContainerExtractor.class
 															) )
 											);
 
@@ -543,8 +543,8 @@ public class CleanupIT {
 		}
 	}
 
-	public static class FailingContainerValueExtractor implements ContainerValueExtractor<Object, Object> {
-		public FailingContainerValueExtractor() {
+	public static class FailingContainerExtractor implements ContainerExtractor<Object, Object> {
+		public FailingContainerExtractor() {
 			throw new SimulatedFailure();
 		}
 

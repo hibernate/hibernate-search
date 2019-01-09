@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class MapKeyExtractor<T> implements ContainerValueExtractor<Map<T, ?>, T> {
+public class MapKeyExtractor<T> implements ContainerExtractor<Map<T, ?>, T> {
 	@Override
 	public Stream<T> extract(Map<T, ?> container) {
 		return container == null ? Stream.empty() : container.keySet().stream();

@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.dirtiness;
 
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 /**
  * Defines the various strategies for handling updates to a value in an entity.
  * <p>
  * A "value" here means either an entity property or something extracted from that property
- * using a {@link org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor}.
+ * using a {@link ContainerExtractor}.
  */
 public enum ReindexOnUpdate {
 

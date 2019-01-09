@@ -31,10 +31,10 @@ import org.hibernate.search.mapper.pojo.bridge.binding.impl.ValueBridgeBindingCo
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorBinder;
-import org.hibernate.search.mapper.pojo.extractor.impl.ContainerValueExtractorHolder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
+import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelPropertyRootElement;
@@ -58,12 +58,12 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BridgeBuildContext bridgeBuildContext;
-	private final ContainerValueExtractorBinder extractorBinder;
+	private final ContainerExtractorBinder extractorBinder;
 	private final BridgeResolver bridgeResolver;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 
 	PojoIndexModelBinderImpl(MappingBuildContext buildContext,
-			ContainerValueExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
+			ContainerExtractorBinder extractorBinder, BridgeResolver bridgeResolver,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
 		this.bridgeBuildContext = new BridgeBuildContextImpl( buildContext );
 		this.extractorBinder = extractorBinder;
@@ -72,14 +72,14 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <C> BoundContainerValueExtractorPath<C, ?> bindExtractorPath(
-			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerValueExtractorPath extractorPath) {
+	public <C> BoundContainerExtractorPath<C, ?> bindExtractorPath(
+			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath) {
 		return extractorBinder.bindPath( pojoGenericTypeModel, extractorPath );
 	}
 
 	@Override
-	public <C, V> ContainerValueExtractorHolder<C, V> createExtractors(
-			BoundContainerValueExtractorPath<C, V> boundExtractorPath) {
+	public <C, V> ContainerExtractorHolder<C, V> createExtractors(
+			BoundContainerExtractorPath<C, V> boundExtractorPath) {
 		return extractorBinder.create( boundExtractorPath );
 	}
 

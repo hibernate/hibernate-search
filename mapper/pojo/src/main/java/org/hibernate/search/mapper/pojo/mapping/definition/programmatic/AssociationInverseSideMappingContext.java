@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 
 /**
  * @author Yoann Rodiere
@@ -15,14 +15,14 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 public interface AssociationInverseSideMappingContext extends PropertyMappingContext {
 
 	default AssociationInverseSideMappingContext withExtractor(
-			Class<? extends ContainerValueExtractor> extractorClass) {
-		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
+			Class<? extends ContainerExtractor> extractorClass) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
 	default AssociationInverseSideMappingContext withoutExtractors() {
-		return withExtractors( ContainerValueExtractorPath.noExtractors() );
+		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
-	AssociationInverseSideMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
+	AssociationInverseSideMappingContext withExtractors(ContainerExtractorPath extractorPath);
 
 }

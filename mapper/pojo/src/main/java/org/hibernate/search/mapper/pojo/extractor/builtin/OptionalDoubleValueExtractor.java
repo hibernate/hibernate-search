@@ -9,9 +9,9 @@ package org.hibernate.search.mapper.pojo.extractor.builtin;
 import java.util.OptionalDouble;
 import java.util.stream.Stream;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 
-public class OptionalDoubleValueExtractor implements ContainerValueExtractor<OptionalDouble, Double> {
+public class OptionalDoubleValueExtractor implements ContainerExtractor<OptionalDouble, Double> {
 	@Override
 	public Stream<Double> extract(OptionalDouble container) {
 		if ( container != null && container.isPresent() ) {

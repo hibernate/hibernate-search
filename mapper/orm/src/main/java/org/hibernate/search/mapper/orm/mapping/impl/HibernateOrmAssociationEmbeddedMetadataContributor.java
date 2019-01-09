@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
@@ -14,9 +14,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTypeMetadataContributor {
 	private final String propertyName;
-	private final ContainerValueExtractorPath extractorPath;
+	private final ContainerExtractorPath extractorPath;
 
-	HibernateOrmAssociationEmbeddedMetadataContributor(String propertyName, ContainerValueExtractorPath extractorPath) {
+	HibernateOrmAssociationEmbeddedMetadataContributor(String propertyName, ContainerExtractorPath extractorPath) {
 		this.propertyName = propertyName;
 		this.extractorPath = extractorPath;
 	}

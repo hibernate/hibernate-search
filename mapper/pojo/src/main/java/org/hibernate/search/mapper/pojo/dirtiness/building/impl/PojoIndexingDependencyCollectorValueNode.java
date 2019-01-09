@@ -15,8 +15,8 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolverNode;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
@@ -338,7 +338,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			PojoModelPathValueNode unboundPath) {
 		PojoImplicitReindexingResolverPropertyNodeBuilder<?, ?> propertyNodeBuilder =
 				applyPath( builder, unboundPath.getParent() );
-		ContainerValueExtractorPath extractorPath = unboundPath.getExtractorPath();
+		ContainerExtractorPath extractorPath = unboundPath.getExtractorPath();
 		return propertyNodeBuilder.value( extractorPath );
 	}
 
@@ -362,7 +362,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 			PojoModelPathValueNode unboundPath) {
 		PojoIndexingDependencyCollectorPropertyNode<?, ?> propertyCollectorNode =
 				applyPath( rootCollectorTypeNode, unboundPath.getParent() );
-		ContainerValueExtractorPath extractorPath = unboundPath.getExtractorPath();
+		ContainerExtractorPath extractorPath = unboundPath.getExtractorPath();
 		return propertyCollectorNode.value( extractorPath );
 	}
 
@@ -405,8 +405,8 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	}
 
 	private <T, P> BoundPojoModelPathValueNode<T, P, ?> bindAndApplyExtractorPath(
-			BoundPojoModelPathPropertyNode<T, P> propertyNode, ContainerValueExtractorPath extractorPath) {
-		BoundContainerValueExtractorPath<P, ?> boundExtractorPath =
+			BoundPojoModelPathPropertyNode<T, P> propertyNode, ContainerExtractorPath extractorPath) {
+		BoundContainerExtractorPath<P, ?> boundExtractorPath =
 				buildingHelper.bindExtractorPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
 		return propertyNode.value( boundExtractorPath );
 	}

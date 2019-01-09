@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.extractor.impl;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
 /**
- * A {@link ContainerValueExtractorPath} bound to a given source type.
+ * A {@link ContainerExtractorPath} bound to a given source type.
  * <p>
- * Instances are returned by the {@code bind}/{@code tryBind} methods of {@link ContainerValueExtractorBinder}.
+ * Instances are returned by the {@code bind}/{@code tryBind} methods of {@link ContainerExtractorBinder}.
  * <p>
  * The {@link #getExtractorPath() extractor path} is guaranteed to be explicit
- * ({@link ContainerValueExtractorPath#isDefault()} returns {@code false}),
+ * ({@link ContainerExtractorPath#isDefault()} returns {@code false}),
  * and to be valid when applied to the source type.
  * <p>
  * The extractor path may be empty, in which case the source type is equal to the extracted type.
@@ -23,18 +23,18 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  * @param <C> The container type
  * @param <V> The extracted value type
  */
-public class BoundContainerValueExtractorPath<C, V> {
-	public static <V> BoundContainerValueExtractorPath<V, V> noExtractors(PojoGenericTypeModel<V> sourceType) {
-		return new BoundContainerValueExtractorPath<>(
-				sourceType, ContainerValueExtractorPath.noExtractors(), sourceType
+public class BoundContainerExtractorPath<C, V> {
+	public static <V> BoundContainerExtractorPath<V, V> noExtractors(PojoGenericTypeModel<V> sourceType) {
+		return new BoundContainerExtractorPath<>(
+				sourceType, ContainerExtractorPath.noExtractors(), sourceType
 		);
 	}
 
 	private final PojoGenericTypeModel<C> sourceType;
-	private final ContainerValueExtractorPath extractorPath;
+	private final ContainerExtractorPath extractorPath;
 	private final PojoGenericTypeModel<V> extractedType;
 
-	BoundContainerValueExtractorPath(PojoGenericTypeModel<C> sourceType, ContainerValueExtractorPath extractorPath,
+	BoundContainerExtractorPath(PojoGenericTypeModel<C> sourceType, ContainerExtractorPath extractorPath,
 			PojoGenericTypeModel<V> extractedType) {
 		this.sourceType = sourceType;
 		this.extractorPath = extractorPath;
@@ -45,7 +45,7 @@ public class BoundContainerValueExtractorPath<C, V> {
 		return sourceType;
 	}
 
-	public ContainerValueExtractorPath getExtractorPath() {
+	public ContainerExtractorPath getExtractorPath() {
 		return extractorPath;
 	}
 

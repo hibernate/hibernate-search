@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
@@ -27,7 +27,7 @@ public class IndexingDependencyMappingContextImpl
 		extends DelegatingPropertyMappingContext
 		implements IndexingDependencyMappingContext, PojoPropertyMetadataContributor {
 
-	private ContainerValueExtractorPath extractorPath = ContainerValueExtractorPath.defaultExtractors();
+	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 	private ReindexOnUpdate reindexOnUpdate = ReindexOnUpdate.DEFAULT;
 	// Use a LinkedHashSet for deterministic iteration
 	private Set<PojoModelPathValueNode> derivedFrom = null;
@@ -69,7 +69,7 @@ public class IndexingDependencyMappingContextImpl
 	}
 
 	@Override
-	public IndexingDependencyMappingContext withExtractors(ContainerValueExtractorPath extractorPath) {
+	public IndexingDependencyMappingContext withExtractors(ContainerExtractorPath extractorPath) {
 		this.extractorPath = extractorPath;
 		return this;
 	}

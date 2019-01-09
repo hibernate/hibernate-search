@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 
 /**
@@ -21,14 +21,14 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 	IndexingDependencyMappingContext derivedFrom(PojoModelPathValueNode pojoModelPath);
 
 	default IndexingDependencyMappingContext withExtractor(
-			Class<? extends ContainerValueExtractor> extractorClass) {
-		return withExtractors( ContainerValueExtractorPath.explicitExtractor( extractorClass ) );
+			Class<? extends ContainerExtractor> extractorClass) {
+		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
 	}
 
 	default IndexingDependencyMappingContext withoutExtractors() {
-		return withExtractors( ContainerValueExtractorPath.noExtractors() );
+		return withExtractors( ContainerExtractorPath.noExtractors() );
 	}
 
-	IndexingDependencyMappingContext withExtractors(ContainerValueExtractorPath extractorPath);
+	IndexingDependencyMappingContext withExtractors(ContainerExtractorPath extractorPath);
 
 }

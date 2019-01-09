@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
  * <p>
  * Any runtime use of this extractor will simply increment a counter and throw an exception.
  */
-public class StartupStubContainerValueExtractor implements ContainerValueExtractor<Object, Object> {
+public class StartupStubContainerExtractor implements ContainerExtractor<Object, Object> {
 	public static class CounterKeys {
 		public final StaticCounters.Key instance = StaticCounters.createKey();
 		public final StaticCounters.Key runtimeUse = StaticCounters.createKey();
@@ -34,14 +34,14 @@ public class StartupStubContainerValueExtractor implements ContainerValueExtract
 		return new CounterKeys();
 	}
 
-	public static BeanHolder<StartupStubContainerValueExtractor> create(CounterKeys counterKeys) {
-		StartupStubContainerValueExtractor bridge = new StartupStubContainerValueExtractor( counterKeys );
+	public static BeanHolder<StartupStubContainerExtractor> create(CounterKeys counterKeys) {
+		StartupStubContainerExtractor bridge = new StartupStubContainerExtractor( counterKeys );
 		return new CloseCountingBeanHolder<>( bridge, counterKeys.holderClose );
 	}
 
 	public final CounterKeys counterKeys;
 
-	private StartupStubContainerValueExtractor(CounterKeys counterKeys) {
+	private StartupStubContainerExtractor(CounterKeys counterKeys) {
 		StaticCounters.get().increment( counterKeys.instance );
 		this.counterKeys = counterKeys;
 	}
