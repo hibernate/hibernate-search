@@ -39,9 +39,10 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkDisabled_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		log.expectMessageMissing(
+		log.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used"
-		);
+		)
+				.never();
 		log.expectMessage( "Configuration property tracking is disabled" );
 		setup( builder -> {
 			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
@@ -56,12 +57,11 @@ public class UnusedPropertiesIT {
 				"Some properties in the Hibernate Search configuration were not used",
 				"[" + unusedPropertyKey + "]"
 		);
-		log.expectMessageMissing( "Configuration property tracking is disabled" );
+		log.expectMessage( "Configuration property tracking is disabled" )
+				.never();
 		// Also check that used properties are not reported as unused
-		log.expectMessageMissing(
-				"not used",
-				DEFAULT_BACKEND_PROPERTY_KEY
-		);
+		log.expectMessage( "not used", DEFAULT_BACKEND_PROPERTY_KEY )
+				.never();
 
 		setup( builder -> {
 			builder.setProperty( unusedPropertyKey, "bar" );
@@ -75,8 +75,10 @@ public class UnusedPropertiesIT {
 		 * This is a corner case worth testing, since the property may legitimately be accessed before
 		 * we start tracking property usage.
  		 */
-		log.expectMessageMissing( "Some properties in the Hibernate Search configuration were not used" );
-		log.expectMessageMissing( "Configuration property tracking is disabled" );
+		log.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
+				.never();
+		log.expectMessage( "Configuration property tracking is disabled" )
+				.never();
 		setup( builder -> {
 			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
 		} );
