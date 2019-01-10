@@ -40,9 +40,8 @@ public class ExpectedLog4jLog implements TestRule {
 		return new ExpectedLog4jLog();
 	}
 
-	private List<Matcher<?>> expectations = new ArrayList<>();
-
-	private List<Matcher<?>> absenceExpectations = new ArrayList<>();
+	private List<LogExpectation> expectations = new ArrayList<>();
+	private TestAppender currentAppender;
 
 	private ExpectedLog4jLog() {
 	}
@@ -53,15 +52,23 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * Verify that your code produces a log event matching the given matcher.
+	 * Expect a logging event matching the given matcher.
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
-	public void expectEvent(Matcher<? extends LoggingEvent> matcher) {
-		expectations.add( matcher );
+	public LogExpectation expectEvent(Matcher<? extends LoggingEvent> matcher) {
+		LogExpectation expectation = new LogExpectation( matcher );
+		expectations.add( expectation );
+		if ( currentAppender != null ) {
+			currentAppender.addChecker( expectation.createChecker() );
+		}
+		return expectation;
 	}
 
 	/**
-	 * Verify that your code produces a log event matching the given level or higher,
-	 * with a throwable matching the given matcher, and a message containing the given strings.
+	 * Expect a logging event matching the given level or higher,
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
 	public void expectEvent(Level level,
 			Matcher<? super Throwable> throwableMatcher,
@@ -74,59 +81,79 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	/**
-	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given matcher.
+	 * @deprecated Use {@code expectEvent( matcher ).never() }
 	 */
+	@Deprecated
 	public void expectEventMissing(Matcher<? extends LoggingEvent> matcher) {
-		absenceExpectations.add( matcher );
+		expectEvent( matcher ).never();
 	}
 
 	/**
-	 * Verify that your code <strong>doesn't</strong> produce a log event matching the given level or higher.
+	 * Expect a logging event matching the given level or higher.
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
+	public LogExpectation expectLevel(Level level) {
+		return expectEvent( eventLevelMatcher( level ) );
+	}
+
+	/**
+	 * @deprecated Use {@code expectLevel( level ).never() }
+	 */
+	@Deprecated
 	public void expectLevelMissing(Level level) {
-		expectEventMissing( eventLevelMatcher( level ) );
+		expectLevel( level ).never();
 	}
 
 	/**
-	 * Verify that your code produces a log message containing the given string.
+	 * Expect a log message containing the given string.
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
-	public void expectMessage(String containedString) {
-		expectMessage( CoreMatchers.containsString( containedString ) );
+	public LogExpectation expectMessage(String containedString) {
+		return expectMessage( CoreMatchers.containsString( containedString ) );
 	}
 
 	/**
-	 * Verify that your code <strong>doesn't</strong> produce a log message containing the given string.
+	 * @deprecated Use {@code expectMessage( containedString ).never() }
 	 */
+	@Deprecated
 	public void expectMessageMissing(String containedString) {
-		expectMessageMissing( CoreMatchers.containsString( containedString ) );
+		expectMessage( containedString ).never();
 	}
 
 	/**
-	 * Verify that your code produces a log message containing all of the given string.
+	 * Expect a log message containing all of the given string.
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
-	public void expectMessage(String containedString, String... otherContainedStrings) {
-		expectMessage( containsAllStrings( containedString, otherContainedStrings ) );
+	public LogExpectation expectMessage(String containedString, String... otherContainedStrings) {
+		return expectMessage( containsAllStrings( containedString, otherContainedStrings ) );
 	}
 
 	/**
-	 * Verify that your code <strong>doesn't</strong> produce a log message containing all of the given string.
+	 * @deprecated Use {@code expectMessage( matcher ).never() }
 	 */
+	@Deprecated
 	public void expectMessageMissing(String containedString, String... otherContainedStrings) {
-		expectMessageMissing( containsAllStrings( containedString, otherContainedStrings ) );
+		expectMessage( containedString, otherContainedStrings ).times( 0 );
 	}
 
 	/**
-	 * Verify that your code produces a log message matches the given Hamcrest matcher.
+	 * Expect a log message matches the given Hamcrest matcher.
+	 * <p>
+	 * Defaults to expecting the event once or more.
 	 */
-	public void expectMessage(Matcher<String> matcher) {
-		expectEvent( eventMessageMatcher( matcher ) );
+	public LogExpectation expectMessage(Matcher<String> matcher) {
+		return expectEvent( eventMessageMatcher( matcher ) );
 	}
 
 	/**
-	 * Verify that your code <strong>doesn't</strong> produce a log message matches the given Hamcrest matcher.
+	 * @deprecated Use {@code expectMessage( matcher ).never() }
 	 */
+	@Deprecated
 	public void expectMessageMissing(Matcher<String> matcher) {
-		expectEventMissing( eventMessageMatcher( matcher ) );
+		expectMessage( matcher ).times( 0 );
 	}
 
 	private Matcher<String> containsAllStrings(String containedString, String... otherContainedStrings) {
@@ -182,8 +209,15 @@ public class ExpectedLog4jLog implements TestRule {
 	}
 
 	private class TestAppender extends AppenderSkeleton {
-		private final Set<Matcher<?>> expectationsMet = new HashSet<>();
-		private final Set<LoggingEvent> unexpectedEvents = new HashSet<>();
+		private final List<LogChecker> checkers;
+
+		private TestAppender() {
+			this.checkers = new ArrayList<>();
+		}
+
+		void addChecker(LogChecker checker) {
+			checkers.add( checker );
+		}
 
 		@Override
 		public void close() {
@@ -197,36 +231,27 @@ public class ExpectedLog4jLog implements TestRule {
 
 		@Override
 		protected void append(LoggingEvent event) {
-			for ( Matcher<?> expectation : ExpectedLog4jLog.this.expectations ) {
-				if ( !expectationsMet.contains( expectation ) && expectation.matches( event ) ) {
-					expectationsMet.add( expectation );
-				}
-			}
-			for ( Matcher<?> absenceExpectation : ExpectedLog4jLog.this.absenceExpectations ) {
-				if ( absenceExpectation.matches( event ) ) {
-					unexpectedEvents.add( event );
-				}
+			for ( LogChecker checker : checkers ) {
+				checker.process( event );
 			}
 		}
 
-		public Set<Matcher<?>> getExpectationsNotMet() {
-			Set<Matcher<?>> expectationsNotMet = new HashSet<>();
-			expectationsNotMet.addAll( expectations );
-			expectationsNotMet.removeAll( expectationsMet );
-			return expectationsNotMet;
+		Set<LogChecker> getFailingCheckers() {
+			Set<LogChecker> failingCheckers = new HashSet<>();
+			for ( LogChecker checker : checkers ) {
+				if ( !checker.areExpectationsMet() ) {
+					failingCheckers.add( checker );
+				}
+			}
+			return failingCheckers;
 		}
-
-		public Set<LoggingEvent> getUnexpectedEvents() {
-			return unexpectedEvents;
-		}
-
 	}
 
 	private class ExpectedLogStatement extends Statement {
 
 		private final Statement next;
 
-		public ExpectedLogStatement(Statement base) {
+		ExpectedLogStatement(Statement base) {
 			next = base;
 		}
 
@@ -234,6 +259,10 @@ public class ExpectedLog4jLog implements TestRule {
 		public void evaluate() throws Throwable {
 			final Logger logger = Logger.getRootLogger();
 			TestAppender appender = new TestAppender();
+			for ( LogExpectation expectation : ExpectedLog4jLog.this.expectations ) {
+				appender.addChecker( expectation.createChecker() );
+			}
+			ExpectedLog4jLog.this.currentAppender = appender;
 			logger.addAppender( appender );
 			try {
 				next.evaluate();
@@ -241,32 +270,109 @@ public class ExpectedLog4jLog implements TestRule {
 			finally {
 				logger.removeAppender( appender );
 			}
-			Set<Matcher<?>> expectationsNotMet = appender.getExpectationsNotMet();
-			Set<LoggingEvent> unexpectedEvents = appender.getUnexpectedEvents();
-			if ( !expectationsNotMet.isEmpty() || !unexpectedEvents.isEmpty() ) {
-				fail( buildFailureMessage( expectationsNotMet, unexpectedEvents ) );
+			Set<LogChecker> failingCheckers = appender.getFailingCheckers();
+			if ( !failingCheckers.isEmpty() ) {
+				fail( buildFailureMessage( failingCheckers ) );
 			}
 		}
 	}
 
-	private static String buildFailureMessage(Set<Matcher<?>> missingSet, Set<LoggingEvent> unexpectedEvents) {
+	private static String buildFailureMessage(Set<LogChecker> failingCheckers) {
 		Description description = new StringDescription();
-		description.appendText( "Produced logs did not meet the expectations." );
-		if ( !missingSet.isEmpty() ) {
-			description.appendText( "\nMissing logs:" );
-			for ( Matcher<?> missing : missingSet ) {
-				description.appendText( "\n\t" );
-				missing.describeTo( description );
-			}
-		}
-		if ( !unexpectedEvents.isEmpty() ) {
-			description.appendText( "\nUnexpected logs:" );
-			for ( LoggingEvent unexpected : unexpectedEvents ) {
-				description.appendText( "\n\t" );
-				description.appendText( unexpected.getRenderedMessage() );
-			}
+		description.appendText( "Produced logs did not meet the following expectations:\n" );
+		for ( LogChecker failingChecker : failingCheckers ) {
+			failingChecker.appendFailure( description, "\n\t" );
 		}
 		return description.toString();
+	}
+
+	public static class LogExpectation {
+		private final Matcher<?> matcher;
+		private Integer expectedCount;
+
+		LogExpectation(Matcher<?> matcher) {
+			this.matcher = matcher;
+		}
+
+		public void never() {
+			times( 0 );
+		}
+
+		public void times(int expectedCount) {
+			if ( this.expectedCount != null ) {
+				throw new IllegalStateException( "Can only set log expectations once" );
+			}
+			this.expectedCount = expectedCount;
+		}
+
+		LogChecker createChecker() {
+			return new LogChecker( this );
+		}
+
+		Matcher<?> getMatcher() {
+			return matcher;
+		}
+
+		int getMinExpectedCount() {
+			return expectedCount == null ? 1 : expectedCount;
+		}
+
+		Integer getMaxExpectedCount() {
+			return expectedCount;
+		}
+	}
+
+	public static class LogChecker {
+		private final LogExpectation expectation;
+		private int count = 0;
+		private List<LoggingEvent> extraEvents;
+
+		public LogChecker(LogExpectation expectation) {
+			this.expectation = expectation;
+		}
+
+		void process(LoggingEvent event) {
+			if ( expectation.getMaxExpectedCount() == null && expectation.getMinExpectedCount() <= count ) {
+				// We don't care about events anymore, expectations are met and it won't change
+				return;
+			}
+			if ( expectation.getMatcher().matches( event ) ) {
+				++count;
+			}
+			if ( expectation.getMaxExpectedCount() != null && count > expectation.getMaxExpectedCount() ) {
+				if ( extraEvents == null ) {
+					extraEvents = new ArrayList<>();
+				}
+				extraEvents.add( event );
+			}
+		}
+
+		boolean areExpectationsMet() {
+			return expectation.getMinExpectedCount() <= count
+					&& ( expectation.getMaxExpectedCount() == null || count <= expectation.getMaxExpectedCount() );
+		}
+
+		void appendFailure(Description description, String newline) {
+			description.appendText( newline );
+			if ( count < expectation.getMinExpectedCount() ) {
+				description.appendText( "Expected at least " + expectation.getMinExpectedCount() + " time(s) " );
+				expectation.getMatcher().describeTo( description );
+				description.appendText( " but only got " + count + " such event(s)." );
+			}
+			if ( expectation.getMaxExpectedCount() != null && expectation.getMaxExpectedCount() < count ) {
+				description.appendText( "Expected at most " + expectation.getMaxExpectedCount() + " time(s) " );
+				expectation.getMatcher().describeTo( description );
+				description.appendText( " but got " + count + " such event(s)." );
+				description.appendText( " Extra events: " );
+				for ( LoggingEvent extraEvent : extraEvents ) {
+					description.appendText( newline );
+					description.appendText( "\t - " );
+					description.appendText( extraEvent.getRenderedMessage() );
+				}
+			}
+		}
+
+
 	}
 
 }
