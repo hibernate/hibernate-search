@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
-import org.hibernate.search.util.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -26,9 +25,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
 
-	private final JsonObject innerObject = new JsonObject();
-
-	private boolean built;
+	private SortOrder order;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -37,32 +34,25 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 
 	@Override
 	public void order(SortOrder order) {
-		switch ( order ) {
-			case ASC:
-				ORDER.set( getInnerObject(), ASC_KEYWORD_JSON );
-				break;
-			case DESC:
-				ORDER.set( getInnerObject(), DESC_KEYWORD_JSON );
-				break;
-		}
+		this.order = order;
 	}
 
 	@Override
 	public final void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		if ( built ) {
-			// we must never call a builder twice. Building may have side-effects.
-			throw new AssertionFailure(
-					"A sort builder was called twice. There is a bug in Hibernate Search, please report it."
-			);
+		JsonObject innerObject = new JsonObject();
+		if ( order != null ) {
+			switch ( order ) {
+				case ASC:
+					ORDER.set( innerObject, ASC_KEYWORD_JSON );
+					break;
+				case DESC:
+					ORDER.set( innerObject, DESC_KEYWORD_JSON );
+					break;
+			}
 		}
-		built = true;
-		doBuildAndAddTo( collector );
+		doBuildAndAddTo( collector, innerObject );
 	}
 
-	protected final JsonObject getInnerObject() {
-		return innerObject;
-	}
-
-	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector);
+	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject);
 
 }

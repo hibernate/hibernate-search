@@ -6,21 +6,23 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
-import org.hibernate.search.engine.search.SearchSort;
+import java.util.List;
 
-import com.google.gson.JsonArray;
+import org.hibernate.search.engine.search.SearchSort;
 
 class ElasticsearchSearchSort implements SearchSort, ElasticsearchSearchSortBuilder {
 
-	private final JsonArray jsonArray;
+	private final List<ElasticsearchSearchSortBuilder> delegates;
 
-	ElasticsearchSearchSort(JsonArray jsonArray) {
-		this.jsonArray = jsonArray;
+	ElasticsearchSearchSort(List<ElasticsearchSearchSortBuilder> delegates) {
+		this.delegates = delegates;
 	}
 
 	@Override
 	public void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		collector.collectSort( jsonArray );
+		for ( ElasticsearchSearchSortBuilder delegate : delegates ) {
+			delegate.buildAndAddTo( collector );
+		}
 	}
 
 }

@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
@@ -51,12 +50,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public SearchSort toSearchSort(List<ElasticsearchSearchSortBuilder> builders) {
-		// FIXME we should not pass null here... it works but it's dodgy.
-		ElasticsearchSearchQueryElementCollector collector = new ElasticsearchSearchQueryElementCollector( null );
-		for ( ElasticsearchSearchSortBuilder builder : builders ) {
-			builder.buildAndAddTo( collector );
-		}
-		return new ElasticsearchSearchSort( collector.toJsonSort() );
+		return new ElasticsearchSearchSort( builders );
 	}
 
 	@Override

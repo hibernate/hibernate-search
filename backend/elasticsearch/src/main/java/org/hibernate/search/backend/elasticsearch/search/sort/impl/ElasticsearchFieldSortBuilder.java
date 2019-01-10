@@ -36,6 +36,8 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
+	private JsonElement missing;
+
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
@@ -48,32 +50,33 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	@Override
 	public void missingFirst() {
-		MISSING.set( getInnerObject(), MISSING_FIRST_KEYWORD_JSON );
+		this.missing = MISSING_FIRST_KEYWORD_JSON;
 	}
 
 	@Override
 	public void missingLast() {
-		MISSING.set( getInnerObject(), MISSING_LAST_KEYWORD_JSON );
+		this.missing = MISSING_LAST_KEYWORD_JSON;
 	}
 
 	@Override
 	public void missingAs(Object value) {
-		JsonElement element;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			element = codec.encode( converted );
+			this.missing = codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
-		MISSING.set( getInnerObject(), element );
 	}
 
 	@Override
-	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		JsonObject innerObject = getInnerObject();
+	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+		if ( missing != null ) {
+			MISSING.set( innerObject, missing );
+		}
+
 		if ( innerObject.size() == 0 ) {
 			collector.collectSort( new JsonPrimitive( absoluteFieldPath ) );
 		}

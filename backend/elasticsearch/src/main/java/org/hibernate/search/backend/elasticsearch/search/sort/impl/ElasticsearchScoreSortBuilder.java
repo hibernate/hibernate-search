@@ -18,8 +18,7 @@ class ElasticsearchScoreSortBuilder extends AbstractElasticsearchSearchSortBuild
 	private static final JsonPrimitive SCORE_SORT_KEYWORD_JSON = new JsonPrimitive( SCORE_SORT_KEYWORD );
 
 	@Override
-	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		JsonObject innerObject = getInnerObject();
+	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( innerObject.size() == 0 ) {
 			collector.collectSort( SCORE_SORT_KEYWORD_JSON );
 		}
