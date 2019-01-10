@@ -8,9 +8,9 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.spi.FailureCollector;
@@ -38,7 +38,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationBridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
+import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -87,15 +89,28 @@ class AnnotationProcessorHelper {
 		if ( extractors.length == 0 ) {
 			return ContainerExtractorPath.noExtractors();
 		}
-		else if ( extractors.length == 1 && ContainerExtractorRef.DefaultExtractors.class.equals( extractors[0].type() ) ) {
+		else if ( extractors.length == 1 && ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractors[0].type() ) &&
+				BuiltinContainerExtractor.AUTOMATIC.equals( extractors[0].value() ) ) {
 			return ContainerExtractorPath.defaultExtractors();
 		}
 		else {
-			return ContainerExtractorPath.explicitExtractors(
-					Arrays.stream( extractors )
-							.map( ContainerExtractorRef::type )
-							.collect( Collectors.toList() )
-			);
+			List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
+			for ( ContainerExtractorRef extractor : extractors ) {
+				checkContainerExtractor( extractor );
+				if ( ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() ) ) {
+					if ( BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() ) ) {
+						// We know we're in a multi-extractor chain, because the above else if branch wasn't executed
+						// Using the default extractors in a multi-extractor chain is not yet supported (see HSEARCH-3463)
+						throw log.cannotUseAutomaticContainerExtractorInMultiExtractorChain();
+					}
+					explicitExtractorClasses.add( extractor.value().getType() );
+				}
+				else {
+					explicitExtractorClasses.add( extractor.type() );
+				}
+			}
+
+			return ContainerExtractorPath.explicitExtractors( explicitExtractorClasses );
 		}
 	}
 
@@ -298,6 +313,14 @@ class AnnotationProcessorHelper {
 		else {
 			Class<? extends T> defaultedType = cleanedUpType == null ? expectedType : cleanedUpType;
 			return Optional.of( BeanReference.of( defaultedType, cleanedUpName ) );
+		}
+	}
+
+	private static void checkContainerExtractor(ContainerExtractorRef extractor) {
+		boolean isBuiltinDefault = BuiltinContainerExtractor.AUTOMATIC.equals( extractor.value() );
+		boolean isExplicitDefault = ContainerExtractorRef.UndefinedContainerExtractorImplementationType.class.equals( extractor.type() );
+		if ( !isBuiltinDefault && !isExplicitDefault ) {
+			throw log.invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType( extractor.value(), extractor.type() );
 		}
 	}
 }

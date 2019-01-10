@@ -38,8 +38,7 @@ public @interface AssociationInverseSide {
 	 * 	 * and use the first one that works.
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
-	ContainerExtractorRef[] extractors()
-			default @ContainerExtractorRef(type = ContainerExtractorRef.DefaultExtractors.class);
+	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
 
 	/**
 	 * @return The path to the targeted entity on the inverse side of the association.

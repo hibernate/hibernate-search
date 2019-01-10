@@ -73,8 +73,7 @@ public @interface KeywordField {
 	 * @return An array of reference to container value extractor implementation classes.
 	 * @see GenericField#extractors()
 	 */
-	ContainerExtractorRef[] extractors()
-			default @ContainerExtractorRef(type = ContainerExtractorRef.DefaultExtractors.class);
+	ContainerExtractorRef[] extractors() default @ContainerExtractorRef;
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -86,7 +87,7 @@ public class FieldContainerExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extractors = @ContainerExtractorRef(type = MapValueExtractor.class))
+			@GenericField(extractors = @ContainerExtractorRef(BuiltinContainerExtractor.MAP_VALUE))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -107,4 +108,63 @@ public class FieldContainerExtractorBaseIT {
 				);
 	}
 
+	@Test
+	public void cannotUseAutomaticContainerExtractorInMultiExtractorChain() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			List<Integer> numbers;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(extractors = { @ContainerExtractorRef( BuiltinContainerExtractor.MAP_VALUE ), @ContainerExtractorRef( BuiltinContainerExtractor.AUTOMATIC ) })
+			public List<Integer> getNumbers() {
+				return numbers;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".numbers" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure( "Annotation @ContainerExtractorRef requests automatic resolution of the container extractor," +
+								" but automatic resolution cannot be used in extractor chains. Use explicit references to the type of each extractor to be applied instead." )
+						.build()
+				);
+	}
+
+	@Test
+	public void invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			List<Integer> numbers;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField(extractors = @ContainerExtractorRef(value = BuiltinContainerExtractor.MAP_VALUE, type = RawContainerExtractor.class))
+			public List<Integer> getNumbers() {
+				return numbers;
+			}
+		}
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock ).setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".numbers" )
+						.annotationContextAnyParameters( GenericField.class )
+						.failure( "Annotation @ContainerExtractorRef references both built-in extractor (using 'MAP_VALUE') and an explicit type (using '" +
+								RawContainerExtractor.class.getName() + "'). Only one of those can be defined, not both." )
+						.build()
+				);
+	}
 }

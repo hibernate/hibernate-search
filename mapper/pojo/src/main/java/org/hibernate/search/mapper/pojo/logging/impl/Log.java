@@ -15,6 +15,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -26,6 +27,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;
 import org.hibernate.search.util.impl.common.MessageConstants;
+import org.hibernate.search.util.impl.common.logging.EnumFormatter;
 import org.hibernate.search.util.impl.common.logging.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.logging.TypeFormatter;
@@ -305,4 +307,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 40, value = "Cannot work on type %1$s, because it is not directly indexed.")
 	SearchException notDirectlyIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+
+	@Message(id = ID_OFFSET_2 + 41,
+			value = "Annotation @ContainerExtractorRef requests automatic resolution of the container extractor, but automatic resolution cannot be used in extractor chains."
+					+ " Use explicit references to the type of each extractor to be applied instead."
+	)
+	SearchException cannotUseAutomaticContainerExtractorInMultiExtractorChain();
+
+	@Message(id = ID_OFFSET_2 + 42,
+			value = "Annotation @ContainerExtractorRef references both built-in extractor (using '%1$s') and an explicit type (using '%2$s')."
+			+ " Only one of those can be defined, not both."
+	)
+	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
+			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> type);
 }
