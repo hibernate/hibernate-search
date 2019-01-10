@@ -53,11 +53,21 @@ public class SimpleIndexingProgressMonitor implements MassIndexerProgressMonitor
 
 	@Override
 	public void documentsAdded(long increment) {
-		long current = documentsDoneCounter.addAndGet( increment );
-		if ( current == increment ) {
-			startTime = System.nanoTime();
+		long previous = documentsDoneCounter.getAndAdd( increment );
+		if ( startTime == 0 ) {
+			synchronized ( this ) {
+				if ( startTime == 0 ) {
+					startTime = System.nanoTime();
+				}
+			}
 		}
-		if ( current % getStatusMessagePeriod() == 0 ) {
+		/*
+		 * Only log if the current increment was the one that made the counter
+		 * go to a higher multiple of the period.
+		 */
+		long current = previous + increment;
+		int period = getStatusMessagePeriod();
+		if ( ( previous / period ) < ( current / period ) ) {
 			printStatusMessage( startTime, totalCounter.longValue(), current );
 		}
 	}
