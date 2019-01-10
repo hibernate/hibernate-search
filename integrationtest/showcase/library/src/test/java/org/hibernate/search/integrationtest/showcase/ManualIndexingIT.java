@@ -45,17 +45,31 @@ import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.tool.schema.Action;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class ManualIndexingIT {
 
 	private static final String PREFIX = SearchOrmSettings.PREFIX;
 	private static final int NUMBER_OF_BOOKS = 200;
+	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
+	static {
+		if ( NUMBER_OF_BOOKS < 2 * MASS_INDEXING_MONITOR_LOG_PERIOD ) {
+			throw new IllegalStateException(
+					"There's a bug in tests: NUMBER_OF_BOOKS should be strictly higher than two times "
+							+ MASS_INDEXING_MONITOR_LOG_PERIOD
+			);
+		}
+	}
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private final DaoFactory daoFactory;
 
@@ -109,9 +123,53 @@ public class ManualIndexingIT {
 	}
 
 	@Test
-	public void testMassindexing() {
+	public void testMassIndexing() {
 		withinSession( sessionFactory, this::checkNothingIsIndexed );
-		withinTransaction( sessionFactory, this::runMassIndexing );
+		withinTransaction( sessionFactory, session -> {
+			FullTextSession ftSession = Search.getFullTextSession( session );
+			MassIndexer indexer = ftSession.createIndexer();
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
+		withinSession( sessionFactory, this::checkEverythingIsIndexed );
+	}
+
+	@Test
+	public void testMassIndexingMonitor() {
+		withinSession( sessionFactory, this::checkNothingIsIndexed );
+
+		withinTransaction( sessionFactory, session -> {
+			FullTextSession ftSession = Search.getFullTextSession( session );
+			MassIndexer indexer = ftSession.createIndexer();
+			try {
+				/*
+				 * The default period for logging in the default mass indexing monitor is 50.
+				 * We set the batch size to 49.
+				 * 50 = 5*5*2
+				 * 49 = 7*7
+				 * Thus a multiple of 49 cannot be a multiple of 50,
+				 * and if we set the batch size to 49, the bug described in HSEARCH-3462
+				 * will prevent any log from ever happening, except at the very end
+				 *
+				 * Regardless of this bug, here we also check that the mass indexing monitor works correctly:
+				 * the number of log events should be equal to NUMBER_OF_BOOKS / 50.
+				 */
+				int batchSize = 49;
+				indexer.batchSizeToLoadObjects( batchSize );
+				int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
+				logged.expectMessage( "documents indexed in" ).times( expectedNumberOfLogs );
+				logged.expectMessage( "Indexing speed: " ).times( expectedNumberOfLogs );
+
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+		} );
 		withinSession( sessionFactory, this::checkEverythingIsIndexed );
 	}
 
@@ -130,17 +188,6 @@ public class ManualIndexingIT {
 				"The Divine Comedy is composed of 14,233 lines that are divided into three cantiche (singular cantica) – Inferno (Hell), Purgatorio (Purgatory), and Paradiso (Paradise)",
 				"literature,poem,afterlife"
 		);
-	}
-
-	private void runMassIndexing(Session session) {
-		FullTextSession ftSession = Search.getFullTextSession( session );
-		MassIndexer indexer = ftSession.createIndexer();
-		try {
-			indexer.startAndWait();
-		}
-		catch (InterruptedException e) {
-			fail( "Unexpected InterruptedException: " + e.getMessage() );
-		}
 	}
 
 	private void checkNothingIsIndexed(Session session) {
