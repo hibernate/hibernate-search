@@ -28,11 +28,11 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearc
 	}
 
 	@Override
-	protected void doBuildAndAddTo(ElasticsearchSearchSortCollector collector) {
-		getInnerObject().add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( location ) );
+	protected void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
+		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( location ) );
 
 		JsonObject outerObject = new JsonObject();
-		GEO_DISTANCE.add( outerObject, getInnerObject() );
+		GEO_DISTANCE.add( outerObject, innerObject );
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, location );
 	}
 }
