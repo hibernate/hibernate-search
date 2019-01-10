@@ -7,6 +7,15 @@
 package org.hibernate.search.mapper.pojo.extractor.builtin;
 
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.ArrayElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.IterableElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapKeyExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.MapValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalDoubleValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
 
 public enum BuiltinContainerExtractor {
 

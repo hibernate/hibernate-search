@@ -26,9 +26,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
@@ -220,14 +218,14 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	private Class<? extends ContainerExtractor> getExtractorClass(org.hibernate.mapping.Collection collectionValue) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			// Caution if you add other if ( ... instanceof ) branches: Array extends List!
-			return ArrayElementExtractor.class;
+			return BuiltinContainerExtractor.ARRAY.getType();
 		}
 		else if ( collectionValue instanceof org.hibernate.mapping.Map ) {
 			// See contributeModelPropertyNode(), we only care about map values, not about keys
-			return MapValueExtractor.class;
+			return BuiltinContainerExtractor.MAP_VALUE.getType();
 		}
 		else {
-			return CollectionElementExtractor.class;
+			return BuiltinContainerExtractor.COLLECTION.getType();
 		}
 	}
 

@@ -25,10 +25,7 @@ import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.extractor.builtin.ArrayElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.CollectionElementExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
@@ -295,17 +292,17 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 
 	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue,
 			Class<? extends ContainerExtractor> extractorClass) {
-		if ( ArrayElementExtractor.class.equals( extractorClass ) ) {
+		if ( BuiltinContainerExtractor.ARRAY.getType().equals( extractorClass ) ) {
 			if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 				return collectionValue.getElement();
 			}
 		}
-		else if ( MapValueExtractor.class.equals( extractorClass ) ) {
+		else if ( BuiltinContainerExtractor.MAP_VALUE.getType().equals( extractorClass ) ) {
 			if ( collectionValue instanceof org.hibernate.mapping.Map ) {
 				return collectionValue.getElement();
 			}
 		}
-		else if ( MapKeyExtractor.class.equals( extractorClass ) ) {
+		else if ( BuiltinContainerExtractor.MAP_KEY.getType().equals( extractorClass ) ) {
 			if ( collectionValue instanceof org.hibernate.mapping.Map ) {
 				/*
 				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
@@ -314,7 +311,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				return ( (org.hibernate.mapping.Map) collectionValue ).getIndex();
 			}
 		}
-		else if ( CollectionElementExtractor.class.equals( extractorClass ) ) {
+		else if ( BuiltinContainerExtractor.COLLECTION.getType().equals( extractorClass ) ) {
 			return collectionValue.getElement();
 		}
 

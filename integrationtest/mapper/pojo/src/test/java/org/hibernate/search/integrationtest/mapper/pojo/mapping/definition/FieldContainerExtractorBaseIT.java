@@ -13,7 +13,6 @@ import java.util.stream.Stream;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
-import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -101,7 +100,7 @@ public class FieldContainerExtractorBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure(
-								"Cannot apply the requested container value extractor '" + MapValueExtractor.class.getName()
+								"Cannot apply the requested container value extractor '" + BuiltinContainerExtractor.MAP_VALUE.getType().getName()
 										+ "' to type '" + List.class.getName() + "<" + Integer.class.getName() + ">'"
 						)
 						.build()
