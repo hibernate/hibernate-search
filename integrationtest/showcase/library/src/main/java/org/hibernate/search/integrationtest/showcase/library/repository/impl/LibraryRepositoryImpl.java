@@ -4,19 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda;
+package org.hibernate.search.integrationtest.showcase.library.repository.impl;
 
 import java.util.Collections;
 import java.util.List;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.integrationtest.showcase.library.dao.LibraryDao;
+import org.hibernate.search.integrationtest.showcase.library.repository.LibraryRepository;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 
-class LambdaSyntaxLibraryDao extends LibraryDao {
+class LibraryRepositoryImpl extends LibraryRepository {
 
-	LambdaSyntaxLibraryDao(EntityManager entityManager) {
+	LibraryRepositoryImpl(EntityManager entityManager) {
 		super( entityManager );
 	}
 

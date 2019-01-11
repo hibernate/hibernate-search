@@ -27,9 +27,9 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycl
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
-import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
-import org.hibernate.search.integrationtest.showcase.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
+import org.hibernate.search.integrationtest.showcase.library.repository.DocumentRepository;
+import org.hibernate.search.integrationtest.showcase.library.repository.RepositoryFactory;
+import org.hibernate.search.integrationtest.showcase.library.repository.impl.RepositoryFactoryImpl;
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
@@ -78,12 +78,12 @@ public class ManualIndexingIT {
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private final DaoFactory daoFactory;
+	private final RepositoryFactory repoFactory;
 
 	private SessionFactory sessionFactory;
 
 	public ManualIndexingIT() {
-		this.daoFactory = new LambdaSyntaxDaoFactory();
+		this.repoFactory = new RepositoryFactoryImpl();
 	}
 
 	@Before
@@ -190,16 +190,16 @@ public class ManualIndexingIT {
 	}
 
 	private void initData(Session session) {
-		DocumentDao documentDao = daoFactory.createDocumentDao( session );
+		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
-			addBook( documentDao, i );
+			addBook( documentRepo, i );
 		}
 	}
 
-	private void addBook(DocumentDao documentDao, int index) {
+	private void addBook(DocumentRepository documentRepo, int index) {
 		String isbn = String.format( Locale.ROOT, "973-0-00-%06d-3", index );
 
-		documentDao.createBook(
+		documentRepo.createBook(
 				index, new ISBN( isbn ), "Divine Comedy chapter n. " + ( index + 1 ),
 				"The Divine Comedy is composed of 14,233 lines that are divided into three cantiche (singular cantica) – Inferno (Hell), Purgatorio (Purgatory), and Paradiso (Paradise)",
 				"literature,poem,afterlife"
@@ -216,11 +216,11 @@ public class ManualIndexingIT {
 	}
 
 	private void checkEverythingIsIndexed(Session session) {
-		DocumentDao dao = daoFactory.createDocumentDao( session );
+		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
-		assertThat( dao.count() ).isEqualTo( NUMBER_OF_BOOKS );
+		assertThat( documentRepo.count() ).isEqualTo( NUMBER_OF_BOOKS );
 
-		Optional<Book> book = dao.getByIsbn( "973-0-00-000007-3" );
+		Optional<Book> book = documentRepo.getByIsbn( "973-0-00-000007-3" );
 		assertTrue( book.isPresent() );
 		assertThat( book.get() ).isEqualTo( session.get( Book.class, 7 ) );
 	}

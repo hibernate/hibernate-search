@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.showcase.library.dao;
+package org.hibernate.search.integrationtest.showcase.library.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +24,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-public abstract class DocumentDao {
+public abstract class DocumentRepository {
 
 	// Hack to deal with Document<?> instead of raw Document
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -32,7 +32,7 @@ public abstract class DocumentDao {
 
 	protected final FullTextEntityManager entityManager;
 
-	public DocumentDao(EntityManager entityManager) {
+	public DocumentRepository(EntityManager entityManager) {
 		this.entityManager = Search.getFullTextEntityManager( entityManager );
 	}
 
