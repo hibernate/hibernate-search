@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
@@ -36,21 +37,23 @@ public abstract class DocumentRepository {
 		this.entityManager = Search.getFullTextEntityManager( entityManager );
 	}
 
-	public Book createBook(int id, ISBN isbn, String title, String summary, String tags) {
+	public Book createBook(int id, ISBN isbn, String title, String author, String summary, String tags) {
 		Book book = new Book();
 		book.setId( id );
 		book.setIsbn( isbn );
 		book.setTitle( title );
+		book.setAuthor( author );
 		book.setSummary( summary );
 		book.setTags( tags );
 		entityManager.persist( book );
 		return book;
 	}
 
-	public Video createVideo(int id, String title, String summary, String tags) {
+	public Video createVideo(int id, String title, String author, String summary, String tags) {
 		Video video = new Video();
 		video.setId( id );
 		video.setTitle( title );
+		video.setAuthor( author );
 		video.setSummary( summary );
 		video.setTags( tags );
 		entityManager.persist( video );
@@ -90,4 +93,5 @@ public abstract class DocumentRepository {
 			List<LibraryService> libraryServices,
 			int offset, int limit);
 
+	public abstract List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order);
 }

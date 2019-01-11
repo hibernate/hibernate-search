@@ -20,25 +20,11 @@ import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.SessionFactoryBuilder;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
-import org.hibernate.search.integrationtest.fullstack.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.fullstack.library.bridge.AccountBorrowalSummaryBridge;
-import org.hibernate.search.integrationtest.fullstack.library.repository.RepositoryFactory;
-import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
-import org.hibernate.search.integrationtest.fullstack.library.repository.LibraryRepository;
-import org.hibernate.search.integrationtest.fullstack.library.repository.PersonRepository;
-import org.hibernate.search.integrationtest.fullstack.library.repository.impl.RepositoryFactoryImpl;
-import org.hibernate.search.integrationtest.fullstack.library.model.Account;
+import org.hibernate.search.integrationtest.fullstack.library.config.SessionFactoryConfig;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
-import org.hibernate.search.integrationtest.fullstack.library.model.BookCopy;
 import org.hibernate.search.integrationtest.fullstack.library.model.BookMedium;
 import org.hibernate.search.integrationtest.fullstack.library.model.Borrowal;
 import org.hibernate.search.integrationtest.fullstack.library.model.BorrowalType;
@@ -49,11 +35,13 @@ import org.hibernate.search.integrationtest.fullstack.library.model.Library;
 import org.hibernate.search.integrationtest.fullstack.library.model.LibraryService;
 import org.hibernate.search.integrationtest.fullstack.library.model.Person;
 import org.hibernate.search.integrationtest.fullstack.library.model.Video;
-import org.hibernate.search.integrationtest.fullstack.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.fullstack.library.model.VideoMedium;
-import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.service.ServiceRegistry;
-import org.hibernate.tool.schema.Action;
+import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.LibraryRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.PersonRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.RepositoryFactory;
+import org.hibernate.search.integrationtest.fullstack.library.repository.impl.RepositoryFactoryImpl;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
 import org.junit.After;
 import org.junit.Before;
@@ -96,47 +84,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 
 	@Before
 	public void setup() {
-		StandardServiceRegistryBuilder registryBuilder = new StandardServiceRegistryBuilder()
-				.applySetting( PREFIX + "backends.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
-				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
-				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
-				.applySetting(
-						PREFIX + "backends.elasticsearchBackend_1.index_defaults.lifecycle.strategy",
-						ElasticsearchIndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP
-				)
-				.applySetting(
-						// Make this test work even if there is only a single node in the cluster
-						PREFIX + "backends.elasticsearchBackend_1.index_defaults.lifecycle.required_status",
-						ElasticsearchIndexStatus.YELLOW
-				)
-				.applySetting(
-						// TODO remove this and use an explicit refresh after initializing data instead
-						PREFIX + "backends.elasticsearchBackend_1.index_defaults.refresh_after_write", true
-				)
-				.applySetting(
-						PREFIX + "backends.elasticsearchBackend_1." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new LibraryAnalysisConfigurer()
-				)
-				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
-
-		ServiceRegistry serviceRegistry = registryBuilder.build();
-
-		MetadataSources ms = new MetadataSources( serviceRegistry )
-				.addAnnotatedClass( Document.class )
-				.addAnnotatedClass( Book.class )
-				.addAnnotatedClass( Video.class )
-				.addAnnotatedClass( Library.class )
-				.addAnnotatedClass( DocumentCopy.class )
-				.addAnnotatedClass( BookCopy.class )
-				.addAnnotatedClass( VideoCopy.class )
-				.addAnnotatedClass( Person.class )
-				.addAnnotatedClass( Account.class )
-				.addAnnotatedClass( Borrowal.class );
-
-		Metadata metadata = ms.buildMetadata();
-
-		final SessionFactoryBuilder sfb = metadata.getSessionFactoryBuilder();
-		this.sessionFactory = sfb.build();
+		this.sessionFactory = SessionFactoryConfig.sessionFactory( false );
 	}
 
 	@After
@@ -476,6 +424,24 @@ public class OrmElasticsearchLibraryFullStackIT {
 		} );
 	}
 
+	/**
+	 * This demonstrates how to define a projection for the query and how to set order.
+	 */
+	@Test
+	public void projectionAndOrder() {
+		withinTransaction( sessionFactory, this::initData );
+
+		withinSession( sessionFactory, session -> {
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+
+			List<String> results = documentRepo.getAuthorsOfBooksHavingTerms( "java", SortOrder.ASC );
+			assertThat( results ).containsExactly( "Mark Red", "Michele Violet", "Stuart Green" );
+
+			results = documentRepo.getAuthorsOfBooksHavingTerms( "Indonesia", SortOrder.DESC );
+			assertThat( results ).containsExactly( "Mark Red", "Mark Red" );
+		} );
+	}
+
 	@Test
 	public void aggregation() {
 		// TODO aggregation
@@ -491,6 +457,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				CALLIGRAPHY_ID,
 				new ISBN( "978-0-00-000001-1" ),
 				"Calligraphy for Dummies",
+				"Roger Blue",
 				"Learn to write artfully in ten lessons",
 				"calligraphy,art"
 		);
@@ -498,6 +465,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		Video javaDancing = documentRepo.createVideo(
 				JAVA_DANCING_ID,
 				"Java le dire à tout le monde",
+				"Michele Violet",
 				"A brief history of Java dancing in Paris during the early 20th century",
 				"java,dancing,history"
 		);
@@ -506,6 +474,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				INDONESIAN_ECONOMY_ID,
 				new ISBN( "978-0-00-000003-3" ),
 				"Comparative Study of the Economy of Java and other Indonesian Islands",
+				"Mark Red",
 				"Comparative study of the late 20th century economy of the main islands of Indonesia"
 						+ " with accurate projections over the next ten centuries",
 				"geography,economy,java,sumatra,borneo,sulawesi"
@@ -516,6 +485,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				new ISBN( "978-0-00-000004-4" ),
 				// Use varying case on purpose
 				"java for Dummies",
+				"Stuart Green",
 				"Learning the Java programming language in ten lessons",
 				"programming,language,java"
 		);
@@ -524,6 +494,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				ART_OF_COMPUTER_PROG_ID,
 				new ISBN( "978-0-00-000005-5" ),
 				"The Art of Computer Programming",
+				"Stuart Green",
 				"Quick review of basic computer programming principles in 965 chapters",
 				"programming"
 		);
@@ -532,6 +503,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				THESAURUS_OF_LANGUAGES_ID,
 				new ISBN( "978-0-00-000006-6" ),
 				"Thesaurus of Indo-European Languages",
+				"Dorothy White",
 				"An entertaining list of about three thousand languages, most of which are long dead",
 				"geography,language"
 		);
@@ -539,6 +511,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		Video livingOnIsland = documentRepo.createVideo(
 				LIVING_ON_ISLAND_ID,
 				"Living in an Island, Episode 3: Indonesia",
+				"Mark Red",
 				"A journey across Indonesia's smallest islands depicting how island way of life differs from mainland living",
 				"geography,java,sumatra,borneo,sulawesi"
 		);
