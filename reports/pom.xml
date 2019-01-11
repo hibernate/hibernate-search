@@ -83,7 +83,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
+            <artifactId>hibernate-search-integrationtest-fullstack-library</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

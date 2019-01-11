@@ -24,7 +24,7 @@
         <module>backend/lucene</module>
         <module>mapper/pojo</module>
         <module>mapper/orm</module>
-        <module>showcase/library</module>
+        <module>fullstack/library</module>
     </modules>
 
     <dependencyManagement>

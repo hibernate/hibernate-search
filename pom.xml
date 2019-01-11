@@ -438,7 +438,7 @@
          -->
         <sonar.jacoco.reportPaths>${jacoco.mergedExecFilePath}</sonar.jacoco.reportPaths>
         <!--
-            Exclude build code and integration tests defined in the main source (utils, Showcases, Backend TCK)
+            Exclude build code and integration tests defined in the main source (utils, full-stack tests, Backend TCK)
             from coverage computation.
          -->
         <sonar.coverage.exclusions>
@@ -527,7 +527,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
+                <artifactId>hibernate-search-integrationtest-fullstack-library</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
