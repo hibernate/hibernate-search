@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.fullstack.library.dao.syntax.lambda;
+package org.hibernate.search.integrationtest.fullstack.library.repository.impl;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.integrationtest.fullstack.library.dao.DocumentDao;
+import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
 import org.hibernate.search.integrationtest.fullstack.library.model.BookMedium;
 import org.hibernate.search.integrationtest.fullstack.library.model.Document;
@@ -21,8 +21,8 @@ import org.hibernate.search.integrationtest.fullstack.library.model.LibraryServi
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class LambdaSyntaxDocumentDao extends DocumentDao {
-	LambdaSyntaxDocumentDao(EntityManager entityManager) {
+class DocumentRepositoryImpl extends DocumentRepository {
+	DocumentRepositoryImpl(EntityManager entityManager) {
 		super( entityManager );
 	}
 

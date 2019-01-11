@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.fullstack.library.dao.syntax.object;
+package org.hibernate.search.integrationtest.fullstack.library.repository.impl;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,12 +12,12 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
-import org.hibernate.search.integrationtest.fullstack.library.dao.PersonDao;
+import org.hibernate.search.integrationtest.fullstack.library.repository.PersonRepository;
 import org.hibernate.search.integrationtest.fullstack.library.model.Person;
 
-class ObjectSyntaxPersonDao extends PersonDao {
+class PersonRepositoryImpl extends PersonRepository {
 
-	ObjectSyntaxPersonDao(EntityManager entityManager) {
+	PersonRepositoryImpl(EntityManager entityManager) {
 		super( entityManager );
 	}
 
@@ -31,15 +31,11 @@ class ObjectSyntaxPersonDao extends PersonDao {
 
 		FullTextQuery<Person> query = target.query()
 				.asEntity()
-				.predicate(
-						target.predicate().match().onFields( "firstName", "lastName" ).matching( terms ).toPredicate()
-				)
-				.sort(
-						target.sort()
-						.byField( "lastName_sort" )
-						.then().byField( "firstName_sort" )
-						.toSort()
-				)
+				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ).toPredicate() )
+				.sort( c -> {
+					c.byField( "lastName_sort" );
+					c.byField( "firstName_sort" );
+				} )
 				.build();
 
 		query.setFirstResult( offset );
@@ -54,12 +50,8 @@ class ObjectSyntaxPersonDao extends PersonDao {
 
 		FullTextQuery<Person> query = target.query()
 				.asEntity()
-				.predicate(
-						target.predicate().matchAll().toPredicate()
-				)
-				.sort(
-						target.sort().by( target.sort().byField( borrowalsCountField ).desc().toSort() ).toSort()
-				)
+				.predicate( f -> f.matchAll().toPredicate() )
+				.sort( c -> c.byField( borrowalsCountField ).desc() )
 				.build();
 
 		query.setFirstResult( offset );

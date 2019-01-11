@@ -31,12 +31,11 @@ import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFacto
 import org.hibernate.search.integrationtest.fullstack.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.integrationtest.fullstack.library.bridge.AccountBorrowalSummaryBridge;
-import org.hibernate.search.integrationtest.fullstack.library.dao.DaoFactory;
-import org.hibernate.search.integrationtest.fullstack.library.dao.DocumentDao;
-import org.hibernate.search.integrationtest.fullstack.library.dao.LibraryDao;
-import org.hibernate.search.integrationtest.fullstack.library.dao.PersonDao;
-import org.hibernate.search.integrationtest.fullstack.library.dao.syntax.lambda.LambdaSyntaxDaoFactory;
-import org.hibernate.search.integrationtest.fullstack.library.dao.syntax.object.ObjectSyntaxDaoFactory;
+import org.hibernate.search.integrationtest.fullstack.library.repository.RepositoryFactory;
+import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.LibraryRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.PersonRepository;
+import org.hibernate.search.integrationtest.fullstack.library.repository.impl.RepositoryFactoryImpl;
 import org.hibernate.search.integrationtest.fullstack.library.model.Account;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
 import org.hibernate.search.integrationtest.fullstack.library.model.BookCopy;
@@ -49,7 +48,6 @@ import org.hibernate.search.integrationtest.fullstack.library.model.ISBN;
 import org.hibernate.search.integrationtest.fullstack.library.model.Library;
 import org.hibernate.search.integrationtest.fullstack.library.model.LibraryService;
 import org.hibernate.search.integrationtest.fullstack.library.model.Person;
-import org.hibernate.search.integrationtest.fullstack.library.model.ProgrammaticMappingConfigurer;
 import org.hibernate.search.integrationtest.fullstack.library.model.Video;
 import org.hibernate.search.integrationtest.fullstack.library.model.VideoCopy;
 import org.hibernate.search.integrationtest.fullstack.library.model.VideoMedium;
@@ -60,39 +58,8 @@ import org.hibernate.tool.schema.Action;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
-@RunWith(Parameterized.class)
 public class OrmElasticsearchLibraryFullStackIT {
-
-	private enum MappingMode {
-		ANNOTATION_MAPPING,
-		PROGRAMMATIC_MAPPING;
-	}
-
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static Object[][] parameters() {
-		MappingMode[] mappingModes = new MappingMode[] {
-				MappingMode.ANNOTATION_MAPPING,
-				MappingMode.PROGRAMMATIC_MAPPING
-		};
-		DaoFactory[] daoFactories = new DaoFactory[] {
-				new LambdaSyntaxDaoFactory(),
-				new ObjectSyntaxDaoFactory()
-		};
-		// Compute the cross product
-		Object[][] parameters = new Object[mappingModes.length * daoFactories.length][2];
-		int i = 0;
-		for ( MappingMode mappingMode : mappingModes ) {
-			for ( DaoFactory daoFactory : daoFactories ) {
-				parameters[i][0] = mappingMode;
-				parameters[i][1] = daoFactory;
-				++i;
-			}
-		}
-		return parameters;
-	}
 
 	private static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
@@ -123,15 +90,9 @@ public class OrmElasticsearchLibraryFullStackIT {
 	private static final int JOHN_PAUL_ID = 9;
 	private static final int PAUL_JOHN_ID = 10;
 
-	private final MappingMode mappingMode;
-	private final DaoFactory daoFactory;
+	private final RepositoryFactory repoFactory = new RepositoryFactoryImpl();
 
 	private SessionFactory sessionFactory;
-
-	public OrmElasticsearchLibraryFullStackIT(MappingMode mappingMode, DaoFactory daoFactory) {
-		this.mappingMode = mappingMode;
-		this.daoFactory = daoFactory;
-	}
 
 	@Before
 	public void setup() {
@@ -157,12 +118,6 @@ public class OrmElasticsearchLibraryFullStackIT {
 						new LibraryAnalysisConfigurer()
 				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
-
-		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
-			registryBuilder.applySetting( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" );
-			registryBuilder.applySetting( HibernateOrmMapperSettings.MAPPING_CONFIGURER,
-					new ProgrammaticMappingConfigurer() );
-		}
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 
@@ -196,32 +151,32 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			LibraryDao dao = daoFactory.createLibraryDao( session );
+			LibraryRepository libraryRepo = repoFactory.createLibraryRepository( session );
 
-			List<Library> libraries = dao.search( "library", 0, 10 );
+			List<Library> libraries = libraryRepo.search( "library", 0, 10 );
 			assertThat( libraries ).containsExactly(
 					session.get( Library.class, CITY_CENTER_ID ),
 					session.get( Library.class, UNIVERSITY_ID ), // Bumped to this position because of its collection size
 					session.get( Library.class, SUBURBAN_1_ID ),
 					session.get( Library.class, SUBURBAN_2_ID )
 			);
-			libraries = dao.search( "library", 1, 2 );
+			libraries = libraryRepo.search( "library", 1, 2 );
 			assertThat( libraries ).containsExactly(
 					session.get( Library.class, UNIVERSITY_ID ),
 					session.get( Library.class, SUBURBAN_1_ID )
 			);
-			libraries = dao.search( "sUburban", 0, 10 );
+			libraries = libraryRepo.search( "sUburban", 0, 10 );
 			assertThat( libraries ).containsExactly(
 					session.get( Library.class, SUBURBAN_1_ID ),
 					session.get( Library.class, SUBURBAN_2_ID )
 			);
 			// TODO introduce an AND operator in the match query to make this match SUBURBAN_1_ID only
-			libraries = dao.search( "Suburban 1", 0, 10 );
+			libraries = libraryRepo.search( "Suburban 1", 0, 10 );
 			assertThat( libraries ).containsExactly(
 					session.get( Library.class, SUBURBAN_1_ID ),
 					session.get( Library.class, SUBURBAN_2_ID )
 			);
-			libraries = dao.search( "city center", 0, 10 );
+			libraries = libraryRepo.search( "city center", 0, 10 );
 			assertThat( libraries ).containsExactly(
 					session.get( Library.class, CITY_CENTER_ID )
 			);
@@ -233,9 +188,9 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			PersonDao dao = daoFactory.createPersonDao( sessionFactory.createEntityManager() );
+			PersonRepository personRepo = repoFactory.createPersonRepository( sessionFactory.createEntityManager() );
 
-			List<Person> results = dao.search(
+			List<Person> results = personRepo.search(
 					"smith", 0, 10
 			);
 			assertThat( results ).containsExactly(
@@ -245,7 +200,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Person.class, PATTY_SMITH_ID )
 			);
 
-			results = dao.search(
+			results = personRepo.search(
 					"john", 0, 10
 			);
 			assertThat( results ).containsExactly(
@@ -258,7 +213,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 			);
 
 			// TODO introduce an AND operator in the match query to make this match JOHN_SMITH_ID and JOHN_PAUL_SMITH_ID only
-			results = dao.search(
+			results = personRepo.search(
 					"john smith", 0, 10
 			);
 			assertThat( results ).containsExactly(
@@ -279,21 +234,21 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentDao dao = daoFactory.createDocumentDao( session );
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
-			Optional<Book> book = dao.getByIsbn( "978-0-00-000001-1" );
+			Optional<Book> book = documentRepo.getByIsbn( "978-0-00-000001-1" );
 			assertTrue( book.isPresent() );
 			assertThat( book.get() ).isEqualTo( session.get( Book.class, CALLIGRAPHY_ID ) );
 
-			book = dao.getByIsbn( "978-0-00-000005-5" );
+			book = documentRepo.getByIsbn( "978-0-00-000005-5" );
 			assertTrue( book.isPresent() );
 			assertThat( book.get() ).isEqualTo( session.get( Book.class, ART_OF_COMPUTER_PROG_ID ) );
 
-			book = dao.getByIsbn( "978-0-00-000005-1" );
+			book = documentRepo.getByIsbn( "978-0-00-000005-1" );
 			assertFalse( book.isPresent() );
 
 			// Test the normalizer
-			book = dao.getByIsbn( "9780000000055" );
+			book = documentRepo.getByIsbn( "9780000000055" );
 			assertTrue( book.isPresent() );
 			assertThat( book.get() ).isEqualTo( session.get( Book.class, ART_OF_COMPUTER_PROG_ID ) );
 		} );
@@ -309,16 +264,16 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentDao dao = daoFactory.createDocumentDao( session );
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
-			List<Book> books = dao.searchByMedium(
+			List<Book> books = documentRepo.searchByMedium(
 					"java", BookMedium.DEMATERIALIZED, 0, 10
 			);
 			assertThat( books ).containsExactlyInAnyOrder(
 					session.get( Book.class, JAVA_FOR_DUMMIES_ID )
 			);
 
-			books = dao.searchByMedium(
+			books = documentRepo.searchByMedium(
 					"java", BookMedium.HARDCOPY, 0, 10
 			);
 			assertThat( books ).containsExactlyInAnyOrder(
@@ -333,11 +288,11 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentDao dao = daoFactory.createDocumentDao( session );
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
 			GeoPoint myLocation = GeoPoint.of( 42.0, 0.5 );
 
-			List<Document<?>> documents = dao.searchAroundMe(
+			List<Document<?>> documents = documentRepo.searchAroundMe(
 					null, null,
 					myLocation, 20.0,
 					null,
@@ -351,7 +306,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Book.class, THESAURUS_OF_LANGUAGES_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					null, null,
 					myLocation, 40.0,
 					null,
@@ -366,7 +321,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Book.class, THESAURUS_OF_LANGUAGES_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					"calligraphy", null,
 					myLocation, 40.0,
 					null,
@@ -378,7 +333,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 			);
 
 			myLocation = GeoPoint.of( 42.0, 0.75 );
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					null, null,
 					myLocation, 40.0,
 					null,
@@ -399,9 +354,9 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentDao dao = daoFactory.createDocumentDao( session );
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
-			List<Document<?>> documents = dao.searchAroundMe(
+			List<Document<?>> documents = documentRepo.searchAroundMe(
 					"java", null,
 					null, null,
 					Collections.singletonList( LibraryService.DISABLED_ACCESS ),
@@ -413,7 +368,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Book.class, INDONESIAN_ECONOMY_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					"java", null,
 					null, null,
 					Collections.singletonList( LibraryService.READING_ROOMS ),
@@ -425,7 +380,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Book.class, INDONESIAN_ECONOMY_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					"java", null,
 					null, null,
 					Arrays.asList( LibraryService.DISABLED_ACCESS, LibraryService.READING_ROOMS ),
@@ -448,9 +403,9 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentDao dao = daoFactory.createDocumentDao( session );
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
 
-			List<Document<?>> documents = dao.searchAroundMe(
+			List<Document<?>> documents = documentRepo.searchAroundMe(
 					null, "java",
 					null, null,
 					null,
@@ -463,7 +418,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Video.class, LIVING_ON_ISLAND_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					null, "programming",
 					null, null,
 					null,
@@ -474,7 +429,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 					session.get( Book.class, ART_OF_COMPUTER_PROG_ID )
 			);
 
-			documents = dao.searchAroundMe(
+			documents = documentRepo.searchAroundMe(
 					null, "java,programming",
 					null, null,
 					null,
@@ -496,23 +451,23 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			PersonDao dao = daoFactory.createPersonDao( session );
+			PersonRepository personRepo = repoFactory.createPersonRepository( session );
 
-			List<Person> results = dao.listTopBorrowers( 0, 3 );
+			List<Person> results = personRepo.listTopBorrowers( 0, 3 );
 			assertThat( results ).containsExactly(
 					session.get( Person.class, JANE_SMITH_ID ),
 					session.get( Person.class, JANE_FONDA_ID ),
 					session.get( Person.class, JANE_PORTER_ID )
 			);
 
-			results = dao.listTopShortTermBorrowers( 0, 3 );
+			results = personRepo.listTopShortTermBorrowers( 0, 3 );
 			assertThat( results ).containsExactly(
 					session.get( Person.class, JANE_FONDA_ID ),
 					session.get( Person.class, JANE_SMITH_ID ),
 					session.get( Person.class, PAUL_JOHN_ID )
 			);
 
-			results = dao.listTopLongTermBorrowers( 0, 3 );
+			results = personRepo.listTopLongTermBorrowers( 0, 3 );
 			assertThat( results ).containsExactly(
 					session.get( Person.class, JANE_PORTER_ID ),
 					session.get( Person.class, JANE_SMITH_ID ),
@@ -528,11 +483,11 @@ public class OrmElasticsearchLibraryFullStackIT {
 	}
 
 	private void initData(Session session) {
-		LibraryDao libraryDao = daoFactory.createLibraryDao( session );
-		DocumentDao documentDao = daoFactory.createDocumentDao( session );
-		PersonDao personDao = daoFactory.createPersonDao( session );
+		LibraryRepository libraryRepo = repoFactory.createLibraryRepository( session );
+		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+		PersonRepository personRepo = repoFactory.createPersonRepository( session );
 
-		Book calligraphy = documentDao.createBook(
+		Book calligraphy = documentRepo.createBook(
 				CALLIGRAPHY_ID,
 				new ISBN( "978-0-00-000001-1" ),
 				"Calligraphy for Dummies",
@@ -540,14 +495,14 @@ public class OrmElasticsearchLibraryFullStackIT {
 				"calligraphy,art"
 		);
 
-		Video javaDancing = documentDao.createVideo(
+		Video javaDancing = documentRepo.createVideo(
 				JAVA_DANCING_ID,
 				"Java le dire à tout le monde",
 				"A brief history of Java dancing in Paris during the early 20th century",
 				"java,dancing,history"
 		);
 
-		Book indonesianEconomy = documentDao.createBook(
+		Book indonesianEconomy = documentRepo.createBook(
 				INDONESIAN_ECONOMY_ID,
 				new ISBN( "978-0-00-000003-3" ),
 				"Comparative Study of the Economy of Java and other Indonesian Islands",
@@ -556,7 +511,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				"geography,economy,java,sumatra,borneo,sulawesi"
 		);
 
-		Book javaForDummies = documentDao.createBook(
+		Book javaForDummies = documentRepo.createBook(
 				JAVA_FOR_DUMMIES_ID,
 				new ISBN( "978-0-00-000004-4" ),
 				// Use varying case on purpose
@@ -565,7 +520,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				"programming,language,java"
 		);
 
-		Book artOfComputerProg = documentDao.createBook(
+		Book artOfComputerProg = documentRepo.createBook(
 				ART_OF_COMPUTER_PROG_ID,
 				new ISBN( "978-0-00-000005-5" ),
 				"The Art of Computer Programming",
@@ -573,7 +528,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				"programming"
 		);
 
-		Book thesaurusOfLanguages = documentDao.createBook(
+		Book thesaurusOfLanguages = documentRepo.createBook(
 				THESAURUS_OF_LANGUAGES_ID,
 				new ISBN( "978-0-00-000006-6" ),
 				"Thesaurus of Indo-European Languages",
@@ -581,7 +536,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 				"geography,language"
 		);
 
-		Video livingOnIsland = documentDao.createVideo(
+		Video livingOnIsland = documentRepo.createVideo(
 				LIVING_ON_ISLAND_ID,
 				"Living in an Island, Episode 3: Indonesia",
 				"A journey across Indonesia's smallest islands depicting how island way of life differs from mainland living",
@@ -589,7 +544,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		);
 
 		// City center library
-		Library cityCenterLibrary = libraryDao.create(
+		Library cityCenterLibrary = libraryRepo.create(
 				CITY_CENTER_ID,
 				"City Center Library",
 				12400,
@@ -598,16 +553,16 @@ public class OrmElasticsearchLibraryFullStackIT {
 				LibraryService.HARDCOPY_LOAN
 		);
 		// Content: every document, but no dematerialized copy
-		documentDao.createCopy( cityCenterLibrary, calligraphy, BookMedium.HARDCOPY );
-		documentDao.createCopy( cityCenterLibrary, javaDancing, VideoMedium.DVD );
-		documentDao.createCopy( cityCenterLibrary, indonesianEconomy, BookMedium.HARDCOPY );
-		documentDao.createCopy( cityCenterLibrary, javaForDummies, BookMedium.HARDCOPY );
-		documentDao.createCopy( cityCenterLibrary, artOfComputerProg, BookMedium.HARDCOPY );
-		documentDao.createCopy( cityCenterLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
-		documentDao.createCopy( cityCenterLibrary, livingOnIsland, VideoMedium.BLURAY );
+		documentRepo.createCopy( cityCenterLibrary, calligraphy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( cityCenterLibrary, javaDancing, VideoMedium.DVD );
+		documentRepo.createCopy( cityCenterLibrary, indonesianEconomy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( cityCenterLibrary, javaForDummies, BookMedium.HARDCOPY );
+		documentRepo.createCopy( cityCenterLibrary, artOfComputerProg, BookMedium.HARDCOPY );
+		documentRepo.createCopy( cityCenterLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
+		documentRepo.createCopy( cityCenterLibrary, livingOnIsland, VideoMedium.BLURAY );
 
 		// Suburban library 1
-		Library suburbanLibrary1 = libraryDao.create(
+		Library suburbanLibrary1 = libraryRepo.create(
 				SUBURBAN_1_ID,
 				// Use varying case on purpose
 				"suburban Library 1",
@@ -617,14 +572,14 @@ public class OrmElasticsearchLibraryFullStackIT {
 				LibraryService.HARDCOPY_LOAN
 		);
 		// Content: no video document
-		documentDao.createCopy( suburbanLibrary1, calligraphy, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary1, indonesianEconomy, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary1, javaForDummies, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary1, artOfComputerProg, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary1, thesaurusOfLanguages, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary1, calligraphy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary1, indonesianEconomy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary1, javaForDummies, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary1, artOfComputerProg, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary1, thesaurusOfLanguages, BookMedium.HARDCOPY );
 
 		// Suburban library 2
-		Library suburbanLibrary2 = libraryDao.create(
+		Library suburbanLibrary2 = libraryRepo.create(
 				SUBURBAN_2_ID,
 				"Suburban Library 2",
 				800, // Same as the other suburban library
@@ -633,17 +588,17 @@ public class OrmElasticsearchLibraryFullStackIT {
 				LibraryService.HARDCOPY_LOAN
 		);
 		// Content: no academic document, offers dematerialized copies
-		documentDao.createCopy( suburbanLibrary2, calligraphy, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary2, calligraphy, BookMedium.DEMATERIALIZED );
-		documentDao.createCopy( suburbanLibrary2, javaDancing, VideoMedium.DVD );
-		documentDao.createCopy( suburbanLibrary2, javaDancing, VideoMedium.DEMATERIALIZED );
-		documentDao.createCopy( suburbanLibrary2, javaForDummies, BookMedium.HARDCOPY );
-		documentDao.createCopy( suburbanLibrary2, javaForDummies, BookMedium.DEMATERIALIZED );
-		documentDao.createCopy( suburbanLibrary2, livingOnIsland, VideoMedium.BLURAY );
-		documentDao.createCopy( suburbanLibrary2, livingOnIsland, VideoMedium.DEMATERIALIZED );
+		documentRepo.createCopy( suburbanLibrary2, calligraphy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary2, calligraphy, BookMedium.DEMATERIALIZED );
+		documentRepo.createCopy( suburbanLibrary2, javaDancing, VideoMedium.DVD );
+		documentRepo.createCopy( suburbanLibrary2, javaDancing, VideoMedium.DEMATERIALIZED );
+		documentRepo.createCopy( suburbanLibrary2, javaForDummies, BookMedium.HARDCOPY );
+		documentRepo.createCopy( suburbanLibrary2, javaForDummies, BookMedium.DEMATERIALIZED );
+		documentRepo.createCopy( suburbanLibrary2, livingOnIsland, VideoMedium.BLURAY );
+		documentRepo.createCopy( suburbanLibrary2, livingOnIsland, VideoMedium.DEMATERIALIZED );
 
 		// University library
-		Library universityLibrary = libraryDao.create(
+		Library universityLibrary = libraryRepo.create(
 				UNIVERSITY_ID,
 				"University Library",
 				9000,
@@ -652,75 +607,75 @@ public class OrmElasticsearchLibraryFullStackIT {
 				LibraryService.HARDCOPY_LOAN, LibraryService.DEMATERIALIZED_LOAN
 		);
 		// Content: only academic and learning documents
-		documentDao.createCopy( universityLibrary, indonesianEconomy, BookMedium.HARDCOPY );
-		documentDao.createCopy( universityLibrary, javaForDummies, BookMedium.HARDCOPY );
-		documentDao.createCopy( universityLibrary, artOfComputerProg, BookMedium.HARDCOPY );
-		documentDao.createCopy( universityLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
+		documentRepo.createCopy( universityLibrary, indonesianEconomy, BookMedium.HARDCOPY );
+		documentRepo.createCopy( universityLibrary, javaForDummies, BookMedium.HARDCOPY );
+		documentRepo.createCopy( universityLibrary, artOfComputerProg, BookMedium.HARDCOPY );
+		documentRepo.createCopy( universityLibrary, thesaurusOfLanguages, BookMedium.HARDCOPY );
 
-		Person janeSmith = personDao.create( JANE_SMITH_ID, "Jane", "Smith" );
-		personDao.createAccount( janeSmith );
-		createBorrowal( personDao, janeSmith, cityCenterLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeSmith, cityCenterLibrary, artOfComputerProg, BorrowalType.LONG_TERM );
-		createBorrowal( personDao, janeSmith, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeSmith, cityCenterLibrary, calligraphy, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeSmith, cityCenterLibrary, javaDancing, BorrowalType.LONG_TERM );
+		Person janeSmith = personRepo.create( JANE_SMITH_ID, "Jane", "Smith" );
+		personRepo.createAccount( janeSmith );
+		createBorrowal( personRepo, janeSmith, cityCenterLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeSmith, cityCenterLibrary, artOfComputerProg, BorrowalType.LONG_TERM );
+		createBorrowal( personRepo, janeSmith, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeSmith, cityCenterLibrary, calligraphy, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeSmith, cityCenterLibrary, javaDancing, BorrowalType.LONG_TERM );
 
-		Person janeFonda = personDao.create( JANE_FONDA_ID, "Jane", "Fonda" );
-		personDao.createAccount( janeFonda );
-		createBorrowal( personDao, janeFonda, universityLibrary, javaForDummies, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeFonda, universityLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeFonda, universityLibrary, thesaurusOfLanguages, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, janeFonda, universityLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
-
-		// Use varying case on purpose
-		Person janePorter = personDao.create( JANE_PORTER_ID, "Jane", "porter" );
-		personDao.createAccount( janePorter );
-		createBorrowal( personDao, janePorter, suburbanLibrary1, indonesianEconomy, BorrowalType.LONG_TERM );
-		createBorrowal( personDao, janePorter, suburbanLibrary2, livingOnIsland, 1, BorrowalType.LONG_TERM );
-		createBorrowal( personDao, janePorter, universityLibrary, thesaurusOfLanguages, BorrowalType.LONG_TERM );
+		Person janeFonda = personRepo.create( JANE_FONDA_ID, "Jane", "Fonda" );
+		personRepo.createAccount( janeFonda );
+		createBorrowal( personRepo, janeFonda, universityLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeFonda, universityLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeFonda, universityLibrary, thesaurusOfLanguages, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, janeFonda, universityLibrary, indonesianEconomy, BorrowalType.SHORT_TERM );
 
 		// Use varying case on purpose
-		Person johnLennon = personDao.create( JOHN_LENNON_ID, "john", "Lennon" );
-		personDao.createAccount( johnLennon );
-		createBorrowal( personDao, johnLennon, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+		Person janePorter = personRepo.create( JANE_PORTER_ID, "Jane", "porter" );
+		personRepo.createAccount( janePorter );
+		createBorrowal( personRepo, janePorter, suburbanLibrary1, indonesianEconomy, BorrowalType.LONG_TERM );
+		createBorrowal( personRepo, janePorter, suburbanLibrary2, livingOnIsland, 1, BorrowalType.LONG_TERM );
+		createBorrowal( personRepo, janePorter, universityLibrary, thesaurusOfLanguages, BorrowalType.LONG_TERM );
 
 		// Use varying case on purpose
-		Person eltonJohn = personDao.create( ELTON_JOHN_ID, "elton", "john" );
-		personDao.createAccount( eltonJohn );
-		createBorrowal( personDao, eltonJohn, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+		Person johnLennon = personRepo.create( JOHN_LENNON_ID, "john", "Lennon" );
+		personRepo.createAccount( johnLennon );
+		createBorrowal( personRepo, johnLennon, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person pattySmith = personDao.create( PATTY_SMITH_ID, "Patty", "Smith" );
-		personDao.createAccount( pattySmith );
-		createBorrowal( personDao, pattySmith, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
+		// Use varying case on purpose
+		Person eltonJohn = personRepo.create( ELTON_JOHN_ID, "elton", "john" );
+		personRepo.createAccount( eltonJohn );
+		createBorrowal( personRepo, eltonJohn, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person johnSmith = personDao.create( JOHN_SMITH_ID, "John", "Smith" );
-		personDao.createAccount( johnSmith );
-		createBorrowal( personDao, johnSmith, suburbanLibrary1, indonesianEconomy, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, johnSmith, suburbanLibrary1, artOfComputerProg, BorrowalType.LONG_TERM );
+		Person pattySmith = personRepo.create( PATTY_SMITH_ID, "Patty", "Smith" );
+		personRepo.createAccount( pattySmith );
+		createBorrowal( personRepo, pattySmith, suburbanLibrary2, javaDancing, 1, BorrowalType.SHORT_TERM );
 
-		Person johnPaulSmith = personDao.create( JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
+		Person johnSmith = personRepo.create( JOHN_SMITH_ID, "John", "Smith" );
+		personRepo.createAccount( johnSmith );
+		createBorrowal( personRepo, johnSmith, suburbanLibrary1, indonesianEconomy, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, johnSmith, suburbanLibrary1, artOfComputerProg, BorrowalType.LONG_TERM );
+
+		Person johnPaulSmith = personRepo.create( JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
 		// No account for this one
 
-		Person johnPaul = personDao.create( JOHN_PAUL_ID, "John", "Paul" );
-		personDao.createAccount( johnPaul );
+		Person johnPaul = personRepo.create( JOHN_PAUL_ID, "John", "Paul" );
+		personRepo.createAccount( johnPaul );
 		// This one has an account, but no borrowal
 
-		Person paulJohn = personDao.create( PAUL_JOHN_ID, "Paul", "John" );
-		personDao.createAccount( paulJohn );
-		createBorrowal( personDao, paulJohn, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
-		createBorrowal( personDao, paulJohn, cityCenterLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
+		Person paulJohn = personRepo.create( PAUL_JOHN_ID, "Paul", "John" );
+		personRepo.createAccount( paulJohn );
+		createBorrowal( personRepo, paulJohn, cityCenterLibrary, javaForDummies, BorrowalType.SHORT_TERM );
+		createBorrowal( personRepo, paulJohn, cityCenterLibrary, artOfComputerProg, BorrowalType.SHORT_TERM );
 	}
 
 	// Helper methods
 
 	private <D extends Document<C>, C extends DocumentCopy<D>> Borrowal createBorrowal(
-			PersonDao personDao, Person person, Library library, D document, BorrowalType borrowalType) {
-		return createBorrowal( personDao, person, library, document, 0, borrowalType );
+			PersonRepository personRepo, Person person, Library library, D document, BorrowalType borrowalType) {
+		return createBorrowal( personRepo, person, library, document, 0, borrowalType );
 	}
 
 	private <D extends Document<C>, C extends DocumentCopy<D>> Borrowal createBorrowal(
-			PersonDao personDao, Person person, Library library, D document, int copyIndex, BorrowalType borrowalType) {
-		return personDao.createBorrowal(
+			PersonRepository personRepo, Person person, Library library, D document, int copyIndex, BorrowalType borrowalType) {
+		return personRepo.createBorrowal(
 				person.getAccount(),
 				getCopy( library, document, copyIndex ),
 				borrowalType
