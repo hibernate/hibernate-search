@@ -31,11 +31,7 @@ public abstract class DocumentRepository {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected static final Class<Document<?>> DOCUMENT_CLASS = (Class<Document<?>>) (Class) Document.class;
 
-	protected final FullTextEntityManager entityManager;
-
-	public DocumentRepository(EntityManager entityManager) {
-		this.entityManager = Search.getFullTextEntityManager( entityManager );
-	}
+	protected FullTextEntityManager entityManager;
 
 	public Book createBook(int id, ISBN isbn, String title, String author, String summary, String tags) {
 		Book book = new Book();
@@ -94,4 +90,8 @@ public abstract class DocumentRepository {
 			int offset, int limit);
 
 	public abstract List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order);
+
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = Search.getFullTextEntityManager( entityManager );
+	}
 }

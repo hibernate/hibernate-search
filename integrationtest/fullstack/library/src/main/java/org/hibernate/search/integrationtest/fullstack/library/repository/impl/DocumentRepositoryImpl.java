@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.fullstack.library.repository.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
 
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
@@ -25,9 +24,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
 
 class DocumentRepositoryImpl extends DocumentRepository {
-	DocumentRepositoryImpl(EntityManager entityManager) {
-		super( entityManager );
-	}
 
 	@Override
 	public Optional<Book> getByIsbn(String isbnAsString) {

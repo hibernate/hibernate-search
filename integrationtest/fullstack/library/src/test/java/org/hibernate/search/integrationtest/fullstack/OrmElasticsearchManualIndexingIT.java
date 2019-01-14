@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.search.integrationtest.fullstack.library.repository.RepositoryFactory;
 import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
-import org.hibernate.search.integrationtest.fullstack.library.repository.impl.RepositoryFactoryImpl;
-import org.hibernate.search.integrationtest.fullstack.library.config.SessionFactoryConfig;
+import org.hibernate.search.integrationtest.fullstack.library.config.ManualIndexing;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
 import org.hibernate.search.integrationtest.fullstack.library.model.ISBN;
 import org.hibernate.search.mapper.orm.Search;
@@ -30,10 +30,12 @@ import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.junit4.WeldInitiator;
 
 public class OrmElasticsearchManualIndexingIT {
 
@@ -51,25 +53,19 @@ public class OrmElasticsearchManualIndexingIT {
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
-	private final RepositoryFactory repoFactory;
+	@Rule
+	public WeldInitiator weld = WeldInitiator.from( new Weld() ).inject( this ).build();
 
+	@Inject
+	@ManualIndexing
 	private SessionFactory sessionFactory;
 
-	public OrmElasticsearchManualIndexingIT() {
-		this.repoFactory = new RepositoryFactoryImpl();
-	}
+	@Inject
+	private DocumentRepository documentRepo;
 
 	@Before
 	public void setup() {
-		this.sessionFactory = SessionFactoryConfig.sessionFactory( true );
 		withinTransaction( sessionFactory, this::initData );
-	}
-
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
 	}
 
 	@Test
@@ -124,7 +120,7 @@ public class OrmElasticsearchManualIndexingIT {
 	}
 
 	private void initData(Session session) {
-		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+		documentRepo.setEntityManager( session );
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			addBook( documentRepo, i );
 		}
@@ -150,7 +146,7 @@ public class OrmElasticsearchManualIndexingIT {
 	}
 
 	private void checkEverythingIsIndexed(Session session) {
-		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+		documentRepo.setEntityManager( session );
 
 		assertThat( documentRepo.count() ).isEqualTo( NUMBER_OF_BOOKS );
 

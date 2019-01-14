@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.fullstack.library.repository.impl;
 
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
@@ -16,10 +15,6 @@ import org.hibernate.search.integrationtest.fullstack.library.repository.PersonR
 import org.hibernate.search.integrationtest.fullstack.library.model.Person;
 
 class PersonRepositoryImpl extends PersonRepository {
-
-	PersonRepositoryImpl(EntityManager entityManager) {
-		super( entityManager );
-	}
 
 	@Override
 	public List<Person> search(String terms, int offset, int limit) {

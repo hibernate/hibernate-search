@@ -19,11 +19,7 @@ import org.hibernate.search.integrationtest.fullstack.library.model.Person;
 
 public abstract class PersonRepository {
 
-	protected final FullTextEntityManager entityManager;
-
-	public PersonRepository(EntityManager entityManager) {
-		this.entityManager = Search.getFullTextEntityManager( entityManager );
-	}
+	protected FullTextEntityManager entityManager;
 
 	public Person create(int id, String firstName, String lastName) {
 		Person person = new Person();
@@ -65,6 +61,10 @@ public abstract class PersonRepository {
 
 	public final List<Person> listTopLongTermBorrowers(int offset, int limit) {
 		return listTopBorrowers( "account.borrowals.longTermCount", offset, limit );
+	}
+
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = Search.getFullTextEntityManager( entityManager );
 	}
 
 	protected abstract List<Person> listTopBorrowers(String borrowalsCountField, int offset, int limit);

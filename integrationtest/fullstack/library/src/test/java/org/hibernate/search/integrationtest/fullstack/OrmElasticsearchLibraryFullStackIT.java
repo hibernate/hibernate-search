@@ -18,12 +18,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.fullstack.library.bridge.AccountBorrowalSummaryBridge;
-import org.hibernate.search.integrationtest.fullstack.library.config.SessionFactoryConfig;
+import org.hibernate.search.integrationtest.fullstack.library.config.AutoIndexing;
 import org.hibernate.search.integrationtest.fullstack.library.model.Book;
 import org.hibernate.search.integrationtest.fullstack.library.model.BookMedium;
 import org.hibernate.search.integrationtest.fullstack.library.model.Borrowal;
@@ -39,17 +41,14 @@ import org.hibernate.search.integrationtest.fullstack.library.model.VideoMedium;
 import org.hibernate.search.integrationtest.fullstack.library.repository.DocumentRepository;
 import org.hibernate.search.integrationtest.fullstack.library.repository.LibraryRepository;
 import org.hibernate.search.integrationtest.fullstack.library.repository.PersonRepository;
-import org.hibernate.search.integrationtest.fullstack.library.repository.RepositoryFactory;
-import org.hibernate.search.integrationtest.fullstack.library.repository.impl.RepositoryFactoryImpl;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-public class OrmElasticsearchLibraryFullStackIT {
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.junit4.WeldInitiator;
 
-	private static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
+public class OrmElasticsearchLibraryFullStackIT {
 
 	// Document IDs
 	private static final int CALLIGRAPHY_ID = 1;
@@ -78,28 +77,28 @@ public class OrmElasticsearchLibraryFullStackIT {
 	private static final int JOHN_PAUL_ID = 9;
 	private static final int PAUL_JOHN_ID = 10;
 
-	private final RepositoryFactory repoFactory = new RepositoryFactoryImpl();
+	@Rule
+	public WeldInitiator weld = WeldInitiator.from( new Weld() ).inject( this ).build();
 
+	@Inject
+	@AutoIndexing
 	private SessionFactory sessionFactory;
 
-	@Before
-	public void setup() {
-		this.sessionFactory = SessionFactoryConfig.sessionFactory( false );
-	}
+	@Inject
+	private LibraryRepository libraryRepo;
 
-	@After
-	public void cleanup() {
-		if ( sessionFactory != null ) {
-			sessionFactory.close();
-		}
-	}
+	@Inject
+	private PersonRepository personRepo;
+
+	@Inject
+	private DocumentRepository documentRepo;
 
 	@Test
 	public void search_library() {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			LibraryRepository libraryRepo = repoFactory.createLibraryRepository( session );
+			libraryRepo.setEntityManager( session );
 
 			List<Library> libraries = libraryRepo.search( "library", 0, 10 );
 			assertThat( libraries ).containsExactly(
@@ -136,7 +135,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			PersonRepository personRepo = repoFactory.createPersonRepository( sessionFactory.createEntityManager() );
+			personRepo.setEntityManager( session );
 
 			List<Person> results = personRepo.search(
 					"smith", 0, 10
@@ -182,7 +181,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			Optional<Book> book = documentRepo.getByIsbn( "978-0-00-000001-1" );
 			assertTrue( book.isPresent() );
@@ -212,7 +211,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			List<Book> books = documentRepo.searchByMedium(
 					"java", BookMedium.DEMATERIALIZED, 0, 10
@@ -236,7 +235,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			GeoPoint myLocation = GeoPoint.of( 42.0, 0.5 );
 
@@ -302,7 +301,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			List<Document<?>> documents = documentRepo.searchAroundMe(
 					"java", null,
@@ -351,7 +350,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			List<Document<?>> documents = documentRepo.searchAroundMe(
 					null, "java",
@@ -399,7 +398,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			PersonRepository personRepo = repoFactory.createPersonRepository( session );
+			personRepo.setEntityManager( session );
 
 			List<Person> results = personRepo.listTopBorrowers( 0, 3 );
 			assertThat( results ).containsExactly(
@@ -432,7 +431,7 @@ public class OrmElasticsearchLibraryFullStackIT {
 		withinTransaction( sessionFactory, this::initData );
 
 		withinSession( sessionFactory, session -> {
-			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+			documentRepo.setEntityManager( session );
 
 			List<String> results = documentRepo.getAuthorsOfBooksHavingTerms( "java", SortOrder.ASC );
 			assertThat( results ).containsExactly( "Mark Red", "Michele Violet", "Stuart Green" );
@@ -449,9 +448,9 @@ public class OrmElasticsearchLibraryFullStackIT {
 	}
 
 	private void initData(Session session) {
-		LibraryRepository libraryRepo = repoFactory.createLibraryRepository( session );
-		DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
-		PersonRepository personRepo = repoFactory.createPersonRepository( session );
+		libraryRepo.setEntityManager( session );
+		documentRepo.setEntityManager( session );
+		personRepo.setEntityManager( session );
 
 		Book calligraphy = documentRepo.createBook(
 				CALLIGRAPHY_ID,

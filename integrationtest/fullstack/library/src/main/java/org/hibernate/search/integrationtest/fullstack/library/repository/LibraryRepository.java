@@ -17,11 +17,7 @@ import org.hibernate.search.integrationtest.fullstack.library.model.LibraryServi
 
 public abstract class LibraryRepository {
 
-	protected final FullTextEntityManager entityManager;
-
-	public LibraryRepository(EntityManager entityManager) {
-		this.entityManager = Search.getFullTextEntityManager( entityManager );
-	}
+	protected FullTextEntityManager entityManager;
 
 	public Library create(int id, String name, int collectionSize, double latitude, double longitude, LibraryService... services) {
 		Library library = new Library();
@@ -37,4 +33,7 @@ public abstract class LibraryRepository {
 
 	public abstract List<Library> search(String terms, int offset, int limit);
 
+	public void setEntityManager(EntityManager entityManager) {
+		this.entityManager = Search.getFullTextEntityManager( entityManager );
+	}
 }

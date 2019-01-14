@@ -8,17 +8,12 @@ package org.hibernate.search.integrationtest.fullstack.library.repository.impl;
 
 import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.integrationtest.fullstack.library.repository.LibraryRepository;
 import org.hibernate.search.integrationtest.fullstack.library.model.Library;
 
 class LibraryRepositoryImpl extends LibraryRepository {
-
-	LibraryRepositoryImpl(EntityManager entityManager) {
-		super( entityManager );
-	}
 
 	@Override
 	public List<Library> search(String terms, int offset, int limit) {
@@ -39,5 +34,4 @@ class LibraryRepositoryImpl extends LibraryRepository {
 
 		return query.getResultList();
 	}
-
 }
