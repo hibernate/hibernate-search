@@ -4,36 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.elasticsearch.test;
+package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.test.util.JsonHelper.assertJsonEquals;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import org.apache.lucene.analysis.ngram.EdgeNGramTokenizerFactory;
-import org.hibernate.search.annotations.Analyzer;
-import org.hibernate.search.annotations.AnalyzerDef;
-import org.hibernate.search.annotations.CharFilterDef;
-import org.hibernate.search.annotations.DocumentId;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Parameter;
-import org.hibernate.search.annotations.TokenFilterDef;
-import org.hibernate.search.annotations.TokenizerDef;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchCharFilterFactory;
-import org.hibernate.search.elasticsearch.analyzer.ElasticsearchTokenFilterFactory;
-import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
-import org.hibernate.search.elasticsearch.cfg.IndexSchemaManagementStrategy;
-import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
-import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
-import org.hibernate.search.elasticsearch.testutil.junit.SkipOnAWS;
-import org.hibernate.search.test.SearchInitializationTestBase;
-import org.hibernate.search.test.util.ImmutableTestConfiguration;
-import org.hibernate.search.testsupport.junit.PortedToSearch6;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,15 +23,17 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests for {@link ElasticsearchIndexManager}'s analyzer definition migration feature.
- *
- * @author Yoann Rodiere
+ * Tests for the analyzer migration feature when using automatic index management.
  */
-@Category({
-		PortedToSearch6.class,
-		SkipOnAWS.class // Cannot alter Elasticsearch settings on AWS, because indexes cannot be closed.
-})
-public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializationTestBase {
+@PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionMigrationIT")
+@Category(RequiresIndexOpenClose.class)
+public class ElasticsearchAnalyzerDefinitionMigrationIT {
+
+	private static final String BACKEND_NAME = "myElasticsearchBackend";
+	private static final String INDEX_NAME = "IndexName";
+
+	@Rule
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -57,23 +41,13 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	@Override
-	protected void init(Class<?>... annotatedClasses) {
-		Map<String, Object> settings = new HashMap<>();
-		settings.put(
-				"hibernate.search.default." + ElasticsearchEnvironment.INDEX_SCHEMA_MANAGEMENT_STRATEGY,
-				IndexSchemaManagementStrategy.UPDATE.getExternalName()
-		);
-		init( new ImmutableTestConfiguration( settings, annotatedClasses ) );
-	}
-
 	@Test
 	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
 									+ "'filter': ['custom-keep-types']"
@@ -103,20 +77,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									+ "'generate_word_parts': false"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( AnalyzedEntity.class );
+		setup();
 
 		assertJsonEquals(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
+									+ "'type': 'custom',"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -143,16 +122,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									/*
+									 * Strangely enough, even if you send properly typed booleans
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of booleans...
+									 */
+									+ "'generate_word_parts': 'false'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'char_filter': {"
@@ -174,20 +162,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									+ "'generate_word_parts': false"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( AnalyzedEntity.class );
+		setup();
 
 		assertJsonEquals(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
+									+ "'type': 'custom',"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -214,16 +207,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									/*
+									 * Strangely enough, even if you send properly typed booleans
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of booleans...
+									 */
+									+ "'generate_word_parts': 'false'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentDefinition_missing() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					/*
@@ -242,20 +244,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									+ "'generate_word_parts': false"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( AnalyzedEntity.class );
+		setup();
 
 		assertJsonEquals(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
+									+ "'type': 'custom',"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -282,23 +289,32 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									/*
+									 * Strangely enough, even if you send properly typed booleans
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of booleans...
+									 */
+									+ "'generate_word_parts': 'false'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentReference_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
 									+ "'char_filter': ['html_strip']," // Invalid
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -320,20 +336,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									+ "'generate_word_parts': false"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( AnalyzedEntity.class );
+		setup();
 
 		assertJsonEquals(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
+									+ "'type': 'custom',"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -360,23 +381,32 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									/*
+									 * Strangely enough, even if you send properly typed booleans
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of booleans...
+									 */
+									+ "'generate_word_parts': 'false'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
 				);
 	}
 
 	@Test
 	public void analyzer_componentDefinition_invalid() throws Exception {
-		elasticSearchClient.index( AnalyzedEntity.class ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis",
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
 									+ "'char_filter': ['custom-pattern-replace']," // Correct, but the actual definition is not
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -395,20 +425,25 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									+ "'generate_word_parts': false"
 							+ "}"
 					+ "}"
 				+ "}"
 				);
 
-		init( AnalyzedEntity.class );
+		setup();
 
 		assertJsonEquals(
 				"{"
 					+ "'analyzer': {"
-							+ "'analyzerWithElasticsearchFactories': {"
+							+ "'custom-analyzer': {"
+									+ "'type': 'custom',"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['custom-keep-types']"
+									+ "'filter': ['custom-keep-types', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -435,51 +470,44 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT extends SearchInitializa
 							+ "'custom-keep-types': {"
 									+ "'type': 'keep_types',"
 									+ "'types': ['<NUM>', '<DOUBLE>']"
+							+ "},"
+							+ "'custom-word-delimiter': {"
+									+ "'type': 'word_delimiter',"
+									/*
+									 * Strangely enough, even if you send properly typed booleans
+									 * to Elasticsearch, when you ask for the current settings it
+									 * will spit back strings instead of booleans...
+									 */
+									+ "'generate_word_parts': 'false'"
 							+ "}"
 					+ "}"
 				+ "}",
-				elasticSearchClient.index( AnalyzedEntity.class ).settings( "index.analysis" ).get()
+				elasticSearchClient.index( INDEX_NAME ).settings( "index.analysis" ).get()
 				);
 	}
 
-	@Indexed
-	@Entity
-	@AnalyzerDef(
-			name = "analyzerWithElasticsearchFactories",
-			charFilters = @CharFilterDef(
-					name = "custom-pattern-replace",
-					factory = ElasticsearchCharFilterFactory.class,
-					params = {
-							@Parameter(name = "type", value = "'pattern_replace'"),
-							@Parameter(name = "pattern", value = "'[^0-9]'"),
-							@Parameter(name = "replacement", value = "'0'"),
-							@Parameter(name = "tags", value = "'CASE_INSENSITIVE|COMMENTS'")
-					}
-			),
-			tokenizer = @TokenizerDef(
-					name = "custom-edgeNGram",
-					factory = EdgeNGramTokenizerFactory.class,
-					params = {
-							@Parameter(name = "minGramSize", value = "1"),
-							@Parameter(name = "maxGramSize", value = "10")
-					}
-			),
-			filters = @TokenFilterDef(
-					name = "custom-keep-types",
-					factory = ElasticsearchTokenFilterFactory.class,
-					params = {
-							@Parameter(name = "type", value = "'keep_types'"),
-							@Parameter(name = "types", value = "['<NUM>','<DOUBLE>']")
-					}
-			)
-	)
-	public static class AnalyzedEntity {
-		@DocumentId
-		@Id
-		Long id;
+	private void setup() {
+		withManagementStrategyConfiguration()
+				.withIndex(
+						"MappedType", INDEX_NAME,
+						ctx -> { },
+						indexMapping -> { }
+				)
+				.setup();
+	}
 
-		@Field(analyzer = @Analyzer(definition = "analyzerWithElasticsearchFactories"))
-		String myField;
+	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
+				.withIndexDefaultsProperty(
+						BACKEND_NAME,
+						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
+						ElasticsearchIndexManagementStrategyConfiguration.UPDATE.getExternalName()
+				)
+				.withBackendProperty(
+						BACKEND_NAME,
+						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						new ElasticsearchAnalyzerManagementITAnalysisConfigurer()
+				);
 	}
 
 }

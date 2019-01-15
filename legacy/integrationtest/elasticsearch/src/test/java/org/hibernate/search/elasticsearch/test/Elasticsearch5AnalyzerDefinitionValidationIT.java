@@ -8,9 +8,14 @@ package org.hibernate.search.elasticsearch.test;
 
 import java.io.IOException;
 
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
+import org.junit.experimental.categories.Category;
+
 /**
  * @author Yoann Rodiere
  */
+@Category(PortedToSearch6.class)
 public class Elasticsearch5AnalyzerDefinitionValidationIT extends AbstractAnalyzerDefinitionValidationIT {
 
 	@Override
