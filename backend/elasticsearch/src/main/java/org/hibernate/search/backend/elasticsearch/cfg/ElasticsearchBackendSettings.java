@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Configuration properties for Elasticsearch,
+ * Configuration properties for Elasticsearch backends.
  *
  * @author Gunnar Morling
  */
