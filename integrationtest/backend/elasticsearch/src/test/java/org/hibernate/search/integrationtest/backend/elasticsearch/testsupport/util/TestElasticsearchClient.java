@@ -219,6 +219,10 @@ public class TestElasticsearchClient implements TestRule {
 			this.templateName = templateName;
 		}
 
+		public TemplateClient create(String templateString, String settings) {
+			return create( templateString, toJsonElement( settings ).getAsJsonObject() );
+		}
+
 		public TemplateClient create(String templateString, JsonObject settings) {
 			TestElasticsearchClient.this.createTemplate( templateName, templateString, settings );
 			return this;

@@ -27,8 +27,11 @@ import org.hibernate.search.elasticsearch.impl.ElasticsearchIndexManager;
 import org.hibernate.search.elasticsearch.testutil.TestElasticsearchClient;
 import org.hibernate.search.test.SearchInitializationTestBase;
 import org.hibernate.search.test.util.ImmutableTestConfiguration;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -40,6 +43,7 @@ import org.junit.runners.Parameterized.Parameters;
  * @author Yoann Rodiere
  */
 @RunWith(Parameterized.class)
+@Category(PortedToSearch6.class)
 public class Elasticsearch5SchemaCreationIT extends SearchInitializationTestBase {
 
 	@Parameters(name = "With strategy {0}")
