@@ -777,6 +777,10 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
                     <skip>${failsafe.legacy.skip}</skip>
+                    <excludedGroups>
+                        org.hibernate.search.testsupport.junit.PortedToSearch6,
+                        org.hibernate.search.testsupport.junit.WillNotPortToSearch6
+                    </excludedGroups>
                 </configuration>
             </plugin>
         </plugins>

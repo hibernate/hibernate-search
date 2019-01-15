@@ -267,7 +267,9 @@
                             </excludes>
                             <excludedGroups>
                                 ${test.elasticsearch.failsafe.excludedGroups.version}
-                                ${test.elasticsearch.failsafe.excludedGroups.aws}
+                                ${test.elasticsearch.failsafe.excludedGroups.aws},
+                                org.hibernate.search.testsupport.junit.PortedToSearch6,
+                                org.hibernate.search.testsupport.junit.WillNotPortToSearch6
                             </excludedGroups>
                         </configuration>
                     </execution>
