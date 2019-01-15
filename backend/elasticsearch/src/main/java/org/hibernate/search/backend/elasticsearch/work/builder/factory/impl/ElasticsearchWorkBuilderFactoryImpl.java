@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -23,14 +25,17 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWor
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OptimizeWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
@@ -44,14 +49,17 @@ import org.hibernate.search.backend.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.FlushWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexSettingsWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OptimizeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWork;
 
 import com.google.gson.JsonObject;
 
@@ -161,10 +169,19 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
 	}
 
-	// TODO restore method => GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName);
+	@Override
+	public GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName) {
+		return new GetIndexTypeMappingsWork.Builder( indexName );
+	}
 
-	// TODO restore method => PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, TypeMapping mapping);
+	@Override
+	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping) {
+		return new PutIndexTypeMappingWork.Builder( gsonProvider, indexName, typeName, mapping );
+	}
 
-	// TODO restore method => WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout);
+	@Override
+	public WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout) {
+		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
+	}
 
 }

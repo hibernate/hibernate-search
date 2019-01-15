@@ -92,6 +92,12 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 12, value = "Interrupted while waiting for requests to be processed.")
 	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
 
+	@Message(id = ID_OFFSET_2 + 22, value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'.")
+	SearchException unexpectedIndexStatusString(String status);
+
+	@Message(id = ID_OFFSET_2 + 24, value = "Timed out while waiting for for index '%1$s' to reach status '%2$s'; status was still '%3$s' after %4$s.")
+	SearchException unexpectedIndexStatus(String indexName, String expected, String actual, String timeoutAndUnit);
+
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 53,
 			value = "Executing Elasticsearch query on '%s' with parameters '%s': <%s>" )
