@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.cfg;
 
 /**
- * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
+ * Configuration properties for Elasticsearch indexes.
  */
 public final class ElasticsearchIndexSettings {
 

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.cfg;
 import org.apache.lucene.util.Version;
 
 /**
- * Configuration properties for Lucene,
+ * Configuration properties for Lucene backends.
  */
 public final class LuceneBackendSettings {
 
