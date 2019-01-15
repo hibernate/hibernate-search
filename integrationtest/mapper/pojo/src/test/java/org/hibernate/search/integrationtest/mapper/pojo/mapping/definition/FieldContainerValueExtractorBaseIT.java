@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -47,7 +47,7 @@ public class FieldContainerValueExtractorBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(extractors = @ContainerValueExtractorBeanReference(type = RawContainerValueExtractor.class))
+			@GenericField(extractors = @ContainerExtractorRef(type = RawContainerValueExtractor.class))
 			public Integer getId() {
 				return id;
 			}
@@ -86,7 +86,7 @@ public class FieldContainerValueExtractorBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))
+			@GenericField(extractors = @ContainerExtractorRef(type = MapValueExtractor.class))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}

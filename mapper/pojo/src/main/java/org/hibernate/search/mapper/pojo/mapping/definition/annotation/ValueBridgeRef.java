@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 /**
  * @author Yoann Rodiere
@@ -19,16 +19,17 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractor;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ContainerValueExtractorBeanReference {
+public @interface ValueBridgeRef {
 
-	Class<? extends ContainerValueExtractor> type();
+	String name() default "";
+
+	Class<? extends ValueBridge<?, ?>> type() default UndefinedImplementationType.class;
 
 	/**
-	 * Class used as a marker for the default value of attributes of type {@link ContainerValueExtractorBeanReference}
-	 * in other annotations.
+	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class DefaultExtractors implements ContainerValueExtractor<Object, Object> {
-		private DefaultExtractors() {
+	abstract class UndefinedImplementationType implements ValueBridge<Object, Object> {
+		private UndefinedImplementationType() {
 		}
 	}
 }

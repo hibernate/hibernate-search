@@ -52,7 +52,7 @@ public @interface GenericField {
 	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridgeBuilder()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	ValueBridgeBeanReference valueBridge() default @ValueBridgeBeanReference;
+	ValueBridgeRef valueBridge() default @ValueBridgeRef;
 
 	/**
 	 * @return A reference to the builder to use to build a value bridge for this field.
@@ -68,8 +68,8 @@ public @interface GenericField {
 	 * ({@link java.lang.Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
-	ContainerValueExtractorBeanReference[] extractors()
-			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
+	ContainerExtractorRef[] extractors()
+			default @ContainerExtractorRef(type = ContainerExtractorRef.DefaultExtractors.class);
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

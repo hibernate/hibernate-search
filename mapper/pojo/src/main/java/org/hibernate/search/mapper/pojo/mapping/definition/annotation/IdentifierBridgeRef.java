@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IdentifierBridgeBeanReference {
+public @interface IdentifierBridgeRef {
 
 	String name() default "";
 

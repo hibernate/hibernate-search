@@ -28,7 +28,7 @@ import javax.persistence.Transient;
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -274,7 +274,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
+				extractors = @ContainerExtractorRef( type = MapKeyExtractor.class )
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbedded = new LinkedHashMap<>();
 
@@ -298,11 +298,11 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 		@OrderBy("map_key asc") // Forces Hibernate ORM to use a LinkedHashMap; we make sure to insert entries in the correct order
 		@IndexedEmbedded(
 				includePaths = { "indexedField", "indexedElementCollectionField", "containedDerivedField" },
-				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
+				extractors = @ContainerExtractorRef( type = MapKeyExtractor.class )
 		)
 		@IndexingDependency(
 				reindexOnUpdate = ReindexOnUpdate.NO,
-				extractors = @ContainerValueExtractorBeanReference( type = MapKeyExtractor.class )
+				extractors = @ContainerExtractorRef( type = MapKeyExtractor.class )
 		)
 		private Map<ContainedEntity, String> containedIndexedEmbeddedNoReindexOnUpdate = new LinkedHashMap<>();
 
@@ -361,14 +361,14 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedIndexedEmbedded",
-								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+								extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField1")
 				}),
 				@ObjectPath({
 						@PropertyValue(
 								propertyName = "containedIndexedEmbedded",
-								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+								extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 						),
 						@PropertyValue(propertyName = "fieldUsedInCrossEntityDerivedField2")
 				})
@@ -409,7 +409,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbedded",
-								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+								extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 						)
 				)
 		)
@@ -433,7 +433,7 @@ public class AutomaticIndexingMapKeysAssociationIT extends AbstractAutomaticInde
 				inversePath = @ObjectPath(
 						@PropertyValue(
 								propertyName = "containedIndexedEmbeddedNoReindexOnUpdate",
-								extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+								extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 						)
 				)
 		)

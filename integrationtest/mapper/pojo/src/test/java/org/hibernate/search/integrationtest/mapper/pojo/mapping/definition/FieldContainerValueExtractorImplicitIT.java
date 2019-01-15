@@ -18,7 +18,7 @@ import java.util.SortedSet;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 /**
@@ -327,7 +327,7 @@ public class FieldContainerValueExtractorImplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(valueBridge = @ValueBridgeBeanReference(type = PrefixedStringBridge.class))
+				@GenericField(valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class))
 				public List<String> getMyProperty() {
 					return myProperty;
 				}

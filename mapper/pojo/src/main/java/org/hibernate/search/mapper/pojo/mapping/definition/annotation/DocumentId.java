@@ -25,7 +25,7 @@ public @interface DocumentId {
 	 * Cannot be used in the same {@code @DocumentId} annotation as {@link #identifierBridgeBuilder()}:
 	 * either a bridge or a bridge builder can be provided, but never both.
 	 */
-	IdentifierBridgeBeanReference identifierBridge() default @IdentifierBridgeBeanReference;
+	IdentifierBridgeRef identifierBridge() default @IdentifierBridgeRef;
 
 	/**
 	 * @return A reference to the builder to use to builder an identifier bridge for document IDs.

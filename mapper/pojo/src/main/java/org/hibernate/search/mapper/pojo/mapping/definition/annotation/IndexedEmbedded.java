@@ -37,8 +37,8 @@ public @interface IndexedEmbedded {
 	 * ({@link java.lang.Iterable}, {@link java.util.Collection}, {@link java.util.Optional}, ...).
 	 * To prevent Hibernate Search from applying any extractor, set this attribute to an empty array (<code>{}</code>).
 	 */
-	ContainerValueExtractorBeanReference[] extractors()
-			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
+	ContainerExtractorRef[] extractors()
+			default @ContainerExtractorRef(type = ContainerExtractorRef.DefaultExtractors.class);
 
 	// TODO includeEmbeddedObjectId?
 	// TODO targetElement?

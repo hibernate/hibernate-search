@@ -30,15 +30,15 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.impl.common.CollectionHelper;
@@ -598,7 +598,7 @@ public class AnnotationMappingSmokeIT {
 
 		private Integer numeric;
 
-		@DocumentId(identifierBridge = @IdentifierBridgeBeanReference(type = DefaultIntegerIdentifierBridge.class))
+		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DefaultIntegerIdentifierBridge.class))
 		public Integer getId() {
 			return id;
 		}
@@ -608,7 +608,7 @@ public class AnnotationMappingSmokeIT {
 		}
 
 		@GenericField
-		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
+		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeRef(type = IntegerAsStringValueBridge.class))
 		public Integer getNumeric() {
 			return numeric;
 		}
@@ -704,7 +704,7 @@ public class AnnotationMappingSmokeIT {
 		)
 		@GenericField(
 				name = "embeddedMapKeys",
-				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 		)
 		public Map<String, List<IndexedEntity>> getEmbeddedMap() {
 			return embeddedMap;

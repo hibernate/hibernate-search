@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -202,7 +202,7 @@ public class ContainedInThroughNonContainingIndexedType {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
-	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(type = BridgeGoingThroughEntityBoundaries.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = BridgeGoingThroughEntityBoundaries.class))
 	public @interface BridgeGoingThroughEntityBoundariesAnnotation {
 	}
 

@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -40,7 +40,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
@@ -272,7 +272,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ValueBridgeBeanReference getValueBridge(GenericField annotation) {
+		ValueBridgeRef getValueBridge(GenericField annotation) {
 			return annotation.valueBridge();
 		}
 
@@ -282,7 +282,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerValueExtractorBeanReference[] getExtractors(GenericField annotation) {
+		ContainerExtractorRef[] getExtractors(GenericField annotation) {
 			return annotation.extractors();
 		}
 	}
@@ -310,7 +310,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ValueBridgeBeanReference getValueBridge(FullTextField annotation) {
+		ValueBridgeRef getValueBridge(FullTextField annotation) {
 			return annotation.valueBridge();
 		}
 
@@ -320,7 +320,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerValueExtractorBeanReference[] getExtractors(FullTextField annotation) {
+		ContainerExtractorRef[] getExtractors(FullTextField annotation) {
 			return annotation.extractors();
 		}
 	}
@@ -357,7 +357,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ValueBridgeBeanReference getValueBridge(KeywordField annotation) {
+		ValueBridgeRef getValueBridge(KeywordField annotation) {
 			return annotation.valueBridge();
 		}
 
@@ -367,7 +367,7 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ContainerValueExtractorBeanReference[] getExtractors(KeywordField annotation) {
+		ContainerExtractorRef[] getExtractors(KeywordField annotation) {
 			return annotation.extractors();
 		}
 	}

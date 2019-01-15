@@ -67,7 +67,7 @@ public @interface KeywordField {
 	 * @return A reference to the value bridge to use for this field.
 	 * @see GenericField#valueBridge()
 	 */
-	ValueBridgeBeanReference valueBridge() default @ValueBridgeBeanReference;
+	ValueBridgeRef valueBridge() default @ValueBridgeRef;
 
 	/**
 	 * @return A reference to the builder to use to build a value bridge for this field.
@@ -79,8 +79,8 @@ public @interface KeywordField {
 	 * @return An array of reference to container value extractor implementation classes.
 	 * @see GenericField#extractors()
 	 */
-	ContainerValueExtractorBeanReference[] extractors()
-			default @ContainerValueExtractorBeanReference(type = ContainerValueExtractorBeanReference.DefaultExtractors.class);
+	ContainerExtractorRef[] extractors()
+			default @ContainerExtractorRef(type = ContainerExtractorRef.DefaultExtractors.class);
 
 	@Documented
 	@Target({ ElementType.METHOD, ElementType.FIELD })

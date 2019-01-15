@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -92,7 +92,7 @@ public class FullTextFieldIT {
 			public Integer getId() {
 				return id;
 			}
-			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = ValidImplicitBindingBridge.class))
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeRef(type = ValidImplicitBindingBridge.class))
 			public WrappedValue getMyProperty() {
 				return myProperty;
 			}
@@ -121,7 +121,7 @@ public class FullTextFieldIT {
 			public Integer getId() {
 				return id;
 			}
-			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = ValidExplicitBindingBridge.class))
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeRef(type = ValidExplicitBindingBridge.class))
 			public WrappedValue getMyProperty() {
 				return myProperty;
 			}
@@ -178,7 +178,7 @@ public class FullTextFieldIT {
 			public Integer getId() {
 				return id;
 			}
-			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeBeanReference(type = InvalidExplicitBindingBridge.class))
+			@FullTextField(analyzer = ANALYZER_NAME, valueBridge = @ValueBridgeRef(type = InvalidExplicitBindingBridge.class))
 			public String getMyProperty() {
 				return myProperty;
 			}

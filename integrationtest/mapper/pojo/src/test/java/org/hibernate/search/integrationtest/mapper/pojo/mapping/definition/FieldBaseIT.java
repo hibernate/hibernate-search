@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -174,7 +174,7 @@ public class FieldBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@GenericField(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
 			public Integer getId() {
 				return id;
 			}
@@ -205,7 +205,7 @@ public class FieldBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@GenericField(valueBridge = @ValueBridgeBeanReference(type = MyStringBridge.class))
+			@GenericField(valueBridge = @ValueBridgeRef(type = MyStringBridge.class))
 			public List<Integer> getNumbers() {
 				return numbers;
 			}
@@ -250,7 +250,7 @@ public class FieldBaseIT {
 			Integer id;
 			@DocumentId
 			@GenericField(
-					valueBridge = @ValueBridgeBeanReference(name = "foo"),
+					valueBridge = @ValueBridgeRef(name = "foo"),
 					valueBridgeBuilder = @ValueBridgeBuilderBeanReference(name = "bar")
 			)
 			public Integer getId() {

@@ -35,13 +35,13 @@ import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
@@ -440,10 +440,10 @@ public class AnnotationMappingSmokeIT {
 		private Integer id;
 
 		@Column(name = "numeric_column")
-		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeBeanReference(type = IntegerAsStringValueBridge.class))
+		@GenericField(name = "numericAsString", valueBridge = @ValueBridgeRef(type = IntegerAsStringValueBridge.class))
 		private Integer numeric;
 
-		@DocumentId(identifierBridge = @IdentifierBridgeBeanReference(type = DefaultIntegerIdentifierBridge.class))
+		@DocumentId(identifierBridge = @IdentifierBridgeRef(type = DefaultIntegerIdentifierBridge.class))
 		public Integer getId() {
 			return id;
 		}
@@ -513,7 +513,7 @@ public class AnnotationMappingSmokeIT {
 		@IndexedEmbedded(includePaths = "embedded.prefix_myLocalDateField")
 		@GenericField(
 				name = "embeddedMapKeys",
-				extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class)
+				extractors = @ContainerExtractorRef(type = MapKeyExtractor.class)
 		)
 		public Map<String, IndexedEntity> getEmbeddedMap() {
 			return embeddedMap;

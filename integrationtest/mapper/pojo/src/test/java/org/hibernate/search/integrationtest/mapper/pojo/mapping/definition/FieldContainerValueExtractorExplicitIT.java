@@ -24,11 +24,11 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.MapKeyExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.MapValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalIntValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.OptionalValueExtractor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerValueExtractorBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -63,7 +63,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 				return id;
 			}
 
-			@GenericField(extractors = @ContainerValueExtractorBeanReference(type = MapKeyExtractor.class))
+			@GenericField(extractors = @ContainerExtractorRef(type = MapKeyExtractor.class))
 			public Map<String, String> getMyProperty() {
 				return myProperty;
 			}
@@ -98,8 +98,8 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 			}
 
 			@GenericField(extractors = {
-					@ContainerValueExtractorBeanReference(type = MapKeyExtractor.class),
-					@ContainerValueExtractorBeanReference(type = IterableElementExtractor.class)
+					@ContainerExtractorRef(type = MapKeyExtractor.class),
+					@ContainerExtractorRef(type = IterableElementExtractor.class)
 			})
 			public Map<List<String>, String> getMyProperty() {
 				return myProperty;
@@ -133,7 +133,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 				return id;
 			}
 
-			@GenericField(extractors = {}, valueBridge = @ValueBridgeBeanReference(type = FirstCollectionElementBridge.class))
+			@GenericField(extractors = {}, valueBridge = @ValueBridgeRef(type = FirstCollectionElementBridge.class))
 			public List<String> getMyProperty() {
 				return myProperty;
 			}
@@ -165,7 +165,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = ArrayElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = ArrayElementExtractor.class))
 				public String[] getMyProperty() {
 					return myProperty;
 				}
@@ -190,7 +190,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public Iterable<String> getMyProperty() {
 					return myProperty;
 				}
@@ -215,7 +215,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public Collection<String> getMyProperty() {
 					return myProperty;
 				}
@@ -240,7 +240,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public List<String> getMyProperty() {
 					return myProperty;
 				}
@@ -265,7 +265,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public Set<String> getMyProperty() {
 					return myProperty;
 				}
@@ -290,7 +290,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public SortedSet<String> getMyProperty() {
 					return myProperty;
 				}
@@ -315,7 +315,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = MapValueExtractor.class))
 				public Map<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -340,7 +340,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = MapValueExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = MapValueExtractor.class))
 				public SortedMap<String, String> getMyProperty() {
 					return myProperty;
 				}
@@ -366,8 +366,8 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 				}
 
 				@GenericField(extractors = {
-						@ContainerValueExtractorBeanReference(type = MapValueExtractor.class),
-						@ContainerValueExtractorBeanReference(type = IterableElementExtractor.class)
+						@ContainerExtractorRef(type = MapValueExtractor.class),
+						@ContainerExtractorRef(type = IterableElementExtractor.class)
 				})
 				public Map<String, List<String>> getMyProperty() {
 					return myProperty;
@@ -393,7 +393,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = OptionalValueExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = OptionalValueExtractor.class))
 				public Optional<String> getMyProperty() {
 					return myProperty;
 				}
@@ -418,7 +418,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = OptionalIntValueExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = OptionalIntValueExtractor.class))
 				public OptionalInt getMyProperty() {
 					return myProperty;
 				}
@@ -444,8 +444,8 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 				}
 
 				@GenericField(
-						valueBridge = @ValueBridgeBeanReference(type = PrefixedStringBridge.class),
-						extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class)
+						valueBridge = @ValueBridgeRef(type = PrefixedStringBridge.class),
+						extractors = @ContainerExtractorRef(type = IterableElementExtractor.class)
 				)
 				public List<String> getMyProperty() {
 					return myProperty;
@@ -471,7 +471,7 @@ public class FieldContainerValueExtractorExplicitIT extends AbstractFieldContain
 					return id;
 				}
 
-				@GenericField(extractors = @ContainerValueExtractorBeanReference(type = IterableElementExtractor.class))
+				@GenericField(extractors = @ContainerExtractorRef(type = IterableElementExtractor.class))
 				public List<MyEnum> getMyProperty() {
 					return myProperty;
 				}

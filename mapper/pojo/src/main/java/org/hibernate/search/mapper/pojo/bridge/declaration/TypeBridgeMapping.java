@@ -41,7 +41,7 @@ public @interface TypeBridgeMapping {
 	 *
 	 * @return A reference to the type bridge to use.
 	 */
-	TypeBridgeReference bridge() default @TypeBridgeReference;
+	TypeBridgeRef bridge() default @TypeBridgeRef;
 
 	/**
 	 * Map a type bridge builder to an annotation type.

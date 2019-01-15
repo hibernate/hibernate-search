@@ -26,10 +26,10 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
@@ -251,7 +251,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeReference(name = "foo"), builder = @TypeBridgeAnnotationBuilderReference(name = "bar"))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo"), builder = @TypeBridgeAnnotationBuilderReference(name = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping {
 	}
 
@@ -287,7 +287,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeReference(type = IncompatibleTypeRequestingTypeBridge.class))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(type = IncompatibleTypeRequestingTypeBridge.class))
 	private @interface IncompatibleTypeRequestingTypeBridgeAnnotation {
 	}
 
@@ -369,7 +369,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(name = "foo"), builder = @PropertyBridgeAnnotationBuilderReference(name = "bar"))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(name = "foo"), builder = @PropertyBridgeAnnotationBuilderReference(name = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping {
 	}
 
@@ -441,7 +441,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeReference(type = IncompatibleTypeRequestingPropertyBridge.class))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(type = IncompatibleTypeRequestingPropertyBridge.class))
 	private @interface IncompatibleTypeRequestingPropertyBridgeAnnotation {
 	}
 

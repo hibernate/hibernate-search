@@ -11,7 +11,7 @@ import javax.persistence.Entity;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
 import org.hibernate.search.integrationtest.showcase.library.usertype.ISBNUserType;
@@ -29,7 +29,7 @@ public class Book extends Document<BookCopy> {
 
 	@Basic
 	@Type(type = ISBNUserType.NAME)
-	@GenericField(valueBridge = @ValueBridgeBeanReference(type = ISBNBridge.class))
+	@GenericField(valueBridge = @ValueBridgeRef(type = ISBNBridge.class))
 	private ISBN isbn;
 
 	public ISBN getIsbn() {

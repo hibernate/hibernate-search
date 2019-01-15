@@ -41,7 +41,7 @@ public @interface PropertyBridgeMapping {
 	 *
 	 * @return A reference to the property bridge to use.
 	 */
-	PropertyBridgeReference bridge() default @PropertyBridgeReference;
+	PropertyBridgeRef bridge() default @PropertyBridgeRef;
 
 	/**
 	 * Map a property bridge builder to an annotation type.

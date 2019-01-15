@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBeanReference;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
@@ -147,7 +147,7 @@ public class DocumentIdBaseIT {
 		class IndexedEntity {
 			Object id;
 			@DocumentId(
-					identifierBridge = @IdentifierBridgeBeanReference(name = "foo"),
+					identifierBridge = @IdentifierBridgeRef(name = "foo"),
 					identifierBridgeBuilder = @IdentifierBridgeBuilderBeanReference(name = "bar")
 			)
 			public Object getId() {
