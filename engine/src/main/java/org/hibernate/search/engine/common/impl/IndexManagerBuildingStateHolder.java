@@ -13,9 +13,9 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.cfg.SearchBackendCommonSettings;
-import org.hibernate.search.engine.cfg.SearchEngineSettings;
-import org.hibernate.search.engine.cfg.SearchIndexCommonSettings;
+import org.hibernate.search.engine.cfg.BackendSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.IndexSettings;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -45,13 +45,13 @@ class IndexManagerBuildingStateHolder {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final OptionalConfigurationProperty<String> DEFAULT_INDEX_BACKEND_NAME =
-			ConfigurationProperty.forKey( SearchEngineSettings.DEFAULT_BACKEND ).asString().build();
+			ConfigurationProperty.forKey( EngineSettings.DEFAULT_BACKEND ).asString().build();
 
 	private static final OptionalConfigurationProperty<String> INDEX_BACKEND_NAME =
-			ConfigurationProperty.forKey( SearchIndexCommonSettings.BACKEND ).asString().build();
+			ConfigurationProperty.forKey( IndexSettings.BACKEND ).asString().build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends BackendFactory>> BACKEND_TYPE =
-			ConfigurationProperty.forKey( SearchBackendCommonSettings.TYPE ).asBeanReference( BackendFactory.class )
+			ConfigurationProperty.forKey( BackendSettings.TYPE ).asBeanReference( BackendFactory.class )
 					.build();
 
 	private final BeanProvider beanProvider;
@@ -70,7 +70,7 @@ class IndexManagerBuildingStateHolder {
 
 	public IndexManagerBuildingState<?> startBuilding(String indexName, boolean multiTenancyEnabled) {
 		ConfigurationPropertySource indexPropertySource =
-				propertySource.withMask( SearchEngineSettings.INDEXES ).withMask( indexName );
+				propertySource.withMask( EngineSettings.INDEXES ).withMask( indexName );
 		String backendName = getBackendName( indexName, indexPropertySource );
 
 		BackendBuildingState<?> backendBuildingstate =
@@ -130,7 +130,7 @@ class IndexManagerBuildingStateHolder {
 
 	private BackendBuildingState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource =
-				propertySource.withMask( SearchEngineSettings.BACKENDS ).withMask( backendName );
+				propertySource.withMask( EngineSettings.BACKENDS ).withMask( backendName );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
 				BACKEND_TYPE.getAndMapOrThrow(
 						backendPropertySource,
@@ -155,7 +155,7 @@ class IndexManagerBuildingStateHolder {
 				BackendImplementor<D> backend) {
 			this.backendBuildContext = backendBuildContext;
 			this.defaultIndexPropertySource =
-					backendPropertySource.withMask( SearchBackendCommonSettings.INDEX_DEFAULTS );
+					backendPropertySource.withMask( BackendSettings.INDEX_DEFAULTS );
 			this.backend = backend;
 		}
 

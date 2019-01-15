@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
@@ -53,7 +53,7 @@ public class HibernateOrmSimpleMappingIT {
 						return setupHelper.withBackend( "lucene", BACKEND_NAME )
 								.withBackendProperty(
 										BACKEND_NAME,
-										SearchBackendLuceneSettings.ANALYSIS_CONFIGURER,
+										LuceneBackendSettings.ANALYSIS_CONFIGURER,
 										new LuceneSimpleMappingAnalysisConfigurer()
 								);
 					}
@@ -68,7 +68,7 @@ public class HibernateOrmSimpleMappingIT {
 						return setupHelper.withBackend( "elasticsearch", "backendName" )
 								.withBackendProperty(
 										BACKEND_NAME,
-										SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+										ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 										new ElasticsearchSimpleMappingAnalysisConfigurer()
 								);
 					}

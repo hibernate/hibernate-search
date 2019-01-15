@@ -9,9 +9,9 @@ package org.hibernate.search.engine.cfg;
 /**
  * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
  */
-public final class SearchIndexCommonSettings {
+public final class IndexSettings {
 
-	private SearchIndexCommonSettings() {
+	private IndexSettings() {
 	}
 
 	/**

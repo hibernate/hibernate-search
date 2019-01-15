@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 /**
  * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
  */
-public final class SearchIndexElasticsearchSettings {
+public final class ElasticsearchIndexSettings {
 
-	private SearchIndexElasticsearchSettings() {
+	private ElasticsearchIndexSettings() {
 	}
 
 	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";

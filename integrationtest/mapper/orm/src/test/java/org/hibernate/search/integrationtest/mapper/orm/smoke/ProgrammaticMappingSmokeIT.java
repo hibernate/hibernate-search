@@ -31,7 +31,7 @@ import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomProper
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
@@ -122,7 +122,7 @@ public class ProgrammaticMappingSmokeIT {
 		);
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withProperty( SearchOrmSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
+				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
 				.setup(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,

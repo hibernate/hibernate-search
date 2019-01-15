@@ -24,10 +24,10 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
 import org.hibernate.search.integrationtest.showcase.library.dao.DocumentDao;
@@ -92,7 +92,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		return parameters;
 	}
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
+	private static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 
 	// Document IDs
 	private static final int CALLIGRAPHY_ID = 1;
@@ -142,14 +142,14 @@ public class OrmElasticsearchLibraryShowcaseIT {
 						PREFIX + "backends.elasticsearchBackend_1.index_defaults.refresh_after_write", true
 				)
 				.applySetting(
-						PREFIX + "backends.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						PREFIX + "backends.elasticsearchBackend_1." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new LibraryAnalysisConfigurer()
 				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP );
 
 		if ( MappingMode.PROGRAMMATIC_MAPPING.equals( mappingMode ) ) {
-			registryBuilder.applySetting( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" );
-			registryBuilder.applySetting( SearchOrmSettings.MAPPING_CONFIGURER,
+			registryBuilder.applySetting( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" );
+			registryBuilder.applySetting( HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 					new ProgrammaticMappingConfigurer() );
 		}
 

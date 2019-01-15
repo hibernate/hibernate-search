@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.work;
 
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.backend.elasticsearch.cfg.spi.SearchBackendElasticsearchSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -53,7 +53,7 @@ public class ElasticsearchIndexingIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withBackendProperty(
-						BACKEND_NAME, SearchBackendElasticsearchSpiSettings.CLIENT_FACTORY, clientMock.getFactory()
+						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientMock.getFactory()
 				)
 				.withIndex(
 						"MappedType", INDEX_NAME,

@@ -9,9 +9,9 @@ package org.hibernate.search.engine.cfg;
 /**
  * Configuration properties common to all Hibernate Search backends regardless of the underlying technology.
  */
-public final class SearchBackendCommonSettings {
+public final class BackendSettings {
 
-	private SearchBackendCommonSettings() {
+	private BackendSettings() {
 	}
 
 	/**

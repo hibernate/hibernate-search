@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.SearchBackendElasticsearchSpiSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
@@ -58,25 +58,25 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.MULTI_TENANCY_STRATEGY )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.MULTI_TENANCY_STRATEGY )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> LOG_JSON_PRETTY_PRINTING =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.LOG_JSON_PRETTY_PRINTING )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.LOG_JSON_PRETTY_PRINTING )
 					.asBoolean()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
+					.withDefault( ElasticsearchBackendSettings.Defaults.LOG_JSON_PRETTY_PRINTING )
 					.build();
 
 	private static final ConfigurationProperty<BeanReference<? extends ElasticsearchClientFactory>> CLIENT_FACTORY =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSpiSettings.CLIENT_FACTORY )
+			ConfigurationProperty.forKey( ElasticsearchBackendSpiSettings.CLIENT_FACTORY )
 					.asBeanReference( ElasticsearchClientFactory.class )
-					.withDefault( SearchBackendElasticsearchSpiSettings.Defaults.CLIENT_FACTORY )
+					.withDefault( ElasticsearchBackendSpiSettings.Defaults.CLIENT_FACTORY )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
 					.build();
 

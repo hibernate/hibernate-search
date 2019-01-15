@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchIndexElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
@@ -53,9 +53,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> REFRESH_AFTER_WRITE =
-			ConfigurationProperty.forKey( SearchIndexElasticsearchSettings.REFRESH_AFTER_WRITE )
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.REFRESH_AFTER_WRITE )
 					.asBoolean()
-					.withDefault( SearchIndexElasticsearchSettings.Defaults.REFRESH_AFTER_WRITE )
+					.withDefault( ElasticsearchIndexSettings.Defaults.REFRESH_AFTER_WRITE )
 					.build();
 
 	private final ElasticsearchClientImplementor client;

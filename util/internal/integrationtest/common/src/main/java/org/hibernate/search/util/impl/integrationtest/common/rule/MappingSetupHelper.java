@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.cfg.SearchEngineSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
@@ -30,13 +30,13 @@ public abstract class MappingSetupHelper<C extends MappingSetupHelper<C, B, R>.A
 		String backendName = backendMock.getBackendName();
 		return createSetupContext()
 				.withBackendProperty( backendName, "type", StubBackendFactory.class.getName() )
-				.withPropertyRadical( SearchEngineSettings.DEFAULT_BACKEND, backendName );
+				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName );
 	}
 
 	public C withBackend(String configurationId, String backendName) {
 		String propertiesPath = getPropertiesPath( configurationId );
 		return createSetupContext()
-				.withPropertyRadical( SearchEngineSettings.DEFAULT_BACKEND, backendName )
+				.withPropertyRadical( EngineSettings.DEFAULT_BACKEND, backendName )
 				.withProperties( testHelper.getPropertiesFromFile( propertiesPath ) );
 	}
 

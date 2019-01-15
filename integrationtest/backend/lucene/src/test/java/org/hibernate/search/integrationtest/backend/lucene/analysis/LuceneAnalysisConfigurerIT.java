@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
@@ -49,7 +49,7 @@ public class LuceneAnalysisConfigurerIT {
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								// TODO HSEARCH-3388 expect the full property key instead of just the radical
 								"Unable to convert configuration property 'backends." + BACKEND_NAME + "."
-										+ SearchBackendLuceneSettings.ANALYSIS_CONFIGURER + "'",
+										+ LuceneBackendSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + LuceneAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
@@ -188,7 +188,7 @@ public class LuceneAnalysisConfigurerIT {
 	private void setup(String analysisConfigurer, Consumer<IndexModelBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withProperty(
-						"backends." + BACKEND_NAME + "." + SearchBackendLuceneSettings.ANALYSIS_CONFIGURER,
+						"backends." + BACKEND_NAME + "." + LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer
 				)
 				.withIndex(

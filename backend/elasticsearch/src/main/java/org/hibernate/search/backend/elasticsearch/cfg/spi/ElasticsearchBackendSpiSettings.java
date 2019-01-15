@@ -13,9 +13,9 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 /**
  * Configuration properties for the Elasticsearch backend that are considered SPI (and not API).
  */
-public final class SearchBackendElasticsearchSpiSettings {
+public final class ElasticsearchBackendSpiSettings {
 
-	private SearchBackendElasticsearchSpiSettings() {
+	private ElasticsearchBackendSpiSettings() {
 	}
 
 	public static final String CLIENT_FACTORY = "client_factory";

@@ -21,7 +21,7 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -42,21 +42,21 @@ public class HibernateSearchIntegrator implements Integrator {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> AUTOREGISTER_LISTENERS =
-			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.AUTOREGISTER_LISTENERS )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOREGISTER_LISTENERS )
 					.asBoolean()
-					.withDefault( SearchOrmSettings.Defaults.AUTOREGISTER_LISTENERS )
+					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOREGISTER_LISTENERS )
 					.build();
 
 	private static final ConfigurationProperty<IndexingStrategyConfiguration> INDEXING_MODE =
-			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.INDEXING_STRATEGY )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY )
 					.as( IndexingStrategyConfiguration.class, IndexingStrategyConfiguration::fromExternalRepresentation )
-					.withDefault( SearchOrmSettings.Defaults.INDEXING_STRATEGY )
+					.withDefault( HibernateOrmMapperSettings.Defaults.INDEXING_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DIRTY_PROCESSING_ENABLED =
-			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_DIRTY_CHECK )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLE_DIRTY_CHECK )
 					.asBoolean()
-					.withDefault( SearchOrmSettings.Defaults.ENABLE_DIRTY_CHECK )
+					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_DIRTY_CHECK )
 					.build();
 
 	@Override

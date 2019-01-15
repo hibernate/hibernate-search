@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
  */
-public final class SearchOrmSettings {
+public final class HibernateOrmMapperSettings {
 
 	public static final String PREFIX = "hibernate.search.";
 
@@ -87,7 +87,7 @@ public final class SearchOrmSettings {
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}
 
-	private SearchOrmSettings() {
+	private HibernateOrmMapperSettings() {
 	}
 
 }

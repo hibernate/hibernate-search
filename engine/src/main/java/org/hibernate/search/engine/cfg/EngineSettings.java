@@ -16,9 +16,9 @@ import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 /**
  * Configuration properties for the Hibernate Search engine.
  */
-public final class SearchEngineSettings {
+public final class EngineSettings {
 
-	private SearchEngineSettings() {
+	private EngineSettings() {
 	}
 
 	/**
