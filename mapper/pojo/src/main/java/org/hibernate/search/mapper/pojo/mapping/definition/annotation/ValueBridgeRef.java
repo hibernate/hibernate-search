@@ -12,8 +12,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 /**
+ * Reference to the value bridge to use for a not-identifier field.
+ * <p>
+ * Either a bridge or a bridge builder can be provided, but never both.
+ * Reference can be obtained using either a name or a type.
+ * <p>
+ * At the moment, a not-identifier field could be either {@link GenericField} or a {@link KeywordField} or a {@link FullTextField}.
+ *
  * @author Yoann Rodiere
  */
 @Documented
@@ -21,15 +29,47 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValueBridgeRef {
 
+	/**
+	 * Provide the bridge name to get the bridge reference.
+	 *
+	 * @return the bridge name
+	 */
 	String name() default "";
 
-	Class<? extends ValueBridge<?, ?>> type() default UndefinedImplementationType.class;
+	/**
+	 * Provide the bridge type to get the bridge reference.
+	 *
+	 * @return the bridge type
+	 */
+	Class<? extends ValueBridge<?, ?>> type() default UndefinedBridgeImplementationType.class;
+
+	/**
+	 * Provide the builder bridge name to get the bridge reference.
+	 *
+	 * @return the bridge builder name
+	 */
+	String builderName() default "";
+
+	/**
+	 * Provide the builder bridge type to get the bridge reference.
+	 *
+	 * @return the bridge builder type
+	 */
+	Class<? extends BridgeBuilder<? extends ValueBridge<?, ?>>> builderType() default UndefinedBuilderImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedImplementationType implements ValueBridge<Object, Object> {
-		private UndefinedImplementationType() {
+	abstract class UndefinedBridgeImplementationType implements ValueBridge<Object, Object> {
+		private UndefinedBridgeImplementationType() {
+		}
+	}
+
+	/**
+	 * Class used as a marker for the default value of the {@link #builderType()} attribute.
+	 */
+	abstract class UndefinedBuilderImplementationType implements BridgeBuilder<ValueBridge<Object, Object>> {
+		private UndefinedBuilderImplementationType() {
 		}
 	}
 }

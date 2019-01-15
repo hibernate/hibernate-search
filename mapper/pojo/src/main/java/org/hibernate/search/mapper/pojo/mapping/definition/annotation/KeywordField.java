@@ -65,15 +65,9 @@ public @interface KeywordField {
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
-	 * @see GenericField#valueBridge()
+	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;
-
-	/**
-	 * @return A reference to the builder to use to build a value bridge for this field.
-	 * @see GenericField#valueBridgeBuilder()
-	 */
-	ValueBridgeBuilderBeanReference valueBridgeBuilder() default @ValueBridgeBuilderBeanReference;
 
 	/**
 	 * @return An array of reference to container value extractor implementation classes.

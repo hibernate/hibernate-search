@@ -49,17 +49,9 @@ public @interface GenericField {
 
 	/**
 	 * @return A reference to the value bridge to use for this field.
-	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridgeBuilder()}:
-	 * either a bridge or a bridge builder can be provided, but never both.
+	 * @see ValueBridgeRef
 	 */
 	ValueBridgeRef valueBridge() default @ValueBridgeRef;
-
-	/**
-	 * @return A reference to the builder to use to build a value bridge for this field.
-	 * Cannot be used in the same {@code @GenericField} annotation as {@link #valueBridge()}:
-	 * either a bridge or a bridge builder can be provided, but never both.
-	 */
-	ValueBridgeBuilderBeanReference valueBridgeBuilder() default @ValueBridgeBuilderBeanReference;
 
 	/**
 	 * @return An array of reference to container value extractor implementation classes,

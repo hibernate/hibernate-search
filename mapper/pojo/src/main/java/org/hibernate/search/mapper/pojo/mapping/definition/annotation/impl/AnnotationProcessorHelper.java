@@ -43,11 +43,9 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IdentifierBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -124,14 +122,13 @@ class AnnotationProcessorHelper {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = toBeanReference(
 				IdentifierBridge.class,
-				IdentifierBridgeRef.UndefinedImplementationType.class,
+				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
-		IdentifierBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation = annotation.identifierBridgeBuilder();
 		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
 				BridgeBuilder.class,
-				IdentifierBridgeBuilderBeanReference.UndefinedImplementationType.class,
-				bridgeBuilderReferenceAnnotation.type(), bridgeBuilderReferenceAnnotation.name()
+				IdentifierBridgeRef.UndefinedBuilderImplementationType.class,
+				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 		);
 
 		if ( bridgeReference.isPresent() && bridgeBuilderReference.isPresent() ) {
@@ -230,17 +227,16 @@ class AnnotationProcessorHelper {
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	BridgeBuilder<? extends ValueBridge<?, ?>> createValueBridgeBuilder(
 			ValueBridgeRef bridgeReferenceAnnotation,
-			ValueBridgeBuilderBeanReference bridgeBuilderReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
 				ValueBridge.class,
-				ValueBridgeRef.UndefinedImplementationType.class,
+				ValueBridgeRef.UndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
 		Optional<BeanReference<? extends BridgeBuilder>> bridgeBuilderReference = toBeanReference(
 				BridgeBuilder.class,
-				ValueBridgeBuilderBeanReference.UndefinedImplementationType.class,
-				bridgeBuilderReferenceAnnotation.type(), bridgeBuilderReferenceAnnotation.name()
+				ValueBridgeRef.UndefinedBuilderImplementationType.class,
+				bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 		);
 
 		if ( bridgeReference.isPresent() && bridgeBuilderReference.isPresent() ) {

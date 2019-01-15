@@ -41,7 +41,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
@@ -277,11 +276,6 @@ class AnnotationProcessorProvider {
 		}
 
 		@Override
-		ValueBridgeBuilderBeanReference getValueBridgeBuilder(GenericField annotation) {
-			return annotation.valueBridgeBuilder();
-		}
-
-		@Override
 		ContainerExtractorRef[] getExtractors(GenericField annotation) {
 			return annotation.extractors();
 		}
@@ -312,11 +306,6 @@ class AnnotationProcessorProvider {
 		@Override
 		ValueBridgeRef getValueBridge(FullTextField annotation) {
 			return annotation.valueBridge();
-		}
-
-		@Override
-		ValueBridgeBuilderBeanReference getValueBridgeBuilder(FullTextField annotation) {
-			return annotation.valueBridgeBuilder();
 		}
 
 		@Override
@@ -359,11 +348,6 @@ class AnnotationProcessorProvider {
 		@Override
 		ValueBridgeRef getValueBridge(KeywordField annotation) {
 			return annotation.valueBridge();
-		}
-
-		@Override
-		ValueBridgeBuilderBeanReference getValueBridgeBuilder(KeywordField annotation) {
-			return annotation.valueBridgeBuilder();
 		}
 
 		@Override

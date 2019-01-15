@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerValueExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ValueBridgeBuilderBeanReference;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -48,7 +47,6 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 		BridgeBuilder<? extends ValueBridge<?, ?>> builder = helper.createValueBridgeBuilder(
 				getValueBridge( annotation ),
-				getValueBridgeBuilder( annotation ),
 				propertyModel
 		);
 		fieldContext.valueBridge( builder );
@@ -71,8 +69,6 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	abstract Projectable getProjectable(A annotation);
 
 	abstract ValueBridgeRef getValueBridge(A annotation);
-
-	abstract ValueBridgeBuilderBeanReference getValueBridgeBuilder(A annotation);
 
 	abstract ContainerExtractorRef[] getExtractors(A annotation);
 }
