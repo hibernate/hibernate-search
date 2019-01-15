@@ -19,7 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.hibernate.SessionFactory;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
@@ -67,7 +67,7 @@ public class ProgrammaticMappingAccessTypeIT {
 		backendMock.expectSchema( IndexedEntityWithoutIdSetter.INDEX, b -> { } );
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withProperty( SearchOrmSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
+				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, new MyMappingConfigurer() )
 				.setup(
 						IndexedEntity.class,
 						ParentIndexedEntity.class,

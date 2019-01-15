@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
@@ -45,7 +45,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 						.failure(
 								ANALYSIS_CONFIGURER_ERROR_MESSAGE_PREFIX,
 								"Unable to convert configuration property 'backends." + BACKEND_NAME
-										+ "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER + "'",
+										+ "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER + "'",
 								"'foobar'",
 								"Unable to find " + ElasticsearchAnalysisConfigurer.class.getName() + " implementation class: foobar"
 						)
@@ -348,7 +348,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 	private void setup(String analysisConfigurer, Consumer<IndexModelBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withProperty(
-						"backends." + BACKEND_NAME + "." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						"backends." + BACKEND_NAME + "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						analysisConfigurer
 				)
 				.withIndex(

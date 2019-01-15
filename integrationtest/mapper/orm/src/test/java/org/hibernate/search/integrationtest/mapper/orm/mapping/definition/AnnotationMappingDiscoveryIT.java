@@ -20,7 +20,7 @@ import javax.persistence.Id;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -80,7 +80,7 @@ public class AnnotationMappingDiscoveryIT {
 
 		ormSetupHelper.withBackendMock( backendMock )
 				.withProperty(
-						SearchOrmSettings.MAPPING_CONFIGURER,
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
 							public void configure(HibernateOrmMappingDefinitionContainerContext context) {
@@ -118,9 +118,9 @@ public class AnnotationMappingDiscoveryIT {
 		);
 
 		ormSetupHelper.withBackendMock( backendMock )
-				.withProperty( SearchOrmSettings.ENABLE_ANNOTATION_MAPPING, "false" )
+				.withProperty( HibernateOrmMapperSettings.ENABLE_ANNOTATION_MAPPING, "false" )
 				.withProperty(
-						SearchOrmSettings.MAPPING_CONFIGURER,
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
 						new HibernateOrmSearchMappingConfigurer() {
 							@Override
 							public void configure(HibernateOrmMappingDefinitionContainerContext context) {

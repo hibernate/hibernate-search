@@ -39,7 +39,7 @@ public enum IndexingStrategyConfiguration {
 
 	/**
 	 * Returns the {@link IndexingStrategyConfiguration} matching the given external representation as specified via
-	 * {@link SearchOrmSettings#INDEXING_STRATEGY}
+	 * {@link HibernateOrmMapperSettings#INDEXING_STRATEGY}
 	 * @param indexingMode the indexing mode external representation
 	 * @return the {@link IndexingStrategyConfiguration}
 	 */

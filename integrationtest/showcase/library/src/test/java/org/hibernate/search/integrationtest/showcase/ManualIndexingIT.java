@@ -22,7 +22,7 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.integrationtest.showcase.library.dao.DaoFactory;
@@ -41,7 +41,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -54,7 +54,7 @@ import org.junit.Test;
 
 public class ManualIndexingIT {
 
-	private static final String PREFIX = SearchOrmSettings.PREFIX;
+	private static final String PREFIX = HibernateOrmMapperSettings.PREFIX;
 	private static final int NUMBER_OF_BOOKS = 200;
 
 	private final DaoFactory daoFactory;
@@ -72,12 +72,12 @@ public class ManualIndexingIT {
 				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
-						PREFIX + "backends.elasticsearchBackend_1." + SearchBackendElasticsearchSettings.ANALYSIS_CONFIGURER,
+						PREFIX + "backends.elasticsearchBackend_1." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new LibraryAnalysisConfigurer()
 				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP )
 				// disable auto indexing:
-				.applySetting( SearchOrmSettings.INDEXING_STRATEGY, IndexingStrategyConfiguration.MANUAL );
+				.applySetting( HibernateOrmMapperSettings.INDEXING_STRATEGY, IndexingStrategyConfiguration.MANUAL );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 

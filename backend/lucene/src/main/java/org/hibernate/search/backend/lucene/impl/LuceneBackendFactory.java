@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponent
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.InitialLuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
-import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
@@ -51,29 +51,29 @@ public class LuceneBackendFactory implements BackendFactory {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Optional<Version>> LUCENE_VERSION =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.LUCENE_VERSION )
+			ConfigurationProperty.forKey( LuceneBackendSettings.LUCENE_VERSION )
 					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> DIRECTORY_PROVIDER =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.DIRECTORY_PROVIDER )
+			ConfigurationProperty.forKey( LuceneBackendSettings.DIRECTORY_PROVIDER )
 					.asString()
 					.build();
 
 	private static final ConfigurationProperty<Path> ROOT_DIRECTORY =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ROOT_DIRECTORY )
+			ConfigurationProperty.forKey( LuceneBackendSettings.ROOT_DIRECTORY )
 					.as( Path.class, Paths::get )
 					.withDefault( () -> Paths.get( "." ) )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.MULTI_TENANCY_STRATEGY )
+			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
-					.withDefault( SearchBackendLuceneSettings.Defaults.MULTI_TENANCY_STRATEGY )
+					.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends LuceneAnalysisConfigurer>> ANALYSIS_CONFIGURER =
-			ConfigurationProperty.forKey( SearchBackendLuceneSettings.ANALYSIS_CONFIGURER )
+			ConfigurationProperty.forKey( LuceneBackendSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( LuceneAnalysisConfigurer.class )
 					.build();
 
@@ -111,7 +111,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			}
 		}
 		else {
-			Version latestVersion = SearchBackendLuceneSettings.Defaults.LUCENE_VERSION;
+			Version latestVersion = LuceneBackendSettings.Defaults.LUCENE_VERSION;
 			log.recommendConfiguringLuceneVersion(
 					LUCENE_VERSION.resolveOrRaw( propertySource ),
 					latestVersion,

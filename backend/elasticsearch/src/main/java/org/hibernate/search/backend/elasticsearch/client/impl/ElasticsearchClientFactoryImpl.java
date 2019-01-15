@@ -22,7 +22,7 @@ import org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
 import org.elasticsearch.client.sniff.NodesSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -38,67 +38,67 @@ import org.hibernate.search.util.impl.common.SearchThreadFactory;
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
 	private static final ConfigurationProperty<List<String>> HOST =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.HOST )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOST )
 					.asString().multivalued( Pattern.compile( "\\s+" ) )
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.HOST )
+					.withDefault( ElasticsearchBackendSettings.Defaults.HOST )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> USERNAME =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.USERNAME )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.USERNAME )
 					.asString()
 					.build();
 
 	private static final OptionalConfigurationProperty<String> PASSWORD =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.PASSWORD )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PASSWORD )
 					.asString()
 					.build();
 
 	private static final ConfigurationProperty<Integer> REQUEST_TIMEOUT =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.REQUEST_TIMEOUT )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.REQUEST_TIMEOUT )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.REQUEST_TIMEOUT )
+					.withDefault( ElasticsearchBackendSettings.Defaults.REQUEST_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> READ_TIMEOUT =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.READ_TIMEOUT )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.READ_TIMEOUT )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.READ_TIMEOUT )
+					.withDefault( ElasticsearchBackendSettings.Defaults.READ_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> CONNECTION_TIMEOUT =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.CONNECTION_TIMEOUT )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.CONNECTION_TIMEOUT )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.CONNECTION_TIMEOUT )
+					.withDefault( ElasticsearchBackendSettings.Defaults.CONNECTION_TIMEOUT )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.MAX_TOTAL_CONNECTION )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_TOTAL_CONNECTION )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.MAX_TOTAL_CONNECTION )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_TOTAL_CONNECTION )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.MAX_TOTAL_CONNECTION_PER_ROUTE )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_TOTAL_CONNECTION_PER_ROUTE )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DISCOVERY_ENABLED =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.DISCOVERY_ENABLED )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DISCOVERY_ENABLED )
 					.asBoolean()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.DISCOVERY_ENABLED )
+					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<Integer> DISCOVERY_REFRESH_INTERVAL =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.DISCOVERY_REFRESH_INTERVAL )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DISCOVERY_REFRESH_INTERVAL )
 					.asInteger()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
+					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
 	private static final ConfigurationProperty<String> DISCOVERY_SCHEME =
-			ConfigurationProperty.forKey( SearchBackendElasticsearchSettings.DISCOVERY_SCHEME )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DISCOVERY_SCHEME )
 					.asString()
-					.withDefault( SearchBackendElasticsearchSettings.Defaults.DISCOVERY_SCHEME )
+					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_SCHEME )
 					.build();
 
 	/* TODO ElasticsearchHttpClientConfigurer

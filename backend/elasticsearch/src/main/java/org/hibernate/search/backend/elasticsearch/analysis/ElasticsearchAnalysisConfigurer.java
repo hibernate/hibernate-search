@@ -7,14 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.analysis;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.elasticsearch.cfg.SearchBackendElasticsearchSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 
 /**
  * An object responsible for configuring analysis in an Elasticsearch backend,
  * providing analysis-related definitions that can be referenced from the mapping.
  * <p>
  * Users can select an analysis configurer through the
- * {@link SearchBackendElasticsearchSettings#ANALYSIS_CONFIGURER configuration properties}.
+ * {@link ElasticsearchBackendSettings#ANALYSIS_CONFIGURER configuration properties}.
  *
  * @author Yoann Rodiere
  */

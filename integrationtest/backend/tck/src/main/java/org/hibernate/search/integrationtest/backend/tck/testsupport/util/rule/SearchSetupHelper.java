@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.cfg.SearchEngineSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
@@ -56,7 +56,7 @@ public class SearchSetupHelper implements TestRule {
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
 
 		return new SetupContext( propertySource )
-				.withProperty( SearchEngineSettings.DEFAULT_BACKEND, backendName );
+				.withProperty( EngineSettings.DEFAULT_BACKEND, backendName );
 	}
 
 	@Override
@@ -101,7 +101,7 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext withBackendProperty(String backendName, String keyRadical, Object value) {
-			return withProperty( SearchEngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
+			return withProperty( EngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
 		}
 
 		public SetupContext withIndex(String typeName, String rawIndexName,

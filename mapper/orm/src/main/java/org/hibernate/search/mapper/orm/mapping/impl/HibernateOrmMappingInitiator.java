@@ -22,7 +22,7 @@ import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -42,13 +42,13 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		implements HibernateOrmMappingDefinitionContainerContext {
 
 	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
-			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLE_ANNOTATION_MAPPING )
 					.asBoolean()
-					.withDefault( SearchOrmSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
+					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_ANNOTATION_MAPPING )
 					.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends HibernateOrmSearchMappingConfigurer>> MAPPING_CONFIGURER =
-			ConfigurationProperty.forKey( SearchOrmSettings.Radicals.MAPPING_CONFIGURER )
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.MAPPING_CONFIGURER )
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
 

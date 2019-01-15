@@ -11,9 +11,9 @@ import org.apache.lucene.util.Version;
 /**
  * Configuration properties for Lucene,
  */
-public final class SearchBackendLuceneSettings {
+public final class LuceneBackendSettings {
 
-	private SearchBackendLuceneSettings() {
+	private LuceneBackendSettings() {
 	}
 
 	/**

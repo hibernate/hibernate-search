@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.analysis;
 
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisDefinitionContainerContext;
-import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 
 /**
  * A provider of analysis-related definitions that can be referenced from the mapping,
@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.cfg.SearchBackendLuceneSettings;
  * or {@literal @Normalizer(definition = "some-other-name")}.
  * <p>
  * Users can select a definition provider through the
- * {@link SearchBackendLuceneSettings#ANALYSIS_CONFIGURER configuration properties}.
+ * {@link LuceneBackendSettings#ANALYSIS_CONFIGURER configuration properties}.
  *
  * @author Yoann Rodiere
  */

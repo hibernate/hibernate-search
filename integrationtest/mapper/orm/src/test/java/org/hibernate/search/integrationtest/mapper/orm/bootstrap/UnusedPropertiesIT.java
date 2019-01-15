@@ -11,8 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.search.engine.cfg.SearchEngineSettings;
-import org.hibernate.search.mapper.orm.cfg.SearchOrmSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -25,7 +25,7 @@ import org.junit.Test;
 
 public class UnusedPropertiesIT {
 
-	private static final String DEFAULT_BACKEND_PROPERTY_KEY = SearchOrmSettings.PREFIX + "." + SearchEngineSettings.DEFAULT_BACKEND;
+	private static final String DEFAULT_BACKEND_PROPERTY_KEY = HibernateOrmMapperSettings.PREFIX + "." + EngineSettings.DEFAULT_BACKEND;
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -44,7 +44,7 @@ public class UnusedPropertiesIT {
 		);
 		log.expectMessage( "Configuration property tracking is disabled" );
 		setup( builder -> {
-			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
+			builder.setProperty( HibernateOrmMapperSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
 			builder.setProperty( unusedPropertyKey, "bar" );
 		} );
 	}
@@ -78,7 +78,7 @@ public class UnusedPropertiesIT {
 		log.expectMessageMissing( "Some properties in the Hibernate Search configuration were not used" );
 		log.expectMessageMissing( "Configuration property tracking is disabled" );
 		setup( builder -> {
-			builder.setProperty( SearchOrmSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
+			builder.setProperty( HibernateOrmMapperSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, true );
 		} );
 	}
 
