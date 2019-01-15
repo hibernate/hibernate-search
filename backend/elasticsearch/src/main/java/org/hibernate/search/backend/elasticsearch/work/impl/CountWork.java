@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -87,7 +86,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 			}
 
 			if ( !routingKeys.isEmpty() ) {
-				builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+				builder.multiValuedParam( "routing", routingKeys );
 			}
 
 			return builder.build();

@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -132,6 +133,10 @@ public final class ElasticsearchRequest {
 
 		public Builder param(String name, boolean value) {
 			return param( name, String.valueOf( value ) );
+		}
+
+		public Builder multiValuedParam(String name, Collection<String> values) {
+			return param( name, String.join( ",", values ) );
 		}
 
 		public Builder body(JsonObject object) {

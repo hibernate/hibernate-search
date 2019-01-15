@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -121,7 +120,7 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 			}
 
 			if ( !routingKeys.isEmpty() ) {
-				builder.param( "routing", routingKeys.stream().collect( Collectors.joining( "," ) ) );
+				builder.multiValuedParam( "routing", routingKeys );
 			}
 
 			return builder.build();
