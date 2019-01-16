@@ -50,21 +50,22 @@ class LuceneIndexManagerImpl
 	private final String indexName;
 	private final LuceneIndexModel model;
 
-	private final LuceneIndexWorkOrchestrator workPlanOrchestrator;
-	private final LuceneIndexWorkOrchestrator streamOrchestrator;
+	private final LuceneIndexWorkOrchestrator serialOrchestrator;
+	private final LuceneIndexWorkOrchestrator parallelOrchestrator;
 	private final IndexWriter indexWriter;
 
 	LuceneIndexManagerImpl(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
-			String indexName, LuceneIndexModel model, IndexWriter indexWriter) {
+			String indexName, LuceneIndexModel model,
+			IndexWriter indexWriter) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
 		this.indexName = indexName;
 		this.model = model;
 
-		this.workPlanOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
-		this.streamOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
+		this.serialOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
+		this.parallelOrchestrator = new LuceneStubIndexWorkOrchestrator( indexWriter );
 		this.indexWriter = indexWriter;
 	}
 
@@ -74,17 +75,17 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createWorkPlan( workPlanOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createWorkPlan( serialOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
 	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( streamOrchestrator, indexName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, indexName, sessionContext );
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( streamOrchestrator, indexName );
+		return indexingBackendContext.createWorkExecutor( parallelOrchestrator, indexName );
 	}
 
 	@Override
@@ -116,8 +117,8 @@ class LuceneIndexManagerImpl
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneIndexWorkOrchestrator::close, workPlanOrchestrator );
-			closer.push( LuceneIndexWorkOrchestrator::close, streamOrchestrator );
+			closer.push( LuceneIndexWorkOrchestrator::close, serialOrchestrator );
+			closer.push( LuceneIndexWorkOrchestrator::close, parallelOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexWriter::close, indexWriter );
 			closer.push( LuceneIndexModel::close, model );

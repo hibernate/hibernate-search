@@ -68,18 +68,18 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
-		// create a stream orchestrator instance for each index,
-		// it is supposed to be closed by the index manager we're building now
-		ElasticsearchWorkOrchestrator streamOrchestrator = indexingBackendContext.createStreamOrchestrator( elasticsearchIndexName );
+		ElasticsearchWorkOrchestrator parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName );
+		ElasticsearchWorkOrchestrator serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName, refreshAfterWrite );
 
 		// TODO make sure index initialization is performed in parallel for all indexes?
-		indexingBackendContext.initializeIndex( streamOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
+		indexingBackendContext.initializeIndex( parallelOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
 				.join();
 
-		return new ElasticsearchIndexManagerImpl( streamOrchestrator,
+		return new ElasticsearchIndexManagerImpl(
 				indexingBackendContext, searchBackendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
 				encodedTypeName, model,
+				serialOrchestrator, parallelOrchestrator,
 				refreshAfterWrite
 		);
 	}

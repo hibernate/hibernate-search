@@ -46,13 +46,14 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
+	private final ElasticsearchWorkOrchestrator serialOrchestrator;
+	private final ElasticsearchWorkOrchestrator parallelOrchestrator;
 	private final boolean refreshAfterWrite;
-	private final ElasticsearchWorkOrchestrator workPlanOrchestrator;
-	private final ElasticsearchWorkOrchestrator streamOrchestrator;
 
-	ElasticsearchIndexManagerImpl(ElasticsearchWorkOrchestrator streamOrchestrator, IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
-			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
+	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
+			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,URLEncodedString typeName,
 			ElasticsearchIndexModel model,
+			ElasticsearchWorkOrchestrator serialOrchestrator, ElasticsearchWorkOrchestrator parallelOrchestrator,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
@@ -60,17 +61,16 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.typeName = typeName;
 		this.model = model;
+		this.serialOrchestrator = serialOrchestrator;
+		this.parallelOrchestrator = parallelOrchestrator;
 		this.refreshAfterWrite = refreshAfterWrite;
-		this.workPlanOrchestrator = indexingBackendContext.createWorkPlanOrchestrator( elasticsearchIndexName.encoded, refreshAfterWrite );
-		this.streamOrchestrator = streamOrchestrator;
 	}
 
 	@Override
 	public void close() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			// Index managers own the work plan context, but not the stream context (which is shared)
-			closer.push( ElasticsearchWorkOrchestrator::close, workPlanOrchestrator );
-			closer.push( ElasticsearchWorkOrchestrator::close, streamOrchestrator );
+			closer.push( ElasticsearchWorkOrchestrator::close, serialOrchestrator );
+			closer.push( ElasticsearchWorkOrchestrator::close, parallelOrchestrator );
 		}
 		catch (IOException e) {
 			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, indexingBackendContext.getEventContext() );
@@ -84,7 +84,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	@Override
 	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
 		return indexingBackendContext.createWorkPlan(
-				workPlanOrchestrator,
+				serialOrchestrator,
 				elasticsearchIndexName, typeName,
 				refreshAfterWrite,
 				sessionContext
@@ -93,12 +93,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( streamOrchestrator, elasticsearchIndexName, typeName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, elasticsearchIndexName, typeName, sessionContext );
 	}
 
 	@Override
 	public IndexWorkExecutor createWorkExecutor() {
-		return indexingBackendContext.createWorkExecutor( streamOrchestrator, elasticsearchIndexName );
+		return indexingBackendContext.createWorkExecutor( parallelOrchestrator, elasticsearchIndexName );
 	}
 
 	@Override
