@@ -26,6 +26,6 @@ public interface ElasticsearchSchemaMigrator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void migrate(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void migrate(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 }

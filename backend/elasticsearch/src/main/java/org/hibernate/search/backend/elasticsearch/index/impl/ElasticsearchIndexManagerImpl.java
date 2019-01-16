@@ -12,6 +12,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
@@ -50,9 +52,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final ElasticsearchWorkOrchestrator parallelOrchestrator;
 	private final boolean refreshAfterWrite;
 
+	private final ElasticsearchIndexManagementStrategy managementStrategy;
+	private final ElasticsearchIndexAdministrationClient administrationClient;
+
 	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,URLEncodedString typeName,
 			ElasticsearchIndexModel model,
+			ElasticsearchIndexManagementStrategy managementStrategy,
 			ElasticsearchWorkOrchestrator serialOrchestrator, ElasticsearchWorkOrchestrator parallelOrchestrator,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
@@ -64,6 +70,14 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.serialOrchestrator = serialOrchestrator;
 		this.parallelOrchestrator = parallelOrchestrator;
 		this.refreshAfterWrite = refreshAfterWrite;
+		this.managementStrategy = managementStrategy;
+		this.administrationClient = indexingBackendContext.createAdministrationClient(
+				elasticsearchIndexName, typeName, model
+		);
+	}
+
+	public void start() {
+		managementStrategy.onStart( administrationClient );
 	}
 
 	@Override
@@ -71,6 +85,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchWorkOrchestrator::close, serialOrchestrator );
 			closer.push( ElasticsearchWorkOrchestrator::close, parallelOrchestrator );
+			closer.push( strategy -> strategy.onStop( administrationClient ), managementStrategy );
 		}
 		catch (IOException e) {
 			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, indexingBackendContext.getEventContext() );

@@ -7,9 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.impl.common.LoggerFactory;
@@ -31,7 +29,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
 		schemaAccessor.createIndex( indexName, indexMetadata.getSettings(), executionOptions );
@@ -40,7 +38,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
 		boolean created = false;
@@ -55,7 +53,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void checkIndexExists(URLEncodedString indexName, ExecutionOptions executionOptions) {
+	public void checkIndexExists(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		if ( schemaAccessor.indexExists( indexName ) ) {
 			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
 		}
@@ -65,7 +63,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void createMapping(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void createMapping(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 		URLEncodedString typeName = indexMetadata.getTypeName();
 		schemaAccessor.putMapping( indexName, typeName, indexMetadata.getMapping() );

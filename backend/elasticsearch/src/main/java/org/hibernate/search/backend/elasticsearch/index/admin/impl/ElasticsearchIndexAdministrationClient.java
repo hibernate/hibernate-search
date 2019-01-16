@@ -1,0 +1,75 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.backend.elasticsearch.index.admin.impl;
+
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+
+/**
+ * The administration client for a given Elasticsearch index.
+ * <p>
+ * This interface is split from the rest of the code because we may one day expose these operations to users
+ * (so that they can manage index updates more finely).
+ */
+public class ElasticsearchIndexAdministrationClient {
+
+	private final ElasticsearchSchemaCreator schemaCreator;
+	private final ElasticsearchSchemaDropper schemaDropper;
+	private final ElasticsearchSchemaValidator schemaValidator;
+	private final ElasticsearchSchemaMigrator schemaMigrator;
+
+	private final URLEncodedString elasticsearchIndexName;
+	private final IndexMetadata expectedMetadata;
+
+	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchWorkOrchestrator workOrchestrator,
+			URLEncodedString elasticsearchIndexName,
+			IndexMetadata expectedMetadata) {
+		ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( workFactory, workOrchestrator );
+
+		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor );
+		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );
+		this.schemaValidator = new ElasticsearchSchemaValidatorImpl( schemaAccessor );
+		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );
+
+		this.elasticsearchIndexName = elasticsearchIndexName;
+		this.expectedMetadata = expectedMetadata;
+	}
+
+	public void createIfAbsent(ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		boolean createdIndex = schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
+		if ( createdIndex ) {
+			schemaCreator.createMapping( expectedMetadata, executionOptions );
+		}
+	}
+
+	public void dropAndCreate(ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		schemaDropper.dropIfExisting( elasticsearchIndexName, executionOptions );
+		schemaCreator.createIndex( expectedMetadata, executionOptions );
+		schemaCreator.createMapping( expectedMetadata, executionOptions );
+	}
+
+	public void dropIfExisting(ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		schemaDropper.dropIfExisting( elasticsearchIndexName, executionOptions );
+	}
+
+	public void update(ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		boolean createdIndex = schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
+		if ( createdIndex ) {
+			schemaCreator.createMapping( expectedMetadata, executionOptions );
+		}
+		else {
+			schemaMigrator.migrate( expectedMetadata, executionOptions );
+		}
+	}
+
+	public void validate(ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		schemaCreator.checkIndexExists( elasticsearchIndexName, executionOptions );
+		schemaValidator.validate( expectedMetadata, executionOptions );
+	}
+}

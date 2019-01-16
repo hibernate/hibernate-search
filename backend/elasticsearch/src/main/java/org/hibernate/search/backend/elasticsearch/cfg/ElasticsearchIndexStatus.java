@@ -29,7 +29,7 @@ public enum ElasticsearchIndexStatus {
 		return elasticsearchString;
 	}
 
-	public static ElasticsearchIndexStatus fromString(String status) {
+	public static ElasticsearchIndexStatus fromExternalRepresentation(String status) {
 		for ( ElasticsearchIndexStatus indexStatus : ElasticsearchIndexStatus.values() ) {
 			if ( indexStatus.getElasticsearchString().equalsIgnoreCase( status ) ) {
 				return indexStatus;

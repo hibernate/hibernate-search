@@ -22,12 +22,12 @@ public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDroppe
 	}
 
 	@Override
-	public void drop(URLEncodedString indexName, ExecutionOptions executionOptions) {
+	public void drop(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		schemaAccessor.dropIndex( indexName, executionOptions );
 	}
 
 	@Override
-	public void dropIfExisting(URLEncodedString indexName, ExecutionOptions executionOptions) {
+	public void dropIfExisting(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		// Not actually needed, but do it to avoid cluttering the ES log
 		if ( ! schemaAccessor.indexExists( indexName ) ) {
 			return;
