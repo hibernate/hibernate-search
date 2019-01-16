@@ -25,6 +25,8 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -137,6 +139,15 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.type", ElasticsearchBackendFactory.class.getName() )
 				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
+				.applySetting(
+						PREFIX + "backends.elasticsearchBackend_1.index_defaults.management.strategy",
+						ElasticsearchIndexManagementStrategyConfiguration.DROP_AND_CREATE_AND_DROP
+				)
+				.applySetting(
+						// Make this test work even if there is only a single node in the cluster
+						PREFIX + "backends.elasticsearchBackend_1.index_defaults.management.required_status",
+						ElasticsearchIndexStatus.YELLOW
+				)
 				.applySetting(
 						// TODO remove this and use an explicit refresh after initializing data instead
 						PREFIX + "backends.elasticsearchBackend_1.index_defaults.refresh_after_write", true
