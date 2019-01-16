@@ -24,14 +24,14 @@ public class JsonHelper {
 	}
 
 	public static void assertJsonEquals(String expectedJson, String actualJson) {
-		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.NON_EXTENSIBLE );
+		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.STRICT );
 	}
 
 	public static void assertJsonEqualsIgnoringUnknownFields(String expectedJson, String actualJson) {
-		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.LENIENT );
+		assertJsonEquals( expectedJson, actualJson, JSONCompareMode.STRICT_ORDER );
 	}
 
-	private static void assertJsonEquals(String expectedJson, String actualJson, JSONCompareMode mode) {
+	public static void assertJsonEquals(String expectedJson, String actualJson, JSONCompareMode mode) {
 		try {
 			JSONCompareResult result = JSONCompare.compareJSON( expectedJson, actualJson, mode );
 
