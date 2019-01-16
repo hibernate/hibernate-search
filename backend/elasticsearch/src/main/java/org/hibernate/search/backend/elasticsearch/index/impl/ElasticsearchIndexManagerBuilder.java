@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBacken
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 /**
  * @author Yoann Rodiere
@@ -68,20 +69,31 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
-		ElasticsearchWorkOrchestrator parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName );
-		ElasticsearchWorkOrchestrator serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName, refreshAfterWrite );
+		ElasticsearchWorkOrchestrator parallelOrchestrator = null;
+		ElasticsearchWorkOrchestrator serialOrchestrator = null;
 
-		// TODO make sure index initialization is performed in parallel for all indexes?
-		indexingBackendContext.initializeIndex( parallelOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
-				.join();
+		try {
+			parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName );
+			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName, refreshAfterWrite );
 
-		return new ElasticsearchIndexManagerImpl(
-				indexingBackendContext, searchBackendContext,
-				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				encodedTypeName, model,
-				serialOrchestrator, parallelOrchestrator,
-				refreshAfterWrite
-		);
+			// TODO make sure index initialization is performed in parallel for all indexes?
+			indexingBackendContext.initializeIndex( parallelOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
+					.join();
+
+			return new ElasticsearchIndexManagerImpl(
+					indexingBackendContext, searchBackendContext,
+					hibernateSearchIndexName, encodedElasticsearchIndexName,
+					encodedTypeName,model,
+					serialOrchestrator, parallelOrchestrator,
+					refreshAfterWrite
+			);
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( parallelOrchestrator )
+					.push( serialOrchestrator );
+			throw e;
+		}
 	}
 
 }
