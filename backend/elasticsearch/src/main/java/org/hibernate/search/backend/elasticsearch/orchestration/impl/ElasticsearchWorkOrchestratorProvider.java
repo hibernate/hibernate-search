@@ -147,6 +147,14 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	/**
+	 * @return The root parallel orchestrator. Useful to execute operations after an index manager was closed,
+	 * such as index dropping.
+	 */
+	public ElasticsearchBatchingSharedWorkOrchestrator getRootParallelOrchestrator() {
+		return rootParallelOrchestrator;
+	}
+
+	/**
 	 * @param name The name of the orchestrator to create.
 	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */

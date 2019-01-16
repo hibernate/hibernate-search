@@ -135,7 +135,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	@Override
-	public void validate(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
+	public void validate(IndexMetadata expectedIndexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
 		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );
@@ -167,7 +167,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	@Override
-	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
+	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
 		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );

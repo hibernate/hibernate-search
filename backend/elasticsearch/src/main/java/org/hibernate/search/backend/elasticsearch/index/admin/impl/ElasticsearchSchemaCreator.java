@@ -23,7 +23,7 @@ public interface ElasticsearchSchemaCreator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void createIndex(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 	/**
 	 * Create an index, but only if the index doesn't already exist.
@@ -33,7 +33,7 @@ public interface ElasticsearchSchemaCreator {
 	 * @return {@code true} if the index had to be created, {@code false} otherwise.
 	 * @throws SearchException If an error occurs.
 	 */
-	boolean createIndexIfAbsent(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 	/**
 	 * Checks that an index already exists.
@@ -42,7 +42,7 @@ public interface ElasticsearchSchemaCreator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
-	void checkIndexExists(URLEncodedString indexname, ExecutionOptions executionOptions);
+	void checkIndexExists(URLEncodedString indexname, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 	/**
 	 * Create the mapping on a supposedly existing index.
@@ -53,6 +53,6 @@ public interface ElasticsearchSchemaCreator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void createMapping(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void createMapping(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 }

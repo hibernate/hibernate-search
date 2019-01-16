@@ -41,7 +41,7 @@ public class ElasticsearchSchemaAccessor {
 		this.orchestrator = orchestrator;
 	}
 
-	public void createIndex(URLEncodedString indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+	public void createIndex(URLEncodedString indexName, IndexSettings settings, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.createIndex( indexName ).settings( settings ).build();
 		execute( work );
 	}
@@ -52,7 +52,7 @@ public class ElasticsearchSchemaAccessor {
 	 * @param executionOptions The execution options
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings, ExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.ignoreExisting()
@@ -115,9 +115,9 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void waitForIndexStatus(final URLEncodedString indexName, ExecutionOptions executionOptions) {
-		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredIndexStatus();
-		String timeoutAndUnit = executionOptions.getIndexManagementTimeoutInMs() + "ms";
+	public void waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
+		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
 		ElasticsearchWork<?> work =
 				workFactory.waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
@@ -126,12 +126,12 @@ public class ElasticsearchSchemaAccessor {
 		execute( work );
 	}
 
-	public void dropIndex(URLEncodedString indexName, ExecutionOptions executionOptions) {
+	public void dropIndex(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).build();
 		execute( work );
 	}
 
-	public void dropIndexIfExisting(URLEncodedString indexName, ExecutionOptions executionOptions) {
+	public void dropIndexIfExisting(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
 		execute( work );
 	}

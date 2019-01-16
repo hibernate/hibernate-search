@@ -12,9 +12,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexManagementExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
@@ -56,6 +60,24 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.REFRESH_AFTER_WRITE )
 					.asBoolean()
 					.withDefault( ElasticsearchIndexSettings.Defaults.REFRESH_AFTER_WRITE )
+					.build();
+
+	private static final ConfigurationProperty<ElasticsearchIndexManagementStrategyConfiguration> MANAGEMENT_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.MANAGEMENT_STRATEGY )
+					.as( ElasticsearchIndexManagementStrategyConfiguration.class, ElasticsearchIndexManagementStrategyConfiguration::fromExternalRepresentation )
+					.withDefault( ElasticsearchIndexSettings.Defaults.MANAGEMENT_STRATEGY )
+					.build();
+
+	private static final ConfigurationProperty<ElasticsearchIndexStatus> MANAGEMENT_REQUIRED_STATUS =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.MANAGEMENT_REQUIRED_STATUS )
+					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::fromExternalRepresentation )
+					.withDefault( ElasticsearchIndexSettings.Defaults.MANAGEMENT_REQUIRED_STATUS )
+					.build();
+
+	private static final ConfigurationProperty<Integer> MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
 	private final ElasticsearchClientImplementor client;
@@ -166,11 +188,24 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		boolean refreshAfterWrite = REFRESH_AFTER_WRITE.get( propertySource );
 
+		ElasticsearchIndexManagementStrategy managementStrategy = createIndexManagementStrategy( propertySource );
+
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
 				indexSchemaRootNodeBuilder, settingsBuilder,
+				managementStrategy,
 				refreshAfterWrite
+		);
+	}
+
+	private ElasticsearchIndexManagementStrategy createIndexManagementStrategy(ConfigurationPropertySource propertySource) {
+		return new ElasticsearchIndexManagementStrategy(
+				MANAGEMENT_STRATEGY.get( propertySource ),
+				new ElasticsearchIndexManagementExecutionOptions(
+					MANAGEMENT_REQUIRED_STATUS.get( propertySource ),
+					MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
+				)
 		);
 	}
 

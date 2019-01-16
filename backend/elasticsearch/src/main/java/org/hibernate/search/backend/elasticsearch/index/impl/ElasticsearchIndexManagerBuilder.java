@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexManagementStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
@@ -32,13 +33,16 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
+	private final ElasticsearchIndexManagementStrategy indexManagementStrategy;
 	private final boolean refreshAfterWrite;
+
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
+			ElasticsearchIndexManagementStrategy indexManagementStrategy,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
@@ -47,6 +51,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
+		this.indexManagementStrategy = indexManagementStrategy;
 		this.refreshAfterWrite = refreshAfterWrite;
 	}
 
@@ -71,27 +76,31 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 		ElasticsearchWorkOrchestrator parallelOrchestrator = null;
 		ElasticsearchWorkOrchestrator serialOrchestrator = null;
+		ElasticsearchIndexManagerImpl indexManager = null;
 
 		try {
 			parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName );
 			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName, refreshAfterWrite );
 
-			// TODO make sure index initialization is performed in parallel for all indexes?
-			indexingBackendContext.initializeIndex( parallelOrchestrator, encodedElasticsearchIndexName, encodedTypeName, model )
-					.join();
-
-			return new ElasticsearchIndexManagerImpl(
+			indexManager = new ElasticsearchIndexManagerImpl(
 					indexingBackendContext, searchBackendContext,
 					hibernateSearchIndexName, encodedElasticsearchIndexName,
-					encodedTypeName,model,
+					encodedTypeName, model,
+					indexManagementStrategy,
 					serialOrchestrator, parallelOrchestrator,
 					refreshAfterWrite
 			);
+
+			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
+			indexManager.start();
+
+			return indexManager;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( parallelOrchestrator )
-					.push( serialOrchestrator );
+					.push( serialOrchestrator )
+					.push( indexManager );
 			throw e;
 		}
 	}

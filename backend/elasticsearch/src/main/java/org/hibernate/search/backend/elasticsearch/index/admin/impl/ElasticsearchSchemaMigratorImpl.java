@@ -34,7 +34,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	}
 
 	@Override
-	public void migrate(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void migrate(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 		URLEncodedString typeName = indexMetadata.getTypeName();
 		IndexSettings settings = indexMetadata.getSettings();

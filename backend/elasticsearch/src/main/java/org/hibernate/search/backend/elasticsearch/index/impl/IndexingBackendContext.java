@@ -6,20 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.util.Arrays;
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.EventContext;
@@ -48,15 +45,17 @@ public class IndexingBackendContext {
 		return eventContext;
 	}
 
-	CompletableFuture<?> initializeIndex(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName, URLEncodedString typeName,
+	ElasticsearchIndexAdministrationClient createAdministrationClient(URLEncodedString indexName, URLEncodedString typeName,
 			ElasticsearchIndexModel model) {
-		ElasticsearchWork<?> dropWork = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
-		ElasticsearchWork<CreateIndexResult> createWork = workFactory.createIndex( indexName )
-				.settings( model.getSettings() )
-				.mapping( typeName, model.getMapping() )
-				.build();
-
-		return orchestrator.submit( Arrays.asList( dropWork, createWork ) );
+		IndexMetadata metadata = new IndexMetadata();
+		metadata.setName( model.getElasticsearchIndexName() );
+		metadata.setTypeName( typeName );
+		metadata.setSettings( model.getSettings() );
+		metadata.setMapping( model.getMapping() );
+		return new ElasticsearchIndexAdministrationClient(
+				workFactory, orchestratorProvider.getRootParallelOrchestrator(),
+				indexName, metadata
+		);
 	}
 
 	ElasticsearchWorkOrchestrator createSerialOrchestrator(String indexName, boolean refreshAfterWrite) {
