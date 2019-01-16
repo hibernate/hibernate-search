@@ -26,7 +26,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.impl.AnnotationInitializingBeanDelegatingBridgeBuilder;
@@ -196,7 +195,6 @@ class AnnotationProcessorHelper {
 	<A extends Annotation> BridgeBuilder<? extends TypeBridge> createTypeBridgeBuilder(A annotation) {
 		TypeBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( TypeBridgeMapping.class );
 		TypeBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
-		TypeBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
 
 		return createAnnotationMappedBridgeBuilder(
 				TypeBridge.class,
@@ -204,13 +202,13 @@ class AnnotationProcessorHelper {
 				annotation,
 				toBeanReference(
 						TypeBridge.class,
-						TypeBridgeRef.UndefinedImplementationType.class,
+						TypeBridgeRef.UndefinedBridgeImplementationType.class,
 						bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 				),
 				toBeanReference(
 						AnnotationBridgeBuilder.class,
-						TypeBridgeAnnotationBuilderReference.UndefinedImplementationType.class,
-						bridgeBuilderReferenceAnnotation.type(), bridgeBuilderReferenceAnnotation.name()
+						TypeBridgeRef.UndefinedBuilderImplementationType.class,
+						bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 				)
 		);
 	}

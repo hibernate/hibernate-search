@@ -17,8 +17,8 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 
 /**
  * Defines a GeoPoint bridge, mapping a latitude and longitude, in degrees,
@@ -66,8 +66,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 @PropertyBridgeMapping(builder = @PropertyBridgeAnnotationBuilderReference(
 		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
 ))
-@TypeBridgeMapping(builder = @TypeBridgeAnnotationBuilderReference(
-		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
+@TypeBridgeMapping(bridge = @TypeBridgeRef(
+		builderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
 ))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })

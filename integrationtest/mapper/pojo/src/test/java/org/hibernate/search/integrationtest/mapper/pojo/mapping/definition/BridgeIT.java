@@ -27,7 +27,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -190,7 +189,7 @@ public class BridgeIT {
 	@Test
 	public void typeBridgeMapping_error_missingBridgeReference() {
 		@Indexed
-		@BridgeAnnotationWithEmptyTypeBridgeMapping
+		@BridgeAnnotationWithEmptyTypeBridgeRef
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -205,9 +204,9 @@ public class BridgeIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.annotationContextAnyParameters( BridgeAnnotationWithEmptyTypeBridgeMapping.class )
+						.annotationContextAnyParameters( BridgeAnnotationWithEmptyTypeBridgeRef.class )
 						.failure(
-								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeMapping.class.getName()
+								"Annotation type '" + BridgeAnnotationWithEmptyTypeBridgeRef.class.getName()
 										+ "' is annotated with '" + TypeBridgeMapping.class.getName() + "',"
 										+ " but neither a bridge reference nor a bridge builder reference was provided."
 						)
@@ -217,8 +216,8 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping
-	private @interface BridgeAnnotationWithEmptyTypeBridgeMapping {
+	@TypeBridgeMapping(bridge = @TypeBridgeRef)
+	private @interface BridgeAnnotationWithEmptyTypeBridgeRef {
 	}
 
 	@Test
@@ -251,7 +250,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo"), builder = @TypeBridgeAnnotationBuilderReference(name = "bar"))
+	@TypeBridgeMapping(bridge = @TypeBridgeRef(name = "foo", builderName = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping {
 	}
 
