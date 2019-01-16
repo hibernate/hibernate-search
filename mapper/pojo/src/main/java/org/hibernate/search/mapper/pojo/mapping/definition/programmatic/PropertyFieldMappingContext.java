@@ -12,6 +12,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
 
 /**
  * @param <S> The "self" type, i.e. the type to return from methods.
@@ -43,6 +44,10 @@ public interface PropertyFieldMappingContext<S extends PropertyFieldMappingConte
 	default S withExtractor(
 			Class<? extends ContainerExtractor> extractorClass) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );
+	}
+
+	default S withExtractor(BuiltinContainerExtractor mapKey) {
+		return withExtractor( mapKey.getType() );
 	}
 
 	default S withoutExtractors() {

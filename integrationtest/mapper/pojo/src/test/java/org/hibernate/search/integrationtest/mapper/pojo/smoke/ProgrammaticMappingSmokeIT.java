@@ -201,7 +201,7 @@ public class ProgrammaticMappingSmokeIT {
 											PojoModelPath.fromRoot( "embeddingAsMap" )
 													.value( ContainerExtractorPath.defaultExtractors() )
 									)
-									.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractor.MAP_KEY.getType() )
+									.genericField( "embeddedMapKeys" ).withExtractor( BuiltinContainerExtractor.MAP_KEY )
 									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 				} )
 				.setup();
