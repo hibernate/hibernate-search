@@ -137,7 +137,8 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	@Override
 	public void validate(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
+		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
 		errorCollector.push( ValidationContextType.INDEX, indexName.original );
@@ -168,7 +169,8 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	@Override
 	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
+		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
 		errorCollector.push( ValidationContextType.INDEX, indexName.original );
@@ -242,8 +244,6 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 		switch ( type ) {
 			case INDEX:
 				return MESSAGES.indexContext( name );
-			case MAPPING:
-				return MESSAGES.mappingContext( name );
 			case MAPPING_PROPERTY:
 				return MESSAGES.mappingPropertyContext( name );
 			case MAPPING_PROPERTY_FIELD:
@@ -266,8 +266,16 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
 
-		validateAll( errorCollector, ValidationContextType.MAPPING, MESSAGES.mappingMissing(), rootTypeMappingValidator,
-				expectedIndexMetadata.getMappings(), actualIndexMetadata.getMappings() );
+		RootTypeMapping expectedRootMapping = expectedIndexMetadata.getMapping();
+		RootTypeMapping actualRootMapping = actualIndexMetadata.getMapping();
+		if ( expectedRootMapping == null ) {
+			return;
+		}
+		if ( actualRootMapping == null ) {
+			errorCollector.addError( MESSAGES.mappingMissing( expectedIndexMetadata.getTypeName().original ) );
+			return;
+		}
+		rootTypeMappingValidator.validate( errorCollector, expectedRootMapping, actualRootMapping );
 	}
 
 	private void validateIndexSettings(ValidationErrorCollector errorCollector, IndexSettings expectedSettings, IndexSettings actualSettings) {

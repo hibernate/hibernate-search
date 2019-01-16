@@ -24,7 +24,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWor
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
@@ -83,7 +83,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings);
 
-	GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName);
+	GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName);
 
 	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping);
 

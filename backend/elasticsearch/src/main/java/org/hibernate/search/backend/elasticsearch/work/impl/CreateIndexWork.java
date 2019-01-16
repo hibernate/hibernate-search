@@ -68,9 +68,14 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		public Builder mapping(URLEncodedString typeName, RootTypeMapping mapping) {
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
 
-			JsonObject typeMapping = new JsonObject();
-			typeMapping.add( typeName.original, gson.toJsonTree( mapping ) );
-			payload.add( "mappings", typeMapping );
+			JsonObject mappings = payload.getAsJsonObject( "mappings" );
+			if ( mappings == null ) {
+				mappings = new JsonObject();
+				payload.add( "mappings", mappings );
+			}
+
+			mappings.add( typeName.original, gson.toJsonTree( mapping ) );
+
 			return this;
 		}
 

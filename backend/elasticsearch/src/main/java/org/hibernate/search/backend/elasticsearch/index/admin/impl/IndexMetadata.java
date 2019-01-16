@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -24,7 +21,9 @@ public class IndexMetadata {
 
 	private URLEncodedString name;
 
-	private Map<String, RootTypeMapping> mappings = new TreeMap<>();
+	private URLEncodedString typeName;
+
+	private RootTypeMapping mapping;
 
 	private IndexSettings settings;
 
@@ -36,20 +35,20 @@ public class IndexMetadata {
 		this.name = name;
 	}
 
-	public Map<String, RootTypeMapping> getMappings() {
-		return mappings;
+	public URLEncodedString getTypeName() {
+		return typeName;
 	}
 
-	public void setMappings(Map<String, RootTypeMapping> mappings) {
-		this.mappings = mappings;
+	public void setTypeName(URLEncodedString typeName) {
+		this.typeName = typeName;
 	}
 
-	public void putMapping(String name, RootTypeMapping mapping) {
-		this.mappings.put( name, mapping );
+	public RootTypeMapping getMapping() {
+		return mapping;
 	}
 
-	public void removeMapping(String name) {
-		this.mappings.remove( name );
+	public void setMapping(RootTypeMapping mapping) {
+		this.mapping = mapping;
 	}
 
 	public IndexSettings getSettings() {

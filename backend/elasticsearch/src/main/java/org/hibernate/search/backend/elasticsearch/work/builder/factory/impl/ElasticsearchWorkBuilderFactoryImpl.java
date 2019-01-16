@@ -25,7 +25,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWor
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
@@ -49,7 +49,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.DropIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.FlushWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexSettingsWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingsWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
@@ -170,8 +170,8 @@ public class ElasticsearchWorkBuilderFactoryImpl implements ElasticsearchWorkBui
 	}
 
 	@Override
-	public GetIndexTypeMappingsWorkBuilder getIndexTypeMappings(URLEncodedString indexName) {
-		return new GetIndexTypeMappingsWork.Builder( indexName );
+	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName) {
+		return new GetIndexTypeMappingWork.Builder( indexName, typeName );
 	}
 
 	@Override
