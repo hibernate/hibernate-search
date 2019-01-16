@@ -8,11 +8,8 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletionException;
-import java.util.Collections;
-import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -69,16 +66,15 @@ public class ElasticsearchSchemaAccessor {
 		return execute( work );
 	}
 
-	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName) {
+	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName, URLEncodedString typeName) {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
+		indexMetadata.setTypeName( typeName );
 
-		ElasticsearchWork<RootTypeMapping> getMappingWork = workFactory.getIndexTypeMapping( indexName ).build();
+		ElasticsearchWork<RootTypeMapping> getMappingWork = workFactory.getIndexTypeMapping( indexName, typeName ).build();
 		try {
 			RootTypeMapping mapping = execute( getMappingWork );
-			// FIXME the mapping name does not make sense, it's always "_doc" and there's only just one. Change something here?
-			Map<String, RootTypeMapping> mappings = Collections.singletonMap( Paths.TYPE_NAME.original, mapping );
-			indexMetadata.setMappings( mappings );
+			indexMetadata.setMapping( mapping );
 		}
 		catch (RuntimeException e) {
 			throw log.elasticsearchMappingRetrievalForValidationFailed( e );
@@ -107,15 +103,15 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void putMapping(URLEncodedString indexName, URLEncodedString mappingName, RootTypeMapping mapping) {
-		// FIXME the mapping name does not make sense, we can't chose it. Change something here?
-		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, mapping ).build();
+	public void putMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping) {
+		// TODO HSEARCH-3080 the mapping name does not make sense, we can't chose it. Change something here?
+		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, typeName, mapping ).build();
 
 		try {
 			execute( work );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchMappingCreationFailed( indexName.original, mappingName.original, e );
+			throw log.elasticsearchMappingCreationFailed( indexName.original, e );
 		}
 	}
 

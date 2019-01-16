@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import java.util.Map;
-
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 /**
  * @author Yoann Rodiere
  */
-public interface GetIndexTypeMappingsWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Map<String, RootTypeMapping>>> {
+public interface GetIndexTypeMappingWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<RootTypeMapping>> {
 
 }

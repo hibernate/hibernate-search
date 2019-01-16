@@ -25,11 +25,6 @@ public interface ElasticsearchValidationMessages {
 	String indexContext(String name);
 
 	@Message(
-			value = "mapping '%1$s'"
-	)
-	String mappingContext(String name);
-
-	@Message(
 			value = "property '%1$s'"
 	)
 	String mappingPropertyContext(String path);
@@ -65,9 +60,9 @@ public interface ElasticsearchValidationMessages {
 	String tokenFilterContext(String name);
 
 	@Message(
-			value = "Missing type mapping"
+			value = "Missing '%1$s' type mapping"
 	)
-	String mappingMissing();
+	String mappingMissing(String name);
 
 	@Message(
 			value = "Missing property mapping"

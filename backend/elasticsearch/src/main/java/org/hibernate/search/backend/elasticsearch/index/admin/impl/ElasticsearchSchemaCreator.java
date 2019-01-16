@@ -45,14 +45,14 @@ public interface ElasticsearchSchemaCreator {
 	void checkIndexExists(URLEncodedString indexname, ExecutionOptions executionOptions);
 
 	/**
-	 * Create mappings on a supposedly existing index.
+	 * Create the mapping on a supposedly existing index.
 	 *
-	 * <p>Mappings are supposed to be absent from the index.
+	 * <p>The mapping is supposed to be absent from the index.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
+	void createMapping(IndexMetadata indexMetadata, ExecutionOptions executionOptions);
 
 }

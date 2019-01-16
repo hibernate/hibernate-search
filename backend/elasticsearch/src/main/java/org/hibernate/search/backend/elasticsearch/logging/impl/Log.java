@@ -94,9 +94,9 @@ public interface Log extends BasicLogger {
 	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 20,
-			value = "Could not create mapping for index %1$s, type %2$s"
+			value = "Could not create mapping for index %1$s"
 	)
-	SearchException elasticsearchMappingCreationFailed(String indexName, String typeName, @Cause Exception cause);
+	SearchException elasticsearchMappingCreationFailed(String indexName, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 22, value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'.")
 	SearchException unexpectedIndexStatusString(String status);

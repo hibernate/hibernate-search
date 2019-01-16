@@ -65,14 +65,10 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void createMappings(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
+	public void createMapping(IndexMetadata indexMetadata, ExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
-
-		for ( Map.Entry<String, RootTypeMapping> entry : indexMetadata.getMappings().entrySet() ) {
-			URLEncodedString mappingName = URLEncodedString.fromString( entry.getKey() );
-			RootTypeMapping mapping = entry.getValue();
-			schemaAccessor.putMapping( indexName, mappingName, mapping );
-		}
+		URLEncodedString typeName = indexMetadata.getTypeName();
+		schemaAccessor.putMapping( indexName, typeName, indexMetadata.getMapping() );
 	}
 
 }
