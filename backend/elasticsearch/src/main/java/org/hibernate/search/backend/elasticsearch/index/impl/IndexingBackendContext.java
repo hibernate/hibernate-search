@@ -9,13 +9,13 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorFactory;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -29,14 +29,14 @@ public class IndexingBackendContext {
 	private final EventContext eventContext;
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final ElasticsearchWorkOrchestratorFactory orchestratorFactory;
+	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 
 	public IndexingBackendContext(EventContext eventContext, ElasticsearchWorkBuilderFactory workFactory, MultiTenancyStrategy multiTenancyStrategy,
-			ElasticsearchWorkOrchestratorFactory orchestratorFactory) {
+			ElasticsearchWorkOrchestratorProvider orchestratorProvider) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.orchestratorFactory = orchestratorFactory;
+		this.orchestratorProvider = orchestratorProvider;
 	}
 
 	@Override
@@ -59,15 +59,15 @@ public class IndexingBackendContext {
 		return orchestrator.submit( Arrays.asList( dropWork, createWork ) );
 	}
 
-	ElasticsearchWorkOrchestrator createWorkPlanOrchestrator(String indexName, boolean refreshAfterWrite) {
-		return orchestratorFactory.createNonStreamOrchestrator(
-				"Elasticsearch non-stream work orchestrator for index " + indexName, refreshAfterWrite
+	ElasticsearchWorkOrchestrator createSerialOrchestrator(String indexName, boolean refreshAfterWrite) {
+		return orchestratorProvider.createSerialOrchestrator(
+				"Elasticsearch serial work orchestrator for index " + indexName, refreshAfterWrite
 		);
 	}
 
-	ElasticsearchWorkOrchestrator createStreamOrchestrator(String indexName) {
-		return orchestratorFactory.createStreamOrchestrator(
-				"Elasticsearch stream work orchestrator for index " + indexName
+	ElasticsearchWorkOrchestrator createParallelOrchestrator(String indexName) {
+		return orchestratorProvider.createParallelOrchestrator(
+				"Elasticsearch parallel work orchestrator for index " + indexName
 		);
 	}
 

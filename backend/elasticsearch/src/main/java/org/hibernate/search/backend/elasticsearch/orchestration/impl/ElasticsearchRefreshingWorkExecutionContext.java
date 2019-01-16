@@ -24,12 +24,9 @@ import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
- * The execution context used in {@link ElasticsearchWorkOrchestratorFactory}
- * when there's a need for indexing monitor buffering *and* for dirty index refresh.
+ * The execution context used in orchestrators when we need to refresh dirty indexes after a sequence of works.
  * <p>
  * This context is mutable and is not thread-safe.
- *
- * @author Yoann Rodiere
  */
 class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlushableWorkExecutionContext {
 

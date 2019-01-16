@@ -13,35 +13,76 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
- * Executes single or multiple {@link ElasticsearchWork}s against the Elasticsearch server.
- * <p>
- * When processing multiple requests, bulk requests will be formed and executed as far as possible.
- * <p>
- * Requests can be processed synchronously or asynchronously.
- * In the latter case, incoming requests are added to a queue
- * via a {@link ElasticsearchBatchingSharedWorkOrchestrator} and processed in bulks.
+ * Provides access to various orchestrators.
  *
- * @author Gunnar Morling
+ * <h2>Orchestrator types</h2>
+ *
+ * Each orchestrator has its own characteristics and is suitable for different use cases.
+ * We distinguish in particular between parallel orchestrators and serial orchestrators.
+ *
+ * <h3 id="parallel-orchestrators">Parallel orchestrators</h3>
+ *
+ * Parallel orchestrators execute changesets in no particular order.
+ * <p>
+ * They are suitable when the client takes the responsibility
+ * of submitting works as needed to implement ordering: if work #2 must be executed after work #1,
+ * the client will submit #1 and #2 in that order in the same changeset,
+ * or will take care to wait until #1 is done before he submits #2 in a different changeset.
+ * <p>
+ * With a parallel orchestrator:
+ * <ul>
+ *     <li>Works submitted in the same changeset will be executed in the given order.
+ *     <li>Relative execution order between changesets is undefined.
+ *     <li>Two works from the same changeset may be sent together in a single bulk request,
+ *     but only if all the works between them are bulked too.
+ *     <li>Two works from different changesets may be sent together in a single bulk request.
+ * </ul>
+ * <p>
+ * Parallel orchestrators from a single {@link ElasticsearchWorkOrchestratorProvider} (i.e. from a single backend)
+ * rely on the same resources (same queue and consumer thread).
+ *
+ * <h3 id="serial-orchestrators">Serial orchestrators</h3>
+ *
+ * Serial orchestrators execute changesets in the order they were submitted.
+ * <p>
+ * They are best used as index-scoped orchestrators, when many changesets are submitted from different threads:
+ * they allow to easily implement a reasonably safe (though imperfect) concurrency control by expecting
+ * the most recent changeset to hold the most recent data to be indexed.
+ * <p>
+ * With serial orchestrator:
+ * <ul>
+ *     <li>Works submitted in the same changeset will be executed in the given order.
+ *     <li>Changesets will be executed in the order they were submitted.
+ *     <li>Two works from the same changeset may be sent together in a single bulk request,
+ *     but only if all the works between them are bulked too.
+ *     <li>Two works from different changesets may be sent together in a single bulk request.
+ * </ul>
+ * <p>
+ * Serial orchestrators from a single {@link ElasticsearchWorkOrchestratorProvider} (i.e. from a single backend)
+ * rely on the separate resources (each has a dedicated queue and consumer thread).
+ * <p>
+ * Note that while serial orchestrators preserve ordering as best they can,
+ * they lead to a lesser throughput and can only guarantee ordering within a single JVM.
+ * When multiple JVMs with multiple instances of Hibernate Search target the same index
  */
-public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
+public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 
-	private static final int NON_STREAM_MIN_BULK_SIZE = 2;
+	private static final int SERIAL_MIN_BULK_SIZE = 2;
 	/*
-	 * For stream works, we use a minimum bulk size of 1,
+	 * For parallel orchestrators, we use a minimum bulk size of 1,
 	 * and thus allow bulks with only one work.
-	 * The reason is, for stream works, we only submit single-work changesets,
+	 * The reason is, for parallel orchestrators, we generally only submit single-work changesets,
 	 * which means the decision on whether to bulk the work or not will always happen
 	 * immediately after each work, when we only have one work to bulk.
 	 * Thus if we set the minimum to a value higher than 1, we would always
 	 * decide not to start a bulk (because there would always be only one
 	 * work to bulk), which would result in terrible performance.
 	 */
-	private static final int STREAM_MIN_BULK_SIZE = 1;
+	private static final int PARALLEL_MIN_BULK_SIZE = 1;
 	private static final int MAX_BULK_SIZE = 250;
 
 	/*
@@ -50,29 +91,30 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 	 * to create bulks of the maximum size defined above most of the time,
 	 * but we also want to keep the number as low as possible to avoid
 	 * consuming too much memory with pending changesets.
-	 * Here we set the number for stream works higher than the number
-	 * for non-stream works, because stream works will only ever be grouped
-	 * in single-work changesets, and also because the stream work
-	 * orchestrator is shared between all index managers.
+	 * Here we set the number for parallel orchestrators higher than the number
+	 * for serial orchestrators, because parallel orchestrators will generally only handle
+	 * single-work changesets, and also because the parallel orchestrators rely on a single
+	 * consumer thread shared between all index managers.
 	 */
-	private static final int NON_STREAM_MAX_CHANGESETS_PER_BATCH = 10 * MAX_BULK_SIZE;
-	private static final int STREAM_MAX_CHANGESETS_PER_BATCH = 20 * MAX_BULK_SIZE;
+	private static final int SERIAL_MAX_CHANGESETS_PER_BATCH = 10 * MAX_BULK_SIZE;
+	private static final int PARALLEL_MAX_CHANGESETS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ErrorHandler errorHandler;
 	private final ElasticsearchClient client;
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ErrorHandler errorHandler;
 
-	private final ElasticsearchBatchingSharedWorkOrchestrator streamOrchestrator;
+	private final ElasticsearchBatchingSharedWorkOrchestrator rootParallelOrchestrator;
 
-	public ElasticsearchWorkOrchestratorFactory(ErrorHandler errorHandler,
-			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory) {
-		this.errorHandler = errorHandler;
+	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
+			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
+			ErrorHandler errorHandler) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.workFactory = workFactory;
+		this.errorHandler = errorHandler;
 
 		/*
 		 * The following orchestrator doesn't require a strict execution ordering
@@ -83,40 +125,32 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 		 * to determine whether a work finished or not, explicit refreshes are useless,
 		 * so we disable refreshes both in the bulk API call and in the execution contexts.
 		 */
-		this.streamOrchestrator = createBatchingSharedOrchestrator(
-				"Elasticsearch stream work orchestrator",
-				STREAM_MAX_CHANGESETS_PER_BATCH,
+		this.rootParallelOrchestrator = createBatchingSharedOrchestrator(
+				rootParallelOrchestratorName,
+				PARALLEL_MAX_CHANGESETS_PER_BATCH,
 				false, // Do not care about ordering when queuing changesets
-				createParallelOrchestrator( this::createIgnoreDirtyWorkExecutionContext, STREAM_MIN_BULK_SIZE, false ) );
+				createThreadUnsafeParallelOrchestrator( this::createIgnoreDirtyWorkExecutionContext, false ) );
 	}
 
 	@Override
 	public void close() {
 		try {
-			streamOrchestrator.awaitCompletion();
+			rootParallelOrchestrator.awaitCompletion();
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw log.interruptedWhileWaitingForRequestCompletion( e );
 		}
 		finally {
-			streamOrchestrator.close();
+			rootParallelOrchestrator.close();
 		}
 	}
 
 	/**
-	 * Return an orchestrator for non-stream works.
-	 * <p>
-	 * Works submitted in the same changeset will be executed in the given order.
-	 * Relative execution order between changesets is undefined.
-	 * <p>
-	 * Works submitted to this orchestrator
-	 * will only be bulked with subsequent works (possibly of a different changeset).
-	 *
 	 * @param name The name of the orchestrator to create.
-	 * @return the orchestrator for synchronous, non-stream background works.
+	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createNonStreamOrchestrator(String name, boolean refreshAfterWrite) {
+	public ElasticsearchBarrierWorkOrchestrator createSerialOrchestrator(String name, boolean refreshAfterWrite) {
 		/*
 		 * Since works are applied in order, refreshing the index after changesets
 		 * is actually an option, and if enabled we use refreshing execution contexts.
@@ -135,42 +169,23 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 			refreshInBulkApiCall = false;
 		}
 
-		/*
-		 * The non-stream orchestrator requires a strict execution ordering,
-		 * because subsequent changesets may be inter-dependent (an addition in one changeset
-		 * followed by a deletion in the next, for instance).
-		 * To make sure we apply works in order, we use serial orchestrators.
-		 */
 		ElasticsearchFlushableWorkOrchestrator delegate =
-				createSerialOrchestrator( contextSupplier, NON_STREAM_MIN_BULK_SIZE, refreshInBulkApiCall );
+				createThreadUnsafeSerialOrchestrator( contextSupplier, refreshInBulkApiCall );
 
 		return createBatchingSharedOrchestrator(
 				name,
-				NON_STREAM_MAX_CHANGESETS_PER_BATCH,
-				true /* enqueue changesets in the order they were submitted */,
+				SERIAL_MAX_CHANGESETS_PER_BATCH,
+				true /* enqueue changesets in the exact order they were submitted */,
 				delegate
 				);
 	}
 
 	/**
-	 * Return an orchestrator for asynchronous, stream background works.
-	 * <p>
-	 * Works submitted in the same changeset will be executed in the given order.
-	 * Relative execution order between changesets is undefined.
-	 * <p>
-	 * Works submitted to this orchestrator
-	 * will only be bulked with subsequent works from the same changeset
-	 * or with works from a different changeset.
-	 * <p>
-	 * Works submitted to this orchestrator may be bulked with works from changesets
-	 * targeting different indexes, submitted to a different stream orchestrator
-	 * relying on the same internal resources.
-	 *
 	 * @param name The name of the orchestrator to create.
-	 * @return the orchestrator for stream background works.
+	 * @return A <a href="#parallel-orchestrators">parallel orchestrator</a>.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createStreamOrchestrator(String name) {
-		return streamOrchestrator.createChild( name );
+	public ElasticsearchBarrierWorkOrchestrator createParallelOrchestrator(String name) {
+		return rootParallelOrchestrator.createChild( name );
 	}
 
 	private ElasticsearchBatchingSharedWorkOrchestrator createBatchingSharedOrchestrator(
@@ -180,17 +195,19 @@ public class ElasticsearchWorkOrchestratorFactory implements AutoCloseable {
 				delegate, errorHandler );
 	}
 
-	private ElasticsearchFlushableWorkOrchestrator createSerialOrchestrator(
-			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier, int minBulkSize, boolean refreshInBulkAPICall) {
+	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeSerialOrchestrator(
+			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier,
+			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, minBulkSize, refreshInBulkAPICall );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, SERIAL_MIN_BULK_SIZE, refreshInBulkAPICall );
 		return new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchFlushableWorkOrchestrator createParallelOrchestrator(
-			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier, int minBulkSize, boolean refreshInBulkAPICall) {
+	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeParallelOrchestrator(
+			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier,
+			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, minBulkSize, refreshInBulkAPICall );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, PARALLEL_MIN_BULK_SIZE, refreshInBulkAPICall );
 		return new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
