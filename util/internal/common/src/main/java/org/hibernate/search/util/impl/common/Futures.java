@@ -173,6 +173,22 @@ public final class Futures {
 				} );
 	}
 
+	/**
+	 * Call join an unwrap any {@link CompletionException}, expecting the exception to be a {@link RuntimeException}.
+	 * @param future The future to join on.
+	 * @param <T> The type of result the future will return.
+	 * @return The result returned by the future.
+	 * @throws RuntimeException If the future fails.
+	 */
+	public static <T> T unwrappedExceptionJoin(CompletableFuture<T> future) {
+		try {
+			return future.join();
+		}
+		catch (CompletionException e) {
+			throw Throwables.expectRuntimeException( e.getCause() );
+		}
+	}
+
 	private static RuntimeException wrap(Throwable throwable) {
 		if ( throwable instanceof RuntimeException ) {
 			return (RuntimeException) throwable;

@@ -14,6 +14,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
@@ -92,11 +93,35 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 12, value = "Interrupted while waiting for requests to be processed.")
 	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
 
+	@Message(id = ID_OFFSET_2 + 20,
+			value = "Could not create mapping for index %1$s, type %2$s"
+	)
+	SearchException elasticsearchMappingCreationFailed(String indexName, String typeName, @Cause Exception cause);
+
 	@Message(id = ID_OFFSET_2 + 22, value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'.")
 	SearchException unexpectedIndexStatusString(String status);
 
 	@Message(id = ID_OFFSET_2 + 24, value = "Timed out while waiting for for index '%1$s' to reach status '%2$s'; status was still '%3$s' after %4$s.")
 	SearchException unexpectedIndexStatus(String indexName, String expected, String actual, String timeoutAndUnit);
+
+	@Message(id = ID_OFFSET_2 + 33,
+			value = "An Elasticsearch schema validation failed: %1$s"
+	)
+	ElasticsearchSchemaValidationException schemaValidationFailed(String message);
+
+	@Message(id = ID_OFFSET_2 + 34,
+			value = "Could not retrieve the mappings from Elasticsearch for validation"
+	)
+	SearchException elasticsearchMappingRetrievalForValidationFailed(@Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 35,
+			value = "Could not update mappings in index '%1$s'"
+	)
+	SearchException schemaUpdateFailed(Object indexName, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 50,
+			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
+	SearchException indexMissing(Object indexName);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 53,
@@ -115,6 +140,28 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 57,
 			value = "Multiple token filter definitions with the same name: '%1$s'. The token filter names must be unique.")
 	SearchException tokenFilterNamingConflict(String remoteName);
+
+	@Message(id = ID_OFFSET_2 + 67,
+			value = "Could not update settings for index '%1$s'"
+	)
+	SearchException elasticsearchSettingsUpdateFailed(Object indexName, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 68,
+			value = "Could not retrieve the index settings from Elasticsearch for validation"
+	)
+	SearchException elasticsearchIndexSettingsRetrievalForValidationFailed(@Cause Exception cause);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = ID_OFFSET_2 + 69,
+			value = "Closed Elasticsearch index '%1$s' automatically."
+	)
+	void closedIndex(Object indexName);
+
+	@LogMessage(level = Level.INFO)
+	@Message(id = ID_OFFSET_2 + 70,
+			value = "Opened Elasticsearch index '%1$s' automatically."
+	)
+	void openedIndex(Object indexName);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_2 + 73,

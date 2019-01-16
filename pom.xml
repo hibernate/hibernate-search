@@ -1292,6 +1292,7 @@
                                       -->
                                     <exclude>**/SearchException.class</exclude>
                                     <exclude>**/ClassLoadingException.class</exclude>
+                                    <exclude>**/ElasticsearchSchemaValidationException.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->
