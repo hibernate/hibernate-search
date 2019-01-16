@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.util.SearchException;
 
 /**
  * The default {@link ElasticsearchSchemaDropper} implementation.
@@ -34,15 +33,7 @@ public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDroppe
 			return;
 		}
 
-		try {
-			schemaAccessor.dropIndex( indexName, executionOptions );
-		}
-		catch (SearchException e) {
-			// ignoring deletion of non-existing index
-			if ( !e.getMessage().contains( "index_not_found_exception" ) ) {
-				throw e;
-			}
-		}
+		schemaAccessor.dropIndexIfExisting( indexName, executionOptions );
 	}
 
 }

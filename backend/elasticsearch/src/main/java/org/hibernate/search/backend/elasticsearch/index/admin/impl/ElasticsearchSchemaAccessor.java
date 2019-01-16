@@ -135,6 +135,11 @@ public class ElasticsearchSchemaAccessor {
 		execute( work );
 	}
 
+	public void dropIndexIfExisting(URLEncodedString indexName, ExecutionOptions executionOptions) {
+		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
+		execute( work );
+	}
+
 	public void closeIndex(URLEncodedString indexName) {
 		ElasticsearchWork<?> work = workFactory.closeIndex( indexName ).build();
 		execute( work );
