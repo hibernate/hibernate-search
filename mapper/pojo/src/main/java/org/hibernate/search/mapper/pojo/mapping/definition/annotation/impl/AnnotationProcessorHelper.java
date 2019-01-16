@@ -24,9 +24,8 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderR
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
-import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
@@ -175,8 +174,7 @@ class AnnotationProcessorHelper {
 
 	<A extends Annotation> BridgeBuilder<? extends RoutingKeyBridge> createRoutingKeyBridgeBuilder(A annotation) {
 		RoutingKeyBridgeMapping bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBridgeMapping.class );
-		RoutingKeyBridgeReference bridgeReferenceAnnotation = bridgeMapping.bridge();
-		RoutingKeyBridgeAnnotationBuilderReference bridgeBuilderReferenceAnnotation = bridgeMapping.builder();
+		RoutingKeyBridgeRef bridgeReferenceAnnotation = bridgeMapping.bridge();
 
 		return createAnnotationMappedBridgeBuilder(
 				RoutingKeyBridge.class,
@@ -184,13 +182,13 @@ class AnnotationProcessorHelper {
 				annotation,
 				toBeanReference(
 						RoutingKeyBridge.class,
-						RoutingKeyBridgeReference.UndefinedImplementationType.class,
+						RoutingKeyBridgeRef.UndefinedBridgeImplementationType.class,
 						bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 				),
 				toBeanReference(
 						AnnotationBridgeBuilder.class,
-						RoutingKeyBridgeAnnotationBuilderReference.UndefinedImplementationType.class,
-						bridgeBuilderReferenceAnnotation.type(), bridgeBuilderReferenceAnnotation.name()
+						RoutingKeyBridgeRef.UndefinedBuilderImplementationType.class,
+						bridgeReferenceAnnotation.builderType(), bridgeReferenceAnnotation.builderName()
 				)
 		);
 	}
