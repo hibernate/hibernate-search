@@ -166,6 +166,12 @@ and do the work of converting between user entities and documents to be indexed.
 * `reports`: Module built last, producing reports related to test coverage in particular.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
+## Showcase Project
+
+The project [Full-stack ORM integration test suite](hibernate-search/tree/master/integrationtest/fullstack/library) shows possible Hibernate Search application cases.
+It can be treated as a quickstart and a showcase of many Hibernate Search's features.
+Visit it to have Hibernate Search's working samples.
+
 ## Contact
 
 ### Latest Documentation:

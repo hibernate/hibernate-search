@@ -441,6 +441,13 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 ====
 
+=== Showcase Project
+
+The project [Full-stack ORM integration test suite](https://github.com/hibernate/hibernate-search/tree/master/integrationtest/fullstack/library)
+shows possible Hibernate Search application cases.
+It can be treated as a quickstart and a showcase of many Hibernate Search's features.
+Visit it to have Hibernate Search's working samples.
+
 === What's next
 
 The above paragraphs helped you getting an overview of Hibernate Search.
