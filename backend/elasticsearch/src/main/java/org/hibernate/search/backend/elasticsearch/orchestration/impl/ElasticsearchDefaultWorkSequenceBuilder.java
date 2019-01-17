@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.impl.common.Futures;
+import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
  * A simple implementation of {@link ElasticsearchWorkSequenceBuilder}.
@@ -29,23 +30,27 @@ import org.hibernate.search.util.impl.common.Futures;
  */
 class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequenceBuilder {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier;
 	private final Supplier<ContextualErrorHandler> errorHandlerSupplier;
 	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
-	private CompletableFuture<Void> rootSequenceFuture;
+	private CompletableFuture<Void> flushFuture;
 	private CompletableFuture<?> sequenceFuture;
 	private ElasticsearchFlushableWorkExecutionContext executionContext;
 	private ContextualErrorHandler errorHandler;
 
-	public ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier, Supplier<ContextualErrorHandler> errorHandlerSupplier) {
+	public ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier,
+			Supplier<ContextualErrorHandler> errorHandlerSupplier) {
 		this.contextSupplier = contextSupplier;
 		this.errorHandlerSupplier = errorHandlerSupplier;
 	}
 
 	@Override
 	public void init(CompletableFuture<?> previous) {
-		this.rootSequenceFuture = previous.handle( (ignoredResult, ignoredThrowable) -> null );
+		CompletableFuture<Void> rootSequenceFuture = previous.handle( (ignoredResult, ignoredThrowable) -> null );
+		this.flushFuture = new CompletableFuture<>();
 		this.sequenceFuture = rootSequenceFuture;
 		this.executionContext = contextSupplier.get();
 		this.errorHandler = errorHandlerSupplier.get();
@@ -64,9 +69,37 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	public <T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
 		final ElasticsearchFlushableWorkExecutionContext context = this.executionContext;
-		CompletableFuture<T> result = chain( this.sequenceFuture, work, ignored -> work.execute( context ) );
-		this.sequenceFuture = result;
-		return result;
+		final ContextualErrorHandler errorHandler = this.errorHandler;
+
+		/*
+		 * Use a different future for the caller than the one used in the sequence,
+		 * because we manipulate internal exceptions in the sequence
+		 * that should not be exposed to the caller.
+ 		 */
+		CompletableFuture<T> workFutureForCaller = new CompletableFuture<>();
+
+		// If the previous work failed, then skip the new work and notify the caller and error handler as necessary.
+		CompletableFuture<T> handledWorkExecutionFuture = this.sequenceFuture.whenComplete( Futures.handler( (ignoredResult, throwable) -> {
+			if ( throwable != null ) {
+				notifySkipping( work, throwable, errorHandler, workFutureForCaller );
+			}
+		} ) )
+				// If the previous work completed normally, then execute the new work
+				.thenCompose( Futures.safeComposer(
+						ignoredPreviousResult -> {
+							CompletableFuture<T> workExecutionFuture = work.execute( context );
+							return addPostExecutionHandlers( work, workExecutionFuture, workFutureForCaller );
+						}
+				) );
+
+		/*
+		 * Make sure that the sequence will only advance to the next work
+		 * after both the work and *all* the handlers are executed,
+		 * because otherwise errorHandler.handle() could be called before all failed/skipped works are reported.
+		 */
+		this.sequenceFuture = handledWorkExecutionFuture;
+
+		return workFutureForCaller;
 	}
 
 	/**
@@ -105,9 +138,11 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		// Use local variables to make sure the lambdas won't be affected by a reset()
 		final ElasticsearchFlushableWorkExecutionContext context = this.executionContext;
 		final ContextualErrorHandler errorHandler = this.errorHandler;
+		final CompletableFuture<Void> flushFuture = this.flushFuture;
+
 		CompletableFuture<Void> futureWithFlush = Futures.whenCompleteExecute(
 						sequenceFuture,
-						() -> context.flush()
+						() -> context.flush().whenComplete( Futures.copyHandler( flushFuture ) )
 				)
 				.exceptionally( Futures.handler( throwable -> {
 					if ( !( throwable instanceof PreviousWorkException) ) {
@@ -121,43 +156,51 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		return futureWithFlush;
 	}
 
-	private <T, R> CompletableFuture<R> chain(CompletableFuture<T> previous, ElasticsearchWork<R> work,
-			Function<T, CompletableFuture<R>> composer) {
+	private <R> void notifySkipping(ElasticsearchWork<R> work, Throwable throwable,
+			ContextualErrorHandler errorHandler, CompletableFuture<R> workFutureForCaller) {
+		Throwable skippingCause =
+				throwable instanceof PreviousWorkException ? throwable.getCause() : throwable;
+		workFutureForCaller.completeExceptionally(
+				log.elasticsearchSkippedBecauseOfPreviousWork( skippingCause )
+		);
+		errorHandler.markAsSkipped( work );
+	}
+
+	private <R> void notifyFailure(ElasticsearchWork<R> work, Throwable throwable,
+			ContextualErrorHandler errorHandler, CompletableFuture<R> workFutureForCaller) {
+		workFutureForCaller.completeExceptionally( throwable );
+		errorHandler.markAsFailed( work, throwable );
+	}
+
+	private <T> CompletableFuture<T> addPostExecutionHandlers(ElasticsearchWork<T> work,
+			CompletableFuture<T> workExecutionFuture, CompletableFuture<T> workFutureForCaller) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
 		final ContextualErrorHandler errorHandler = this.errorHandler;
 
-		final Function<T, CompletionStage<R>> safeComposer = Futures.safeComposer( composer );
-
-		return previous
-				// If the previous work failed, the new one won't execute, so mark it as such
-				.whenComplete( (result, throwable) -> {
-					if ( throwable != null ) {
-						errorHandler.markAsSkipped( work );
-					}
-				} )
-				// If the previous work completed normally, then execute the work
-				.thenCompose( previousResult ->
-						/*
-						 * Add an error handler to the result of executing an Elasticsearch work.
-						 *
-						 * Note that the error handler is applied to the "inner" (to be composed) work,
-						 * so that the handler is only executed if *this* work fails,
-						 * not if a previous one fails.
-						 *
-						 * Note that the error handler won't stop the exception from propagating
-						 * to the next works, so they will be skipped.
-						 */
-						safeComposer.apply( previousResult )
-								.handle( Futures.handler( (result, throwable) -> {
-									if ( throwable != null ) {
-										errorHandler.markAsFailed( work, throwable );
-										throw new PreviousWorkException( throwable );
-									}
-									else {
-										return result;
-									}
-								} ) )
-				);
+		/*
+		 * In case of success, wait for the flush and propagate the result to the client.
+		 * We ABSOLUTELY DO NOT WANT the resulting future to be included in the sequence,
+		 * because it would create a deadlock:
+		 * future A will only complete when the flush future (B) is executed,
+		 * which will only happen when the sequence ends,
+		 * which will only happen after A completes...
+		 */
+		workExecutionFuture.thenCombine( flushFuture, (workResult, flushResult) -> workResult )
+				.whenComplete( Futures.copyHandler( workFutureForCaller ) );
+		/*
+		 * In case of error, propagate the exception immediately to both the error handler and the client.
+		 *
+		 * Also, make sure to re-throw an exception
+		 * so that execution of following works in the sequence will be skipped.
+		 *
+		 * Make sure to return the resulting stage, and not executedWorkStage,
+		 * so that exception handling happens before the end of the sequence,
+		 * meaning errorHandler.markAsFailed() is guaranteed to be called before errorHandler.handle().
+		 */
+		return workExecutionFuture.exceptionally( Futures.handler( throwable -> {
+			notifyFailure( work, throwable, errorHandler, workFutureForCaller );
+			throw new PreviousWorkException( throwable );
+		} ) );
 	}
 
 	private static final class PreviousWorkException extends RuntimeException {
@@ -178,13 +221,50 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		@Override
 		public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index) {
-			CompletableFuture<T> bulkedWorkResultFuture = chain( extractorFuture, bulkedWork,
-					extractor -> extractor.extract( bulkedWork, index ) );
+			// Use local variables to make sure the lambdas won't be affected by a reset()
+			final ContextualErrorHandler errorHandler = ElasticsearchDefaultWorkSequenceBuilder.this.errorHandler;
+
+			/*
+			 * Use a different future for the caller than the one used in the sequence,
+			 * because we manipulate internal exceptions in the sequence
+			 * that should not be exposed to the caller.
+			 */
+			CompletableFuture<T> workFutureForCaller = new CompletableFuture<>();
+
+			// If the bulk work fails, make sure to notify the caller and error handler as necessary.
+			CompletableFuture<T> handledWorkExecutionFuture = extractorFuture.whenComplete( Futures.handler( (result, throwable) -> {
+				if ( throwable == null ) {
+					return;
+				}
+				else if ( throwable instanceof PreviousWorkException ) {
+					// The bulk work itself was skipped; mark the bulked work as skipped too
+					notifySkipping( bulkedWork, throwable, errorHandler, workFutureForCaller );
+				}
+				else {
+					// The bulk work failed; mark the bulked work as failed too
+					notifyFailure( bulkedWork, throwable, errorHandler, workFutureForCaller );
+				}
+			} ) )
+					// If the bulk work succeeds, then extract the bulked work result and notify as necessary
+					.thenCompose( extractor -> {
+						// Use Futures.create to catch any exception thrown by extractor.extract
+						CompletableFuture<T> workExecutionFuture = Futures.create(
+								() -> extractor.extract( bulkedWork, index )
+						);
+						return addPostExecutionHandlers( bulkedWork, workExecutionFuture, workFutureForCaller );
+					} );
+
+			/*
+			 * Make sure that the sequence will only advance to the next work
+			 * after both the work and *all* the handlers are executed,
+			 * because otherwise errorHandler.handle() could be called before all failed/skipped works are reported.
+			 */
 			ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture = CompletableFuture.allOf(
 					ElasticsearchDefaultWorkSequenceBuilder.this.sequenceFuture,
-					bulkedWorkResultFuture
+					handledWorkExecutionFuture
 			);
-			return bulkedWorkResultFuture;
+
+			return workFutureForCaller;
 		}
 
 	}
