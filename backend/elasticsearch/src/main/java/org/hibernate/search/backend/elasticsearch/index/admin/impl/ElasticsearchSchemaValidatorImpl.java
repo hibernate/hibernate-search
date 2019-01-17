@@ -526,9 +526,13 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 		@Override
 		public void validate(ValidationErrorCollector errorCollector, T expectedDefinition, T actualDefinition) {
-			if ( ! Objects.equals( expectedDefinition.getType(), actualDefinition.getType() ) ) {
+			String expectedType = expectedDefinition.getType();
+			String actualType = actualDefinition.getType();
+			Object defaultedExpectedType = expectedType == null ? getDefaultType() : expectedType;
+			Object defaultedActualType = actualType == null ? getDefaultType() : actualType;
+			if ( ! Objects.equals( defaultedExpectedType, defaultedActualType ) ) {
 				errorCollector.addError( MESSAGES.invalidAnalysisDefinitionType(
-						expectedDefinition.getType(), actualDefinition.getType()
+						expectedType, actualType
 				) );
 			}
 
@@ -557,6 +561,10 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				}
 			}
 		}
+
+		protected String getDefaultType() {
+			return null;
+		}
 	}
 
 	private class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDefinition> {
@@ -582,6 +590,11 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				errorCollector.addError( MESSAGES.invalidAnalyzerTokenFilters(
 						expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) );
 			}
+		}
+
+		@Override
+		protected String getDefaultType() {
+			return "custom";
 		}
 	}
 
@@ -705,6 +718,11 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				errorCollector.addError( MESSAGES.invalidAnalyzerTokenFilters(
 						expectedDefinition.getTokenFilters(), actualDefinition.getTokenFilters() ) );
 			}
+		}
+
+		@Override
+		protected String getDefaultType() {
+			return "custom";
 		}
 	}
 }
