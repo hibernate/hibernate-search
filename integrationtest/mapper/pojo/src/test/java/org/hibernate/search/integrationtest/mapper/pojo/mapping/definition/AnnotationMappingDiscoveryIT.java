@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.AnnotationMarkerBuilder;
@@ -221,7 +221,7 @@ public class AnnotationMappingDiscoveryIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@MarkerMapping(builder = @MarkerMappingBuilderReference(type = CustomMarker.Builder.class))
+	@MarkerMapping(builder = @MarkerMappingRef(builderType = CustomMarker.Builder.class))
 	private @interface CustomMarkerAnnotation {
 	}
 

@@ -20,6 +20,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface MarkerMapping {
 
-	MarkerMappingBuilderReference builder();
+	/**
+	 * Define a marker mapper builder
+	 *
+	 * @see MarkerMappingRef
+	 * @return A reference to the marker mapping builder.
+	 */
+	MarkerMappingRef builder();
 
 }

@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.RoutingKeyBridgeMapping;
@@ -113,13 +113,13 @@ class AnnotationProcessorHelper {
 
 	<A extends Annotation> MarkerBuilder createMarkerBuilder(A annotation) {
 		MarkerMapping markerMapping = annotation.annotationType().getAnnotation( MarkerMapping.class );
-		MarkerMappingBuilderReference markerBuilderReferenceAnnotation = markerMapping.builder();
+		MarkerMappingRef markerBuilderReferenceAnnotation = markerMapping.builder();
 
 		return new AnnotationInitializingBeanDelegatingMarkerBuilder<>(
 				toBeanReference(
 						AnnotationMarkerBuilder.class,
-						MarkerMappingBuilderReference.UndefinedImplementationType.class,
-						markerBuilderReferenceAnnotation.type(), markerBuilderReferenceAnnotation.name()
+						MarkerMappingRef.UndefinedBuilderImplementationType.class,
+						markerBuilderReferenceAnnotation.builderType(), markerBuilderReferenceAnnotation.builderName()
 				)
 						.orElseThrow( () -> log.missingBuilderReferenceInMarkerMapping(
 								MarkerMapping.class, annotation.annotationType()
