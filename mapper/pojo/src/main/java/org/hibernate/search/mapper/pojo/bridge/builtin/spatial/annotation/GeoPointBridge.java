@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
+import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
@@ -63,8 +63,8 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
  * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
  */
-@PropertyBridgeMapping(builder = @PropertyBridgeAnnotationBuilderReference(
-		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
+@PropertyBridgeMapping(bridge = @PropertyBridgeRef(
+		builderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class
 ))
 @TypeBridgeMapping(bridge = @TypeBridgeRef(
 		builderType = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Builder.class

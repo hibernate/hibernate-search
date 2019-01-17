@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingCont
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingBuilderReference;
-import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeAnnotationBuilderReference;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -333,7 +332,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef())
 	private @interface BridgeAnnotationWithEmptyPropertyBridgeMapping {
 	}
 
@@ -368,7 +367,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(name = "foo"), builder = @PropertyBridgeAnnotationBuilderReference(name = "bar"))
+	@PropertyBridgeMapping(bridge = @PropertyBridgeRef(name = "foo", builderName = "bar"))
 	private @interface BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping {
 	}
 
