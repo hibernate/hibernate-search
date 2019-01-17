@@ -395,4 +395,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")
 	SearchException failedToShutdownIndexManager(String indexName, @Cause Exception cause, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same changeset.")
+	SearchException elasticsearchSkippedBecauseOfPreviousWork(@Cause Throwable skippingCause);
 }

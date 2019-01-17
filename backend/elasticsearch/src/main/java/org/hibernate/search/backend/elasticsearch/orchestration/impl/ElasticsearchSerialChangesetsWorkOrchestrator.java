@@ -52,12 +52,6 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchFlus
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
 		CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
 		future = sequenceFuture;
-
-		/*
-		 * Return a future that does not wait for the index refreshes:
-		 * when we call this method, we do explicit flushes/refreshes afterwards.
-		 * TODO This is dodgy. Try to either implement refreshes efficiently in this case, or to make the behavior more obvious in the interfaces.
-		 */
 		return workFuture;
 	}
 
