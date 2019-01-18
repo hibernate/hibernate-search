@@ -61,18 +61,12 @@ public class AnalysisJsonElementEquivalence {
 	/*
 	 * Compares the string representation of primitives.
 	 *
-	 * This is necessary when validating analysis settings for two reasons:
-	 *
-	 * 1.  When we translate Lucene analyzer definitions, we only use
-	 *     string parameters, even for integer values, because strings
-	 *     are what we get from users and we don't have extensive knowledge
-	 *     of the parameter types (which would enable us to convert them
-	 *     to the right type).
-	 * 2.  Regardless of the item above, when we retrieve settings
-	 *     from Elasticsearch, it only returns strings, probably because
-	 *     the values are stored as strings. Thus we must also handle the
-	 *     case where we initially set an integer value but Elasticsearch
-	 *     shows it as a string.
+	 * This is necessary when validating analysis settings because,
+	 * when we retrieve settings from Elasticsearch,
+	 * it only returns strings.
+	 * The reason is probably that the values are stored as strings.
+	 * Thus we must also handle the case where we initially set an integer value but Elasticsearch
+	 * shows it as a string.
 	 */
 	protected boolean isPrimitiveEquivalent(JsonPrimitive left, JsonPrimitive right) {
 		return Objects.equals( left.getAsString(), right.getAsString() );
