@@ -149,10 +149,10 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 82,
-			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s in %dms."
+			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'."
 	)
-	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
+	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage);
 
 	@Message(id = ID_OFFSET_2 + 86,
@@ -179,10 +179,10 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.TRACE)
 	@Message(id = ID_OFFSET_2 + 93,
-			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s in %dms."
+			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
 					+ " Response had status %d '%s'. Request body: <%s>. Response body: <%s>"
 	)
-	void executedRequest(String method, String path, Map<String, String> getParameters, long timeInMs,
+	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage,
 			String requestBodyParts, String responseBody);
 
