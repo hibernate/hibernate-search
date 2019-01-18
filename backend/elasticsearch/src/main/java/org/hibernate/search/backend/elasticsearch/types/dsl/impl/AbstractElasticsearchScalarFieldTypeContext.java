@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -54,6 +55,8 @@ abstract class AbstractElasticsearchScalarFieldTypeContext<S extends AbstractEla
 		resolvedSortable = resolveDefault( sortable );
 		resolvedProjectable = resolveDefault( projectable );
 
+		// TODO HSEARCH-3048 allow to configure indexed/not indexed
+		mapping.setIndex( IndexType.TRUE );
 		mapping.setStore( resolvedProjectable );
 		mapping.setDocValues( resolvedSortable );
 
