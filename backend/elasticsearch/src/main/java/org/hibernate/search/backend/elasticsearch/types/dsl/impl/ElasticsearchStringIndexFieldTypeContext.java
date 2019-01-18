@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;
@@ -73,6 +74,9 @@ class ElasticsearchStringIndexFieldTypeContext
 
 		boolean resolvedSortable = resolveDefault( sortable );
 		boolean resolvedProjectable = resolveDefault( projectable );
+
+		// TODO HSEARCH-3048 allow to configure indexed/not indexed
+		mapping.setIndex( IndexType.TRUE );
 
 		// TODO Use sub-fields? (but in that case, adjust projections accordingly)
 		if ( analyzerName != null ) {
