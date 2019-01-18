@@ -210,13 +210,15 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( requestLog.isTraceEnabled() ) {
 			JsonLogHelper logHelper = gsonProvider.getLogHelper();
-			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
+			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
+					request.getBodyParts().size(), executionTimeMs,
 					response.getStatusCode(), response.getStatusMessage(),
 					logHelper.toString( request.getBodyParts() ),
 					logHelper.toString( response.getBody() ) );
 		}
 		else {
-			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(), executionTimeMs,
+			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
+					request.getBodyParts().size(), executionTimeMs,
 					response.getStatusCode(), response.getStatusMessage() );
 		}
 	}
