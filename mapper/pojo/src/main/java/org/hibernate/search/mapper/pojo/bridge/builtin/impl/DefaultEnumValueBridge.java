@@ -27,7 +27,7 @@ public final class DefaultEnumValueBridge<V extends Enum<V>> implements ValueBri
 	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<V> context) {
 		this.enumType = (Class<V>) context.getBridgedElement().getRawType();
 		return context.getTypeFactory().asString()
-				.projectionConverter( new PojoDefaultEnumFromDocumentFieldValueConverter( enumType ) );
+				.projectionConverter( new PojoDefaultEnumFromDocumentFieldValueConverter<>( enumType ) );
 	}
 
 	@Override
