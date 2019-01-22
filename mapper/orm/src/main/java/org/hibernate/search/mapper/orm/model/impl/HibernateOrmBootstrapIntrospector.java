@@ -20,9 +20,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.persistence.metamodel.ManagedType;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -32,7 +31,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
 import org.hibernate.search.mapper.pojo.model.spi.FieldPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
@@ -52,10 +51,10 @@ import org.hibernate.search.util.common.impl.StreamHelper;
  */
 public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospector {
 
+	private final Map<String, PersistentClass> persistentClasses;
 	private final ReflectionManager reflectionManager;
 	private final MethodHandles.Lookup lookup;
 	private final AnnotationHelper annotationHelper;
-	private final SessionFactoryImplementor sessionFactoryImplementor;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
@@ -73,7 +72,9 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
-	public HibernateOrmBootstrapIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
+	public HibernateOrmBootstrapIntrospector(Metadata metadata) {
+		this.persistentClasses = metadata.getEntityBindings().stream()
+				.collect( Collectors.toMap( pc -> pc.getClassName(), Function.identity() ) );
 		ReflectionManager metadataReflectionManager = null;
 		if ( metadata instanceof MetadataImplementor ) {
 			metadataReflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
@@ -87,10 +88,10 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 			// the reflection manager were not created by Hibernate yet.
 			this.reflectionManager = new JavaReflectionManager();
 		}
+
 		// TODO get the user lookup from Hibernate ORM?
 		this.lookup = MethodHandles.publicLookup();
 		this.annotationHelper = new AnnotationHelper( lookup );
-		this.sessionFactoryImplementor = sessionFactoryImplementor;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -183,21 +184,10 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
-		ManagedType<T> managedType = getManagedType( type );
 		return new HibernateOrmRawTypeModel<>(
-				this, type, managedType,
+				this, type, persistentClasses.get( type.getName() ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
-	}
-
-	private <T> ManagedType<T> getManagedType(Class<T> type) {
-		try {
-			return sessionFactoryImplementor.getMetamodel().managedType( type );
-		}
-		catch (IllegalArgumentException ignored) {
-			// The type is not managed in the current session factory
-			return null;
-		}
 	}
 
 	private Collector<XProperty, ?, Map<String, XProperty>> xPropertiesByNameNoDuplicate() {
