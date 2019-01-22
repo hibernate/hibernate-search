@@ -19,12 +19,14 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.persistence.metamodel.Attribute;
-import javax.persistence.metamodel.ManagedType;
 
+import org.hibernate.MappingException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.cfg.annotations.HCANNHelper;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
@@ -41,7 +43,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final XClass xClass;
 	private final Class<T> clazz;
-	private final ManagedType<T> managedType;
+	private final PersistentClass persistentClass;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
 
@@ -53,11 +55,11 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
 
 	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz,
-			ManagedType<T> managedType, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+			PersistentClass persistentClass, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.xClass = introspector.toXClass( clazz );
 		this.clazz = clazz;
-		this.managedType = managedType;
+		this.persistentClass = persistentClass;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( clazz );
 	}
@@ -278,16 +280,17 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	private Member getPropertyMemberFromHibernateOrmMetamodel(String propertyName) {
-		if ( managedType == null ) {
-			// There isn't any Hibernate ORM metamodel for this type
+		if ( persistentClass == null ) {
+			// There isn't any Hibernate ORM metadata for this type
 			return null;
 		}
 		try {
-			Attribute<? super T, ?> attribute = managedType.getAttribute( propertyName );
-			return attribute.getJavaMember();
+			Property property = persistentClass.getProperty( propertyName );
+			Getter getter = property.getGetter( clazz );
+			return getter.getMember();
 		}
-		catch (IllegalArgumentException e) {
-			// Error resolving the property through the JPA metamodel
+		catch (MappingException e) {
+			// Error resolving the property through the metadata
 			// Ignore this property
 			return null;
 		}

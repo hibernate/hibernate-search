@@ -20,9 +20,8 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.persistence.metamodel.ManagedType;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -32,7 +31,7 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
@@ -60,8 +59,10 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
-			ConfigurationPropertySource propertySource,
-			SessionFactoryImplementor sessionFactoryImplementor) {
+			ConfigurationPropertySource propertySource) {
+		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
+				.collect( Collectors.toMap( pc -> pc.getClassName(), Function.identity() ) );
+
 		// TODO get the user lookup from Hibernate ORM?
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 
@@ -93,14 +94,14 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				reflectionManager, annotationHelper, propertyHandleFactory, sessionFactoryImplementor
+				persistentClasses, reflectionManager, annotationHelper, propertyHandleFactory
 		);
 	}
 
+	private final Map<String, PersistentClass> persistentClasses;
 	private final ReflectionManager reflectionManager;
 	private final PropertyHandleFactory propertyHandleFactory;
 	private final AnnotationHelper annotationHelper;
-	private final SessionFactoryImplementor sessionFactoryImplementor;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
@@ -117,14 +118,15 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	private HibernateOrmBootstrapIntrospector(ReflectionManager reflectionManager,
+	private HibernateOrmBootstrapIntrospector(
+			Map<String, PersistentClass> persistentClasses,
+			ReflectionManager reflectionManager,
 			AnnotationHelper annotationHelper,
-			PropertyHandleFactory propertyHandleFactory,
-			SessionFactoryImplementor sessionFactoryImplementor) {
+			PropertyHandleFactory propertyHandleFactory) {
+		this.persistentClasses = persistentClasses;
 		this.reflectionManager = reflectionManager;
 		this.propertyHandleFactory = propertyHandleFactory;
 		this.annotationHelper = annotationHelper;
-		this.sessionFactoryImplementor = sessionFactoryImplementor;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
 				genericContextHelper, Object.class
@@ -217,21 +219,10 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
-		ManagedType<T> managedType = getManagedType( type );
 		return new HibernateOrmRawTypeModel<>(
-				this, type, managedType,
+				this, type, persistentClasses.get( type.getName() ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
-	}
-
-	private <T> ManagedType<T> getManagedType(Class<T> type) {
-		try {
-			return sessionFactoryImplementor.getMetamodel().managedType( type );
-		}
-		catch (IllegalArgumentException ignored) {
-			// The type is not managed in the current session factory
-			return null;
-		}
 	}
 
 	private Collector<XProperty, ?, Map<String, XProperty>> xPropertiesByNameNoDuplicate() {
