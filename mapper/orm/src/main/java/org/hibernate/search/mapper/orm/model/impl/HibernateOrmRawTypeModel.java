@@ -240,11 +240,11 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			 * We still try to comply with JPA's configured access type,
 			 * which explains the two if/else branches below.
 			 */
-			if ( memberFromHibernateOrmMetamodel instanceof Method && methodAccessXProperty != null ) {
-				return HCANNHelper.getUnderlyingMember( methodAccessXProperty );
+			if ( memberFromHibernateOrmMetamodel instanceof Method ) {
+				return methodAccessXProperty == null ? memberFromHibernateOrmMetamodel : HCANNHelper.getUnderlyingMember( methodAccessXProperty );
 			}
-			else if ( memberFromHibernateOrmMetamodel instanceof Field && fieldAccessXProperty != null ) {
-				return HCANNHelper.getUnderlyingMember( fieldAccessXProperty );
+			else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
+				return fieldAccessXProperty == null ? memberFromHibernateOrmMetamodel : HCANNHelper.getUnderlyingMember( fieldAccessXProperty );
 			}
 			else {
 				/*
