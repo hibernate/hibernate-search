@@ -52,7 +52,7 @@ public class InitialPropertyMappingContext
 
 	@Override
 	public void contributeMapping(PojoMappingCollectorTypeNode collector) {
-		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyHandle );
+		PojoMappingCollectorPropertyNode collectorPropertyNode = collector.property( propertyHandle.getName() );
 		children.contributeMapping( collectorPropertyNode );
 	}
 

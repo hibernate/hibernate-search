@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 
 public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
@@ -17,6 +16,6 @@ public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
 	void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> reference);
 
-	PojoMappingCollectorPropertyNode property(PropertyHandle propertyHandle);
+	PojoMappingCollectorPropertyNode property(String propertyName);
 
 }
