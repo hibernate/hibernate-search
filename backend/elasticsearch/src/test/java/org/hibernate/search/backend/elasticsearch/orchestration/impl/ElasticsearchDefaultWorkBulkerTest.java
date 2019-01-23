@@ -87,7 +87,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( work1, 0 ) ).andReturn( work1FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work2, 1 ) ).andReturn( work2FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( work1Future ).isPending();
 		assertThat( work2Future ).isPending();
@@ -96,7 +96,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ) ) ).andReturn( (ElasticsearchWork) bulkWork );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( work1Future ).isPending();
 		assertThat( work2Future ).isPending();
@@ -135,13 +135,13 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		resetAll();
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( work1FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( work1Future ).isPending();
 
 		resetAll();
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( work1Future ).isPending();
 
@@ -181,14 +181,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWorkResultFuture ) ).andReturn( bulkResultExtractionStepMock );
 		expect( bulkResultExtractionStepMock.add( work1, 0 ) ).andReturn( work1FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1 ) ) ).andReturn( (ElasticsearchWork) bulkWork );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
 	}
@@ -227,7 +227,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( work1, 0 ) ).andReturn( work1FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work2, 1 ) ).andReturn( work2FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
 
@@ -243,14 +243,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( work3, 2 ) ).andReturn( work3FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work4, 3 ) ).andReturn( work4FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWorkFutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2, work3, work4 ) ) ).andReturn( (ElasticsearchWork) bulkWork );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( bulkWorkFutureCapture.getValue() ).isSuccessful( bulkWork );
 	}
@@ -292,14 +292,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( work1, 0 ) ).andReturn( work1FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work2, 1 ) ).andReturn( work2FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWork1FutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work1, work2 ) ) ).andReturn( (ElasticsearchWork) bulkWork1 );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( bulkWork1FutureCapture.getValue() ).isSuccessful( bulkWork1 );
 
@@ -315,14 +315,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( work3, 0 ) ).andReturn( work3FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( work4, 1 ) ).andReturn( work4FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWork2FutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( work3, work4 ) ) ).andReturn( (ElasticsearchWork) bulkWork2 );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
 	}
@@ -384,14 +384,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		expect( bulkResultExtractionStepMock.add( additionalWork1, 0 ) ).andReturn( additionalWork1FutureFromSequenceBuilder );
 		expect( bulkResultExtractionStepMock.add( additionalWork2, 1 ) ).andReturn( additionalWork2FutureFromSequenceBuilder );
 		replayAll();
-		bulker.flushBulked();
+		bulker.addWorksToSequence();
 		verifyAll();
 		assertThat( bulkWork2FutureCapture.getValue() ).isPending();
 
 		resetAll();
 		expect( bulkWorkFactoryMock.apply( Arrays.asList( additionalWork1, additionalWork2 ) ) ).andReturn( (ElasticsearchWork) bulkWork2 );
 		replayAll();
-		bulker.flushBulk();
+		bulker.finalizeBulkWork();
 		verifyAll();
 		assertThat( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
 	}

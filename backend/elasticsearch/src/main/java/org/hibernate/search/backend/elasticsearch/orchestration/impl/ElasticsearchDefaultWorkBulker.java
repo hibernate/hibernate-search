@@ -27,18 +27,20 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final List<BulkableElasticsearchWork<?>> currentBulkItems;
 	private final List<CompletableFuture<?>> currentBulkItemsFutures;
-	private int currentBulkFirstUnflushedItem;
+	private int currentBulkFirstNonAddedItem;
 	private CompletableFuture<ElasticsearchWork<BulkResult>> currentBulkWorkFuture;
 	private CompletableFuture<BulkResult> currentBulkResultFuture;
 
 	/**
-	 * @param sequenceBuilder The sequence builder to send flushed works to
+	 * @param sequenceBuilder The sequence builder to add works to
 	 * @param bulkWorkFactory The factory for bulk works
 	 * @param minBulkSize Minimum number of works in a single bulk.
-	 * If a {@link #flushBulked() flush of bulked works} is requested before
+	 * If {@link #addWorksToSequence() adding works to the sequence} is requested before
 	 * this threshold has been reached, works will not be bulked.
 	 * @param maxBulkSize Maximum number of works in a single bulk.
-	 * If a bulk reaches this size, it will be automatically {@link #flushBulk() flushed}
+	 * If a bulk reaches this size, it will be automatically
+	 * {@link #addWorksToSequence() add the bulk work and work extractions to the sequence}
+	 * and {@link #finalizeBulkWork() finalize the bulk work}
 	 * to the underlying sequence builder.
 	 */
 	public ElasticsearchDefaultWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
@@ -51,7 +53,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 		this.currentBulkItems = new ArrayList<>();
 		this.currentBulkItemsFutures = new ArrayList<>();
-		this.currentBulkFirstUnflushedItem = 0;
+		this.currentBulkFirstNonAddedItem = 0;
 		this.currentBulkWorkFuture = null;
 		this.currentBulkResultFuture = null;
 	}
@@ -62,23 +64,23 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		currentBulkItems.add( work );
 		currentBulkItemsFutures.add( future );
 		if ( currentBulkItems.size() >= maxBulkSize ) {
-			flushBulked();
-			flushBulk();
+			addWorksToSequence();
+			finalizeBulkWork();
 		}
 		return future;
 	}
 
 	@Override
-	public boolean flushBulked() {
+	public boolean addWorksToSequence() {
 		int currentBulkWorksSize = currentBulkItems.size();
-		if ( currentBulkWorksSize <= currentBulkFirstUnflushedItem ) {
-			// No work to flush
+		if ( currentBulkWorksSize <= currentBulkFirstNonAddedItem ) {
+			// No work to add
 			return false;
 		}
-		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstUnflushedItem == 0 ) {
+		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstNonAddedItem == 0 ) {
 			/*
-			 * Not enough works in the bulk, and no work has been flushed yet.
-			 * We'll just flush the works without bulking them,
+			 * Not enough works in the bulk, and no work has been added to the sequence yet.
+			 * We'll just add the works to the sequence without bulking them,
 			 * and start a new bulk.
 			 */
 			for ( int i = 0; i < currentBulkWorksSize ; ++i ) {
@@ -95,19 +97,19 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		}
 
 		BulkResultExtractionStep extractionStep = sequenceBuilder.addBulkResultExtraction( currentBulkResultFuture );
-		for ( int i = currentBulkFirstUnflushedItem; i < currentBulkWorksSize ; ++i ) {
+		for ( int i = currentBulkFirstNonAddedItem; i < currentBulkWorksSize ; ++i ) {
 			BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
 			addAndConnectBulkedWorkExtraction( extractionStep, work, i );
 		}
-		currentBulkFirstUnflushedItem = currentBulkWorksSize;
+		currentBulkFirstNonAddedItem = currentBulkWorksSize;
 
 		return true;
 	}
 
 	@Override
-	public void flushBulk() {
-		if ( currentBulkItems.size() != currentBulkFirstUnflushedItem ) {
-			throw new AssertionFailure( "Some works haven't been flushed to the sequence builder" );
+	public void finalizeBulkWork() {
+		if ( currentBulkItems.size() != currentBulkFirstNonAddedItem ) {
+			throw new AssertionFailure( "Some works haven't been added to the sequence builder" );
 		}
 
 		if ( currentBulkWorkFuture == null ) {
@@ -124,7 +126,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	public void reset() {
 		this.currentBulkItems.clear();
 		this.currentBulkItemsFutures.clear();
-		this.currentBulkFirstUnflushedItem = 0;
+		this.currentBulkFirstNonAddedItem = 0;
 		this.currentBulkWorkFuture = null;
 		this.currentBulkResultFuture = null;
 	}

@@ -41,7 +41,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
 			work.aggregate( aggregator );
 		}
-		CompletableFuture<Void> future = aggregator.flushSequence();
+		CompletableFuture<Void> future = aggregator.buildSequence();
 		sequenceFutures.add( future );
 		return future;
 	}
@@ -50,7 +50,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.initSequence();
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		aggregator.flushSequence();
+		aggregator.buildSequence();
 		return workFuture;
 	}
 
@@ -92,7 +92,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 		@Override
 		public <T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work) {
 			if ( !currentBulkIsUsableInSameSequence ) {
-				bulker.flushBulk();
+				bulker.finalizeBulkWork();
 				currentBulkIsUsableInSameSequence = true;
 			}
 			return bulker.add( work );
@@ -100,7 +100,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 
 		@Override
 		public <T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work) {
-			if ( bulker.flushBulked() ) {
+			if ( bulker.addWorksToSequence() ) {
 				/*
 				 * A non-bulkable work follows bulked works,
 				 * so we won't be able to re-use the same bulk in the same sequence
@@ -111,15 +111,15 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 			return sequenceBuilder.addNonBulkExecution( work );
 		}
 
-		public CompletableFuture<Void> flushSequence() {
-			bulker.flushBulked();
+		public CompletableFuture<Void> buildSequence() {
+			bulker.addWorksToSequence();
 			CompletableFuture<Void> future = sequenceBuilder.build();
 			currentBulkIsUsableInSameSequence = true;
 			return future;
 		}
 
 		public void startSequences() {
-			bulker.flushBulk();
+			bulker.finalizeBulkWork();
 		}
 
 		public void reset() {

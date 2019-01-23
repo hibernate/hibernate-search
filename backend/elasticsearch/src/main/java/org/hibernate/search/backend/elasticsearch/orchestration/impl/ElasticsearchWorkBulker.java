@@ -32,7 +32,7 @@ public interface ElasticsearchWorkBulker {
 	 * <p>
 	 * After this method is called, the underlying sequence builder can
 	 * safely be used to build a new sequence, but the execution of bulked works
-	 * in this sequence will block until {@link #flushBulk()} has been called.
+	 * in this sequence will block until {@link #finalizeBulkWork()} has been called.
 	 *
 	 * @return {@code true} if works have been added to the sequence builder
 	 * <strong>as part of the current bulk</strong>,
@@ -40,18 +40,18 @@ public interface ElasticsearchWorkBulker {
 	 * (for instance if there was only one work) or if no work
 	 * was added to the sequence builder.
 	 */
-	boolean flushBulked();
+	boolean addWorksToSequence();
 
 	/**
 	 * Ensure that the bulk work (if any) is created.
 	 * <p>
-	 * This method expects that all works have been flushed to the sequence builder
-	 * using {@link #flushBulked()} beforehand.
+	 * This method expects that all works have been added to the sequence builder
+	 * using {@link #addWorksToSequence()} beforehand.
 	 * <p>
 	 * After this method is called, any new work added through {@link #add(BulkableElasticsearchWork)}
 	 * will be added to a new bulk.
 	 */
-	void flushBulk();
+	void finalizeBulkWork();
 
 	/**
 	 * Reset internal state.
