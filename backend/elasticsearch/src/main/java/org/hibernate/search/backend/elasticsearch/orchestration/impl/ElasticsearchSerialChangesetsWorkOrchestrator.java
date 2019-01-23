@@ -41,7 +41,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
 			work.aggregate( aggregator );
 		}
-		CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
 		future = sequenceFuture;
 		return sequenceFuture;
 	}
@@ -50,14 +50,14 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.init( future );
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		CompletableFuture<Void> sequenceFuture = aggregator.flushSequence();
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
 		future = sequenceFuture;
 		return workFuture;
 	}
 
 	@Override
 	public CompletableFuture<Void> executeSubmitted() {
-		aggregator.flushBulk();
+		aggregator.finalizeBulkWork();
 		return future;
 	}
 
@@ -89,7 +89,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 
 		@Override
 		public <T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work) {
-			if ( bulker.flushBulked() ) {
+			if ( bulker.addWorksToSequence() ) {
 				/*
 				 * We want to execute works in the exact order they were received,
 				 * so if a non-bulkable work is about to be added,
@@ -97,18 +97,18 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 				 * (otherwise the next bulked works may be executed
 				 * before the current non-bulkable work).
 				 */
-				bulker.flushBulk();
+				bulker.finalizeBulkWork();
 			}
 			return sequenceBuilder.addNonBulkExecution( work );
 		}
 
-		public CompletableFuture<Void> flushSequence() {
-			bulker.flushBulked();
+		public CompletableFuture<Void> buildSequence() {
+			bulker.addWorksToSequence();
 			return sequenceBuilder.build();
 		}
 
-		public void flushBulk() {
-			bulker.flushBulk();
+		public void finalizeBulkWork() {
+			bulker.finalizeBulkWork();
 		}
 
 		public void reset() {
