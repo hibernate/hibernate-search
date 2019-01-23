@@ -73,8 +73,12 @@ interface ElasticsearchWorkSequenceBuilder {
 	 *
 	 * @param bulkResultFuture The bulk work result
 	 */
-	BulkResultExtractionStep startBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture);
+	BulkResultExtractionStep addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture);
 
+	/**
+	 * Build the resulting {@link CompletableFuture} for this sequence by adding some final steps if necessary.
+	 * @return A completable future that will be complete when all the works in the sequence completed.
+	 */
 	CompletableFuture<Void> build();
 
 	interface BulkResultExtractionStep {

@@ -94,7 +94,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 			currentBulkResultFuture = sequenceBuilder.addBulkExecution( currentBulkWorkFuture );
 		}
 
-		BulkResultExtractionStep extractionStep = sequenceBuilder.startBulkResultExtraction( currentBulkResultFuture );
+		BulkResultExtractionStep extractionStep = sequenceBuilder.addBulkResultExtraction( currentBulkResultFuture );
 		for ( int i = currentBulkFirstUnflushedItem; i < currentBulkWorksSize ; ++i ) {
 			BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
 			addAndConnectBulkedWorkExtraction( extractionStep, work, i );
