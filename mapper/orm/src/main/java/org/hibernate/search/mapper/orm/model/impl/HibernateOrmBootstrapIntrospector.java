@@ -14,13 +14,14 @@ import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
@@ -31,7 +32,11 @@ import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.mapping.Component;
+import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.mapping.Property;
+import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
@@ -60,8 +65,13 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
 			ConfigurationPropertySource propertySource) {
-		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
-				.collect( Collectors.toMap( pc -> pc.getClassName(), Function.identity() ) );
+		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings();
+		Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new HashMap<>();
+		collectPersistentTypes( typeMetadata, metadata.getEntityBindings() );
+		for ( PersistentClass persistentClass : persistentClasses ) {
+			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getIdentifier() );
+			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getPropertyIterator() );
+		}
 
 		// TODO get the user lookup from Hibernate ORM?
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
@@ -94,11 +104,51 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				persistentClasses, reflectionManager, annotationHelper, propertyHandleFactory
+				typeMetadata, reflectionManager, annotationHelper, propertyHandleFactory
 		);
 	}
 
-	private final Map<String, PersistentClass> persistentClasses;
+	private static void collectPersistentTypes(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Collection<PersistentClass> persistentClasses) {
+		for ( PersistentClass persistentClass : persistentClasses ) {
+			collected.put( persistentClass.getMappedClass(), HibernateOrmBasicTypeMetadata.create( persistentClass ) );
+		}
+	}
+
+	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Iterator<Property> propertyIterator) {
+		while ( propertyIterator.hasNext() ) {
+			Property property = propertyIterator.next();
+			collectEmbeddedTypesRecursively( collected, property.getValue() );
+		}
+	}
+
+	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Value value) {
+		if ( value instanceof Component ) {
+			Component component = (Component) value;
+			// We don't care about duplicates, we assume they are all the same regarding the information we need
+			collected.computeIfAbsent(
+					component.getComponentClass(),
+					ignored -> HibernateOrmBasicTypeMetadata.create( component )
+			);
+			// Recurse
+			collectEmbeddedTypesRecursively( collected, component.getPropertyIterator() );
+		}
+		else if ( value instanceof org.hibernate.mapping.Collection ) {
+			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
+			// Recurse
+			collectEmbeddedTypesRecursively( collected, collection.getElement() );
+			if ( collection instanceof IndexedCollection ) {
+				IndexedCollection indexedCollection = (IndexedCollection) collection;
+				/*
+				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
+				 * but the value of the foreign key to the targeted entity...
+				 * We need to call getIndex() to retrieve the value of the map key.
+				 */
+				collectEmbeddedTypesRecursively( collected, indexedCollection.getIndex() );
+			}
+		}
+	}
+
+	private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata;
 	private final ReflectionManager reflectionManager;
 	private final PropertyHandleFactory propertyHandleFactory;
 	private final AnnotationHelper annotationHelper;
@@ -119,11 +169,11 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	private HibernateOrmBootstrapIntrospector(
-			Map<String, PersistentClass> persistentClasses,
+			Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata,
 			ReflectionManager reflectionManager,
 			AnnotationHelper annotationHelper,
 			PropertyHandleFactory propertyHandleFactory) {
-		this.persistentClasses = persistentClasses;
+		this.typeMetadata = typeMetadata;
 		this.reflectionManager = reflectionManager;
 		this.propertyHandleFactory = propertyHandleFactory;
 		this.annotationHelper = annotationHelper;
@@ -220,7 +270,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
 		return new HibernateOrmRawTypeModel<>(
-				this, type, persistentClasses.get( type.getName() ),
+				this, type, typeMetadata.get( type ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
 	}

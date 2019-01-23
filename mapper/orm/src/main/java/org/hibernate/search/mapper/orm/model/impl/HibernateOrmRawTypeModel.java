@@ -20,13 +20,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.MappingException;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.cfg.annotations.HCANNHelper;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
@@ -43,7 +39,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final XClass xClass;
 	private final Class<T> clazz;
-	private final PersistentClass persistentClass;
+	private final HibernateOrmBasicTypeMetadata metadataFromHibernateOrm;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
 
@@ -55,11 +51,11 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
 
 	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz,
-			PersistentClass persistentClass, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+			HibernateOrmBasicTypeMetadata metadataFromHibernateOrm, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
 		this.xClass = introspector.toXClass( clazz );
 		this.clazz = clazz;
-		this.persistentClass = persistentClass;
+		this.metadataFromHibernateOrm = metadataFromHibernateOrm;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( clazz );
 	}
@@ -280,19 +276,12 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	private Member getPropertyMemberFromHibernateOrmMetamodel(String propertyName) {
-		if ( persistentClass == null ) {
+		if ( metadataFromHibernateOrm == null ) {
 			// There isn't any Hibernate ORM metadata for this type
 			return null;
 		}
-		try {
-			Property property = persistentClass.getProperty( propertyName );
-			Getter getter = property.getGetter( clazz );
-			return getter.getMember();
-		}
-		catch (MappingException e) {
-			// Error resolving the property through the metadata
-			// Ignore this property
-			return null;
+		else {
+			return metadataFromHibernateOrm.getMemberOrNull( propertyName );
 		}
 	}
 
