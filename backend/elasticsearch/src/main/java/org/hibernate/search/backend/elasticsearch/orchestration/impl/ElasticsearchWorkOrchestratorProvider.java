@@ -169,7 +169,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 			refreshInBulkApiCall = false;
 		}
 
-		ElasticsearchFlushableWorkOrchestrator delegate =
+		ElasticsearchAccumulatingWorkOrchestrator delegate =
 				createThreadUnsafeSerialOrchestrator( contextSupplier, refreshInBulkApiCall );
 
 		return createBatchingSharedOrchestrator(
@@ -190,12 +190,12 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 
 	private ElasticsearchBatchingSharedWorkOrchestrator createBatchingSharedOrchestrator(
 			String name, int maxChangesetsPerBatch, boolean fair,
-			ElasticsearchFlushableWorkOrchestrator delegate) {
+			ElasticsearchAccumulatingWorkOrchestrator delegate) {
 		return new ElasticsearchBatchingSharedWorkOrchestrator( name, maxChangesetsPerBatch, fair,
 				delegate, errorHandler );
 	}
 
-	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeSerialOrchestrator(
+	private ElasticsearchAccumulatingWorkOrchestrator createThreadUnsafeSerialOrchestrator(
 			Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier,
 			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
@@ -203,7 +203,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		return new ElasticsearchSerialChangesetsWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeParallelOrchestrator(
+	private ElasticsearchAccumulatingWorkOrchestrator createThreadUnsafeParallelOrchestrator(
 			Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier,
 			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );

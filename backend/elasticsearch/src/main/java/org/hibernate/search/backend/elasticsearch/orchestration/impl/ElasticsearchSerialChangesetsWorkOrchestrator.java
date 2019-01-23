@@ -24,7 +24,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchFlushableWorkOrchestrator {
+class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccumulatingWorkOrchestrator {
 
 	private final BulkAndSequenceAggregator aggregator;
 
@@ -56,7 +56,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchFlus
 	}
 
 	@Override
-	public CompletableFuture<Void> flush() {
+	public CompletableFuture<Void> executeSubmitted() {
 		aggregator.flushBulk();
 		return future;
 	}
