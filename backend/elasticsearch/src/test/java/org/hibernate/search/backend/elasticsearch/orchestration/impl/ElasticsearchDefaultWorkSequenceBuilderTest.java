@@ -54,10 +54,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		Object work1Result = new Object();
 		Object work2Result = new Object();
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<Object> work1Future = new CompletableFuture<>();
 		CompletableFuture<Object> work2Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Object> work2FutureFromSequenceBuilder;
 
@@ -146,6 +149,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkItemResultExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
@@ -154,6 +158,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work3Future = new CompletableFuture<>();
 		CompletableFuture<Object> work4Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Object> work2FutureFromSequenceBuilder;
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
@@ -295,6 +301,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture1 = new CompletableFuture<>();
 		CompletableFuture<?> previousFuture2 = new CompletableFuture<>();
 		// We'll never complete this future, so as to check that work 2 is executed in a different sequence
@@ -386,10 +393,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		Object work0Result = new Object();
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<Object> work0Future = new CompletableFuture<>();
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work0FutureFromSequenceBuilder;
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
@@ -460,12 +470,15 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
 		BulkableElasticsearchWork<Void> work3 = bulkableWork( 3 );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
+		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Void> work3FutureFromSequenceBuilder;
-		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
-		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
 
 		MyException exception = new MyException();
 
@@ -529,13 +542,16 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableElasticsearchWork<Void> work3 = bulkableWork( 3 );
 		ElasticsearchWork<BulkResult> bulkWork = work( 4 );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<Void> work1FutureFromSequenceBuilder;
-		CompletableFuture<Void> work2FutureFromSequenceBuilder;
-		CompletableFuture<Void> work3FutureFromSequenceBuilder;
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
+		CompletableFuture<Void> work1FutureFromSequenceBuilder;
+		CompletableFuture<Void> work2FutureFromSequenceBuilder;
+		CompletableFuture<Void> work3FutureFromSequenceBuilder;
 
 		MyException exception = new MyException();
 
@@ -616,12 +632,15 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 		CompletableFuture<Object> work1Future = new CompletableFuture<>();
 		CompletableFuture<Object> work3Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
@@ -733,6 +752,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkItemResultExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
@@ -813,6 +833,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
@@ -820,6 +841,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 		CompletableFuture<Object> work3Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
@@ -942,6 +965,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<ElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
@@ -1026,6 +1050,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		ElasticsearchWork<Void> work1 = work( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
 
+		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
