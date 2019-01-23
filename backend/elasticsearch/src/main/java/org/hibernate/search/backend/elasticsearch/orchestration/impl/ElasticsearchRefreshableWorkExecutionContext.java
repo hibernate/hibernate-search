@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 /**
  * @author Yoann Rodiere
  */
-interface ElasticsearchFlushableWorkExecutionContext extends ElasticsearchWorkExecutionContext {
+interface ElasticsearchRefreshableWorkExecutionContext extends ElasticsearchWorkExecutionContext {
 
-	CompletableFuture<Void> flush();
+	CompletableFuture<Void> executePendingRefreshes();
 
 }

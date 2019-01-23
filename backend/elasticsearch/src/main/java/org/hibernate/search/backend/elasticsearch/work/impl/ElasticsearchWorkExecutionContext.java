@@ -17,7 +17,7 @@ public interface ElasticsearchWorkExecutionContext {
 
 	ElasticsearchClient getClient();
 
-	void setIndexDirty(URLEncodedString indexName);
+	void registerIndexToRefresh(URLEncodedString indexName);
 
 	GsonProvider getGsonProvider();
 

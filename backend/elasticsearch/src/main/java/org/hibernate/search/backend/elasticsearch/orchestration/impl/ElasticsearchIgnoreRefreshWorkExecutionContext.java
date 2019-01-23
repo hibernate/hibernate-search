@@ -12,13 +12,13 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
-class ElasticsearchIgnoreDirtyWorkExecutionContext implements ElasticsearchFlushableWorkExecutionContext {
+class ElasticsearchIgnoreRefreshWorkExecutionContext implements ElasticsearchRefreshableWorkExecutionContext {
 
 	private final ElasticsearchClient client;
 
 	private final GsonProvider gsonProvider;
 
-	public ElasticsearchIgnoreDirtyWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
+	public ElasticsearchIgnoreRefreshWorkExecutionContext(ElasticsearchClient client, GsonProvider gsonProvider) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 	}
@@ -34,12 +34,12 @@ class ElasticsearchIgnoreDirtyWorkExecutionContext implements ElasticsearchFlush
 	}
 
 	@Override
-	public void setIndexDirty(URLEncodedString indexName) {
+	public void registerIndexToRefresh(URLEncodedString indexName) {
 		// Ignored
 	}
 
 	@Override
-	public CompletableFuture<Void> flush() {
+	public CompletableFuture<Void> executePendingRefreshes() {
 		return CompletableFuture.completedFuture( null );
 	}
 }

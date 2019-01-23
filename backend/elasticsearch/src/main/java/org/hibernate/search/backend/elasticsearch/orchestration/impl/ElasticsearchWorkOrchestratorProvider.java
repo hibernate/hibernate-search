@@ -158,7 +158,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		 * refreshes for works bulked in the same bulk API call. Non-bulked works will have
 		 * their refresh executed at the end of each changeset.
 		 */
-		Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier;
+		Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier;
 		boolean refreshInBulkApiCall;
 		if ( refreshAfterWrite ) {
 			contextSupplier = this::createRefreshingWorkExecutionContext;
@@ -196,7 +196,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeSerialOrchestrator(
-			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier,
+			Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier,
 			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, SERIAL_MIN_BULK_SIZE, refreshInBulkAPICall );
@@ -204,14 +204,14 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	private ElasticsearchFlushableWorkOrchestrator createThreadUnsafeParallelOrchestrator(
-			Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier,
+			Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier,
 			boolean refreshInBulkAPICall) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( contextSupplier );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, PARALLEL_MIN_BULK_SIZE, refreshInBulkAPICall );
 		return new ElasticsearchParallelChangesetsWorkOrchestrator( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchFlushableWorkExecutionContext> contextSupplier) {
+	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
 		return new ElasticsearchDefaultWorkSequenceBuilder(
 				contextSupplier,
 				() -> new DefaultContextualErrorHandler( errorHandler )
@@ -226,12 +226,12 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 				);
 	}
 
-	private ElasticsearchFlushableWorkExecutionContext createIgnoreDirtyWorkExecutionContext() {
-		return new ElasticsearchIgnoreDirtyWorkExecutionContext( client, gsonProvider );
+	private ElasticsearchRefreshableWorkExecutionContext createIgnoreDirtyWorkExecutionContext() {
+		return new ElasticsearchIgnoreRefreshWorkExecutionContext( client, gsonProvider );
 	}
 
-	private ElasticsearchFlushableWorkExecutionContext createRefreshingWorkExecutionContext() {
-		return new ElasticsearchRefreshingWorkExecutionContext(
+	private ElasticsearchRefreshableWorkExecutionContext createRefreshingWorkExecutionContext() {
+		return new ElasticsearchDefaultWorkExecutionContext(
 				client, gsonProvider, workFactory, errorHandler );
 	}
 
