@@ -84,7 +84,7 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 			result = generateResult( executionContext, bulkResponseItem );
 
 			if ( markIndexDirty ) {
-				executionContext.setIndexDirty( dirtiedIndexName );
+				executionContext.registerIndexToRefresh( dirtiedIndexName );
 			}
 		}
 		catch (RuntimeException e) {

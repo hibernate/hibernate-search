@@ -92,7 +92,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 			result = generateResult( executionContext, response );
 
 			if ( markIndexDirty ) {
-				executionContext.setIndexDirty( dirtiedIndexName );
+				executionContext.registerIndexToRefresh( dirtiedIndexName );
 			}
 		}
 		catch (RuntimeException e) {

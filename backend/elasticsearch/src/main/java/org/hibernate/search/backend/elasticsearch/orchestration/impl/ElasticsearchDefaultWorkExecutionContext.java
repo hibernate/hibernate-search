@@ -24,11 +24,11 @@ import org.hibernate.search.util.impl.common.Futures;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
- * The execution context used in orchestrators when we need to refresh dirty indexes after a sequence of works.
+ * The execution context used in orchestrators when we need to refresh indexes after a sequence of works.
  * <p>
  * This context is mutable and is not thread-safe.
  */
-class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlushableWorkExecutionContext {
+class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshableWorkExecutionContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -40,18 +40,18 @@ class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlusha
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 
-	private final Set<URLEncodedString> dirtyIndexes = new HashSet<>();
+	private final Set<URLEncodedString> indexesToRefresh = new HashSet<>();
 
-	private final ElasticsearchWorkExecutionContext flushExecutionContext;
+	private final ElasticsearchWorkExecutionContext refreshExecutionContext;
 
-	public ElasticsearchRefreshingWorkExecutionContext(ElasticsearchClient client,
+	public ElasticsearchDefaultWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
 			ErrorHandler errorHandler) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
 		this.errorHandler = errorHandler;
 		this.workFactory = workFactory;
-		this.flushExecutionContext = new ElasticsearchImmutableWorkExecutionContext( client, gsonProvider );
+		this.refreshExecutionContext = new ElasticsearchImmutableWorkExecutionContext( client, gsonProvider );
 	}
 
 	@Override
@@ -65,35 +65,34 @@ class ElasticsearchRefreshingWorkExecutionContext implements ElasticsearchFlusha
 	}
 
 	@Override
-	public void setIndexDirty(URLEncodedString indexName) {
-		dirtyIndexes.add( indexName );
+	public void registerIndexToRefresh(URLEncodedString indexName) {
+		indexesToRefresh.add( indexName );
 	}
 
 	@Override
-	public CompletableFuture<Void> flush() {
+	public CompletableFuture<Void> executePendingRefreshes() {
 		CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
 
-		// Refresh dirty indexes
-		if ( !dirtyIndexes.isEmpty() ) {
-			future = future.thenCompose( ignored -> refreshDirtyIndexes() )
-					.thenRun( () -> dirtyIndexes.clear() );
+		if ( !indexesToRefresh.isEmpty() ) {
+			future = future.thenCompose( ignored -> refreshIndexes() )
+					.thenRun( () -> indexesToRefresh.clear() );
 		}
 
 		return future;
 	}
 
-	private CompletableFuture<?> refreshDirtyIndexes() {
+	private CompletableFuture<?> refreshIndexes() {
 		if ( log.isTraceEnabled() ) {
-			log.tracef( "Refreshing index(es) %s", dirtyIndexes );
+			log.tracef( "Refreshing index(es) %s", indexesToRefresh );
 		}
 
 		RefreshWorkBuilder builder = workFactory.refresh();
-		for ( URLEncodedString index : dirtyIndexes ) {
+		for ( URLEncodedString index : indexesToRefresh ) {
 			builder.index( index );
 		}
 		ElasticsearchWork<?> work = builder.build();
 
-		return work.execute( flushExecutionContext )
+		return work.execute( refreshExecutionContext )
 				.handle( Futures.handler(
 						(result, throwable) -> {
 							if ( throwable != null ) {

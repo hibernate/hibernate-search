@@ -103,7 +103,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		}
 
 		@Override
-		public void setIndexDirty(URLEncodedString indexName) {
+		public void registerIndexToRefresh(URLEncodedString indexName) {
 			// Don't delegate
 		}
 	}

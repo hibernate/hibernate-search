@@ -34,8 +34,8 @@ public class ElasticsearchForwardingWorkExecutionContext implements Elasticsearc
 	}
 
 	@Override
-	public void setIndexDirty(URLEncodedString indexName) {
-		delegate.setIndexDirty( indexName );
+	public void registerIndexToRefresh(URLEncodedString indexName) {
+		delegate.registerIndexToRefresh( indexName );
 	}
 
 }
