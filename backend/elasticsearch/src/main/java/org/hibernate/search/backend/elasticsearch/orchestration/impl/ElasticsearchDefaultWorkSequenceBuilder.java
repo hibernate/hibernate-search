@@ -22,9 +22,6 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 /**
  * A simple implementation of {@link ElasticsearchWorkSequenceBuilder}.
  * <p>
- * Execution of works will not be performed by this class;
- * instead, it delegates to an "executor" passed to the constructor.
- * <p>
  * Works will be executed inside a sequence-scoped context (a {@link ElasticsearchRefreshableWorkExecutionContext}),
  * ultimately leading to a {@link ElasticsearchRefreshableWorkExecutionContext#executePendingRefreshes()}.
  */
