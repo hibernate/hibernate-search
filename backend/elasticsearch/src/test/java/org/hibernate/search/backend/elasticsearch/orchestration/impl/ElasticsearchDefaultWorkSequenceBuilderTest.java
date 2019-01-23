@@ -175,7 +175,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		work1FutureFromSequenceBuilder = builder.addNonBulkExecution( work1 );
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 0 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 1 );
 		work4FutureFromSequenceBuilder = builder.addNonBulkExecution( work4 );
@@ -484,7 +484,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
@@ -554,7 +554,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
@@ -644,7 +644,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
@@ -757,7 +757,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		extractionStep.add( work1, 0 );
 		extractionStep.add( work2, 1 );
 		builder.addNonBulkExecution( work3 );
@@ -842,7 +842,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
@@ -967,7 +967,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		resetAll();
 		replayAll();
 		CompletableFuture<BulkResult> sequenceBuilderBulkResultFuture = builder.addBulkExecution( bulkWorkFuture );
-		BulkResultExtractionStep extractionStep = builder.startBulkResultExtraction( sequenceBuilderBulkResultFuture );
+		BulkResultExtractionStep extractionStep = builder.addBulkResultExtraction( sequenceBuilderBulkResultFuture );
 		extractionStep.add( work1, 0 );
 		extractionStep.add( work2, 1 );
 		builder.addNonBulkExecution( work3 );

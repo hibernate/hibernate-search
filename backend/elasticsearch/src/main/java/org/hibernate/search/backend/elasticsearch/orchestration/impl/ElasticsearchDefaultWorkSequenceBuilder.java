@@ -121,7 +121,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	}
 
 	@Override
-	public BulkResultExtractionStep startBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture) {
+	public BulkResultExtractionStep addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture) {
 		// Use local variables to make sure the lambdas won't be affected by a reset()
 		final ElasticsearchWorkExecutionContext context = this.executionContext;
 		CompletableFuture<BulkResultItemExtractor> extractorFuture =
