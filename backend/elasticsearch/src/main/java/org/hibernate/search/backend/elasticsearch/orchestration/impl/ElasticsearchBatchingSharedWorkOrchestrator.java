@@ -39,7 +39,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchFlushableWorkOrchestrator delegate;
+	private final ElasticsearchAccumulatingWorkOrchestrator delegate;
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
 
@@ -68,7 +68,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 	 */
 	public ElasticsearchBatchingSharedWorkOrchestrator(
 			String name, int maxChangesetsPerBatch, boolean fair,
-			ElasticsearchFlushableWorkOrchestrator delegate,
+			ElasticsearchAccumulatingWorkOrchestrator delegate,
 			ErrorHandler errorHandler) {
 		super( name );
 		this.delegate = delegate;
@@ -205,7 +205,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 
 					for ( Changeset changeset : changesetBuffer ) {
 						try {
-							changeset.applyToDelegate( delegate );
+							changeset.submitTo( delegate );
 						}
 						catch (Throwable e) {
 							changeset.getFuture().completeExceptionally( e );
@@ -213,8 +213,8 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 						}
 					}
 
-					// Nothing more to do, flush and terminate
-					future = delegate.flush();
+					// Nothing more to do, executeSubmitted and terminate
+					future = delegate.executeSubmitted();
 				}
 			}
 			finally {

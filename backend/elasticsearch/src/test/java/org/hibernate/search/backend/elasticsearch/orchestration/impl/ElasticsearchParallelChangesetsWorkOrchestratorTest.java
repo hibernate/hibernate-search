@@ -79,7 +79,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		resetAll();
 		bulkerMock.flushBulk();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.flush();
+		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isPending();
 		sequenceFuture.complete( null );
@@ -130,7 +130,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		resetAll();
 		bulkerMock.flushBulk();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.flush();
+		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isPending();
 		sequence2Future.complete( null );
@@ -182,7 +182,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		resetAll();
 		bulkerMock.flushBulk();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.flush();
+		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isPending();
 
@@ -236,7 +236,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		resetAll();
 		bulkerMock.flushBulk();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.flush();
+		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isPending();
 
@@ -295,7 +295,7 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		resetAll();
 		bulkerMock.flushBulk();
 		replayAll();
-		CompletableFuture<Void> futureAll = orchestrator.flush();
+		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isPending();
 

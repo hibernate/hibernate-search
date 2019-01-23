@@ -9,12 +9,12 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An {@link ElasticsearchWorkOrchestrator} requiring a call to {@link #flush()}
+ * An {@link ElasticsearchWorkOrchestrator} requiring a call to {@link #executeSubmitted()}
  * to finalize orchestration, and calls to {@link #reset()} before re-use.
  *
  * @author Yoann Rodiere
  */
-interface ElasticsearchFlushableWorkOrchestrator extends ElasticsearchWorkOrchestrator {
+interface ElasticsearchAccumulatingWorkOrchestrator extends ElasticsearchWorkOrchestrator {
 
 	/**
 	 * Ensure all works submitted since the last call to {@link #reset()} will
@@ -23,7 +23,7 @@ interface ElasticsearchFlushableWorkOrchestrator extends ElasticsearchWorkOrches
 	 * @return A future completing when all submitted since the last call to {@link #reset()}
 	 * have completed.
 	 */
-	CompletableFuture<?> flush();
+	CompletableFuture<?> executeSubmitted();
 
 	void reset();
 

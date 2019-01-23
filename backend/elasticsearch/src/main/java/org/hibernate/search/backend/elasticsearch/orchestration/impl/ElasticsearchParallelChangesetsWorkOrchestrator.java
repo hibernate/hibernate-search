@@ -25,7 +25,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFlushableWorkOrchestrator {
+class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAccumulatingWorkOrchestrator {
 
 	private final BulkAndSequenceAggregator aggregator;
 	private final List<CompletableFuture<?>> sequenceFutures = new ArrayList<>();
@@ -55,7 +55,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchFl
 	}
 
 	@Override
-	public CompletableFuture<Void> flush() {
+	public CompletableFuture<Void> executeSubmitted() {
 		CompletableFuture<Void> future =
 				CompletableFuture.allOf( sequenceFutures.toArray( new CompletableFuture[ sequenceFutures.size()] ) );
 		sequenceFutures.clear();

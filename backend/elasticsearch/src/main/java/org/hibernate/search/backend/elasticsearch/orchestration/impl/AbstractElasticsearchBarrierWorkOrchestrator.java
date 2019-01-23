@@ -97,7 +97,7 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 	}
 
 	interface Changeset {
-		void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate);
+		void submitTo(ElasticsearchAccumulatingWorkOrchestrator delegate);
 		CompletableFuture<?> getFuture();
 	}
 
@@ -111,7 +111,7 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 		}
 
 		@Override
-		public void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate) {
+		public void submitTo(ElasticsearchAccumulatingWorkOrchestrator delegate) {
 			delegate.submit( works ).whenComplete( Futures.copyHandler( future ) );
 		}
 
@@ -131,7 +131,7 @@ abstract class AbstractElasticsearchBarrierWorkOrchestrator
 		}
 
 		@Override
-		public void applyToDelegate(ElasticsearchFlushableWorkOrchestrator delegate) {
+		public void submitTo(ElasticsearchAccumulatingWorkOrchestrator delegate) {
 			delegate.submit( work ).whenComplete( Futures.copyHandler( future ) );
 		}
 
