@@ -41,8 +41,13 @@ public class ElasticsearchSchemaAccessor {
 		this.orchestrator = orchestrator;
 	}
 
-	public void createIndex(URLEncodedString indexName, IndexSettings settings, ElasticsearchIndexManagementExecutionOptions executionOptions) {
-		ElasticsearchWork<?> work = workFactory.createIndex( indexName ).settings( settings ).build();
+	public void createIndex(URLEncodedString indexName, IndexSettings settings,
+			URLEncodedString typeName, RootTypeMapping mapping,
+			ElasticsearchIndexManagementExecutionOptions executionOptions) {
+		ElasticsearchWork<?> work = workFactory.createIndex( indexName )
+				.settings( settings )
+				.mapping( typeName, mapping )
+				.build();
 		execute( work );
 	}
 
@@ -52,9 +57,12 @@ public class ElasticsearchSchemaAccessor {
 	 * @param executionOptions The execution options
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
+			URLEncodedString typeName, RootTypeMapping mapping,
+			ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
+				.mapping( typeName, mapping )
 				.ignoreExisting()
 				.build();
 		CreateIndexResult result = execute( work );

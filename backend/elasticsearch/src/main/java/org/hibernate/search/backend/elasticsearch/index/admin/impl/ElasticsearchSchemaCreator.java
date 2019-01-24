@@ -17,7 +17,7 @@ import org.hibernate.search.util.SearchException;
 public interface ElasticsearchSchemaCreator {
 
 	/**
-	 * Create an index.
+	 * Create an index and its mapping.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @param executionOptions The execution options, giving more context information.
@@ -26,7 +26,7 @@ public interface ElasticsearchSchemaCreator {
 	void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 	/**
-	 * Create an index, but only if the index doesn't already exist.
+	 * Create an index and its mapping, but only if the index doesn't already exist.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @param executionOptions The execution options, giving more context information.
@@ -43,16 +43,5 @@ public interface ElasticsearchSchemaCreator {
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
 	void checkIndexExists(URLEncodedString indexname, ElasticsearchIndexManagementExecutionOptions executionOptions);
-
-	/**
-	 * Create the mapping on a supposedly existing index.
-	 *
-	 * <p>The mapping is supposed to be absent from the index.
-	 *
-	 * @param indexMetadata The expected index metadata.
-	 * @param executionOptions The execution options, giving more context information.
-	 * @throws SearchException If an error occurs.
-	 */
-	void createMapping(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
 
 }
