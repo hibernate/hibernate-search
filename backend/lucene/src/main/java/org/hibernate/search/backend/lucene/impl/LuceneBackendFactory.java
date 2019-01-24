@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.impl.InitialLuceneAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyConfiguration;
+import org.hibernate.search.backend.lucene.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -66,9 +66,9 @@ public class LuceneBackendFactory implements BackendFactory {
 					.withDefault( () -> Paths.get( "." ) )
 					.build();
 
-	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
+	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
-					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
+					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::fromExternalRepresentation )
 					.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
@@ -140,9 +140,9 @@ public class LuceneBackendFactory implements BackendFactory {
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(EventContext backendContext, ConfigurationPropertySource propertySource) {
-		MultiTenancyStrategyConfiguration multiTenancyStrategyConfiguration = MULTI_TENANCY_STRATEGY.get( propertySource );
+		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
 
-		switch ( multiTenancyStrategyConfiguration ) {
+		switch ( multiTenancyStrategyName ) {
 			case NONE:
 				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:
@@ -150,7 +150,7 @@ public class LuceneBackendFactory implements BackendFactory {
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'. %2$s",
-						multiTenancyStrategyConfiguration,
+						multiTenancyStrategyName,
 						backendContext.render()
 				) );
 		}

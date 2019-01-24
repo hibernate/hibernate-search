@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -35,10 +35,10 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyConfiguration> strategies() {
+	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexManagementStrategyConfiguration.NONE, ElasticsearchIndexManagementStrategyConfiguration.VALIDATE
+				ElasticsearchIndexManagementStrategyName.NONE, ElasticsearchIndexManagementStrategyName.VALIDATE
 		) );
 	}
 
@@ -48,9 +48,9 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexManagementStrategyConfiguration strategy;
+	private final ElasticsearchIndexManagementStrategyName strategy;
 
-	public ElasticsearchNormalizerDefinitionCreationIT(ElasticsearchIndexManagementStrategyConfiguration strategy) {
+	public ElasticsearchNormalizerDefinitionCreationIT(ElasticsearchIndexManagementStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}

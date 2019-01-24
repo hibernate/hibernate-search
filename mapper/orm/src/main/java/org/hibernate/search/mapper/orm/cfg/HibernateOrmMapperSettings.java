@@ -82,7 +82,7 @@ public final class HibernateOrmMapperSettings {
 
 		public static final boolean ENABLE_CONFIGURATION_PROPERTY_TRACKING = true;
 		public static final boolean AUTOREGISTER_LISTENERS = true;
-		public static final IndexingStrategyConfiguration INDEXING_STRATEGY = IndexingStrategyConfiguration.EVENT;
+		public static final HibernateOrmIndexingStrategyName INDEXING_STRATEGY = HibernateOrmIndexingStrategyName.EVENT;
 		public static final boolean ENABLE_DIRTY_CHECK = true;
 		public static final boolean ENABLE_ANNOTATION_MAPPING = true;
 	}

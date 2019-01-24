@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
  *
  * @author Gunnar Morling
  */
-public enum IndexingStrategyConfiguration {
+public enum HibernateOrmIndexingStrategyName {
 
 	/**
 	 * Indexing is triggered automatically upon entity insertion, update etc.
@@ -33,22 +33,22 @@ public enum IndexingStrategyConfiguration {
 
 	private String externalRepresentation;
 
-	private IndexingStrategyConfiguration(String externalRepresentation) {
+	private HibernateOrmIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 
 	/**
-	 * Returns the {@link IndexingStrategyConfiguration} matching the given external representation as specified via
+	 * Returns the {@link HibernateOrmIndexingStrategyName} matching the given external representation as specified via
 	 * {@link HibernateOrmMapperSettings#INDEXING_STRATEGY}
 	 * @param indexingMode the indexing mode external representation
-	 * @return the {@link IndexingStrategyConfiguration}
+	 * @return the {@link HibernateOrmIndexingStrategyName}
 	 */
-	public static IndexingStrategyConfiguration fromExternalRepresentation(String indexingMode) {
+	public static HibernateOrmIndexingStrategyName fromExternalRepresentation(String indexingMode) {
 		if ( EVENT.toExternalRepresentation().equals( indexingMode ) ) {
-			return IndexingStrategyConfiguration.EVENT;
+			return HibernateOrmIndexingStrategyName.EVENT;
 		}
 		else if ( MANUAL.toExternalRepresentation().equals( indexingMode ) ) {
-			return IndexingStrategyConfiguration.MANUAL;
+			return HibernateOrmIndexingStrategyName.MANUAL;
 		}
 		else {
 			throw LOG.unknownIndexingMode( indexingMode );

@@ -65,6 +65,6 @@ public final class ElasticsearchBackendSettings {
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final String DISCOVERY_SCHEME = "http";
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
-		public static final MultiTenancyStrategyConfiguration MULTI_TENANCY_STRATEGY = MultiTenancyStrategyConfiguration.NONE;
+		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
 }

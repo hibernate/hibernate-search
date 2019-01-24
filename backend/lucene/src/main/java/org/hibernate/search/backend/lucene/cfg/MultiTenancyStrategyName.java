@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.cfg;
+package org.hibernate.search.backend.lucene.cfg;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
-public enum MultiTenancyStrategyConfiguration {
+public enum MultiTenancyStrategyName {
 
 	/**
 	 * Single tenant configuration.
@@ -27,11 +27,11 @@ public enum MultiTenancyStrategyConfiguration {
 
 	private final String externalRepresentation;
 
-	private MultiTenancyStrategyConfiguration(String externalRepresentation) {
+	private MultiTenancyStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	public static MultiTenancyStrategyConfiguration fromExternalRepresentation(String multiTenancyStrategy) {
+	public static MultiTenancyStrategyName fromExternalRepresentation(String multiTenancyStrategy) {
 		if ( NONE.externalRepresentation.equals( multiTenancyStrategy ) ) {
 			return NONE;
 		}
