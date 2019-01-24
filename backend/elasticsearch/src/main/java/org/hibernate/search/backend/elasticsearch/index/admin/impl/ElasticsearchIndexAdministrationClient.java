@@ -42,16 +42,12 @@ public class ElasticsearchIndexAdministrationClient {
 	}
 
 	public void createIfAbsent(ElasticsearchIndexManagementExecutionOptions executionOptions) {
-		boolean createdIndex = schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
-		if ( createdIndex ) {
-			schemaCreator.createMapping( expectedMetadata, executionOptions );
-		}
+		schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
 	}
 
 	public void dropAndCreate(ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		schemaDropper.dropIfExisting( elasticsearchIndexName, executionOptions );
 		schemaCreator.createIndex( expectedMetadata, executionOptions );
-		schemaCreator.createMapping( expectedMetadata, executionOptions );
 	}
 
 	public void dropIfExisting(ElasticsearchIndexManagementExecutionOptions executionOptions) {
@@ -60,10 +56,7 @@ public class ElasticsearchIndexAdministrationClient {
 
 	public void update(ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		boolean createdIndex = schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
-		if ( createdIndex ) {
-			schemaCreator.createMapping( expectedMetadata, executionOptions );
-		}
-		else {
+		if ( !createdIndex ) {
 			schemaMigrator.migrate( expectedMetadata, executionOptions );
 		}
 	}

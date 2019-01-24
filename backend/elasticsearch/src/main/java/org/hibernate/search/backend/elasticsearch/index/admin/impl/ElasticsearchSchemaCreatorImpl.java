@@ -32,7 +32,11 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	public void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
-		schemaAccessor.createIndex( indexName, indexMetadata.getSettings(), executionOptions );
+		schemaAccessor.createIndex(
+				indexName, indexMetadata.getSettings(),
+				indexMetadata.getTypeName(), indexMetadata.getMapping(),
+				executionOptions
+		);
 
 		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
 	}
@@ -44,7 +48,11 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 		boolean created = false;
 
 		if ( !schemaAccessor.indexExists( indexName ) ) {
-			created = schemaAccessor.createIndexIfAbsent( indexName, indexMetadata.getSettings(), executionOptions );
+			created = schemaAccessor.createIndexIfAbsent(
+					indexName, indexMetadata.getSettings(),
+					indexMetadata.getTypeName(), indexMetadata.getMapping(),
+					executionOptions
+			);
 		}
 
 		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
@@ -60,13 +68,6 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 		else {
 			throw log.indexMissing( indexName );
 		}
-	}
-
-	@Override
-	public void createMapping(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
-		URLEncodedString indexName = indexMetadata.getName();
-		URLEncodedString typeName = indexMetadata.getTypeName();
-		schemaAccessor.putMapping( indexName, typeName, indexMetadata.getMapping() );
 	}
 
 }
