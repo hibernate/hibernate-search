@@ -29,7 +29,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
 		schemaAccessor.createIndex(
@@ -42,7 +42,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
 		boolean created = false;
@@ -61,7 +61,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void checkIndexExists(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public void checkIndexExists(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		if ( schemaAccessor.indexExists( indexName ) ) {
 			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
 		}

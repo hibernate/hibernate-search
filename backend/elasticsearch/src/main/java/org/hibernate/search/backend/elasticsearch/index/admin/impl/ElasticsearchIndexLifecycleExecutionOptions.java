@@ -12,13 +12,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public class ElasticsearchIndexManagementExecutionOptions {
+public class ElasticsearchIndexLifecycleExecutionOptions {
 
 	private final ElasticsearchIndexStatus requiredStatus;
 
 	private final int requiredStatusTimeoutInMs;
 
-	public ElasticsearchIndexManagementExecutionOptions(
+	public ElasticsearchIndexLifecycleExecutionOptions(
 			ElasticsearchIndexStatus requiredStatus, int requiredStatusTimeoutInMs) {
 		this.requiredStatus = requiredStatus;
 		this.requiredStatusTimeoutInMs = requiredStatusTimeoutInMs;

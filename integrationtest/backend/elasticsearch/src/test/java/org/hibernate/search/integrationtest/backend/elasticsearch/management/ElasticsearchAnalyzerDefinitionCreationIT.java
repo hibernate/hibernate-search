@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -35,10 +35,10 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
+	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexManagementStrategyName.NONE, ElasticsearchIndexManagementStrategyName.VALIDATE
+				ElasticsearchIndexLifecycleStrategyName.NONE, ElasticsearchIndexLifecycleStrategyName.VALIDATE
 		) );
 	}
 
@@ -48,9 +48,9 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexManagementStrategyName strategy;
+	private final ElasticsearchIndexLifecycleStrategyName strategy;
 
-	public ElasticsearchAnalyzerDefinitionCreationIT(ElasticsearchIndexManagementStrategyName strategy) {
+	public ElasticsearchAnalyzerDefinitionCreationIT(ElasticsearchIndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -126,7 +126,7 @@ public class ElasticsearchAnalyzerDefinitionCreationIT {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalName()
 				)
 				.withBackendProperty(

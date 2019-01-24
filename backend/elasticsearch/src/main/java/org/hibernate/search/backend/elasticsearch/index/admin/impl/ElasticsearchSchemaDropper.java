@@ -23,7 +23,7 @@ public interface ElasticsearchSchemaDropper {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void drop(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions);
+	void drop(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 	/**
 	 * Drops an index, throwing an exception if dropping fails.
@@ -34,6 +34,6 @@ public interface ElasticsearchSchemaDropper {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void dropIfExisting(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions);
+	void dropIfExisting(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 }

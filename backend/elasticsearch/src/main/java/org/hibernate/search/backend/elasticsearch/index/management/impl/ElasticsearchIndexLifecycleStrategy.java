@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.management.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexManagementExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.util.AssertionFailure;
 
-public class ElasticsearchIndexManagementStrategy {
+public class ElasticsearchIndexLifecycleStrategy {
 
-	private final ElasticsearchIndexManagementStrategyName strategyName;
-	protected final ElasticsearchIndexManagementExecutionOptions executionOptions;
+	private final ElasticsearchIndexLifecycleStrategyName strategyName;
+	protected final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
-	public ElasticsearchIndexManagementStrategy(
-			ElasticsearchIndexManagementStrategyName strategyName,
-			ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public ElasticsearchIndexLifecycleStrategy(
+			ElasticsearchIndexLifecycleStrategyName strategyName,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		this.strategyName = strategyName;
 		this.executionOptions = executionOptions;
 	}

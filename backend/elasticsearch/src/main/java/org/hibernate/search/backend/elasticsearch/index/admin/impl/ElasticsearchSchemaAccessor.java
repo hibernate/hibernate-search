@@ -43,7 +43,7 @@ public class ElasticsearchSchemaAccessor {
 
 	public void createIndex(URLEncodedString indexName, IndexSettings settings,
 			URLEncodedString typeName, RootTypeMapping mapping,
-			ElasticsearchIndexManagementExecutionOptions executionOptions) {
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.mapping( typeName, mapping )
@@ -59,7 +59,7 @@ public class ElasticsearchSchemaAccessor {
 	 */
 	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
 			URLEncodedString typeName, RootTypeMapping mapping,
-			ElasticsearchIndexManagementExecutionOptions executionOptions) {
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.mapping( typeName, mapping )
@@ -123,7 +123,7 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public void waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchIndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
@@ -134,12 +134,12 @@ public class ElasticsearchSchemaAccessor {
 		execute( work );
 	}
 
-	public void dropIndex(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public void dropIndex(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).build();
 		execute( work );
 	}
 
-	public void dropIndexIfExisting(URLEncodedString indexName, ElasticsearchIndexManagementExecutionOptions executionOptions) {
+	public void dropIndexIfExisting(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
 		execute( work );
 	}

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexManagementStrategy;
+import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
@@ -33,7 +33,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
-	private final ElasticsearchIndexManagementStrategy indexManagementStrategy;
+	private final ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy;
 	private final boolean refreshAfterWrite;
 
 
@@ -42,7 +42,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
-			ElasticsearchIndexManagementStrategy indexManagementStrategy,
+			ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
@@ -51,7 +51,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
-		this.indexManagementStrategy = indexManagementStrategy;
+		this.indexLifecycleStrategy = indexLifecycleStrategy;
 		this.refreshAfterWrite = refreshAfterWrite;
 	}
 
@@ -86,7 +86,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 					indexingBackendContext, searchBackendContext,
 					hibernateSearchIndexName, encodedElasticsearchIndexName,
 					encodedTypeName, model,
-					indexManagementStrategy,
+					indexLifecycleStrategy,
 					serialOrchestrator, parallelOrchestrator,
 					refreshAfterWrite
 			);

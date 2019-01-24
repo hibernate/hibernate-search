@@ -14,11 +14,11 @@ public final class ElasticsearchIndexSettings {
 	private ElasticsearchIndexSettings() {
 	}
 
-	public static final String MANAGEMENT_STRATEGY = "management.strategy";
+	public static final String LIFECYCLE_STRATEGY = "lifecycle.strategy";
 
-	public static final String MANAGEMENT_REQUIRED_STATUS = "management.required_status";
+	public static final String LIFECYCLE_REQUIRED_STATUS = "lifecycle.required_status";
 
-	public static final String MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT = "management.required_status_wait_timeout";
+	public static final String LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.required_status_wait_timeout";
 
 	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";
 
@@ -30,9 +30,9 @@ public final class ElasticsearchIndexSettings {
 		private Defaults() {
 		}
 
-		public static final ElasticsearchIndexManagementStrategyName MANAGEMENT_STRATEGY = ElasticsearchIndexManagementStrategyName.CREATE;
-		public static final ElasticsearchIndexStatus MANAGEMENT_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
-		public static final int MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
+		public static final ElasticsearchIndexLifecycleStrategyName LIFECYCLE_STRATEGY = ElasticsearchIndexLifecycleStrategyName.CREATE;
+		public static final ElasticsearchIndexStatus LIFECYCLE_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
+		public static final int LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 		public static final boolean REFRESH_AFTER_WRITE = false;
 	}
 
