@@ -23,6 +23,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -53,7 +54,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata,
-			ConfigurationPropertySource propertySource,
+			HibernateOrmConfigurationPropertySource propertySource,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmBootstrapIntrospector introspector =
 				HibernateOrmBootstrapIntrospector.create( metadata, propertySource );
@@ -69,7 +70,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(Metadata metadata,
-			ConfigurationPropertySource propertySource,
+			HibernateOrmConfigurationPropertySource propertySource,
 			HibernateOrmBootstrapIntrospector introspector,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		super(
@@ -81,8 +82,17 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		this.propertySource = propertySource;
 		this.introspector = introspector;
 
+		/*
+		 * This method is called when the session factory is created, and once again when HSearch boots.
+		 * It logs a warning when the configuration property is invalid,
+		 * so the warning will be logged twice.
+		 * Since it only happens when the configuration is invalid,
+		 * we can live with this quirk.
+		 */
+		MultiTenancyStrategy multiTenancyStrategy = MultiTenancyStrategy.determineMultiTenancyStrategy( propertySource.getAllRawProperties() );
+
 		setMultiTenancyEnabled(
-				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
+				!MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
 		);
 	}
 
