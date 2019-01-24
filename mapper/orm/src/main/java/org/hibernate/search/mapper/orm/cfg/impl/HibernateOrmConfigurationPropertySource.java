@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.cfg.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -29,10 +30,12 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
 					.build();
 
+	private final ConfigurationService configurationService;
 	private final UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource;
 	private final ConfigurationPropertySource delegate;
 
 	public HibernateOrmConfigurationPropertySource(ConfigurationService configurationService) {
+		this.configurationService = configurationService;
 		HibernateOrmConfigurationServicePropertySource serviceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
 		ConfigurationPropertySource maskedSource = serviceSource.withMask( "hibernate.search" );
 
@@ -59,6 +62,10 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 	@Override
 	public Optional<String> resolve(String key) {
 		return delegate.resolve( key );
+	}
+
+	public Map<?, ?> getAllRawProperties() {
+		return configurationService.getSettings();
 	}
 
 	public void afterBootstrap() {

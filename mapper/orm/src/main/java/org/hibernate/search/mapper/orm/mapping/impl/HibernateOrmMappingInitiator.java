@@ -23,6 +23,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
@@ -53,11 +54,12 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata,
+			HibernateOrmConfigurationPropertySource propertySource,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmBootstrapIntrospector introspector = new HibernateOrmBootstrapIntrospector( metadata );
 
 		return new HibernateOrmMappingInitiator(
-				metadata,
+				metadata, propertySource,
 				introspector, sessionFactoryImplementor
 		);
 	}
@@ -66,6 +68,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(Metadata metadata,
+			HibernateOrmConfigurationPropertySource propertySource,
 			HibernateOrmBootstrapIntrospector introspector,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		super(
@@ -76,8 +79,15 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		this.metadata = metadata;
 		this.introspector = introspector;
 
+		/*
+		 * TODO we may end up logging warnings twice here:
+		 * we resolve the strategy twice (one when the session factory is created, once when HSearch boots),
+		 * and the resolution may log warnings in some cases.
+		 */
+		MultiTenancyStrategy multiTenancyStrategy = MultiTenancyStrategy.determineMultiTenancyStrategy( propertySource.getAllRawProperties() );
+
 		setMultiTenancyEnabled(
-				!MultiTenancyStrategy.NONE.equals( sessionFactoryImplementor.getSessionFactoryOptions().getMultiTenancyStrategy() )
+				!MultiTenancyStrategy.NONE.equals( multiTenancyStrategy )
 		);
 	}
 
