@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
@@ -120,8 +120,8 @@ public class ElasticsearchNormalizerDefinitionValidationIT {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
-						ElasticsearchIndexManagementStrategyName.VALIDATE.getExternalName()
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						ElasticsearchIndexLifecycleStrategyName.VALIDATE.getExternalName()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

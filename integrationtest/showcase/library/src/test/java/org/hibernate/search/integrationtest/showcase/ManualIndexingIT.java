@@ -23,7 +23,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
@@ -88,12 +88,12 @@ public class ManualIndexingIT {
 				.applySetting( PREFIX + "default_backend", "elasticsearchBackend_1" )
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
-						PREFIX + "backends.elasticsearchBackend_1.index_defaults.management.strategy",
-						ElasticsearchIndexManagementStrategyName.DROP_AND_CREATE_AND_DROP
+						PREFIX + "backends.elasticsearchBackend_1.index_defaults.lifecycle.strategy",
+						ElasticsearchIndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP
 				)
 				.applySetting(
 						// Make this test work even if there is only a single node in the cluster
-						PREFIX + "backends.elasticsearchBackend_1.index_defaults.management.required_status",
+						PREFIX + "backends.elasticsearchBackend_1.index_defaults.lifecycle.required_status",
 						ElasticsearchIndexStatus.YELLOW
 				)
 				.applySetting(

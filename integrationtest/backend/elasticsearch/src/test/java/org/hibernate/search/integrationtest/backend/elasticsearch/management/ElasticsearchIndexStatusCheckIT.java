@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 
 import java.util.EnumSet;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -37,9 +37,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
+	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
 		// The "NONE" strategy never checks that the index exists.
-		return EnumSet.complementOf( EnumSet.of( ElasticsearchIndexManagementStrategyName.NONE ) );
+		return EnumSet.complementOf( EnumSet.of( ElasticsearchIndexLifecycleStrategyName.NONE ) );
 	}
 
 	@Rule
@@ -51,9 +51,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private ElasticsearchIndexManagementStrategyName strategy;
+	private ElasticsearchIndexLifecycleStrategyName strategy;
 
-	public ElasticsearchIndexStatusCheckIT(ElasticsearchIndexManagementStrategyName strategy) {
+	public ElasticsearchIndexStatusCheckIT(ElasticsearchIndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -144,24 +144,24 @@ public class ElasticsearchIndexStatusCheckIT {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalName()
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_REQUIRED_STATUS,
+						ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS,
 						ElasticsearchIndexStatus.GREEN.getElasticsearchString()
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT,
+						ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				);
 	}
 
-	private boolean createsIndex(ElasticsearchIndexManagementStrategyName strategy) {
-		return !ElasticsearchIndexManagementStrategyName.NONE.equals( strategy )
-				&& !ElasticsearchIndexManagementStrategyName.VALIDATE.equals( strategy );
+	private boolean createsIndex(ElasticsearchIndexLifecycleStrategyName strategy) {
+		return !ElasticsearchIndexLifecycleStrategyName.NONE.equals( strategy )
+				&& !ElasticsearchIndexLifecycleStrategyName.VALIDATE.equals( strategy );
 	}
 
 }

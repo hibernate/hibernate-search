@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
@@ -319,8 +319,8 @@ public class ElasticsearchNormalizerDefinitionMigrationIT {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
-						ElasticsearchIndexManagementStrategyName.UPDATE.getExternalName()
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						ElasticsearchIndexLifecycleStrategyName.UPDATE.getExternalName()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

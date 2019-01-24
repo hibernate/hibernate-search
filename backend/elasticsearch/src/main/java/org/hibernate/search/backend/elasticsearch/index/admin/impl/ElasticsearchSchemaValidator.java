@@ -23,7 +23,7 @@ public interface ElasticsearchSchemaValidator {
 	 * @param executionOptions The execution options, giving more context information.
 	 * @throws ElasticsearchSchemaValidationException If a validation error occurs.
 	 */
-	void validate(IndexMetadata expectedIndexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
+	void validate(IndexMetadata expectedIndexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 	/**
 	 * Retrieves and validate actual index settings, returning a boolean indicating
@@ -34,6 +34,6 @@ public interface ElasticsearchSchemaValidator {
 	 * @return {@code true} if the actual settings are valid, {@code false} otherwise.
 	 * @throws ElasticsearchSchemaValidationException If a validation error occurs.
 	 */
-	boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ElasticsearchIndexManagementExecutionOptions executionOptions);
+	boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 }

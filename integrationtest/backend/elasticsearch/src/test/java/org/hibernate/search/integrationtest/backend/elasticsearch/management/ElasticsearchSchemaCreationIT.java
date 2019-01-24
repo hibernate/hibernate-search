@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -39,10 +39,10 @@ public class ElasticsearchSchemaCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
+	public static EnumSet<ElasticsearchIndexLifecycleStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexManagementStrategyName.NONE, ElasticsearchIndexManagementStrategyName.VALIDATE
+				ElasticsearchIndexLifecycleStrategyName.NONE, ElasticsearchIndexLifecycleStrategyName.VALIDATE
 				) );
 	}
 
@@ -52,9 +52,9 @@ public class ElasticsearchSchemaCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexManagementStrategyName strategy;
+	private final ElasticsearchIndexLifecycleStrategyName strategy;
 
-	public ElasticsearchSchemaCreationIT(ElasticsearchIndexManagementStrategyName strategy) {
+	public ElasticsearchSchemaCreationIT(ElasticsearchIndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -209,7 +209,7 @@ public class ElasticsearchSchemaCreationIT {
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalName()
 				)
 				.withBackendProperty(

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
-import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexManagementStrategy;
+import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
@@ -52,13 +52,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final ElasticsearchWorkOrchestrator parallelOrchestrator;
 	private final boolean refreshAfterWrite;
 
-	private final ElasticsearchIndexManagementStrategy managementStrategy;
+	private final ElasticsearchIndexLifecycleStrategy managementStrategy;
 	private final ElasticsearchIndexAdministrationClient administrationClient;
 
 	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,URLEncodedString typeName,
 			ElasticsearchIndexModel model,
-			ElasticsearchIndexManagementStrategy managementStrategy,
+			ElasticsearchIndexLifecycleStrategy managementStrategy,
 			ElasticsearchWorkOrchestrator serialOrchestrator, ElasticsearchWorkOrchestrator parallelOrchestrator,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;

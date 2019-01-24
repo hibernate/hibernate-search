@@ -17,7 +17,7 @@ import java.util.Map;
  * @author Gunnar Morling
  * @author Yoann Rodiere
  */
-public enum ElasticsearchIndexManagementStrategyName {
+public enum ElasticsearchIndexLifecycleStrategyName {
 
 	/**
 	 * Indexes will never be created or deleted.
@@ -63,18 +63,18 @@ public enum ElasticsearchIndexManagementStrategyName {
 	 */
 	DROP_AND_CREATE_AND_DROP("drop-and-create-and-drop");
 
-	private static final Map<String, ElasticsearchIndexManagementStrategyName> VALUES_BY_EXTERNAL_NAME;
+	private static final Map<String, ElasticsearchIndexLifecycleStrategyName> VALUES_BY_EXTERNAL_NAME;
 	static {
-		Map<String, ElasticsearchIndexManagementStrategyName> tmpMap = new HashMap<>();
-		for ( ElasticsearchIndexManagementStrategyName strategy : values() ) {
+		Map<String, ElasticsearchIndexLifecycleStrategyName> tmpMap = new HashMap<>();
+		for ( ElasticsearchIndexLifecycleStrategyName strategy : values() ) {
 			tmpMap.put( strategy.externalName.toLowerCase( Locale.ROOT ), strategy );
 		}
 		VALUES_BY_EXTERNAL_NAME = Collections.unmodifiableMap( tmpMap );
 	}
 
-	public static ElasticsearchIndexManagementStrategyName fromExternalRepresentation(String propertyValue) {
+	public static ElasticsearchIndexLifecycleStrategyName fromExternalRepresentation(String propertyValue) {
 		final String normalizedName = propertyValue.trim().toLowerCase( Locale.ROOT );
-		ElasticsearchIndexManagementStrategyName strategy = VALUES_BY_EXTERNAL_NAME.get( normalizedName );
+		ElasticsearchIndexLifecycleStrategyName strategy = VALUES_BY_EXTERNAL_NAME.get( normalizedName );
 		if ( strategy == null ) {
 				throw new IllegalArgumentException( "Unrecognized property value for an index management strategy: '" + propertyValue
 						+ "'. Please use one of " + VALUES_BY_EXTERNAL_NAME.keySet() );
@@ -84,7 +84,7 @@ public enum ElasticsearchIndexManagementStrategyName {
 
 	private final String externalName;
 
-	private ElasticsearchIndexManagementStrategyName(String propertyValue) {
+	private ElasticsearchIndexLifecycleStrategyName(String propertyValue) {
 		this.externalName = propertyValue;
 	}
 
