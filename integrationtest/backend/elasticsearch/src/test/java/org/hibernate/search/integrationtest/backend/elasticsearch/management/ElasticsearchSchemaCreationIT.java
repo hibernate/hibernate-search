@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -39,10 +39,10 @@ public class ElasticsearchSchemaCreationIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyConfiguration> strategies() {
+	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
 		return EnumSet.complementOf( EnumSet.of(
 				// Those strategies don't create the schema, so we don't test them
-				ElasticsearchIndexManagementStrategyConfiguration.NONE, ElasticsearchIndexManagementStrategyConfiguration.VALIDATE
+				ElasticsearchIndexManagementStrategyName.NONE, ElasticsearchIndexManagementStrategyName.VALIDATE
 				) );
 	}
 
@@ -52,9 +52,9 @@ public class ElasticsearchSchemaCreationIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final ElasticsearchIndexManagementStrategyConfiguration strategy;
+	private final ElasticsearchIndexManagementStrategyName strategy;
 
-	public ElasticsearchSchemaCreationIT(ElasticsearchIndexManagementStrategyConfiguration strategy) {
+	public ElasticsearchSchemaCreationIT(ElasticsearchIndexManagementStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}

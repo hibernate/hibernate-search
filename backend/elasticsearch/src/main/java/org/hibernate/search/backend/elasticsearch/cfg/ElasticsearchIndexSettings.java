@@ -30,7 +30,7 @@ public final class ElasticsearchIndexSettings {
 		private Defaults() {
 		}
 
-		public static final ElasticsearchIndexManagementStrategyConfiguration MANAGEMENT_STRATEGY = ElasticsearchIndexManagementStrategyConfiguration.CREATE;
+		public static final ElasticsearchIndexManagementStrategyName MANAGEMENT_STRATEGY = ElasticsearchIndexManagementStrategyName.CREATE;
 		public static final ElasticsearchIndexStatus MANAGEMENT_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
 		public static final int MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 		public static final boolean REFRESH_AFTER_WRITE = false;

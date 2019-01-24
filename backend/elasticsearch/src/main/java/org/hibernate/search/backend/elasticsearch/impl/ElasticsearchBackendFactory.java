@@ -12,7 +12,7 @@ import java.util.Locale;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
@@ -57,9 +57,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<MultiTenancyStrategyConfiguration> MULTI_TENANCY_STRATEGY =
+	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
-					.as( MultiTenancyStrategyConfiguration.class, MultiTenancyStrategyConfiguration::fromExternalRepresentation )
+					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::fromExternalRepresentation )
 					.withDefault( ElasticsearchBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
@@ -128,9 +128,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
-		MultiTenancyStrategyConfiguration multiTenancyStrategyConfiguration = MULTI_TENANCY_STRATEGY.get( propertySource );
+		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
 
-		switch ( multiTenancyStrategyConfiguration ) {
+		switch ( multiTenancyStrategyName ) {
 			case NONE:
 				return new NoMultiTenancyStrategy();
 			case DISCRIMINATOR:
@@ -138,7 +138,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported multi-tenancy strategy '%2$s' for backend '%1$s'",
-						backendName, multiTenancyStrategyConfiguration
+						backendName, multiTenancyStrategyName
 				) );
 		}
 	}

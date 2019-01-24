@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -62,9 +62,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					.withDefault( ElasticsearchIndexSettings.Defaults.REFRESH_AFTER_WRITE )
 					.build();
 
-	private static final ConfigurationProperty<ElasticsearchIndexManagementStrategyConfiguration> MANAGEMENT_STRATEGY =
+	private static final ConfigurationProperty<ElasticsearchIndexManagementStrategyName> MANAGEMENT_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.MANAGEMENT_STRATEGY )
-					.as( ElasticsearchIndexManagementStrategyConfiguration.class, ElasticsearchIndexManagementStrategyConfiguration::fromExternalRepresentation )
+					.as( ElasticsearchIndexManagementStrategyName.class, ElasticsearchIndexManagementStrategyName::fromExternalRepresentation )
 					.withDefault( ElasticsearchIndexSettings.Defaults.MANAGEMENT_STRATEGY )
 					.build();
 

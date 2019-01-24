@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
@@ -804,7 +804,7 @@ public class ElasticsearchSchemaValidationIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.MANAGEMENT_STRATEGY,
-						ElasticsearchIndexManagementStrategyConfiguration.VALIDATE.getExternalName()
+						ElasticsearchIndexManagementStrategyName.VALIDATE.getExternalName()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

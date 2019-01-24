@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 
 import java.util.EnumSet;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
@@ -37,9 +37,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
-	public static EnumSet<ElasticsearchIndexManagementStrategyConfiguration> strategies() {
+	public static EnumSet<ElasticsearchIndexManagementStrategyName> strategies() {
 		// The "NONE" strategy never checks that the index exists.
-		return EnumSet.complementOf( EnumSet.of( ElasticsearchIndexManagementStrategyConfiguration.NONE ) );
+		return EnumSet.complementOf( EnumSet.of( ElasticsearchIndexManagementStrategyName.NONE ) );
 	}
 
 	@Rule
@@ -51,9 +51,9 @@ public class ElasticsearchIndexStatusCheckIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private ElasticsearchIndexManagementStrategyConfiguration strategy;
+	private ElasticsearchIndexManagementStrategyName strategy;
 
-	public ElasticsearchIndexStatusCheckIT(ElasticsearchIndexManagementStrategyConfiguration strategy) {
+	public ElasticsearchIndexStatusCheckIT(ElasticsearchIndexManagementStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -159,9 +159,9 @@ public class ElasticsearchIndexStatusCheckIT {
 				);
 	}
 
-	private boolean createsIndex(ElasticsearchIndexManagementStrategyConfiguration strategy) {
-		return !ElasticsearchIndexManagementStrategyConfiguration.NONE.equals( strategy )
-				&& !ElasticsearchIndexManagementStrategyConfiguration.VALIDATE.equals( strategy );
+	private boolean createsIndex(ElasticsearchIndexManagementStrategyName strategy) {
+		return !ElasticsearchIndexManagementStrategyName.NONE.equals( strategy )
+				&& !ElasticsearchIndexManagementStrategyName.VALIDATE.equals( strategy );
 	}
 
 }

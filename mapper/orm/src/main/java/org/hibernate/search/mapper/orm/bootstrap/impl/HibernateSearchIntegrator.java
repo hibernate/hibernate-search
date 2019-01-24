@@ -20,7 +20,7 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
@@ -47,9 +47,9 @@ public class HibernateSearchIntegrator implements Integrator {
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOREGISTER_LISTENERS )
 					.build();
 
-	private static final ConfigurationProperty<IndexingStrategyConfiguration> INDEXING_MODE =
+	private static final ConfigurationProperty<HibernateOrmIndexingStrategyName> INDEXING_MODE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY )
-					.as( IndexingStrategyConfiguration.class, IndexingStrategyConfiguration::fromExternalRepresentation )
+					.as( HibernateOrmIndexingStrategyName.class, HibernateOrmIndexingStrategyName::fromExternalRepresentation )
 					.withDefault( HibernateOrmMapperSettings.Defaults.INDEXING_STRATEGY )
 					.build();
 
@@ -72,7 +72,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		}
 
 		FullTextIndexEventListener fullTextIndexEventListener = new FullTextIndexEventListener(
-				IndexingStrategyConfiguration.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
+				HibernateOrmIndexingStrategyName.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
 				DIRTY_PROCESSING_ENABLED.get( propertySource )
 		);
 		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );

@@ -14,7 +14,7 @@ import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -53,7 +53,7 @@ public class BasicMassIndexingIT {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		sessionFactory = ormSetupHelper.withBackendMock( backendMock )
-				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY, IndexingStrategyConfiguration.MANUAL )
+				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY, HibernateOrmIndexingStrategyName.MANUAL )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();

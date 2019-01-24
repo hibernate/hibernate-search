@@ -23,7 +23,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchBackendFactory;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
@@ -42,7 +42,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.integrationtest.showcase.library.model.Video;
 import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.cfg.IndexingStrategyConfiguration;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
@@ -89,7 +89,7 @@ public class ManualIndexingIT {
 				.applySetting( PREFIX + "backends.elasticsearchBackend_1.log.json_pretty_printing", true )
 				.applySetting(
 						PREFIX + "backends.elasticsearchBackend_1.index_defaults.management.strategy",
-						ElasticsearchIndexManagementStrategyConfiguration.DROP_AND_CREATE_AND_DROP
+						ElasticsearchIndexManagementStrategyName.DROP_AND_CREATE_AND_DROP
 				)
 				.applySetting(
 						// Make this test work even if there is only a single node in the cluster
@@ -102,7 +102,7 @@ public class ManualIndexingIT {
 				)
 				.applySetting( org.hibernate.cfg.AvailableSettings.HBM2DDL_AUTO, Action.CREATE_DROP )
 				// disable auto indexing:
-				.applySetting( HibernateOrmMapperSettings.INDEXING_STRATEGY, IndexingStrategyConfiguration.MANUAL );
+				.applySetting( HibernateOrmMapperSettings.INDEXING_STRATEGY, HibernateOrmIndexingStrategyName.MANUAL );
 
 		ServiceRegistry serviceRegistry = registryBuilder.build();
 

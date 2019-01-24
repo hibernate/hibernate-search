@@ -6,25 +6,25 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.management.impl;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyConfiguration;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexManagementStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexManagementExecutionOptions;
 import org.hibernate.search.util.AssertionFailure;
 
 public class ElasticsearchIndexManagementStrategy {
 
-	private final ElasticsearchIndexManagementStrategyConfiguration strategyConfiguration;
+	private final ElasticsearchIndexManagementStrategyName strategyName;
 	protected final ElasticsearchIndexManagementExecutionOptions executionOptions;
 
 	public ElasticsearchIndexManagementStrategy(
-			ElasticsearchIndexManagementStrategyConfiguration strategyConfiguration,
+			ElasticsearchIndexManagementStrategyName strategyName,
 			ElasticsearchIndexManagementExecutionOptions executionOptions) {
-		this.strategyConfiguration = strategyConfiguration;
+		this.strategyName = strategyName;
 		this.executionOptions = executionOptions;
 	}
 
 	public void onStart(ElasticsearchIndexAdministrationClient client) {
-		switch ( strategyConfiguration ) {
+		switch ( strategyName ) {
 			case CREATE:
 				client.createIfAbsent( executionOptions );
 				break;
@@ -39,12 +39,12 @@ public class ElasticsearchIndexManagementStrategy {
 				client.validate( executionOptions );
 				break;
 			default:
-				throw new AssertionFailure( "Unexpected index management strategy: " + strategyConfiguration );
+				throw new AssertionFailure( "Unexpected index management strategy: " + strategyName );
 		}
 	}
 
 	public void onStop(ElasticsearchIndexAdministrationClient client) {
-		switch ( strategyConfiguration ) {
+		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
 				client.dropIfExisting( executionOptions );
 				break;
@@ -55,7 +55,7 @@ public class ElasticsearchIndexManagementStrategy {
 				// Nothing to do
 				break;
 			default:
-				throw new AssertionFailure( "Unexpected index management strategy: " + strategyConfiguration );
+				throw new AssertionFailure( "Unexpected index management strategy: " + strategyName );
 		}
 	}
 }

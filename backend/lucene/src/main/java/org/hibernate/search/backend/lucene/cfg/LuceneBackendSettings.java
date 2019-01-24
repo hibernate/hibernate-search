@@ -45,6 +45,6 @@ public final class LuceneBackendSettings {
 		 */
 		public static final Version LUCENE_VERSION = Version.LATEST;
 
-		public static final MultiTenancyStrategyConfiguration MULTI_TENANCY_STRATEGY = MultiTenancyStrategyConfiguration.NONE;
+		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
 }
