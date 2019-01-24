@@ -6,30 +6,16 @@
  */
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
-import org.hibernate.boot.Metadata;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.resource.beans.container.spi.BeanContainer;
-import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
-import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
-import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
-import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Contracts;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase.
@@ -40,14 +26,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  */
 public class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 
-	private final HibernateOrmConfigurationPropertySource propertySource;
-	// TODO JMX
-	//private final JndiService namingService;
-	private final ClassLoaderService hibernateOrmClassLoaderService;
-	private final EnvironmentSynchronizer environmentSynchronizer;
-	private final ManagedBeanRegistry managedBeanRegistry;
+	private final HibernateOrmIntegrationBooterImpl booter;
 	private final HibernateSearchEventListener listener;
-	private final Metadata metadata;
 
 	private final CompletableFuture<HibernateSearchContextService> contextFuture = new CompletableFuture<>();
 	private final CompletableFuture<?> closingTrigger = new CompletableFuture<>();
@@ -58,19 +38,10 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 //	private JMXHook jmx;
 
 	HibernateSearchSessionFactoryObserver(
-			Metadata metadata,
-			HibernateOrmConfigurationPropertySource propertySource,
-			HibernateSearchEventListener listener,
-			ClassLoaderService hibernateOrmClassLoaderService,
-			EnvironmentSynchronizer environmentSynchronizer,
-			ManagedBeanRegistry managedBeanRegistry) {
-		this.metadata = metadata;
-		this.propertySource = propertySource;
+			HibernateOrmIntegrationBooterImpl booter,
+			HibernateSearchEventListener listener) {
+		this.booter = booter;
 		this.listener = listener;
-		Contracts.assertNotNull( hibernateOrmClassLoaderService, "Hibernate ORM ClassResolver" );
-		this.hibernateOrmClassLoaderService = hibernateOrmClassLoaderService;
-		this.environmentSynchronizer = environmentSynchronizer;
-		this.managedBeanRegistry = managedBeanRegistry;
 
 		/*
 		 * Make sure that if a Search integrator is created, it will eventually get closed,
@@ -89,12 +60,13 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			SessionFactoryImplementor sessionFactoryImplementor = (SessionFactoryImplementor) factory;
 			listener.initialize( contextFuture );
 
-			if ( environmentSynchronizer != null ) {
-				environmentSynchronizer.whenEnvironmentDestroying( () -> {
+			Optional<EnvironmentSynchronizer> environmentSynchronizer = booter.getEnvironmentSynchronizer();
+			if ( environmentSynchronizer.isPresent() ) {
+				environmentSynchronizer.get().whenEnvironmentDestroying( () -> {
 					// Trigger integrator closing if the integrator actually exists and wasn't already closed
 					closingTrigger.complete( null );
 				} );
-				environmentSynchronizer.whenEnvironmentReady( () -> boot( sessionFactoryImplementor ) );
+				environmentSynchronizer.get().whenEnvironmentReady( () -> boot( sessionFactoryImplementor ) );
 			}
 			else {
 				boot( sessionFactoryImplementor );
@@ -124,71 +96,11 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		if ( contextFuture.isDone() ) {
 			return;
 		}
-		ReflectionBeanResolver reflectionBeanResolver = null;
-		BeanResolver beanResolver = null;
 		try {
-			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
-
-			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
-			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, propertySource
-			);
-			builder.addMappingInitiator( mappingKey, mappingInitiator );
-
-			HibernateOrmClassLoaderServiceClassAndResourceResolver classAndResourceResolver =
-					new HibernateOrmClassLoaderServiceClassAndResourceResolver( hibernateOrmClassLoaderService );
-			builder.setClassResolver( classAndResourceResolver );
-			builder.setResourceResolver( classAndResourceResolver );
-
-			reflectionBeanResolver = new ReflectionBeanResolver( classAndResourceResolver );
-			if ( managedBeanRegistry != null ) {
-				BeanContainer beanContainer = managedBeanRegistry.getBeanContainer();
-				if ( beanContainer != null ) {
-					// Only use the primary registry, so that we can implement our own fallback when beans are not found
-					beanResolver = new HibernateOrmBeanContainerBeanResolver( beanContainer, reflectionBeanResolver );
-				}
-				// else: The given ManagedBeanRegistry only implements fallback: let's ignore it
-			}
-			if ( beanResolver == null ) {
-				beanResolver = reflectionBeanResolver;
-			}
-			builder.setBeanResolver( beanResolver );
-
-			// TODO namingService (JMX)
-
-			SearchIntegrationPartialBuildState integrationPartialBuildState = builder.prepareBuild();
-			SearchIntegration integration;
-			HibernateOrmMapping mapping;
-			try {
-				mapping = integrationPartialBuildState.finalizeMapping(
-						mappingKey,
-						partialBuildState -> partialBuildState.bindToSessionFactory( sessionFactoryImplementor )
-				);
-				integration = integrationPartialBuildState.finalizeIntegration();
-			}
-			catch (RuntimeException e) {
-				new SuppressingCloser( e )
-						.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
-				throw e;
-			}
-
-			// TODO JMX
-//			this.jmx = new JMXHook( propertySource );
-//			this.jmx.registerIfEnabled( extendedIntegrator, factory );
-
-			//Register the SearchFactory in the ORM ServiceRegistry (for convenience of lookup)
-			HibernateSearchContextService contextService =
-					sessionFactoryImplementor.getServiceRegistry().getService( HibernateSearchContextService.class );
-			contextService.initialize( integration, mapping );
+			HibernateSearchContextService contextService = booter.boot( sessionFactoryImplementor );
 			contextFuture.complete( contextService );
-
-			propertySource.afterBootstrap();
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( BeanResolver::close, reflectionBeanResolver )
-					.push( BeanResolver::close, beanResolver );
-
 			contextFuture.completeExceptionally( e );
 			// This will make the SessionFactory abort and close itself
 			throw e;

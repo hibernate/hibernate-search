@@ -24,12 +24,17 @@ public final class HibernateOrmMapperSpiSettings {
 	 */
 	public static final String PROPERTY_HANDLE_FACTORY = PREFIX + Radicals.PROPERTY_HANDLE_FACTORY;
 
+	public static final String INTEGRATION_PARTIAL_BUILD_STATE =
+			PREFIX + Radicals.INTEGRATION_PARTIAL_BUILD_STATE;
+
 	public static class Radicals {
 
 		private Radicals() {
 		}
 
 		public static final String PROPERTY_HANDLE_FACTORY = "property_handle_factory";
+
+		public static final String INTEGRATION_PARTIAL_BUILD_STATE = "integration_partial_build_state";
 	}
 
 	/**

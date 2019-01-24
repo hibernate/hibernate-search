@@ -10,23 +10,19 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
-import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.service.spi.ServiceBinding;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 /**
@@ -74,18 +70,11 @@ public class HibernateSearchIntegrator implements Integrator {
 		);
 		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
 
-		ClassLoaderService hibernateOrmClassLoaderService = serviceRegistry.getService( ClassLoaderService.class );
-		ServiceBinding<EnvironmentSynchronizer> environmentSynchronizerBinding =
-				serviceRegistry.locateServiceBinding( EnvironmentSynchronizer.class );
-		ServiceBinding<ManagedBeanRegistry> managedBeanRegistryServiceBinding =
-				serviceRegistry.locateServiceBinding( ManagedBeanRegistry.class );
+		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, serviceRegistry );
+
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
-				metadata,
-				propertySource,
-				hibernateSearchEventListener,
-				hibernateOrmClassLoaderService,
-				environmentSynchronizerBinding == null ? null : serviceRegistry.getService( EnvironmentSynchronizer.class ),
-				managedBeanRegistryServiceBinding == null ? null : serviceRegistry.getService( ManagedBeanRegistry.class )
+				booter,
+				hibernateSearchEventListener
 		);
 
 		sessionFactory.addObserver( observer );
