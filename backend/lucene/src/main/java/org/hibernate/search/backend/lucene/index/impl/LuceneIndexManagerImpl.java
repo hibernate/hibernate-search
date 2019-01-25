@@ -76,7 +76,7 @@ class LuceneIndexManagerImpl
 
 	@Override
 	public void start(IndexManagerStartContext context) {
-		// TODO HSEARCH-3118 start thread(s) and allocate resources specific to this index manager here
+		// TODO HSEARCH-3528 start thread(s) and allocate resources specific to this index manager here
 	}
 
 	@Override

@@ -18,10 +18,15 @@ import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 
 class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartialBuildState {
+
+	private static final int FAILURE_LIMIT = 100;
 
 	private final BeanResolver beanResolver;
 
@@ -80,6 +85,25 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					+ " Partially built mappings: " + partiallyBuiltMappings
 			);
 		}
+
+		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+
+		// Start indexes
+		for ( Map.Entry<String, IndexManagerImplementor<?>> entry : indexManagers.entrySet() ) {
+			String indexName = entry.getKey();
+			IndexManagerImplementor<?> indexManager = entry.getValue();
+			ContextualFailureCollector indexFailureCollector =
+					failureCollector.withContext( EventContexts.fromIndexName( indexName ) );
+			IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl( indexFailureCollector );
+			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
+			try {
+				indexManager.start( startContext );
+			}
+			catch (RuntimeException e) {
+				indexFailureCollector.add( e );
+			}
+		}
+		failureCollector.checkNoFailure();
 
 		return new SearchIntegrationImpl(
 				beanResolver,
