@@ -21,6 +21,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
@@ -195,6 +196,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
+
+			// Fourth phase: start indexes
+			for ( IndexManagerImplementor<?> indexManager : indexManagerBuildingStateHolder.getIndexManagersByName().values() ) {
+				// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
+				indexManager.start();
+			}
 
 			return new SearchIntegrationImpl(
 					beanResolver,

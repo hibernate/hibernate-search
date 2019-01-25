@@ -74,6 +74,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		);
 	}
 
+	@Override
 	public void start() {
 		managementStrategy.onStart( administrationClient );
 	}

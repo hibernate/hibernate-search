@@ -74,6 +74,11 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
+	public void start() {
+		// TODO HSEARCH-3118 start thread(s) and allocate resources specific to this index manager here
+	}
+
+	@Override
 	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
 		return indexingBackendContext.createWorkPlan( serialOrchestrator, indexName, sessionContext );
 	}

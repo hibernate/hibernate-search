@@ -86,9 +86,6 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 					refreshAfterWrite
 			);
 
-			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
-			indexManager.start();
-
 			return indexManager;
 		}
 		catch (RuntimeException e) {
