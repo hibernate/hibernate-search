@@ -62,6 +62,11 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
+	public void start() {
+		// Nothing to do
+	}
+
+	@Override
 	public IndexWorkPlan<StubDocumentElement> createWorkPlan(SessionContextImplementor context) {
 		return new StubIndexWorkPlan( this, context );
 	}

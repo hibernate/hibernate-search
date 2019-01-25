@@ -19,6 +19,13 @@ import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImpl
 public interface IndexManagerImplementor<D extends DocumentElement> extends AutoCloseable {
 
 	/**
+	 * Start any resource necessary to operate the index manager at runtime.
+	 * <p>
+	 * Called by the engine once after bootstrap.
+	 */
+	void start();
+
+	/**
 	 * @return The object that should be exposed as API to users.
 	 */
 	IndexManager toAPI();
