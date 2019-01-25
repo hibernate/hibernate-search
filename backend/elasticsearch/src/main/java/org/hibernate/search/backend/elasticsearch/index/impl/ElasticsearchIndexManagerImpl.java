@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -48,8 +49,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final URLEncodedString elasticsearchIndexName;
 	private final ElasticsearchIndexModel model;
 
-	private final ElasticsearchWorkOrchestrator serialOrchestrator;
-	private final ElasticsearchWorkOrchestrator parallelOrchestrator;
+	private final ElasticsearchSharedWorkOrchestrator serialOrchestrator;
+	private final ElasticsearchSharedWorkOrchestrator parallelOrchestrator;
 	private final boolean refreshAfterWrite;
 
 	private final ElasticsearchIndexLifecycleStrategy managementStrategy;
@@ -59,7 +60,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexModel model,
 			ElasticsearchIndexLifecycleStrategy managementStrategy,
-			ElasticsearchWorkOrchestrator serialOrchestrator, ElasticsearchWorkOrchestrator parallelOrchestrator,
+			ElasticsearchSharedWorkOrchestrator serialOrchestrator, ElasticsearchSharedWorkOrchestrator parallelOrchestrator,
 			boolean refreshAfterWrite) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
@@ -77,6 +78,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public void start(IndexManagerStartContext context) {
+		serialOrchestrator.start();
+		parallelOrchestrator.start();
 		managementStrategy.onStart( administrationClient, context );
 	}
 

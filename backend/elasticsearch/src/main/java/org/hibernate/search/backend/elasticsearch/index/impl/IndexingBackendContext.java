@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -57,13 +58,13 @@ public class IndexingBackendContext {
 		);
 	}
 
-	ElasticsearchWorkOrchestrator createSerialOrchestrator(String indexName, boolean refreshAfterWrite) {
+	ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String indexName, boolean refreshAfterWrite) {
 		return orchestratorProvider.createSerialOrchestrator(
 				"Elasticsearch serial work orchestrator for index " + indexName, refreshAfterWrite
 		);
 	}
 
-	ElasticsearchWorkOrchestrator createParallelOrchestrator(String indexName) {
+	ElasticsearchSharedWorkOrchestrator createParallelOrchestrator(String indexName) {
 		return orchestratorProvider.createParallelOrchestrator(
 				"Elasticsearch parallel work orchestrator for index " + indexName
 		);

@@ -81,12 +81,29 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	public SearchIntegration finalizeIntegration() {
 		if ( !partiallyBuiltMappings.isEmpty() ) {
 			throw new AssertionFailure(
-				"Some mappings were not fully built; there is probably a bug in Hibernate Search."
-					+ " Partially built mappings: " + partiallyBuiltMappings
+					"Some mappings were not fully built; there is probably a bug in Hibernate Search."
+							+ " Partially built mappings: " + partiallyBuiltMappings
 			);
 		}
 
 		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+
+		// Start backends
+		for ( Map.Entry<String, BackendImplementor<?>> entry : backends.entrySet() ) {
+			String backendName = entry.getKey();
+			BackendImplementor<?> backend = entry.getValue();
+			ContextualFailureCollector backendFailureCollector =
+					failureCollector.withContext( EventContexts.fromBackendName( backendName ) );
+			BackendStartContextImpl startContext = new BackendStartContextImpl( backendFailureCollector );
+			// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
+			try {
+				backend.start( startContext );
+			}
+			catch (RuntimeException e) {
+				backendFailureCollector.add( e );
+			}
+		}
+		failureCollector.checkNoFailure();
 
 		// Start indexes
 		for ( Map.Entry<String, IndexManagerImplementor<?>> entry : indexManagers.entrySet() ) {

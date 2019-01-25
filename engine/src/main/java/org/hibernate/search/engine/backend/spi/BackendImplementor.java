@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.spi;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
@@ -16,6 +17,17 @@ import org.hibernate.search.engine.cfg.IndexSettings;
  * @author Yoann Rodiere
  */
 public interface BackendImplementor<D extends DocumentElement> extends AutoCloseable {
+
+	/**
+	 * Start any resource necessary to operate the backend at runtime.
+	 * <p>
+	 * Called by the engine once after bootstrap, before
+	 * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#start(IndexManagerStartContext)}
+	 * is called on the index managers.
+	 *
+	 * @param context The start context.
+	 */
+	void start(BackendStartContext context);
 
 	/**
 	 * @return The object that should be exposed as API to users.
