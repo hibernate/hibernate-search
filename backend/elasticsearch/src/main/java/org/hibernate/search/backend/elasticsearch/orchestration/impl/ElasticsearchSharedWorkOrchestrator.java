@@ -7,12 +7,17 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 /**
- * An {@link ElasticsearchWorkOrchestrator} providing a synchronization barrier
- * through its {@link #awaitCompletion()} method.
- *
- * @author Yoann Rodiere
+ * An {@link ElasticsearchWorkOrchestrator} that is designed to be shared among multiple threads.
  */
-public interface ElasticsearchBarrierWorkOrchestrator extends ElasticsearchWorkOrchestrator {
+public interface ElasticsearchSharedWorkOrchestrator extends ElasticsearchWorkOrchestrator {
+
+	/**
+	 * Start any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator once after bootstrap,
+	 * before any other method is called.
+	 */
+	void start();
 
 	/**
 	 * Block until there is no more work to execute.

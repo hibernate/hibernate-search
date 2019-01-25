@@ -26,6 +26,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubQueryWor
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -72,6 +73,11 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 		this.searchContext = new SearchBackendContext(
 				eventContext, workFactory, multiTenancyStrategy, queryOrchestrator
 		);
+	}
+
+	@Override
+	public void start(BackendStartContext context) {
+		// TODO HSEARCH-3528 start thread(s) and allocate resources specific to this backend here
 	}
 
 	@Override

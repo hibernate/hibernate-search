@@ -146,6 +146,10 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		}
 	}
 
+	public void start() {
+		rootParallelOrchestrator.start();
+	}
+
 	/**
 	 * @return The root parallel orchestrator. Useful to execute operations after an index manager was closed,
 	 * such as index dropping.
@@ -158,7 +162,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @param name The name of the orchestrator to create.
 	 * @return A <a href="#serial-orchestrators">serial orchestrator</a>.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createSerialOrchestrator(String name, boolean refreshAfterWrite) {
+	public ElasticsearchSharedWorkOrchestrator createSerialOrchestrator(String name, boolean refreshAfterWrite) {
 		/*
 		 * Since works are applied in order, refreshing the index after changesets
 		 * is actually an option, and if enabled we use refreshing execution contexts.
@@ -192,7 +196,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	 * @param name The name of the orchestrator to create.
 	 * @return A <a href="#parallel-orchestrators">parallel orchestrator</a>.
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createParallelOrchestrator(String name) {
+	public ElasticsearchSharedWorkOrchestrator createParallelOrchestrator(String name) {
 		return rootParallelOrchestrator.createChild( name );
 	}
 

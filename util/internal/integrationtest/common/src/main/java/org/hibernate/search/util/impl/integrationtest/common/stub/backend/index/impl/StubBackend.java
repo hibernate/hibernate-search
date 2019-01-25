@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -26,6 +27,11 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	@Override
 	public String toString() {
 		return StubBackend.class.getSimpleName() + "[" + name + "]";
+	}
+
+	@Override
+	public void start(BackendStartContext context) {
+		// Nothing to do
 	}
 
 	@Override

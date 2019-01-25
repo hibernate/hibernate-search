@@ -34,8 +34,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Yoann Rodiere
  */
-class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchBarrierWorkOrchestrator
-		implements ElasticsearchBarrierWorkOrchestrator, AutoCloseable {
+class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchSharedWorkOrchestrator
+		implements ElasticsearchSharedWorkOrchestrator, AutoCloseable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,10 +43,11 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 	private final ErrorHandler errorHandler;
 	private final int changesetsPerBatch;
 
-	private final ExecutorService executor;
 	private final BlockingQueue<Changeset> changesetQueue;
 	private final List<Changeset> changesetBuffer;
 	private final AtomicBoolean processingScheduled;
+
+	private ExecutorService executor;
 
 	private final Phaser phaser = new Phaser() {
 		@Override
@@ -76,8 +77,12 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 		this.changesetsPerBatch = maxChangesetsPerBatch;
 		changesetQueue = new ArrayBlockingQueue<>( maxChangesetsPerBatch, fair );
 		changesetBuffer = new ArrayList<>( maxChangesetsPerBatch );
-		executor = Executors.newFixedThreadPool( 1, name );
 		processingScheduled = new AtomicBoolean( false );
+	}
+
+	@Override
+	public void start() {
+		executor = Executors.newFixedThreadPool( 1, getName() );
 	}
 
 	/**
@@ -92,7 +97,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 	 *
 	 * @param name The name of the child orchestrator when reporting errors
 	 */
-	public ElasticsearchBarrierWorkOrchestrator createChild(String name) {
+	public ElasticsearchSharedWorkOrchestrator createChild(String name) {
 		return new ChildOrchestrator( name );
 	}
 
@@ -271,11 +276,16 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 		}
 	}
 
-	private class ChildOrchestrator extends AbstractElasticsearchBarrierWorkOrchestrator
-			implements ElasticsearchBarrierWorkOrchestrator {
+	private class ChildOrchestrator extends AbstractElasticsearchSharedWorkOrchestrator
+			implements ElasticsearchSharedWorkOrchestrator {
 
 		protected ChildOrchestrator(String name) {
 			super( name );
+		}
+
+		@Override
+		public void start() {
+			// uses the resources of the parent orchestrator
 		}
 
 		@Override

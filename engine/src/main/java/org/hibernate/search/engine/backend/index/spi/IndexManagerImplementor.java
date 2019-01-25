@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 
@@ -21,7 +22,9 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	/**
 	 * Start any resource necessary to operate the index manager at runtime.
 	 * <p>
-	 * Called by the engine once after bootstrap.
+	 * Called by the engine once after bootstrap, after
+	 * {@link org.hibernate.search.engine.backend.spi.BackendImplementor#start(BackendStartContext)}
+	 * was called on the corresponding backend.
 	 *
 	 * @param context The start context.
 	 */
