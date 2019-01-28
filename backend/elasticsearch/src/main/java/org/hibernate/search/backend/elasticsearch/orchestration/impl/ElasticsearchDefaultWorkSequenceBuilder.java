@@ -67,6 +67,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		// Use local variables to make sure the lambdas won't be affected by a reset()
 		final ElasticsearchRefreshableWorkExecutionContext context = this.executionContext;
 		final ContextualErrorHandler errorHandler = this.errorHandler;
+		final CompletableFuture<Void> refreshFuture = this.refreshFuture;
 
 		/*
 		 * Use a different future for the caller than the one used in the sequence,
@@ -85,7 +86,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 				.thenCompose( Futures.safeComposer(
 						ignoredPreviousResult -> {
 							CompletableFuture<T> workExecutionFuture = work.execute( context );
-							return addPostExecutionHandlers( work, workExecutionFuture, workFutureForCaller );
+							return addPostExecutionHandlers( work, workExecutionFuture, errorHandler, refreshFuture, workFutureForCaller );
 						}
 				) );
 
@@ -170,10 +171,9 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	}
 
 	private <T> CompletableFuture<T> addPostExecutionHandlers(ElasticsearchWork<T> work,
-			CompletableFuture<T> workExecutionFuture, CompletableFuture<T> workFutureForCaller) {
-		// Use local variables to make sure the lambdas won't be affected by a reset()
-		final ContextualErrorHandler errorHandler = this.errorHandler;
-
+			CompletableFuture<T> workExecutionFuture,
+			ContextualErrorHandler errorHandler, CompletableFuture<Void> refreshFuture,
+			CompletableFuture<T> workFutureForCaller) {
 		/*
 		 * In case of success, wait for the refresh and propagate the result to the client.
 		 * We ABSOLUTELY DO NOT WANT the resulting future to be included in the sequence,
@@ -220,6 +220,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index) {
 			// Use local variables to make sure the lambdas won't be affected by a reset()
 			final ContextualErrorHandler errorHandler = ElasticsearchDefaultWorkSequenceBuilder.this.errorHandler;
+			final CompletableFuture<Void> refreshFuture = ElasticsearchDefaultWorkSequenceBuilder.this.refreshFuture;
 
 			/*
 			 * Use a different future for the caller than the one used in the sequence,
@@ -248,7 +249,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 						CompletableFuture<T> workExecutionFuture = Futures.create(
 								() -> extractor.extract( bulkedWork, index )
 						);
-						return addPostExecutionHandlers( bulkedWork, workExecutionFuture, workFutureForCaller );
+						return addPostExecutionHandlers( bulkedWork, workExecutionFuture, errorHandler, refreshFuture, workFutureForCaller );
 					} );
 
 			/*
