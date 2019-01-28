@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" version="1.0">
+
+    <persistence-unit name="elasticsearchAutoIndexing">
+        <properties>
+            <property name="hibernate.search.backends.elasticsearchBackend_1.type" value="elasticsearch" />
+            <property name="hibernate.search.default_backend" value="elasticsearchBackend_1" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.log.json_pretty_printing" value="true" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.lifecycle.strategy" value="drop-and-create-and-drop" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.lifecycle.required_status" value="yellow" />
+
+            <!--
+                TODO HSEARCH-3316 remove this and replace it with proper in-transaction code setting a completion handler
+             -->
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.refresh_after_write" value="true" />
+
+            <property name="hibernate.search.backends.elasticsearchBackend_1.elasticsearchBackend_1.analysis_configurer"
+                      value="org.hibernate.search.integrationtest.fullstack.library.analysis.LibraryAnalysisConfigurer" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+        </properties>
+    </persistence-unit>
+
+    <persistence-unit name="elasticsearchManualIndexing">
+        <properties>
+            <property name="hibernate.search.backends.elasticsearchBackend_1.type" value="elasticsearch" />
+            <property name="hibernate.search.default_backend" value="elasticsearchBackend_1" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.log.json_pretty_printing" value="true" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.lifecycle.strategy" value="drop-and-create-and-drop" />
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.lifecycle.required_status" value="yellow" />
+
+            <!--
+                TODO HSEARCH-3316 remove this and replace it with proper in-transaction code setting a completion handler
+             -->
+            <property name="hibernate.search.backends.elasticsearchBackend_1.index_defaults.refresh_after_write" value="true" />
+
+            <property name="hibernate.search.backends.elasticsearchBackend_1.analysis_configurer"
+                      value="org.hibernate.search.integrationtest.fullstack.library.analysis.LibraryAnalysisConfigurer" />
+            <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+
+            <property name="hibernate.search.indexing_strategy" value="manual" />
+        </properties>
+    </persistence-unit>
+</persistence>

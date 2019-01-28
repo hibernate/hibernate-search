@@ -35,7 +35,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity<Integer> {
 
 	@Id
-	private Integer id;
+	protected Integer id;
 
 	@Basic
 	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
@@ -44,21 +44,21 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
 			sortable = Sortable.YES
 	)
-	private String title;
+	protected String title;
 
 	@GenericField( projectable = Projectable.YES, sortable = Sortable.YES)
-	private String author;
+	protected String author;
 
 	@Basic
 	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
-	private String summary;
+	protected String summary;
 
 	/**
 	 * Comma-separated tags.
 	 */
 	@Basic
 	@MultiKeywordStringBridge(fieldName = "tags")
-	private String tags;
+	protected String tags;
 
 	@OneToMany(mappedBy = "document", targetEntity = DocumentCopy.class)
 	@IndexedEmbedded(includePaths = {"medium", "library.location", "library.services"}, storage = ObjectFieldStorage.NESTED)

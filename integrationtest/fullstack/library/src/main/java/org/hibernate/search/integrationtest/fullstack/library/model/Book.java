@@ -27,6 +27,18 @@ public class Book extends Document<BookCopy> {
 
 	static final String INDEX = "Book";
 
+	public Book() {
+	}
+
+	public Book(int id, String isbn, String title, String author, String summary, String tags) {
+		this.id = id;
+		this.isbn = new ISBN( isbn );
+		this.title = title;
+		this.author = author;
+		this.summary = summary;
+		this.tags = tags;
+	}
+
 	@Basic
 	@Type(type = ISBNUserType.NAME)
 	@GenericField(valueBridge = @ValueBridgeBeanReference(type = ISBNBridge.class))
