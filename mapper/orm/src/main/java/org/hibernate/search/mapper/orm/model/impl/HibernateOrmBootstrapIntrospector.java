@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
+
 import javax.persistence.metamodel.ManagedType;
 
 import org.hibernate.AssertionFailure;
@@ -33,13 +34,15 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
+import org.hibernate.search.mapper.pojo.model.spi.FieldPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.MethodPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.impl.StreamHelper;
@@ -158,16 +161,16 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
 	}
 
-	MemberPropertyHandle createPropertyHandle(String name, Member member) throws IllegalAccessException {
+	PropertyHandle createPropertyHandle(String name, Member member) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return new MemberPropertyHandle( name, method, lookup.unreflect( method ) );
+			return new MethodPropertyHandle( name, method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
 			setAccessible( field );
-			return new MemberPropertyHandle( name, field, lookup.unreflectGetter( field ) );
+			return new FieldPropertyHandle( name, field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
