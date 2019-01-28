@@ -1090,6 +1090,122 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isFailed( handlerException );
 	}
 
+	/**
+	 * Test that, when a sequence follows another one,
+	 * but the first sequence is still executing when we start building the second one,
+	 * everything works fine.
+	 * <p>
+	 * We used to have problems related to instance variables we referred to from lambdas:
+	 * as these variables were reset when we started building the second sequence,
+	 * the execution of the first sequence was relying on the wrong data,
+	 * and in the worst case could even deadlock.
+	 */
+	@Test
+	public void intertwinedSequenceExecution() {
+		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
+		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
+		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
+
+		Object work1Result = new Object();
+		Object work2Result = new Object();
+		Object work3Result = new Object();
+
+		// Futures returned by mocks: we will complete them
+		CompletableFuture<?> sequence1PreviousFuture = new CompletableFuture<>();
+		CompletableFuture<?> sequence2PreviousFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work1Future = new CompletableFuture<>();
+		CompletableFuture<Object> work2Future = new CompletableFuture<>();
+		CompletableFuture<Object> work3Future = new CompletableFuture<>();
+		CompletableFuture<Void> sequence1RefreshFuture = new CompletableFuture<>();
+		CompletableFuture<Void> sequence2RefreshFuture = new CompletableFuture<>();
+
+		// Futures returned by the sequence builder: we will test them
+		CompletableFuture<Object> work1FutureFromSequenceBuilder;
+		CompletableFuture<Object> work2FutureFromSequenceBuilder;
+		CompletableFuture<Object> work3FutureFromSequenceBuilder;
+
+		replayAll();
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
+				contextSupplierMock, errorHandlerSupplierMock );
+		verifyAll();
+
+		// Build and start the first sequence and simulate a long-running first work
+		resetAll();
+		expect( contextSupplierMock.get() ).andReturn( contextMock );
+		expect( errorHandlerSupplierMock.get() ).andReturn( errorHandlerMock );
+		expect( work1.execute( contextMock ) ).andReturn( (CompletableFuture) work1Future );
+		replayAll();
+		builder.init( sequence1PreviousFuture );
+		work1FutureFromSequenceBuilder = builder.addNonBulkExecution( work1 );
+		work2FutureFromSequenceBuilder = builder.addNonBulkExecution( work2 );
+		CompletableFuture<Void> sequence1Future = builder.build();
+		sequence1PreviousFuture.complete( null );
+		verifyAll();
+		assertThat( work1FutureFromSequenceBuilder ).isPending();
+		assertThat( work2FutureFromSequenceBuilder ).isPending();
+		assertThat( sequence1Future ).isPending();
+
+		// Meanwhile, build and start the second sequence
+		resetAll();
+		expect( contextSupplierMock.get() ).andReturn( contextMock );
+		expect( errorHandlerSupplierMock.get() ).andReturn( errorHandlerMock );
+		expect( work3.execute( contextMock ) ).andReturn( (CompletableFuture) work3Future );
+		replayAll();
+		builder.init( sequence2PreviousFuture );
+		work3FutureFromSequenceBuilder = builder.addNonBulkExecution( work3 );
+		CompletableFuture<Void> sequence2Future = builder.build();
+		sequence2PreviousFuture.complete( null );
+		verifyAll();
+		assertThat( work1FutureFromSequenceBuilder ).isPending();
+		assertThat( work2FutureFromSequenceBuilder ).isPending();
+		assertThat( sequence1Future ).isPending();
+		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( sequence2Future ).isPending();
+
+		// Then simulate the end of the first and second works
+		resetAll();
+		expect( work2.execute( contextMock ) ).andReturn( (CompletableFuture) work2Future );
+		expect( contextMock.executePendingRefreshes() ).andReturn( sequence1RefreshFuture );
+		replayAll();
+		work1Future.complete( work1Result );
+		work2Future.complete( work2Result );
+		verifyAll();
+		assertThat( work1FutureFromSequenceBuilder ).isPending(); // Still pending, waiting for refresh
+		assertThat( work2FutureFromSequenceBuilder ).isPending(); // Still pending, waiting for refresh
+		assertThat( sequence1Future ).isPending();
+		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( sequence2Future ).isPending();
+
+		// Then simulate the end of the refresh for the first sequence
+		resetAll();
+		replayAll();
+		sequence1RefreshFuture.complete( null );
+		verifyAll();
+		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
+		// This used to fail because we didn't refer to the refresh future from the right sequence
+		assertThat( work2FutureFromSequenceBuilder ).isSuccessful( work2Result );
+		assertThat( sequence1Future ).isSuccessful( (Void) null );
+		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( sequence2Future ).isPending();
+
+		// Then simulate the end of the third work
+		resetAll();
+		expect( contextMock.executePendingRefreshes() ).andReturn( sequence2RefreshFuture );
+		replayAll();
+		work3Future.complete( null );
+		verifyAll();
+		assertThat( work3FutureFromSequenceBuilder ).isPending(); // Still pending, waiting for refresh
+		assertThat( sequence2Future ).isPending();
+
+		// Then simulate the end of the refresh for the second sequence
+		resetAll();
+		replayAll();
+		sequence2RefreshFuture.complete( null );
+		verifyAll();
+		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
+		assertThat( sequence2Future ).isSuccessful( (Void) null );
+	}
+
 	private <T> ElasticsearchWork<T> work(int index) {
 		@SuppressWarnings("unchecked")
 		ElasticsearchWork<T> mock = createStrictMock( "work" + index, ElasticsearchWork.class );
