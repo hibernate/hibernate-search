@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LongitudeMarker;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingRef;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerRef;
 
 /**
  * Mark the property hosting the longitude of a specific spatial coordinate.
@@ -22,7 +22,7 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingRef;
  *
  * @author Nicolas Helleringer
  */
-@MarkerMapping(builder = @MarkerMappingRef(builderType = LongitudeMarker.Builder.class))
+@MarkerMapping(builder = @MarkerRef(builderType = LongitudeMarker.Builder.class))
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.METHOD, ElementType.FIELD } )
 @Documented

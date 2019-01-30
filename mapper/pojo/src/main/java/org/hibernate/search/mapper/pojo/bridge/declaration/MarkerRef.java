@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuilder;
 @Documented
 @Target({}) // Only used as a component in other annotations
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MarkerMappingRef {
+public @interface MarkerRef {
 
 	String builderName() default "";
 

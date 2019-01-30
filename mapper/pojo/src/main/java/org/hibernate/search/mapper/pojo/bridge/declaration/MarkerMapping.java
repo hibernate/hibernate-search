@@ -23,9 +23,9 @@ public @interface MarkerMapping {
 	/**
 	 * Define a marker mapper builder
 	 *
-	 * @see MarkerMappingRef
+	 * @see MarkerRef
 	 * @return A reference to the marker mapping builder.
 	 */
-	MarkerMappingRef builder();
+	MarkerRef builder();
 
 }

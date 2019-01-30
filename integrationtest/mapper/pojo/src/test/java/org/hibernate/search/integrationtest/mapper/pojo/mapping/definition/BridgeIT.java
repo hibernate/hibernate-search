@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
-import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMappingRef;
+import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeRef;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -402,7 +402,7 @@ public class BridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerMapping(builder = @MarkerMappingRef)
+	@MarkerMapping(builder = @MarkerRef)
 	private @interface MarkerAnnotationWithEmptyMarkerMapping {
 	}
 
