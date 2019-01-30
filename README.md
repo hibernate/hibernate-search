@@ -149,7 +149,9 @@ defines APIs common to every mapper/backend (the Search DSL in particular),
 and provides the "glue" between mappers and backends.
 * `integrationtest`: Integration tests for backends (Elasticsearch, Lucene) and mappers (Hibernate ORM),
 as well as any other technology Hibernate Search integrates with.
-Also includes performance tests.
+Here are some notable sub-directories:
+  *  `performance`: performance tests.
+  *  `showcase/library`: a sample application using Hibernate Search in a Spring Boot environment.
 * `legacy`: Legacy code from Search 5. This code is not part of the distributed JARs.
 Parts of it will progressively be re-integrated into the main (Search 6+) code base.
 Note that tests in this directory are disabled by default
