@@ -15,14 +15,12 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 /**
- * Reference to the value bridge to use for a not-identifier field.
+ * Reference to the value bridge to use in a {@code @*Field} annotation,
+ * for example in {@link GenericField#valueBridge()}, {@link KeywordField#valueBridge()},
+ * or {@link FullTextField#valueBridge()}.
  * <p>
  * Either a bridge or a bridge builder can be provided, but never both.
  * Reference can be obtained using either a name or a type.
- * <p>
- * At the moment, a not-identifier field could be either {@link GenericField} or a {@link KeywordField} or a {@link FullTextField}.
- *
- * @author Yoann Rodiere
  */
 @Documented
 @Target({}) // Only used as a component in other annotations

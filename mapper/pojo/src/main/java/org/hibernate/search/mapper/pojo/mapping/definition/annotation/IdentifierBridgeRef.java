@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 
 /**
- * Reference to the identifier bridge to use for a {@link DocumentId} field.
+ * Reference to the identifier bridge to use for a {@link DocumentId}.
  * <p>
  * Either a bridge or a bridge builder can be provided, but never both.
  * Reference can be obtained using either a name or a type.
