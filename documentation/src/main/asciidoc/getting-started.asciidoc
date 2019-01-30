@@ -453,4 +453,8 @@ were analysis configuration (<<analysis>>) and bridges (<<mapper-pojo-bridge>>).
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include
-<<mapper-orm-query-sort,sorts>> and <<mapper-orm-query-projection,projections>>
+<<mapper-orm-query-sort,sorts>> and <<mapper-orm-query-projection,projections>>.
+
+If you want to see an example project using Hibernate Search,
+you can also have a look at the ["Library" showcase](https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library),
+a sample application using Hibernate Search in a Spring Boot environment.
