@@ -1,6 +1,47 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha2 (31-01-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3462 SimpleIndexingProgressMonitor stops logging as soon as the number of indexed document stops being a multiple of the logging period
+
+** Improvement
+    * HSEARCH-3466 Add the number of objects in the payload in the Elasticsearch request log
+    * HSEARCH-3464 Use consistent naming for *Settings class with respect to Maven modules
+    * HSEARCH-3454 Upgrade to Lucene 7.6.0
+    * HSEARCH-3453 Execute blocking search result processing in another thread than the one used for HTTP requests
+    * HSEARCH-3451 Make the index defaults backend-scoped
+    * HSEARCH-3429 Add a lambda-based syntax to the projection DSL
+    * HSEARCH-3421 Support for ID predicates when multi-tenancy is enabled
+    * HSEARCH-3416 Use ID bridges from the mapper when building ID predicates
+    * HSEARCH-3174 Allow non-String values in environment configuration
+
+** Task
+    * HSEARCH-3472 Upgrade to Elasticsearch 6.6.0
+    * HSEARCH-3470 Upgrade Hibernate ORM to 5.4.1.Final
+    * HSEARCH-3455 Add a way to test the JSON sent to the Elasticsearch cluster
+    * HSEARCH-3450 Search 6 groundwork - Use a consistent naming scheme for the configuration properties added in Search 6 so far
+    * HSEARCH-3449 Fix random test failures caused by improper mocking of ObjectLoader
+    * HSEARCH-3448 Move all classes related to test configuration/utils/etc to "testsupport" packages
+    * HSEARCH-3446 Search 6 groundwork - Clean up and factorize code around converters and type-specific features in backends
+    * HSEARCH-3442 Search 6 groundwork - Properly handle missing backend / backend type in configuration properties
+    * HSEARCH-3438 Make references to value bridges and container value extractors in the mapping cleaner and simpler
+    * HSEARCH-3433 Upgrade to Hibernate ORM 5.4.0.Final
+    * HSEARCH-3410 Upgrade to ORM 5.4.0.CR2 + HCANN 5.1.0.Final
+    * HSEARCH-3386 Search 6 groundwork - Make bean references easier to use in configuration properties
+    * HSEARCH-3376 Remove the explicit dependency to JAXB/javax.xml.bind from the ORM modules when building with JDK9+
+    * HSEARCH-3374 Search 6 groundwork - Restore the Search 5 syntax for including/excluding bounds in range predicates
+    * HSEARCH-3351 Search 6 groundwork - Restore support for FullTextQuery.getResultSize()
+    * HSEARCH-3291 Search 6 groundwork - Split the field definition API in two: encoding definition and field definition
+    * HSEARCH-3268 Search 6 groundwork - Restore support for the massindexer
+    * HSEARCH-3170 Implement CDI/Spring bean releasing more cleanly
+    * HSEARCH-3101 Search 6 groundwork - Support aliases for backend factories
+    * HSEARCH-3086 Search 6 groundwork - Add the missing non-field projections compared to Search 5
+    * HSEARCH-3053 Search 6 groundwork - Restore the full Elasticsearch work factory/orchestrators from Search 5
+    * HSEARCH-3052 Search 6 groundwork - Restore the Elasticsearch index schema management strategies (validation, ...)
+
 6.0.0.Alpha1 (28-11-2018)
 -------------------------
 
