@@ -28,6 +28,17 @@ public class Borrowal extends AbstractEntity<Integer> {
 	@Basic(optional = false)
 	private BorrowalType type;
 
+	public Borrowal() {
+	}
+
+	public Borrowal(Account account, DocumentCopy<?> copy, BorrowalType type) {
+		this.account = account;
+		this.copy = copy;
+		this.type = type;
+		account.getBorrowals().add( this );
+		copy.getBorrowals().add( this );
+	}
+
 	@Override
 	public Integer getId() {
 		return id;

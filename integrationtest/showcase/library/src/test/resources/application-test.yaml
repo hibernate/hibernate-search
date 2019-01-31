@@ -1,0 +1,19 @@
+spring.jpa:
+  hibernate:
+    ddl-auto: create-drop
+  properties:
+    hibernate.search:
+      indexing_strategy: ${indexing.strategy}
+      backends:
+        elasticsearch1:
+          index_defaults:
+            lifecycle.strategy: drop-and-create-and-drop
+            lifecycle.required_status: yellow
+            refresh_after_write: true
+          log.json_pretty_printing: true
+
+logging.level:
+  org.hibernate.SQL: DEBUG
+  org.hibernate.search.massindexing: INFO
+  org.hibernate.search.fulltext_query: DEBUG
+  org.hibernate.search.elasticsearch.request: DEBUG

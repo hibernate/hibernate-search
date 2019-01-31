@@ -1,0 +1,21 @@
+spring.jpa:
+  properties:
+    hibernate:
+      dialect: ${HIBERNATE_DIALECT} # From environment variable
+    hibernate.search:
+      default_backend: elasticsearch1
+      backends:
+        elasticsearch1:
+          type: elasticsearch
+          hosts: ${ELASTICSEARCH_URL} # From environment variable
+          username: ${ELASTICSEARCH_USERNAME} # From environment variable
+          password: ${ELASTICSEARCH_PASSWORD} # From environment variable
+          discovery.enabled: true
+          analysis_configurer: analysisConfigurer
+          log.json_pretty_printing: true
+
+spring.datasource:
+  driver-class: ${JDBC_DRIVER} # From environment variable
+  url: ${JDBC_URL} # From environment variable
+  username: ${JDBC_USERNAME} # From environment variable
+  password: ${JDBC_PASSWORD} # From environment variable

@@ -12,6 +12,30 @@
     <name>Hibernate Search Integration Tests - Showcase - Library</name>
     <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects</description>
 
+    <properties>
+        <version.org.springframework.boot>2.1.2.RELEASE</version.org.springframework.boot>
+
+        <!--
+            Remove Hibernate system properties from parent settings:
+            They are supposed to be handled by the spring.datasource subsystem
+            and not by the Hibernate internal pool!
+            See also the failsafe configuration.
+         -->
+        <failsafe.jvm.args.hibernate-orm></failsafe.jvm.args.hibernate-orm>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${version.org.springframework.boot}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -23,9 +47,28 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <!-- Spring Boot uses Mockito -->
+                <exclusion>
+                    <groupId>org.easymock</groupId>
+                    <artifactId>easymock</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--
             Leave this dependency here, not in a utils module, so that we don't need to recompile
@@ -35,6 +78,19 @@
             <groupId>${jdbc.driver.groupId}</groupId>
             <artifactId>${jdbc.driver.artifactId}</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Using JBoss Logging -->
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Enable extracting shared test build resources -->
@@ -49,6 +105,12 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,6 +119,26 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <!--
+                        Since we do not pass the Hibernate ORM settings through system properties directly
+                        (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),
+                        we need to pass the settings some other way.
+                        Here we chose to use environment variables.
+                     -->
+                    <environmentVariables>
+                        <HIBERNATE_DIALECT>${db.dialect}</HIBERNATE_DIALECT>
+                        <JDBC_DRIVER>${jdbc.driver}</JDBC_DRIVER>
+                        <JDBC_URL>${jdbc.url}</JDBC_URL>
+                        <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
+                        <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
+                        <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
+                        <ELASTICSEARCH_URL>${test.elasticsearch.host.url}</ELASTICSEARCH_URL>
+                        <ELASTICSEARCH_USERNAME>${test.elasticsearch.host.username}</ELASTICSEARCH_USERNAME>
+                        <ELASTICSEARCH_PASSWORD>${test.elasticsearch.host.password}</ELASTICSEARCH_PASSWORD>
+                    </environmentVariables>
+                </configuration>
+
                 <executions>
                     <execution>
                         <id>it</id>

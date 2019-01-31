@@ -35,6 +35,13 @@ public class Account extends AbstractEntity<Integer> {
 	@OrderBy("id")
 	private List<Borrowal> borrowals = new ArrayList<>();
 
+	public Account() {
+	}
+
+	public Account(Person user) {
+		this.user = user;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;

@@ -9,6 +9,9 @@ package org.hibernate.search.integrationtest.showcase.library.analysis;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 
+import org.springframework.stereotype.Component;
+
+@Component("analysisConfigurer")
 public class LibraryAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	public static final String ANALYZER_DEFAULT = "default"; // No definition, just use the default from Elasticsearch
 	public static final String NORMALIZER_SORT = "asciifolding_lowercase";

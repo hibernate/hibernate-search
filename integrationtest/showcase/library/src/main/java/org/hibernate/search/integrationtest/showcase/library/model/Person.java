@@ -52,6 +52,15 @@ public class Person extends AbstractEntity<Integer> {
 	@IndexedEmbedded
 	private Account account;
 
+	public Person() {
+	}
+
+	public Person(int id, String firstName, String lastName) {
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
 	@Override
 	public Integer getId() {
 		return id;
