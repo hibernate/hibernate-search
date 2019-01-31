@@ -1,6 +1,15 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.1.Final (31-01-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3458 ClassCastException: Cannot cast ScopedElasticsearchAnalyzerReference to LuceneAnalyzerReference
+
+** Task
+    * HSEARCH-3470 Upgrade Hibernate ORM to 5.4.1.Final
+
 5.11.0.Final (18-12-2018)
 -------------------------
 
