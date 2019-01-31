@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.analyzer.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A reference to an {@link Analyzer}.
@@ -15,6 +19,8 @@ import org.hibernate.search.analyzer.spi.AnalyzerReference;
  * @author Davide D'Alto
  */
 public abstract class LuceneAnalyzerReference implements AnalyzerReference {
+
+	private final Log log = LoggerFactory.make( MethodHandles.lookup() );
 
 	public abstract Analyzer getAnalyzer();
 
@@ -25,6 +31,18 @@ public abstract class LuceneAnalyzerReference implements AnalyzerReference {
 
 	@Override
 	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
-		return analyzerType.cast( this );
+		try {
+			return analyzerType.cast( this );
+		}
+		catch (ClassCastException e) {
+			if ( !LuceneAnalyzerReference.class.isAssignableFrom( analyzerType ) ) {
+				// Not even the same technology, probably a user error
+				throw log.invalidConversionFromLuceneAnalyzer( this, e );
+			}
+			else {
+				// The other type uses the same technology... probably a bug?
+				throw e;
+			}
+		}
 	}
 }

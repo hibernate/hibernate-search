@@ -13,6 +13,7 @@ import java.util.Map;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.SortField;
 import org.hibernate.search.analyzer.spi.AnalyzerReference;
+import org.hibernate.search.elasticsearch.analyzer.impl.ElasticsearchAnalyzerReference;
 import org.hibernate.search.elasticsearch.cfg.ElasticsearchEnvironment;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchRequest;
 import org.hibernate.search.elasticsearch.client.impl.ElasticsearchResponse;
@@ -528,4 +529,9 @@ public interface Log extends BaseHibernateSearchLogger {
 					+ " when used in the Elasticsearch integration."
 	)
 	SearchException booleanBridgeMustImplementTwoWayStringBridge(IndexedTypeIdentifier typeIdentifier, String staticAbsolutePath);
+
+	@Message(id = ES_BACKEND_MESSAGES_START_ID + 96, value = "This analyzer is defined as an Elasticsearch analyzer,"
+			+ " and cannot be used with any other technology (Lucene in particular)."
+			+ " Analyzer reference: %s")
+	SearchException invalidConversionFromElasticsearchAnalyzer(ElasticsearchAnalyzerReference reference, @Cause Exception cause);
 }
