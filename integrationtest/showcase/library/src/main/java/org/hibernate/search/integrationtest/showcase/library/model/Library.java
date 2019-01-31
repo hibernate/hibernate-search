@@ -7,8 +7,10 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -62,10 +64,42 @@ public class Library extends AbstractEntity<Integer> {
 
 	@ElementCollection
 	@GenericField
-	private List<LibraryService> services;
+	private List<LibraryServiceOption> services;
 
-	@OneToMany(mappedBy = "library")
+	@OneToMany(mappedBy = "library", cascade = CascadeType.REMOVE)
 	private List<DocumentCopy<?>> copies = new ArrayList<>();
+
+	public Library() {
+	}
+
+	public Library(int id, String name, int collectionSize, double latitude, double longitude, LibraryServiceOption... services) {
+		this.id = id;
+		this.name = name;
+		this.collectionSize = collectionSize;
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.services = Arrays.asList( services );
+	}
+
+	public VideoCopy add(Video video, VideoMedium medium) {
+		VideoCopy copy = new VideoCopy();
+		copy.setLibrary( this );
+		copies.add( copy );
+		copy.setDocument( video );
+		video.getCopies().add( copy );
+		copy.setMedium( medium );
+		return copy;
+	}
+
+	public BookCopy add(Book book, BookMedium medium) {
+		BookCopy copy = new BookCopy();
+		copy.setLibrary( this );
+		copies.add( copy );
+		copy.setDocument( book );
+		book.getCopies().add( copy );
+		copy.setMedium( medium );
+		return copy;
+	}
 
 	@Override
 	public Integer getId() {
@@ -108,11 +142,11 @@ public class Library extends AbstractEntity<Integer> {
 		this.longitude = longitude;
 	}
 
-	public List<LibraryService> getServices() {
+	public List<LibraryServiceOption> getServices() {
 		return services;
 	}
 
-	public void setServices(List<LibraryService> services) {
+	public void setServices(List<LibraryServiceOption> services) {
 		this.services = services;
 	}
 

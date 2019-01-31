@@ -6,92 +6,9 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.repository;
 
-import java.util.List;
-import java.util.Optional;
-import javax.persistence.EntityManager;
-
-import org.hibernate.search.engine.search.dsl.sort.SortOrder;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
-import org.hibernate.search.integrationtest.showcase.library.model.Book;
-import org.hibernate.search.integrationtest.showcase.library.model.BookCopy;
-import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
-import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
-import org.hibernate.search.integrationtest.showcase.library.model.Library;
-import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
-import org.hibernate.search.integrationtest.showcase.library.model.Video;
-import org.hibernate.search.integrationtest.showcase.library.model.VideoCopy;
-import org.hibernate.search.integrationtest.showcase.library.model.VideoMedium;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
-public abstract class DocumentRepository {
+import org.springframework.data.repository.CrudRepository;
 
-	// Hack to deal with Document<?> instead of raw Document
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	protected static final Class<Document<?>> DOCUMENT_CLASS = (Class<Document<?>>) (Class) Document.class;
-
-	protected final FullTextEntityManager entityManager;
-
-	public DocumentRepository(EntityManager entityManager) {
-		this.entityManager = Search.getFullTextEntityManager( entityManager );
-	}
-
-	public Book createBook(int id, ISBN isbn, String title, String author, String summary, String tags) {
-		Book book = new Book();
-		book.setId( id );
-		book.setIsbn( isbn );
-		book.setTitle( title );
-		book.setAuthor( author );
-		book.setSummary( summary );
-		book.setTags( tags );
-		entityManager.persist( book );
-		return book;
-	}
-
-	public Video createVideo(int id, String title, String author, String summary, String tags) {
-		Video video = new Video();
-		video.setId( id );
-		video.setTitle( title );
-		video.setAuthor( author );
-		video.setSummary( summary );
-		video.setTags( tags );
-		entityManager.persist( video );
-		return video;
-	}
-
-	public BookCopy createCopy(Library library, Book document, BookMedium medium) {
-		BookCopy copy = new BookCopy();
-		copy.setLibrary( library );
-		library.getCopies().add( copy );
-		copy.setDocument( document );
-		document.getCopies().add( copy );
-		copy.setMedium( medium );
-		entityManager.persist( copy );
-		return copy;
-	}
-
-	public VideoCopy createCopy(Library library, Video document, VideoMedium medium) {
-		VideoCopy copy = new VideoCopy();
-		copy.setLibrary( library );
-		library.getCopies().add( copy );
-		copy.setDocument( document );
-		document.getCopies().add( copy );
-		copy.setMedium( medium );
-		entityManager.persist( copy );
-		return copy;
-	}
-
-	public abstract Optional<Book> getByIsbn(String isbnAsString);
-
-	public abstract long count();
-
-	public abstract List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit);
-
-	public abstract List<Document<?>> searchAroundMe(String terms, String tags,
-			GeoPoint myLocation, Double maxDistanceInKilometers,
-			List<LibraryService> libraryServices,
-			int offset, int limit);
-
-	public abstract List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order);
+public interface DocumentRepository extends CrudRepository<Document, Integer> {
 }

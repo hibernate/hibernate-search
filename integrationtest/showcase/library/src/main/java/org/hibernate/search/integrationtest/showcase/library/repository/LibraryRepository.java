@@ -6,35 +6,9 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.repository;
 
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
-
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
-import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 
-public abstract class LibraryRepository {
+import org.springframework.data.repository.CrudRepository;
 
-	protected final FullTextEntityManager entityManager;
-
-	public LibraryRepository(EntityManager entityManager) {
-		this.entityManager = Search.getFullTextEntityManager( entityManager );
-	}
-
-	public Library create(int id, String name, int collectionSize, double latitude, double longitude, LibraryService... services) {
-		Library library = new Library();
-		library.setId( id );
-		library.setName( name );
-		library.setCollectionSize( collectionSize );
-		library.setLatitude( latitude );
-		library.setLongitude( longitude );
-		library.setServices( Arrays.asList( services ) );
-		entityManager.persist( library );
-		return library;
-	}
-
-	public abstract List<Library> search(String terms, int offset, int limit);
-
+public interface LibraryRepository extends CrudRepository<Library, Integer> {
 }

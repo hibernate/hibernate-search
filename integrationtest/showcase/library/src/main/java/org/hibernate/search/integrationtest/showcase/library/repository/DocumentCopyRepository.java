@@ -6,14 +6,9 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.repository;
 
-import javax.persistence.EntityManager;
+import org.hibernate.search.integrationtest.showcase.library.model.DocumentCopy;
 
-public interface RepositoryFactory {
+import org.springframework.data.repository.CrudRepository;
 
-	DocumentRepository createDocumentRepository(EntityManager entityManager);
-
-	LibraryRepository createLibraryRepository(EntityManager entityManager);
-
-	PersonRepository createPersonRepository(EntityManager entityManager);
-
+public interface DocumentCopyRepository extends CrudRepository<DocumentCopy, Integer> {
 }

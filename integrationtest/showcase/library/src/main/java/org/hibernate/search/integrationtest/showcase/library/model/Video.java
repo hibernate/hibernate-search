@@ -21,4 +21,10 @@ public class Video extends Document<VideoCopy> {
 
 	static final String INDEX = "Video";
 
+	public Video() {
+	}
+
+	public Video(int id, String title, String author, String summary, String tags) {
+		super( id, title, author, summary, tags );
+	}
 }

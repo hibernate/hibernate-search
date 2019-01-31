@@ -32,6 +32,14 @@ public class Book extends Document<BookCopy> {
 	@GenericField(valueBridge = @ValueBridgeRef(type = ISBNBridge.class))
 	private ISBN isbn;
 
+	public Book() {
+	}
+
+	public Book(int id, String isbn, String title, String author, String summary, String tags) {
+		super( id, title, author, summary, tags );
+		this.isbn = new ISBN( isbn );
+	}
+
 	public ISBN getIsbn() {
 		return isbn;
 	}
