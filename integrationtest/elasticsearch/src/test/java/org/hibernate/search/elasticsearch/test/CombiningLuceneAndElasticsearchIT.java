@@ -125,6 +125,17 @@ public class CombiningLuceneAndElasticsearchIT extends SearchTestBase {
 		}
 	}
 
+	@Test
+	public void cannotRetrieveElasticsearchAnalyzerAsLuceneAnalyzer() throws Exception {
+		try {
+			getSearchFactory().getAnalyzer( ElasticsearchIndexedEntity.class );
+			fail( "Expected exception wasn't raised" );
+		}
+		catch (SearchException se) {
+			assertThat( se.getMessage() ).contains( "HSEARCH400096" );
+		}
+	}
+
 	@After
 	public void deleteTestData() {
 		Session s = openSession();
