@@ -470,7 +470,9 @@ stage('Non-default environment ITs') {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \
-							clean install -pl org.hibernate.search:hibernate-search-integrationtest-orm -P$itEnv.mavenProfile \
+							clean install \
+							-pl org.hibernate.search:hibernate-search-integrationtest-orm,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
+							-P$itEnv.mavenProfile \
 					"""
 				}
 			}
@@ -484,7 +486,8 @@ stage('Non-default environment ITs') {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \
-							clean install -pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch \
+							clean install \
+							-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 							${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
 					"""
 				}
