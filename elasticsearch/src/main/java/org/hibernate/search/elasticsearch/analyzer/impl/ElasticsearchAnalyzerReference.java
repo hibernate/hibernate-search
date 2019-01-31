@@ -6,9 +6,14 @@
  */
 package org.hibernate.search.elasticsearch.analyzer.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.analyzer.impl.RemoteAnalyzerReference;
+import org.hibernate.search.analyzer.spi.AnalyzerReference;
 import org.hibernate.search.elasticsearch.analyzer.definition.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.settings.impl.translation.ElasticsearchAnalyzerDefinitionTranslator;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A reference to an {@code ElasticsearchAnalyzer}.
@@ -16,6 +21,8 @@ import org.hibernate.search.elasticsearch.settings.impl.translation.Elasticsearc
  * @author Yoann Rodiere
  */
 public abstract class ElasticsearchAnalyzerReference extends RemoteAnalyzerReference {
+
+	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	/**
 	 * Register definitions that will be needed in order to add the field named {@code fieldName}
@@ -39,6 +46,23 @@ public abstract class ElasticsearchAnalyzerReference extends RemoteAnalyzerRefer
 	 */
 	public abstract void initialize(ElasticsearchAnalysisDefinitionRegistry definitionRegistry,
 			ElasticsearchAnalyzerDefinitionTranslator translator);
+
+	@Override
+	public <T extends AnalyzerReference> T unwrap(Class<T> analyzerType) {
+		try {
+			return super.unwrap( analyzerType );
+		}
+		catch (ClassCastException e) {
+			if ( !ElasticsearchAnalyzerReference.class.isAssignableFrom( analyzerType ) ) {
+				// Not even the same technology, probably a user error
+				throw log.invalidConversionFromElasticsearchAnalyzer( this, e );
+			}
+			else {
+				// The other type uses the same technology... probably a bug?
+				throw e;
+			}
+		}
+	}
 
 	@Override
 	public void close() {
