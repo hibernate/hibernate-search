@@ -58,6 +58,8 @@ public interface SearchFactory {
 	 *
 	 * @throws java.lang.IllegalArgumentException in case {@code clazz == null} or the specified
 	 * class is not an indexed entity.
+	 * @throws org.hibernate.search.exception.SearchException if the entity is not indexed with Lucene,
+	 * but with an alternative technology such as Elasticsearch.
 	 */
 	Analyzer getAnalyzer(Class<?> clazz);
 
