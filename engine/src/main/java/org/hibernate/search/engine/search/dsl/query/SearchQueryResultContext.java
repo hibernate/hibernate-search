@@ -10,6 +10,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 
 /**
  * The context used when building a query, after the search result type has been defined.
@@ -18,6 +19,6 @@ public interface SearchQueryResultContext<Q> {
 
 	SearchQueryContext<Q> predicate(SearchPredicate predicate);
 
-	SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicate> predicateContributor);
+	SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor);
 
 }

@@ -39,7 +39,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 				fullTextSession.search( Book.class ).query()
 				.asEntity()
 				// TODO allow to bypass the bridge in the DSL
-				.predicate( f -> f.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ).toPredicate() )
+				.predicate( f -> f.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
 				.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
@@ -52,7 +52,7 @@ class LambdaSyntaxDocumentDao extends DocumentDao {
 		FullTextQuery<Book> query =
 				fullTextSession.search( Book.class ).query()
 						.asEntity()
-						.predicate( f -> f.matchAll().toPredicate() )
+						.predicate( f -> f.matchAll() )
 						.build();
 
 		return query.getResultSize();

@@ -68,7 +68,7 @@ public class ElasticsearchSearchQueryIT {
 
 		SearchQuery<Object> query = searchTarget.query()
 				.asProjection( f -> f.field( "string" ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		clientMock.expectNext(
@@ -91,7 +91,7 @@ public class ElasticsearchSearchQueryIT {
 
 		SearchQuery<?> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.routing( routingKey )
 				.build();
 

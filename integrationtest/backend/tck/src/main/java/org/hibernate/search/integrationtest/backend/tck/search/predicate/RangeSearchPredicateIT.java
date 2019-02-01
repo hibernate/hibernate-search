@@ -77,7 +77,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -95,7 +95,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -115,7 +115,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -125,7 +125,7 @@ public class RangeSearchPredicateIT {
 
 			query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit().toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit() )
 					.build();
 
 			assertThat( query )
@@ -143,7 +143,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -161,7 +161,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -181,7 +181,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -191,7 +191,7 @@ public class RangeSearchPredicateIT {
 
 			query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).excludeLimit().toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).excludeLimit() )
 					.build();
 
 			assertThat( query )
@@ -210,7 +210,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -229,7 +229,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -251,7 +251,7 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ).toPredicate() )
+					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -264,7 +264,6 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch ).excludeLimit()
 							.to( value2ToMatch )
-							.toPredicate()
 					)
 					.build();
 
@@ -278,7 +277,6 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch )
 							.to( value2ToMatch ).excludeLimit()
-							.toPredicate()
 					)
 					.build();
 
@@ -292,7 +290,6 @@ public class RangeSearchPredicateIT {
 					.predicate( f -> f.range().onField( absoluteFieldPath )
 							.from( value1ToMatch ).excludeLimit()
 							.to( value3ToMatch ).excludeLimit()
-							.toPredicate()
 					)
 					.build();
 
@@ -329,12 +326,11 @@ public class RangeSearchPredicateIT {
 				.asReference()
 				.predicate( root -> root.bool()
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName )
-								.above( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 						)
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
-								.below( indexMapping.string1Field.document1Value.indexedValue ).toPredicate()
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -346,12 +342,11 @@ public class RangeSearchPredicateIT {
 				.asReference()
 				.predicate( root -> root.bool()
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
-								.above( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 						)
 						.should( c -> c.range().onField( indexMapping.string1Field.relativeFieldName )
-								.below( indexMapping.string1Field.document1Value.indexedValue ).toPredicate()
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -371,7 +366,6 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -383,7 +377,6 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -397,7 +390,6 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -409,7 +401,6 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.from( "d" ).to( "e" )
-						.toPredicate()
 				)
 				.build();
 
@@ -421,7 +412,6 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.above( indexMapping.string3Field.document3Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -434,7 +424,6 @@ public class RangeSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -445,7 +434,6 @@ public class RangeSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -637,7 +625,7 @@ public class RangeSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 	}

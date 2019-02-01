@@ -41,7 +41,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1_500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -53,7 +52,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -65,7 +63,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -77,7 +74,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
-						.toPredicate()
 				)
 				.build();
 
@@ -89,7 +85,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1.5, DistanceUnit.KILOMETERS )
-						.toPredicate()
 				)
 				.build();
 
@@ -106,7 +101,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				() -> searchTarget.predicate().spatial().within()
 						.onField( "string" )
 						.circle( METRO_GARIBALDI, 400 )
-						.toPredicate()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -131,7 +125,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.onField( "string" ).boostedTo( 42 )
 								.matching( OURSON_QUI_BOIT_STRING )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -150,7 +143,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 								.onField( "string" )
 								.matching( OURSON_QUI_BOIT_STRING )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -170,7 +162,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_GARIBALDI, 400 )
-						.toPredicate()
 				)
 				.build();
 
@@ -182,7 +173,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_HOTEL_DE_VILLE_1, 500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -196,7 +186,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -208,7 +197,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_1, 1_500 )
-						.toPredicate()
 				)
 				.build();
 
@@ -220,7 +208,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_2, 400 )
-						.toPredicate()
 				)
 				.build();
 
@@ -234,7 +221,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_GARIBALDI, 400 )
-						.toPredicate()
 				)
 				.build();
 
@@ -246,7 +232,6 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 				.predicate( f -> f.spatial().within()
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE_2, 500 )
-						.toPredicate()
 				)
 				.build();
 

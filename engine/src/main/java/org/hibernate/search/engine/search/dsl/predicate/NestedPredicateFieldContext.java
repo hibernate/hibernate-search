@@ -61,10 +61,12 @@ public interface NestedPredicateFieldContext {
 	 * Matching documents are those for which at least one element of the nested object field
 	 * matches the inner predicate.
 	 *
-	 * @param predicateContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param predicateContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext nest(Function<? super SearchPredicateFactoryContext, SearchPredicate> predicateContributor);
+	SearchPredicateTerminalContext nest(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor);
 
 }

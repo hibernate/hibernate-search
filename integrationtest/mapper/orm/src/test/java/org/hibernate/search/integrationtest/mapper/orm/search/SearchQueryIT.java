@@ -79,7 +79,7 @@ public class SearchQueryIT {
 			FullTextQuery<Book> query = ftSession.search( Book.class )
 					.query()
 					.asEntity()
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchObjects(
@@ -111,7 +111,7 @@ public class SearchQueryIT {
 			FullTextQuery<Book> query = ftSession.search( Book.class )
 					.query()
 					.asEntity()
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			query.setFirstResult( 2 );
@@ -144,7 +144,7 @@ public class SearchQueryIT {
 					.asProjection(
 							searchTarget.projection().field( "title", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjection(
@@ -183,7 +183,7 @@ public class SearchQueryIT {
 							searchTarget.projection().documentReference().toProjection(),
 							searchTarget.projection().field( "author", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjection(
@@ -255,7 +255,7 @@ public class SearchQueryIT {
 									f.score().toProjection()
 							).toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjection(
@@ -306,7 +306,7 @@ public class SearchQueryIT {
 									f.score().toProjection()
 							).toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjection(

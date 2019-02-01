@@ -55,10 +55,12 @@ public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<
 	 * <p>
 	 * Documents matching the "must not" clause won't match the "match all" predicate.
 	 *
-	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param clauseContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	MatchAllPredicateContext except(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
+	MatchAllPredicateContext except(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor);
 
 }

@@ -204,7 +204,7 @@ public class ManualIndexingIT {
 	private void checkNothingIsIndexed(Session session) {
 		FullTextSession ftSession = Search.getFullTextSession( session );
 		FullTextQuery<Book> query = ftSession.search( Book.class ).query().asEntity()
-				.predicate( context -> context.matchAll().toPredicate() ).build();
+				.predicate( context -> context.matchAll() ).build();
 		List<Book> books = query.getResultList();
 
 		assertThat( books ).hasSize( 0 );

@@ -301,7 +301,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 					.query()
 					.asEntity()
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 			query.setFirstResult( 3 );
 			query.setMaxResults( 2 );

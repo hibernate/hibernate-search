@@ -46,7 +46,8 @@ public final class DslExtensionState<R> {
 		} );
 	}
 
-	public <E> void ifSupported(Object extension, Optional<E> extendedContextOptional, Function<E, R> extendedContextFunction) {
+	public <E> void ifSupported(Object extension, Optional<E> extendedContextOptional,
+			Function<E, ? extends R> extendedContextFunction) {
 		if ( appliedOrElse ) {
 			throw log.cannotCallDslExtensionIfSupportedAfterOrElse();
 		}
@@ -71,7 +72,7 @@ public final class DslExtensionState<R> {
 		} );
 	}
 
-	public <T> R orElse(T defaultContext, Function<T, R> defaultContextFunction) {
+	public <T> R orElse(T defaultContext, Function<T, ? extends R> defaultContextFunction) {
 		if ( !appliedAtLeastOneExtension ) {
 			appliedOrElse = true;
 			result = defaultContextFunction.apply( defaultContext );

@@ -39,7 +39,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -63,7 +63,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -89,7 +89,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();
@@ -124,7 +124,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.byField( "string" ).onMissingValue().sortLast().asc().then()
 						.byDistance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
@@ -154,7 +154,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
 		SearchResult<List<?>> results = query.execute();

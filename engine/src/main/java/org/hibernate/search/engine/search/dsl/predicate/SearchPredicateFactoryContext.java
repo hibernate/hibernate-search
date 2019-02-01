@@ -85,7 +85,7 @@ public interface SearchPredicateFactoryContext {
 	 * @return The resulting {@link SearchPredicate}
 	 * @see BooleanJunctionPredicateContext
 	 */
-	SearchPredicate bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
+	SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.

@@ -62,7 +62,7 @@ public class SmokeIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -70,7 +70,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ).toPredicate() )
+				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
@@ -78,7 +78,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "integer" ).matching( 1 ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -86,7 +86,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ).toPredicate() )
+				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -94,7 +94,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ).toPredicate() )
+				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -107,7 +107,7 @@ public class SmokeIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ).toPredicate() )
+				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -115,7 +115,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ).toPredicate() )
+				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -123,7 +123,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ).toPredicate() )
+				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -134,7 +134,6 @@ public class SmokeIT {
 				.predicate( f -> f.range().onField( "localDate" )
 						.from( LocalDate.of( 2018, 1, 2 ) )
 						.to( LocalDate.of( 2018, 2, 23 ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -143,7 +142,7 @@ public class SmokeIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ).toPredicate() )
+				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
@@ -159,7 +158,6 @@ public class SmokeIT {
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "integer" ).matching( 1 ) )
 						.should( f.match().onField( "integer" ).matching( 2 ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -171,7 +169,6 @@ public class SmokeIT {
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.filter( f.match().onField( "integer" ).matching( 1 ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -183,7 +180,6 @@ public class SmokeIT {
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.mustNot( f.match().onField( "integer" ).matching( 2 ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -201,7 +197,6 @@ public class SmokeIT {
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
 						.must( f.match().onField( "flattenedObject.integer" ).matching( 101 ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -211,7 +206,7 @@ public class SmokeIT {
 		// With nested storage, we expect direct queries to never match
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ).toPredicate() )
+				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 				.build();
 		assertThat( query )
 				.hasNoHits()
@@ -225,7 +220,6 @@ public class SmokeIT {
 								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_2" ) )
 								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -240,7 +234,6 @@ public class SmokeIT {
 								.must( f.match().onField( "nestedObject.string" ).matching( "text 1_1" ) )
 								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -271,8 +264,8 @@ public class SmokeIT {
 				.hasHitCount( 2 );
 
 		predicate = searchTarget.predicate().bool()
-				.should( f -> f.match().onField( "integer" ).matching( 1 ).toPredicate() )
-				.should( f -> f.match().onField( "integer" ).matching( 2 ).toPredicate() )
+				.should( f -> f.match().onField( "integer" ).matching( 1 ) )
+				.should( f -> f.match().onField( "integer" ).matching( 2 ) )
 				.toPredicate();
 		query = searchTarget.query()
 				.asReference()
@@ -349,7 +342,7 @@ public class SmokeIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );

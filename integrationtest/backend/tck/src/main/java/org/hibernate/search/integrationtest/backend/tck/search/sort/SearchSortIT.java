@@ -89,7 +89,7 @@ public class SearchSortIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
 				.build();
 	}
@@ -164,7 +164,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( sortAsc )
 				.build();
 		assertThat( query )
@@ -172,7 +172,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortAsc ) )
 				.build();
 		assertThat( query )
@@ -184,7 +184,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( sortDesc )
 				.build();
 		assertThat( query )
@@ -192,7 +192,7 @@ public class SearchSortIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortDesc ) )
 				.build();
 		assertThat( query )
@@ -467,7 +467,7 @@ public class SearchSortIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}

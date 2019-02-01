@@ -119,7 +119,7 @@ public class ProgrammaticMappingRoutingIT {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReference()
-					.predicate( f -> f.match().onField( "value" ).matching( "val1" ).toPredicate() )
+					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )
 					.build();
 

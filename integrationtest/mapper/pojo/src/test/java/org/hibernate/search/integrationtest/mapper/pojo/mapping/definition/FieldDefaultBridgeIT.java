@@ -128,7 +128,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() ).query()
 					.asProjection( f -> f.field( FIELD_NAME, expectations.getProjectionType() ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjection(

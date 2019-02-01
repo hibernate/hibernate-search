@@ -96,7 +96,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -108,7 +108,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -127,7 +127,7 @@ public class MultiTenancyIT {
 						)
 								.toProjection()
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ).toPredicate() )
+				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -139,7 +139,7 @@ public class MultiTenancyIT {
 						)
 								.toProjection()
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ).toPredicate() )
+				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
@@ -160,7 +160,6 @@ public class MultiTenancyIT {
 						.nest( f.match()
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -177,7 +176,6 @@ public class MultiTenancyIT {
 						.nest( f.match()
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
@@ -190,7 +188,7 @@ public class MultiTenancyIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -203,7 +201,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
@@ -224,7 +222,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
@@ -232,7 +230,7 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant1SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -245,7 +243,7 @@ public class MultiTenancyIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( checkQuery )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -271,7 +269,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
@@ -287,7 +285,6 @@ public class MultiTenancyIT {
 						.nest( f.match()
 								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
@@ -302,7 +299,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ).toPredicate() )
+				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				.build();
 		assertThat( query ).hasNoHits();
 
@@ -318,7 +315,6 @@ public class MultiTenancyIT {
 						.nest( f.match()
 								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasNoHits();
@@ -331,7 +327,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
@@ -347,7 +343,6 @@ public class MultiTenancyIT {
 						.nest( f.match()
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
@@ -389,7 +384,7 @@ public class MultiTenancyIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -479,7 +474,7 @@ public class MultiTenancyIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -583,7 +578,7 @@ public class MultiTenancyIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -596,7 +591,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_1 );
@@ -605,7 +600,7 @@ public class MultiTenancyIT {
 
 		query = searchTarget.query( tenant2SessionContext )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
@@ -618,7 +613,7 @@ public class MultiTenancyIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );

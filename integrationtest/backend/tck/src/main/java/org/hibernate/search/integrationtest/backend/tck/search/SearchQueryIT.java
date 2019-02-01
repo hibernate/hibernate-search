@@ -67,7 +67,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
@@ -78,7 +78,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
@@ -90,7 +90,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setMaxResults( 2L );
@@ -101,7 +101,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( null );
@@ -118,7 +118,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( 1L );
@@ -143,7 +143,7 @@ public class SearchQueryIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setFirstResult( null );
@@ -161,7 +161,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.build();
 		query.setMaxResults( 0L );
@@ -177,7 +177,7 @@ public class SearchQueryIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.build();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
@@ -189,7 +189,7 @@ public class SearchQueryIT {
 
 		QueryWrapper queryWrapper = searchTarget.query()
 				.asReference( QueryWrapper::new )
-				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.build();
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
 	}
@@ -212,7 +212,7 @@ public class SearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

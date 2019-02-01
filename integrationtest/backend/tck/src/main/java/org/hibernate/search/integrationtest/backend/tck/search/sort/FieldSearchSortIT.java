@@ -82,7 +82,7 @@ public class FieldSearchSortIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
 				.build();
 	}
@@ -258,7 +258,7 @@ public class FieldSearchSortIT {
 
 		searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -279,7 +279,7 @@ public class FieldSearchSortIT {
 
 		searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -300,7 +300,7 @@ public class FieldSearchSortIT {
 
 		searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
 				.build();
 	}
@@ -403,7 +403,7 @@ public class FieldSearchSortIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}

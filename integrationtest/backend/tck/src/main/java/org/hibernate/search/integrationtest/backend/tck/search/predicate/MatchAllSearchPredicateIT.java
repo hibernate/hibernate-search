@@ -62,7 +62,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertThat( query )
@@ -75,7 +75,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ).toPredicate() ).toPredicate() )
+				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ) ) )
 				.build();
 
 		assertThat( query )
@@ -84,7 +84,7 @@ public class MatchAllSearchPredicateIT {
 		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().except( searchPredicate ).toPredicate() )
+				.predicate( f -> f.matchAll().except( searchPredicate ) )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -99,7 +99,6 @@ public class MatchAllSearchPredicateIT {
 				.predicate( f -> f.matchAll()
 						.except( f.match().onField( "string" ).matching( STRING_1 ) )
 						.except( f.match().onField( "string" ).matching( STRING_2 ) )
-						.toPredicate()
 				)
 				.build();
 
@@ -111,7 +110,7 @@ public class MatchAllSearchPredicateIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ).toPredicate() )
+				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
 				.build();
 
 		assertThat( query )
@@ -136,7 +135,7 @@ public class MatchAllSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

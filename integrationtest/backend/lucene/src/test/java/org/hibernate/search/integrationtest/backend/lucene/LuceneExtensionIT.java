@@ -110,7 +110,6 @@ public class LuceneExtensionIT {
 						.should( f.extension( LuceneExtension.get() )
 								.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -128,11 +127,11 @@ public class LuceneExtensionIT {
 				.fromLuceneQuery( IntPoint.newExactQuery( "integer", 2 ) ).toPredicate();
 		SearchPredicate predicate3 = searchTarget.predicate().extension( LuceneExtension.get() )
 				.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) ).toPredicate();
-		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
-			b.should( predicate1 );
-			b.should( predicate2 );
-			b.should( predicate3 );
-		} );
+		SearchPredicate booleanPredicate = searchTarget.predicate().bool()
+				.should( predicate1 )
+				.should( predicate2 )
+				.should( predicate3 )
+				.toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
@@ -149,7 +148,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( LuceneExtension.get() )
 								.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
@@ -166,7 +165,7 @@ public class LuceneExtensionIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension().ifSupported(
 								LuceneExtension.get(),
@@ -209,7 +208,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
 				.build();
 		assertThat( query )
@@ -226,7 +225,7 @@ public class LuceneExtensionIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort ) )
 				.build();
 		assertThat( query )
@@ -241,7 +240,7 @@ public class LuceneExtensionIT {
 				"match() predicate on unsupported native field",
 				() -> searchTarget.query()
 						.asReference()
-						.predicate( f -> f.match().onField( "nativeField" ).matching( "37" ).toPredicate() )
+						.predicate( f -> f.match().onField( "nativeField" ).matching( "37" ) )
 						.build()
 				)
 				.assertThrown()
@@ -260,7 +259,7 @@ public class LuceneExtensionIT {
 				"sort on unsupported native field",
 				() -> searchTarget.query()
 						.asReference()
-						.predicate( f -> f.matchAll().toPredicate() )
+						.predicate( f -> f.matchAll() )
 						.sort( c -> c.byField( "nativeField" ) )
 						.build()
 				)
@@ -280,7 +279,6 @@ public class LuceneExtensionIT {
 				.asReference()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
-						.toPredicate()
 				)
 				.build();
 
@@ -294,7 +292,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<Integer> query = searchTarget.query()
 				.asProjection( f -> f.field( "nativeField", Integer.class ).toProjection() )
-				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.build();
 
 		assertThat( query ).hasHitsAnyOrder( 37 );
@@ -309,7 +307,6 @@ public class LuceneExtensionIT {
 				.asReference()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
-						.toPredicate()
 				)
 				.build();
 
@@ -335,7 +332,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
 				.build();
 
@@ -351,7 +348,7 @@ public class LuceneExtensionIT {
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document().toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		List<Document> result = query.execute().getHits();
@@ -415,7 +412,7 @@ public class LuceneExtensionIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
 
 		List<Document> result = query.execute().getHits().stream()
@@ -438,7 +435,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<Explanation> query = searchTarget.query()
 				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation().toProjection() )
-				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
 
 		List<Explanation> result = query.execute().getHits();
@@ -558,7 +555,7 @@ public class LuceneExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,

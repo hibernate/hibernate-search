@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -67,28 +68,28 @@ class BooleanJunctionPredicateContextImpl<B>
 
 	@Override
 	public BooleanJunctionPredicateContext must(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
 		must( clauseContributor.apply( factoryContext ) );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext mustNot(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
 		mustNot( clauseContributor.apply( factoryContext ) );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext should(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
 		should( clauseContributor.apply( factoryContext ) );
 		return this;
 	}
 
 	@Override
 	public BooleanJunctionPredicateContext filter(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
 		filter( clauseContributor.apply( factoryContext ) );
 		return this;
 	}

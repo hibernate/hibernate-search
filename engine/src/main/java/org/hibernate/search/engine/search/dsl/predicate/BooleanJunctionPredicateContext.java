@@ -153,44 +153,52 @@ public interface BooleanJunctionPredicateContext extends
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param clauseContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext must(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext must(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param clauseContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext mustNot(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext mustNot(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param clauseContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext should(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext should(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
 	 * <p>
 	 * Best used with lambda expressions.
 	 *
-	 * @param clauseContributor A function that will use the context passed in parameter to create a {@link SearchPredicate}.
+	 * @param clauseContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanJunctionPredicateContext filter(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor);
+	BooleanJunctionPredicateContext filter(
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor);
 
 	/*
 	 * Options
