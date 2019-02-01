@@ -24,9 +24,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.esnative.T
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DynamicType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.NormsType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.admin.gson.impl.AnalysisJsonElementEquivalence;
@@ -666,23 +663,22 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	private void validateIndexOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
-		IndexType expectedIndex = expectedMapping.getIndex();
-		if ( IndexType.TRUE.equals( expectedIndex ) ) { // If we don't need an index, we don't care
+		Boolean expectedIndex = expectedMapping.getIndex();
+		if ( Boolean.TRUE.equals( expectedIndex ) ) { // If we don't need an index, we don't care
 			// From ES 5.0 on, all indexable fields are indexed by default
-			IndexType indexDefault = IndexType.TRUE;
-			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), indexDefault );
+			validateEqualWithDefault( errorCollector, "index", expectedIndex, actualMapping.getIndex(), true );
 		}
 
-		NormsType expectedNorms = expectedMapping.getNorms();
-		if ( NormsType.TRUE.equals( expectedNorms ) ) { // If we don't need norms, we don't care
+		Boolean expectedNorms = expectedMapping.getNorms();
+		if ( Boolean.TRUE.equals( expectedNorms ) ) { // If we don't need norms, we don't care
 			// From ES 5.0 on, norms are enabled by default on text fields only
-			NormsType normsDefault = DataType.TEXT.equals( expectedMapping.getType() ) ? NormsType.TRUE : NormsType.FALSE;
+			Boolean normsDefault = DataType.TEXT.equals( expectedMapping.getType() ) ? Boolean.TRUE : Boolean.FALSE;
 			validateEqualWithDefault( errorCollector, "norms", expectedNorms, actualMapping.getNorms(), normsDefault );
 		}
 
-		FieldDataType expectedFieldData = expectedMapping.getFieldData();
-		if ( FieldDataType.TRUE.equals( expectedFieldData ) ) { // If we don't need an index, we don't care
-			validateEqualWithDefault( errorCollector, "fielddata", expectedFieldData, actualMapping.getFieldData(), FieldDataType.FALSE );
+		Boolean expectedFieldData = expectedMapping.getFieldData();
+		if ( Boolean.TRUE.equals( expectedFieldData ) ) { // If we don't need an index, we don't care
+			validateEqualWithDefault( errorCollector, "fielddata", expectedFieldData, actualMapping.getFieldData(), false );
 		}
 
 		Boolean expectedDocValues = expectedMapping.getDocValues();

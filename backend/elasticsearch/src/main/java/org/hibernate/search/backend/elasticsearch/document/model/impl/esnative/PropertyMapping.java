@@ -35,9 +35,9 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	private Float boost;
 
-	private IndexType index;
+	private Boolean index;
 
-	private NormsType norms;
+	private Boolean norms;
 
 	@SerializedName("doc_values")
 	private Boolean docValues;
@@ -72,7 +72,7 @@ public class PropertyMapping extends AbstractTypeMapping {
 	private String analyzer;
 
 	@SerializedName("fielddata")
-	private FieldDataType fieldData;
+	private Boolean fieldData;
 
 	/*
 	 * Keyword datatype
@@ -111,19 +111,19 @@ public class PropertyMapping extends AbstractTypeMapping {
 		this.boost = boost;
 	}
 
-	public IndexType getIndex() {
+	public Boolean getIndex() {
 		return index;
 	}
 
-	public void setIndex(IndexType index) {
+	public void setIndex(Boolean index) {
 		this.index = index;
 	}
 
-	public NormsType getNorms() {
+	public Boolean getNorms() {
 		return norms;
 	}
 
-	public void setNorms(NormsType norms) {
+	public void setNorms(Boolean norms) {
 		this.norms = norms;
 	}
 
@@ -186,11 +186,11 @@ public class PropertyMapping extends AbstractTypeMapping {
 		this.normalizer = normalizer;
 	}
 
-	public FieldDataType getFieldData() {
+	public Boolean getFieldData() {
 		return fieldData;
 	}
 
-	public void setFieldData(FieldDataType fieldData) {
+	public void setFieldData(Boolean fieldData) {
 		this.fieldData = fieldData;
 	}
 }
