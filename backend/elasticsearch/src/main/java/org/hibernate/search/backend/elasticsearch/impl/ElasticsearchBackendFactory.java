@@ -17,13 +17,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.FieldDataType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.IndexType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.NormsType;
 import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
-import org.hibernate.search.backend.elasticsearch.gson.impl.ES5FieldDataTypeJsonAdapter;
-import org.hibernate.search.backend.elasticsearch.gson.impl.ES5IndexTypeJsonAdapter;
-import org.hibernate.search.backend.elasticsearch.gson.impl.ES5NormsTypeJsonAdapter;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
@@ -121,10 +115,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	}
 
 	private GsonBuilder createES5GsonBuilderBase() {
-		return new GsonBuilder()
-				.registerTypeAdapter( IndexType.class, new ES5IndexTypeJsonAdapter().nullSafe() )
-				.registerTypeAdapter( FieldDataType.class, new ES5FieldDataTypeJsonAdapter().nullSafe() )
-				.registerTypeAdapter( NormsType.class, new ES5NormsTypeJsonAdapter().nullSafe() );
+		return new GsonBuilder();
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {

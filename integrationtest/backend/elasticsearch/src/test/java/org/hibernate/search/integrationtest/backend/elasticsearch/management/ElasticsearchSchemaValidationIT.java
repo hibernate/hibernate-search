@@ -323,7 +323,7 @@ public class ElasticsearchSchemaValidationIT {
 				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "property 'myField'" )
-						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'TRUE', actual is 'FALSE'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'true', actual is 'false'" )
 				.build()
 		);
 
@@ -391,7 +391,7 @@ public class ElasticsearchSchemaValidationIT {
 				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "property 'myField'" )
-						.withMessage( "\n\tInvalid value for attribute 'norms'. Expected 'TRUE', actual is 'FALSE'" )
+						.withMessage( "\n\tInvalid value for attribute 'norms'. Expected 'true', actual is 'false'" )
 				.build()
 		);
 
@@ -759,7 +759,7 @@ public class ElasticsearchSchemaValidationIT {
 				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "property 'myField', field 'myField" + FACET_FIELD_SUFFIX + "'" )
-						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'TRUE', actual is 'FALSE'" )
+						.withMessage( "\n\tInvalid value for attribute 'index'. Expected 'true', actual is 'false'" )
 				.build()
 		);
 
