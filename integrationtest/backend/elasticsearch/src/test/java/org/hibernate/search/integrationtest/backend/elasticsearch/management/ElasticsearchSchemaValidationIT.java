@@ -135,7 +135,7 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType1", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -144,7 +144,7 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType2", INDEX2_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean().toIndexFieldType() )
+							root.field( "myField", f -> f.asBoolean() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -155,7 +155,7 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field(
 									"myField",
-									f -> f.asString().analyzer( "default" ).toIndexFieldType()
+									f -> f.asString().analyzer( "default" )
 							)
 									.createAccessor();
 						},
@@ -361,7 +361,7 @@ public class ElasticsearchSchemaValidationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field(
 									"myField",
-									f -> f.asString().analyzer( "default" ).toIndexFieldType()
+									f -> f.asString().analyzer( "default" )
 							)
 									.createAccessor();
 						},
@@ -404,7 +404,6 @@ public class ElasticsearchSchemaValidationIT {
 									"myField",
 									f -> f.asString().analyzer( "default" )
 											// TODO disable norms once the APIs allow it; see HSEARCH-3048
-											.toIndexFieldType()
 							)
 									.createAccessor();
 						},
@@ -441,7 +440,7 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType1", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> {
@@ -538,9 +537,9 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType1", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLong().toIndexFieldType() )
+							root.field( "myField", f -> f.asLong() )
 									.createAccessor();
-							root.field( "myTextField", f -> f.asString().analyzer( "default" ).toIndexFieldType() )
+							root.field( "myTextField", f -> f.asString().analyzer( "default" ) )
 									.createAccessor();
 						},
 						indexManager -> {
@@ -640,7 +639,7 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType1", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().toIndexFieldType() )
+							root.field( "myField", f -> f.asString() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -649,7 +648,7 @@ public class ElasticsearchSchemaValidationIT {
 						"MappedType2", INDEX2_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().toIndexFieldType() )
+							root.field( "myField", f -> f.asString() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -775,7 +774,7 @@ public class ElasticsearchSchemaValidationIT {
 						typeName, indexName,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().toIndexFieldType() )
+							root.field( "myField", f -> f.asString() )
 									.createAccessor();
 						},
 						indexManager -> {
@@ -790,7 +789,7 @@ public class ElasticsearchSchemaValidationIT {
 						typeName, indexName,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> {

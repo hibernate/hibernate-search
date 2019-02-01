@@ -239,7 +239,7 @@ public class AnalysisCustomIT {
 						ctx -> {
 							IndexFieldAccessor<String> accessor = ctx.getSchemaElement().field(
 									fieldName,
-									f -> typeContributor.apply( f.asString() ).toIndexFieldType()
+									f -> typeContributor.apply( f.asString() )
 							)
 									.createAccessor();
 							MainFieldModel fieldModel = new MainFieldModel( accessor, fieldName );

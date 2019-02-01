@@ -51,15 +51,15 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 		IndexSchemaObjectField borrowalsObjectField = context.getIndexSchemaElement().objectField( "borrowals" );
 		borrowalsObjectFieldAccessor = borrowalsObjectField.createAccessor();
 		shortTermBorrowalCountAccessor = borrowalsObjectField.field(
-				"shortTermCount", f -> f.asInteger().sortable( Sortable.YES ).toIndexFieldType()
+				"shortTermCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
 				.createAccessor();
 		longTermBorrowalCountAccessor = borrowalsObjectField.field(
-				"longTermCount", f -> f.asInteger().sortable( Sortable.YES ).toIndexFieldType()
+				"longTermCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
 				.createAccessor();
 		totalBorrowalCountAccessor = borrowalsObjectField.field(
-				"totalCount", f -> f.asInteger().sortable( Sortable.YES ).toIndexFieldType()
+				"totalCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
 				.createAccessor();
 	}

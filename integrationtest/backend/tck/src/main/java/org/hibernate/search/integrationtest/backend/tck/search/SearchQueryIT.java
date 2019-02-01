@@ -221,7 +221,7 @@ public class SearchQueryIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
 					.createAccessor();
 		}
 	}

@@ -417,7 +417,7 @@ public class SearchResultLoadingOrTransformingIT {
 		IndexAccessors(IndexSchemaElement root) {
 			string = root.field(
 					"string",
-					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			string_analyzed = root.field(
@@ -425,22 +425,21 @@ public class SearchResultLoadingOrTransformingIT {
 					f -> f.asString()
 							.projectable( Projectable.YES )
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			integer = root.field(
 					"integer",
-					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asInteger().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			localDate = root.field(
 					"localDate",
-					f -> f.asLocalDate().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asLocalDate().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			geoPoint = root.field(
 					"geoPoint",
-					f -> f.asGeoPoint().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asGeoPoint().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			IndexSchemaObjectField flattenedObjectField =
@@ -461,12 +460,12 @@ public class SearchResultLoadingOrTransformingIT {
 			self = objectField.createAccessor();
 			string = objectField.field(
 					"string",
-					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			integer = objectField.field(
 					"integer",
-					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asInteger().projectable( Projectable.YES )
 			)
 					.createAccessor();
 		}

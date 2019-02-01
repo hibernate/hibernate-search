@@ -92,7 +92,7 @@ public class BridgeIT {
 										.createAccessor( String.class );
 								indexFieldAccessor = context.getIndexSchemaElement().field(
 										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" ).toIndexFieldType()
+										f -> f.asString().analyzer( "myAnalyzer" )
 								)
 										.createAccessor();
 							}
@@ -157,7 +157,7 @@ public class BridgeIT {
 										.createAccessor( String.class );
 								indexFieldAccessor = context.getIndexSchemaElement().field(
 										"someField",
-										f -> f.asString().analyzer( "myAnalyzer" ).toIndexFieldType()
+										f -> f.asString().analyzer( "myAnalyzer" )
 								)
 										.createAccessor();
 							}

@@ -86,7 +86,7 @@ public class StartupStubBridge
 		// Add at least one field so that the bridge is not removed
 		context.getIndexSchemaElement().field(
 				"startupStubBridgeFieldFromPropertyBridge",
-				f -> f.asString().toIndexFieldType()
+				f -> f.asString()
 		)
 				.createAccessor();
 	}
@@ -96,7 +96,7 @@ public class StartupStubBridge
 		// Add at least one field so that the bridge is not removed
 		context.getIndexSchemaElement().field(
 				"startupStubBridgeFieldFromTypeBridge",
-				f -> f.asString().toIndexFieldType()
+				f -> f.asString()
 		)
 				.createAccessor();
 	}

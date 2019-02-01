@@ -69,8 +69,8 @@ public final class CustomTypeBridge implements TypeBridge {
 
 		IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( objectName );
 		objectFieldAccessor = objectField.createAccessor();
-		textFieldAccessor = objectField.field( TEXT_FIELD_NAME, f -> f.asString().toIndexFieldType() ).createAccessor();
-		localDateFieldAccessor = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate().toIndexFieldType() )
+		textFieldAccessor = objectField.field( TEXT_FIELD_NAME, f -> f.asString() ).createAccessor();
+		localDateFieldAccessor = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate() )
 				.createAccessor();
 	}
 

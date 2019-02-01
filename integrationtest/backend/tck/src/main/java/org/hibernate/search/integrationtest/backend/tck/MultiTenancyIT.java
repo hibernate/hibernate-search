@@ -611,9 +611,9 @@ public class MultiTenancyIT {
 		final ObjectAccessors nestedObject;
 
 		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ).toIndexFieldType() )
+			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) )
 					.createAccessor();
-			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType() )
+			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.createAccessor();
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
@@ -628,9 +628,9 @@ public class MultiTenancyIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string", f -> f.asString().projectable( Projectable.YES ).toIndexFieldType() )
+			string = objectField.field( "string", f -> f.asString().projectable( Projectable.YES ) )
 					.createAccessor();
-			integer = objectField.field( "integer", f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType() )
+			integer = objectField.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
 					.createAccessor();
 		}
 	}

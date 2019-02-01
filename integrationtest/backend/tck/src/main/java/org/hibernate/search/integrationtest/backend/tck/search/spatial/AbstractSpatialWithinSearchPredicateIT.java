@@ -115,35 +115,35 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 
 		IndexAccessors(IndexSchemaElement root) {
 			geoPoint = root.field(
-					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			geoPoint_1 = root.field(
-					"geoPoint_1", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					"geoPoint_1", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			geoPoint_2 = root.field(
-					"geoPoint_2", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					"geoPoint_2", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			geoPoint_with_longName = root.field(
 					"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
-					f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			nonProjectableGeoPoint = root.field(
 					"nonProjectableGeoPoint",
-					f -> f.asGeoPoint().projectable( Projectable.NO ).toIndexFieldType()
+					f -> f.asGeoPoint().projectable( Projectable.NO )
 			)
 					.createAccessor();
 			unsortableGeoPoint = root.field(
 					"unsortableGeoPoint",
-					f -> f.asGeoPoint().sortable( Sortable.NO ).toIndexFieldType()
+					f -> f.asGeoPoint().sortable( Sortable.NO )
 			)
 					.createAccessor();
 			string = root.field(
 					"string",
-					f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ).toIndexFieldType()
+					f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES )
 			)
 					.createAccessor();
 		}
