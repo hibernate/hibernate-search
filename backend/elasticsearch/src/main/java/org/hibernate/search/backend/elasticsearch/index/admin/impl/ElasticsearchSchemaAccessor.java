@@ -42,11 +42,11 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void createIndex(URLEncodedString indexName, IndexSettings settings,
-			URLEncodedString typeName, RootTypeMapping mapping,
+			RootTypeMapping mapping,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<?> work = workFactory.createIndex( indexName )
 				.settings( settings )
-				.mapping( typeName, mapping )
+				.mapping( mapping )
 				.build();
 		execute( work );
 	}
@@ -58,11 +58,11 @@ public class ElasticsearchSchemaAccessor {
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
-			URLEncodedString typeName, RootTypeMapping mapping,
+			RootTypeMapping mapping,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
-				.mapping( typeName, mapping )
+				.mapping( mapping )
 				.ignoreExisting()
 				.build();
 		CreateIndexResult result = execute( work );
@@ -74,12 +74,11 @@ public class ElasticsearchSchemaAccessor {
 		return execute( work );
 	}
 
-	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName, URLEncodedString typeName) {
+	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName) {
 		IndexMetadata indexMetadata = new IndexMetadata();
 		indexMetadata.setName( indexName );
-		indexMetadata.setTypeName( typeName );
 
-		ElasticsearchWork<RootTypeMapping> getMappingWork = workFactory.getIndexTypeMapping( indexName, typeName ).build();
+		ElasticsearchWork<RootTypeMapping> getMappingWork = workFactory.getIndexTypeMapping( indexName ).build();
 		try {
 			RootTypeMapping mapping = execute( getMappingWork );
 			indexMetadata.setMapping( mapping );
@@ -111,9 +110,8 @@ public class ElasticsearchSchemaAccessor {
 		}
 	}
 
-	public void putMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping) {
-		// TODO HSEARCH-3080 the mapping name does not make sense, we can't chose it. Change something here?
-		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, typeName, mapping ).build();
+	public void putMapping(URLEncodedString indexName, RootTypeMapping mapping) {
+		ElasticsearchWork<?> work = workFactory.putIndexTypeMapping( indexName, mapping ).build();
 
 		try {
 			execute( work );

@@ -21,8 +21,6 @@ public class IndexMetadata {
 
 	private URLEncodedString name;
 
-	private URLEncodedString typeName;
-
 	private RootTypeMapping mapping;
 
 	private IndexSettings settings;
@@ -33,14 +31,6 @@ public class IndexMetadata {
 
 	public void setName(URLEncodedString name) {
 		this.name = name;
-	}
-
-	public URLEncodedString getTypeName() {
-		return typeName;
-	}
-
-	public void setTypeName(URLEncodedString typeName) {
-		this.typeName = typeName;
 	}
 
 	public RootTypeMapping getMapping() {

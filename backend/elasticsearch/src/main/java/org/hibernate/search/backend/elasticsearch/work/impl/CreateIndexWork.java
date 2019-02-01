@@ -45,12 +45,14 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 			implements CreateIndexWorkBuilder {
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;
+		private final URLEncodedString typeName;
 		private JsonObject payload = new JsonObject();
 
-		public Builder(GsonProvider gsonProvider, URLEncodedString indexName) {
+		public Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
+			this.typeName = typeName;
 		}
 
 		@Override
@@ -65,7 +67,7 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		}
 
 		@Override
-		public Builder mapping(URLEncodedString typeName, RootTypeMapping mapping) {
+		public Builder mapping(RootTypeMapping mapping) {
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
 
 			JsonObject mappings = payload.getAsJsonObject( "mappings" );

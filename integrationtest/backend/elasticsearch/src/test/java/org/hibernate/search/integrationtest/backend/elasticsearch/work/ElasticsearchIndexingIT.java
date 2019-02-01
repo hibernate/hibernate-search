@@ -10,8 +10,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -35,7 +35,7 @@ public class ElasticsearchIndexingIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
-	private static final String TYPE_NAME = ElasticsearchIndexManagerBuilder.TYPE_NAME;
+	private static final URLEncodedString TYPE_NAME = Elasticsearch6WorkBuilderFactory.TYPE_NAME;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -74,7 +74,7 @@ public class ElasticsearchIndexingIT {
 		clientMock.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( URLEncodedString.fromString( TYPE_NAME ) )
+						.pathComponent( TYPE_NAME )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )
@@ -90,7 +90,7 @@ public class ElasticsearchIndexingIT {
 		clientMock.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( URLEncodedString.fromString( TYPE_NAME ) )
+						.pathComponent( TYPE_NAME )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )
@@ -104,7 +104,7 @@ public class ElasticsearchIndexingIT {
 		clientMock.expectNext(
 				ElasticsearchRequest.delete()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( URLEncodedString.fromString( TYPE_NAME ) )
+						.pathComponent( TYPE_NAME )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.param( "routing", routingKey )
 						.build(),

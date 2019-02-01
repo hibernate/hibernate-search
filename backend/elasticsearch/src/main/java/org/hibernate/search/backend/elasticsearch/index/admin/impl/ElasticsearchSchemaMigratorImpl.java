@@ -36,7 +36,6 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	@Override
 	public void migrate(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
-		URLEncodedString typeName = indexMetadata.getTypeName();
 		IndexSettings settings = indexMetadata.getSettings();
 
 		try {
@@ -64,7 +63,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			}
 
 			// Elasticsearch itself takes care of the actual merging
-			schemaAccessor.putMapping( indexName, typeName, indexMetadata.getMapping() );
+			schemaAccessor.putMapping( indexName, indexMetadata.getMapping() );
 		}
 		catch (SearchException e) {
 			throw log.schemaUpdateFailed( indexName, e );

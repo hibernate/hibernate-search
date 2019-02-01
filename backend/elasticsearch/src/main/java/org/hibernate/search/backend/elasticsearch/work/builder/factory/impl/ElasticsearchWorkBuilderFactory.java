@@ -45,9 +45,9 @@ import com.google.gson.JsonObject;
  */
 public interface ElasticsearchWorkBuilderFactory {
 
-	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document);
+	IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString id, String routingKey, JsonObject document);
 
-	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey);
+	DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString id, String routingKey);
 
 	DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload);
 
@@ -63,7 +63,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	CountWorkBuilder count(Set<URLEncodedString> indexNames);
 
-	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload);
+	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload);
 
 	<T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 
@@ -83,9 +83,9 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings);
 
-	GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName);
+	GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName);
 
-	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping);
+	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping);
 
 	WaitForIndexStatusWorkBuilder waitForIndexStatusWork(URLEncodedString indexName, ElasticsearchIndexStatus requiredStatus, String timeout);
 

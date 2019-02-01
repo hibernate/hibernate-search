@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
-import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -174,7 +173,7 @@ public class ElasticsearchSchemaValidationIT {
 		thrown.expect(
 				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "\n\tMissing '" + ElasticsearchIndexManagerBuilder.TYPE_NAME + "' type mapping" )
+						.withMessage( "\n\tMissing type mapping" )
 				.build()
 		);
 

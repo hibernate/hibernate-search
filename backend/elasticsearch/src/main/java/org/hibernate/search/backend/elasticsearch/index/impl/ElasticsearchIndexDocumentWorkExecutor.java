@@ -27,18 +27,16 @@ public class ElasticsearchIndexDocumentWorkExecutor implements IndexDocumentWork
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
-	private final URLEncodedString typeName;
 	private final String tenantId;
 
 	ElasticsearchIndexDocumentWorkExecutor(ElasticsearchWorkBuilderFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName, URLEncodedString typeName,
+			URLEncodedString indexName,
 			SessionContextImplementor sessionContext) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
-		this.typeName = typeName;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
@@ -52,7 +50,7 @@ public class ElasticsearchIndexDocumentWorkExecutor implements IndexDocumentWork
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		ElasticsearchWork<Void> work = factory.index( indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build();
+		ElasticsearchWork<Void> work = factory.index( indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build();
 		return orchestrator.submit( work );
 	}
 }

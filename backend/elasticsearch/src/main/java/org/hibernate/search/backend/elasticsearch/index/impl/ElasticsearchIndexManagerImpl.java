@@ -45,7 +45,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private final String hibernateSearchIndexName;
 	private final URLEncodedString elasticsearchIndexName;
-	private final URLEncodedString typeName;
 	private final ElasticsearchIndexModel model;
 
 	private final ElasticsearchWorkOrchestrator serialOrchestrator;
@@ -56,7 +55,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final ElasticsearchIndexAdministrationClient administrationClient;
 
 	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
-			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,URLEncodedString typeName,
+			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexModel model,
 			ElasticsearchIndexLifecycleStrategy managementStrategy,
 			ElasticsearchWorkOrchestrator serialOrchestrator, ElasticsearchWorkOrchestrator parallelOrchestrator,
@@ -65,14 +64,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.searchBackendContext = searchBackendContext;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
-		this.typeName = typeName;
 		this.model = model;
 		this.serialOrchestrator = serialOrchestrator;
 		this.parallelOrchestrator = parallelOrchestrator;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.managementStrategy = managementStrategy;
 		this.administrationClient = indexingBackendContext.createAdministrationClient(
-				elasticsearchIndexName, typeName, model
+				elasticsearchIndexName, model
 		);
 	}
 
@@ -100,7 +98,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(SessionContextImplementor sessionContext) {
 		return indexingBackendContext.createWorkPlan(
 				serialOrchestrator,
-				elasticsearchIndexName, typeName,
+				elasticsearchIndexName,
 				refreshAfterWrite,
 				sessionContext
 		);
@@ -108,7 +106,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(SessionContextImplementor sessionContext) {
-		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, elasticsearchIndexName, typeName, sessionContext );
+		return indexingBackendContext.createDocumentWorkExecutor( parallelOrchestrator, elasticsearchIndexName, sessionContext );
 	}
 
 	@Override

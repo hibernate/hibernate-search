@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
@@ -21,5 +20,5 @@ public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<Elastic
 
 	CreateIndexWorkBuilder settings(IndexSettings settings);
 
-	CreateIndexWorkBuilder mapping(URLEncodedString typeName, RootTypeMapping mapping);
+	CreateIndexWorkBuilder mapping(RootTypeMapping mapping);
 }
