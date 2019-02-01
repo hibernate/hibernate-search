@@ -22,7 +22,7 @@
 
     <properties>
         <!-- Skip artifact deployment -->
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>
