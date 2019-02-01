@@ -169,7 +169,7 @@ public class HibernateOrmSimpleMappingIT {
 			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
 
 			FullTextQuery<String> query = fullTextEntityManager.search( Book.class ).query()
-					.asProjection( f -> f.field( "title", String.class ).toProjection() )
+					.asProjection( f -> f.field( "title", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
 
@@ -194,7 +194,6 @@ public class HibernateOrmSimpleMappingIT {
 									f.object(),
 									f.score()
 							)
-							.toProjection()
 					)
 					.predicate( f -> f.matchAll() )
 					.build();

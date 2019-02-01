@@ -253,7 +253,7 @@ public class SearchQueryIT {
 											f.field( "author", String.class ).toProjection()
 									).toProjection(),
 									f.score().toProjection()
-							).toProjection()
+							)
 					)
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -300,11 +300,11 @@ public class SearchQueryIT {
 									Book_Author_Score::new,
 									f.composite(
 											Book_Author::new,
-											f.object().toProjection(),
-											f.field( "author", String.class ).toProjection()
-									).toProjection(),
-									f.score().toProjection()
-							).toProjection()
+											f.object(),
+											f.field( "author", String.class )
+									),
+									f.score()
+							)
 					)
 					.predicate( f -> f.matchAll() )
 					.build();

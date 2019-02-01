@@ -94,7 +94,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
@@ -106,7 +105,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
@@ -125,7 +123,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-								.toProjection()
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.build();
@@ -137,7 +134,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-								.toProjection()
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
 				.build();
@@ -154,7 +150,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.match()
@@ -170,7 +165,6 @@ public class MultiTenancyIT {
 								searchTarget.projection().field( "string", String.class ),
 								searchTarget.projection().field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.match()
@@ -199,7 +193,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -220,7 +213,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -267,7 +259,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ) )
 				.build();
@@ -279,7 +270,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.match()
@@ -297,7 +287,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ) )
 				.build();
@@ -309,7 +298,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.match()
@@ -325,7 +313,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
 				.build();
@@ -337,7 +324,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.match()
@@ -589,7 +575,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -611,7 +596,6 @@ public class MultiTenancyIT {
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();

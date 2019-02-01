@@ -160,7 +160,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		SearchQuery<String> query = searchTarget.query()
-				.asProjection( f -> f.field( "sortField", String.class ).toProjection() )
+				.asProjection( f -> f.field( "sortField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
 
@@ -192,7 +192,7 @@ public class SearchMultiIndexIT {
 		// Projection
 
 		SearchQuery<String> projectionQuery = searchTarget.query()
-				.asProjection( f -> f.field( "additionalField", String.class ).toProjection() )
+				.asProjection( f -> f.field( "additionalField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
 

@@ -291,7 +291,7 @@ public class LuceneExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Integer> query = searchTarget.query()
-				.asProjection( f -> f.field( "nativeField", Integer.class ).toProjection() )
+				.asProjection( f -> f.field( "nativeField", Integer.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.build();
 
@@ -346,7 +346,7 @@ public class LuceneExtensionIT {
 
 		SearchQuery<Document> query = searchTarget.query()
 				.asProjection(
-						f -> f.extension( LuceneExtension.get() ).document().toProjection()
+						f -> f.extension( LuceneExtension.get() ).document()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -407,10 +407,9 @@ public class LuceneExtensionIT {
 		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
-								f.extension( LuceneExtension.get() ).document().toProjection(),
-								f.field( "string" ).toProjection()
+								f.extension( LuceneExtension.get() ).document(),
+								f.field( "string" )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
@@ -434,7 +433,7 @@ public class LuceneExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Explanation> query = searchTarget.query()
-				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation().toProjection() )
+				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
 
