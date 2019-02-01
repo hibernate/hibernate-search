@@ -107,8 +107,8 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public <T> SearchWorkBuilder search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return new SearchWork.Builder( payload, searchResultExtractor );
+	public <T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+		return new SearchWork.Builder<>( payload, searchResultExtractor );
 	}
 
 	@Override
@@ -123,7 +123,7 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public <T> ScrollWorkBuilder<T> scroll(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return new ScrollWork.Builder( scrollId, scrollTimeout, searchResultExtractor );
+		return new ScrollWork.Builder<>( scrollId, scrollTimeout, searchResultExtractor );
 	}
 
 	@Override
