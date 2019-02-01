@@ -67,7 +67,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	public void bind(PropertyBridgeBindingContext context) {
 		sourceAccessor = context.getBridgedElement().createAccessor( String.class );
 		valueFieldAccessor = context.getIndexSchemaElement().field(
-				fieldName, f -> f.asString().toIndexFieldType()
+				fieldName, f -> f.asString()
 		)
 				.createAccessor();
 	}

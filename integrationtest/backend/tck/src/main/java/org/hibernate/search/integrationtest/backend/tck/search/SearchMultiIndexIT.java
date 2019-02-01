@@ -372,20 +372,20 @@ public class SearchMultiIndexIT {
 		final IndexFieldAccessor<String> sortField;
 
 		IndexAccessors_1_1(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			string = root.field( "string", f -> f.asString() ).createAccessor();
 			additionalField = root.field(
 					"additionalField",
-					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			differentTypesField = root.field(
 					"differentTypesField",
-					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			sortField = root.field(
 					"sortField",
-					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 		}
@@ -399,17 +399,17 @@ public class SearchMultiIndexIT {
 		IndexAccessors_1_2(IndexSchemaElement root) {
 			string = root.field(
 					"string",
-					f -> f.asString().toIndexFieldType()
+					f -> f.asString()
 			)
 					.createAccessor();
 			differentTypesField = root.field(
 					"differentTypesField",
-					f -> f.asInteger().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asInteger().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 			sortField = root.field(
 					"sortField",
-					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 		}
@@ -419,7 +419,7 @@ public class SearchMultiIndexIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors_2_1(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			string = root.field( "string", f -> f.asString() ).createAccessor();
 		}
 	}
 }

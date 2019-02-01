@@ -375,7 +375,7 @@ public class NestedSearchPredicateIT {
 
 		ObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			string = objectField.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			string = objectField.field( "string", f -> f.asString() ).createAccessor();
 			IndexSchemaObjectField nestedObjectField = objectField.objectField(
 					"nestedObject",
 					ObjectFieldStorage.NESTED
@@ -391,8 +391,8 @@ public class NestedSearchPredicateIT {
 
 		SecondLevelObjectAccessors(IndexSchemaObjectField objectField) {
 			self = objectField.createAccessor();
-			field1 = objectField.field( "field1", f -> f.asString().toIndexFieldType() ).createAccessor();
-			field2 = objectField.field( "field2", f -> f.asString().toIndexFieldType() ).createAccessor();
+			field1 = objectField.field( "field1", f -> f.asString() ).createAccessor();
+			field2 = objectField.field( "field2", f -> f.asString() ).createAccessor();
 		}
 	}
 }

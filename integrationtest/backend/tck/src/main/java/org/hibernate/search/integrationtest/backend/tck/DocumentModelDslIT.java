@@ -14,9 +14,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -259,7 +259,7 @@ public class DocumentModelDslIT {
 				"Name collision between two fields on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "field1", f -> f.asString().toIndexFieldType() );
+					root.field( "field1", f -> f.asString() );
 					root.field( "field1", this::irrelevantTypeContributor );
 				} )
 		)
@@ -277,7 +277,7 @@ public class DocumentModelDslIT {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
-					objectField2.field( "field1", f -> f.asString().toIndexFieldType() );
+					objectField2.field( "field1", f -> f.asString() );
 					objectField2.field( "field1", this::irrelevantTypeContributor );
 				} )
 		)
@@ -333,7 +333,7 @@ public class DocumentModelDslIT {
 				"Name collision between two fields on root",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
-					root.field( "field1", f -> f.asString().toIndexFieldType() );
+					root.field( "field1", f -> f.asString() );
 					root.objectField( "field1" );
 				} )
 		)
@@ -351,7 +351,7 @@ public class DocumentModelDslIT {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
-					objectField2.field( "field1", f -> f.asString().toIndexFieldType() );
+					objectField2.field( "field1", f -> f.asString() );
 					objectField2.objectField( "field1" );
 				} )
 		)
@@ -375,7 +375,6 @@ public class DocumentModelDslIT {
 							f -> f.asString()
 									.sortable( Sortable.YES )
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
-									.toIndexFieldType()
 					)
 							.createAccessor();
 				} )
@@ -401,7 +400,6 @@ public class DocumentModelDslIT {
 							f -> f.asString()
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
-									.toIndexFieldType()
 					)
 							.createAccessor();
 				} )
@@ -423,7 +421,7 @@ public class DocumentModelDslIT {
 					"Missing createAccessor() call after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
-						root.field( "myField", f -> typedContextFunction.apply( f ).toIndexFieldType() );
+						root.field( "myField", typedContextFunction::apply );
 					} )
 			)
 					.assertThrown()
@@ -459,7 +457,7 @@ public class DocumentModelDslIT {
 						IndexSchemaElement root = ctx.getSchemaElement();
 						IndexSchemaFieldTerminalContext<?> context = root.field(
 								"myField",
-								f -> typedContextFunction.apply( f ).toIndexFieldType()
+								typedContextFunction::apply
 						);
 						context.createAccessor();
 						context.createAccessor();
@@ -491,8 +489,8 @@ public class DocumentModelDslIT {
 				) );
 	}
 
-	private IndexFieldType<String> irrelevantTypeContributor(IndexFieldTypeFactoryContext factoryContext) {
-		return factoryContext.asString().toIndexFieldType();
+	private IndexFieldTypeTerminalContext<String> irrelevantTypeContributor(IndexFieldTypeFactoryContext factoryContext) {
+		return factoryContext.asString();
 	}
 
 	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {

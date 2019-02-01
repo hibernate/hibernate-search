@@ -156,10 +156,10 @@ public class LuceneSearchMultiIndexIT {
 		final IndexFieldAccessor<String> additionalField;
 
 		IndexAccessors_1_1(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().toIndexFieldType() ).createAccessor();
+			string = root.field( "string", f -> f.asString() ).createAccessor();
 			additionalField = root.field(
 					"additionalField",
-					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
 					.createAccessor();
 		}
@@ -169,7 +169,7 @@ public class LuceneSearchMultiIndexIT {
 		final IndexFieldAccessor<String> string;
 
 		IndexAccessors_1_2(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().toIndexFieldType() )
+			string = root.field( "string", f -> f.asString() )
 					.createAccessor();
 		}
 	}

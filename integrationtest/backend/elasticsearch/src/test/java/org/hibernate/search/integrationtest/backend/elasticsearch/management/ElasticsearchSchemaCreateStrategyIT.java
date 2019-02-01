@@ -80,7 +80,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 						"MappedType", INDEX_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "field", f -> f.asString().toIndexFieldType() )
+							root.field( "field", f -> f.asString() )
 									.createAccessor();
 						},
 						indexManager -> { }

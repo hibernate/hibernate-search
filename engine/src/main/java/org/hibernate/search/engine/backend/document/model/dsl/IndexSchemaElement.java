@@ -49,13 +49,14 @@ public interface IndexSchemaElement {
 	 * Best used with lambda expressions.
 	 *
 	 * @param relativeFieldName The relative name of the new field.
-	 * @param typeContributor A function that will use the context passed in parameter to create a {@link IndexFieldType}.
+	 * @param typeContributor A function that will use the DSL context passed in parameter to create a type,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @param <F> The type of accessors for the new field.
 	 * @return A context allowing to retrieve the accessor to that new field.
 	 */
 	<F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> field(String relativeFieldName,
-			Function<IndexFieldTypeFactoryContext, IndexFieldType<F>> typeContributor);
+			Function<? super IndexFieldTypeFactoryContext, ? extends IndexFieldTypeTerminalContext<F>> typeContributor);
 
 	/**
 	 * Add an object field to this index schema element with the default storage type.

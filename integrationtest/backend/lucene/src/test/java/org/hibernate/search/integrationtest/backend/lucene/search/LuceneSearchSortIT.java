@@ -108,7 +108,7 @@ public class LuceneSearchSortIT {
 		IndexAccessors(IndexSchemaElement root) {
 			geoPoint = root.field(
 					"geoPoint",
-					f -> f.asGeoPoint().sortable( Sortable.YES ).toIndexFieldType()
+					f -> f.asGeoPoint().sortable( Sortable.YES )
 			)
 					.createAccessor();
 		}

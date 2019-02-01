@@ -82,7 +82,7 @@ public class IndexDocumentWorkExecutorIT {
 		final IndexFieldAccessor<String> title;
 
 		IndexAccessors(IndexSchemaElement root) {
-			title = root.field( "title", f -> f.asString().toIndexFieldType() ).createAccessor();
+			title = root.field( "title", f -> f.asString() ).createAccessor();
 		}
 	}
 }

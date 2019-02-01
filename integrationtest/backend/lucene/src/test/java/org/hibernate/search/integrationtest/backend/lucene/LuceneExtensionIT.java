@@ -589,46 +589,43 @@ public class LuceneExtensionIT {
 		IndexAccessors(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
-					f -> f.asInteger().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asInteger().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			string = root.field(
 					"string",
-					f -> f.asString().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asString().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			geoPoint = root.field(
 					"geoPoint",
-					f -> f.asGeoPoint().projectable( Projectable.YES ).toIndexFieldType()
+					f -> f.asGeoPoint().projectable( Projectable.YES )
 			)
 					.createAccessor();
 			nativeField = root.field(
 					"nativeField",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			nativeField_unsupportedProjection = root.field(
 					"nativeField_unsupportedProjection",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			nativeField_invalidFieldPath = root.field(
 					"nativeField_invalidFieldPath",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 
-			sort1 = root.field( "sort1", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+			sort1 = root.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
 					.createAccessor();
-			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ) )
 					.createAccessor();
-			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ).toIndexFieldType() )
+			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
 					.createAccessor();
 		}
 	}

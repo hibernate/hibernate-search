@@ -736,12 +736,12 @@ public class AutomaticIndexingBridgeIT {
 					.createAccessor( String.class );
 			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
 			typeBridgeObjectFieldAccessor = typeBridgeObjectField.createAccessor();
-			directFieldTargetAccessor = typeBridgeObjectField.field( "directField", f -> f.asString().toIndexFieldType() )
+			directFieldTargetAccessor = typeBridgeObjectField.field( "directField", f -> f.asString() )
 					.createAccessor();
 			IndexSchemaObjectField childObjectField = typeBridgeObjectField.objectField( "child" );
 			childObjectFieldAccessor = childObjectField.createAccessor();
 			includedInTypeBridgeTargetAccessor = childObjectField.field(
-					"includedInTypeBridge", f -> f.asString().toIndexFieldType()
+					"includedInTypeBridge", f -> f.asString()
 			)
 					.createAccessor();
 		}
@@ -778,7 +778,7 @@ public class AutomaticIndexingBridgeIT {
 			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
 			propertyBridgeObjectFieldAccessor = propertyBridgeObjectField.createAccessor();
 			includedInPropertyBridgeTargetAccessor = propertyBridgeObjectField.field(
-					"includedInPropertyBridge", f -> f.asString().toIndexFieldType()
+					"includedInPropertyBridge", f -> f.asString()
 			)
 					.createAccessor();
 		}

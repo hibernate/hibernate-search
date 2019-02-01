@@ -216,7 +216,7 @@ public class ContainedInThroughNonContainingIndexedType {
 			sourceFieldAccessor = context.getBridgedElement().property( "indexedInContaining" )
 					.createAccessor( Integer.class );
 			indexFieldAccessor = context.getIndexSchemaElement().field(
-					"indexedInContaining", f -> f.asInteger().toIndexFieldType()
+					"indexedInContaining", f -> f.asInteger()
 			)
 					.createAccessor();
 		}

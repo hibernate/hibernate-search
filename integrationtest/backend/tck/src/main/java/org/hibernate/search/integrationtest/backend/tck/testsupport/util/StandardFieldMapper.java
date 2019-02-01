@@ -66,7 +66,7 @@ public final class StandardFieldMapper<F, M> {
 					for ( Consumer<? super StandardIndexFieldTypeContext<?, F>> additionalConfiguration : additionalConfigurations ) {
 						additionalConfiguration.accept( context );
 					}
-					return context.toIndexFieldType();
+					return context;
 				}
 		)
 				.createAccessor();

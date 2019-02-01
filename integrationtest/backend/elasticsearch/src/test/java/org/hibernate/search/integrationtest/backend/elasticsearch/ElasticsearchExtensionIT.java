@@ -466,28 +466,24 @@ public class ElasticsearchExtensionIT {
 					"integer",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'integer'}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			string = root.field(
 					"string",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword'}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'geo_point'}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			yearDays = root.field(
 					"yearDays",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'date', 'format': 'yyyy:DDD'}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 
@@ -495,35 +491,30 @@ public class ElasticsearchExtensionIT {
 					"sort1",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			sort2 = root.field(
 					"sort2",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			sort3 = root.field(
 					"sort3",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			sort4 = root.field(
 					"sort4",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 			sort5 = root.field(
 					"sort5",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
-							.toIndexFieldType()
 			)
 					.createAccessor();
 		}

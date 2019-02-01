@@ -116,7 +116,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType1", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -125,7 +125,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType2", INDEX2_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean().toIndexFieldType() )
+							root.field( "myField", f -> f.asBoolean() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -136,19 +136,17 @@ public class ElasticsearchSchemaMigrationIT {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field(
 									"defaultAnalyzer",
-									f -> f.asString().analyzer( "default" ).toIndexFieldType()
+									f -> f.asString().analyzer( "default" )
 							)
 									.createAccessor();
 							root.field(
 									"nonDefaultAnalyzer",
 									f -> f.asString().analyzer( "customAnalyzer" )
-											.toIndexFieldType()
 							)
 									.createAccessor();
 							root.field(
 									"normalizer",
 									f -> f.asString().normalizer( "customNormalizer" )
-											.toIndexFieldType()
 							)
 									.createAccessor();
 						},
@@ -219,7 +217,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean().toIndexFieldType() )
+							root.field( "myField", f -> f.asBoolean() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -265,7 +263,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean().toIndexFieldType() )
+							root.field( "myField", f -> f.asBoolean() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -310,7 +308,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -368,7 +366,7 @@ public class ElasticsearchSchemaMigrationIT {
 						"MappedType", INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate().toIndexFieldType() )
+							root.field( "myField", f -> f.asLocalDate() )
 									.createAccessor();
 						},
 						indexManager -> { }
@@ -412,7 +410,6 @@ public class ElasticsearchSchemaMigrationIT {
 							root.field(
 									"analyzer",
 									f -> f.asString().analyzer( "customAnalyzer" )
-											.toIndexFieldType()
 							)
 									.createAccessor();
 						},
@@ -457,7 +454,6 @@ public class ElasticsearchSchemaMigrationIT {
 							root.field(
 									"normalizer",
 									f -> f.asString().normalizer( "customNormalizer" )
-											.toIndexFieldType()
 							)
 									.createAccessor();
 						},

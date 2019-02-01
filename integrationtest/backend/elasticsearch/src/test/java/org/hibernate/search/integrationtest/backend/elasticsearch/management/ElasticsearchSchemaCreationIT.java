@@ -67,7 +67,7 @@ public class ElasticsearchSchemaCreationIT {
 		setup( ctx -> {
 			ctx.getSchemaElement().field(
 					"myField",
-					f -> f.asLocalDate().toIndexFieldType()
+					f -> f.asLocalDate()
 			)
 					.createAccessor();
 		} );
@@ -95,7 +95,7 @@ public class ElasticsearchSchemaCreationIT {
 		setup( ctx -> {
 			ctx.getSchemaElement().field(
 					"myField",
-					f -> f.asBoolean().toIndexFieldType()
+					f -> f.asBoolean()
 			)
 					.createAccessor();
 		} );
@@ -122,7 +122,7 @@ public class ElasticsearchSchemaCreationIT {
 		setup( ctx -> {
 			ctx.getSchemaElement().field(
 					"myField",
-					f -> f.asString().toIndexFieldType()
+					f -> f.asString()
 			)
 					.createAccessor();
 		} );
@@ -149,7 +149,7 @@ public class ElasticsearchSchemaCreationIT {
 		setup( ctx -> {
 			ctx.getSchemaElement().field(
 					"myField",
-					f -> f.asString().analyzer( "standard" ).toIndexFieldType()
+					f -> f.asString().analyzer( "standard" )
 			)
 					.createAccessor();
 		} );
@@ -180,7 +180,6 @@ public class ElasticsearchSchemaCreationIT {
 					"myField",
 					f -> f.asString().analyzer( "standard" )
 							// TODO disable norms once the APIs allow it; see HSEARCH-3048
-							.toIndexFieldType()
 			)
 					.createAccessor();
 		} );
