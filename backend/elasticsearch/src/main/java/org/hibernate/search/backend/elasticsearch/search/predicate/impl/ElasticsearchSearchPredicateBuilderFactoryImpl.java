@@ -30,10 +30,6 @@ import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
-/**
- * @author Yoann Rodiere
- */
-// TODO have one version of the factory per Elasticsearch dialect, if necessary
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

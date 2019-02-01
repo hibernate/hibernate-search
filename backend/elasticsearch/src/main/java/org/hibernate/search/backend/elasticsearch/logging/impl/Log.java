@@ -194,6 +194,15 @@ public interface Log extends BasicLogger {
 			value = "Invalid token filter definition for name '%1$s'. Token filter definitions must at least define the token filter type.")
 	SearchException invalidElasticsearchTokenFilterDefinition(String name);
 
+	@Message(id = ID_OFFSET_2 + 80,
+			value = "Failed to detect the Elasticsearch version running on the cluster." )
+	SearchException failedToDetectElasticsearchVersion(@Cause Exception e);
+
+	@Message(id = ID_OFFSET_2 + 81,
+			value = "An unsupported Elasticsearch version runs on the Elasticsearch cluster: '%s'."
+					+ " Please refer to the documentation to know which versions are supported." )
+	SearchException unsupportedElasticsearchVersion(String name);
+
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 82,
 			value = "Executed Elasticsearch HTTP %s request to path '%s' with query parameters %s and %d objects in payload in %dms."
@@ -201,6 +210,11 @@ public interface Log extends BasicLogger {
 	)
 	void executedRequest(String method, String path, Map<String, String> getParameters, int bodyParts, long timeInMs,
 			int responseStatusCode, String responseStatusMessage);
+
+	@LogMessage(level = Level.WARN)
+	@Message(id = ID_OFFSET_2 + 85,
+			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
+	void unexpectedElasticsearchVersion(String name);
 
 	@Message(id = ID_OFFSET_2 + 86,
 			value = "Multiple normalizer definitions with the same name: '%1$s'. The normalizer names must be unique.")
