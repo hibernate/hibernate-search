@@ -60,9 +60,9 @@ public interface ElasticsearchValidationMessages {
 	String tokenFilterContext(String name);
 
 	@Message(
-			value = "Missing '%1$s' type mapping"
+			value = "Missing type mapping"
 	)
-	String mappingMissing(String name);
+	String mappingMissing();
 
 	@Message(
 			value = "Missing property mapping"

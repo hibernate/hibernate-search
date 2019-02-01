@@ -134,8 +134,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	@Override
 	public void validate(IndexMetadata expectedIndexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
 		errorCollector.push( ValidationContextType.INDEX, indexName.original );
@@ -166,8 +165,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	@Override
 	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		URLEncodedString typeName = expectedIndexMetadata.getTypeName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName, typeName );
+		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
 		errorCollector.push( ValidationContextType.INDEX, indexName.original );
@@ -269,7 +267,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			return;
 		}
 		if ( actualRootMapping == null ) {
-			errorCollector.addError( MESSAGES.mappingMissing( expectedIndexMetadata.getTypeName().original ) );
+			errorCollector.addError( MESSAGES.mappingMissing() );
 			return;
 		}
 		rootTypeMappingValidator.validate( errorCollector, expectedRootMapping, actualRootMapping );

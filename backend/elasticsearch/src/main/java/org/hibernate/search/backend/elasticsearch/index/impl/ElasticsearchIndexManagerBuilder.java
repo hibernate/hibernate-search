@@ -23,9 +23,6 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
  */
 public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> {
 
-	// Exposed for tests
-	public static final String TYPE_NAME = "typeName";
-
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
@@ -68,8 +65,6 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	@Override
 	public ElasticsearchIndexManagerImpl build() {
 		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
-		// TODO find out what to do with type names: what's the point if there is only one type per index anyway?
-		URLEncodedString encodedTypeName = URLEncodedString.fromString( TYPE_NAME );
 
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
@@ -85,7 +80,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 			indexManager = new ElasticsearchIndexManagerImpl(
 					indexingBackendContext, searchBackendContext,
 					hibernateSearchIndexName, encodedElasticsearchIndexName,
-					encodedTypeName, model,
+					model,
 					indexLifecycleStrategy,
 					serialOrchestrator, parallelOrchestrator,
 					refreshAfterWrite

@@ -33,7 +33,6 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
-	private final URLEncodedString typeName;
 	private final boolean refreshAfterWrite;
 	private final String tenantId;
 
@@ -42,14 +41,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	ElasticsearchIndexWorkPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName, URLEncodedString typeName,
+			URLEncodedString indexName,
 			boolean refreshAfterWrite,
 			SessionContextImplementor sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexName = indexName;
-		this.typeName = typeName;
 		this.refreshAfterWrite = refreshAfterWrite;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
@@ -67,7 +65,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 
 		collect(
 				builderFactory.index(
-						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
 						.markIndexDirty( refreshAfterWrite )
 						.build()
@@ -87,7 +85,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 
 		collect(
 				builderFactory.index(
-						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
 						.markIndexDirty( refreshAfterWrite )
 						.build()
@@ -101,7 +99,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 
 		collect(
 				builderFactory.delete(
-						indexName, typeName, URLEncodedString.fromString( elasticsearchId ), routingKey
+						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
 						.markIndexDirty( refreshAfterWrite )
 						.build()

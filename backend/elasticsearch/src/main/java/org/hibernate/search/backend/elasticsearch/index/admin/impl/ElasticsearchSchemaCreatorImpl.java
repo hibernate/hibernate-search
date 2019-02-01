@@ -34,7 +34,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 
 		schemaAccessor.createIndex(
 				indexName, indexMetadata.getSettings(),
-				indexMetadata.getTypeName(), indexMetadata.getMapping(),
+				indexMetadata.getMapping(),
 				executionOptions
 		);
 
@@ -50,7 +50,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 		if ( !schemaAccessor.indexExists( indexName ) ) {
 			created = schemaAccessor.createIndexIfAbsent(
 					indexName, indexMetadata.getSettings(),
-					indexMetadata.getTypeName(), indexMetadata.getMapping(),
+					indexMetadata.getMapping(),
 					executionOptions
 			);
 		}

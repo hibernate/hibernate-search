@@ -45,11 +45,10 @@ public class IndexingBackendContext {
 		return eventContext;
 	}
 
-	ElasticsearchIndexAdministrationClient createAdministrationClient(URLEncodedString indexName, URLEncodedString typeName,
+	ElasticsearchIndexAdministrationClient createAdministrationClient(URLEncodedString indexName,
 			ElasticsearchIndexModel model) {
 		IndexMetadata metadata = new IndexMetadata();
 		metadata.setName( model.getElasticsearchIndexName() );
-		metadata.setTypeName( typeName );
 		metadata.setSettings( model.getSettings() );
 		metadata.setMapping( model.getMapping() );
 		return new ElasticsearchIndexAdministrationClient(
@@ -72,14 +71,14 @@ public class IndexingBackendContext {
 
 	IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName, URLEncodedString typeName,
+			URLEncodedString indexName,
 			boolean refreshAfterWrite,
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkPlan(
 				workFactory, multiTenancyStrategy, orchestrator,
-				indexName, typeName,
+				indexName,
 				refreshAfterWrite,
 				sessionContext
 		);
@@ -87,12 +86,12 @@ public class IndexingBackendContext {
 
 	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName, URLEncodedString typeName,
+			URLEncodedString indexName,
 			SessionContextImplementor sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexDocumentWorkExecutor( workFactory, multiTenancyStrategy, orchestrator,
-				indexName, typeName, sessionContext );
+				indexName, sessionContext );
 	}
 
 	IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName) {

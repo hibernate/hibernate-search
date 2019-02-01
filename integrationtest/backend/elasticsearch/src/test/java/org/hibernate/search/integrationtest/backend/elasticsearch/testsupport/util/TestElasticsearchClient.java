@@ -23,10 +23,10 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
-import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.AssertionFailure;
@@ -99,7 +99,7 @@ public class TestElasticsearchClient implements TestRule {
 		}
 
 		public TypeClient type() {
-			return type( ElasticsearchIndexManagerBuilder.TYPE_NAME );
+			return new TypeClient( this, Elasticsearch6WorkBuilderFactory.TYPE_NAME );
 		}
 
 		public TypeClient type(String mappingName) {

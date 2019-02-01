@@ -65,6 +65,9 @@ import com.google.gson.JsonObject;
 
 public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilderFactory {
 
+	// Exposed publicly for testing purposes
+	public static final URLEncodedString TYPE_NAME = URLEncodedString.fromString( "typeName" );
+
 	private final GsonProvider gsonProvider;
 
 	public Elasticsearch6WorkBuilderFactory(GsonProvider gsonProvider) {
@@ -72,13 +75,13 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
-		return new IndexWork.Builder( indexName, typeName, id, routingKey, document );
+	public IndexWorkBuilder index(URLEncodedString indexName, URLEncodedString id, String routingKey, JsonObject document) {
+		return new IndexWork.Builder( indexName, TYPE_NAME, id, routingKey, document );
 	}
 
 	@Override
-	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
-		return new DeleteWork.Builder( indexName, typeName, id, routingKey );
+	public DeleteWorkBuilder delete(URLEncodedString indexName, URLEncodedString id, String routingKey) {
+		return new DeleteWork.Builder( indexName, TYPE_NAME, id, routingKey );
 	}
 
 	@Override
@@ -117,8 +120,8 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
-		return new ExplainWork.Builder( indexName, typeName, id, payload );
+	public ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload) {
+		return new ExplainWork.Builder( indexName, TYPE_NAME, id, payload );
 	}
 
 	@Override
@@ -133,7 +136,7 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
-		return new CreateIndexWork.Builder( gsonProvider, indexName );
+		return new CreateIndexWork.Builder( gsonProvider, indexName, TYPE_NAME );
 	}
 
 	@Override
@@ -167,13 +170,13 @@ public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName) {
-		return new GetIndexTypeMappingWork.Builder( indexName, typeName );
+	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName) {
+		return new GetIndexTypeMappingWork.Builder( indexName, TYPE_NAME );
 	}
 
 	@Override
-	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping mapping) {
-		return new PutIndexTypeMappingWork.Builder( gsonProvider, indexName, typeName, mapping );
+	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
+		return new PutIndexTypeMappingWork.Builder( gsonProvider, indexName, TYPE_NAME, mapping );
 	}
 
 	@Override
