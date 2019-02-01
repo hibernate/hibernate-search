@@ -17,6 +17,8 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -24,7 +26,6 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.Discriminato
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -89,15 +90,16 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				client = clientFactoryHolder.get().create( propertySource, initialGsonProvider );
 			}
 
-			// TODO implement and detect dialects
-			// Assume ES5 for now
+			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
+			ElasticsearchDialect dialect = dialectFactory.createFromClusterVersion( client );
+
 			GsonProvider dialectSpecificGsonProvider =
-					DefaultGsonProvider.create( this::createES5GsonBuilderBase, logPrettyPrinting );
+					DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
 			client.init( dialectSpecificGsonProvider );
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 
-			ElasticsearchWorkBuilderFactory workFactory = new ElasticsearchWorkBuilderFactoryImpl( dialectSpecificGsonProvider );
+			ElasticsearchWorkBuilderFactory workFactory = dialect.createWorkBuilderFactory( dialectSpecificGsonProvider );
 
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
