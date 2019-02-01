@@ -8,7 +8,6 @@ package org.hibernate.search.engine.search.dsl.predicate.spi;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.BooleanJunctionPredicateContext;
@@ -18,6 +17,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 
 /**
@@ -49,7 +49,7 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	}
 
 	@Override
-	public SearchPredicate bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
+	public SearchPredicateTerminalContext bool(Consumer<? super BooleanJunctionPredicateContext> clauseContributor) {
 		return delegate.bool( clauseContributor );
 	}
 

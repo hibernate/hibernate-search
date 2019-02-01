@@ -127,7 +127,6 @@ public class ObjectFieldStorageIT {
 						.must( f.match().onField( "flattenedObject.string_analyzed" ).matching( MATCHING_STRING_ANALYZED ) )
 						.must( f.match().onField( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) )
 						.must( f.match().onField( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -143,7 +142,6 @@ public class ObjectFieldStorageIT {
 								.must( f.match().onField( "nestedObject.integer" ).matching( MATCHING_INTEGER ) )
 								.must( f.match().onField( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -167,7 +165,6 @@ public class ObjectFieldStorageIT {
 						.must( f.range().onField( "flattenedObject.localDate" )
 								.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -189,7 +186,6 @@ public class ObjectFieldStorageIT {
 										.to( MATCHING_LOCAL_DATE.plusDays( 1 ) )
 								)
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -326,7 +322,7 @@ public class ObjectFieldStorageIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(

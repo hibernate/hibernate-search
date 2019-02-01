@@ -56,7 +56,7 @@ public class MatchIdSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.id().matching( DOCUMENT_1 ).toPredicate() )
+				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
 				.build();
 
 		assertThat( query )
@@ -72,7 +72,7 @@ public class MatchIdSearchPredicateIT {
 				.predicate( f -> f.id()
 						.matching( DOCUMENT_1 )
 						.matching( DOCUMENT_3 )
-						.toPredicate() )
+				)
 				.build();
 
 		assertThat( query )
@@ -88,7 +88,7 @@ public class MatchIdSearchPredicateIT {
 				.predicate( f -> f.id()
 						.matching( DOCUMENT_2 )
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
-						.toPredicate() )
+				)
 				.build();
 
 		assertThat( query )
@@ -103,7 +103,7 @@ public class MatchIdSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
-						.toPredicate() )
+				)
 				.build();
 
 		assertThat( query )
@@ -118,7 +118,7 @@ public class MatchIdSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) )
-						.toPredicate() )
+				)
 				.build();
 
 		assertThat( query )
@@ -136,7 +136,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

@@ -87,7 +87,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -99,7 +99,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asObject()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -121,7 +121,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<StubTransformedReference> referencesQuery = searchTarget.query( objectLoaderMock )
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
@@ -163,7 +163,7 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<StubLoadedObject> objectsQuery = searchTarget.query( objectLoaderMock )
 				.asObject()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
 
@@ -210,7 +210,7 @@ public class SearchResultLoadingOrTransformingIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( projectionsQuery ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
@@ -245,7 +245,7 @@ public class SearchResultLoadingOrTransformingIT {
 								f.object().toProjection()
 						).toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
@@ -314,7 +314,7 @@ public class SearchResultLoadingOrTransformingIT {
 								f.object().toProjection()
 						).toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 
@@ -327,14 +327,14 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertEquals( 2L, query.executeCount() );
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.build();
 
 		assertEquals( 1L, query.executeCount() );
@@ -342,7 +342,7 @@ public class SearchResultLoadingOrTransformingIT {
 		// Using setFirstResult/setMaxResult should not affect the count
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		query.setFirstResult( 1L );
@@ -359,14 +359,14 @@ public class SearchResultLoadingOrTransformingIT {
 
 		SearchQuery<String> query = searchTarget.query()
 				.asProjection( f -> f.field( "string", String.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertEquals( 2L, query.executeCount() );
 
 		query = searchTarget.query()
 				.asProjection( f -> f.field( "string", String.class ).toProjection() )
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.build();
 
 		assertEquals( 1L, query.executeCount() );
@@ -400,7 +400,7 @@ public class SearchResultLoadingOrTransformingIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );

@@ -91,7 +91,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -109,7 +109,7 @@ public class MatchSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
-					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 					.build();
 
 			assertThat( query )
@@ -125,7 +125,7 @@ public class MatchSearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ).toPredicate() )
+				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.build();
 
 		assertThat( query )
@@ -141,7 +141,7 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				// Use a stopword, which should be removed by the analysis
-				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ).toPredicate() )
+				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ) )
 				.build();
 
 		assertThat( query )
@@ -194,13 +194,12 @@ public class MatchSearchPredicateIT {
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( root -> root.bool()
-						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
-								.matching( indexMapping.string1Field.document1Value.indexedValue ).toPredicate()
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
 						)
-						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
-								.matching( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -211,13 +210,12 @@ public class MatchSearchPredicateIT {
 		query = searchTarget.query()
 				.asReference()
 				.predicate( root -> root.bool()
-						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
-								.matching( indexMapping.string1Field.document1Value.indexedValue ).toPredicate()
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
 						)
-						.should( c -> c.match().onField( indexMapping.string1Field.relativeFieldName )
-								.matching( indexMapping.string1Field.document3Value.indexedValue ).toPredicate()
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
 						)
-						.toPredicate()
 				)
 				.sort( c -> c.byScore() )
 				.build();
@@ -237,7 +235,6 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -249,7 +246,6 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -263,7 +259,6 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -275,7 +270,6 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -287,7 +281,6 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string3Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -300,7 +293,6 @@ public class MatchSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -311,7 +303,6 @@ public class MatchSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
-						.toPredicate()
 				)
 				.build();
 
@@ -398,7 +389,7 @@ public class MatchSearchPredicateIT {
 
 				SearchQuery<DocumentReference> query = searchTarget.query()
 						.asReference()
-						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
+						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
 						.build();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -446,7 +437,7 @@ public class MatchSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY,
 				DOCUMENT_3

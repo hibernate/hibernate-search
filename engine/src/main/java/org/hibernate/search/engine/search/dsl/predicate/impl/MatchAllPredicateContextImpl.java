@@ -13,6 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
@@ -48,7 +49,7 @@ class MatchAllPredicateContextImpl<B>
 
 	@Override
 	public MatchAllPredicateContext except(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
 		getExceptContext().addClause( clauseContributor );
 		return this;
 	}
@@ -79,8 +80,8 @@ class MatchAllPredicateContextImpl<B>
 			this.booleanBuilder = MatchAllPredicateContextImpl.this.factory.bool();
 		}
 
-		void addClause(Function<? super SearchPredicateFactoryContext, SearchPredicate> clauseContributor) {
-			addClause( clauseContributor.apply( factoryContext ) );
+		void addClause(Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> clauseContributor) {
+			addClause( clauseContributor.apply( factoryContext ).toPredicate() );
 		}
 
 		void addClause(SearchPredicate predicate) {

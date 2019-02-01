@@ -106,7 +106,6 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -147,7 +146,6 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -181,7 +179,6 @@ public class NestedSearchPredicateIT {
 										)
 								)
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -202,7 +199,6 @@ public class NestedSearchPredicateIT {
 								.onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 )
 						)
-						.toPredicate()
 				)
 				.toPredicate();
 
@@ -215,7 +211,6 @@ public class NestedSearchPredicateIT {
 								.onField( "nestedObject.nestedObject.field2" )
 								.matching( MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 )
 						)
-						.toPredicate()
 				)
 				.toPredicate();
 
@@ -228,7 +223,6 @@ public class NestedSearchPredicateIT {
 								// This is referred to as "condition 2" in the data initialization method
 								.must( predicate2 )
 						)
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -356,7 +350,7 @@ public class NestedSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(

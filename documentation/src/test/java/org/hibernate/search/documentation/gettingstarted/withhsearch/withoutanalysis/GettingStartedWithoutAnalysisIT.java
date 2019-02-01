@@ -131,7 +131,6 @@ public class GettingStartedWithoutAnalysisIT {
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
-							.toPredicate()
 					)
 					.build();
 
@@ -153,7 +152,6 @@ public class GettingStartedWithoutAnalysisIT {
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
-							.toPredicate()
 					)
 					.build();
 

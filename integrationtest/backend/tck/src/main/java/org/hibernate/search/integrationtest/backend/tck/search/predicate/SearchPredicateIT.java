@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -69,7 +70,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		assertThat( query )
@@ -97,7 +98,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		assertThat( query )
@@ -105,12 +106,12 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_lambda_caching_root() {
+	public void match_caching_root() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingContributor = c -> {
+		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingPredicateProducer = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -125,7 +126,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( cachingContributor )
+				.predicate( cachingPredicateProducer.apply( searchTarget.predicate() ) )
 				.build();
 
 		assertThat( query )
@@ -135,7 +136,7 @@ public class SearchPredicateIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( cachingContributor )
+				.predicate( cachingPredicateProducer.apply( searchTarget.predicate() ) )
 				.build();
 
 		assertThat( query )
@@ -143,12 +144,12 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_lambda_caching_nonRoot() {
+	public void match_caching_nonRoot() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
-		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingContributor = c -> {
+		Function<? super SearchPredicateFactoryContext, SearchPredicate> cachingPredicateProducer = c -> {
 			if ( cache.get() == null ) {
 				SearchPredicate result = c.match().onField( "string" ).matching( STRING_1 ).toPredicate();
 				cache.set( result );
@@ -163,7 +164,7 @@ public class SearchPredicateIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.bool().must( cachingContributor ).toPredicate() )
+				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
 				.build();
 
 		assertThat( query )
@@ -174,9 +175,8 @@ public class SearchPredicateIT {
 		query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
-						.should( cachingContributor )
+						.should( cachingPredicateProducer.apply( f ) )
 						.should( f.match().onField( "string" ).matching( STRING_2 ) )
-						.toPredicate()
 				)
 				.build();
 
@@ -251,7 +251,7 @@ public class SearchPredicateIT {
 								shouldNotBeCalled()
 						)
 						.orElse(
-								c -> c.match().onField( "string" ).matching( STRING_1 ).toPredicate()
+								c -> c.match().onField( "string" ).matching( STRING_1 )
 						)
 				)
 				.build();
@@ -275,7 +275,7 @@ public class SearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
@@ -321,8 +321,8 @@ public class SearchPredicateIT {
 			this.delegate = delegate;
 		}
 
-		public SearchPredicate extendedPredicate(String fieldName, String value) {
-			return delegate.match().onField( fieldName ).matching( value ).toPredicate();
+		public SearchPredicateTerminalContext extendedPredicate(String fieldName, String value) {
+			return delegate.match().onField( fieldName ).matching( value );
 		}
 	}
 }

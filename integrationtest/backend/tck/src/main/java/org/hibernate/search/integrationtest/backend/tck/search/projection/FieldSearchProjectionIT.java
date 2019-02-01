@@ -119,7 +119,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						searchTarget.query()
 								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -141,7 +141,7 @@ public class FieldSearchProjectionIT {
 
 			query = searchTarget.query()
 					.asProjection( f -> f.field( fieldPath ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
 					fieldModel.document1Value.indexedValue,
@@ -160,7 +160,7 @@ public class FieldSearchProjectionIT {
 				.asProjection( f ->
 						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class ).toProjection()
 				)
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -257,7 +257,7 @@ public class FieldSearchProjectionIT {
 
 			query = searchTarget.query()
 					.asProjection( f -> f.field( fieldPath, ValueWrapper.class ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 			assertThat( query ).hasHitsAnyOrder(
 				new ValueWrapper<>( fieldModel.document1Value.indexedValue ),
@@ -302,7 +302,7 @@ public class FieldSearchProjectionIT {
 										)
 										.toProjection()
 								)
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						Arrays.asList( model.document1Value.indexedValue, model.document1Value.indexedValue ),
@@ -327,7 +327,7 @@ public class FieldSearchProjectionIT {
 								.asProjection(
 										f -> f.field( fieldPath, model.type ).toProjection()
 								)
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -353,7 +353,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						searchTarget.query()
 								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -388,7 +388,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						searchTarget.query()
 								.asProjection( f -> f.field( fieldPath, model.type ).toProjection() )
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -412,7 +412,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						searchTarget.query()
 								.asProjection( f -> f.field( fieldPath, ValueWrapper.class ).toProjection() )
-								.predicate( f -> f.matchAll().toPredicate() )
+								.predicate( f -> f.matchAll() )
 								.build()
 				).hasHitsAnyOrder(
 						new ValueWrapper<>( model.document1Value.indexedValue ),
@@ -519,7 +519,7 @@ public class FieldSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );

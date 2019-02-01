@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
@@ -44,7 +45,7 @@ public final class SearchQueryResultContextImpl<T, C, Q>
 	}
 
 	@Override
-	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicate> dslPredicateContributor) {
+	public SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> dslPredicateContributor) {
 		searchPredicateCollector.collect( dslPredicateContributor );
 		return getNext();
 	}

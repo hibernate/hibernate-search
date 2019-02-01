@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -43,9 +44,9 @@ class SearchQueryPredicateCollector<C, B> {
 		collect( factory.toImplementation( predicate ) );
 	}
 
-	void collect(Function<? super SearchPredicateFactoryContext, SearchPredicate> dslPredicateContributor) {
+	void collect(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> dslPredicateContributor) {
 		SearchPredicateFactoryContext factoryContext = new DefaultSearchPredicateFactoryContext<>( factory );
-		collect( dslPredicateContributor.apply( factoryContext ) );
+		collect( dslPredicateContributor.apply( factoryContext ).toPredicate() );
 	}
 
 	private void collect(B builder) {

@@ -9,10 +9,10 @@ package org.hibernate.search.engine.search.dsl.predicate.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
@@ -21,7 +21,7 @@ final class SearchPredicateFactoryExtensionContextImpl<B> implements SearchPredi
 	private final SearchPredicateFactoryContext parent;
 	private final SearchPredicateBuilderFactory<?, B> factory;
 
-	private final DslExtensionState<SearchPredicate> state = new DslExtensionState<>();
+	private final DslExtensionState<SearchPredicateTerminalContext> state = new DslExtensionState<>();
 
 	SearchPredicateFactoryExtensionContextImpl(SearchPredicateFactoryContext parent,
 			SearchPredicateBuilderFactory<?, B> factory) {
@@ -31,18 +31,20 @@ final class SearchPredicateFactoryExtensionContextImpl<B> implements SearchPredi
 
 	@Override
 	public <T> SearchPredicateFactoryExtensionContext ifSupported(
-			SearchPredicateFactoryContextExtension<T> extension, Function<T, SearchPredicate> predicateContributor) {
+			SearchPredicateFactoryContextExtension<T> extension,
+			Function<T, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory ), predicateContributor );
 		return this;
 	}
 
 	@Override
-	public SearchPredicate orElse(Function<SearchPredicateFactoryContext, SearchPredicate> predicateContributor) {
+	public SearchPredicateTerminalContext orElse(
+			Function<SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return state.orElse( parent, predicateContributor );
 	}
 
 	@Override
-	public SearchPredicate orElseFail() {
+	public SearchPredicateTerminalContext orElseFail() {
 		return state.orElseFail();
 	}
 }

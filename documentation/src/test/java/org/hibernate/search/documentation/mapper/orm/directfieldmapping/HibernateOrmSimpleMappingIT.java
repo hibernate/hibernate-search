@@ -128,7 +128,7 @@ public class HibernateOrmSimpleMappingIT {
 
 			FullTextQuery<Book> query = searchTarget.query()
 					.asEntity()
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc()
 							.then().byField( "title_sort" )
 							.toSort()
@@ -170,7 +170,7 @@ public class HibernateOrmSimpleMappingIT {
 
 			FullTextQuery<String> query = fullTextEntityManager.search( Book.class ).query()
 					.asProjection( f -> f.field( "title", String.class ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			List<String> result = query.getResultList();
@@ -196,7 +196,7 @@ public class HibernateOrmSimpleMappingIT {
 							)
 							.toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			List<MyEntityAndScoreBean<Book>> result = query.getResultList();

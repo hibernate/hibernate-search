@@ -107,7 +107,6 @@ public class ElasticsearchExtensionIT {
 						)
 						// Also test using the standard DSL on a field defined with the extension
 						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ) )
-						.toPredicate()
 				)
 				.build();
 		assertThat( query )
@@ -139,12 +138,12 @@ public class ElasticsearchExtensionIT {
 		// Also test using the standard DSL on a field defined with the extension
 		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
 				.matching( "'2018:12'" ).toPredicate();
-		SearchPredicate booleanPredicate = searchTarget.predicate().bool( b -> {
-			b.should( predicate1 );
-			b.should( predicate2 );
-			b.should( predicate3 );
-			b.should( predicate4 );
-		} );
+		SearchPredicate booleanPredicate = searchTarget.predicate().bool()
+				.should( predicate1 )
+				.should( predicate2 )
+				.should( predicate3 )
+				.should( predicate4 )
+				.toPredicate();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
@@ -161,7 +160,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'asc'}" )
@@ -181,7 +180,7 @@ public class ElasticsearchExtensionIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c
 						.extension( ElasticsearchExtension.get() )
 								.fromJsonString( "{'sort1': 'desc'}" )
@@ -220,7 +219,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
 				.build();
 		assertThat( query )
@@ -242,7 +241,7 @@ public class ElasticsearchExtensionIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
 				.build();
 		assertThat( query )
@@ -257,7 +256,7 @@ public class ElasticsearchExtensionIT {
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source().toProjection()
 				)
-				.predicate( f -> f.id().matching( FIFTH_ID ).toPredicate() )
+				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.build();
 
 		List<String> result = query.execute().getHits();
@@ -291,7 +290,7 @@ public class ElasticsearchExtensionIT {
 						)
 						.toProjection()
 				)
-				.predicate( f -> f.id().matching( FIFTH_ID ).toPredicate() )
+				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.build();
 
 		List<String> result = query.execute().getHits().stream()
@@ -317,7 +316,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<String> query = searchTarget.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation().toProjection() )
-				.predicate( f -> f.id().matching( FIRST_ID ).toPredicate() )
+				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
 
 		List<String> result = query.execute().getHits();
@@ -443,7 +442,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,

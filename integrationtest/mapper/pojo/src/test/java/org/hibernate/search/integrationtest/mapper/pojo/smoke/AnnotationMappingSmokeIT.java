@@ -365,7 +365,7 @@ public class AnnotationMappingSmokeIT {
 			)
 					.query()
 					.asReference()
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -403,7 +403,7 @@ public class AnnotationMappingSmokeIT {
 			SearchQuery<String> query = searchTarget
 					.query()
 					.asProjection( f -> f.field( "myTextField", String.class ).toProjection() )
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
@@ -446,7 +446,7 @@ public class AnnotationMappingSmokeIT {
 							searchTarget.projection().documentReference().toProjection(),
 							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll().toPredicate() )
+					.predicate( f -> f.matchAll() )
 					.build();
 
 			backendMock.expectSearchProjections(

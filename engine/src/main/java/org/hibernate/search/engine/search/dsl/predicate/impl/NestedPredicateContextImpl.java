@@ -53,7 +53,7 @@ class NestedPredicateContextImpl<B>
 
 	@Override
 	public SearchPredicateTerminalContext nest(
-			Function<? super SearchPredicateFactoryContext, SearchPredicate> predicateContributor) {
+			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return nest( predicateContributor.apply( factoryContext ) );
 	}
 

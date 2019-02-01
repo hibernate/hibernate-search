@@ -117,7 +117,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
@@ -132,7 +132,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
 				.build();
 
@@ -144,7 +144,7 @@ public class SearchMultiIndexIT {
 
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).desc() )
 				.build();
 
@@ -161,7 +161,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<String> query = searchTarget.query()
 				.asProjection( f -> f.field( "sortField", String.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -178,7 +178,7 @@ public class SearchMultiIndexIT {
 		// Predicate
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ).toPredicate() )
+				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.build();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -193,7 +193,7 @@ public class SearchMultiIndexIT {
 
 		SearchQuery<String> projectionQuery = searchTarget.query()
 				.asProjection( f -> f.field( "additionalField", String.class ).toProjection() )
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertThat( projectionQuery ).hasHitsAnyOrder(
@@ -321,7 +321,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
@@ -340,7 +340,7 @@ public class SearchMultiIndexIT {
 		searchTarget = indexManager_1_2.createSearchTarget();
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 
@@ -360,7 +360,7 @@ public class SearchMultiIndexIT {
 		searchTarget = indexManager_2_1.createSearchTarget();
 		query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}

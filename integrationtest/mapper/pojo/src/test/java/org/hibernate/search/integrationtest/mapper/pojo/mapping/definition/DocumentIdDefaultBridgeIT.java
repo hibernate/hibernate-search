@@ -139,7 +139,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 				SearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
 						.query()
 						.asReference()
-						.predicate( f -> f.matchAll().toPredicate() )
+						.predicate( f -> f.matchAll() )
 						.build();
 
 				assertThat( query )

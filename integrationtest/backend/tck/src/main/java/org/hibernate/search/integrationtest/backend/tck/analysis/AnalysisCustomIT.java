@@ -217,7 +217,7 @@ public class AnalysisCustomIT {
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ).toPredicate() )
+				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
 				.build();
 
 		return assertThat( query );
@@ -269,7 +269,7 @@ public class AnalysisCustomIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		SearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
-				.predicate( f -> f.matchAll().toPredicate() )
+				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> {

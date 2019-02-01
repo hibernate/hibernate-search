@@ -84,7 +84,6 @@ public class GettingStartedWithAnalysisIT {
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
 							.matching( "refactor" )
-							.toPredicate()
 					)
 					.build();
 
@@ -106,7 +105,6 @@ public class GettingStartedWithAnalysisIT {
 						.predicate( factory -> factory.match()
 								.onFields( "title", "authors.name" )
 								.matching( term )
-								.toPredicate()
 						)
 						.build();
 				List<Book> result = query.getResultList();
