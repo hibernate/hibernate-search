@@ -67,7 +67,7 @@ public class ElasticsearchSearchQueryIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Object> query = searchTarget.query()
-				.asProjection( f -> f.field( "string" ).toProjection() )
+				.asProjection( f -> f.field( "string" ) )
 				.predicate( f -> f.matchAll() )
 				.build();
 

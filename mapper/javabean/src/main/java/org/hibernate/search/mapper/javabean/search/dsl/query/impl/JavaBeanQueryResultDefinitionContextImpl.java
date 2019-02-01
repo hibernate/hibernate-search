@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
@@ -32,8 +33,8 @@ public class JavaBeanQueryResultDefinitionContextImpl implements JavaBeanQueryRe
 
 	@Override
 	public <T> SearchQueryResultContext<SearchQuery<T>> asProjection(
-			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, SearchProjection<T>> projectionContributor) {
-		return asProjection( projectionContributor.apply( delegate.projection() ) );
+			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
+		return asProjection( projectionContributor.apply( delegate.projection() ).toProjection() );
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
@@ -25,7 +26,7 @@ public interface FullTextQueryResultDefinitionContext<O>
 
 	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
-			Function<? super SearchProjectionFactoryContext<PojoReference, O>, SearchProjection<T>> projectionContributor);
+			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
 	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(SearchProjection<T> projection);

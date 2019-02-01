@@ -254,7 +254,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<String> query = searchTarget.query()
 				.asProjection(
-						f -> f.extension( ElasticsearchExtension.get() ).source().toProjection()
+						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.build();
@@ -285,10 +285,9 @@ public class ElasticsearchExtensionIT {
 		SearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
-								f.extension( ElasticsearchExtension.get() ).source().toProjection(),
-								f.field( "string" ).toProjection()
+								f.extension( ElasticsearchExtension.get() ).source(),
+								f.field( "string" )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.build();
@@ -315,7 +314,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<String> query = searchTarget.query()
-				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation().toProjection() )
+				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
 

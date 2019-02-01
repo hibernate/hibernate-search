@@ -13,6 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -53,8 +54,8 @@ public final class StubMappingQueryResultDefinitionContext<R, O> {
 	}
 
 	public <P> SearchQueryResultContext<SearchQuery<P>> asProjection(
-			Function<SearchProjectionFactoryContext<R, O>, SearchProjection<P>> projectionContributor) {
-		return asProjection( projectionContributor.apply( indexSearchTarget.projection() ) );
+			Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
+		return asProjection( projectionContributor.apply( indexSearchTarget.projection() ).toProjection() );
 	}
 
 	public <P> SearchQueryResultContext<SearchQuery<P>> asProjection(SearchProjection<P> projection) {

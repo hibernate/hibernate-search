@@ -85,7 +85,6 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -107,7 +106,6 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.author.relativeFieldName, String.class ),
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
-								.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -129,7 +127,7 @@ public class CompositeSearchProjectionIT {
 								this::listToBook_Bi,
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -151,7 +149,7 @@ public class CompositeSearchProjectionIT {
 								this::listToBook_Bi,
 								f.field( indexMapping.author.relativeFieldName, String.class ),
 								f.field( indexMapping.title.relativeFieldName, String.class )
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -173,7 +171,6 @@ public class CompositeSearchProjectionIT {
 								Book::new,
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -195,7 +192,6 @@ public class CompositeSearchProjectionIT {
 								Book::new,
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
-								.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -217,7 +213,7 @@ public class CompositeSearchProjectionIT {
 								Book_Bi::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -239,7 +235,7 @@ public class CompositeSearchProjectionIT {
 								Book_Bi::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ),
 								f.field( indexMapping.title.relativeFieldName, String.class )
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -262,7 +258,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -288,7 +284,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.author.relativeFieldName, String.class ),
 								f.field( indexMapping.title.relativeFieldName, String.class ),
 								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class )
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -317,7 +313,7 @@ public class CompositeSearchProjectionIT {
 										f.field( indexMapping.title.relativeFieldName, String.class )
 								),
 								f.score()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();

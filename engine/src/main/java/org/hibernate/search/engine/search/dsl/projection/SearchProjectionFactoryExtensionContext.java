@@ -8,8 +8,6 @@ package org.hibernate.search.engine.search.dsl.projection;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.SearchProjection;
-
 /**
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactoryContext}.
@@ -31,15 +29,16 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * This method cannot be called after {@link #orElse(Function)} or {@link #orElseFail()}.
 	 *
 	 * @param extension The extension to apply.
-	 * @param projectionContributor A function that will use the (extended) context passed in parameter to create a {@link SearchProjection},
-	 * if the extension is successfully applied.
+	 * @param projectionContributor A function called if the extension is successfully applied;
+	 * it will use the (extended) DSL context passed in parameter to create a projection,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @param <T> The type of the extended context.
 	 * @return {@code this}, for method chaining.
 	 */
 	<T> SearchProjectionFactoryExtensionContext<P, R, O> ifSupported(
 			SearchProjectionFactoryContextExtension<T, R, O> extension,
-			Function<T, SearchProjection<P>> projectionContributor
+			Function<T, ? extends SearchProjectionTerminalContext<P>> projectionContributor
 	);
 
 	/**
@@ -47,12 +46,13 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * was supported so far, apply the given function to the current (non-extended) {@link SearchProjectionFactoryContext};
 	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
 	 *
-	 * @param projectionContributor A function that will use the (non-extended) context passed in parameter to create a {@link SearchProjection},
-	 * if the extension is successfully applied.
+	 * @param projectionContributor A function called if no extension was successfully applied;
+	 * it will use the (extended) DSL context passed in parameter to create a projection,
+	 * returning the resulting terminal context.
 	 * Should generally be a lambda expression.
 	 * @return The created projection.
 	 */
-	SearchProjection<P> orElse(Function<SearchProjectionFactoryContext<R, O>, SearchProjection<P>> projectionContributor);
+	SearchProjectionTerminalContext<P> orElse(Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor);
 
 	/**
 	 * If no extension passed to {@link #ifSupported(SearchProjectionFactoryContextExtension, Function)}
@@ -62,6 +62,6 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * @return The created projection.
 	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
 	 */
-	SearchProjection<P> orElseFail();
+	SearchProjectionTerminalContext<P> orElseFail();
 
 }

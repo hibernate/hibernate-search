@@ -457,7 +457,7 @@ public class ProgrammaticMappingSmokeIT {
 
 			SearchQuery<String> query = searchTarget
 					.query()
-					.asProjection( f -> f.field( "myTextField", String.class ).toProjection() )
+					.asProjection( f -> f.field( "myTextField", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
 			query.setFirstResult( 3L );

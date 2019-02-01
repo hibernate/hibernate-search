@@ -208,7 +208,6 @@ public class SearchResultLoadingOrTransformingIT {
 								f.reference(),
 								f.object()
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -243,7 +242,7 @@ public class SearchResultLoadingOrTransformingIT {
 								f.documentReference().toProjection(),
 								f.reference().toProjection(),
 								f.object().toProjection()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -312,7 +311,7 @@ public class SearchResultLoadingOrTransformingIT {
 								f.documentReference().toProjection(),
 								f.reference().toProjection(),
 								f.object().toProjection()
-						).toProjection()
+						)
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -358,14 +357,14 @@ public class SearchResultLoadingOrTransformingIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<String> query = searchTarget.query()
-				.asProjection( f -> f.field( "string", String.class ).toProjection() )
+				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertEquals( 2L, query.executeCount() );
 
 		query = searchTarget.query()
-				.asProjection( f -> f.field( "string", String.class ).toProjection() )
+				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.build();
 

@@ -9,10 +9,10 @@ package org.hibernate.search.engine.search.dsl.projection.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 public class SearchProjectionFactoryExtensionContextImpl<P, R, O> implements SearchProjectionFactoryExtensionContext<P, R, O> {
@@ -20,7 +20,7 @@ public class SearchProjectionFactoryExtensionContextImpl<P, R, O> implements Sea
 	private final SearchProjectionFactoryContext<R, O> parent;
 	private final SearchProjectionBuilderFactory factory;
 
-	private final DslExtensionState<SearchProjection<P>> state = new DslExtensionState<>();
+	private final DslExtensionState<SearchProjectionTerminalContext<P>> state = new DslExtensionState<>();
 
 	SearchProjectionFactoryExtensionContextImpl(SearchProjectionFactoryContext<R, O> parent,
 			SearchProjectionBuilderFactory factory) {
@@ -30,18 +30,20 @@ public class SearchProjectionFactoryExtensionContextImpl<P, R, O> implements Sea
 
 	@Override
 	public <T> SearchProjectionFactoryExtensionContext<P, R, O> ifSupported(
-			SearchProjectionFactoryContextExtension<T, R, O> extension, Function<T, SearchProjection<P>> projectionContributor) {
+			SearchProjectionFactoryContextExtension<T, R, O> extension,
+			Function<T, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		state.ifSupported( extension, extension.extendOptional( parent, factory ), projectionContributor );
 		return this;
 	}
 
 	@Override
-	public SearchProjection<P> orElse(Function<SearchProjectionFactoryContext<R, O>, SearchProjection<P>> projectionContributor) {
+	public SearchProjectionTerminalContext<P> orElse(
+			Function<SearchProjectionFactoryContext<R, O>, ? extends SearchProjectionTerminalContext<P>> projectionContributor) {
 		return state.orElse( parent, projectionContributor );
 	}
 
 	@Override
-	public SearchProjection<P> orElseFail() {
+	public SearchProjectionTerminalContext<P> orElseFail() {
 		return state.orElseFail();
 	}
 }

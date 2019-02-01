@@ -12,6 +12,7 @@ import java.util.function.Function;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
 import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
@@ -56,8 +57,8 @@ class FullTextQueryResultDefinitionContextImpl<O>
 
 	@Override
 	public <T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
-			Function<? super SearchProjectionFactoryContext<PojoReference, O>, SearchProjection<T>> projectionContributor) {
-		return asProjection( projectionContributor.apply( searchTargetDelegate.projection() ) );
+			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
+		return asProjection( projectionContributor.apply( searchTargetDelegate.projection() ).toProjection() );
 	}
 
 	@Override

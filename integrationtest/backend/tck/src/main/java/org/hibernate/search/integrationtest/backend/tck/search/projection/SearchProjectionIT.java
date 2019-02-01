@@ -28,6 +28,7 @@ import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.SearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -218,7 +219,7 @@ public class SearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<Float> query = searchTarget.query()
-				.asProjection( f -> f.score().toProjection() )
+				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byScore().desc() )
 				.build();
@@ -252,7 +253,6 @@ public class SearchProjectionIT {
 								f.documentReference(),
 								f.field( indexMapping.string2Field.relativeFieldName, String.class )
 						)
-						.toProjection()
 				)
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -346,7 +346,7 @@ public class SearchProjectionIT {
 								shouldNotBeCalled()
 						)
 						.orElse(
-								c -> c.field( "string1", String.class ).toProjection()
+								c -> c.field( "string1", String.class )
 						)
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
@@ -496,8 +496,8 @@ public class SearchProjectionIT {
 			this.delegate = delegate;
 		}
 
-		public <T> SearchProjection<T> extendedProjection(String fieldName, Class<T> type) {
-			return delegate.field( fieldName, type ).toProjection();
+		public <T> SearchProjectionTerminalContext<T> extendedProjection(String fieldName, Class<T> type) {
+			return delegate.field( fieldName, type );
 		}
 	}
 }
