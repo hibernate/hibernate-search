@@ -17,8 +17,20 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
  */
 public interface SearchQueryResultContext<Q> {
 
+	/**
+	 * Set the predicate for this query.
+	 * @param predicate A {@link SearchPredicate} object obtained from the search target.
+	 * @return A context allowing to define the query further.
+	 */
 	SearchQueryContext<Q> predicate(SearchPredicate predicate);
 
+	/**
+	 * Set the predicate for this query.
+	 * @param predicateContributor A function that will use the DSL context passed in parameter to create a predicate,
+	 * returning the resulting terminal context.
+	 * Should generally be a lambda expression.
+	 * @return A context allowing to define the query further.
+	 */
 	SearchQueryContext<Q> predicate(Function<? super SearchPredicateFactoryContext, SearchPredicateTerminalContext> predicateContributor);
 
 }
