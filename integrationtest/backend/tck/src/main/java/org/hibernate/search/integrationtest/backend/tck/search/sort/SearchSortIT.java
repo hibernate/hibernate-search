@@ -278,12 +278,12 @@ public class SearchSortIT {
 
 		// Mandatory extension
 		query = simpleQuery( c -> c
-				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast().toSort()
+				.extension( new SupportedExtension() ).byField( "string" ).onMissingValue().sortLast()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		query = simpleQuery( b -> b
-				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast().toSort()
+				.extension( new SupportedExtension() ).byField( "string" ).desc().onMissingValue().sortLast()
 		);
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
@@ -293,7 +293,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).onMissingValue().sortLast()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -307,7 +307,7 @@ public class SearchSortIT {
 				.extension()
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
 						)
 						.ifSupported(
 								new SupportedExtension(),
@@ -327,7 +327,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).onMissingValue().sortLast()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
@@ -341,7 +341,7 @@ public class SearchSortIT {
 						)
 						.ifSupported(
 								new SupportedExtension(),
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
 						)
 						.orElse( ignored -> Assert.fail( "This should not be called" ) )
 		);
@@ -360,7 +360,7 @@ public class SearchSortIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).onMissingValue().sortLast()
 						)
 		);
 		assertThat( query )
@@ -376,7 +376,7 @@ public class SearchSortIT {
 								ignored -> Assert.fail( "This should not be called" )
 						)
 						.orElse(
-								c -> c.byField( "string" ).desc().onMissingValue().sortLast().toSort()
+								c -> c.byField( "string" ).desc().onMissingValue().sortLast()
 						)
 		);
 
@@ -389,7 +389,7 @@ public class SearchSortIT {
 							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
-			b.byField( "string" ).onMissingValue().sortLast().toSort();
+			b.byField( "string" ).onMissingValue().sortLast();
 		} );
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
@@ -399,7 +399,7 @@ public class SearchSortIT {
 							new UnSupportedExtension(),
 							ignored -> Assert.fail( "This should not be called" )
 					);
-			b.byField( "string" ).desc().onMissingValue().sortLast().toSort();
+			b.byField( "string" ).desc().onMissingValue().sortLast();
 		} );
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );

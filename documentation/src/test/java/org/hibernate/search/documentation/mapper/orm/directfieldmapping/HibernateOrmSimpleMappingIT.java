@@ -131,7 +131,6 @@ public class HibernateOrmSimpleMappingIT {
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc()
 							.then().byField( "title_sort" )
-							.toSort()
 					)
 					.build();
 
