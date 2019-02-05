@@ -32,7 +32,7 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements ExplainWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

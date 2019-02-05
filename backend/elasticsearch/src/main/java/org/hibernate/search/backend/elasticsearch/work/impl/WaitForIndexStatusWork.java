@@ -36,7 +36,7 @@ public class WaitForIndexStatusWork extends AbstractSimpleElasticsearchWork<Void
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements WaitForIndexStatusWorkBuilder {
 		private final URLEncodedString indexName;
 		private final ElasticsearchIndexStatus requiredStatus;

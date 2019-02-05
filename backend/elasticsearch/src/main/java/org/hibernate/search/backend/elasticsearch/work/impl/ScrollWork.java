@@ -33,7 +33,7 @@ public class ScrollWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 	}
 
 	public static class Builder<T>
-			extends AbstractSimpleElasticsearchWork.Builder<Builder<T>>
+			extends AbstractBuilder<Builder<T>>
 			implements ScrollWorkBuilder<T> {
 		private final String scrollId;
 		private final String scrollTimeout;

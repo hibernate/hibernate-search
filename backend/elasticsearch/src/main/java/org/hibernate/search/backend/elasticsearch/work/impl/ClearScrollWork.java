@@ -28,7 +28,7 @@ public class ClearScrollWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements ClearScrollWorkBuilder {
 		private final String scrollId;
 

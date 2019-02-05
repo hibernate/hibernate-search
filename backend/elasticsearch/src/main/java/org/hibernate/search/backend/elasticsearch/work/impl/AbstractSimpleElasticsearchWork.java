@@ -32,7 +32,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 	protected final boolean markIndexDirty;
 
-	protected AbstractSimpleElasticsearchWork(Builder<?> builder) {
+	protected AbstractSimpleElasticsearchWork(AbstractBuilder<?> builder) {
 		this.request = builder.buildRequest();
 		this.dirtiedIndexName = builder.dirtiedIndexName;
 		this.resultAssessor = builder.resultAssessor;
@@ -107,13 +107,13 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	}
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B
-	protected abstract static class Builder<B> {
+	protected abstract static class AbstractBuilder<B> {
 		protected final URLEncodedString dirtiedIndexName;
 		protected ElasticsearchRequestSuccessAssessor resultAssessor;
 
 		protected boolean markIndexDirty;
 
-		public Builder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.dirtiedIndexName = dirtiedIndexName;
 			this.resultAssessor = resultAssessor;
 		}

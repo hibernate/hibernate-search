@@ -59,7 +59,7 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements GetIndexTypeMappingWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

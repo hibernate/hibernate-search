@@ -53,7 +53,7 @@ public class GetIndexSettingsWork extends AbstractSimpleElasticsearchWork<IndexS
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements GetIndexSettingsWorkBuilder {
 		private final URLEncodedString indexName;
 

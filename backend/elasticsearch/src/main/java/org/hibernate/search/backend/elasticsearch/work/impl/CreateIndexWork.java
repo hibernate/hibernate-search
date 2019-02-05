@@ -41,7 +41,7 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements CreateIndexWorkBuilder {
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;

@@ -31,7 +31,7 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 
 	private final JsonObject bulkableActionMetadata;
 
-	protected AbstractSimpleBulkableElasticsearchWork(Builder<?> builder) {
+	protected AbstractSimpleBulkableElasticsearchWork(AbstractBuilder builder) {
 		super( builder );
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 	}
@@ -103,10 +103,10 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 				.thenApply( ignored -> result );
 	}
 
-	protected abstract static class Builder<B>
-			extends AbstractSimpleElasticsearchWork.Builder<B> {
+	protected abstract static class AbstractBuilder<B>
+			extends AbstractSimpleElasticsearchWork.AbstractBuilder<B> {
 
-		public Builder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			super( dirtiedIndexName, resultAssessor );
 		}
 

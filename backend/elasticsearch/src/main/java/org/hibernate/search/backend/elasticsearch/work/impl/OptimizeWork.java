@@ -34,7 +34,7 @@ public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements OptimizeWorkBuilder {
 		private List<URLEncodedString> indexNames = new ArrayList<>();
 

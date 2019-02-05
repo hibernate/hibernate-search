@@ -32,7 +32,7 @@ public class PutIndexSettingsWork extends AbstractSimpleElasticsearchWork<Void> 
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements PutIndexSettingsWorkBuilder {
 		private final URLEncodedString indexName;
 		private final JsonObject payload;
