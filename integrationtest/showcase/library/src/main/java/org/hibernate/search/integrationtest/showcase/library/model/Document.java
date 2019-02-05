@@ -18,7 +18,7 @@ import javax.persistence.OneToMany;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -38,10 +38,10 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private Integer id;
 
 	@Basic
-	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "title_sort",
-			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
+			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
 			sortable = Sortable.YES
 	)
 	private String title;
@@ -50,7 +50,7 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 	private String author;
 
 	@Basic
-	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	private String summary;
 
 	/**
