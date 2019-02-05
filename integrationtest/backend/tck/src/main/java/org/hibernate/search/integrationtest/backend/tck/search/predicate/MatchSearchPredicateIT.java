@@ -45,17 +45,23 @@ import org.junit.Test;
 public class MatchSearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
 	private static final String DOCUMENT_3 = "document3";
 	private static final String EMPTY = "empty";
 
+	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	private IndexMapping compatibleIndexMapping;
+	private StubMappingIndexManager compatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -64,6 +70,11 @@ public class MatchSearchPredicateIT {
 						"MappedType", INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
+				)
+				.withIndex(
+						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
+						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.setup();
 
@@ -376,6 +387,28 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
+	@Test
+	public void multiIndex() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String absoluteFieldPath = model.relativeFieldName;
+				Object valueToMatch = model.predicateParameterValue;
+
+				SearchQuery<DocumentReference> query = searchTarget.query()
+						.asReference()
+						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ).toPredicate() )
+						.build();
+
+				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+					b.doc( INDEX_NAME, DOCUMENT_1 );
+					b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+				} );
+			} );
+		}
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -400,7 +433,13 @@ public class MatchSearchPredicateIT {
 			indexMapping.string2Field.document3Value.write( document );
 			indexMapping.string3Field.document3Value.write( document );
 		} );
+		workPlan.execute().join();
 
+		workPlan = compatibleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+		} );
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
