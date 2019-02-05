@@ -13,7 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
@@ -30,20 +30,20 @@ public class Person extends AbstractEntity<Integer> {
 
 	@Basic(optional = false)
 	// TODO use a different analyzer/normalizer for these fields
-	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "firstName_sort",
-			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
+			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
 			sortable = Sortable.YES
 	)
 	private String firstName;
 
 	@Basic(optional = false)
 	// TODO use a different analyzer/normalizer for these fields
-	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "lastName_sort",
-			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
+			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
 			sortable = Sortable.YES
 	)
 	private String lastName;

@@ -45,6 +45,10 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-backend-elasticsearch</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-backend-lucene</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -105,12 +109,6 @@
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -136,14 +134,39 @@
                         <ELASTICSEARCH_URL>${test.elasticsearch.host.url}</ELASTICSEARCH_URL>
                         <ELASTICSEARCH_USERNAME>${test.elasticsearch.host.username}</ELASTICSEARCH_USERNAME>
                         <ELASTICSEARCH_PASSWORD>${test.elasticsearch.host.password}</ELASTICSEARCH_PASSWORD>
+                        <!-- ${random.uuid} is a Spring-defined property that ensures we use a different directory for each test -->
+                        <LUCENE_ROOT_PATH>${project.build.directory}/test-indexes/${random.uuid}</LUCENE_ROOT_PATH>
                     </environmentVariables>
                 </configuration>
 
                 <executions>
                     <execution>
-                        <id>it</id>
+                        <id>it-lucene</id>
                         <goals>
                             <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-lucene</reportNameSuffix>
+                            <systemPropertyVariables>
+                                <spring.profiles.active>lucene,test</spring.profiles.active>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-elasticsearch</id>
+                        <goals>
+                            <goal>integration-test</goal>
+                        </goals>
+                        <configuration>
+                            <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-elasticsearch</reportNameSuffix>
+                            <systemPropertyVariables>
+                                <spring.profiles.active>elasticsearch,test</spring.profiles.active>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>it-verify</id>
+                        <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>

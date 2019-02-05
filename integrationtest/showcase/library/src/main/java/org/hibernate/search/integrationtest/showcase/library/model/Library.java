@@ -17,7 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
+import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalyzers;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
@@ -42,10 +42,10 @@ public class Library extends AbstractEntity<Integer> {
 	@Basic
 	// TODO use multi-fields here
 	// TODO use a different analyzer/normalizer for these fields
-	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
+	@FullTextField(analyzer = LibraryAnalyzers.ANALYZER_DEFAULT)
 	@KeywordField(
 			name = "name_sort",
-			normalizer = LibraryAnalysisConfigurer.NORMALIZER_SORT,
+			normalizer = LibraryAnalyzers.NORMALIZER_SORT,
 			sortable = Sortable.YES
 	)
 	private String name;
