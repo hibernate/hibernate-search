@@ -200,6 +200,10 @@ public class ToStringTreeBuilder {
 							builder.append( style.indentInListNoBulletPoint );
 						}
 						break;
+					case UNNAMED_ENTRY:
+					case NAMED_ENTRY:
+						// No indent for these
+						break;
 				}
 			}
 			grandParent = parent;
