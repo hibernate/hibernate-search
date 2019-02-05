@@ -325,7 +325,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	/*
 	 * Variation of validateEqualWithDefault() for floats.
 	 */
-	private <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	private void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Float expectedValue, Float actualValue, float delta, Float defaultValueForNulls) {
 		Float defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Float defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -358,7 +358,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	/*
 	 * Variation of validateEqualWithDefault() for doubles.
 	 */
-	private <T> void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
+	private void validateEqualWithDefault(ValidationErrorCollector errorCollector, String attributeName,
 			Double expectedValue, Double actualValue, double delta, Double defaultValueForNulls) {
 		Double defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		Double defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
@@ -391,7 +391,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	 * - Checks that the first element (the format used for output format in ES) is equal
 	 * - Checks all expected formats are present in the actual value
 	 */
-	private <T> void validateFormatWithDefault(ValidationErrorCollector errorCollector,
+	private void validateFormatWithDefault(ValidationErrorCollector errorCollector,
 			String attributeName, List<String> expectedValue, List<String> actualValue, List<String> defaultValueForNulls) {
 		List<String> defaultedExpectedValue = expectedValue == null ? defaultValueForNulls : expectedValue;
 		List<String> defaultedActualValue = actualValue == null ? defaultValueForNulls : actualValue;
