@@ -26,7 +26,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<JsonElement> MISSING = JsonAccessor.root().property( "missing" );
+	private static final JsonAccessor<JsonElement> MISSING_ACCESSOR = JsonAccessor.root().property( "missing" );
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
@@ -74,7 +74,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	@Override
 	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( missing != null ) {
-			MISSING.set( innerObject, missing );
+			MISSING_ACCESSOR.set( innerObject, missing );
 		}
 
 		if ( innerObject.size() == 0 ) {

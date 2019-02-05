@@ -29,9 +29,9 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<JsonElement> QUERY = JsonAccessor.root().property( "query" );
+	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 
-	private static final JsonObjectAccessor MATCH = JsonAccessor.root().property( "match" ).asObject();
+	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
 
 	private final ElasticsearchSearchContext searchContext;
 
@@ -67,12 +67,12 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		QUERY.set( innerObject, value );
+		QUERY_ACCESSOR.set( innerObject, value );
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
 
-		MATCH.set( outerObject, middleObject );
+		MATCH_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
 	}
 

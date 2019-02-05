@@ -29,12 +29,12 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonObjectAccessor RANGE = JsonAccessor.root().property( "range" ).asObject();
+	private static final JsonObjectAccessor RANGE_ACCESSOR = JsonAccessor.root().property( "range" ).asObject();
 
-	private static final JsonAccessor<JsonElement> GT = JsonAccessor.root().property( "gt" );
-	private static final JsonAccessor<JsonElement> GTE = JsonAccessor.root().property( "gte" );
-	private static final JsonAccessor<JsonElement> LT = JsonAccessor.root().property( "lt" );
-	private static final JsonAccessor<JsonElement> LTE = JsonAccessor.root().property( "lte" );
+	private static final JsonAccessor<JsonElement> GT_ACCESSOR = JsonAccessor.root().property( "gt" );
+	private static final JsonAccessor<JsonElement> GTE_ACCESSOR = JsonAccessor.root().property( "gte" );
+	private static final JsonAccessor<JsonElement> LT_ACCESSOR = JsonAccessor.root().property( "lt" );
+	private static final JsonAccessor<JsonElement> LTE_ACCESSOR = JsonAccessor.root().property( "lte" );
 
 	private final ElasticsearchSearchContext searchContext;
 
@@ -98,17 +98,17 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonAccessor<JsonElement> accessor;
 		if ( lowerLimit != null ) {
-			accessor = excludeLowerLimit ? GT : GTE;
+			accessor = excludeLowerLimit ? GT_ACCESSOR : GTE_ACCESSOR;
 			accessor.set( innerObject, lowerLimit );
 		}
 		if ( upperLimit != null ) {
-			accessor = excludeUpperLimit ? LT : LTE;
+			accessor = excludeUpperLimit ? LT_ACCESSOR : LTE_ACCESSOR;
 			accessor.set( innerObject, upperLimit );
 		}
 
 		JsonObject middleObject = new JsonObject();
 		middleObject.add( absoluteFieldPath, innerObject );
-		RANGE.set( outerObject, middleObject );
+		RANGE_ACCESSOR.set( outerObject, middleObject );
 
 		return outerObject;
 	}

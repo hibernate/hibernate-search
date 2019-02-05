@@ -21,9 +21,9 @@ import com.google.gson.JsonObject;
 class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
-	private static final JsonObjectAccessor GEO_POLYGON = JsonAccessor.root().property( "geo_polygon" ).asObject();
+	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR = JsonAccessor.root().property( "geo_polygon" ).asObject();
 
-	private static final String POINTS = "points";
+	private static final String POINTS_PROPERTY_NAME = "points";
 
 	private final String absoluteFieldPath;
 
@@ -49,10 +49,10 @@ class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends Abstract
 			ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonObject pointsObject = new JsonObject();
-		pointsObject.add( POINTS, pointsArray );
+		pointsObject.add( POINTS_PROPERTY_NAME, pointsArray );
 
 		innerObject.add( absoluteFieldPath, pointsObject );
-		GEO_POLYGON.set( outerObject, innerObject );
+		GEO_POLYGON_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 }

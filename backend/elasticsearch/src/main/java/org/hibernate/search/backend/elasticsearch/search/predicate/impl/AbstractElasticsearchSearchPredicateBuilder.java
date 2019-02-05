@@ -19,7 +19,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
 				ElasticsearchSearchPredicateBuilder {
 
-	private static final JsonAccessor<Float> BOOST = JsonAccessor.root().property( "boost" ).asFloat();
+	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
 	private Float boost;
 
@@ -39,7 +39,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 		JsonObject innerObject = new JsonObject();
 
 		if ( boost != null ) {
-			BOOST.set( innerObject, boost );
+			BOOST_ACCESSOR.set( innerObject, boost );
 		}
 
 		return doBuild( context, outerObject, innerObject );
