@@ -32,7 +32,10 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 			return false;
 		}
 		LuceneTextFieldPredicateBuilderFactory<?> castedOther = (LuceneTextFieldPredicateBuilderFactory<?>) other;
-		return Objects.equals( queryBuilder, castedOther.queryBuilder );
+		if ( queryBuilder == null && castedOther.queryBuilder == null ) {
+			return true;
+		}
+		return Objects.equals( queryBuilder.getAnalyzer(), castedOther.queryBuilder.getAnalyzer() );
 	}
 
 	@Override
