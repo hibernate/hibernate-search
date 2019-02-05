@@ -32,7 +32,7 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements PutIndexMappingWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

@@ -33,7 +33,7 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleBulkableElasticsearchWork.Builder<Builder>
+			extends AbstractSimpleBulkableElasticsearchWork.AbstractBuilder<Builder>
 			implements IndexWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

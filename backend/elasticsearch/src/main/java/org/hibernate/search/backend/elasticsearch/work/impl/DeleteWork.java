@@ -36,7 +36,7 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleBulkableElasticsearchWork.Builder<Builder>
+			extends AbstractSimpleBulkableElasticsearchWork.AbstractBuilder<Builder>
 			implements DeleteWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

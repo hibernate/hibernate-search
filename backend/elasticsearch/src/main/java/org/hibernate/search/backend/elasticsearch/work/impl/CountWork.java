@@ -35,7 +35,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		return COUNT_ACCESSOR.get( body ).get();
 	}
 
-	public static class Builder extends AbstractSimpleElasticsearchWork.Builder<Builder> implements CountWorkBuilder {
+	public static class Builder extends AbstractBuilder<Builder> implements CountWorkBuilder {
 
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private final List<URLEncodedString> typeNames = new ArrayList<>();

@@ -26,7 +26,7 @@ public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements DropIndexWorkBuilder {
 		private final URLEncodedString indexName;
 

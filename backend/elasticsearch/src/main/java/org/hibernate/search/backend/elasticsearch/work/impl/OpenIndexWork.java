@@ -27,7 +27,7 @@ public class OpenIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements OpenIndexWorkBuilder {
 		private final URLEncodedString indexName;
 

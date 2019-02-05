@@ -48,7 +48,7 @@ public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements DeleteByQueryWorkBuilder {
 		private final URLEncodedString indexName;
 		private final JsonObject payload;

@@ -54,7 +54,7 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 	}
 
 	public static class Builder<T>
-			extends AbstractSimpleElasticsearchWork.Builder<Builder<T>>
+			extends AbstractBuilder<Builder<T>>
 			implements SearchWorkBuilder<T> {
 		private final JsonObject payload;
 		private final ElasticsearchSearchResultExtractor<T> resultExtractor;

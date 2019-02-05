@@ -46,7 +46,7 @@ public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements FlushWorkBuilder {
 		private final RefreshWorkBuilder refreshWorkBuilder;
 		private final Set<URLEncodedString> indexNames = new HashSet<>();

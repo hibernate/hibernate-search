@@ -31,7 +31,7 @@ public class IndexExistsWork extends AbstractSimpleElasticsearchWork<Boolean> {
 	}
 
 	public static class Builder
-			extends AbstractSimpleElasticsearchWork.Builder<Builder>
+			extends AbstractBuilder<Builder>
 			implements IndexExistsWorkBuilder {
 		private final URLEncodedString indexName;
 
