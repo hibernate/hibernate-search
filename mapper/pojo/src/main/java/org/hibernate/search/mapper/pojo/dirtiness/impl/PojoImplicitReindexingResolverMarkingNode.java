@@ -17,9 +17,6 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
  */
 public class PojoImplicitReindexingResolverMarkingNode<T, S> extends PojoImplicitReindexingResolverNode<T, S> {
 
-	public PojoImplicitReindexingResolverMarkingNode() {
-	}
-
 	@Override
 	public void close() {
 		// Nothing to do
