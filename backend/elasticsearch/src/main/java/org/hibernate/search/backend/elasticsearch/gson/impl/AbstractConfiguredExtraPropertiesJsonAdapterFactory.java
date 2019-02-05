@@ -136,7 +136,7 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 		return fieldNames;
 	}
 
-	private static class ReflectiveExtraPropertyAdapter<T, F> implements ExtraPropertyAdapter<T> {
+	private static class ReflectiveExtraPropertyAdapter<T> implements ExtraPropertyAdapter<T> {
 
 		private final Field extraPropertiesField;
 		private final TypeAdapter<JsonElement> propertyValueAdapter;

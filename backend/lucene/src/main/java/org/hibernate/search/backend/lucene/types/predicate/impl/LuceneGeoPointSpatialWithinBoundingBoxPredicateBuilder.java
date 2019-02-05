@@ -10,10 +10,9 @@ import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
-import org.hibernate.search.engine.spatial.GeoPoint;
 
 class LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
-		AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder<GeoPoint> {
+		AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder {
 
 	LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath) {
 		super( absoluteFieldPath );

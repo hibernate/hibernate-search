@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class LuceneGeoPointSpatialWithinPolygonPredicateBuilder extends
-		AbstractLuceneSpatialWithinPolygonPredicateBuilder<GeoPoint> {
+		AbstractLuceneSpatialWithinPolygonPredicateBuilder {
 
 	LuceneGeoPointSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
 		super( absoluteFieldPath );
