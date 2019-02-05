@@ -40,9 +40,6 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 	private IndexFieldAccessor<Integer> longTermBorrowalCountAccessor;
 	private IndexFieldAccessor<Integer> totalBorrowalCountAccessor;
 
-	public AccountBorrowalSummaryBridge() {
-	}
-
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
 		// TODO allow to access collections properly, and more importantly to declare dependencies on parts of collection items
