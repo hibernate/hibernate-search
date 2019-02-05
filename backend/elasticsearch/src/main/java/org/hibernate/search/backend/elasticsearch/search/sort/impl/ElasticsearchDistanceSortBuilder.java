@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
 public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearchSortBuilder
 		implements DistanceSortBuilder<ElasticsearchSearchSortBuilder> {
 
-	private static final JsonObjectAccessor GEO_DISTANCE = JsonAccessor.root().property( "_geo_distance" ).asObject();
+	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
 
 	private final String absoluteFieldPath;
 	private final GeoPoint location;
@@ -32,7 +32,7 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearc
 		innerObject.add( absoluteFieldPath, ElasticsearchGeoPointFieldCodec.INSTANCE.encode( location ) );
 
 		JsonObject outerObject = new JsonObject();
-		GEO_DISTANCE.add( outerObject, innerObject );
+		GEO_DISTANCE_ACCESSOR.add( outerObject, innerObject );
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, location );
 	}
 }

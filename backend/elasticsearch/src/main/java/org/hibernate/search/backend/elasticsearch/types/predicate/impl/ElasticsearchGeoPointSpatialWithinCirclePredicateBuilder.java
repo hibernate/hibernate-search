@@ -22,9 +22,9 @@ import com.google.gson.JsonObject;
 class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
-	private static final JsonObjectAccessor GEO_DISTANCE = JsonAccessor.root().property( "geo_distance" ).asObject();
+	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "geo_distance" ).asObject();
 
-	private static final JsonAccessor<Double> DISTANCE = JsonAccessor.root().property( "distance" ).asDouble();
+	private static final JsonAccessor<Double> DISTANCE_ACCESSOR = JsonAccessor.root().property( "distance" ).asDouble();
 
 	private final String absoluteFieldPath;
 
@@ -48,10 +48,10 @@ class ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder extends AbstractE
 	protected JsonObject doBuild(
 			ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		DISTANCE.set( innerObject, distanceInMeters );
+		DISTANCE_ACCESSOR.set( innerObject, distanceInMeters );
 		innerObject.add( absoluteFieldPath, center );
 
-		GEO_DISTANCE.set( outerObject, innerObject );
+		GEO_DISTANCE_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 

@@ -22,11 +22,11 @@ import com.google.gson.JsonObject;
 class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
-	private static final JsonObjectAccessor GEO_BOUNDING_BOX = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
+	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
 
-	private static final String TOP_LEFT = "top_left";
+	private static final String TOP_LEFT_PROPERTY_NAME = "top_left";
 
-	private static final String BOTTOM_RIGHT = "bottom_right";
+	private static final String BOTTOM_RIGHT_PROPERTY_NAME = "bottom_right";
 
 	private final String absoluteFieldPath;
 
@@ -51,12 +51,12 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends Abst
 			ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonObject boundingBoxObject = new JsonObject();
-		boundingBoxObject.add( TOP_LEFT, topLeft );
-		boundingBoxObject.add( BOTTOM_RIGHT, bottomRight );
+		boundingBoxObject.add( TOP_LEFT_PROPERTY_NAME, topLeft );
+		boundingBoxObject.add( BOTTOM_RIGHT_PROPERTY_NAME, bottomRight );
 
 		innerObject.add( absoluteFieldPath, boundingBoxObject );
 
-		GEO_BOUNDING_BOX.set( outerObject, innerObject );
+		GEO_BOUNDING_BOX_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 

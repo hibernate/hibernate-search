@@ -18,8 +18,8 @@ import com.google.gson.JsonObject;
 class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
-	private static final JsonAccessor<String> PATH = JsonAccessor.root().property( "path" ).asString();
-	private static final JsonAccessor<JsonObject> QUERY = JsonAccessor.root().property( "query" ).asObject();
+	private static final JsonAccessor<String> PATH_ACCESSOR = JsonAccessor.root().property( "path" ).asString();
+	private static final JsonAccessor<JsonObject> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asObject();
 
 	private final String absoluteFieldPath;
 
@@ -37,8 +37,8 @@ class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPre
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		PATH.set( innerObject, absoluteFieldPath );
-		QUERY.set( innerObject, nestedBuilder.build( context ) );
+		PATH_ACCESSOR.set( innerObject, absoluteFieldPath );
+		QUERY_ACCESSOR.set( innerObject, nestedBuilder.build( context ) );
 		outerObject.add( "nested", innerObject );
 		return outerObject;
 	}

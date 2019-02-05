@@ -42,8 +42,8 @@ import com.google.gson.JsonObject;
 public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
-	private static final JsonObjectAccessor IDS = JsonAccessor.root().property( "ids" ).asObject();
-	private static final JsonAccessor<JsonElement> VALUES = JsonAccessor.root().property( "values" );
+	private static final JsonObjectAccessor IDS_ACCESSOR = JsonAccessor.root().property( "ids" ).asObject();
+	private static final JsonAccessor<JsonElement> VALUES_ACCESSOR = JsonAccessor.root().property( "values" );
 
 	private final ElasticsearchSearchContext searchContext;
 
@@ -68,9 +68,9 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonArray array = convert( values, context.getTenantId() );
 
-		VALUES.set( innerObject, array );
+		VALUES_ACCESSOR.set( innerObject, array );
 
-		IDS.set( outerObject, innerObject );
+		IDS_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
 	}
 

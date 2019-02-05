@@ -29,12 +29,12 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<JsonObject> MUST = JsonAccessor.root().property( "must" ).asObject();
-	private static final JsonAccessor<JsonObject> MUST_NOT = JsonAccessor.root().property( "must_not" ).asObject();
-	private static final JsonAccessor<JsonObject> SHOULD = JsonAccessor.root().property( "should" ).asObject();
-	private static final JsonAccessor<JsonObject> FILTER = JsonAccessor.root().property( "filter" ).asObject();
+	private static final JsonAccessor<JsonObject> MUST_ACCESSOR = JsonAccessor.root().property( "must" ).asObject();
+	private static final JsonAccessor<JsonObject> MUST_NOT_ACCESSOR = JsonAccessor.root().property( "must_not" ).asObject();
+	private static final JsonAccessor<JsonObject> SHOULD_ACCESSOR = JsonAccessor.root().property( "should" ).asObject();
+	private static final JsonAccessor<JsonObject> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" ).asObject();
 
-	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH =
+	private static final JsonAccessor<String> MINIMUM_SHOULD_MATCH_ACCESSOR =
 			JsonAccessor.root().property( "minimum_should_match" ).asString();
 
 	private List<ElasticsearchSearchPredicateBuilder> mustClauseBuilders;
@@ -107,13 +107,13 @@ class ElasticsearchBooleanJunctionPredicateBuilder extends AbstractElasticsearch
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
-		contributeClauses( context, innerObject, MUST, mustClauseBuilders );
-		contributeClauses( context, innerObject, MUST_NOT, mustNotClauseBuilders );
-		contributeClauses( context, innerObject, SHOULD, shouldClauseBuilders );
-		contributeClauses( context, innerObject, FILTER, filterClauseBuilders );
+		contributeClauses( context, innerObject, MUST_ACCESSOR, mustClauseBuilders );
+		contributeClauses( context, innerObject, MUST_NOT_ACCESSOR, mustNotClauseBuilders );
+		contributeClauses( context, innerObject, SHOULD_ACCESSOR, shouldClauseBuilders );
+		contributeClauses( context, innerObject, FILTER_ACCESSOR, filterClauseBuilders );
 
 		if ( minimumShouldMatchConstraints != null ) {
-			MINIMUM_SHOULD_MATCH.set(
+			MINIMUM_SHOULD_MATCH_ACCESSOR.set(
 					innerObject,
 					formatMinimumShouldMatchConstraints( minimumShouldMatchConstraints )
 			);
