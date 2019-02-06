@@ -161,16 +161,14 @@ class IndexSchemaFilter {
 
 		// The remaining composition depth according to the nested IndexedEmbedded only
 		Integer nestedRemainingDepth = maxDepth;
-		if ( maxDepth == null ) {
-			if ( !nullSafeIncludePaths.isEmpty() ) {
-				/*
-				 * If no max depth was provided and "includePaths" was provided,
-				 * the remaining composition depth is implicitly set to 0,
-				 * meaning no composition is allowed and paths are excluded unless
-				 * explicitly listed in "includePaths".
-				 */
-				nestedRemainingDepth = 0;
-			}
+		if ( maxDepth == null && !nullSafeIncludePaths.isEmpty() ) {
+			/*
+			 * If no max depth was provided and "includePaths" was provided,
+			 * the remaining composition depth is implicitly set to 0,
+			 * meaning no composition is allowed and paths are excluded unless
+			 * explicitly listed in "includePaths".
+			 */
+			nestedRemainingDepth = 0;
 		}
 
 		/*
