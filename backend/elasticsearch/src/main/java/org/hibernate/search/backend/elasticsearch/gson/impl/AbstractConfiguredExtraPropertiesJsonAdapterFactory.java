@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -129,9 +130,7 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 		}
 		else {
 			fieldNames.add( serializedName.value() );
-			for ( String alternate : serializedName.alternate() ) {
-				fieldNames.add( alternate );
-			}
+			Collections.addAll( fieldNames, serializedName.alternate() );
 		}
 		return fieldNames;
 	}
