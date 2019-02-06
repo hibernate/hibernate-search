@@ -43,7 +43,7 @@ class RangePredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
-		this.fromContext = new RangePredicateFromContextImpl( commonState );
+		this.fromContext = new RangePredicateFromContextImpl<>( commonState );
 	}
 
 	@Override

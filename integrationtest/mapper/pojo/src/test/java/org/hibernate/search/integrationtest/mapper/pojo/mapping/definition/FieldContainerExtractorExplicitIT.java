@@ -482,6 +482,7 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 			return value == null || value.isEmpty() ? null : value.iterator().next();
 		}
 		@Override
+		@SuppressWarnings("unchecked")
 		public Collection<String> cast(Object value) {
 			return (Collection<String>) value;
 		}

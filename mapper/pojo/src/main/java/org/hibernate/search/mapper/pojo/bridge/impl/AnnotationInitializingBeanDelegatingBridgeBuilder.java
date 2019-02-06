@@ -48,12 +48,14 @@ public final class AnnotationInitializingBeanDelegatingBridgeBuilder<B, A extend
 		try ( BeanHolder<? extends AnnotationBridgeBuilder> delegateHolder =
 				delegateReference.getBean( buildContext.getBeanProvider() ) ) {
 			/*
-			 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of delegate.getClass() somehow,
+			 * TODO HSEARCH-3077 make this raw type use safer by checking the generic parameters of castedDelegate.getClass() somehow,
 			 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
 			 * and throwing an exception with a detailed explanation if something is wrong.
 			 */
-			delegateHolder.get().initialize( annotation );
-			bridgeHolder = delegateHolder.get().build( buildContext );
+			@SuppressWarnings("unchecked")
+			AnnotationBridgeBuilder<?, A> castedDelegate = delegateHolder.get();
+			castedDelegate.initialize( annotation );
+			bridgeHolder = castedDelegate.build( buildContext );
 		}
 
 		expectedBridgeType.cast( bridgeHolder.get() );

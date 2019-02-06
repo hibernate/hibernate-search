@@ -77,10 +77,12 @@ public class SearchResultAssert<T> {
 		return this;
 	}
 
+	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsExactOrder(Collection<T> hits) {
 		return hasHitsExactOrder( (T[]) hits.toArray() );
 	}
 
+	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsAnyOrder(Collection<T> hits) {
 		return hasHitsAnyOrder( (T[]) hits.toArray() );
 	}

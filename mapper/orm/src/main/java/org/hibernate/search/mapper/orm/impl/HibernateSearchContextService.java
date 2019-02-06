@@ -204,6 +204,7 @@ public class HibernateSearchContextService implements Service {
 
 		@Override
 		public void end() {
+			@SuppressWarnings("unchecked") // This key "belongs" to us, we know what we put in there.
 			TransientReference<HibernateOrmSearchManager> reference =
 					(TransientReference<HibernateOrmSearchManager>) sessionImplementor.getProperties().get( SEARCH_MANAGER_KEY );
 			HibernateOrmSearchManager searchManager = reference == null ? null : reference.get();

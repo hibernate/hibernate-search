@@ -97,6 +97,7 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 		}
 	}
 
+	@SuppressWarnings("unchecked") // Can't do better here, this code is all about reflection
 	private GenericContextAwarePojoGenericTypeModel(Helper helper, GenericTypeContext genericTypeContext) {
 		this.helper = helper;
 		this.rawTypeModel = helper.getRawTypeModel(
@@ -143,9 +144,10 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 
 	private <U> PojoPropertyModel<? extends U> wrapProperty(PojoPropertyModel<U> rawPropertyModel) {
 		Object cacheKey = helper.getPropertyCacheKey( rawPropertyModel );
-		PojoPropertyModel<?> cached = genericPropertyCache.get( cacheKey );
+		@SuppressWarnings("unchecked") // See how we add values to the cache
+		PojoPropertyModel<? extends U> cached = (PojoPropertyModel<? extends U>) genericPropertyCache.get( cacheKey );
 		if ( cached != null ) {
-			return (PojoPropertyModel<? extends U>) cached;
+			return cached;
 		}
 		Type propertyType = helper.getPropertyGenericType( rawPropertyModel );
 		GenericTypeContext propertyGenericTypeContext = new GenericTypeContext( genericTypeContext, propertyType );

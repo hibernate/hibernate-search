@@ -158,6 +158,7 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( LuceneIndexManager.class ) ) {
 			return (T) this;

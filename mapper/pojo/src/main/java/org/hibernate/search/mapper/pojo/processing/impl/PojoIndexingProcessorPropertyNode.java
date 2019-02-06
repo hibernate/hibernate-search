@@ -66,7 +66,8 @@ public class PojoIndexingProcessorPropertyNode<T, P> extends PojoIndexingProcess
 
 	@Override
 	public final void process(DocumentElement target, T source, AbstractPojoSessionContextImplementor sessionContext) {
-		// TODO add generic type parameters to property handles
+		// TODO HSEARCH-3058 add generic type parameters to property handles
+		@SuppressWarnings("unchecked")
 		P propertyValue = (P) handle.get( source );
 		if ( !propertyBridgeHolders.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( propertyValue );
