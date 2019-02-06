@@ -38,9 +38,6 @@ public class ExcludeTestPackages implements Filter {
 
 	private boolean acceptTestfileEvent(AuditEvent aEvent) {
 		String message = aEvent.getMessage();
-		if ( message != null && message.contains( MESSAGE_DISABLE_KEYWORD ) ) {
-			return false;
-		}
-		return true;
+		return message == null || !message.contains( MESSAGE_DISABLE_KEYWORD );
 	}
 }
