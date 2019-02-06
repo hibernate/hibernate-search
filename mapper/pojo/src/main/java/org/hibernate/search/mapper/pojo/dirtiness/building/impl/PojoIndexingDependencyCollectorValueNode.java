@@ -101,7 +101,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		this.modelPathFromRootEntityNode = modelPathFromRootEntityNode;
 
 		BoundPojoModelPathValueNode<?, P, V> modelPathValueNode = modelPathFromLastTypeNode;
-		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathValueNode.getParent();
+		BoundPojoModelPathPropertyNode<?, P> modelPathPropertyNode = modelPathFromLastTypeNode.getParent();
 		BoundPojoModelPathTypeNode<?> modelPathTypeNode = modelPathPropertyNode.getParent();
 		this.reindexOnUpdate = buildingHelper.getReindexOnUpdate(
 				parentNode.getReindexOnUpdate(),

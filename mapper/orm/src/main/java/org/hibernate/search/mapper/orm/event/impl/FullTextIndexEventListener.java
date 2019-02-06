@@ -165,8 +165,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 		if ( eventProcessingEnabled ) {
 			log.debug( "Hibernate Search dirty checks " + ( dirtyCheckingEnabled ? "enabled" : "disabled" ) );
 		}
-		OptimalEventsHibernateSearchState newState = new OptimalEventsHibernateSearchState( context );
-		this.state = newState; // discard the suboptimal EventsHibernateSearchState instances
+		// discard the suboptimal EventsHibernateSearchState instances
+		this.state = new OptimalEventsHibernateSearchState( context );
 		return context;
 	}
 

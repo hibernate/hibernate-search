@@ -93,8 +93,7 @@ class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			CompletableFuture<?> future = orchestrator.submit( works );
-			return future;
+			return orchestrator.submit( works );
 		}
 		finally {
 			works.clear();
