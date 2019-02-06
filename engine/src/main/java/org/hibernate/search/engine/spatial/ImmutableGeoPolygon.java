@@ -69,11 +69,7 @@ final class ImmutableGeoPolygon implements GeoPolygon {
 
 		ImmutableGeoPolygon that = (ImmutableGeoPolygon) obj;
 
-		if ( !that.points.equals( points ) ) {
-			return false;
-		}
-
-		return true;
+		return that.points.equals( points );
 	}
 
 	@Override
