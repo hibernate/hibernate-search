@@ -75,6 +75,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( LuceneBackend.class ) ) {
 			return (T) this;

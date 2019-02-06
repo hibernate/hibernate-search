@@ -24,9 +24,11 @@ class PojoModelPropertyElementAccessor<P> implements PojoModelElementAccessor<P>
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public P read(PojoElement bridgedElement) {
 		Object parentValue = parent.read( bridgedElement );
 		if ( parentValue != null ) {
+			// TODO HSEARCH-3058 add generic type parameters to property handles
 			return (P) handle.get( parentValue );
 		}
 		else {

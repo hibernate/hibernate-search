@@ -38,6 +38,7 @@ public final class StubMapperUtils {
 	 * @param <R> The reference type.
 	 * @param <O> The loaded object type.
 	 */
+	@SuppressWarnings("unchecked")
 	public static <R, O> void expectLoad(ObjectLoader<R, O> objectLoaderMock,
 			Consumer<LoadingDefinitionContext<R, O>> loadingDefinition) {
 		LoadingDefinitionContext<R, O> context = new LoadingDefinitionContext<>();

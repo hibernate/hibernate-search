@@ -48,8 +48,11 @@ public final class AnnotationInitializingBeanDelegatingMarkerBuilder<A extends A
 			 * maybe in a similar way to what we do in PojoIndexModelBinderImpl#addValueBridge,
 			 * and throwing an exception with a detailed explanation if something is wrong.
 			 */
-			delegateHolder.get().initialize( annotation );
-			return delegateHolder.get().build( buildContext );
+			@SuppressWarnings("unchecked")
+			AnnotationMarkerBuilder<A> castedDelegate = delegateHolder.get();
+			castedDelegate.initialize( annotation );
+			castedDelegate.initialize( annotation );
+			return castedDelegate.build( buildContext );
 		}
 	}
 

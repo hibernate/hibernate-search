@@ -287,7 +287,8 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 
 	@Override
 	public FullTextQueryImpl<R> setFlushMode(FlushModeType flushModeType) {
-		return (FullTextQueryImpl<R>) super.setFlushMode( flushModeType );
+		super.setFlushMode( flushModeType );
+		return this;
 	}
 
 	@Override

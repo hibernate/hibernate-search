@@ -136,6 +136,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( ElasticsearchBackend.class ) ) {
 			return (T) this;

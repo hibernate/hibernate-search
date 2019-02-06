@@ -96,6 +96,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		 * TODO HSEARCH-3243 check that the bridge is suitable for the given typeModel
 		 * (use introspection, similarly to what we do to detect the value bridge's field type?)
 		 */
+		@SuppressWarnings("unchecked")
 		BeanHolder<? extends IdentifierBridge<I>> bridgeHolder =
 				(BeanHolder<IdentifierBridge<I>>) defaultedBuilder.build( bridgeBuildContext );
 		try {
@@ -103,7 +104,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 			bridge.bind( new IdentifierBridgeBindingContextImpl<>(
 					new PojoModelValueElement<>( typeModel )
 			) );
-			bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter( bridge ) );
+			bindingContext.idDslConverter( new PojoIdentifierBridgeToDocumentIdentifierValueConverter<>( bridge ) );
 			return bridgeHolder;
 		}
 		catch (RuntimeException e) {

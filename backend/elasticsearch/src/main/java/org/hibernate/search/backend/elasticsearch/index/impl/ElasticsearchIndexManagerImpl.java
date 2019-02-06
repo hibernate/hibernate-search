@@ -147,6 +147,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // Checked using reflection
 	public <T> T unwrap(Class<T> clazz) {
 		if ( clazz.isAssignableFrom( ElasticsearchIndexManager.class ) ) {
 			return (T) this;

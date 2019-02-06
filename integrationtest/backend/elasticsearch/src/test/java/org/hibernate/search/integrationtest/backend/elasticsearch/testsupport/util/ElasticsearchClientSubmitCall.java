@@ -7,7 +7,6 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util;
 
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.util.impl.integrationtest.common.rule.Call;
@@ -55,7 +54,7 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 				break;
 			case EXTENSIBLE:
 				Assertions.assertThat( actualCall.request.getParameters() )
-						.contains( request.getParameters().entrySet().toArray( new Map.Entry[0] ) );
+						.containsAllEntriesOf( request.getParameters() );
 				try {
 					JSONAssert.assertEquals(
 							toComparableJson( request.getBodyParts() ),

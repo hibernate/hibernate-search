@@ -95,9 +95,9 @@ public class ClassLoaderHelper {
 	 */
 	public static <T> T untypedInstanceFromClass(final Class<T> classToLoad, final String componentDescription) {
 		checkClassType( classToLoad, componentDescription );
-		Constructor<?> constructor = getNoArgConstructor( classToLoad, componentDescription );
+		Constructor<T> constructor = getNoArgConstructor( classToLoad, componentDescription );
 		try {
-			return (T) constructor.newInstance();
+			return constructor.newInstance();
 		}
 		catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 			if ( StringHelper.isEmpty( componentDescription ) ) {

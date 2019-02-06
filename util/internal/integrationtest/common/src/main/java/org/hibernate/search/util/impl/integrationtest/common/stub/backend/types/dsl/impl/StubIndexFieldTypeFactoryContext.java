@@ -17,6 +17,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryContext {
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public <F> StandardIndexFieldTypeContext<?, F> as(Class<F> inputType) {
 		if ( String.class.isAssignableFrom( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asString();
