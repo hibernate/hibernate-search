@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 /**
@@ -69,7 +70,8 @@ public class ElasticsearchDialectFactory {
 				throw log.elasticsearchResponseIndicatesFailure();
 			}
 
-			return VERSION_ACCESSOR.get( response.getBody() ).get();
+			return VERSION_ACCESSOR.get( response.getBody() )
+					.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
 		}
 		catch (RuntimeException e) {
 			throw log.elasticsearchRequestFailed( request, response, e );
