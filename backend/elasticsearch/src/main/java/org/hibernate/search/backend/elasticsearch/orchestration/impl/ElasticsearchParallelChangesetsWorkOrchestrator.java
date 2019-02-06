@@ -57,7 +57,7 @@ class ElasticsearchParallelChangesetsWorkOrchestrator implements ElasticsearchAc
 	@Override
 	public CompletableFuture<Void> executeSubmitted() {
 		CompletableFuture<Void> future =
-				CompletableFuture.allOf( sequenceFutures.toArray( new CompletableFuture<?>[ sequenceFutures.size()] ) );
+				CompletableFuture.allOf( sequenceFutures.toArray( new CompletableFuture<?>[0] ) );
 		sequenceFutures.clear();
 		aggregator.startSequences();
 		return future;

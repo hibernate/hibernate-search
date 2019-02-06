@@ -113,7 +113,7 @@ class PojoWorkPlanImpl implements PojoWorkPlan {
 			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.execute() );
 			}
-			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[futures.size()] ) );
+			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
 		}
 		finally {
 			indexedTypeDelegates.clear();

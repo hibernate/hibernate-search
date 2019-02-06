@@ -193,7 +193,7 @@ public class SearchResultAssert<T> {
 		}
 
 		private DocumentReference[] getExpectedHits() {
-			return expectedHits.toArray( new DocumentReference[expectedHits.size()] );
+			return expectedHits.toArray( new DocumentReference[0] );
 		}
 	}
 
@@ -211,7 +211,7 @@ public class SearchResultAssert<T> {
 
 		@SuppressWarnings("rawtypes")
 		private List[] getExpectedHits() {
-			return expectedHits.toArray( new List[expectedHits.size()] );
+			return expectedHits.toArray( new List[0] );
 		}
 	}
 

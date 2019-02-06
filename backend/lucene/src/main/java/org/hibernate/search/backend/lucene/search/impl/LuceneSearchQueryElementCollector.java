@@ -63,6 +63,6 @@ public class LuceneSearchQueryElementCollector
 			return null;
 		}
 
-		return new Sort( sortFields.toArray( new SortField[sortFields.size()] ) );
+		return new Sort( sortFields.toArray( new SortField[0] ) );
 	}
 }
