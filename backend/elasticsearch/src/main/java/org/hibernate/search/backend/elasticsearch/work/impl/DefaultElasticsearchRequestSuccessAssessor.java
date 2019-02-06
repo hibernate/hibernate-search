@@ -110,9 +110,10 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 	}
 
 	private boolean isSuccess(Optional<Integer> statusCode, JsonObject responseBody) {
-		return statusCode.map( (c) ->
-						ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
-				).orElse( false )
+		return statusCode.map(
+				c -> ElasticsearchClientUtils.isSuccessCode( c ) || ignoredErrorStatuses.contains( c )
+				)
+				.orElse( false )
 				|| ERROR_TYPE.get( responseBody ).map( ignoredErrorTypes::contains ).orElse( false );
 	}
 
