@@ -55,41 +55,13 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
-		String id = referenceProvider.getIdentifier();
-		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
-		String routingKey = referenceProvider.getRoutingKey();
-
-		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
-		documentContributor.contribute( builder );
-		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
-
-		collect(
-				builderFactory.index(
-						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
-				)
-						.markIndexDirty( refreshAfterWrite )
-						.build()
-		);
+		index( referenceProvider, documentContributor );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
-		String id = referenceProvider.getIdentifier();
-		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
-		String routingKey = referenceProvider.getRoutingKey();
-
-		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
-		documentContributor.contribute( builder );
-		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
-
-		collect(
-				builderFactory.index(
-						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
-				)
-						.markIndexDirty( refreshAfterWrite )
-						.build()
-		);
+		index( referenceProvider, documentContributor );
 	}
 
 	@Override
@@ -123,6 +95,25 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 		finally {
 			works.clear();
 		}
+	}
+
+	private void index(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+		String id = referenceProvider.getIdentifier();
+		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
+		String routingKey = referenceProvider.getRoutingKey();
+
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
+		documentContributor.contribute( builder );
+		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
+
+		collect(
+				builderFactory.index(
+						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+				)
+						.markIndexDirty( refreshAfterWrite )
+						.build()
+		);
 	}
 
 	private void collect(ElasticsearchWork<?> work) {
