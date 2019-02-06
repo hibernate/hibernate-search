@@ -160,6 +160,7 @@ public interface Log extends BasicLogger {
 					+ " Please check that this path points to a persisted value, and in particular not an embedded property.")
 	SearchException unreportedPathForDirtyChecking(Class<?> entityType, PojoModelPath path, Value value);
 
+	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 9,
 			value = "Container value extractor of type '%2$s' cannot be applied to"
 					+ " Hibernate ORM metadata node of type '%1$s'.")

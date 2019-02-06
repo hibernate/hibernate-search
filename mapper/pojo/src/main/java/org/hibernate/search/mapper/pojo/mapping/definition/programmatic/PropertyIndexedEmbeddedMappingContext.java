@@ -30,6 +30,7 @@ public interface PropertyIndexedEmbeddedMappingContext extends PropertyMappingCo
 
 	PropertyIndexedEmbeddedMappingContext includePaths(Collection<String> paths);
 
+	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 	default PropertyIndexedEmbeddedMappingContext withExtractor(
 			Class<? extends ContainerExtractor> extractorClass) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );

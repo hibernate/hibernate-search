@@ -250,8 +250,10 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
 			}
 
+			@SuppressWarnings("rawtypes")
 			List<? extends Class<? extends ContainerExtractor>> extractorClasses =
 					extractorPath.getExplicitExtractorClasses();
+			@SuppressWarnings("rawtypes")
 			Iterator<? extends Class<? extends ContainerExtractor>> extractorClassIterator =
 					extractorClasses.iterator();
 
@@ -290,6 +292,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, null );
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue,
 			Class<? extends ContainerExtractor> extractorClass) {
 		if ( BuiltinContainerExtractor.ARRAY.getType().equals( extractorClass ) ) {

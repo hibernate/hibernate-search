@@ -28,6 +28,7 @@ import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 @RunWith(Parameterized.class)
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSupport {
 
 	@Parameterized.Parameters(name = "{2}")

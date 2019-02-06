@@ -29,6 +29,7 @@ import org.easymock.EasyMockSupport;
 /**
  * @author Yoann Rodiere
  */
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport {
 
 	private ElasticsearchRefreshableWorkExecutionContext contextMock;
@@ -37,7 +38,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	private Supplier<ContextualErrorHandler> errorHandlerSupplierMock;
 
 	@Before
-	@SuppressWarnings("unchecked")
 	public void initMocks() {
 		contextMock = createStrictMock( ElasticsearchRefreshableWorkExecutionContext.class );
 		contextSupplierMock = createStrictMock( Supplier.class );
@@ -46,7 +46,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void simple() {
 		ElasticsearchWork<Object> work1 = work( 1 );
 		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
@@ -134,7 +133,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void bulk() {
 		ElasticsearchWork<Object> work1 = work( 1 );
 		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
@@ -296,7 +294,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void newSequenceOnReset() {
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -385,7 +382,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_work() {
 		ElasticsearchWork<Object> work0 = work( 0 );
 		ElasticsearchWork<Void> work1 = work( 1 );
@@ -535,7 +531,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_bulk_result() {
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -619,7 +614,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_bulk_resultExtraction_singleFailure() {
 		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -742,7 +736,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_bulk_resultExtraction_multipleFailures() {
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -820,7 +813,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_bulk_resultExtraction_future_singleFailure() {
 		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -955,7 +947,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_bulk_resultExtraction_future_multipleFailures() {
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -1045,7 +1036,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	@Test
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void error_handler() {
 		ElasticsearchWork<Void> work1 = work( 1 );
 		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
@@ -1207,13 +1197,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	}
 
 	private <T> ElasticsearchWork<T> work(int index) {
-		@SuppressWarnings("unchecked")
 		ElasticsearchWork<T> mock = createStrictMock( "work" + index, ElasticsearchWork.class );
 		return mock;
 	}
 
 	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
-		@SuppressWarnings("unchecked")
 		BulkableElasticsearchWork<T> mock = createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
 		return mock;
 	}

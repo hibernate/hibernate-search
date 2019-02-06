@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalIntValueE
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalLongValueExtractor;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.OptionalValueExtractor;
 
+@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public enum BuiltinContainerExtractor {
 
 	ARRAY( ArrayElementExtractor.class ),

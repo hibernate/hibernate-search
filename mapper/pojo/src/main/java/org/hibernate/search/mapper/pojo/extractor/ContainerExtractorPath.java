@@ -25,6 +25,7 @@ import java.util.StringJoiner;
  * This second form may result in different "resolved" paths depending on the type of the property it is applied to.
  * </ul>
  */
+@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public class ContainerExtractorPath {
 
 	private static final ContainerExtractorPath DEFAULT = new ContainerExtractorPath(

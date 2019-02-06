@@ -58,7 +58,7 @@ public class IndexDocumentWorkExecutorIT {
 	@Test
 	public void checkAllDocumentsAreSearchable() {
 		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor();
-		CompletableFuture[] tasks = new CompletableFuture[NUMBER_OF_BOOKS];
+		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {

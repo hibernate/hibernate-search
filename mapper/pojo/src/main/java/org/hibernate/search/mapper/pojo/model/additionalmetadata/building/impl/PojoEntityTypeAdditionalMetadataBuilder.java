@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl;
 
 import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorEntityTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
@@ -15,11 +16,11 @@ import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 
 class PojoEntityTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorEntityTypeNode {
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;
-	private final PojoPathFilterFactory pathFilterFactory;
+	private final PojoPathFilterFactory<Set<String>> pathFilterFactory;
 	private String entityIdPropertyName;
 
 	PojoEntityTypeAdditionalMetadataBuilder(PojoTypeAdditionalMetadataBuilder rootBuilder,
-			PojoPathFilterFactory pathFilterFactory) {
+			PojoPathFilterFactory<Set<String>> pathFilterFactory) {
 		this.rootBuilder = rootBuilder;
 		this.pathFilterFactory = pathFilterFactory;
 	}

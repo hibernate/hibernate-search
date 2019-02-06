@@ -91,6 +91,7 @@ class AnnotationProcessorHelper {
 			return ContainerExtractorPath.defaultExtractors();
 		}
 		else {
+			@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 			List<Class<? extends ContainerExtractor>> explicitExtractorClasses = new ArrayList<>();
 			for ( ContainerExtractorRef extractor : extractors ) {
 				checkContainerExtractor( extractor );
@@ -275,6 +276,7 @@ class AnnotationProcessorHelper {
 		}
 	}
 
+	@SuppressWarnings("rawtypes") // The bean reference must be to a raw type
 	private <A extends Annotation, B> BridgeBuilder<? extends B> createAnnotationMappedBridgeBuilder(
 			Class<B> expectedBridgeType, Class<? extends Annotation> bridgeMappingAnnotation, A annotation,
 			Optional<BeanReference<? extends B>> bridgeReferenceOptional,

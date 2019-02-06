@@ -252,6 +252,7 @@ public class FieldSearchProjectionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
 			SearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
 

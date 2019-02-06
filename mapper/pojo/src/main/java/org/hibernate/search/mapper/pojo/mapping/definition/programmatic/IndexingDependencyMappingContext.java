@@ -20,6 +20,7 @@ public interface IndexingDependencyMappingContext extends PropertyMappingContext
 
 	IndexingDependencyMappingContext derivedFrom(PojoModelPathValueNode pojoModelPath);
 
+	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 	default IndexingDependencyMappingContext withExtractor(
 			Class<? extends ContainerExtractor> extractorClass) {
 		return withExtractors( ContainerExtractorPath.explicitExtractor( extractorClass ) );

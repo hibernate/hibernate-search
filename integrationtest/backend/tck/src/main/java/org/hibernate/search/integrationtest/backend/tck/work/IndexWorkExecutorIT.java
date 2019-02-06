@@ -116,7 +116,7 @@ public class IndexWorkExecutorIT {
 
 	private void createBookIndexes(StubSessionContext sessionContext) {
 		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor = indexManager.createDocumentWorkExecutor( sessionContext );
-		CompletableFuture[] tasks = new CompletableFuture[NUMBER_OF_BOOKS];
+		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";

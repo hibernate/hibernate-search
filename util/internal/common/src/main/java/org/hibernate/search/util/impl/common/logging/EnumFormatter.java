@@ -10,7 +10,7 @@ public class EnumFormatter {
 
 	private final String formatted;
 
-	public EnumFormatter(Enum value) {
+	public EnumFormatter(Enum<?> value) {
 		this.formatted = value.name();
 	}
 

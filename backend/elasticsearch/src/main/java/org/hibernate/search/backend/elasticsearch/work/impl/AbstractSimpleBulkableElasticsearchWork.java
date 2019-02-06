@@ -31,7 +31,7 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 
 	private final JsonObject bulkableActionMetadata;
 
-	protected AbstractSimpleBulkableElasticsearchWork(AbstractBuilder builder) {
+	protected AbstractSimpleBulkableElasticsearchWork(AbstractBuilder<?> builder) {
 		super( builder );
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 	}
