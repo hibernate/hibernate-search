@@ -75,8 +75,8 @@ class ElasticsearchSearchQueryBuilderFactory
 	private ElasticsearchSearchProjection<?, List<?>> createRootProjection(SearchProjection<?>[] projections) {
 		List<ElasticsearchSearchProjection<?, ?>> children = new ArrayList<>( projections.length );
 
-		for ( int i = 0; i < projections.length; ++i ) {
-			children.add( searchProjectionFactory.toImplementation( projections[i] ) );
+		for ( SearchProjection<?> projection : projections ) {
+			children.add( searchProjectionFactory.toImplementation( projection ) );
 		}
 
 		return new ElasticsearchCompositeListProjection<>( Function.identity(), children );
