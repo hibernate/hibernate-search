@@ -52,9 +52,7 @@ public final class DefaultClassAndResourceResolver implements ClassResolver, Res
 
 		// now build the aggregated class loader...
 		this.aggregatedClassLoader = new AggregatedClassLoader(
-				orderedClassLoaderSet.toArray(
-						new ClassLoader[orderedClassLoaderSet.size()]
-				)
+				orderedClassLoaderSet.toArray( new ClassLoader[0] )
 		);
 	}
 

@@ -43,7 +43,7 @@ public class ManagedMultiReader extends MultiReader {
 				.map( ReaderProvider::openIndexReader )
 				.toArray( IndexReader[]::new );
 
-		return new ManagedMultiReader( indexReaders, readerProviders.toArray( new ReaderProvider[readerProviders.size()] ) );
+		return new ManagedMultiReader( indexReaders, readerProviders.toArray( new ReaderProvider[0] ) );
 	}
 
 	@Override
