@@ -74,9 +74,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
 @Repeatable(GeoPointBridge.List.class)
 public @interface GeoPointBridge {
 
-	int DEFAULT_TOP_SPATIAL_HASH_LEVEL = 0;
-	int DEFAULT_BOTTOM_SPATIAL_HASH_LEVEL = 16;
-
 	/**
 	 * The name of the index field holding spatial information.
 	 *
