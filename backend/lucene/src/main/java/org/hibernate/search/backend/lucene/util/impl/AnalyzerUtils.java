@@ -41,26 +41,20 @@ public final class AnalyzerUtils {
 	 * @throws SearchException if a problem occurs when analyzing the sortable field's value.
 	 */
 	public static String normalize(Analyzer analyzer, String fieldName, String text) {
-		final TokenStream stream = analyzer.tokenStream( fieldName, new StringReader( text ) );
-		try {
-			try {
-				String firstToken = null;
-				CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
-				stream.reset();
+		try ( TokenStream stream = analyzer.tokenStream( fieldName, new StringReader( text ) ) ) {
+			String firstToken = null;
+			CharTermAttribute term = stream.addAttribute( CharTermAttribute.class );
+			stream.reset();
+			if ( stream.incrementToken() ) {
+				firstToken = new String( term.buffer(), 0, term.length() );
 				if ( stream.incrementToken() ) {
-					firstToken = new String( term.buffer(), 0, term.length() );
-					if ( stream.incrementToken() ) {
-						log.multipleTermsDetectedDuringNormalization( fieldName );
-					}
-					else {
-						stream.end();
-					}
+					log.multipleTermsDetectedDuringNormalization( fieldName );
 				}
-				return firstToken;
+				else {
+					stream.end();
+				}
 			}
-			finally {
-				stream.close();
-			}
+			return firstToken;
 		}
 		catch (SearchException | IOException e) {
 			throw log.couldNotNormalizeField( fieldName, e );
