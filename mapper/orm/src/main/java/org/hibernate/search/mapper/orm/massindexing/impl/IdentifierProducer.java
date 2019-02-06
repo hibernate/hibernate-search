@@ -149,10 +149,9 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			.setCacheable( false )
 			.setFetchSize( idFetchSize );
 
-		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
 		ArrayList<Serializable> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;
-		try {
+		try ( ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY ) ) {
 			while ( results.next() ) {
 				Serializable id = (Serializable) results.get( 0 );
 				destinationList.add( id );
@@ -172,9 +171,6 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 					break;
 				}
 			}
-		}
-		finally {
-			results.close();
 		}
 		enqueueList( destinationList );
 	}
