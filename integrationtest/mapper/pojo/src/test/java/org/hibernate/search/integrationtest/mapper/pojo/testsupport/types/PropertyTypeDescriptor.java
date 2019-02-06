@@ -24,13 +24,26 @@ public abstract class PropertyTypeDescriptor<V> {
 					new BoxedIntegerPropertyTypeDescriptor(),
 					new BoxedLongPropertyTypeDescriptor(),
 					new BoxedBooleanPropertyTypeDescriptor(),
+					new BoxedCharacterPropertyTypeDescriptor(),
+					new BoxedBytePropertyTypeDescriptor(),
+					new BoxedShortPropertyTypeDescriptor(),
+					new BoxedFloatPropertyTypeDescriptor(),
+					new BoxedDoublePropertyTypeDescriptor(),
 					new PrimitiveIntegerPropertyTypeDescriptor(),
 					new PrimitiveLongPropertyTypeDescriptor(),
 					new PrimitiveBooleanPropertyTypeDescriptor(),
+					new PrimitiveCharacterPropertyTypeDescriptor(),
+					new PrimitiveBytePropertyTypeDescriptor(),
+					new PrimitiveShortPropertyTypeDescriptor(),
+					new PrimitiveFloatPropertyTypeDescriptor(),
+					new PrimitiveDoublePropertyTypeDescriptor(),
 					new EnumPropertyTypeDescriptor(),
 					new InstantPropertyTypeDescriptor(),
 					new LocalDatePropertyTypeDescriptor(),
-					new JavaUtilDatePropertyTypeDescriptor()
+					new JavaUtilDatePropertyTypeDescriptor(),
+					new BigDecimalPropertyTypeDescriptor(),
+					new BigIntegerPropertyTypeDescriptor(),
+					new UUIDPropertyTypeDescriptor()
 			) );
 		}
 		return all;
@@ -50,4 +63,11 @@ public abstract class PropertyTypeDescriptor<V> {
 
 	public abstract Optional<DefaultValueBridgeExpectations<V, ?>> getDefaultValueBridgeExpectations();
 
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder( "PropertyTypeDescriptor{" );
+		sb.append( "javaType=" ).append( javaType );
+		sb.append( '}' );
+		return sb.toString();
+	}
 }
