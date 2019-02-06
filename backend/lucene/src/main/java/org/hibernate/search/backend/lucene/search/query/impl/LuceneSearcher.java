@@ -50,7 +50,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.firstResultIndex = firstResultIndex == null ? 0L : firstResultIndex.longValue();
+		this.firstResultIndex = firstResultIndex == null ? 0L : firstResultIndex;
 		this.maxResultsCount = maxResultsCount;
 		this.luceneCollectorProvider = luceneCollectorProvider;
 		this.searchResultExtractor = searchResultExtractor;
