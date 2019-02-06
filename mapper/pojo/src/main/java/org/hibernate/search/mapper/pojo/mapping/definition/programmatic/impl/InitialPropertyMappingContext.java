@@ -44,10 +44,10 @@ public class InitialPropertyMappingContext
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorPropertyNode collectorPropertyNode =
 				collector.property( propertyHandle.getName() );
-		children.contributeModel( collectorPropertyNode );
+		children.contributeAdditionalMetadata( collectorPropertyNode );
 	}
 
 	@Override

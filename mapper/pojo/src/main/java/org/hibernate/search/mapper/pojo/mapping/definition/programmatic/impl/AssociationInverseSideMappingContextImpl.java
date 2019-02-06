@@ -31,7 +31,7 @@ public class AssociationInverseSideMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		collector.value( extractorPath ).associationInverseSide( inversePath );
 	}
 

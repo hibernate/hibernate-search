@@ -56,8 +56,8 @@ public class TypeMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
-		children.contributeModel( collector );
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
+		children.contributeAdditionalMetadata( collector );
 	}
 
 	@Override

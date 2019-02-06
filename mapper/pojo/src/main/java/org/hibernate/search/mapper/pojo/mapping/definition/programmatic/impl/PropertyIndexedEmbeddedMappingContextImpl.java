@@ -37,7 +37,7 @@ public class PropertyIndexedEmbeddedMappingContextImpl extends DelegatingPropert
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		// Nothing to do
 	}
 

@@ -9,10 +9,10 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollector;
 
-public interface PojoMetadataContributor<CMO extends PojoAdditionalMetadataCollector, CMA extends PojoMappingCollector> {
+public interface PojoMetadataContributor<MEC extends PojoAdditionalMetadataCollector, MAC extends PojoMappingCollector> {
 
-	void contributeModel(CMO collector);
+	void contributeAdditionalMetadata(MEC collector);
 
-	void contributeMapping(CMA collector);
+	void contributeMapping(MAC collector);
 
 }

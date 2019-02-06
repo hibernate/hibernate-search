@@ -17,11 +17,11 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 	private List<PojoPropertyMetadataContributor> children;
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		if ( children != null ) {
 			for ( PojoPropertyMetadataContributor child : children ) {
 				try {
-					child.contributeModel( collector );
+					child.contributeAdditionalMetadata( collector );
 				}
 				catch (RuntimeException e) {
 					collector.getFailureCollector().add( e );

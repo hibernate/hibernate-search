@@ -25,7 +25,7 @@ public class TypeBridgeMappingContributor implements PojoTypeMetadataContributor
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		// Nothing to do
 	}
 

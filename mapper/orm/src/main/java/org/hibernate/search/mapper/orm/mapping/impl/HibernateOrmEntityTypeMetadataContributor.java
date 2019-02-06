@@ -23,7 +23,7 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		collector.markAsEntity( new HibernateOrmPathFilterFactory( persistentClass ) )
 				.entityIdPropertyName( idPropertyName );
 	}
