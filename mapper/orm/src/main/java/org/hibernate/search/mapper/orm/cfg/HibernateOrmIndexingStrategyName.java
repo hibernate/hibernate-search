@@ -33,7 +33,7 @@ public enum HibernateOrmIndexingStrategyName {
 
 	private String externalRepresentation;
 
-	private HibernateOrmIndexingStrategyName(String externalRepresentation) {
+	HibernateOrmIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

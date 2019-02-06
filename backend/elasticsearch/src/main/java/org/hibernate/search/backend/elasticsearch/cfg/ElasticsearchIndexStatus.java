@@ -21,7 +21,7 @@ public enum ElasticsearchIndexStatus {
 
 	private final String elasticsearchString;
 
-	private ElasticsearchIndexStatus(String elasticsearchString) {
+	ElasticsearchIndexStatus(String elasticsearchString) {
 		this.elasticsearchString = elasticsearchString;
 	}
 
