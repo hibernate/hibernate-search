@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl.esnative;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
@@ -32,7 +31,7 @@ public class ElasticsearchFormatJsonAdapter extends TypeAdapter<List<String>> {
 			return;
 		}
 
-		String joinedFormats = value.stream().collect( Collectors.joining( FORMAT_SEPARATOR ) );
+		String joinedFormats = String.join( FORMAT_SEPARATOR, value );
 		out.value( joinedFormats );
 	}
 
