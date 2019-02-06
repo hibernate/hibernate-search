@@ -23,7 +23,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	private enum Type {
 		ROOT,
 		OBJECT_FIELD,
-		NON_OBJECT_FIELD;
+		NON_OBJECT_FIELD
 	}
 
 	public static Builder schema() {

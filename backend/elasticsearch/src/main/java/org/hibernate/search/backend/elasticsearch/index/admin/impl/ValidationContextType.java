@@ -15,6 +15,6 @@ enum ValidationContextType {
 	NORMALIZER,
 	CHAR_FILTER,
 	TOKENIZER,
-	TOKEN_FILTER;
+	TOKEN_FILTER
 
 }
