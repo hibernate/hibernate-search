@@ -89,8 +89,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			CompletableFuture<?> future = orchestrator.submit( works );
-			return future;
+			return orchestrator.submit( works );
 		}
 		finally {
 			works.clear();

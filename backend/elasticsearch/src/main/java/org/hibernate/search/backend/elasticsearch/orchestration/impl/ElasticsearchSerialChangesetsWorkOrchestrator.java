@@ -50,8 +50,7 @@ class ElasticsearchSerialChangesetsWorkOrchestrator implements ElasticsearchAccu
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.init( future );
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		future = sequenceFuture;
+		future = aggregator.buildSequence();
 		return workFuture;
 	}
 

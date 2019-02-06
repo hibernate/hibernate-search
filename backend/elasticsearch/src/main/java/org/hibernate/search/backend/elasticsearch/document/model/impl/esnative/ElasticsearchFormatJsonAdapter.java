@@ -44,8 +44,7 @@ public class ElasticsearchFormatJsonAdapter extends TypeAdapter<List<String>> {
 		}
 
 		String joinedFormats = in.nextString();
-		List<String> formats = Arrays.asList( joinedFormats.split( FORMAT_SEPARATOR_REGEX ) );
-		return formats;
+		return Arrays.asList( joinedFormats.split( FORMAT_SEPARATOR_REGEX ) );
 	}
 
 }

@@ -188,8 +188,7 @@ public class MassIndexerImpl implements MassIndexer {
 		BatchCoordinator coordinator = createCoordinator();
 		ExecutorService executor = Executors.newFixedThreadPool( 1, "batch coordinator" );
 		try {
-			Future<?> submit = executor.submit( coordinator );
-			return submit;
+			return executor.submit( coordinator );
 		}
 		finally {
 			executor.shutdown();

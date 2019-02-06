@@ -37,12 +37,11 @@ public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements 
 			FromDocumentFieldValueConvertContext context) {
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
-		Object[] extractedElements = new Object[] {
+		return new Object[] {
 				projection1.extract( projectionHitMapper, listFromIndex.get( 0 ), context ),
 				projection2.extract( projectionHitMapper, listFromIndex.get( 1 ), context ),
 				projection3.extract( projectionHitMapper, listFromIndex.get( 2 ), context )
 		};
-		return extractedElements;
 	}
 
 	@Override

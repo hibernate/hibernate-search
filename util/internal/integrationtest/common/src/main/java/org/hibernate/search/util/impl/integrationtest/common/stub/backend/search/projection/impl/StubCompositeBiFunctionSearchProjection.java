@@ -33,11 +33,10 @@ public class StubCompositeBiFunctionSearchProjection<P1, P2, T> implements StubC
 			FromDocumentFieldValueConvertContext context) {
 		List<?> listFromIndex = (List<?>) projectionFromIndex;
 
-		Object[] extractedElements = new Object[] {
+		return new Object[] {
 				projection1.extract( projectionHitMapper, listFromIndex.get( 0 ), context ),
 				projection2.extract( projectionHitMapper, listFromIndex.get( 1 ), context )
 		};
-		return extractedElements;
 	}
 
 	@Override
