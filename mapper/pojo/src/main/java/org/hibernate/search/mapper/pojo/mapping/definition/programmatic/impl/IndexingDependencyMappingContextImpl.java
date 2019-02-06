@@ -37,7 +37,7 @@ public class IndexingDependencyMappingContextImpl
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		PojoAdditionalMetadataCollectorValueNode collectorValueNode = collector.value( extractorPath );
 		if ( reindexOnUpdate != null ) {
 			collectorValueNode.reindexOnUpdate( reindexOnUpdate );

@@ -22,7 +22,7 @@ final class HibernateOrmAssociationEmbeddedMetadataContributor implements PojoTy
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorValueNode collectorValueNode =
 				collector.property( propertyName ).value( extractorPath );
 		try {

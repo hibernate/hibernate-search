@@ -24,7 +24,7 @@ class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorPropertyNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorPropertyNode collector) {
 		collector.marker( markerBuilder );
 	}
 

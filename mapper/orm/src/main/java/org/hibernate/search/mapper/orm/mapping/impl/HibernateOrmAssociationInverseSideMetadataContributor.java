@@ -26,7 +26,7 @@ final class HibernateOrmAssociationInverseSideMetadataContributor implements Poj
 	}
 
 	@Override
-	public void contributeModel(PojoAdditionalMetadataCollectorTypeNode collector) {
+	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		PojoAdditionalMetadataCollectorValueNode collectorValueNode =
 				collector.property( propertyName ).value( extractorPath );
 		try {
