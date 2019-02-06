@@ -116,10 +116,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private GsonBuilder createES5GsonBuilderBase() {
-		return new GsonBuilder();
-	}
-
 	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {
 		MultiTenancyStrategyName multiTenancyStrategyName = MULTI_TENANCY_STRATEGY.get( propertySource );
 
