@@ -11,7 +11,7 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object, Object> {
 
-	private static NoOpPojoImplicitReindexingResolverNode INSTANCE = new NoOpPojoImplicitReindexingResolverNode();
+	private static final NoOpPojoImplicitReindexingResolverNode INSTANCE = new NoOpPojoImplicitReindexingResolverNode();
 
 	@SuppressWarnings( "unchecked" ) // This instance works for any T or D
 	public static <T, D> PojoImplicitReindexingResolverNode<T, D> get() {

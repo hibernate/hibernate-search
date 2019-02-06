@@ -29,7 +29,7 @@ public enum HibernateOrmIndexingStrategyName {
 	 */
 	MANUAL("manual");
 
-	private static Log LOG = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String externalRepresentation;
 
@@ -51,7 +51,7 @@ public enum HibernateOrmIndexingStrategyName {
 			return HibernateOrmIndexingStrategyName.MANUAL;
 		}
 		else {
-			throw LOG.unknownIndexingMode( indexingMode );
+			throw log.unknownIndexingMode( indexingMode );
 		}
 	}
 
