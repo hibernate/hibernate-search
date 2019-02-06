@@ -104,10 +104,9 @@ public class AnalysisJsonElementEquivalence {
 		for ( Map.Entry<String, JsonElement> rightEntry : right.entrySet() ) {
 			String propertyName = rightEntry.getKey();
 			if ( !left.has( propertyName ) ) {
-				JsonElement leftValue = null;
 				JsonElement rightValue = rightEntry.getValue();
 				// Let the equivalence decide whether null can be equivalent to something
-				if ( !isNestedEquivalent( leftValue, rightValue ) ) {
+				if ( !isNestedEquivalent( null, rightValue ) ) {
 					return false;
 				}
 			}
