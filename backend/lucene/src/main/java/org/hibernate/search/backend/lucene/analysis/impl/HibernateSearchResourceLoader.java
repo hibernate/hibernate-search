@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.analysis.impl;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 
@@ -37,7 +36,7 @@ final class HibernateSearchResourceLoader implements ResourceLoader {
 	}
 
 	@Override
-	public InputStream openResource(String resource) throws IOException {
+	public InputStream openResource(String resource) {
 		InputStream inputStream = resourceResolver.locateResourceStream( resource );
 
 		if ( inputStream == null ) {

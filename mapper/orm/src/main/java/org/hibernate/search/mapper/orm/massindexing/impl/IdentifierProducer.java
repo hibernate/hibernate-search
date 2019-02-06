@@ -76,7 +76,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	}
 
 	@Override
-	public void run(StatelessSession upperSession) throws Exception {
+	public void run(StatelessSession upperSession) {
 		log.trace( "started" );
 		try {
 			inTransactionWrapper( (StatelessSessionImpl) upperSession );
@@ -94,7 +94,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		log.trace( "finished" );
 	}
 
-	private void inTransactionWrapper(StatelessSessionImpl upperSession) throws Exception {
+	private void inTransactionWrapper(StatelessSessionImpl upperSession) {
 		StatelessSessionImpl session = upperSession;
 		if ( upperSession == null ) {
 			if ( tenantId == null ) {

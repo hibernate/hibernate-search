@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.CacheMode;
@@ -180,7 +179,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		}
 	}
 
-	private void rollbackTransaction(SessionImplementor session) throws Exception {
+	private void rollbackTransaction(SessionImplementor session) {
 		try {
 			if ( transactionManager != null ) {
 				transactionManager.rollback();
@@ -194,7 +193,7 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 		}
 	}
 
-	private void indexAllQueue(PojoSessionWorkExecutor workExecutor, List<?> entities) throws InterruptedException, ExecutionException {
+	private void indexAllQueue(PojoSessionWorkExecutor workExecutor, List<?> entities) throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}

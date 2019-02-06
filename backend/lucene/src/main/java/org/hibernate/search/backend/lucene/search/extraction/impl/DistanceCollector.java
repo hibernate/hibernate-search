@@ -168,7 +168,7 @@ public class DistanceCollector implements Collector {
 		}
 
 		@Override
-		public void setScorer(Scorer scorer) throws IOException {
+		public void setScorer(Scorer scorer) {
 			// we don't need any scorer
 		}
 
