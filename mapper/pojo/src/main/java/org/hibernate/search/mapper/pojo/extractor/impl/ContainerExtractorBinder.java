@@ -101,7 +101,7 @@ public class ContainerExtractorBinder {
 	 * @return The resolved extractor path, or an empty optional if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	@SuppressWarnings("unchecked") // Checks are implemented using reflection
+	@SuppressWarnings({"rawtypes", "unchecked"}) // Checks are implemented using reflection
 	public <C> Optional<BoundContainerExtractorPath<C, ?>> tryBindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );
@@ -137,7 +137,7 @@ public class ContainerExtractorBinder {
 	 * @throws org.hibernate.search.util.SearchException if
 	 * one of the extractors in the path cannot be applied.
 	 */
-	@SuppressWarnings("unchecked") // Checks are implemented using reflection
+	@SuppressWarnings({"rawtypes", "unchecked"}) // Checks are implemented using reflection
 	public <C> BoundContainerExtractorPath<C, ?> bindPath(PojoGenericTypeModel<C> sourceType,
 			ContainerExtractorPath extractorPath) {
 		ExtractorResolutionState<C> state = new ExtractorResolutionState<>( sourceType );

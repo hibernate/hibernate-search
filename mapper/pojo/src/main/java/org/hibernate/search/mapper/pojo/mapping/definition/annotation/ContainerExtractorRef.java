@@ -25,6 +25,7 @@ public @interface ContainerExtractorRef {
 
 	BuiltinContainerExtractor value() default BuiltinContainerExtractor.AUTOMATIC;
 
+	@SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 	Class<? extends ContainerExtractor> type() default UndefinedContainerExtractorImplementationType.class;
 
 	abstract class UndefinedContainerExtractorImplementationType implements ContainerExtractor<Object, Object> {

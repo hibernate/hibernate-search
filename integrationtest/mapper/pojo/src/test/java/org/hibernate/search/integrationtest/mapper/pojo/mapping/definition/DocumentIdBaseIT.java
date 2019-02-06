@@ -60,6 +60,7 @@ public class DocumentIdBaseIT {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void error_unableToResolveDefaultIdentifierBridgeFromSourceType_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {

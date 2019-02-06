@@ -69,6 +69,7 @@ public class FieldContainerExtractorBaseIT {
 				);
 	}
 
+	@SuppressWarnings("rawtypes")
 	private static class RawContainerExtractor implements ContainerExtractor {
 		@Override
 		public Stream extract(Object container) {

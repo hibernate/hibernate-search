@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 
 	private final ConfigurationPropertySource sourceMock = createMock( ConfigurationPropertySource.class );

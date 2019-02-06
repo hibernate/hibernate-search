@@ -12,7 +12,7 @@ public class MappingKeyFormatter {
 
 	private final String formatted;
 
-	public MappingKeyFormatter(MappingKey mappingKey) {
+	public MappingKeyFormatter(MappingKey<?> mappingKey) {
 		this.formatted = mappingKey.toString();
 	}
 

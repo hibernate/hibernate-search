@@ -72,6 +72,7 @@ public class FieldBaseIT {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void error_unableToResolveDefaultValueBridgeFromSourceType_enumSuperClassRaw() {
 		@Indexed
 		class IndexedEntity {

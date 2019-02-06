@@ -245,7 +245,7 @@ public class ClassLoaderHelper {
 	 *
 	 * @throws ClassLoadingException From {@link Class#forName(String, boolean, ClassLoader)}.
 	 */
-	public static Class classForName(String classNameToLoad, ClassResolver classResolver) {
+	public static Class<?> classForName(String classNameToLoad, ClassResolver classResolver) {
 		return classResolver.classForName( classNameToLoad );
 	}
 }

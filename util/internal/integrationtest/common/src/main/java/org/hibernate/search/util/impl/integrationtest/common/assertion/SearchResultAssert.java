@@ -156,7 +156,7 @@ public class SearchResultAssert<T> {
 						.as( "Hits of " + queryDescription ),
 				List.class
 		);
-		return ( (List<? extends List>) hits ).stream()
+		return ( (List<? extends List<?>>) hits ).stream()
 				.map( NormalizationUtils::normalizeList )
 				.collect( Collectors.toList() );
 	}

@@ -207,6 +207,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	private ContainerExtractorPath getExtractorPath(Value value) {
 		if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collectionValue = (org.hibernate.mapping.Collection) value;
+			@SuppressWarnings("rawtypes")
 			Class<? extends ContainerExtractor> extractorClass = getExtractorClass( collectionValue );
 			return ContainerExtractorPath.explicitExtractor( extractorClass );
 		}
@@ -215,6 +216,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
 	private Class<? extends ContainerExtractor> getExtractorClass(org.hibernate.mapping.Collection collectionValue) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			// Caution if you add other if ( ... instanceof ) branches: Array extends List!

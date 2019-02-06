@@ -12,7 +12,7 @@ public class PojoTypeModelFormatter {
 
 	private final String formatted;
 
-	public PojoTypeModelFormatter(PojoTypeModel typeModel) {
+	public PojoTypeModelFormatter(PojoTypeModel<?> typeModel) {
 		this.formatted = typeModel.getName();
 	}
 

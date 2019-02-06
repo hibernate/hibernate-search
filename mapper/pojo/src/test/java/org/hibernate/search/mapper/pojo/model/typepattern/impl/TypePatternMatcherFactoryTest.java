@@ -27,6 +27,7 @@ import org.junit.rules.ExpectedException;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class TypePatternMatcherFactoryTest extends EasyMockSupport {
 
 	@Rule

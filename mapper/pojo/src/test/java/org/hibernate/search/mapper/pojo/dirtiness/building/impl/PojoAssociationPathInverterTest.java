@@ -34,6 +34,7 @@ import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class PojoAssociationPathInverterTest extends EasyMockSupport {
 
 	@Rule
@@ -45,7 +46,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 			createMock( ContainerExtractorBinder.class );
 
 	@Test
-	@SuppressWarnings( "unchecked" )
 	public void detectInfiniteRecursion() {
 		String originalSidePropertyName = "originalSideProperty";
 		String inverseSideProperty1Name = "inverseSideProperty1";

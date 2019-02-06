@@ -29,8 +29,7 @@ import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 @RunWith(Parameterized.class)
-// We have to use raw types to mock methods returning generic types with wildcards
-@SuppressWarnings({ "unchecked", "rawtypes" })
+@SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
 public class ConfigurationPropertyValidMissingValuesTest<T> extends EasyMockSupport {
 
 	@Parameterized.Parameters(name = "{2}")

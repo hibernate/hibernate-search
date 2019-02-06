@@ -160,6 +160,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotInferContainerExtractorClassTypePattern(
 			@FormatWith(ClassFormatter.class) Class<?> extractorClass);
 
+	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 16,
 			value = "Cannot apply the requested container value extractor '%1$s' to type '%2$s'")
 	SearchException invalidContainerExtractorForType(
@@ -314,6 +315,7 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotUseAutomaticContainerExtractorInMultiExtractorChain();
 
+	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 42,
 			value = "Annotation @ContainerExtractorRef references both built-in extractor (using '%1$s') and an explicit type (using '%2$s')."
 			+ " Only one of those can be defined, not both."

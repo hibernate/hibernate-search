@@ -168,7 +168,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			// First phase: collect configuration for all mappings
 			for ( Map.Entry<MappingKey<?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
 				// We know the key and initiator have compatible types, see how they are put into the map
-				@SuppressWarnings("unchecked")
+				@SuppressWarnings({"rawtypes", "unchecked"})
 				MappingBuildingState<?, ?> mappingBuildingState = new MappingBuildingState<>(
 						rootBuildContext, propertySource,
 						(MappingKey) entry.getKey(), entry.getValue()

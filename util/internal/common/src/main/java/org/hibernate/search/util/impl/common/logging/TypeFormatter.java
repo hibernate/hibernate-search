@@ -14,7 +14,7 @@ public class TypeFormatter {
 
 	public TypeFormatter(Type type) {
 		if ( type instanceof Class ) {
-			this.formatted = ( (Class) type ).getName();
+			this.formatted = ( (Class<?>) type ).getName();
 		}
 		else if ( type != null ) {
 			this.formatted = type.toString();

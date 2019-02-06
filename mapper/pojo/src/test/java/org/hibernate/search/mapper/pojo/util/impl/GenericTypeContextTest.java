@@ -102,6 +102,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void rawType() {
 		new AssertWithType<Collection>() {
 		}
@@ -117,6 +118,7 @@ public class GenericTypeContextTest {
 	}
 
 	@Test
+	@SuppressWarnings("rawtypes")
 	public void boundedRawType() {
 		new AssertWithType<CustomBoundedGenericInterface>() {
 		}

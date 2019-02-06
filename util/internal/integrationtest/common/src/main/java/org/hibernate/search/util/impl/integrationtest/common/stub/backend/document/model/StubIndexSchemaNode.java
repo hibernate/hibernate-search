@@ -52,7 +52,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		this.idDslConverter = builder.idDslConverter;
 	}
 
-	public ToDocumentIdentifierValueConverter getIdDslConverter() {
+	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
 	}
 
