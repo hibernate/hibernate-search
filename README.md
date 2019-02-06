@@ -168,19 +168,17 @@ and do the work of converting between user entities and documents to be indexed.
 
 ## Contact
 
-### Latest Documentation:
+### Latest Documentation
 
-* [http://hibernate.org/search/documentation/](http://hibernate.org/search/documentation/)
+See <http://hibernate.org/search/documentation/>.
 
-### Bug Reports:
+### Bug Reports
 
-* Hibernate JIRA [HSEARCH](https://hibernate.atlassian.net/browse/HSEARCH) (preferred)
-* [hibernate-dev@lists.jboss.org](mailto:hibernate-dev@lists.jboss.org)
+See the HSEARCH project on the Hibernate JIRA instance: <https://hibernate.atlassian.net/browse/HSEARCH>.
 
-### Community Support:
+### Community Support
 
-* [Hibernate Forum](https://discourse.hibernate.org/c/hibernate-search)
-* [Stackoverflow](http://stackoverflow.com/questions/tagged/hibernate-search); please use tag `hibernate-search`.
+See <http://hibernate.org/community/>.
 
 ## License
 
