@@ -22,5 +22,5 @@ public enum DynamicType {
 	FALSE,
 	@SerializedName("strict")
 	STRICT
-	;
+
 }
