@@ -40,7 +40,7 @@ public class ExpectedLog4jLog implements TestRule {
 		return new ExpectedLog4jLog();
 	}
 
-	private List<LogExpectation> expectations = new ArrayList<>();
+	private final List<LogExpectation> expectations = new ArrayList<>();
 	private TestAppender currentAppender;
 
 	private ExpectedLog4jLog() {
@@ -162,7 +162,7 @@ public class ExpectedLog4jLog implements TestRule {
 		for ( String otherContainedString : otherContainedStrings ) {
 			matchers.add( CoreMatchers.containsString( otherContainedString ) );
 		}
-		return CoreMatchers.<String>allOf( matchers );
+		return CoreMatchers.allOf( matchers );
 	}
 
 	private Matcher<LoggingEvent> eventLevelMatcher(Level level) {
@@ -296,6 +296,10 @@ public class ExpectedLog4jLog implements TestRule {
 
 		public void never() {
 			times( 0 );
+		}
+
+		public void once() {
+			times( 1 );
 		}
 
 		public void times(int expectedCount) {
