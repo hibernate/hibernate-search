@@ -20,7 +20,7 @@ import com.puppycrawl.tools.checkstyle.api.TokenTypes;
  */
 public class IllegalImport extends AbstractCheck {
 
-	private final HashSet<String> notAllowedImports = new HashSet<String>();
+	private final HashSet<String> notAllowedImports = new HashSet<>();
 	private String message = "";
 
 	/**

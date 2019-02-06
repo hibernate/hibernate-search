@@ -100,8 +100,8 @@ public class MassIndexerImpl implements MassIndexer {
 			throw log.someTargetedEntityTypesNotIndexed( StringHelper.join( nonIndexedEntities, "," ) );
 		}
 
-		Set<Class<?>> cleaned = new HashSet<Class<?>>();
-		Set<Class<?>> toRemove = new HashSet<Class<?>>();
+		Set<Class<?>> cleaned = new HashSet<>();
+		Set<Class<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
 		for ( Class<?> type : entities ) {
 			boolean typeIsOk = true;

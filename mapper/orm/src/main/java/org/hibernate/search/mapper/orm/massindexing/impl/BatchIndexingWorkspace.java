@@ -83,7 +83,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 
 		//pipelining queues:
-		this.primaryKeyStream = new ProducerConsumerQueue<List<Serializable>>( 1 );
+		this.primaryKeyStream = new ProducerConsumerQueue<>( 1 );
 
 		//end signal shared with other instances:
 		this.endAllSignal = endAllSignal;

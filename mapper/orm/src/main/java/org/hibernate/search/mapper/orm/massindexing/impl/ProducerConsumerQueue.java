@@ -34,7 +34,7 @@ public class ProducerConsumerQueue<T> {
 	}
 
 	public ProducerConsumerQueue( int queueLength, int producersToWaitFor ) {
-		queue = new ArrayBlockingQueue<Object>( queueLength );
+		queue = new ArrayBlockingQueue<>( queueLength );
 		this.producersToWaitFor = new AtomicInteger( producersToWaitFor );
 	}
 

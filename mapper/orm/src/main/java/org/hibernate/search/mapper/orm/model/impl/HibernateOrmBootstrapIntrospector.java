@@ -180,7 +180,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
 		ManagedType<T> managedType = getManagedType( type );
-		return new HibernateOrmRawTypeModel<T>(
+		return new HibernateOrmRawTypeModel<>(
 				this, type, managedType,
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
