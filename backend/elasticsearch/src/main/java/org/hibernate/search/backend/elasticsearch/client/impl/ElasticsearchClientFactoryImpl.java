@@ -169,8 +169,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(ConfigurationPropertySource propertySource,
 			ServerUris hosts, HttpAsyncClientBuilder builder) {
-		builder = builder
-				.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
+		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
 				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread" ) );
 		if ( !hosts.isAnyRequiringSSL() ) {
@@ -192,7 +191,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					new UsernamePasswordCredentials( username.get(), password.orElse( null ) )
 					);
 
-			builder = builder.setDefaultCredentialsProvider( credentialsProvider );
+			builder.setDefaultCredentialsProvider( credentialsProvider );
 		}
 
 		/* TODO ElasticsearchHttpClientConfigurer
