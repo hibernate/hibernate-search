@@ -140,8 +140,6 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	 * @param listIds the list of entity identifiers (of type
 	 * @param session the session to be used
 	 * @param workExecutor the work executor to be used
-	 *
-	 * @throws InterruptedException
 	 */
 	private void loadList(List<Serializable> listIds, SessionImplementor session, PojoSessionWorkExecutor workExecutor) throws Exception {
 		try {

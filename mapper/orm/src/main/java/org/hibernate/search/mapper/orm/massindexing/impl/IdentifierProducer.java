@@ -55,7 +55,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
 	 * @param indexedType the entity type to be loaded
-	 * @param monitor
+	 * @param monitor the indexing monitor
 	 * @param objectsLimit if not zero
 	 * @param idFetchSize the fetch size
 	 * @param tenantId the tenant identifier

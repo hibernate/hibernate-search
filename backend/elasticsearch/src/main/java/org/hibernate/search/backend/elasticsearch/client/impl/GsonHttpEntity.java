@@ -233,7 +233,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	 * but simply stop and return as soon as the sink can't accept more data.
 	 * Checking state of writer.flowControlPushingBack will reveal if everything
 	 * was written.
-	 * @throws IOException
+	 * @throws IOException If writing fails.
 	 */
 	private void triggerFullWrite() throws IOException {
 		while ( nextBodyToEncodeIndex < bodyParts.size() ) {

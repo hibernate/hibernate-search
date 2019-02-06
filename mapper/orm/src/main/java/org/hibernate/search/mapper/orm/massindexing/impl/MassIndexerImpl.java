@@ -65,14 +65,9 @@ public class MassIndexerImpl implements MassIndexer {
 		this.monitor = new SimpleIndexingProgressMonitor();
 	}
 
-	/**
+	/*
 	 * From the set of classes a new set is built containing all indexed
 	 * subclasses, but removing then all subtypes of indexed entities.
-	 *
-	 * @param mapping
-	 * @param selection
-	 *
-	 * @return a new set of entities
 	 */
 	private static Set<Class<?>> toRootEntities(HibernateOrmMapping mapping, Class<?>... selection) {
 		//first build the "entities" set containing all indexed subtypes of "selection".

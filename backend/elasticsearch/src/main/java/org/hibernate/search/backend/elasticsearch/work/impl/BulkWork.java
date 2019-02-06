@@ -45,7 +45,8 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 	 * Whether to perform a refresh in the course of executing this bulk or not.
 	 * <p>
 	 * Note that this will refresh all indexes touched by this bulk,
-	 * not only those given via {@link #indexesNeedingRefresh}. That's acceptable.
+	 * not only those given via {@link ElasticsearchWorkExecutionContext#registerIndexToRefresh(URLEncodedString)}.
+	 * That's acceptable.
 	 * <p>
 	 * If {@code true}, no additional refresh of the concerned indexes
 	 * is needed after executing the bulk.

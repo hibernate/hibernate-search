@@ -33,7 +33,7 @@ public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, Lucen
 	 *
 	 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
 	 * @param luceneResult A wrapper on top of the Lucene document extracted from the index.
-	 * @param context An execution context for the search projections.
+	 * @param context An execution context for the extraction.
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
 	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)}.
 	 */
@@ -47,7 +47,7 @@ public interface LuceneSearchProjection<E, T> extends SearchProjection<T>, Lucen
 	 * {@link ProjectionHitMapper}.
 	 * @param extractedData The extracted data to transform, coming from the
 	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)} method.
-	 * @param context
+	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */
 	T transform(LoadingResult<?> loadingResult, E extractedData,
