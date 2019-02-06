@@ -20,7 +20,7 @@ import org.junit.runners.model.Statement;
  */
 public final class StaticCounters implements TestRule {
 
-	private static StaticCounters dummyInstance = new StaticCounters();
+	private static final StaticCounters DUMMY_INSTANCE = new StaticCounters();
 	private static StaticCounters activeInstance = null;
 
 	public static final class Key {
@@ -41,7 +41,7 @@ public final class StaticCounters implements TestRule {
 			return activeInstance;
 		}
 		else {
-			return dummyInstance;
+			return DUMMY_INSTANCE;
 		}
 	}
 

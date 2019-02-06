@@ -53,7 +53,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 	private final Collection<BoundPropertyBridge<P>> boundPropertyBridges = new ArrayList<>();
 	private final PojoIndexingProcessorValueNodeBuilderDelegate<P, P> valueWithoutExtractorBuilderDelegate;
 	// Use a LinkedHashMap for deterministic iteration
-	private Map<ContainerExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
+	private final Map<ContainerExtractorPath, PojoIndexingProcessorContainerElementNodeBuilder<P, ? super P, ?>>
 			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoIndexingProcessorPropertyNodeBuilder(

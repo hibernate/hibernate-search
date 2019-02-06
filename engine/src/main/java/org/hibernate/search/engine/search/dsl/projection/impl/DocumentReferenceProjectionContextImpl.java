@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class DocumentReferenceProjectionContextImpl implements DocumentReferenceProjectionContext {
 
-	private DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
+	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
 	DocumentReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.documentReferenceProjectionBuilder = factory.documentReference();

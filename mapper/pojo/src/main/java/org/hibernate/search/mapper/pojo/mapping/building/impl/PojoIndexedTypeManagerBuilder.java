@@ -40,7 +40,7 @@ import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
-	private static Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
 	private final PojoTypeAdditionalMetadata typeAdditionalMetadata;

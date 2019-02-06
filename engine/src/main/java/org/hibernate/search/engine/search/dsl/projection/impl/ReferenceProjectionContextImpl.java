@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class ReferenceProjectionContextImpl<R> implements ReferenceProjectionContext<R> {
 
-	private ReferenceProjectionBuilder<R> referenceProjectionBuilder;
+	private final ReferenceProjectionBuilder<R> referenceProjectionBuilder;
 
 	ReferenceProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.referenceProjectionBuilder = factory.reference();

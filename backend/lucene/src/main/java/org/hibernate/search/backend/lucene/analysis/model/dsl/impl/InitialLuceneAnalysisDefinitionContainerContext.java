@@ -34,9 +34,9 @@ public class InitialLuceneAnalysisDefinitionContainerContext implements LuceneAn
 
 	private final LuceneAnalysisComponentFactory factory;
 
-	private Map<String, LuceneAnalyzerBuilder> analyzers = new LinkedHashMap<>();
+	private final Map<String, LuceneAnalyzerBuilder> analyzers = new LinkedHashMap<>();
 
-	private Map<String, LuceneAnalyzerBuilder> normalizers = new LinkedHashMap<>();
+	private final Map<String, LuceneAnalyzerBuilder> normalizers = new LinkedHashMap<>();
 
 	public InitialLuceneAnalysisDefinitionContainerContext(LuceneAnalysisComponentFactory factory) {
 		this.factory = factory;

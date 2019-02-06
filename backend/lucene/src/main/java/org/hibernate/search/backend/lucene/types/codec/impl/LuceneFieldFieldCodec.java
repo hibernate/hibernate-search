@@ -22,9 +22,9 @@ public final class LuceneFieldFieldCodec<F> implements LuceneFieldCodec<F> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private LuceneFieldContributor<F> fieldContributor;
+	private final LuceneFieldContributor<F> fieldContributor;
 
-	private LuceneFieldValueExtractor<F> fieldValueExtractor;
+	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
 	public LuceneFieldFieldCodec(LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
 		this.fieldContributor = fieldContributor;

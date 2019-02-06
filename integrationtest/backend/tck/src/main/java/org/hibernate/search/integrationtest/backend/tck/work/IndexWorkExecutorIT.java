@@ -48,12 +48,12 @@ public class IndexWorkExecutorIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private final StubSessionContext noTenantSessionContext = new StubSessionContext();
+	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
+	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
+
 	private IndexAccessors indexAccessors;
 	private StubMappingIndexManager indexManager;
-
-	private StubSessionContext noTenantSessionContext = new StubSessionContext();
-	private StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
-	private StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
 
 	@Test
 	public void runOptimizePurgeAndFlushInSequence() {

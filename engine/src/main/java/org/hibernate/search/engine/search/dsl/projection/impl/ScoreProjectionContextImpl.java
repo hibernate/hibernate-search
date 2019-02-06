@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class ScoreProjectionContextImpl implements ScoreProjectionContext {
 
-	private ScoreProjectionBuilder scoreProjectionBuilder;
+	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
 	ScoreProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.scoreProjectionBuilder = factory.score();

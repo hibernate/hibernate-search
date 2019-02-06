@@ -59,7 +59,7 @@ public class AnalysisParameterEquivalenceRegistry {
 	public static class TypeBuilder {
 
 		private final Builder parent;
-		private Map<String, AnalysisJsonElementEquivalence> equivalences;
+		private final Map<String, AnalysisJsonElementEquivalence> equivalences;
 
 		private TypeBuilder(Builder parent, Map<String, AnalysisJsonElementEquivalence> equivalences) {
 			super();

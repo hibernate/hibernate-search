@@ -17,7 +17,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder {
 
-	private AbstractStubIndexSchemaObjectNodeBuilder parent;
+	private final AbstractStubIndexSchemaObjectNodeBuilder parent;
 	private final boolean included;
 	private IndexObjectFieldAccessor accessor;
 

@@ -19,7 +19,7 @@ import org.hibernate.search.util.function.TriFunction;
 
 public class CompositeProjectionContextImpl<T> implements CompositeProjectionContext<T> {
 
-	private CompositeProjectionBuilder<T> compositeProjectionBuilder;
+	private final CompositeProjectionBuilder<T> compositeProjectionBuilder;
 
 	public CompositeProjectionContextImpl(SearchProjectionBuilderFactory factory,
 			Function<List<?>, T> transformer,

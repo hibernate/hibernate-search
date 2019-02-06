@@ -12,9 +12,9 @@ import org.hibernate.search.util.impl.common.Contracts;
 
 final class ImmutableGeoBoundingBox implements GeoBoundingBox {
 
-	private GeoPoint topLeft;
+	private final GeoPoint topLeft;
 
-	private GeoPoint bottomRight;
+	private final GeoPoint bottomRight;
 
 	ImmutableGeoBoundingBox(GeoPoint topLeft, GeoPoint bottomRight) {
 		Contracts.assertNotNull( topLeft, "topLeft" );

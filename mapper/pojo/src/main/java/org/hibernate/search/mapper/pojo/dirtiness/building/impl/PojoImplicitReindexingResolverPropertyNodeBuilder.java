@@ -31,7 +31,7 @@ class PojoImplicitReindexingResolverPropertyNodeBuilder<T, P>
 	private final BoundPojoModelPathPropertyNode<T, P> modelPath;
 	private final PojoImplicitReindexingResolverValueNodeBuilderDelegate<P> valueWithoutExtractorsBuilderDelegate;
 	// Use a LinkedHashMap for deterministic iteration
-	private Map<ContainerExtractorPath, PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?>>
+	private final Map<ContainerExtractorPath, PojoImplicitReindexingResolverContainerElementNodeBuilder<? super P, ?>>
 			containerElementNodeBuilders = new LinkedHashMap<>();
 
 	PojoImplicitReindexingResolverPropertyNodeBuilder(BoundPojoModelPathPropertyNode<T, P> modelPath,

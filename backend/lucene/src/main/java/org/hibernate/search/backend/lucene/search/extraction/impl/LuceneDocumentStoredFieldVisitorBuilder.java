@@ -12,7 +12,7 @@ import java.util.Set;
 public class LuceneDocumentStoredFieldVisitorBuilder {
 
 	private boolean entireDocumentRequired = false;
-	private Set<String> explicitlyRequired = new HashSet<>();
+	private final Set<String> explicitlyRequired = new HashSet<>();
 
 	public void addEntireDocument() {
 		entireDocumentRequired = true;

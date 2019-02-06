@@ -27,7 +27,7 @@ public class PojoMappingWorkExecutorImpl implements PojoMappingWorkExecutor {
 
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 
-	private Map<Class<?>, IndexWorkExecutor> workExecutors = new HashMap<>();
+	private final Map<Class<?>, IndexWorkExecutor> workExecutors = new HashMap<>();
 
 	public PojoMappingWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers) {
 		this.indexedTypeManagers = indexedTypeManagers;

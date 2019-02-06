@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> {
 
-	private List<String> values = new ArrayList<>();
+	private final List<String> values = new ArrayList<>();
 	private final LuceneSearchContext searchContext;
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 

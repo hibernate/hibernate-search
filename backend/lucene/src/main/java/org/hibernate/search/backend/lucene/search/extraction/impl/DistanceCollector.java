@@ -65,7 +65,7 @@ public class DistanceCollector implements Collector {
 	 * latitude and longitude coordinates.
 	 */
 	private abstract static class HitEntry {
-		private int documentId;
+		private final int documentId;
 
 		private HitEntry(int documentId) {
 			this.documentId = documentId;
@@ -75,8 +75,8 @@ public class DistanceCollector implements Collector {
 	}
 
 	private static final class CompleteHitEntry extends HitEntry {
-		private double latitude;
-		private double longitude;
+		private final double latitude;
+		private final double longitude;
 
 		private CompleteHitEntry(int documentId, double latitude, double longitude) {
 			super( documentId );

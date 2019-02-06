@@ -49,7 +49,7 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
-	private List<String> values = new ArrayList<>();
+	private final List<String> values = new ArrayList<>();
 
 	public ElasticsearchMatchIdPredicateBuilder(ElasticsearchSearchContext searchContext,
 			ToDocumentIdentifierValueConverter<?> idDslConverter) {

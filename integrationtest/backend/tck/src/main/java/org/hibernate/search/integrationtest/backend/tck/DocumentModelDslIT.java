@@ -43,7 +43,7 @@ public class DocumentModelDslIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private static List<Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>>> MAIN_TYPES =
+	private static final List<Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>>> MAIN_TYPES =
 			CollectionHelper.toImmutableList( CollectionHelper.asList(
 					IndexFieldTypeFactoryContext::asString,
 					IndexFieldTypeFactoryContext::asInteger,
