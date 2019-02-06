@@ -25,7 +25,7 @@ public enum DistanceUnit {
 
 	private double toMeters;
 
-	private DistanceUnit(double toMeters) {
+	DistanceUnit(double toMeters) {
 		this.toMeters = toMeters;
 	}
 

@@ -50,7 +50,7 @@ public class LogErrorHandler implements ErrorHandler {
 		handleException( errorMsg.toString(), exceptionThatOccurred );
 	}
 
-	public static final void appendFailureMessage(StringBuilder message, Object workThatFailed) {
+	private static void appendFailureMessage(StringBuilder message, Object workThatFailed) {
 		message.append( workThatFailed.toString() );
 	}
 

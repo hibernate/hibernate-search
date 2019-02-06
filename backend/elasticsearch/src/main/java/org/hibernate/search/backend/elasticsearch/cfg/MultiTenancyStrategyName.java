@@ -27,7 +27,7 @@ public enum MultiTenancyStrategyName {
 
 	private final String externalRepresentation;
 
-	private MultiTenancyStrategyName(String externalRepresentation) {
+	MultiTenancyStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 

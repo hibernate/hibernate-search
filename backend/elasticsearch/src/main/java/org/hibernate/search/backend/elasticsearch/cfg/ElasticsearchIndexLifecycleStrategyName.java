@@ -84,7 +84,7 @@ public enum ElasticsearchIndexLifecycleStrategyName {
 
 	private final String externalName;
 
-	private ElasticsearchIndexLifecycleStrategyName(String propertyValue) {
+	ElasticsearchIndexLifecycleStrategyName(String propertyValue) {
 		this.externalName = propertyValue;
 	}
 
