@@ -139,7 +139,10 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 				() -> sequenceContext.executionContext.executePendingRefreshes()
 						.whenComplete( Futures.copyHandler( sequenceContext.refreshFuture ) )
 		)
-				.exceptionally( Futures.handler( sequenceContext::notifySequenceFailed ) );
+				.exceptionally( Futures.handler( t -> {
+					sequenceContext.notifySequenceFailed( t );
+					return null;
+				} ) );
 	}
 
 	<T> CompletableFuture<T> addPostExecutionHandlers(ElasticsearchWork<T> work,
@@ -274,13 +277,12 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			errorHandler.markAsFailed( work, throwable );
 		}
 
-		<T> T notifySequenceFailed(Throwable throwable) {
+		void notifySequenceFailed(Throwable throwable) {
 			if ( !( throwable instanceof PreviousWorkException) ) {
 				// Something else than a work failed, mention it
 				errorHandler.addThrowable( throwable );
 			}
 			errorHandler.handle();
-			return null;
 		}
 	}
 }
