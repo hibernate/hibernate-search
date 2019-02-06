@@ -81,8 +81,8 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	private StubSearchProjection<List<?>> createRootProjection(SearchProjection<?>[] projections) {
 		List<StubSearchProjection<?>> children = new ArrayList<>( projections.length );
 
-		for ( int i = 0; i < projections.length; ++i ) {
-			children.add( (StubSearchProjection<?>) projections[i] );
+		for ( SearchProjection<?> projection : projections ) {
+			children.add( (StubSearchProjection<?>) projection );
 		}
 
 		return new StubCompositeListSearchProjection<>( Function.identity(), children );
