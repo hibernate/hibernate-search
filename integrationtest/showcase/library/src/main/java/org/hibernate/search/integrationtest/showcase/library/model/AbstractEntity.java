@@ -12,7 +12,7 @@ import javax.persistence.MappedSuperclass;
 import org.hibernate.Hibernate;
 
 @MappedSuperclass
-public abstract class AbstractEntity<ID> {
+public abstract class AbstractEntity<I> {
 
 	@Override
 	public boolean equals(Object o) {
@@ -42,7 +42,7 @@ public abstract class AbstractEntity<ID> {
 				.toString();
 	}
 
-	public abstract ID getId();
+	public abstract I getId();
 
 	protected abstract String getDescriptionForToString();
 }
