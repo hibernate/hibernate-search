@@ -127,7 +127,7 @@ class ProgressiveCharBufferWriter extends Writer {
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		// Nothing to do
 	}
 

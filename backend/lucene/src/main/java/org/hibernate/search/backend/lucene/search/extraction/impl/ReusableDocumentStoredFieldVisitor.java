@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
@@ -67,12 +66,12 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	}
 
 	@Override
-	public void binaryField(FieldInfo fieldInfo, byte[] value) throws IOException {
+	public void binaryField(FieldInfo fieldInfo, byte[] value) {
 		getDocument().add( new StoredField( fieldInfo.name, value ) );
 	}
 
 	@Override
-	public void stringField(FieldInfo fieldInfo, byte[] value) throws IOException {
+	public void stringField(FieldInfo fieldInfo, byte[] value) {
 		final FieldType ft = new FieldType( TextField.TYPE_STORED );
 		ft.setStoreTermVectors( fieldInfo.hasVectors() );
 		ft.setOmitNorms( fieldInfo.omitsNorms() );
@@ -101,7 +100,7 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 	}
 
 	@Override
-	public Status needsField(FieldInfo fieldInfo) throws IOException {
+	public Status needsField(FieldInfo fieldInfo) {
 		if ( rootAcceptor == null ) {
 			// We need all fields
 			return Status.YES;

@@ -158,7 +158,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	}
 
 	@Override
-	public InputStream getContent() throws IOException {
+	public InputStream getContent() {
 		//This could be implemented but would be sub-optimal compared to using produceContent().
 		//We therefore prefer throwing the exception so that we can easily spot unintended usage via tests.
 		throw new UnsupportedOperationException( "Not implemented! Expected to produce content only over produceContent(),"
@@ -190,12 +190,12 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	}
 
 	@Override
-	public void consumeContent() throws IOException {
+	public void consumeContent() {
 		//not used (and deprecated)
 	}
 
 	@Override
-	public void close() throws IOException {
+	public void close() {
 		//Nothing to close but let's make sure we re-wind the stream
 		//so that we can start from the beginning if needed
 		this.nextBodyToEncodeIndex = 0;

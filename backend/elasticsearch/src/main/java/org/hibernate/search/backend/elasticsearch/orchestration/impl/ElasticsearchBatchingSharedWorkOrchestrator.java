@@ -279,7 +279,7 @@ class ElasticsearchBatchingSharedWorkOrchestrator extends AbstractElasticsearchB
 		}
 
 		@Override
-		protected void doSubmit(Changeset changeset) throws InterruptedException {
+		protected void doSubmit(Changeset changeset) {
 			ElasticsearchBatchingSharedWorkOrchestrator.this.submit( changeset );
 		}
 
