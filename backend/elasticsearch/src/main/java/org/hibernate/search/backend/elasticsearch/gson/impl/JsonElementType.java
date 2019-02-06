@@ -46,7 +46,7 @@ public abstract class JsonElementType<T> {
 	protected abstract JsonElement nullUnsafeToElement(T element);
 
 	public final boolean isInstance(JsonElement element) {
-		return element == null ? false : nullUnsafeIsInstance( element );
+		return element != null && nullUnsafeIsInstance( element );
 	}
 
 	protected abstract boolean nullUnsafeIsInstance(JsonElement element);

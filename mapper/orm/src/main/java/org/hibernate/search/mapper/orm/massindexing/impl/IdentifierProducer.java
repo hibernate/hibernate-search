@@ -160,7 +160,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
 					// might be produced otherwise if the driver fetches all rows up-front
 					StatelessSessionImpl sessionImpl = (StatelessSessionImpl) session;
-					if ( sessionImpl.isTransactionInProgress() == false ) {
+					if ( !sessionImpl.isTransactionInProgress() ) {
 						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( indexedType );
 					}
 

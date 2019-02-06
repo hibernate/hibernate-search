@@ -37,8 +37,8 @@ class LuceneTextRangePredicateBuilder<F>
 				codec.normalize( absoluteFieldPath, lowerLimit ),
 				codec.normalize( absoluteFieldPath, upperLimit ),
 				// we force the true value if the limit is null because of some Lucene checks down the hill
-				lowerLimit == null ? true : !excludeLowerLimit,
-				upperLimit == null ? true : !excludeUpperLimit
+				lowerLimit == null || !excludeLowerLimit,
+				upperLimit == null || !excludeUpperLimit
 		);
 	}
 }
