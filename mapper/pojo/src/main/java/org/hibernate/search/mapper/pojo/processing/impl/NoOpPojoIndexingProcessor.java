@@ -12,7 +12,7 @@ import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 
 class NoOpPojoIndexingProcessor extends PojoIndexingProcessor<Object> {
 
-	private static NoOpPojoIndexingProcessor INSTANCE = new NoOpPojoIndexingProcessor();
+	private static final NoOpPojoIndexingProcessor INSTANCE = new NoOpPojoIndexingProcessor();
 
 	@SuppressWarnings( "unchecked" ) // This instance works for any T
 	public static <T> PojoIndexingProcessor<T> get() {
