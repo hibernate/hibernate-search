@@ -373,6 +373,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 				errorCollector.addError( MESSAGES.invalidAttributeValue(
 						attributeName, defaultedExpectedValue, actualValue
 				) );
+				return;
 			}
 		}
 		if ( Double.compare( defaultedExpectedValue, defaultedActualValue ) == 0 ) {
