@@ -54,9 +54,7 @@ public class DefaultElasticsearchRequestSuccessAssessor implements Elasticsearch
 		}
 
 		public Builder ignoreErrorTypes(String ... ignoredErrorTypes) {
-			for ( String ignoredErrorType : ignoredErrorTypes ) {
-				this.ignoredErrorTypes.add( ignoredErrorType );
-			}
+			Collections.addAll( this.ignoredErrorTypes, ignoredErrorTypes );
 			return this;
 		}
 

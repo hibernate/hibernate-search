@@ -6,6 +6,7 @@
  */
 package org.hibernate.checkstyle.checks.regexp;
 
+import java.util.Collections;
 import java.util.HashSet;
 
 import com.puppycrawl.tools.checkstyle.api.AbstractCheck;
@@ -29,9 +30,7 @@ public class IllegalImport extends AbstractCheck {
 	 * @param importStatements array of illegal packages
 	 */
 	public void setIllegalClassnames(String[] importStatements) {
-		for ( String impo : importStatements ) {
-			notAllowedImports.add( impo );
-		}
+		Collections.addAll( notAllowedImports, importStatements );
 	}
 
 	public void setMessage(String message) {
