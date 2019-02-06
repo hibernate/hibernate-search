@@ -150,7 +150,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 			.setFetchSize( idFetchSize );
 
 		ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY );
-		ArrayList<Serializable> destinationList = new ArrayList<Serializable>( batchSize );
+		ArrayList<Serializable> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;
 		try {
 			while ( results.next() ) {
@@ -165,7 +165,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 					}
 
 					enqueueList( destinationList );
-					destinationList = new ArrayList<Serializable>( batchSize );
+					destinationList = new ArrayList<>( batchSize );
 				}
 				counter++;
 				if ( counter == totalCount ) {

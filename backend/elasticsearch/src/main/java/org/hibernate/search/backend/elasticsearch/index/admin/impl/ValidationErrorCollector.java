@@ -15,7 +15,7 @@ import java.util.Map;
 
 final class ValidationErrorCollector {
 
-	private final Deque<ValidationContextElement> currentContext = new ArrayDeque<ValidationContextElement>();
+	private final Deque<ValidationContextElement> currentContext = new ArrayDeque<>();
 
 	private final Map<ValidationContext, List<String>> messagesByContext = new LinkedHashMap<>();
 

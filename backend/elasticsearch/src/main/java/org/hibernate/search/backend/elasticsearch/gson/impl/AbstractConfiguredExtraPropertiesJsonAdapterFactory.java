@@ -123,7 +123,7 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 
 	private static List<String> getFieldNames(Field f) {
 		SerializedName serializedName = f.getAnnotation( SerializedName.class );
-		List<String> fieldNames = new LinkedList<String>();
+		List<String> fieldNames = new LinkedList<>();
 		if ( serializedName == null ) {
 			fieldNames.add( f.getName() );
 		}

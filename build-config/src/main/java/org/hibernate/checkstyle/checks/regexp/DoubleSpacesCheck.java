@@ -32,7 +32,7 @@ public class DoubleSpacesCheck extends AbstractCheck {
 
 	private final CommentSuppressor commentSuppressor = new CommentSuppressor();
 	private final StringSuppressor stringSuppressor = new StringSuppressor();
-	private final Set<MatchSuppressor> suppressors = new HashSet<MatchSuppressor>();
+	private final Set<MatchSuppressor> suppressors = new HashSet<>();
 
 	@Override
 	public int[] getDefaultTokens() {
