@@ -232,7 +232,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	@Override
 	@SuppressWarnings("unchecked")
 	public Set<Parameter<?>> getParameters() {
-		return Collections.EMPTY_SET;
+		return Collections.emptySet();
 	}
 
 	@Override
