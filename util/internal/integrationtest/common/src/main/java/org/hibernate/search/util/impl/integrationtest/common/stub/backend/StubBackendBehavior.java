@@ -73,7 +73,7 @@ public abstract class StubBackendBehavior {
 		}
 	};
 
-	private static Map<String, StubBackendBehavior> BEHAVIORS = new HashMap<>();
+	private static final Map<String, StubBackendBehavior> BEHAVIORS = new HashMap<>();
 
 	public static void set(String backendName, StubBackendBehavior behavior) {
 		BEHAVIORS.put( backendName, behavior );

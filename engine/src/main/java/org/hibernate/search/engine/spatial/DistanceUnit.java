@@ -23,7 +23,7 @@ public enum DistanceUnit {
 
 	NAUTICAL_MILES(1_852);
 
-	private double toMeters;
+	private final double toMeters;
 
 	DistanceUnit(double toMeters) {
 		this.toMeters = toMeters;

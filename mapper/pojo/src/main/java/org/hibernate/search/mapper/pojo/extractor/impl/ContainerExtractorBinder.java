@@ -73,7 +73,7 @@ public class ContainerExtractorBinder {
 	private final FirstMatchingExtractorContributor firstMatchingExtractorContributor =
 			new FirstMatchingExtractorContributor();
 	@SuppressWarnings("rawtypes") // Checks are implemented using reflection
-	private Map<Class<? extends ContainerExtractor>, ExtractorContributor> extractorContributorCache =
+	private final Map<Class<? extends ContainerExtractor>, ExtractorContributor> extractorContributorCache =
 			new HashMap<>();
 
 	public ContainerExtractorBinder(MappingBuildContext buildContext,

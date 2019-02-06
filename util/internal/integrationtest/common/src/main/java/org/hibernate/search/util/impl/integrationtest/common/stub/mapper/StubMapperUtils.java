@@ -55,7 +55,7 @@ public final class StubMapperUtils {
 	}
 
 	public static class LoadingDefinitionContext<R, O> {
-		private Map<R, O> loadingMap = new HashMap<>();
+		private final Map<R, O> loadingMap = new HashMap<>();
 
 		public LoadingDefinitionContext<R, O> load(R reference, O loadedObject) {
 			loadingMap.put( reference, loadedObject );

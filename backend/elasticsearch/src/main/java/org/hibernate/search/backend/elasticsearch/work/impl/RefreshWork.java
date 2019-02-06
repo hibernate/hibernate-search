@@ -32,7 +32,7 @@ public class RefreshWork extends AbstractSimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends AbstractBuilder<Builder>
 			implements RefreshWorkBuilder {
-		private List<URLEncodedString> indexNames = new ArrayList<>();
+		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );

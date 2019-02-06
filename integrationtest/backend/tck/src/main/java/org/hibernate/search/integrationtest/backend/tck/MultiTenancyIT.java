@@ -63,12 +63,11 @@ public class MultiTenancyIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
+	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
+
 	private IndexAccessors indexAccessors;
 	private StubMappingIndexManager indexManager;
-
-	private StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
-
-	private StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
 
 	@Before
 	public void setup() {

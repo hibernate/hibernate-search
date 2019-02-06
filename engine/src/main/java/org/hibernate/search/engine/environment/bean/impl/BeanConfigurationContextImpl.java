@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.common.Contracts;
 
 final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 
-	private Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans = new HashMap<>();
+	private final Map<ConfiguredBeanKey<?>, BeanFactory<?>> explicitlyConfiguredBeans = new HashMap<>();
 
 	@Override
 	public <T> void define(Class<T> exposedType, BeanFactory<T> factory) {

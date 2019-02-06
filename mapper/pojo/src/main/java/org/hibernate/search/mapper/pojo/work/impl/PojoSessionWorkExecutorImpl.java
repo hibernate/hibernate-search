@@ -29,7 +29,7 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	private final AbstractPojoSessionContextImplementor sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 
-	private Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
+	private final Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
 
 	public PojoSessionWorkExecutorImpl(PojoIndexedTypeManagerContainer indexedTypeManagers, AbstractPojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;

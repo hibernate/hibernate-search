@@ -24,7 +24,7 @@ class PojoImplicitReindexingResolverMarkingNodeBuilder<T>
 	private final BoundPojoModelPath modelPath;
 
 	// Use a LinkedHashSet for deterministic iteration
-	private Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing = new LinkedHashSet<>();
+	private final Set<PojoModelPathValueNode> dirtyPathsTriggeringReindexing = new LinkedHashSet<>();
 
 	PojoImplicitReindexingResolverMarkingNodeBuilder(BoundPojoModelPathTypeNode<T> modelPath,
 			PojoImplicitReindexingResolverBuildingHelper buildingHelper) {

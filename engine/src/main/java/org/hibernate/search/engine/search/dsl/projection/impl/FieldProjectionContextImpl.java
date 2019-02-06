@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class FieldProjectionContextImpl<T> implements FieldProjectionContext<T> {
 
-	private FieldProjectionBuilder<T> fieldProjectionBuilder;
+	private final FieldProjectionBuilder<T> fieldProjectionBuilder;
 
 	FieldProjectionContextImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz) {
 		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz );

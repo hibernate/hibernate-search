@@ -38,12 +38,10 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	protected final C codec;
+	private final Object sortMissingValueFirstPlaceholder;
+	private final Object sortMissingValueLastPlaceholder;
 
 	protected Object missingValue;
-
-	private Object sortMissingValueFirstPlaceholder;
-
-	private Object sortMissingValueLastPlaceholder;
 
 	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,

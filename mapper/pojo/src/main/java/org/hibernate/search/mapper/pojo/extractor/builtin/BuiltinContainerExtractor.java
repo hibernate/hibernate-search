@@ -34,7 +34,7 @@ public enum BuiltinContainerExtractor {
 	 */
 	AUTOMATIC( null );
 
-	private Class<? extends ContainerExtractor> type;
+	private final Class<? extends ContainerExtractor> type;
 
 	BuiltinContainerExtractor(Class<? extends ContainerExtractor> type) {
 		this.type = type;

@@ -41,7 +41,7 @@ public class ExpectedLog4jLog implements TestRule {
 		return new ExpectedLog4jLog();
 	}
 
-	private List<LogExpectation> expectations = new ArrayList<>();
+	private final List<LogExpectation> expectations = new ArrayList<>();
 	private TestAppender currentAppender;
 
 	private ExpectedLog4jLog() {

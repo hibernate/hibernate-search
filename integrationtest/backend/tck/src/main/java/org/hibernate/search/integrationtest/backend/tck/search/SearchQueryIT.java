@@ -227,8 +227,7 @@ public class SearchQueryIT {
 	}
 
 	private static class QueryWrapper {
-
-		private SearchQuery<?> query;
+		private final SearchQuery<?> query;
 
 		private QueryWrapper(SearchQuery<?> query) {
 			this.query = query;

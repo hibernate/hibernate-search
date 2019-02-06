@@ -31,7 +31,7 @@ public enum HibernateOrmIndexingStrategyName {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private String externalRepresentation;
+	private final String externalRepresentation;
 
 	HibernateOrmIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;

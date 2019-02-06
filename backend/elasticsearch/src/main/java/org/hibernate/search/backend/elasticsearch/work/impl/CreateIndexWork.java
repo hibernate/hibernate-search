@@ -46,7 +46,7 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		private final GsonProvider gsonProvider;
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
-		private JsonObject payload = new JsonObject();
+		private final JsonObject payload = new JsonObject();
 
 		public Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );

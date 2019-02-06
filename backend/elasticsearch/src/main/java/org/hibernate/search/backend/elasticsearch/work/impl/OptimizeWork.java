@@ -36,7 +36,7 @@ public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends AbstractBuilder<Builder>
 			implements OptimizeWorkBuilder {
-		private List<URLEncodedString> indexNames = new ArrayList<>();
+		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );

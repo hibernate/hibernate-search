@@ -20,15 +20,15 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class LuceneCollectorsBuilder {
 
-	private Sort sort;
+	private final Sort sort;
 
-	private int maxDocs;
+	private final int maxDocs;
 
 	private TopDocsCollector<?> topDocsCollector;
 
-	private TotalHitCountCollector totalHitCountCollector;
+	private final TotalHitCountCollector totalHitCountCollector;
 
-	private List<Collector> luceneCollectors = new ArrayList<>();
+	private final List<Collector> luceneCollectors = new ArrayList<>();
 
 	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
 		this.sort = sort;

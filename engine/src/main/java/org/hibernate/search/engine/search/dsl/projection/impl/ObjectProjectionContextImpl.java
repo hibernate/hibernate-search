@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 
 public class ObjectProjectionContextImpl<O> implements ObjectProjectionContext<O> {
 
-	private ObjectProjectionBuilder<O> objectProjectionBuilder;
+	private final ObjectProjectionBuilder<O> objectProjectionBuilder;
 
 	ObjectProjectionContextImpl(SearchProjectionBuilderFactory factory) {
 		this.objectProjectionBuilder = factory.object();

@@ -82,7 +82,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 	private final Set<PojoModelPathValueNode> derivedFrom;
 
 	// First key: inverse side entity type, second key: original side concrete entity type
-	private Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
+	private final Map<PojoRawTypeModel<?>, Map<PojoRawTypeModel<?>, PojoModelPathValueNode>> inverseAssociationPathCache =
 			new HashMap<>();
 
 	PojoIndexingDependencyCollectorValueNode(PojoIndexingDependencyCollectorPropertyNode<?, P> parentNode,

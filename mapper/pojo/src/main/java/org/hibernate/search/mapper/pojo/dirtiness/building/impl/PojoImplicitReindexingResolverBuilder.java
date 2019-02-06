@@ -26,7 +26,7 @@ class PojoImplicitReindexingResolverBuilder<T> {
 	private final PojoRawTypeModel<T> rawTypeModel;
 
 	// Use a LinkedHashSet for deterministic iteration
-	private Set<PojoModelPathValueNode> dirtyPathsTriggeringSelfReindexing = new LinkedHashSet<>();
+	private final Set<PojoModelPathValueNode> dirtyPathsTriggeringSelfReindexing = new LinkedHashSet<>();
 
 	private final PojoImplicitReindexingResolverOriginalTypeNodeBuilder<T> containingEntitiesResolverRootBuilder;
 
