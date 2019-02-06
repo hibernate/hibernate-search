@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -15,15 +17,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -55,6 +61,9 @@ public final class BridgeResolver {
 		addIdentifierBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new DefaultIntegerIdentifierBridge() ) );
 		addIdentifierBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new DefaultLongIdentifierBridge() ) );
 		addIdentifierBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumIdentifierBridge<>() ) );
+		addIdentifierBridgeForExactRawType( Short.class, ignored -> BeanHolder.of( new DefaultShortIdentifierBridge() ) );
+		addIdentifierBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new DefaultBigIntegerIdentifierBridge() ) );
+		addIdentifierBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDIdentifierBridge() ) );
 
 		addValueBridgeForExactRawType( Integer.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Integer.class ) ) );
 		addValueBridgeForExactRawType( Long.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Long.class ) ) );
@@ -64,6 +73,14 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Instant.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Instant.class ) ) );
 		addValueBridgeForExactRawType( Date.class, ignored -> BeanHolder.of( new DefaultJavaUtilDateValueBridge() ) );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumValueBridge<>() ) );
+		addValueBridgeForExactRawType( Character.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Character.class ) ) );
+		addValueBridgeForExactRawType( Byte.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Byte.class ) ) );
+		addValueBridgeForExactRawType( Short.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Short.class ) ) );
+		addValueBridgeForExactRawType( Float.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Float.class ) ) );
+		addValueBridgeForExactRawType( Double.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Double.class ) ) );
+		addValueBridgeForExactRawType( BigDecimal.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigDecimal.class ) ) );
+		addValueBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigInteger.class ) ) );
+		addValueBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( UUID.class ) ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
