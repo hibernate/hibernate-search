@@ -69,7 +69,7 @@ public abstract class AbstractConfiguredExtraPropertiesJsonAdapterFactory implem
 			boolean first = true;
 			for ( String name : getFieldNames( field ) ) {
 				boolean serialized = first;
-				fieldAdapters.put( name, new ReflectiveFieldAdapter<T, F>( field, adapter, serialized ) );
+				fieldAdapters.put( name, new ReflectiveFieldAdapter<>( field, adapter, serialized ) );
 				first = false;
 			}
 
