@@ -41,7 +41,7 @@ public class ManagedMultiReader extends MultiReader {
 	static ManagedMultiReader createInstance(Set<ReaderProvider> readerProviders) throws IOException {
 		IndexReader[] indexReaders = readerProviders.stream()
 				.map( ReaderProvider::openIndexReader )
-				.toArray( size -> new IndexReader[size] );
+				.toArray( IndexReader[]::new );
 
 		return new ManagedMultiReader( indexReaders, readerProviders.toArray( new ReaderProvider[readerProviders.size()] ) );
 	}

@@ -75,7 +75,7 @@ class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshab
 
 		if ( !indexesToRefresh.isEmpty() ) {
 			future = future.thenCompose( ignored -> refreshIndexes() )
-					.thenRun( () -> indexesToRefresh.clear() );
+					.thenRun( indexesToRefresh::clear );
 		}
 
 		return future;
