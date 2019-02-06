@@ -60,7 +60,6 @@ import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeRef;
  * }
  * </code></pre>
  *
- * @hsearch.experimental Spatial support is still considered experimental
  * @author Nicolas Helleringer
  */
 @PropertyBridgeMapping(bridge = @PropertyBridgeRef(

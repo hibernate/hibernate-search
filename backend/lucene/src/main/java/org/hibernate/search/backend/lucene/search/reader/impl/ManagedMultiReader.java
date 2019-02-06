@@ -48,7 +48,7 @@ public class ManagedMultiReader extends MultiReader {
 
 	@Override
 	protected synchronized void doClose() {
-		/**
+		/*
 		 * Important: we don't really close the sub readers but we delegate to the
 		 * close method of the managing ReaderProvider, which might reuse the same
 		 * IndexReader.
