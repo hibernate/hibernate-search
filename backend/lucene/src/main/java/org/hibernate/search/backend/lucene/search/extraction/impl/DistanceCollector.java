@@ -178,7 +178,7 @@ public class DistanceCollector implements Collector {
 			if ( geoPointValues.advanceExact( doc ) ) {
 				long encodedValue = geoPointValues.nextValue();
 				double latitude = GeoEncodingUtils.decodeLatitude( (int) ( encodedValue >> 32 ) );
-				double longitude = GeoEncodingUtils.decodeLongitude( (int) ( encodedValue & 0xFFFFFFFF ) );
+				double longitude = GeoEncodingUtils.decodeLongitude( (int) encodedValue );
 				distances.put( absolute, latitude, longitude );
 			}
 			else {
