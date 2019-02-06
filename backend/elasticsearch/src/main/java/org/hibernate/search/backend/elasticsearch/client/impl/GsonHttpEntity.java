@@ -288,7 +288,7 @@ final class GsonHttpEntity implements HttpEntity, HttpAsyncContentProducer {
 	}
 
 	private void hintContentLength(long contentLength) {
-		if ( contentlengthWasProvided == false ) {
+		if ( !contentlengthWasProvided ) {
 			this.contentLength = contentLength;
 		}
 	}
