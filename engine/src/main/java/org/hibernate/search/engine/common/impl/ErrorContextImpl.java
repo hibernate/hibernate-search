@@ -54,7 +54,7 @@ public class ErrorContextImpl implements ErrorContext {
 
 	@Override
 	public boolean hasErrors() {
-		return failingOperations != null && failingOperations.size() > 0;
+		return failingOperations != null && !failingOperations.isEmpty();
 	}
 
 	@Override

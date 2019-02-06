@@ -83,7 +83,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 
 	@Override
 	public void runWithErrorHandler() {
-		if ( indexingTasks.size() > 0 ) {
+		if ( !indexingTasks.isEmpty() ) {
 			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused - indexingTasks should be empty" );
 		}
 

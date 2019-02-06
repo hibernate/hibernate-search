@@ -95,7 +95,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 
 	@Override
 	public void runWithErrorHandler() {
-		if ( tasks.size() > 0 ) {
+		if ( !tasks.isEmpty() ) {
 			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused - tasks should be empty" );
 		}
 

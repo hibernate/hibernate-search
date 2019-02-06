@@ -31,7 +31,7 @@ public final class MultiReaderFactory {
 	}
 
 	public static IndexReader openReader(Set<String> indexNames, Set<ReaderProvider> readerProviders) {
-		if ( readerProviders.size() == 0 ) {
+		if ( readerProviders.isEmpty() ) {
 			return null;
 		}
 		else {
