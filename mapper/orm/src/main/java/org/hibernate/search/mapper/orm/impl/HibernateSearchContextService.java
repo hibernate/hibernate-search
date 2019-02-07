@@ -121,15 +121,15 @@ public class HibernateSearchContextService implements Service {
 			}
 			return workPlan;
 		}
-		else if ( false ) {
-			/*
-			 * TODO handle the "simulated" transaction when "a Flush listener is registered".
-			 * See:
-			 *  - FullTextIndexEventListener (in Search 5 and here)
-			 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
-			 */
+		/*
+		 * TODO handle the "simulated" transaction when "a Flush listener is registered".
+		 * See:
+		 *  - FullTextIndexEventListener (in Search 5 and here)
+		 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
+		else if ( some condition ) {
 			throw new UnsupportedOperationException( "Not implemented yet" );
 		}
+		 */
 		else {
 			// TODO add a warning when configuration expects transactions, but none was found
 //			if ( transactionExpected ) {
