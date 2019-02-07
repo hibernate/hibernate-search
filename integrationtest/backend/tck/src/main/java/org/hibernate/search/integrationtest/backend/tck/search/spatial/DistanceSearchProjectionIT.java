@@ -216,7 +216,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	}
 
 	@Test
-	public void distanceProjection_unsortable() {
+	public void distanceSort_unsortable() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException( () -> {
