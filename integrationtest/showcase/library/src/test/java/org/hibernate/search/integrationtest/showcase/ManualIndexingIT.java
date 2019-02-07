@@ -62,6 +62,11 @@ public class ManualIndexingIT {
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
 	static {
+		checkInvariants();
+	}
+
+	@SuppressWarnings("unused")
+	private static void checkInvariants() {
 		if ( NUMBER_OF_BOOKS < 2 * MASS_INDEXING_MONITOR_LOG_PERIOD ) {
 			throw new IllegalStateException(
 					"There's a bug in tests: NUMBER_OF_BOOKS should be strictly higher than two times "
