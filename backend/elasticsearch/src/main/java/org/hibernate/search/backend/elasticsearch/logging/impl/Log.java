@@ -275,10 +275,6 @@ public interface Log extends BasicLogger {
 			+ " derived from the Elasticsearch backend. Was applied to '%1$s' instead.")
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
-	@Message(id = ID_OFFSET_3 + 7,
-			value = "Invalid projection on unknown field '%1$s'.")
-	SearchException invalidProjectionUnknownField(String absoluteFieldPath, @Param EventContext context);
-
 	@Message(id = ID_OFFSET_3 + 8,
 			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
 					+ " Given predicate was: '%1$s'")

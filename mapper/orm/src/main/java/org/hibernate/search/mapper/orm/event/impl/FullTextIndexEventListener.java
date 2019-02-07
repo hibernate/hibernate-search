@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.event.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.Session;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.event.spi.AbstractCollectionEvent;
 import org.hibernate.event.spi.FlushEvent;
@@ -140,8 +139,8 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 			return;
 		}
 
-		Session session = event.getSession();
 		// TODO handle the "simulated" transaction when a Flush listener is registered
+//		Session session = event.getSession();
 //		Synchronization synchronization = flushSynch.get( session );
 //		if ( synchronization != null ) {
 //			//first cleanup

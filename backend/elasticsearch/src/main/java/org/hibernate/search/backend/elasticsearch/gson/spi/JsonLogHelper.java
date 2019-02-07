@@ -11,7 +11,6 @@ import java.io.StringWriter;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 /**
@@ -77,13 +76,6 @@ public final class JsonLogHelper {
 			doAppend( sb, object );
 		}
 		afterValue( sb );
-	}
-
-	public JsonElement property(JsonObject parent, String name) {
-		if ( parent == null ) {
-			return null;
-		}
-		return parent.get( name );
 	}
 
 	private void beforeValue(StringBuilder sb) {

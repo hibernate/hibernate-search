@@ -18,19 +18,9 @@ import com.google.gson.annotations.SerializedName;
 public enum DataType {
 
 	@SerializedName("object")
-	OBJECT {
-		@Override
-		public boolean isComposite() {
-			return true;
-		}
-	},
+	OBJECT,
 	@SerializedName("nested")
-	NESTED {
-		@Override
-		public boolean isComposite() {
-			return true;
-		}
-	},
+	NESTED,
 	/**
 	 * @deprecated Only used in Elasticsearch 2.x. Use TEXT or KEYWORD instead.
 	 */
@@ -55,9 +45,5 @@ public enum DataType {
 	BOOLEAN,
 	@SerializedName("geo_point")
 	GEO_POINT
-	;
 
-	public boolean isComposite() {
-		return false;
-	}
 }

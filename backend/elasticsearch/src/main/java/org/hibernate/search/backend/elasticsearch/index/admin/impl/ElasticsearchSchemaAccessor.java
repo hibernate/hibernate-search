@@ -42,8 +42,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public void createIndex(URLEncodedString indexName, IndexSettings settings,
-			RootTypeMapping mapping,
-			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+			RootTypeMapping mapping) {
 		ElasticsearchWork<?> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
@@ -54,12 +53,10 @@ public class ElasticsearchSchemaAccessor {
 	/**
 	 * @param indexName The name of the index
 	 * @param settings The settings for the newly created index
-	 * @param executionOptions The execution options
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
 	public boolean createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
-			RootTypeMapping mapping,
-			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+			RootTypeMapping mapping) {
 		ElasticsearchWork<CreateIndexResult> work = workFactory.createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
@@ -132,12 +129,7 @@ public class ElasticsearchSchemaAccessor {
 		execute( work );
 	}
 
-	public void dropIndex(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).build();
-		execute( work );
-	}
-
-	public void dropIndexIfExisting(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public void dropIndexIfExisting(URLEncodedString indexName) {
 		ElasticsearchWork<?> work = workFactory.dropIndex( indexName ).ignoreIndexNotFound().build();
 		execute( work );
 	}

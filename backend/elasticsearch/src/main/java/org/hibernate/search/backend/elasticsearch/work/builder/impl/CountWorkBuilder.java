@@ -8,14 +8,11 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 import com.google.gson.JsonObject;
 
 public interface CountWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Long>> {
-
-	CountWorkBuilder type(URLEncodedString type);
 
 	CountWorkBuilder query(JsonObject query);
 

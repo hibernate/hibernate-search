@@ -26,10 +26,6 @@ class ChainingContainerExtractor<C, U, V> implements ContainerExtractor<C, V> {
 		return parent.extract( container ).flatMap( chained::extract );
 	}
 
-	public ContainerExtractor<C, U> getParent() {
-		return parent;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder( "[" );

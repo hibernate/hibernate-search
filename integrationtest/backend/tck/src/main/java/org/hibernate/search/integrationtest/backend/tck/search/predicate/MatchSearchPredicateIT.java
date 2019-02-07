@@ -60,7 +60,6 @@ public class MatchSearchPredicateIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
 
 	@Before
@@ -73,7 +72,7 @@ public class MatchSearchPredicateIT {
 				)
 				.withIndex(
 						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.setup();

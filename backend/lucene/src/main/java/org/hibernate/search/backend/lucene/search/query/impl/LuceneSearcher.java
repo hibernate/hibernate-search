@@ -79,10 +79,6 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		return luceneQuery;
 	}
 
-	public Set<String> getIndexNames() {
-		return indexNames;
-	}
-
 	public EventContext getEventContext() {
 		return EventContexts.fromIndexNames( indexNames );
 	}

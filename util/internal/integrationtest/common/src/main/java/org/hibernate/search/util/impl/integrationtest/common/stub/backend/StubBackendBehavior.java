@@ -83,10 +83,6 @@ public abstract class StubBackendBehavior {
 		BEHAVIORS.remove( backendName, behavior );
 	}
 
-	public static void clear() {
-		BEHAVIORS.clear();
-	}
-
 	public static StubBackendBehavior get(String backendName) {
 		return BEHAVIORS.getOrDefault( backendName, DEFAULT );
 	}

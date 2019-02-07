@@ -178,8 +178,6 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 						.multivalued( Pattern.compile( " " ) )
 						.build();
 
-		Optional<List<T>> result;
-
 		// String value - one
 		resetAll();
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidStringValue ) );

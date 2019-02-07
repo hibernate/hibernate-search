@@ -406,7 +406,7 @@ public class SearchProjectionIT {
 			string2Field = FieldModel.mapper( String.class, "ddd", "nnn", "yyy" )
 					.map( root, "string2" );
 
-			scoreField = FieldModel.mapper( String.class,
+			scoreField = FieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
 					"scorepattern scorepattern", "scorepattern", "xxx" )
 					.map( root, "score" );
@@ -431,36 +431,33 @@ public class SearchProjectionIT {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
-					type,
 					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
+		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
 					(accessor, name) -> new FieldModel<>(
-							accessor, name, type,
+							accessor, name,
 							document1Value, document2Value, document3Value
 					)
 			);
 		}
 
 		final String relativeFieldName;
-		final Class<F> type;
 
 		final ValueModel<F> document1Value;
 		final ValueModel<F> document2Value;
 		final ValueModel<F> document3Value;
 
-		private FieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName, Class<F> type,
+		private FieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
 				F document1Value, F document2Value, F document3Value) {
 			this.relativeFieldName = relativeFieldName;
-			this.type = type;
 			this.document1Value = new ValueModel<>( accessor, document1Value );
 			this.document2Value = new ValueModel<>( accessor, document2Value );
 			this.document3Value = new ValueModel<>( accessor, document3Value );

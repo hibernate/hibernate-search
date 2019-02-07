@@ -19,8 +19,6 @@ import com.google.gson.GsonBuilder;
  */
 public class DefaultGsonProvider implements GsonProvider {
 
-	protected static final String ELASTIC_SEARCH_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
-
 	public static GsonProvider create(Supplier<GsonBuilder> builderBaseSupplier, boolean logPrettyPrinting) {
 		return new DefaultGsonProvider( builderBaseSupplier, logPrettyPrinting );
 	}

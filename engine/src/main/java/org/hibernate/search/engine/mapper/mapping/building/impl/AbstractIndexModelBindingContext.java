@@ -21,7 +21,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
-import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexModelBindingContext {
@@ -29,9 +28,6 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 	private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 	final B indexSchemaObjectNodeBuilder;
 	private final ConfiguredIndexSchemaNestingContext nestingContext;
-	private final SearchModel searchModel = new SearchModel() {
-		// TODO provide an actual implementation when the interface defines methods
-	};
 
 	AbstractIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
@@ -71,11 +67,6 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 				indexSchemaObjectNodeBuilder,
 				new NotifyingNestingContext( nestingContext, listener )
 		);
-	}
-
-	@Override
-	public SearchModel getSearchModel() {
-		return searchModel;
 	}
 
 	@Override

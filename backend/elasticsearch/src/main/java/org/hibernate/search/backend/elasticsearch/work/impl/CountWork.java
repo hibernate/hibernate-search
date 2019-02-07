@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -38,23 +37,12 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 	public static class Builder extends AbstractBuilder<Builder> implements CountWorkBuilder {
 
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
-		private final List<URLEncodedString> typeNames = new ArrayList<>();
 		private JsonObject query;
 		private Set<String> routingKeys;
-
-		public Builder(URLEncodedString indexName) {
-			this( Collections.singletonList( indexName ) );
-		}
 
 		public Builder(Collection<URLEncodedString> indexNames) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexNames.addAll( indexNames );
-		}
-
-		@Override
-		public Builder type(URLEncodedString type) {
-			this.typeNames.add( type );
-			return this;
 		}
 
 		@Override
@@ -74,10 +62,6 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
 							.multiValuedPathComponent( indexNames );
-
-			if ( !typeNames.isEmpty() ) {
-				builder.multiValuedPathComponent( typeNames );
-			}
 
 			builder.pathComponent( Paths._COUNT );
 

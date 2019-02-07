@@ -8,7 +8,6 @@ package org.hibernate.search.engine.spatial;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -32,24 +31,6 @@ final class ImmutableGeoPolygon implements GeoPolygon {
 		}
 
 		this.points = CollectionHelper.toImmutableList( new ArrayList<>( points ) );
-	}
-
-	ImmutableGeoPolygon(GeoPoint firstPoint, GeoPoint secondPoint, GeoPoint thirdPoint, GeoPoint fourthPoint, GeoPoint... additionalPoints) {
-
-
-		List<GeoPoint> points = new ArrayList<>();
-		points.add( firstPoint );
-		points.add( secondPoint );
-		points.add( thirdPoint );
-		points.add( fourthPoint );
-		Collections.addAll( points, additionalPoints );
-
-		GeoPoint lastPoint = points.get( points.size() - 1 );
-		if ( !firstPoint.equals( lastPoint ) ) {
-			throw log.invalidGeoPolygonFirstPointNotIdenticalToLastPoint( firstPoint, lastPoint );
-		}
-
-		this.points = CollectionHelper.toImmutableList( points );
 	}
 
 	@Override

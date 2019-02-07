@@ -12,7 +12,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.SessionFactoryObserver;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
-import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
@@ -41,7 +40,8 @@ import org.hibernate.search.util.impl.common.SuppressingCloser;
 public class HibernateSearchSessionFactoryObserver implements SessionFactoryObserver {
 
 	private final HibernateOrmConfigurationPropertySource propertySource;
-	private final JndiService namingService;
+	// TODO JMX
+	//private final JndiService namingService;
 	private final ClassLoaderService hibernateOrmClassLoaderService;
 	private final EnvironmentSynchronizer environmentSynchronizer;
 	private final ManagedBeanRegistry managedBeanRegistry;
@@ -62,8 +62,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 			FullTextIndexEventListener listener,
 			ClassLoaderService hibernateOrmClassLoaderService,
 			EnvironmentSynchronizer environmentSynchronizer,
-			ManagedBeanRegistry managedBeanRegistry,
-			JndiService namingService) {
+			ManagedBeanRegistry managedBeanRegistry) {
 		this.metadata = metadata;
 		this.propertySource = propertySource;
 		this.listener = listener;
@@ -71,7 +70,6 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 		this.hibernateOrmClassLoaderService = hibernateOrmClassLoaderService;
 		this.environmentSynchronizer = environmentSynchronizer;
 		this.managedBeanRegistry = managedBeanRegistry;
-		this.namingService = namingService;
 
 		/*
 		 * Make sure that if a Search integrator is created, it will eventually get closed,

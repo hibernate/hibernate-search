@@ -23,10 +23,6 @@ public interface SearchIntegration extends AutoCloseable {
 	@Override
 	void close();
 
-	static SearchIntegrationBuilder builder() {
-		return new SearchIntegrationBuilderImpl( ConfigurationPropertySource.empty() );
-	}
-
 	static SearchIntegrationBuilder builder(ConfigurationPropertySource propertySource) {
 		return new SearchIntegrationBuilderImpl( propertySource );
 	}

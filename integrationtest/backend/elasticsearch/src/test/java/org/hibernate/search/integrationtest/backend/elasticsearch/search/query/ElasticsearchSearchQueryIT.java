@@ -45,7 +45,6 @@ public class ElasticsearchSearchQueryIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -56,7 +55,7 @@ public class ElasticsearchSearchQueryIT {
 				)
 				.withIndex(
 						"MappedType", INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -108,6 +107,7 @@ public class ElasticsearchSearchQueryIT {
 		query.execute();
 	}
 
+	@SuppressWarnings("unused")
 	private static class IndexAccessors {
 		final IndexFieldAccessor<Integer> integer;
 		final IndexFieldAccessor<String> string;

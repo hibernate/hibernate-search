@@ -12,7 +12,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.engine.config.spi.ConfigurationService;
-import org.hibernate.engine.jndi.spi.JndiService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
@@ -64,8 +63,6 @@ public class HibernateSearchIntegrator implements Integrator {
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		HibernateOrmConfigurationPropertySource propertySource =
 				new HibernateOrmConfigurationPropertySource( configurationService );
-		JndiService namingService = serviceRegistry.getService( JndiService.class );
-
 		if ( ! AUTOREGISTER_LISTENERS.get( propertySource ) ) {
 			log.debug( "Skipping Hibernate Search event listener auto registration" );
 			return;
@@ -88,8 +85,7 @@ public class HibernateSearchIntegrator implements Integrator {
 				fullTextIndexEventListener,
 				hibernateOrmClassLoaderService,
 				environmentSynchronizerBinding == null ? null : serviceRegistry.getService( EnvironmentSynchronizer.class ),
-				managedBeanRegistryServiceBinding == null ? null : serviceRegistry.getService( ManagedBeanRegistry.class ),
-				namingService
+				managedBeanRegistryServiceBinding == null ? null : serviceRegistry.getService( ManagedBeanRegistry.class )
 		);
 
 		sessionFactory.addObserver( observer );

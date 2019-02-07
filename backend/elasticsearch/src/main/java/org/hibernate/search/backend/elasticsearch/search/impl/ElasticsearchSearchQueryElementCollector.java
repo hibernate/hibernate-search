@@ -65,14 +65,6 @@ public class ElasticsearchSearchQueryElementCollector
 		distanceSorts.put( new DistanceSortKey( absoluteFieldPath, center ), index );
 	}
 
-	@Override
-	public void collectSort(JsonArray sorts) {
-		if ( jsonSort == null ) {
-			jsonSort = new JsonArray();
-		}
-		this.jsonSort.addAll( sorts );
-	}
-
 	public JsonObject toJsonPredicate() {
 		return jsonPredicate;
 	}

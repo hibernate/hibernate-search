@@ -18,9 +18,7 @@ public final class Paths {
 	}
 
 	public static final URLEncodedString _EXPLAIN = URLEncodedString.fromString( "_explain" );
-	public static final URLEncodedString _QUERY = URLEncodedString.fromString( "_query" );
 	public static final URLEncodedString _FLUSH = URLEncodedString.fromString( "_flush" );
-	public static final URLEncodedString _OPTIMIZE = URLEncodedString.fromString( "_optimize" );
 	public static final URLEncodedString _DELETE_BY_QUERY = URLEncodedString.fromString( "_delete_by_query" );
 	public static final URLEncodedString _FORCEMERGE = URLEncodedString.fromString( "_forcemerge" );
 	public static final URLEncodedString _COUNT = URLEncodedString.fromString( "_count" );

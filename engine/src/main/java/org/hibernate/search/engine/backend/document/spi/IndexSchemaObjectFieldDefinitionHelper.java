@@ -31,10 +31,6 @@ public final class IndexSchemaObjectFieldDefinitionHelper {
 		this.schemaContext = schemaContext;
 	}
 
-	public IndexSchemaBuildContext getSchemaContext() {
-		return schemaContext;
-	}
-
 	/**
 	 * @return A (potentially un-{@link #initialize(IndexObjectFieldAccessor) initialized}) accessor
 	 */

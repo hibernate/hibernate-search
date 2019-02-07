@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
@@ -42,12 +41,6 @@ public final class ErrorCollectingPojoPropertyMetadataContributor implements Poj
 				}
 			}
 		}
-	}
-
-	public ErrorCollectingPojoPropertyMetadataContributor addAll(Collection<? extends PojoPropertyMetadataContributor> children) {
-		initChildren();
-		this.children.addAll( children );
-		return this;
 	}
 
 	public ErrorCollectingPojoPropertyMetadataContributor add(PojoPropertyMetadataContributor child) {

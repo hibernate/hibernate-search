@@ -38,7 +38,7 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public MatchIdPredicateContext id() {
-		return new MatchIdPredicateContextImpl<>( factory, this );
+		return new MatchIdPredicateContextImpl<>( factory );
 	}
 
 	@Override

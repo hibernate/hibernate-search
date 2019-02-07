@@ -9,7 +9,6 @@ package org.hibernate.search.engine.common.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.spi.ErrorContext;
 
 public class ErrorContextImpl implements ErrorContext {
@@ -19,8 +18,6 @@ public class ErrorContextImpl implements ErrorContext {
 	private Object operationAtFault;
 
 	private Throwable throwable;
-
-	private IndexManager indexManager;
 
 	@Override
 	public List<Object> getFailingOperations() {
@@ -55,15 +52,6 @@ public class ErrorContextImpl implements ErrorContext {
 	@Override
 	public boolean hasErrors() {
 		return failingOperations != null && !failingOperations.isEmpty();
-	}
-
-	@Override
-	public IndexManager getIndexManager() {
-		return indexManager;
-	}
-
-	public void setIndexManager(IndexManager indexManager) {
-		this.indexManager = indexManager;
 	}
 
 }

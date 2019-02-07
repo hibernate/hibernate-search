@@ -69,13 +69,10 @@ public class FieldSearchProjectionIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
 
-	private IncompatibleFieldTypesIndexMapping incompatibleFieldTypesIndexMapping;
 	private StubMappingIndexManager incompatibleFieldTypesIndexManager;
 
-	private IncompatibleFieldProjectionConvertersIndexMapping incompatibleFieldProjectionConvertersIndexMapping;
 	private StubMappingIndexManager incompatibleFieldProjectionConvertersIndexManager;
 
 	@Before
@@ -88,19 +85,17 @@ public class FieldSearchProjectionIT {
 				)
 				.withIndex(
 						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
 						"MappedTypeWithIncompatibleFieldTypes", INCOMPATIBLE_FIELD_TYPES_INDEX_NAME,
-						ctx -> this.incompatibleFieldTypesIndexMapping =
-								new IncompatibleFieldTypesIndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IncompatibleFieldTypesIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleFieldTypesIndexManager = indexManager
 				)
 				.withIndex(
 						"MappedTypeWithIncompatibleFieldProjectionConverters", INCOMPATIBLE_FIELD_CONVERTERS_INDEX_NAME,
-						ctx -> this.incompatibleFieldProjectionConvertersIndexMapping =
-								new IncompatibleFieldProjectionConvertersIndexMapping( ctx.getSchemaElement() ),
+						ctx -> new IncompatibleFieldProjectionConvertersIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleFieldProjectionConvertersIndexManager = indexManager
 				)
 				.setup();
@@ -661,14 +656,12 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static class IncompatibleFieldTypesIndexMapping {
-		final List<IncompatibleFieldModel<?>> fieldModels;
-
 		IncompatibleFieldTypesIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
 			 * but with an incompatible type.
 			 */
-			fieldModels = mapByTypeSupportedIncompatibleFields(
+			mapByTypeSupportedIncompatibleFields(
 					root, "supported_",
 					(type, context) -> {
 						// Just try to pick a different, also supported type
@@ -684,14 +677,12 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static class IncompatibleFieldProjectionConvertersIndexMapping {
-		final List<IncompatibleFieldModel<?>> fieldModels;
-
 		IncompatibleFieldProjectionConvertersIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldWithProjectionConverterModels from IndexMapping,
 			 * but with an incompatible projection converter.
 			 */
-			fieldModels = mapByTypeSupportedIncompatibleFields(
+			mapByTypeSupportedIncompatibleFields(
 					root, "supported_converted_",
 					(type, context) -> {
 						// Just add a different, incompatible projection converter
@@ -715,13 +706,8 @@ public class FieldSearchProjectionIT {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private static class IncompatibleFieldModel<F> {
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(Class<F> type) {
-			return mapper(
-					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type )
-			);
-		}
-
 		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
 			return StandardFieldMapper.of(
