@@ -490,7 +490,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			return;
 		}
 		if ( actualMap == null ) {
-			actualMap = Collections.<String, T>emptyMap();
+			actualMap = Collections.emptyMap();
 		}
 		for ( Map.Entry<String, T> entry : expectedMap.entrySet() ) {
 			String name = entry.getKey();
@@ -635,7 +635,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			validateEqualWithDefault( errorCollector, "type", expectedMapping.getType(), actualMapping.getType(), DataType.OBJECT );
 
 			List<String> formatDefault = DataType.DATE.equals( expectedMapping.getType() )
-					? DEFAULT_DATE_FORMAT : Collections.<String>emptyList();
+					? DEFAULT_DATE_FORMAT : Collections.emptyList();
 			validateFormatWithDefault( errorCollector, "format", expectedMapping.getFormat(), actualMapping.getFormat(), formatDefault );
 
 			validateEqualWithDefault( errorCollector, "boost", expectedMapping.getBoost(), actualMapping.getBoost(), DEFAULT_FLOAT_DELTA, 1.0f );

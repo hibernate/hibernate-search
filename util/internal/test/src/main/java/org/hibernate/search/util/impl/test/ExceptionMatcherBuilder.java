@@ -25,7 +25,7 @@ import org.hamcrest.TypeSafeMatcher;
 public class ExceptionMatcherBuilder {
 
 	public static ExceptionMatcherBuilder isException(Class<? extends Throwable> clazz) {
-		return new ExceptionMatcherBuilder( CoreMatchers.<Throwable>instanceOf( clazz ) );
+		return new ExceptionMatcherBuilder( CoreMatchers.instanceOf( clazz ) );
 	}
 
 	public static ExceptionMatcherBuilder isException(Throwable throwable) {
@@ -58,7 +58,7 @@ public class ExceptionMatcherBuilder {
 	}
 
 	public ExceptionMatcherBuilder causedBy(Class<? extends Throwable> clazz) {
-		return new NestedExceptionCauseMatcherBuilder( CoreMatchers.<Throwable>instanceOf( clazz ) );
+		return new NestedExceptionCauseMatcherBuilder( CoreMatchers.instanceOf( clazz ) );
 	}
 
 	public ExceptionMatcherBuilder causedBy(Throwable throwable) {

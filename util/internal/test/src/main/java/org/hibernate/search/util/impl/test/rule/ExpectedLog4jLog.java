@@ -163,7 +163,7 @@ public class ExpectedLog4jLog implements TestRule {
 		for ( String otherContainedString : otherContainedStrings ) {
 			matchers.add( CoreMatchers.containsString( otherContainedString ) );
 		}
-		return CoreMatchers.<String>allOf( matchers );
+		return CoreMatchers.allOf( matchers );
 	}
 
 	private Matcher<LoggingEvent> eventLevelMatcher(Level level) {

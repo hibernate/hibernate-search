@@ -96,7 +96,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		List<U> results = new ArrayList<>( rawHits.size() );
 
 		for ( Object extractedElement : extractedElements ) {
-			results.add( (U) actualRootProjection.transform( loadingResult, extractedElement ) );
+			results.add( actualRootProjection.transform( loadingResult, extractedElement ) );
 		}
 
 		return results;
