@@ -67,7 +67,6 @@ public final class BridgeResolver {
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		@SuppressWarnings("unchecked")
 		BridgeBuilder<? extends IdentifierBridge<?>> result = getBridgeBuilderOrNull(
 				sourceType,
 				exactRawTypeIdentifierBridgeMappings,
@@ -80,7 +79,6 @@ public final class BridgeResolver {
 	}
 
 	public BridgeBuilder<? extends ValueBridge<?, ?>> resolveValueBridgeForType(PojoGenericTypeModel<?> sourceType) {
-		@SuppressWarnings("unchecked")
 		BridgeBuilder<? extends ValueBridge<?, ?>> result = getBridgeBuilderOrNull(
 				sourceType,
 				exactRawTypeValueBridgeMappings,
@@ -115,7 +113,6 @@ public final class BridgeResolver {
 			List<TypePatternBridgeMapping<? extends B>> typePatternBridgeMappings
 	) {
 		Class<?> rawType = sourceType.getRawType().getJavaClass();
-		@SuppressWarnings("unchecked")
 		BridgeBuilder<? extends B> result = exactRawTypeBridgeMappings.get( rawType );
 
 		if ( result == null ) {

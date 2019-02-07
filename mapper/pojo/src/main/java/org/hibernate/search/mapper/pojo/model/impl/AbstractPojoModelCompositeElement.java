@@ -81,7 +81,6 @@ abstract class AbstractPojoModelCompositeElement<V> implements PojoModelComposit
 		} );
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" }) // Stream is covariant in T
 	@Override
 	public Stream<? extends PojoModelProperty> properties() {
 		if ( !propertiesInitialized ) {

@@ -27,7 +27,6 @@ public class DslExtensionStateTest extends EasyMockSupport {
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
 
-	@SuppressWarnings("unchecked")
 	private final Function<Object, MyResultType> contextFunction = createMock( Function.class );
 
 	private final DslExtensionState<MyResultType> state = new DslExtensionState<>();

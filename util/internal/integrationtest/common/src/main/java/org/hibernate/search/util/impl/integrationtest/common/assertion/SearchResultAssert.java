@@ -60,7 +60,6 @@ public class SearchResultAssert<T> {
 	}
 
 	@SafeVarargs
-	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsExactOrder(T... hits) {
 		Assertions.<T>assertThat( actual.getHits() )
 				.as( "Hits of " + queryDescription )
@@ -69,7 +68,6 @@ public class SearchResultAssert<T> {
 	}
 
 	@SafeVarargs
-	@SuppressWarnings("unchecked")
 	public final SearchResultAssert<T> hasHitsAnyOrder(T... hits) {
 		Assertions.<T>assertThat( actual.getHits() )
 				.as( "Hits of " + queryDescription )

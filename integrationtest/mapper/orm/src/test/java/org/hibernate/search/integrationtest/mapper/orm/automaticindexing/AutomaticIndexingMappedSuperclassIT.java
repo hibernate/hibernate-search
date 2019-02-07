@@ -93,7 +93,6 @@ public class AutomaticIndexingMappedSuperclassIT {
 
 		// Test updating the value
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			@SuppressWarnings("unchecked")
 			ContainedEntity containedEntity = session.get( ContainedEntity.class, 3 );
 			containedEntity.setIncludedInSingle( "updatedValue" );
 

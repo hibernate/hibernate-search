@@ -40,7 +40,6 @@ class LuceneFieldProjection<F, T> implements LuceneSearchProjection<F, T> {
 		codec.contributeStoredFields( absoluteFieldPath, builder::add );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public F extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {

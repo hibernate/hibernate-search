@@ -39,7 +39,6 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {

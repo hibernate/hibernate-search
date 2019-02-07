@@ -30,7 +30,6 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 		REQUEST_EXPLAIN_ACCESSOR.set( requestBody, true );
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {
