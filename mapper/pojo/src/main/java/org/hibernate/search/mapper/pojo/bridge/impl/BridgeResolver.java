@@ -9,8 +9,20 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.Year;
+import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -81,6 +93,18 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( BigDecimal.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigDecimal.class ) ) );
 		addValueBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigInteger.class ) ) );
 		addValueBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( UUID.class ) ) );
+		addValueBridgeForExactRawType( LocalDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDateTime.class ) ) );
+		addValueBridgeForExactRawType( LocalTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalTime.class ) ) );
+		addValueBridgeForExactRawType( ZonedDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZonedDateTime.class ) ) );
+		addValueBridgeForExactRawType( Year.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Year.class ) ) );
+		addValueBridgeForExactRawType( YearMonth.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( YearMonth.class ) ) );
+		addValueBridgeForExactRawType( MonthDay.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( MonthDay.class ) ) );
+		addValueBridgeForExactRawType( OffsetDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetDateTime.class ) ) );
+		addValueBridgeForExactRawType( OffsetTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetTime.class ) ) );
+		addValueBridgeForExactRawType( ZoneOffset.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneOffset.class ) ) );
+		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneId.class ) ) );
+		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Period.class ) ) );
+		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Duration.class ) ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
