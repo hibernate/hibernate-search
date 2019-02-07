@@ -43,7 +43,7 @@ class LuceneSearchQueryBuilderFactory
 	@Override
 	public <O> SearchQueryBuilder<O, LuceneSearchQueryElementCollector> asObject(
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, O> projectionHitMapper) {
-		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneObjectProjection.<O>get() );
+		return createSearchQueryBuilder( sessionContext, projectionHitMapper, LuceneObjectProjection.get() );
 	}
 
 	@Override
