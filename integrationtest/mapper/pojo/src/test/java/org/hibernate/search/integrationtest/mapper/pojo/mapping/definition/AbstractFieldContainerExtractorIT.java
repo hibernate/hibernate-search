@@ -13,7 +13,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -30,6 +32,7 @@ import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -186,6 +189,27 @@ public abstract class AbstractFieldContainerExtractorIT {
 	}
 
 	@Test
+	@Ignore // TODO HSEARCH-3047 enable this test when we add support for the Double type
+	public void optionalDouble_nonEmpty() {
+		doTest(
+				testModelProvider.optionalDouble(),
+				Double.class,
+				OptionalDouble.of( 42.42 ),
+				42.42
+		);
+	}
+
+	@Test
+	@Ignore // TODO HSEARCH-3047 enable this test when we add support for the Double type
+	public void optionalDouble_empty() {
+		doTestExpectMissing(
+				testModelProvider.optionalDouble(),
+				Double.class,
+				OptionalDouble.empty()
+		);
+	}
+
+	@Test
 	public void optionalInt_nonEmpty() {
 		doTest(
 				testModelProvider.optionalInt(),
@@ -201,6 +225,25 @@ public abstract class AbstractFieldContainerExtractorIT {
 				testModelProvider.optionalInt(),
 				Integer.class,
 				OptionalInt.empty()
+		);
+	}
+
+	@Test
+	public void optionalLong_nonEmpty() {
+		doTest(
+				testModelProvider.optionalLong(),
+				Long.class,
+				OptionalLong.of( 42L ),
+				42L
+		);
+	}
+
+	@Test
+	public void optionalLong_empty() {
+		doTestExpectMissing(
+				testModelProvider.optionalLong(),
+				Long.class,
+				OptionalLong.empty()
 		);
 	}
 
@@ -330,7 +373,9 @@ public abstract class AbstractFieldContainerExtractorIT {
 		TestModel<?, SortedMap<String, String>> sortedMapValues();
 		TestModel<?, Map<String, List<String>>> mapListValues();
 		TestModel<?, Optional<String>> optional();
+		TestModel<?, OptionalDouble> optionalDouble();
 		TestModel<?, OptionalInt> optionalInt();
+		TestModel<?, OptionalLong> optionalLong();
 		TestModel<?, List<String>> list_explicitPrefixedStringBridge();
 		TestModel<?, List<MyEnum>> list_implicitEnumBridge();
 	}
