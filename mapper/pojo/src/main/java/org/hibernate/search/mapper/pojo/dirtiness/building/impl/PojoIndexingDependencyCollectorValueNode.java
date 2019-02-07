@@ -404,9 +404,9 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 		}
 	}
 
-	private <T, P> BoundPojoModelPathValueNode<T, P, ?> bindAndApplyExtractorPath(
-			BoundPojoModelPathPropertyNode<T, P> propertyNode, ContainerExtractorPath extractorPath) {
-		BoundContainerExtractorPath<P, ?> boundExtractorPath =
+	private <T2, P2> BoundPojoModelPathValueNode<T2, P2, ?> bindAndApplyExtractorPath(
+			BoundPojoModelPathPropertyNode<T2, P2> propertyNode, ContainerExtractorPath extractorPath) {
+		BoundContainerExtractorPath<P2, ?> boundExtractorPath =
 				buildingHelper.bindExtractorPath( propertyNode.getPropertyModel().getTypeModel(), extractorPath );
 		return propertyNode.value( boundExtractorPath );
 	}
