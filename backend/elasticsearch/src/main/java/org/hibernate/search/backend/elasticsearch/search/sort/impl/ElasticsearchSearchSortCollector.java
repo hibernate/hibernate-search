@@ -10,7 +10,6 @@ import java.util.List;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
 
@@ -23,8 +22,6 @@ import com.google.gson.JsonElement;
  * @see ElasticsearchSearchSortBuilder
  */
 public interface ElasticsearchSearchSortCollector {
-
-	void collectSort(JsonArray sorts);
 
 	void collectSort(JsonElement sort);
 

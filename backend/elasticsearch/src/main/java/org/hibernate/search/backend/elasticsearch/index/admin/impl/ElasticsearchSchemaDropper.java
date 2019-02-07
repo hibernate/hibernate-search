@@ -19,21 +19,11 @@ public interface ElasticsearchSchemaDropper {
 	/**
 	 * Drops an index, throwing an exception if dropping fails.
 	 *
-	 * @param indexName The name of the index to drop.
-	 * @param executionOptions The execution options, giving more context information.
-	 * @throws SearchException If an error occurs.
-	 */
-	void drop(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
-
-	/**
-	 * Drops an index, throwing an exception if dropping fails.
-	 *
 	 * <p>This method will skip operations silently if the index does not exist.
 	 *
 	 * @param indexName The name of the index to drop.
-	 * @param executionOptions The execution options, giving more context information.
 	 * @throws SearchException If an error occurs.
 	 */
-	void dropIfExisting(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
+	void dropIfExisting(URLEncodedString indexName);
 
 }

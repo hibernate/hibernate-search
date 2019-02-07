@@ -56,10 +56,6 @@ public class KeywordFieldIT {
 		class IndexedEntity {
 			Integer id;
 			String myProperty;
-			IndexedEntity(int id, String myProperty) {
-				this.id = id;
-				this.myProperty = myProperty;
-			}
 			@DocumentId
 			public Integer getId() {
 				return id;

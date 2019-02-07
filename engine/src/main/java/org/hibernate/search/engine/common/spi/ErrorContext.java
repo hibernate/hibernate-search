@@ -8,8 +8,6 @@ package org.hibernate.search.engine.common.spi;
 
 import java.util.List;
 
-import org.hibernate.search.engine.backend.index.IndexManager;
-
 public interface ErrorContext {
 
 	List<Object> getFailingOperations();
@@ -19,7 +17,5 @@ public interface ErrorContext {
 	Throwable getThrowable();
 
 	boolean hasErrors();
-
-	IndexManager getIndexManager();
 
 }

@@ -64,12 +64,6 @@ public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public Builder type(URLEncodedString typeName) {
-			typeNames.add( typeName );
-			return this;
-		}
-
-		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()

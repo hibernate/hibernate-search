@@ -6,14 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 /**
  * @author Yoann Rodiere
  */
 public interface DeleteByQueryWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>>, IndexWriteWorkBuilder<DeleteByQueryWorkBuilder> {
-
-	DeleteByQueryWorkBuilder type(URLEncodedString typeName);
 
 }

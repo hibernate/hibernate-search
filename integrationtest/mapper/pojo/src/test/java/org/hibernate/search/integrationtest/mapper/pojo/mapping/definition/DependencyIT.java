@@ -26,6 +26,7 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Rule;
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class DependencyIT {
 
 	@Rule

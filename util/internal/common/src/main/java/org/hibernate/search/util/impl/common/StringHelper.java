@@ -29,18 +29,6 @@ public final class StringHelper {
 		return string == null || string.length() == 0;
 	}
 
-	public static String qualify(final String prefix, final String name) {
-		if ( name == null || prefix == null ) {
-			throw new NullPointerException();
-		}
-
-		return new StringBuilder( prefix.length() + name.length() + 1 )
-				.append( prefix )
-				.append( '.' )
-				.append( name )
-				.toString();
-	}
-
 	/**
 	 * Joins the elements of the given array to a string, separated by the given separator string.
 	 *

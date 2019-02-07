@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -34,7 +33,6 @@ public class MatchIdSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -42,7 +40,7 @@ public class MatchIdSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"MappedType", INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> { }, // Nothing to do, we don't need any field in the mapping
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -139,10 +137,5 @@ public class MatchIdSearchPredicateIT {
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-	}
-
-	private static class IndexMapping {
-		IndexMapping(IndexSchemaElement root) {
-		}
 	}
 }

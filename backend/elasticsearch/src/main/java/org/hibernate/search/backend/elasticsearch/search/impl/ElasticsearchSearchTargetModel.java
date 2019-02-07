@@ -52,10 +52,6 @@ public class ElasticsearchSearchTargetModel {
 		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
 	}
 
-	public Set<ElasticsearchIndexModel> getIndexModels() {
-		return indexModels;
-	}
-
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
 		ElasticsearchIndexModel indexModelForSelectedIdConverter = iterator.next();

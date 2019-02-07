@@ -25,6 +25,7 @@ import org.junit.Test;
  *
  * Does not test default bridges, which are tested in {@link DocumentIdDefaultBridgeIT}.
  */
+@SuppressWarnings("unused")
 public class DocumentIdBaseIT {
 
 	@Rule

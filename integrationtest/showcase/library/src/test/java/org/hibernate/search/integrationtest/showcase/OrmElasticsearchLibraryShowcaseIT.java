@@ -698,6 +698,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		createBorrowal( personDao, johnSmith, suburbanLibrary1, indonesianEconomy, BorrowalType.SHORT_TERM );
 		createBorrowal( personDao, johnSmith, suburbanLibrary1, artOfComputerProg, BorrowalType.LONG_TERM );
 
+		@SuppressWarnings("unused")
 		Person johnPaulSmith = personDao.create( JOHN_PAUL_SMITH_ID, "John Paul", "Smith" );
 		// No account for this one
 

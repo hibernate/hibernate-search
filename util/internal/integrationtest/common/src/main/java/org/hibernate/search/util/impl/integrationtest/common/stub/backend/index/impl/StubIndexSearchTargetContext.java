@@ -61,6 +61,8 @@ class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryEleme
 	static class Builder implements IndexSearchTargetContextBuilder {
 
 		private final StubBackend backend;
+		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
+		@SuppressWarnings("unused")
 		private final MappingContextImplementor mappingContext;
 		private final List<String> indexNames = new ArrayList<>();
 		private final List<StubIndexSchemaNode> rootSchemaNodes = new ArrayList<>();

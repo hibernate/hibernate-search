@@ -54,10 +54,6 @@ public class LuceneSearchQueryElementCollector
 		return luceneQueryPredicate;
 	}
 
-	public List<SortField> toLuceneSortFields() {
-		return sortFields;
-	}
-
 	public Sort toLuceneSort() {
 		if ( sortFields == null || sortFields.isEmpty() ) {
 			return null;

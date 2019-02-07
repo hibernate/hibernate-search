@@ -46,10 +46,6 @@ public class LuceneSearchTargetModel {
 		return EventContexts.fromIndexNames( indexNames );
 	}
 
-	public Set<LuceneIndexModel> getIndexModels() {
-		return indexModels;
-	}
-
 	public Set<ReaderProvider> getReaderProviders() {
 		return readerProviders;
 	}

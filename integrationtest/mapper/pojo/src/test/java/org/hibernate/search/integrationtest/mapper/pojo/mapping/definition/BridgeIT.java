@@ -44,6 +44,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Rule;
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class BridgeIT {
 
 	private static final String INDEX_NAME = "IndexName";

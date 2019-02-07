@@ -182,7 +182,4 @@ public class SuppressingCloserTest {
 		void close() throws MyException1;
 	}
 
-	private static class MyException2 extends Exception {
-	}
-
 }

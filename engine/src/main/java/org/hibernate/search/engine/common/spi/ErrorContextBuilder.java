@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.common.impl.ErrorContextImpl;
 
 public class ErrorContextBuilder {
@@ -20,7 +19,6 @@ public class ErrorContextBuilder {
 	private Iterable<Object> workToBeDone;
 	private List<Object> failingOperations;
 	private List<Object> operationsThatWorked;
-	private IndexManager indexManager;
 
 	public ErrorContextBuilder errorThatOccurred(Throwable th) {
 		this.th = th;
@@ -46,11 +44,6 @@ public class ErrorContextBuilder {
 		this.getOperationsThatWorked().add( luceneWork );
 		return this;
 
-	}
-
-	public ErrorContextBuilder indexManager(IndexManager indexName) {
-		this.indexManager = indexName;
-		return this;
 	}
 
 	public ErrorContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
@@ -82,7 +75,6 @@ public class ErrorContextBuilder {
 			}
 		}
 		context.setFailingOperations( getFailingOperations() );
-		context.setIndexManager( indexManager );
 		return context;
 	}
 

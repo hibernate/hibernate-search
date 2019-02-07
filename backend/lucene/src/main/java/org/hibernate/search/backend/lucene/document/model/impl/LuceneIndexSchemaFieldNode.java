@@ -56,10 +56,6 @@ public class LuceneIndexSchemaFieldNode<F> {
 		return parent;
 	}
 
-	public String getFieldName() {
-		return relativeFieldName;
-	}
-
 	public String getAbsoluteFieldPath() {
 		return absoluteFieldPath;
 	}

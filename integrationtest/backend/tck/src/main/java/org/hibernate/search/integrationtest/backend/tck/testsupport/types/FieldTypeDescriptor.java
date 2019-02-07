@@ -25,6 +25,7 @@ public abstract class FieldTypeDescriptor<F> {
 	public static List<FieldTypeDescriptor<?>> getAll() {
 		if ( all == null ) {
 			all = Collections.unmodifiableList( Arrays.asList(
+					new KeywordStringFieldTypeDescriptor(),
 					new AnalyzedStringFieldTypeDescriptor(),
 					new NormalizedStringFieldTypeDescriptor(),
 					new IntegerFieldTypeDescriptor(),

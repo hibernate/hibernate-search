@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.dsl.predicate.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -19,7 +18,7 @@ class MatchIdPredicateContextImpl<B>
 
 	private final MatchIdPredicateBuilder<B> matchIdBuilder;
 
-	MatchIdPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory, SearchPredicateFactoryContext factoryContext) {
+	MatchIdPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
 		this.matchIdBuilder = factory.id();
 	}

@@ -388,19 +388,18 @@ public class CompositeSearchProjectionIT {
 		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			return mapper(
-					type,
 					c -> (StandardIndexFieldTypeContext<?, F>) c.as( type ),
 					document1Value, document2Value, document3Value
 			);
 		}
 
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(Class<F> type,
+		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration,
 				F document1Value, F document2Value, F document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
-					(accessor, name) -> new FieldModel<>( accessor, name, type, document1Value, document2Value, document3Value )
+					(accessor, name) -> new FieldModel<>( accessor, name, document1Value, document2Value, document3Value )
 			);
 		}
 
@@ -410,7 +409,7 @@ public class CompositeSearchProjectionIT {
 		final ValueModel<F> document2Value;
 		final ValueModel<F> document3Value;
 
-		private FieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName, Class<F> type,
+		private FieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
 				F document1Value, F document2Value, F document3Value) {
 			this.relativeFieldName = relativeFieldName;
 			this.document1Value = new ValueModel<>( accessor, document1Value );

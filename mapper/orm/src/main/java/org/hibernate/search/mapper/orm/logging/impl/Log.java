@@ -16,7 +16,6 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
-import org.hibernate.property.access.spi.Getter;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -132,10 +131,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 3,
 			value = "Unknown indexing mode: %1$s")
 	SearchException unknownIndexingMode(String indexingMode);
-
-	@Message(id = ID_OFFSET_2 + 4,
-			value = "Could not retrieve metadata for type %1$s, property '%2$s' accessed through getter '%3$s'")
-	SearchException unknownPropertyForGetter(Class<?> entityType, String propertyName, Getter getter);
 
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET_2 + 5,

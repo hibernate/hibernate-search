@@ -22,7 +22,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,8 +54,6 @@ public class NestedSearchPredicateIT {
 
 	private IndexAccessors indexAccessors;
 	private StubMappingIndexManager indexManager;
-
-	private StubSessionContext sessionContext = new StubSessionContext();
 
 	@Before
 	public void setup() {

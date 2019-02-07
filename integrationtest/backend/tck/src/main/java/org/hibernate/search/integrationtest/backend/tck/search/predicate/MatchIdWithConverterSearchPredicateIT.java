@@ -14,7 +14,6 @@ import java.util.Arrays;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
@@ -43,7 +42,6 @@ public class MatchIdWithConverterSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	private static final ToDocumentIdentifierValueConverter<Integer> ID_CONVERTER = new ToDocumentIdentifierValueConverter<Integer>() {
@@ -65,7 +63,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 						"MappedType", INDEX_NAME,
 						(ctx) -> {
 							ctx.idDslConverter( ID_CONVERTER );
-							this.indexMapping = new IndexMapping( ctx.getSchemaElement() );
+							// Nothing else to do, we don't need any field in the mapping
 						},
 						indexManager -> this.indexManager = indexManager
 				)
@@ -163,10 +161,5 @@ public class MatchIdWithConverterSearchPredicateIT {
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-	}
-
-	private static class IndexMapping {
-		IndexMapping(IndexSchemaElement root) {
-		}
 	}
 }

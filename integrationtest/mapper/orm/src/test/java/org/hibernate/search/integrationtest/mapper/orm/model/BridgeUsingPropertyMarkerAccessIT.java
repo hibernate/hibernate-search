@@ -38,6 +38,7 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = { "HSEARCH-2759", "HSEARCH-2847" })
+@SuppressWarnings("unused")
 public class BridgeUsingPropertyMarkerAccessIT<TIndexed> {
 
 	private static final String INDEX_NAME = "IndexedEntity";

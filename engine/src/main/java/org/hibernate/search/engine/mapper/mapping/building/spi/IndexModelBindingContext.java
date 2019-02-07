@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.engine.mapper.model.spi.SearchModel;
 
 public interface IndexModelBindingContext {
 
@@ -27,8 +26,6 @@ public interface IndexModelBindingContext {
 	IndexSchemaElement getSchemaElement();
 
 	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
-
-	SearchModel getSearchModel();
 
 	/**
 	 * Inform the model collector that documents will always be provided along

@@ -45,10 +45,6 @@ public class LuceneCollectorsBuilder {
 		}
 	}
 
-	public void addCollector(Collector collector) {
-		luceneCollectors.add( collector );
-	}
-
 	public DistanceCollector addDistanceCollector(String absoluteFieldPath, GeoPoint center) {
 		DistanceCollector distanceCollector = new DistanceCollector( absoluteFieldPath, center, maxDocs );
 		luceneCollectors.add( distanceCollector );

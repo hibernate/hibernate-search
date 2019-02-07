@@ -34,7 +34,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	}
 
 	@Override
-	public void migrate(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public void migrate(IndexMetadata indexMetadata) {
 		URLEncodedString indexName = indexMetadata.getName();
 		IndexSettings settings = indexMetadata.getSettings();
 
@@ -43,7 +43,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			 * We only update settings if it's really necessary, because closing the index,
 			 * even for just a moment, may hurt if other clients are using the index.
 			 */
-			if ( !settings.isEmpty() && !schemaValidator.isSettingsValid( indexMetadata, executionOptions ) ) {
+			if ( !settings.isEmpty() && !schemaValidator.isSettingsValid( indexMetadata ) ) {
 				schemaAccessor.closeIndex( indexName );
 				try {
 					schemaAccessor.updateSettings( indexName, settings );
