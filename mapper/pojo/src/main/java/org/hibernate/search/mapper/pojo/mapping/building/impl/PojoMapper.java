@@ -151,7 +151,7 @@ public class PojoMapper<M> implements Mapper<M> {
 						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
 				);
 
-		PojoMappingDelegate mappingImplementor = null;
+		PojoMappingDelegate mappingImplementor;
 		try {
 			// First phase: build the processors and contribute to the reindexing resolvers
 			for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
