@@ -28,7 +28,7 @@ import com.puppycrawl.tools.checkstyle.api.FileContents;
 public class DoubleSpacesCheck extends AbstractCheck {
 
 	private static final String WHITESPACE_DOUBLE_KEY = "whitespace.double";
-	private static final Pattern TWO_SPACES_PATTERN = Pattern.compile( "  " );
+	private static final Pattern TWO_SPACES_PATTERN = Pattern.compile( " {2}" );
 
 	private final CommentSuppressor commentSuppressor = new CommentSuppressor();
 	private final StringSuppressor stringSuppressor = new StringSuppressor();
