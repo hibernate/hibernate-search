@@ -25,7 +25,6 @@ public class PropertyIdentifierMapping<I, E> implements IdentifierMapping<I, E> 
 	private final PropertyHandle property;
 	private final BeanHolder<? extends IdentifierBridge<I>> bridgeHolder;
 
-	@SuppressWarnings("unchecked")
 	public PropertyIdentifierMapping(PojoCaster<? super I> caster, PropertyHandle property,
 			BeanHolder<? extends IdentifierBridge<I>> bridgeHolder) {
 		this.caster = caster;

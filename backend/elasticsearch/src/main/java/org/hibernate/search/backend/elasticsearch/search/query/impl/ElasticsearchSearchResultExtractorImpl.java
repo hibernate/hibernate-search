@@ -55,7 +55,6 @@ public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchS
 		return new ElasticsearchLoadableSearchResult<>( projectionHitMapper, rootProjection, hitCount, extractedData );
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Object> extractHits(JsonObject responseBody) {
 		JsonArray jsonHits = HITS_HITS_ACCESSOR.get( responseBody ).orElseGet( JsonArray::new );
 

@@ -187,7 +187,6 @@ public class PojoAssociationPathInverterTest extends EasyMockSupport {
 		}
 	}
 
-	@SuppressWarnings( "unchecked" )
 	private PropertyHandle setupPropertyStub(PojoTypeModel<?> holdingTypeMock, String propertyName,
 			PojoGenericTypeModel<?> propertyTypeMock) {
 		PropertyHandle propertyHandleMock =

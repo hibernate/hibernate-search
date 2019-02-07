@@ -22,8 +22,6 @@ class PropertyFullTextFieldMappingContextImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	// We can't use type parameters when calling SomeClass.class, but we expect wildcards anyway, so this is safe.
-	@SuppressWarnings({"rawtypes", "unchecked"})
 	PropertyFullTextFieldMappingContextImpl(PropertyMappingContext parent, String relativeFieldName) {
 		super(
 				parent, relativeFieldName,

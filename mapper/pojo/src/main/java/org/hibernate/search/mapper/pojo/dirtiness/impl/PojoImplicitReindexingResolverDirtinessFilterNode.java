@@ -46,7 +46,6 @@ public class PojoImplicitReindexingResolverDirtinessFilterNode<T, S> extends Poj
 	}
 
 	@Override
-	@SuppressWarnings( "unchecked" ) // We can only cast to the raw type, if U is generic we need an unchecked cast
 	public void resolveEntitiesToReindex(PojoReindexingCollector collector,
 			PojoRuntimeIntrospector runtimeIntrospector, T dirty, S dirtinessState) {
 		// See method javadoc: null means we must consider all paths as dirty

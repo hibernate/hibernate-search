@@ -47,7 +47,6 @@ class LuceneSearchResultExtractorImpl<T> implements LuceneSearchResultExtractor<
 		);
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<Object> extractHits(IndexSearcher indexSearcher, TopDocs topDocs,
 			SearchProjectionExtractContext projectionExecutionContext) throws IOException {
 		if ( topDocs == null ) {

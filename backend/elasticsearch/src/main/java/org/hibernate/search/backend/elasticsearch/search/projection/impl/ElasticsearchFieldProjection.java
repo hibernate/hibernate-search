@@ -52,7 +52,6 @@ class ElasticsearchFieldProjection<F, T> implements ElasticsearchSearchProjectio
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {
