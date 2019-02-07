@@ -82,6 +82,11 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequenceFuture );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -131,6 +136,11 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -179,6 +189,11 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -221,6 +236,11 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence1Future );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -274,6 +294,11 @@ public class ElasticsearchSerialChangesetsWorkOrchestratorTest extends EasyMockS
 		CompletableFuture<Void> futureAll = orchestrator.executeSubmitted();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	private ElasticsearchWork<?> work(int index) {

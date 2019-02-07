@@ -84,6 +84,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		assertThat( futureAll ).isPending();
 		sequenceFuture.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -137,6 +142,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		assertThat( futureAll ).isPending();
 		sequence1Future.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -197,6 +207,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -245,6 +260,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	@Test
@@ -310,6 +330,11 @@ public class ElasticsearchParallelChangesetsWorkOrchestratorTest extends EasyMoc
 		sequence1Future.complete( null );
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
+
+		resetAll();
+		replayAll();
+		orchestrator.close();
+		verifyAll();
 	}
 
 	private <T> ElasticsearchWork<T> work(int index) {

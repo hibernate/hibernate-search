@@ -78,6 +78,7 @@ public class HibernateSearchContextService implements Service {
 	public HibernateOrmSearchManager getSearchManager(SessionImplementor sessionImplementor) {
 		TransientReference<HibernateOrmSearchManager> reference =
 				(TransientReference<HibernateOrmSearchManager>) sessionImplementor.getProperties().get( SEARCH_MANAGER_KEY );
+		@SuppressWarnings("resource") // The listener below handles closing
 		HibernateOrmSearchManager searchManager = reference == null ? null : reference.get();
 		if ( searchManager == null ) {
 			searchManager = getMapping().createSearchManager( sessionImplementor );
