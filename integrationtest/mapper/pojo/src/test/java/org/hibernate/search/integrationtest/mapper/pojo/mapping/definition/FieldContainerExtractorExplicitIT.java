@@ -11,7 +11,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -397,6 +399,31 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 		}
 
 		@Override
+		public TestModel<?, OptionalDouble> optionalDouble() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				private Integer id;
+				private OptionalDouble myProperty;
+
+				private IndexedEntity(int id, OptionalDouble myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+
+				@DocumentId
+				public Integer getId() {
+					return id;
+				}
+
+				@GenericField(extractors = @ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_DOUBLE))
+				public OptionalDouble getMyProperty() {
+					return myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
 		public TestModel<?, OptionalInt> optionalInt() {
 			@Indexed(index = INDEX_NAME)
 			class IndexedEntity {
@@ -415,6 +442,31 @@ public class FieldContainerExtractorExplicitIT extends AbstractFieldContainerExt
 
 				@GenericField(extractors = @ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_INT))
 				public OptionalInt getMyProperty() {
+					return myProperty;
+				}
+			}
+			return new TestModel<>( IndexedEntity.class, (id, p) -> new IndexedEntity( id, p ) );
+		}
+
+		@Override
+		public TestModel<?, OptionalLong> optionalLong() {
+			@Indexed(index = INDEX_NAME)
+			class IndexedEntity {
+				private Integer id;
+				private OptionalLong myProperty;
+
+				private IndexedEntity(int id, OptionalLong myProperty) {
+					this.id = id;
+					this.myProperty = myProperty;
+				}
+
+				@DocumentId
+				public Integer getId() {
+					return id;
+				}
+
+				@GenericField(extractors = @ContainerExtractorRef(BuiltinContainerExtractor.OPTIONAL_LONG))
+				public OptionalLong getMyProperty() {
 					return myProperty;
 				}
 			}
