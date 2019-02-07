@@ -266,6 +266,72 @@ public class BoolSearchPredicateIT {
 	}
 
 	@Test
+	public void filter() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+				)
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.filter( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
+				)
+				.build();
+
+		assertThat( query ).hasNoHits();
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+						.filter( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
+				)
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void filter_function() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.filter( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
+				)
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void filter_separatePredicateObject() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchPredicate predicate = searchTarget.predicate().match().onField( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate(	f -> f.bool().filter( predicate ) )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
 	public void should_mustNot() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
