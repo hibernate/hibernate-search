@@ -43,7 +43,18 @@ public abstract class PropertyTypeDescriptor<V> {
 					new JavaUtilDatePropertyTypeDescriptor(),
 					new BigDecimalPropertyTypeDescriptor(),
 					new BigIntegerPropertyTypeDescriptor(),
-					new UUIDPropertyTypeDescriptor()
+					new UUIDPropertyTypeDescriptor(),
+					new LocalDateTimePropertyTypeDescriptor(),
+					new LocalTimePropertyTypeDescriptor(),
+					new ZonedDateTimePropertyTypeDescriptor(),
+					new YearPropertyTypeDescriptor(),
+					new MonthDayPropertyTypeDescriptor(),
+					new OffsetDateTimePropertyTypeDescriptor(),
+					new OffsetTimePropertyTypeDescriptor(),
+					new ZoneOffsetPropertyTypeDescriptor(),
+					new ZoneIdPropertyTypeDescriptor(),
+					new DurationPropertyTypeDescriptor(),
+					new PeriodPropertyTypeDescriptor()
 			) );
 		}
 		return all;
