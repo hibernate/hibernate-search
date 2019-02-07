@@ -123,9 +123,6 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 			Thread.currentThread().interrupt();
 			throw new IllegalStateException( "Interrupted while getting a future value with a 0 timeout (?)", e );
 		}
-		catch (TimeoutException | CancellationException e) {
-			throw e;
-		}
 		catch (ExecutionException e) {
 			Throwable t = e;
 			while ( t != null ) {
