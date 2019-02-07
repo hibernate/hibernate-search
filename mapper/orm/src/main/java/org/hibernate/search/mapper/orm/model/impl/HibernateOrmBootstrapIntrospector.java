@@ -69,10 +69,11 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
+	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	public HibernateOrmBootstrapIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
 		ReflectionManager metadataReflectionManager = null;
 		if ( metadata instanceof MetadataImplementor ) {
-			metadataReflectionManager = ((MetadataImplementor) metadata).getMetadataBuildingOptions().getReflectionManager();
+			metadataReflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
 		}
 		if ( metadataReflectionManager != null ) {
 			this.reflectionManager = metadataReflectionManager;

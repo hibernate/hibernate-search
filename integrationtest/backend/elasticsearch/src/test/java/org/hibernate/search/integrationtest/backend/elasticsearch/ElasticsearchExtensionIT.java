@@ -38,6 +38,7 @@ import org.junit.rules.ExpectedException;
 
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.json.JSONException;
@@ -351,7 +352,7 @@ public class ElasticsearchExtensionIT {
 		RestClient restClient = elasticsearchBackend.getClient( RestClient.class );
 
 		// Test that the client actually works
-		Response response = restClient.performRequest( "GET", "/" );
+		Response response = restClient.performRequest( new Request( "GET", "/" ) );
 		Assertions.assertThat( response.getStatusLine().getStatusCode() ).isEqualTo( 200 );
 	}
 
