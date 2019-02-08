@@ -12,7 +12,6 @@ import java.util.function.Function;
 
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.boot.Metadata;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
@@ -39,7 +37,7 @@ import org.hibernate.search.util.common.impl.StreamHelper;
  *     when the @DocumentId is NOT the @Id, always ignore the provided ID. See org.hibernate.search.engine.common.impl.WorkPlan.PerClassWork.extractProperId(Work)
  *  2. And more?
  */
-public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMapping>
+public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingDefinitionContainerContext {
 
 	private static final ConfigurationProperty<Boolean> ENABLE_ANNOTATION_MAPPING =
@@ -54,14 +52,13 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata,
-			HibernateOrmConfigurationPropertySource propertySource,
-			SessionFactoryImplementor sessionFactoryImplementor) {
+			HibernateOrmConfigurationPropertySource propertySource) {
 		HibernateOrmBootstrapIntrospector introspector =
 				HibernateOrmBootstrapIntrospector.create( metadata, propertySource );
 
 		return new HibernateOrmMappingInitiator(
 				metadata, propertySource,
-				introspector, sessionFactoryImplementor
+				introspector
 		);
 	}
 
@@ -71,10 +68,9 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	private HibernateOrmMappingInitiator(Metadata metadata,
 			HibernateOrmConfigurationPropertySource propertySource,
-			HibernateOrmBootstrapIntrospector introspector,
-			SessionFactoryImplementor sessionFactoryImplementor) {
+			HibernateOrmBootstrapIntrospector introspector) {
 		super(
-				new HibernateOrmMappingFactory( sessionFactoryImplementor ),
+				new HibernateOrmMappingFactory(),
 				introspector
 		);
 

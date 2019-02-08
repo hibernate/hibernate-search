@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.mapper.javabean.impl;
 
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingFactory;
+import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
 
-public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaBeanMapping> {
+public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaBeanMappingPartialBuildState> {
 
 	private final JavaBeanTypeConfigurationContributor typeConfigurationContributor;
 

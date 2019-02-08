@@ -12,7 +12,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 import org.jboss.logging.Messages;
 
-public final class JavaBeanMappingKey implements MappingKey<JavaBeanMapping> {
+public final class JavaBeanMappingKey implements MappingKey<JavaBeanMappingPartialBuildState, JavaBeanMapping> {
 	private static final JavaBeanEventContextMessages MESSAGES =
 			Messages.getBundle( JavaBeanEventContextMessages.class );
 

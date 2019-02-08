@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+public interface PojoMappingFactory<MPBS> {
 
-public interface PojoMappingFactory<M> {
-
-	MappingImplementor<M> createMapping(PojoMappingDelegate mappingDelegate);
+	MPBS createMapping(PojoMappingDelegate mappingDelegate);
 
 }

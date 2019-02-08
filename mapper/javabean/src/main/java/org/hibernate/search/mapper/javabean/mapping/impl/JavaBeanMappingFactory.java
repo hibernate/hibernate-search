@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingFactory;
 
-public final class JavaBeanMappingFactory implements PojoMappingFactory<JavaBeanMapping> {
+public final class JavaBeanMappingFactory implements PojoMappingFactory<JavaBeanMappingPartialBuildState> {
 	@Override
-	public MappingImplementor<JavaBeanMapping> createMapping(PojoMappingDelegate mappingDelegate) {
-		return new JavaBeanMappingImpl( mappingDelegate );
+	public JavaBeanMappingPartialBuildState createMapping(PojoMappingDelegate mappingDelegate) {
+		return new JavaBeanMappingPartialBuildState( mappingDelegate );
 	}
 }

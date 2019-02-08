@@ -11,6 +11,7 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 
 /**
  * @author Yoann Rodiere
@@ -25,8 +26,9 @@ public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder setProperty(String name, Object value);
 
-	<M> SearchIntegrationBuilder addMappingInitiator(MappingKey<M> mappingKey, MappingInitiator<?, M> initiator);
+	<PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
+			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);
 
-	SearchIntegration build();
+	SearchIntegrationPartialBuildState prepareBuild();
 
 }

@@ -17,6 +17,7 @@ import org.hibernate.resource.beans.container.spi.BeanContainer;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
@@ -130,7 +131,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, propertySource, sessionFactoryImplementor
+					metadata, propertySource
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -155,8 +156,21 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			// TODO namingService (JMX)
 
-			SearchIntegration integration = builder.build();
-			HibernateOrmMapping mapping = integration.getMapping( mappingKey );
+			SearchIntegrationPartialBuildState integrationPartialBuildState = builder.prepareBuild();
+			SearchIntegration integration;
+			HibernateOrmMapping mapping;
+			try {
+				mapping = integrationPartialBuildState.finalizeMapping(
+						mappingKey,
+						partialBuildState -> partialBuildState.bindToSessionFactory( sessionFactoryImplementor )
+				);
+				integration = integrationPartialBuildState.finalizeIntegration();
+			}
+			catch (RuntimeException e) {
+				new SuppressingCloser( e )
+						.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
+				throw e;
+			}
 
 			// TODO JMX
 //			this.jmx = new JMXHook( propertySource );

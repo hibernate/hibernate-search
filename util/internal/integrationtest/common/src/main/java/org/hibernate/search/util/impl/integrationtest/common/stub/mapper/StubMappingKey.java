@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
-public final class StubMappingKey implements MappingKey<StubMapping> {
+public final class StubMappingKey implements MappingKey<StubMappingPartialBuildState, StubMapping> {
 
 	@Override
 	public String render() {

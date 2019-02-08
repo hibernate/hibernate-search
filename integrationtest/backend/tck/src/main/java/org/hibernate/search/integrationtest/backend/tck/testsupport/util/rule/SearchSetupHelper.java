@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -25,6 +26,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingPartialBuildState;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -32,7 +34,8 @@ import org.junit.runners.model.Statement;
 
 public class SearchSetupHelper implements TestRule {
 
-	private final List<SearchIntegration> mappingRepositories = new ArrayList<>();
+	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
+	private final List<SearchIntegration> integrations = new ArrayList<>();
 
 	private TestHelper testHelper;
 
@@ -76,8 +79,10 @@ public class SearchSetupHelper implements TestRule {
 						base.evaluate();
 					}
 					finally {
-						closer.pushAll( SearchIntegration::close, mappingRepositories );
-						mappingRepositories.clear();
+						closer.pushAll( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
+						integrationPartialBuildStates.clear();
+						closer.pushAll( SearchIntegration::close, integrations );
+						integrations.clear();
 					}
 				}
 			}
@@ -141,10 +146,17 @@ public class SearchSetupHelper implements TestRule {
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
 			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
-			SearchIntegration integration = integrationBuilder.build();
-			mappingRepositories.add( integration );
+			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
+			integrationPartialBuildStates.add( integrationPartialBuildState );
 
-			StubMapping mapping = integration.getMapping( mappingKey );
+			StubMapping mapping = integrationPartialBuildState.finalizeMapping(
+					mappingKey, StubMappingPartialBuildState::finalizeMapping
+			);
+
+			SearchIntegration integration = integrationPartialBuildState.finalizeIntegration();
+			integrations.add( integration );
+			integrationPartialBuildStates.remove( integrationPartialBuildState );
+
 			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
 
 			return integration;

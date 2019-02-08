@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanProvider;
@@ -46,8 +46,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -62,7 +62,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private final ConfigurationPropertySource mainPropertySource;
 	private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
-	private final Map<MappingKey<?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
+	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private ClassResolver classResolver;
 	private ResourceResolver resourceResolver;
@@ -98,8 +98,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public <M> SearchIntegrationBuilder addMappingInitiator(MappingKey<M> mappingKey,
-			MappingInitiator<?, M> initiator) {
+	public <PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
+			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator) {
 		if ( frozen ) {
 			throw new AssertionFailure(
 					"Attempt to add a mapping initiator"
@@ -121,11 +121,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
-	public SearchIntegration build() {
+	public SearchIntegrationPartialBuildState prepareBuild() {
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
-		Map<MappingKey<?>, MappingImplementor<?>> mappings = new HashMap<>();
+		Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings = new HashMap<>();
 		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
 		boolean checkingRootFailures = false;
 
@@ -166,8 +166,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanProvider, propertySource, rootBuildContext );
 
-			// First phase: collect configuration for all mappings
-			for ( Map.Entry<MappingKey<?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
+			// First step: collect configuration for all mappings
+			for ( Map.Entry<MappingKey<?, ?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
 				// We know the key and initiator have compatible types, see how they are put into the map
 				@SuppressWarnings({"rawtypes", "unchecked"})
 				MappingBuildingState<?, ?> mappingBuildingState = new MappingBuildingState<>(
@@ -181,7 +181,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Second phase: create mappers and their backing index managers
+			// Second step: create mappers and their backing index managers
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
 				mappingBuildingState.createMapper( indexManagerBuildingStateHolder );
 			}
@@ -189,15 +189,15 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Third phase: create mappings
+			// Third step: create mappings
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
-				mappingBuildingState.createAndAddMapping( mappings );
+				mappingBuildingState.partiallyBuildAndAddTo( partiallyBuiltMappings );
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Fourth phase: start indexes
+			// Fourth step: start indexes
 			for ( Map.Entry<String, IndexManagerImplementor<?>> entry :
 					indexManagerBuildingStateHolder.getIndexManagersByName().entrySet() ) {
 				String indexName = entry.getKey();
@@ -217,9 +217,9 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			return new SearchIntegrationImpl(
+			return new SearchIntegrationPartialBuildStateImpl(
 					beanResolver,
-					mappings,
+					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendsByName(),
 					indexManagerBuildingStateHolder.getIndexManagersByName()
 			);
@@ -253,7 +253,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			SuppressingCloser closer = new SuppressingCloser( rethrownException );
 			// Close the mappers and mappings created so far before aborting
-			closer.pushAll( MappingImplementor::close, mappings.values() );
+			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
 			closer.pushAll( MappingBuildingState::closeOnFailure, mappingBuildingStates );
 			// Close the resources contained in the index manager building state before aborting
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
@@ -264,11 +264,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		}
 	}
 
-	private static class MappingBuildingState<C, M> {
+	private static class MappingBuildingState<C, PBM extends MappingPartialBuildState> {
 		private final MappingBuildContext buildContext;
 
-		private final MappingKey<M> mappingKey;
-		private final MappingInitiator<C, M> mappingInitiator;
+		private final MappingKey<PBM, ?> mappingKey;
+		private final MappingInitiator<C, PBM> mappingInitiator;
 
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
@@ -277,10 +277,10 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
-		private Mapper<M> mapper; // Initially null, set in createMapper()
+		private Mapper<PBM> mapper; // Initially null, set in createMapper()
 
 		MappingBuildingState(RootBuildContext rootBuildContext,
-				MappingKey<M> mappingKey, MappingInitiator<C, M> mappingInitiator) {
+				MappingKey<PBM, ?> mappingKey, MappingInitiator<C, PBM> mappingInitiator) {
 			this.mappingKey = mappingKey;
 			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingKey );
 			this.mappingInitiator = mappingInitiator;
@@ -321,10 +321,10 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 		}
 
-		void createAndAddMapping(Map<MappingKey<?>, MappingImplementor<?>> mappings) {
+		void partiallyBuildAndAddTo(Map<MappingKey<?, ?>, MappingPartialBuildState> mappings) {
 			try {
-				MappingImplementor<M> mapping = mapper.build();
-				mappings.put( mappingKey, mapping );
+				PBM partiallyBuiltMapping = mapper.prepareBuild();
+				mappings.put( mappingKey, partiallyBuiltMapping );
 			}
 			catch (MappingAbortedException e) {
 				ContextualFailureCollector failureCollector = buildContext.getFailureCollector();

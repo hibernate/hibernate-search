@@ -14,8 +14,7 @@ class MappingBuildContextImpl extends DelegatingBuildContext implements MappingB
 
 	private final ContextualFailureCollector failureCollector;
 
-
-	MappingBuildContextImpl(RootBuildContext delegate, MappingKey<?> mappingKey) {
+	MappingBuildContextImpl(RootBuildContext delegate, MappingKey<?, ?> mappingKey) {
 		super( delegate );
 		failureCollector = delegate.getFailureCollector().withContext( mappingKey );
 	}
