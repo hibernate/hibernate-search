@@ -54,7 +54,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
-					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::fromExternalRepresentation )
+					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::parse )
 					.withDefault( ElasticsearchBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 

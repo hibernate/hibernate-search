@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.cfg;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.StringHelper;
 
 /**
  * Strategy for creating/deleting the indexes in Elasticsearch upon Hibernate Search initialization and shut-down.
@@ -63,35 +64,25 @@ public enum ElasticsearchIndexLifecycleStrategyName {
 	 */
 	DROP_AND_CREATE_AND_DROP("drop-and-create-and-drop");
 
-	private static final Map<String, ElasticsearchIndexLifecycleStrategyName> VALUES_BY_EXTERNAL_NAME;
-	static {
-		Map<String, ElasticsearchIndexLifecycleStrategyName> tmpMap = new HashMap<>();
-		for ( ElasticsearchIndexLifecycleStrategyName strategy : values() ) {
-			tmpMap.put( strategy.externalName.toLowerCase( Locale.ROOT ), strategy );
-		}
-		VALUES_BY_EXTERNAL_NAME = Collections.unmodifiableMap( tmpMap );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	// This method conforms to the MicroProfile Config specification. Do not change its signature.
+	public static ElasticsearchIndexLifecycleStrategyName parse(CharSequence charSequence) {
+		return StringHelper.parseDiscreteValues(
+				ElasticsearchIndexLifecycleStrategyName.values(),
+				ElasticsearchIndexLifecycleStrategyName::getExternalRepresentation,
+				log::invalidIndexLifecycleStrategyName,
+				charSequence
+		);
 	}
 
-	public static ElasticsearchIndexLifecycleStrategyName fromExternalRepresentation(String propertyValue) {
-		final String normalizedName = propertyValue.trim().toLowerCase( Locale.ROOT );
-		ElasticsearchIndexLifecycleStrategyName strategy = VALUES_BY_EXTERNAL_NAME.get( normalizedName );
-		if ( strategy == null ) {
-				throw new IllegalArgumentException( "Unrecognized property value for an index management strategy: '" + propertyValue
-						+ "'. Please use one of " + VALUES_BY_EXTERNAL_NAME.keySet() );
-		}
-		return strategy;
+	private final String externalRepresentation;
+
+	ElasticsearchIndexLifecycleStrategyName(String externalRepresentation) {
+		this.externalRepresentation = externalRepresentation;
 	}
 
-	private final String externalName;
-
-	ElasticsearchIndexLifecycleStrategyName(String propertyValue) {
-		this.externalName = propertyValue;
-	}
-
-	/**
-	 * @return the name to use in configuration files.
-	 */
-	public String getExternalName() {
-		return externalName;
+	public String getExternalRepresentation() {
+		return externalRepresentation;
 	}
 }

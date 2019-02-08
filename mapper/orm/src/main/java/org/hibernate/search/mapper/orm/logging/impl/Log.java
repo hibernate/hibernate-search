@@ -12,6 +12,7 @@ import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.SessionFactory;
@@ -129,8 +130,8 @@ public interface Log extends BasicLogger {
 	SearchException unexpectedSearchHitType(Class<?> entityType, Collection<? extends Class<?>> expectedTypes);
 
 	@Message(id = ID_OFFSET_2 + 3,
-			value = "Unknown indexing mode: %1$s")
-	SearchException unknownIndexingMode(String indexingMode);
+			value = "Invalid indexing strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@LogMessage(level = Logger.Level.INFO)
 	@Message(id = ID_OFFSET_2 + 5,

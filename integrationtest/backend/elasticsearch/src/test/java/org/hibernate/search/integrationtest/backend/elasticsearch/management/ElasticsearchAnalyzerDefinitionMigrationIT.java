@@ -501,7 +501,7 @@ public class ElasticsearchAnalyzerDefinitionMigrationIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.UPDATE.getExternalName()
+						ElasticsearchIndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

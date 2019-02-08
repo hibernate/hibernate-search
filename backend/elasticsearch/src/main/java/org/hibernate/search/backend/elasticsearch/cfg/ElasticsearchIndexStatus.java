@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.StringHelper;
 
 public enum ElasticsearchIndexStatus {
 
@@ -19,23 +20,23 @@ public enum ElasticsearchIndexStatus {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String elasticsearchString;
+	// This method conforms to the MicroProfile Config specification. Do not change its signature.
+	public static ElasticsearchIndexStatus parse(CharSequence charSequence) {
+		return StringHelper.parseDiscreteValues(
+				ElasticsearchIndexStatus.values(),
+				ElasticsearchIndexStatus::getElasticsearchString,
+				log::invalidIndexStatus,
+				charSequence
+		);
+	}
 
-	ElasticsearchIndexStatus(String elasticsearchString) {
-		this.elasticsearchString = elasticsearchString;
+	private final String externalRepresentation;
+
+	ElasticsearchIndexStatus(String externalRepresentation) {
+		this.externalRepresentation = externalRepresentation;
 	}
 
 	public String getElasticsearchString() {
-		return elasticsearchString;
-	}
-
-	public static ElasticsearchIndexStatus fromExternalRepresentation(String status) {
-		for ( ElasticsearchIndexStatus indexStatus : ElasticsearchIndexStatus.values() ) {
-			if ( indexStatus.getElasticsearchString().equalsIgnoreCase( status ) ) {
-				return indexStatus;
-			}
-		}
-
-		throw log.unexpectedIndexStatusString( status );
+		return externalRepresentation;
 	}
 }
