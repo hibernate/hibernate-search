@@ -41,6 +41,7 @@ public abstract class PropertyTypeDescriptor<V> {
 					new InstantPropertyTypeDescriptor(),
 					new LocalDatePropertyTypeDescriptor(),
 					new JavaUtilDatePropertyTypeDescriptor(),
+					new JavaUtilCalendarPropertyTypeDescriptor(),
 					new BigDecimalPropertyTypeDescriptor(),
 					new BigIntegerPropertyTypeDescriptor(),
 					new UUIDPropertyTypeDescriptor(),
