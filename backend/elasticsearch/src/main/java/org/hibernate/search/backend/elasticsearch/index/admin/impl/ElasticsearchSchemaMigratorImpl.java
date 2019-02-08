@@ -66,7 +66,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			schemaAccessor.putMapping( indexName, indexMetadata.getMapping() );
 		}
 		catch (SearchException e) {
-			throw log.schemaUpdateFailed( indexName, e );
+			throw log.schemaUpdateFailed( indexName, e.getMessage(), e );
 		}
 	}
 

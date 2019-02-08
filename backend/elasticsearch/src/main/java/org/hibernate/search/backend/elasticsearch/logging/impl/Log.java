@@ -94,15 +94,16 @@ public interface Log extends BasicLogger {
 	SearchException interruptedWhileWaitingForRequestCompletion(@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 20,
-			value = "Could not create mapping for index %1$s"
+			value = "Could not create mapping for index '%1$s': %2$s"
 	)
-	SearchException elasticsearchMappingCreationFailed(String indexName, @Cause Exception cause);
+	SearchException elasticsearchMappingCreationFailed(String indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 22, value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'.")
 	SearchException unexpectedIndexStatusString(String status);
 
-	@Message(id = ID_OFFSET_2 + 24, value = "Timed out while waiting for for index '%1$s' to reach status '%2$s'; status was still '%3$s' after %4$s.")
-	SearchException unexpectedIndexStatus(String indexName, String expected, String actual, String timeoutAndUnit);
+	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$s.")
+	SearchException unexpectedIndexStatus(String indexName, String expected, String timeoutAndUnit,
+			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 33,
 			value = "An Elasticsearch schema validation failed: %1$s"
@@ -115,9 +116,9 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchMappingRetrievalForValidationFailed(@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 35,
-			value = "Could not update mappings in index '%1$s'"
+			value = "Could not update mappings in index '%1$s': %2$s"
 	)
-	SearchException schemaUpdateFailed(Object indexName, @Cause Exception cause);
+	SearchException schemaUpdateFailed(Object indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 50,
 			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )

@@ -198,10 +198,24 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			// Fourth phase: start indexes
-			for ( IndexManagerImplementor<?> indexManager : indexManagerBuildingStateHolder.getIndexManagersByName().values() ) {
+			for ( Map.Entry<String, IndexManagerImplementor<?>> entry :
+					indexManagerBuildingStateHolder.getIndexManagersByName().entrySet() ) {
+				String indexName = entry.getKey();
+				IndexManagerImplementor<?> indexManager = entry.getValue();
+				ContextualFailureCollector indexFailureCollector =
+						failureCollector.withContext( EventContexts.fromIndexName( indexName ) );
+				IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl( indexFailureCollector );
 				// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
-				indexManager.start();
+				try {
+					indexManager.start( startContext );
+				}
+				catch (RuntimeException e) {
+					indexFailureCollector.add( e );
+				}
 			}
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
 
 			return new SearchIntegrationImpl(
 					beanResolver,

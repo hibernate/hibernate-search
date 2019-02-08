@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
@@ -74,7 +75,7 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public void start() {
+	public void start(IndexManagerStartContext context) {
 		// TODO HSEARCH-3118 start thread(s) and allocate resources specific to this index manager here
 	}
 

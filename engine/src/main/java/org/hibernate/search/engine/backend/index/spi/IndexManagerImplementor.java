@@ -22,8 +22,10 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 * Start any resource necessary to operate the index manager at runtime.
 	 * <p>
 	 * Called by the engine once after bootstrap.
+	 *
+	 * @param context The start context.
 	 */
-	void start();
+	void start(IndexManagerStartContext context);
 
 	/**
 	 * @return The object that should be exposed as API to users.

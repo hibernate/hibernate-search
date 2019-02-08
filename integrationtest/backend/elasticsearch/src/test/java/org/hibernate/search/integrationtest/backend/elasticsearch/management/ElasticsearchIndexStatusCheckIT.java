@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
-
 import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
@@ -16,12 +14,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
@@ -46,9 +45,6 @@ public class ElasticsearchIndexStatusCheckIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
-	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	private ElasticsearchIndexLifecycleStrategyName strategy;
@@ -66,10 +62,14 @@ public class ElasticsearchIndexStatusCheckIT {
 
 		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400050" );
-
-		setup();
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.multilineFailure(
+								"HSEARCH400050"
+						)
+						.build()
+		);
 	}
 
 	@Test
@@ -91,16 +91,15 @@ public class ElasticsearchIndexStatusCheckIT {
 
 		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( "HSEARCH400007" )
-				.causedBy( SearchException.class )
-						.withMessage( "HSEARCH400024" )
-						.withMessage( "100ms" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.multilineFailure(
+								"HSEARCH400024",
+								"100ms"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -118,16 +117,22 @@ public class ElasticsearchIndexStatusCheckIT {
 
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( "HSEARCH400007" )
-				.causedBy( SearchException.class )
-						.withMessage( "HSEARCH400024" )
-						.withMessage( "100ms" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.multilineFailure(
+								"HSEARCH400024",
+								"100ms"
+						)
+						.build()
 		);
+	}
 
-		setup();
+	private void setupExpectingFailure(String failureReportRegex) {
+		SubTest.expectException( this::setup )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( failureReportRegex );
 	}
 
 	private void setup() {
