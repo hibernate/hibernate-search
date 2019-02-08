@@ -18,7 +18,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 
-public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMapping> {
+public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMappingPartialBuildState> {
 
 	private final boolean multiTenancyEnabled;
 	private final List<StubTypeMetadataContributor> mappingContributors = new ArrayList<>();
@@ -43,7 +43,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 	}
 
 	@Override
-	public Mapper<StubMapping> createMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
 		return new StubMapper( contributorProvider );
 	}

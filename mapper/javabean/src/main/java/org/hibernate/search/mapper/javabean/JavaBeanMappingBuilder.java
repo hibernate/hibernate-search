@@ -12,9 +12,11 @@ import java.util.Set;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
+import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingPartialBuildState;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
@@ -88,10 +90,23 @@ public final class JavaBeanMappingBuilder {
 	}
 
 	public CloseableJavaBeanMapping build() {
-		SearchIntegration integration = integrationBuilder.build();
+		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
+		SearchIntegration integration = null;
+		JavaBeanMapping mapping;
 		try {
-			JavaBeanMapping mapping = integration.getMapping( mappingKey );
+			mapping = integrationPartialBuildState.finalizeMapping(
+					mappingKey,
+					JavaBeanMappingPartialBuildState::finalizeMapping
+			);
+			integration = integrationPartialBuildState.finalizeIntegration();
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState );
+			throw e;
+		}
 
+		try {
 			/*
 			 * Since the user doesn't have access to the integration, but only to the (closeable) mapping,
 			 * make sure to close the integration whenever the mapping is closed by the user.

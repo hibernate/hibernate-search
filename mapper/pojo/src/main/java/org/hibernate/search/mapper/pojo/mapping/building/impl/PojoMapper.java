@@ -22,7 +22,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
@@ -50,7 +50,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
-public class PojoMapper<M> implements Mapper<M> {
+public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -58,7 +58,7 @@ public class PojoMapper<M> implements Mapper<M> {
 	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
-	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
+	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MPBS> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
@@ -73,7 +73,7 @@ public class PojoMapper<M> implements Mapper<M> {
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
-			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
+			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MPBS> wrapperFactory) {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
@@ -135,7 +135,7 @@ public class PojoMapper<M> implements Mapper<M> {
 	}
 
 	@Override
-	public MappingImplementor<M> build() throws MappingAbortedException {
+	public MPBS prepareBuild() throws MappingAbortedException {
 		Set<PojoRawTypeModel<?>> entityTypes = computeEntityTypes();
 		log.detectedEntityTypes( entityTypes );
 
@@ -151,9 +151,9 @@ public class PojoMapper<M> implements Mapper<M> {
 						extractorBinder, typeAdditionalMetadataProvider, pathInverter, entityTypes
 				);
 
-		PojoMappingDelegate mappingImplementor;
+		PojoMappingDelegate mappingDelegate;
 		try {
-			// First phase: build the processors and contribute to the reindexing resolvers
+			// First step: build the processors and contribute to the reindexing resolvers
 			for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
 				pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
 			}
@@ -161,7 +161,7 @@ public class PojoMapper<M> implements Mapper<M> {
 				throw new MappingAbortedException();
 			}
 
-			// Second phase: build the indexed type managers and their reindexing resolvers
+			// Second step: build the indexed type managers and their reindexing resolvers
 			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?, ?>> entry
 					: indexedTypeManagerBuilders.entrySet() ) {
 				PojoRawTypeModel<?> typeModel = entry.getKey();
@@ -177,7 +177,7 @@ public class PojoMapper<M> implements Mapper<M> {
 							.add( e );
 				}
 			}
-			// Third phase: build the non-indexed, contained type managers and their reindexing resolvers
+			// Third step: build the non-indexed, contained type managers and their reindexing resolvers
 			for ( PojoRawTypeModel<?> entityType : entityTypes ) {
 				// Ignore abstract classes: we create one manager per concrete subclass, which is enough
 				if ( !entityType.isAbstract() && !indexedTypeManagerBuilders.containsKey( entityType ) ) {
@@ -196,7 +196,7 @@ public class PojoMapper<M> implements Mapper<M> {
 				throw new MappingAbortedException();
 			}
 
-			mappingImplementor = new PojoMappingDelegateImpl(
+			mappingDelegate = new PojoMappingDelegateImpl(
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);
@@ -220,10 +220,10 @@ public class PojoMapper<M> implements Mapper<M> {
 		closed = true;
 
 		try {
-			return wrapperFactory.apply( propertySource, mappingImplementor );
+			return wrapperFactory.apply( propertySource, mappingDelegate );
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( mappingImplementor );
+			new SuppressingCloser( e ).push( mappingDelegate );
 			throw e;
 		}
 	}

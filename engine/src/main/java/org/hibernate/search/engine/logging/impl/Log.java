@@ -198,7 +198,7 @@ public interface Log extends BasicLogger {
 	SearchException multipleIndexMapping(@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName, String otherIndexName);
 
 	@Message(id = ID_OFFSET_2 + 32, value = "No mapping registered for mapping key: '%1$s'.")
-	SearchException noMappingRegistered(@FormatWith(MappingKeyFormatter.class) MappingKey<?> mappingKey);
+	SearchException noMappingRegistered(@FormatWith(MappingKeyFormatter.class) MappingKey<?, ?> mappingKey);
 
 	@Message(id = ID_OFFSET_2 + 33, value = "No backend registered for backend name: '%1$s'.")
 	SearchException noBackendRegistered(String backendName);

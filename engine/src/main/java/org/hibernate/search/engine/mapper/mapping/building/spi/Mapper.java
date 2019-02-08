@@ -7,13 +7,13 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
- * @param <M> The Java type of the produced mapping
+ * @param <MPBS> The Java type of the partial build state of the produced mapping.
  */
-public interface Mapper<M> {
+public interface Mapper<MPBS extends MappingPartialBuildState> {
 
 	/**
 	 * Close any allocated resource.
@@ -24,9 +24,9 @@ public interface Mapper<M> {
 	void closeOnFailure();
 
 	/**
-	 * Add an indexed type to the mapping that will be {@link #build() built}.
+	 * Add an indexed type to the mapping that will be {@link #prepareBuild() built}.
 	 * <p>
-	 * Never called after {@link #build()}.
+	 * Never called after {@link #prepareBuild()}.
 	 *
 	 * @param typeModel A model of the type to be mapped
 	 * @param indexManagerBuildingState The building state for the index to be mapped
@@ -34,15 +34,18 @@ public interface Mapper<M> {
 	void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState);
 
 	/**
-	 * Build the mapping based on the {@link #addIndexed(MappableTypeModel, IndexManagerBuildingState) indexed types}
+	 * Partially build the mapping based on the {@link #addIndexed(MappableTypeModel, IndexManagerBuildingState) indexed types}
 	 * added so far.
 	 * <p>
 	 * May only be called once on a given object.
+	 * <p>
+	 * The
+	 * </p>
 	 *
-	 * @return The mapping.
+	 * @return The partially-built mapping.
 	 * @throws MappingAbortedException When aborting the mapping due to
 	 * {@link ContextualFailureCollector#add(Throwable) collected} failures.
 	 */
-	MappingImplementor<M> build() throws MappingAbortedException;
+	MPBS prepareBuild() throws MappingAbortedException;
 
 }

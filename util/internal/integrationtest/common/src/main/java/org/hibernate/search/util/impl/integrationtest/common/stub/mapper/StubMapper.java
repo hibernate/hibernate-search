@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-class StubMapper implements Mapper<StubMapping> {
+class StubMapper implements Mapper<StubMappingPartialBuildState> {
 
 	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
 
@@ -37,12 +37,12 @@ class StubMapper implements Mapper<StubMapping> {
 	}
 
 	@Override
-	public StubMapping build() {
+	public StubMappingPartialBuildState prepareBuild() {
 		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = indexManagerBuildingStates.entrySet().stream()
 				.collect( Collectors.toMap(
 						e -> e.getKey().asString(),
 						e -> new StubMappingIndexManager( e.getValue().build() )
 				) );
-		return new StubMapping( indexMappingsByTypeIdentifier );
+		return new StubMappingPartialBuildState( indexMappingsByTypeIdentifier );
 	}
 }

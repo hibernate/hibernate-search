@@ -15,7 +15,9 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -25,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingPartialBuildState;
 
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -141,11 +144,23 @@ public class SearchSetupHelper implements TestRule {
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
 			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
-			SearchIntegration integration = integrationBuilder.build();
-			mappingRepositories.add( integration );
+			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
+			SearchIntegration integration = null;
+			try {
+				StubMapping mapping = integrationPartialBuildState.finalizeMapping(
+						mappingKey, StubMappingPartialBuildState::finalizeMapping
+				);
+				integration = integrationPartialBuildState.finalizeIntegration();
+				mappingRepositories.add( integration );
 
-			StubMapping mapping = integration.getMapping( mappingKey );
-			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
+				indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
+			}
+			catch (RuntimeException e) {
+				new SuppressingCloser( e )
+						.push( SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildState )
+						.push( integration );
+				throw e;
+			}
 
 			return integration;
 		}

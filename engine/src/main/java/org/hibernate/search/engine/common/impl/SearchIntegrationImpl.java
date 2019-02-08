@@ -27,12 +27,12 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	private final BeanResolver beanResolver;
 
-	private final Map<MappingKey<?>, MappingImplementor<?>> mappings;
+	private final Map<MappingKey<?, ?>, MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
 	SearchIntegrationImpl(BeanResolver beanResolver,
-			Map<MappingKey<?>, MappingImplementor<?>> mappings,
+			Map<MappingKey<?, ?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanResolver = beanResolver;
@@ -42,7 +42,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	}
 
 	@Override
-	public <M> M getMapping(MappingKey<M> mappingKey) {
+	public <M> M getMapping(MappingKey<?, M> mappingKey) {
 		// See SearchIntegrationBuilderImpl: we are sure that, if there is a mapping, it implements MappingImplementor<M>
 		@SuppressWarnings("unchecked")
 		MappingImplementor<M> mappingImplementor = (MappingImplementor<M>) mappings.get( mappingKey );

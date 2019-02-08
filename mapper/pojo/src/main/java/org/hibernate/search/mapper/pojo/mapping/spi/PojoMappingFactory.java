@@ -7,10 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 
-public interface PojoMappingFactory<M> {
+public interface PojoMappingFactory<MPBS> {
 
-	MappingImplementor<M> createMapping(ConfigurationPropertySource propertySource, PojoMappingDelegate mappingDelegate);
+	MPBS createMapping(ConfigurationPropertySource propertySource, PojoMappingDelegate mappingDelegate);
 
 }

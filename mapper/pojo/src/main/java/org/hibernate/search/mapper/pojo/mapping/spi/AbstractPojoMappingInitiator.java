@@ -15,6 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
@@ -23,10 +24,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.ProgrammaticMappingDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
-public abstract class AbstractPojoMappingInitiator<M>
-		implements MappingInitiator<PojoTypeMetadataContributor, M> {
+public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBuildState>
+		implements MappingInitiator<PojoTypeMetadataContributor, MPBS> {
 
-	private final PojoMappingFactory<M> mappingFactory;
+	private final PojoMappingFactory<MPBS> mappingFactory;
 	private final PojoBootstrapIntrospector introspector;
 
 	private boolean implicitProvidedId;
@@ -36,7 +37,7 @@ public abstract class AbstractPojoMappingInitiator<M>
 
 	private final List<PojoMappingConfigurationContributor> delegates = new ArrayList<>();
 
-	protected AbstractPojoMappingInitiator(PojoMappingFactory<M> mappingFactory,
+	protected AbstractPojoMappingInitiator(PojoMappingFactory<MPBS> mappingFactory,
 			PojoBootstrapIntrospector introspector) {
 		this.mappingFactory = mappingFactory;
 		this.introspector = introspector;
@@ -86,7 +87,7 @@ public abstract class AbstractPojoMappingInitiator<M>
 	}
 
 	@Override
-	public Mapper<M> createMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public Mapper<MPBS> createMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
 				buildContext, propertySource, contributorProvider,

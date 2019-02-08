@@ -14,7 +14,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 public interface SearchIntegration extends AutoCloseable {
 
-	<M> M getMapping(MappingKey<M> mappingKey);
+	<M> M getMapping(MappingKey<?, M> mappingKey);
 
 	Backend getBackend(String backendName);
 
