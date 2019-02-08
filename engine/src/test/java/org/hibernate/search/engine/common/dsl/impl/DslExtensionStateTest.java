@@ -331,6 +331,7 @@ public class DslExtensionStateTest extends EasyMockSupport {
 			this.name = name;
 		}
 
+		@Override
 		public String toString() {
 			if ( name != null ) {
 				return name;
