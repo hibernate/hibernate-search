@@ -64,13 +64,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private static final ConfigurationProperty<ElasticsearchIndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_STRATEGY )
-					.as( ElasticsearchIndexLifecycleStrategyName.class, ElasticsearchIndexLifecycleStrategyName::fromExternalRepresentation )
+					.as( ElasticsearchIndexLifecycleStrategyName.class, ElasticsearchIndexLifecycleStrategyName::parse )
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_STRATEGY )
 					.build();
 
 	private static final ConfigurationProperty<ElasticsearchIndexStatus> MANAGEMENT_REQUIRED_STATUS =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS )
-					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::fromExternalRepresentation )
+					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::parse )
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_REQUIRED_STATUS )
 					.build();
 

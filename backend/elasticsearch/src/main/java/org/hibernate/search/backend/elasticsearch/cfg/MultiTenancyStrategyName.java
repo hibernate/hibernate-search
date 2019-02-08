@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.StringHelper;
 
 public enum MultiTenancyStrategyName {
 
@@ -25,21 +26,23 @@ public enum MultiTenancyStrategyName {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	// This method conforms to the MicroProfile Config specification. Do not change its signature.
+	public static MultiTenancyStrategyName parse(CharSequence charSequence) {
+		return StringHelper.parseDiscreteValues(
+				MultiTenancyStrategyName.values(),
+				MultiTenancyStrategyName::getExternalRepresentation,
+				log::invalidMultiTenancyStrategyName,
+				charSequence
+		);
+	}
+
 	private final String externalRepresentation;
 
 	MultiTenancyStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	public static MultiTenancyStrategyName fromExternalRepresentation(String multiTenancyStrategy) {
-		if ( NONE.externalRepresentation.equals( multiTenancyStrategy ) ) {
-			return NONE;
-		}
-		else if ( DISCRIMINATOR.externalRepresentation.equals( multiTenancyStrategy ) ) {
-			return DISCRIMINATOR;
-		}
-		else {
-			throw log.unknownMultiTenancyStrategyConfiguration( multiTenancyStrategy );
-		}
+	private String getExternalRepresentation() {
+		return externalRepresentation;
 	}
 }

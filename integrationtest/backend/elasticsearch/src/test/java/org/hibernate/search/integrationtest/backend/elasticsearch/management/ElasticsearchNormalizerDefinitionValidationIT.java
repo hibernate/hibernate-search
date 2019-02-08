@@ -124,7 +124,7 @@ public class ElasticsearchNormalizerDefinitionValidationIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.VALIDATE.getExternalName()
+						ElasticsearchIndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

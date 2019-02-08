@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.jboss.logging.Logger.Level.WARN;
 
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -97,8 +98,9 @@ public interface Log extends BasicLogger {
 	)
 	SearchException elasticsearchMappingCreationFailed(String indexName, String causeMessage, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_2 + 22, value = "Unexpected index status string: '%1$s'. Specify one of 'green', 'yellow' or 'red'.")
-	SearchException unexpectedIndexStatusString(String status);
+	@Message(id = ID_OFFSET_2 + 22, value = "Invalid index status: '%1$s'."
+			+ " Valid statuses are: %2$s.")
+	SearchException invalidIndexStatus(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$s.")
 	SearchException unexpectedIndexStatus(String indexName, String expected, String timeoutAndUnit,
@@ -292,9 +294,9 @@ public interface Log extends BasicLogger {
 			value = "Index '%1$s' requires multi-tenancy but the backend does not support it in its current configuration.")
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 15,
-			value = "Unknown multi-tenancy strategy '%1$s'.")
-	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
+	@Message(id = ID_OFFSET_3 + 15, value = "Invalid multi-tenancy strategy name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_3 + 16,
 			value = "Tenant identifier '%1$s' is provided, but multi-tenancy is disabled for this backend.")
@@ -450,4 +452,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same changeset.")
 	SearchException elasticsearchSkippedBecauseOfPreviousWork(@Cause Throwable skippingCause);
+
+	@Message(id = ID_OFFSET_3 + 52, value = "Invalid index lifecycle strategy name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidIndexLifecycleStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

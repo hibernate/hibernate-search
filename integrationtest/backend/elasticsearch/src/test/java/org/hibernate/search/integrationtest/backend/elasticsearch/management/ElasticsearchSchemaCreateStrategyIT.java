@@ -88,7 +88,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						ElasticsearchIndexLifecycleStrategyName.CREATE.getExternalName()
+						ElasticsearchIndexLifecycleStrategyName.CREATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

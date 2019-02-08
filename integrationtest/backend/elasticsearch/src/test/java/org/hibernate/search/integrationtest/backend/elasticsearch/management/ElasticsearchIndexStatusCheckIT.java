@@ -150,7 +150,7 @@ public class ElasticsearchIndexStatusCheckIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalName()
+						strategy.getExternalRepresentation()
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,

@@ -209,7 +209,7 @@ public class ElasticsearchSchemaCreationIT {
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalName()
+						strategy.getExternalRepresentation()
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

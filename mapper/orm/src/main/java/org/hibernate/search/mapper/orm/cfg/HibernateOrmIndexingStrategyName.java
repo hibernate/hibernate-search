@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.impl.common.StringHelper;
 
 /**
  * Modes for triggering indexing of entities.
@@ -31,36 +32,23 @@ public enum HibernateOrmIndexingStrategyName {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	// This method conforms to the MicroProfile Config specification. Do not change its signature.
+	public static HibernateOrmIndexingStrategyName parse(CharSequence charSequence) {
+		return StringHelper.parseDiscreteValues(
+				HibernateOrmIndexingStrategyName.values(),
+				HibernateOrmIndexingStrategyName::getExternalRepresentation,
+				log::invalidIndexingStrategyName,
+				charSequence
+		);
+	}
+
 	private final String externalRepresentation;
 
 	HibernateOrmIndexingStrategyName(String externalRepresentation) {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	/**
-	 * Returns the {@link HibernateOrmIndexingStrategyName} matching the given external representation as specified via
-	 * {@link HibernateOrmMapperSettings#INDEXING_STRATEGY}
-	 * @param indexingMode the indexing mode external representation
-	 * @return the {@link HibernateOrmIndexingStrategyName}
-	 */
-	public static HibernateOrmIndexingStrategyName fromExternalRepresentation(String indexingMode) {
-		if ( EVENT.toExternalRepresentation().equals( indexingMode ) ) {
-			return HibernateOrmIndexingStrategyName.EVENT;
-		}
-		else if ( MANUAL.toExternalRepresentation().equals( indexingMode ) ) {
-			return HibernateOrmIndexingStrategyName.MANUAL;
-		}
-		else {
-			throw log.unknownIndexingMode( indexingMode );
-		}
-	}
-
-	/**
-	 * Returns the external representation of this indexing mode. Generally this enumeration itself should preferably be
-	 * used for comparisons etc.
-	 * @return the external representation as string
-	 */
-	public String toExternalRepresentation() {
+	private String getExternalRepresentation() {
 		return externalRepresentation;
 	}
 }

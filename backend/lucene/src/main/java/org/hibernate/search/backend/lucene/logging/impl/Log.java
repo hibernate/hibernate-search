@@ -10,6 +10,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
@@ -251,8 +252,8 @@ public interface Log extends BasicLogger {
 	SearchException multiTenancyRequiredButNotSupportedByBackend(String indexName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 30,
-			value = "Unknown multi-tenancy strategy '%1$s'.")
-	SearchException unknownMultiTenancyStrategyConfiguration(String multiTenancyStrategy);
+			value = "Invalid multi-tenancy strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidMultiTenancyStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_2 + 31,
 			value = "Tenant identifier '%1$s' is provided, but multi-tenancy is disabled for this backend.")
