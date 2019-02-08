@@ -17,4 +17,6 @@ public interface ContextualFailureCollector extends FailureCollector {
 
 	void add(Throwable t);
 
+	void add(String failureMessage);
+
 }
