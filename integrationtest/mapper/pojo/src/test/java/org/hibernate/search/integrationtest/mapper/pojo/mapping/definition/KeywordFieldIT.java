@@ -180,7 +180,7 @@ public class KeywordFieldIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
@@ -212,7 +212,7 @@ public class KeywordFieldIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(

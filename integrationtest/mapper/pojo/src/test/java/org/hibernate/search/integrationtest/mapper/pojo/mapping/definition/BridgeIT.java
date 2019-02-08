@@ -202,7 +202,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.annotationContextAnyParameters( BridgeAnnotationWithEmptyTypeBridgeRef.class )
 						.failure(
@@ -236,7 +236,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.annotationContextAnyParameters( BridgeAnnotationWithConflictingReferencesInTypeBridgeMapping.class )
 						.failure(
@@ -274,7 +274,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"Requested incompatible type for '.stringProperty<no value extractors>'",
@@ -318,7 +318,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( BridgeAnnotationWithEmptyPropertyBridgeMapping.class )
@@ -353,7 +353,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( BridgeAnnotationWithConflictingReferencesInPropertyBridgeMapping.class )
@@ -388,7 +388,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( MarkerAnnotationWithEmptyMarkerMapping.class )
@@ -427,7 +427,7 @@ public class BridgeIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".stringProperty" )
 						.failure(

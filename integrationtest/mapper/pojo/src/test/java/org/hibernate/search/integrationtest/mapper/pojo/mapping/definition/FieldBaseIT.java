@@ -60,7 +60,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
@@ -92,7 +92,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
@@ -122,7 +122,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
@@ -152,7 +152,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".myProperty" )
 						.failure(
@@ -184,7 +184,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -215,7 +215,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".numbers" )
 						.failure(
@@ -261,7 +261,7 @@ public class FieldBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( GenericField.class )

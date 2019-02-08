@@ -49,7 +49,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -76,7 +76,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -101,7 +101,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -126,7 +126,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.failure(
@@ -159,7 +159,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( DocumentId.class )
@@ -185,7 +185,7 @@ public class DocumentIdBaseIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"There isn't any explicit document ID mapping for indexed type '"
