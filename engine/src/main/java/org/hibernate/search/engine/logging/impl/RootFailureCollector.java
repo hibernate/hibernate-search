@@ -211,6 +211,11 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
+		public void add(String failureMessage) {
+			doAdd( failureMessage );
+		}
+
+		@Override
 		ContextualFailureCollectorImpl withDefaultContext() {
 			return this;
 		}
@@ -236,14 +241,18 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		private void doAdd(Throwable failure, String failureMessage) {
+			StringJoiner contextJoiner = new StringJoiner( COMMON_MESSAGES.contextSeparator() );
+			appendContextTo( contextJoiner );
+			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
+
+			doAdd( failureMessage );
+		}
+
+		private void doAdd(String failureMessage) {
 			if ( failureMessages == null ) {
 				failureMessages = new ArrayList<>();
 			}
 			failureMessages.add( failureMessage );
-
-			StringJoiner contextJoiner = new StringJoiner( COMMON_MESSAGES.contextSeparator() );
-			appendContextTo( contextJoiner );
-			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
 
 			root.onAddFailure();
 		}
