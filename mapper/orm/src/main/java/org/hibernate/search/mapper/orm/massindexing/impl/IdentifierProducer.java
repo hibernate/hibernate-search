@@ -6,19 +6,23 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.Criteria;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.SingularAttribute;
+
 import org.hibernate.ScrollMode;
 import org.hibernate.ScrollableResults;
 import org.hibernate.SessionFactory;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -33,16 +37,20 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * instances: the reason for this is to load them in batches
  * in the next step and reduce contention on the queue.
  *
+ * @param <E> The entity type
+ * @param <I> The identifier type
+ *
  * @author Sanne Grinovero
  */
-public class IdentifierProducer implements StatelessSessionAwareRunnable {
+public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ProducerConsumerQueue<List<Serializable>> destination;
+	private final ProducerConsumerQueue<List<I>> destination;
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
-	private final Class<?> indexedType;
+	private final Class<E> indexedType;
+	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final MassIndexingMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
@@ -52,20 +60,24 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
 	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
-	 * @param indexedType the entity type to be loaded
+	 * @param indexedType the entity type whose identifiers are to be loaded
+	 * @param idAttributeOfIndexedType the id attribute to be loaded
 	 * @param monitor the indexing monitor
 	 * @param objectsLimit if not zero
 	 * @param idFetchSize the fetch size
 	 * @param tenantId the tenant identifier
 	 */
 	public IdentifierProducer(
-			ProducerConsumerQueue<List<Serializable>> fromIdentifierListToEntities, SessionFactory sessionFactory,
-			int objectLoadingBatchSize, Class<?> indexedType, MassIndexingMonitor monitor,
+			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities, SessionFactory sessionFactory,
+			int objectLoadingBatchSize,
+			Class<E> indexedType, SingularAttribute<? super E, I> idAttributeOfIndexedType,
+			MassIndexingMonitor monitor,
 			long objectsLimit, int idFetchSize, String tenantId) {
 		this.destination = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;
 		this.batchSize = objectLoadingBatchSize;
 		this.indexedType = indexedType;
+		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 		this.idFetchSize = idFetchSize;
@@ -132,12 +144,7 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 	// See https://hibernate.atlassian.net/browse/HHH-13154.
 	@SuppressWarnings("deprecation")
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
-		Number countAsNumber = (Number) session.createCriteria( indexedType.getName() )
-				.setProjection( Projections.rowCount() )
-				.setCacheable( false )
-				.uniqueResult();
-
-		long totalCount = countAsNumber.longValue();
+		long totalCount = createTotalCountQuery( session ).uniqueResult();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
 			totalCount = objectsLimit;
 		}
@@ -146,16 +153,12 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		}
 		monitor.addToTotalCount( totalCount );
 
-		Criteria criteria = session.createCriteria( indexedType.getName() )
-				.setProjection( Projections.id() )
-				.setCacheable( false )
-				.setFetchSize( idFetchSize );
-
-		ArrayList<Serializable> destinationList = new ArrayList<>( batchSize );
+		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;
-		try ( ScrollableResults results = criteria.scroll( ScrollMode.FORWARD_ONLY ) ) {
+		try ( ScrollableResults results = createIdentifiersQuery( session ).scroll( ScrollMode.FORWARD_ONLY ) ) {
 			while ( results.next() ) {
-				Serializable id = (Serializable) results.get( 0 );
+				@SuppressWarnings("unchecked")
+				I id = (I) results.get( 0 );
 				destinationList.add( id );
 				if ( destinationList.size() == batchSize ) {
 					// Explicitly checking whether the TX is still open; Depending on the driver implementation new ids
@@ -177,7 +180,31 @@ public class IdentifierProducer implements StatelessSessionAwareRunnable {
 		enqueueList( destinationList );
 	}
 
-	private void enqueueList(final List<Serializable> idsList) throws InterruptedException {
+	private Query<Long> createTotalCountQuery(StatelessSession session) {
+		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
+		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
+
+		Root<E> root = criteriaQuery.from( indexedType );
+		criteriaQuery.select( criteriaBuilder.count( root ) );
+
+		return session.createQuery( criteriaQuery )
+				.setCacheable( false );
+	}
+
+	private Query<I> createIdentifiersQuery(StatelessSession session) {
+		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
+		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( idAttributeOfIndexedType.getJavaType() );
+
+		Root<E> root = criteriaQuery.from( indexedType );
+		Path<I> idPath = root.get( idAttributeOfIndexedType );
+		criteriaQuery.select( idPath );
+
+		return session.createQuery( criteriaQuery )
+				.setCacheable( false )
+				.setFetchSize( idFetchSize );
+	}
+
+	private void enqueueList(final List<I> idsList) throws InterruptedException {
 		if ( ! idsList.isEmpty() ) {
 			destination.put( idsList );
 			log.tracef( "produced a list of ids %s", idsList );

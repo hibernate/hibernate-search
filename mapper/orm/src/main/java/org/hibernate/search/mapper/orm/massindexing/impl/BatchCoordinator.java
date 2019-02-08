@@ -23,6 +23,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
+import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.SingularAttribute;
 
 /**
  * Makes sure that several different BatchIndexingWorkspace(s)
@@ -123,15 +125,23 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
-			indexingTasks.add( executor.submit( new BatchIndexingWorkspace(
-					sessionFactory, mappingContext, sessionContext, type,
-					documentBuilderThreads, cacheMode,
-					objectLoadingBatchSize, endAllSignal, monitor, objectsLimit, idFetchSize, transactionTimeout
-			) ) );
-
+			indexingTasks.add( executor.submit( createBatchIndexingWorkspace( type ) ) );
 		}
 		executor.shutdown();
 		endAllSignal.await(); //waits for the executor to finish
+	}
+
+	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(Class<E> indexedType) {
+		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( indexedType );
+		SingularAttribute<? super E, ?> idAttributeOfIndexedType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
+
+		return new BatchIndexingWorkspace<>(
+				sessionFactory, mappingContext, sessionContext,
+				indexedType, idAttributeOfIndexedType,
+				documentBuilderThreads, cacheMode,
+				objectLoadingBatchSize, endAllSignal,
+				monitor, objectsLimit, idFetchSize, transactionTimeout
+		);
 	}
 
 	/**
