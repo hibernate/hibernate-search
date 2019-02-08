@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.types.dsl;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -30,6 +31,8 @@ public interface IndexFieldTypeFactoryContext {
 	StandardIndexFieldTypeContext<?, LocalDate> asLocalDate();
 
 	StandardIndexFieldTypeContext<?, Instant> asInstant();
+
+	StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime();
 
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
