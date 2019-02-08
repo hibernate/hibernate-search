@@ -24,6 +24,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIde
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
@@ -84,6 +86,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( LocalDate.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDate.class ) ) );
 		addValueBridgeForExactRawType( Instant.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Instant.class ) ) );
 		addValueBridgeForExactRawType( Date.class, ignored -> BeanHolder.of( new DefaultJavaUtilDateValueBridge() ) );
+		addValueBridgeForExactRawType( Calendar.class, ignored -> BeanHolder.of( new DefaultJavaUtilCalendarValueBridge() ) );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumValueBridge<>() ) );
 		addValueBridgeForExactRawType( Character.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Character.class ) ) );
 		addValueBridgeForExactRawType( Byte.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Byte.class ) ) );

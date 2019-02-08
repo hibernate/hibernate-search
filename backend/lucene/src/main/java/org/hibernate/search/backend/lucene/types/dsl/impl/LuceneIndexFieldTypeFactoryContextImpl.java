@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
@@ -61,6 +62,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( Instant.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInstant();
 		}
+		else if ( ZonedDateTime.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
+		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
 		}
@@ -98,6 +102,12 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
 		return new LuceneInstantIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
+		// TODO implement this on backend commits within the same HSEARCH-3047 issue
+		return null;
 	}
 
 	@Override

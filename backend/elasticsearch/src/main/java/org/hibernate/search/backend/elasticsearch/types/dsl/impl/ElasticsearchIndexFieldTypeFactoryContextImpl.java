@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
@@ -59,6 +60,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( Instant.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInstant();
 		}
+		else if ( ZonedDateTime.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
+		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
 		}
@@ -96,6 +100,12 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Instant> asInstant() {
 		return new ElasticsearchInstantIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
+		// TODO implement this on backend commits within the same HSEARCH-3047 issue
+		return null;
 	}
 
 	@Override
