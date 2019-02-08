@@ -114,7 +114,7 @@ public class ElasticsearchSchemaAccessor {
 			execute( work );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchMappingCreationFailed( indexName.original, e );
+			throw log.elasticsearchMappingCreationFailed( indexName.original, e.getMessage(), e );
 		}
 	}
 
@@ -126,7 +126,14 @@ public class ElasticsearchSchemaAccessor {
 				workFactory.waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
 				.build();
 
-		execute( work );
+		try {
+			execute( work );
+		}
+		catch (RuntimeException e) {
+			throw log.unexpectedIndexStatus(
+					indexName.original, requiredIndexStatus.getElasticsearchString(), timeoutAndUnit, e
+			);
+		}
 	}
 
 	public void dropIndexIfExisting(URLEncodedString indexName) {

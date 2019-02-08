@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
@@ -62,7 +63,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public void start() {
+	public void start(IndexManagerStartContext context) {
 		// Nothing to do
 	}
 

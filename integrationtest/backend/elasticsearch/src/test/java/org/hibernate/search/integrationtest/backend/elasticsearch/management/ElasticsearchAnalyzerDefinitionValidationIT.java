@@ -11,10 +11,10 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
@@ -134,7 +134,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "analyzer 'custom-analyzer':\n\tMissing analyzer" )
 				.build()
@@ -186,7 +186,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "analyzer 'custom-analyzer':\n"
 								+ "\tInvalid char filters. Expected '[custom-pattern-replace]',"
@@ -240,7 +240,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "analyzer 'custom-analyzer':\n"
 								+ "\tInvalid tokenizer. Expected 'custom-edgeNGram',"
@@ -294,7 +294,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "analyzer 'custom-analyzer':\n"
 								+ "\tInvalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
@@ -333,7 +333,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "char filter 'custom-pattern-replace':\n\tMissing char filter" )
 				.build()
@@ -371,7 +371,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "tokenizer 'custom-edgeNGram':\n\tMissing tokenizer" )
 				.build()
@@ -406,7 +406,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "token filter 'custom-keep-types':\n\tMissing token filter" )
 				.build()
@@ -458,7 +458,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "char filter 'custom-pattern-replace':\n\tInvalid type."
 								+ " Expected 'pattern_replace', actual is 'html_strip'" )
@@ -511,7 +511,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "char filter 'custom-pattern-replace':\n"
 								+ "\tInvalid value for parameter 'pattern'. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'" )
@@ -564,7 +564,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "char filter 'custom-pattern-replace':\n"
 								+ "\tInvalid value for parameter 'tags'."
@@ -619,7 +619,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "filter 'custom-word-delimiter':\n"
 								+ "\tInvalid value for parameter 'generate_number_parts'."

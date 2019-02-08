@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -18,11 +17,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests for the schema migration feature when using automatic index management.
@@ -41,9 +41,6 @@ public class ElasticsearchSchemaMigrationIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
@@ -350,28 +347,29 @@ public class ElasticsearchSchemaMigrationIT {
 				+ "}"
 				);
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( UPDATE_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
-						.withMessage( "index" )
-				.build()
+		setupExpectingFailure(
+				() -> withManagementStrategyConfiguration()
+						.withIndex(
+								"MappedType", INDEX1_NAME,
+								ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field( "myField", f -> f.asLocalDate() )
+											.createAccessor();
+								},
+								indexManager -> { }
+						)
+						.setup(),
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX1_NAME )
+						.multilineFailure(
+								UPDATE_FAILED_MESSAGE_ID,
+								MAPPING_CREATION_FAILED_MESSAGE_ID,
+								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+								"Elasticsearch request failed",
+								"different [index]"
+						)
+						.build()
 		);
-
-		withManagementStrategyConfiguration()
-				.withIndex(
-						"MappedType", INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate() )
-									.createAccessor();
-						},
-						indexManager -> { }
-				)
-				.setup();
 	}
 
 	@Test
@@ -391,31 +389,32 @@ public class ElasticsearchSchemaMigrationIT {
 				+ "}"
 				);
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( UPDATE_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
-						.withMessage( "analyzer" )
-				.build()
+		setupExpectingFailure(
+				() -> withManagementStrategyConfiguration()
+						.withIndex(
+								"MappedType", INDEX1_NAME,
+								ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field(
+											"analyzer",
+											f -> f.asString().analyzer( "customAnalyzer" )
+									)
+											.createAccessor();
+								},
+								indexManager -> { }
+						)
+						.setup(),
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX1_NAME )
+						.multilineFailure(
+								UPDATE_FAILED_MESSAGE_ID,
+								MAPPING_CREATION_FAILED_MESSAGE_ID,
+								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+								"Elasticsearch request failed",
+								"different [analyzer]"
+						)
+						.build()
 		);
-
-		withManagementStrategyConfiguration()
-				.withIndex(
-						"MappedType", INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field(
-									"analyzer",
-									f -> f.asString().analyzer( "customAnalyzer" )
-							)
-									.createAccessor();
-						},
-						indexManager -> { }
-				)
-				.setup();
 	}
 
 	@Test
@@ -435,31 +434,39 @@ public class ElasticsearchSchemaMigrationIT {
 				+ "}"
 				);
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( UPDATE_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( MAPPING_CREATION_FAILED_MESSAGE_ID )
-				.causedBy( SearchException.class )
-						.withMessage( ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID )
-						.withMessage( "normalizer" )
-				.build()
+		setupExpectingFailure(
+				() -> withManagementStrategyConfiguration()
+						.withIndex(
+								"MappedType", INDEX1_NAME,
+								ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field(
+											"normalizer",
+											f -> f.asString().normalizer( "customNormalizer" )
+									)
+											.createAccessor();
+								},
+								indexManager -> { }
+						)
+						.setup(),
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX1_NAME )
+						.multilineFailure(
+								UPDATE_FAILED_MESSAGE_ID,
+								MAPPING_CREATION_FAILED_MESSAGE_ID,
+								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+								"Elasticsearch request failed",
+								"different [normalizer]"
+						)
+						.build()
 		);
+	}
 
-		withManagementStrategyConfiguration()
-				.withIndex(
-						"MappedType", INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field(
-									"normalizer",
-									f -> f.asString().normalizer( "customNormalizer" )
-							)
-									.createAccessor();
-						},
-						indexManager -> { }
-				)
-				.setup();
+	private void setupExpectingFailure(Runnable setupAction, String failureReportRegex) {
+		SubTest.expectException( setupAction )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( failureReportRegex );
 	}
 
 	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {

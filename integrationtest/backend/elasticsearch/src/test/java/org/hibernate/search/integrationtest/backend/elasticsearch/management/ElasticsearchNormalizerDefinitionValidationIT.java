@@ -11,10 +11,10 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
@@ -97,7 +97,7 @@ public class ElasticsearchNormalizerDefinitionValidationIT {
 		putMapping();
 
 		thrown.expect(
-				isException( ElasticsearchSchemaValidationException.class )
+				isException( SearchException.class )
 						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
 						.withMessage( "normalizer 'custom-normalizer':\n\tMissing normalizer" )
 				.build()
