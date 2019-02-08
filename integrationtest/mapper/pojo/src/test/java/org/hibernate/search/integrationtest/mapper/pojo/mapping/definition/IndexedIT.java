@@ -100,7 +100,7 @@ public class IndexedIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedWithoutEntityMetadata.class.getName() )
 						.failure(
 								"Type '" + IndexedWithoutEntityMetadata.class.getName()
@@ -127,7 +127,7 @@ public class IndexedIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
 						.annotationContextAnyParameters( Indexed.class )
 						.failure(
@@ -161,7 +161,7 @@ public class IndexedIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildSingleContextFailureReportPattern()
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
 						.failure(
 								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to index 'indexName',"

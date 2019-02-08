@@ -60,8 +60,8 @@ public final class FailureReportUtils {
 
 	}
 
-	public static SingleContextFailureReportPatternBuilder buildSingleContextFailureReportPattern() {
-		return new SingleContextFailureReportPatternBuilder();
+	public static FailureReportPatternBuilder buildFailureReportPattern() {
+		return new FailureReportPatternBuilder();
 	}
 
 	/*
@@ -72,51 +72,56 @@ public final class FailureReportUtils {
 	 * - "." does not match newline characters
 	 * - "[\S\s]" matches any character, including newline characters
 	 */
-	public static class SingleContextFailureReportPatternBuilder {
-		private final StringBuilder contextPatternBuilder = new StringBuilder();
-		private final StringBuilder failurePatternBuilder = new StringBuilder( "\n\\h+failures: " );
+	public static class FailureReportPatternBuilder {
+		private final StringBuilder patternBuilder = new StringBuilder();
+		private boolean lastPatternWasFailure = false;
 
-		private SingleContextFailureReportPatternBuilder() {
+		private FailureReportPatternBuilder() {
 		}
 
-		public SingleContextFailureReportPatternBuilder typeContext(String exactTypeName) {
+		public FailureReportPatternBuilder typeContext(String exactTypeName) {
 			return contextLiteral( "type '" + exactTypeName + "'" );
 		}
 
-		public SingleContextFailureReportPatternBuilder indexContext(String exactIndexName) {
+		public FailureReportPatternBuilder indexContext(String exactIndexName) {
 			return contextLiteral( "index '" + exactIndexName + "'" );
 		}
 
-		public SingleContextFailureReportPatternBuilder backendContext(String exactBackendName) {
+		public FailureReportPatternBuilder backendContext(String exactBackendName) {
 			return contextLiteral( "backend '" + exactBackendName + "'" );
 		}
 
-		public SingleContextFailureReportPatternBuilder pathContext(String pathPattern) {
+		public FailureReportPatternBuilder pathContext(String pathPattern) {
 			return contextLiteral( "path '" + pathPattern + "'" );
 		}
 
-		public SingleContextFailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
+		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}
 
-		public SingleContextFailureReportPatternBuilder contextLiteral(String contextLiteral) {
+		public FailureReportPatternBuilder contextLiteral(String contextLiteral) {
 			return contextPattern( "\\Q" + contextLiteral + "\\E" );
 		}
 
-		public SingleContextFailureReportPatternBuilder contextPattern(String contextPattern) {
-			contextPatternBuilder.append( "\n\\h+" )
+		public FailureReportPatternBuilder contextPattern(String contextPattern) {
+			lastPatternWasFailure = false;
+			patternBuilder.append( "\n\\h+" )
 					.append( contextPattern )
 					.append( ": " );
 			return this;
 		}
 
-		public SingleContextFailureReportPatternBuilder failure(String ... literalStringsContainedInFailureMessageInOrder) {
-			failurePatternBuilder.append( "\n\\h+-\\h" );
+		public FailureReportPatternBuilder failure(String ... literalStringsContainedInFailureMessageInOrder) {
+			if ( !lastPatternWasFailure ) {
+				patternBuilder.append( "\n\\h+failures: " );
+			}
+			lastPatternWasFailure = true;
+			patternBuilder.append( "\n\\h+-\\h" );
 			for ( String contained : literalStringsContainedInFailureMessageInOrder ) {
-				failurePatternBuilder.append( ".*" )
+				patternBuilder.append( ".*" )
 						.append( "\\Q" ).append( contained ).append( "\\E" );
 			}
-			failurePatternBuilder.append( ".*" );
+			patternBuilder.append( ".*" );
 			return this;
 		}
 
@@ -126,8 +131,7 @@ public final class FailureReportUtils {
 			 * so we must match any characters before and after what we're looking for.
 			 */
 			return "[\\S\\s]*"
-					+ contextPatternBuilder.toString()
-					+ failurePatternBuilder.toString()
+					+ patternBuilder.toString()
 					+ "[\\S\\s]*";
 		}
 	}
