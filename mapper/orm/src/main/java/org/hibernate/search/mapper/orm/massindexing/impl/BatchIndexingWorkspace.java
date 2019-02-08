@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
-import java.io.Serializable;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -27,9 +28,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * This runnable will prepare a pipeline for batch indexing
  * of entities, managing the lifecycle of several ThreadPools.
  *
+ * @param <E> The entity type
+ * @param <I> The identifier type
+ *
  * @author Sanne Grinovero
  */
-public class BatchIndexingWorkspace extends ErrorHandledRunnable {
+public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,11 +41,11 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedSessionContextImplementor sessionContext;
 
-	private final ProducerConsumerQueue<List<Serializable>> primaryKeyStream;
+	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 
 	private final int documentBuilderThreads;
-	private final Class<?> indexedType;
-	private final String idNameOfIndexedType;
+	private final Class<E> indexedType;
+	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 
 	// status control
 	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
@@ -58,13 +62,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
 
-
 	private final List<Future<?>> tasks = new ArrayList<>();
 
 	BatchIndexingWorkspace(SessionFactoryImplementor sessionFactory,
 			HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedSessionContextImplementor sessionContext,
-			Class<?> type,
+			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
@@ -73,11 +76,9 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.sessionContext = sessionContext;
 
 		this.indexedType = type;
+		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
-
-		this.idNameOfIndexedType = sessionFactory.getMetamodel().entity( indexedType ).locateIdAttribute().getName();
-
 
 		//thread pool sizing:
 		this.documentBuilderThreads = objectLoadingThreads;
@@ -136,9 +137,9 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
 				transactionalContext,
-				new IdentifierProducer(
+				new IdentifierProducer<>(
 						primaryKeyStream, sessionFactory, objectLoadingBatchSize,
-						indexedType, monitor, objectsLimit,
+						indexedType, idAttributeOfIndexedType, monitor, objectsLimit,
 						idFetchSize, sessionContext.getTenantIdentifier()
 				),
 				transactionTimeout, sessionContext.getTenantIdentifier()
@@ -154,11 +155,12 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 	}
 
 	private void startTransformationToLuceneWork() {
-		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer(
+		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				primaryKeyStream, monitor,
 				sessionFactory, mappingContext,
-				producerEndSignal, cacheMode, indexedType,
-				idNameOfIndexedType, transactionTimeout,
+				producerEndSignal, cacheMode,
+				indexedType, idAttributeOfIndexedType,
+				transactionTimeout,
 				sessionContext.getTenantIdentifier()
 		);
 		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
