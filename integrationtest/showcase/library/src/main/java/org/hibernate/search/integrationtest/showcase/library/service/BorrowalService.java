@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.service;
 
-import java.util.Collections;
 import java.util.List;
-import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Account;
 import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
@@ -20,9 +18,6 @@ import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.integrationtest.showcase.library.repository.AccountRepository;
 import org.hibernate.search.integrationtest.showcase.library.repository.BorrowalRepository;
 import org.hibernate.search.integrationtest.showcase.library.repository.PersonRepository;
-import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,9 +35,6 @@ public class BorrowalService {
 
 	@Autowired
 	private PersonRepository personRepo;
-
-	@Autowired
-	private EntityManager entityManager;
 
 	public Person create(int id, String firstName, String lastName) {
 		return personRepo.save( new Person( id, firstName, lastName ) );
@@ -63,51 +55,18 @@ public class BorrowalService {
 	}
 
 	public List<Person> listTopBorrowers(int offset, int limit) {
-		return listTopBorrowers( "account.borrowals.totalCount", offset, limit );
+		return personRepo.listTopBorrowers( offset, limit );
 	}
 
 	public List<Person> listTopShortTermBorrowers(int offset, int limit) {
-		return listTopBorrowers( "account.borrowals.shortTermCount", offset, limit );
+		return personRepo.listTopShortTermBorrowers( offset, limit );
 	}
 
 	public List<Person> listTopLongTermBorrowers(int offset, int limit) {
-		return listTopBorrowers( "account.borrowals.longTermCount", offset, limit );
+		return personRepo.listTopLongTermBorrowers( offset, limit );
 	}
 
 	public List<Person> searchPerson(String terms, int offset, int limit) {
-		if ( terms == null || terms.isEmpty() ) {
-			return Collections.emptyList();
-		}
-
-		FullTextSearchTarget<Person> target = Search.getFullTextEntityManager( entityManager ).search( Person.class );
-
-		FullTextQuery<Person> query = target.query()
-				.asEntity()
-				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ) )
-				.sort( c -> {
-					c.byField( "lastName_sort" );
-					c.byField( "firstName_sort" );
-				} )
-				.build();
-
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.getResultList();
-	}
-
-	private List<Person> listTopBorrowers(String borrowalsCountField, int offset, int limit) {
-		FullTextSearchTarget<Person> target = Search.getFullTextEntityManager( entityManager ).search( Person.class );
-
-		FullTextQuery<Person> query = target.query()
-				.asEntity()
-				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( borrowalsCountField ).desc() )
-				.build();
-
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.getResultList();
+		return personRepo.searchPerson( terms, offset, limit );
 	}
 }
