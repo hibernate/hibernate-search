@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.spi;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
 /**
  * A start context for backends.
@@ -22,5 +23,7 @@ public interface BackendStartContext {
 	 * @return A failure collector.
 	 */
 	ContextualFailureCollector getFailureCollector();
+
+	ConfigurationPropertySource getConfigurationPropertySource();
 
 }

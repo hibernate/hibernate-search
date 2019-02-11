@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -25,10 +27,16 @@ class BackendPartialBuildState {
 		partiallyBuiltBackend.close();
 	}
 
-	BackendImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector) {
+	BackendImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector backendFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromBackendName( backendName ) );
-		BackendStartContextImpl startContext = new BackendStartContextImpl( backendFailureCollector );
+		ConfigurationPropertySource backendPropertySource =
+				EngineConfigurationUtils.getBackend( rootPropertySource, backendName );
+		BackendStartContextImpl startContext = new BackendStartContextImpl(
+				backendFailureCollector,
+				backendPropertySource
+		);
 		try {
 			partiallyBuiltBackend.start( startContext );
 		}

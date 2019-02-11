@@ -7,16 +7,21 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 class IndexManagerPartialBuildState {
 
+	private final String backendName;
 	private final String indexName;
 	private final IndexManagerImplementor<?> partiallyBuiltIndexManager;
 
-	IndexManagerPartialBuildState(String indexName, IndexManagerImplementor<?> partiallyBuiltIndexManager) {
+	IndexManagerPartialBuildState(String backendName,
+			String indexName, IndexManagerImplementor<?> partiallyBuiltIndexManager) {
+		this.backendName = backendName;
 		this.indexName = indexName;
 		this.partiallyBuiltIndexManager = partiallyBuiltIndexManager;
 	}
@@ -25,10 +30,20 @@ class IndexManagerPartialBuildState {
 		partiallyBuiltIndexManager.close();
 	}
 
-	IndexManagerImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector) {
+	IndexManagerImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector indexFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromIndexName( indexName ) );
-		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl( indexFailureCollector );
+		ConfigurationPropertySource indexPropertySource =
+				EngineConfigurationUtils.addIndexDefaults(
+						EngineConfigurationUtils.getIndexWithoutDefaults( rootPropertySource, indexName ),
+						EngineConfigurationUtils.getIndexDefaults(
+								EngineConfigurationUtils.getBackend( rootPropertySource, backendName )
+						)
+				);
+		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
+				indexFailureCollector, indexPropertySource
+		);
 		try {
 			partiallyBuiltIndexManager.start( startContext );
 		}

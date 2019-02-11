@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -22,5 +23,7 @@ public interface IndexManagerStartContext {
 	 * @return A failure collector.
 	 */
 	ContextualFailureCollector getFailureCollector();
+
+	ConfigurationPropertySource getConfigurationPropertySource();
 
 }

@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
@@ -80,7 +81,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	}
 
 	@Override
-	public SearchIntegration finalizeIntegration() {
+	public SearchIntegration finalizeIntegration(ConfigurationPropertySource configurationPropertySource) {
 		if ( !partiallyBuiltMappings.isEmpty() ) {
 			throw new AssertionFailure(
 					"Some mappings were not fully built; there is probably a bug in Hibernate Search."
@@ -95,7 +96,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
 			fullyBuiltBackends.put(
 					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector )
+					entry.getValue().finalizeBuild( failureCollector, configurationPropertySource )
 			);
 		}
 		failureCollector.checkNoFailure();
@@ -105,7 +106,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
 			fullyBuiltIndexManagers.put(
 					entry.getKey(),
-					entry.getValue().finalizeBuild( failureCollector )
+					entry.getValue().finalizeBuild( failureCollector, configurationPropertySource )
 			);
 		}
 		failureCollector.checkNoFailure();

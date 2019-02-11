@@ -25,11 +25,13 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
 
+	private final ConfigurationPropertySource propertySource;
 	private final SearchIntegrationBuilder integrationBuilder;
 	private final JavaBeanMappingKey mappingKey;
 	private final JavaBeanMappingInitiator mappingInitiator;
 
 	JavaBeanMappingBuilder(ConfigurationPropertySource propertySource, MethodHandles.Lookup lookup) {
+		this.propertySource = propertySource;
 		integrationBuilder = SearchIntegration.builder( propertySource );
 		JavaBeanBootstrapIntrospector introspector = new JavaBeanBootstrapIntrospector( lookup );
 		mappingKey = new JavaBeanMappingKey();
@@ -98,7 +100,7 @@ public final class JavaBeanMappingBuilder {
 					mappingKey,
 					JavaBeanMappingPartialBuildState::finalizeMapping
 			);
-			integration = integrationPartialBuildState.finalizeIntegration();
+			integration = integrationPartialBuildState.finalizeIntegration( propertySource );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

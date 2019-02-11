@@ -8,6 +8,7 @@ package org.hibernate.search.engine.common.spi;
 
 import java.util.function.Function;
 
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
@@ -16,7 +17,7 @@ public interface SearchIntegrationPartialBuildState {
 	/**
 	 * Close the resources held by this object (backends, index managers, ...).
 	 * <p>
-	 * To be called in the event of a failure that will prevent {@link #finalizeIntegration()} to be called.
+	 * To be called in the event of a failure that will prevent {@link #finalizeIntegration(ConfigurationPropertySource)} to be called.
 	 */
 	void closeOnFailure();
 
@@ -32,8 +33,11 @@ public interface SearchIntegrationPartialBuildState {
 
 	/**
 	 * Finalize the building of the integration.
+	 * @param configurationPropertySource The configuration property source,
+	 * which may hold additional configuration compared to the one passed to
+	 * {@link SearchIntegration#builder(ConfigurationPropertySource)}.
 	 * @return The fully-built integration.
 	 */
-	SearchIntegration finalizeIntegration();
+	SearchIntegration finalizeIntegration(ConfigurationPropertySource configurationPropertySource);
 
 }
