@@ -12,6 +12,9 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 
+import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
+
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 
@@ -36,6 +39,8 @@ import org.assertj.core.api.ThrowableAssert;
  * </ul>
  */
 public class SubTest {
+
+	private static final BasicLogger log = Logger.getLogger( SubTest.class.getName() );
 
 	public static <T> void expectSuccess(T parameter, ParameterizedSubTest<T> subTest) {
 		subTest.test( parameter );
@@ -66,6 +71,7 @@ public class SubTest {
 			throw new IllegalStateException( "This should never happen" );
 		}
 		catch (Exception e) {
+			log.infof( e, "SubTest caught exception (an exception was expected; type/message checks will follow):", e );
 			return new ExceptionThrowingSubTest( "Exception thrown by '" + description + "'", e );
 		}
 	}
