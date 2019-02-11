@@ -125,6 +125,20 @@ public final class FailureReportUtils {
 			return this;
 		}
 
+		public FailureReportPatternBuilder multilineFailure(String ... literalStringsContainedInFailureMessageInOrder) {
+			if ( !lastPatternWasFailure ) {
+				patternBuilder.append( "\n\\h+failures: " );
+			}
+			lastPatternWasFailure = true;
+			patternBuilder.append( "\n\\h+-\\h" );
+			for ( String contained : literalStringsContainedInFailureMessageInOrder ) {
+				patternBuilder.append( "[\\S\\s]*" )
+						.append( "\\Q" ).append( contained ).append( "\\E" );
+			}
+			patternBuilder.append( "[\\S\\s]*" );
+			return this;
+		}
+
 		public String build() {
 			/*
 			 * Prepend and append "[\S\s]*" because we have to match against the entire failure report,
