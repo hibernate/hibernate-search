@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
@@ -555,6 +556,56 @@ public class ElasticsearchSchemaValidationIT {
 						}
 				)
 				.setup();
+	}
+
+	/**
+	 * Tests that properties within properties are correctly represented in the failure report.
+	 */
+	@Test
+	public void nestedProperty_attribute_invalid() throws Exception {
+		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+						+ "'myObjectField': {"
+							+ "'type': 'object',"
+							+ "'dynamic': 'strict',"
+							+ "'properties': {"
+								+ "'myField': {"
+									+ "'type': 'date',"
+									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'index': false"
+								+ "}"
+							+ "}"
+						+ "}"
+					+ "}"
+				+ "}"
+				);
+
+		setupExpectingFailure(
+				() -> withManagementStrategyConfiguration()
+						.withIndex(
+								"MappedTypeName", INDEX1_NAME,
+								ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									IndexSchemaObjectField objectField =
+											root.objectField( "myObjectField" );
+									objectField.field( "myField", f -> f.asLocalDate() )
+											.createAccessor();
+									objectField.createAccessor();
+								},
+								indexManager -> {
+								}
+						)
+						.setup(),
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX1_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myObjectField.myField" )
+						.failure( "Invalid value for attribute 'index'. Expected 'true', actual is 'false'" )
+						.build()
+		);
 	}
 
 	@Test
