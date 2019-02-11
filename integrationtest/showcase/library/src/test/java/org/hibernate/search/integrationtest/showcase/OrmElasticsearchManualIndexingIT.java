@@ -139,7 +139,7 @@ public class OrmElasticsearchManualIndexingIT {
 		String isbn = String.format( Locale.ROOT, "973-0-00-%06d-3", index );
 
 		documentRepo.createBook(
-				index, new ISBN( isbn ), "Divine Comedy chapter n. " + ( index + 1 ),
+				index, new ISBN( isbn ), "Divine Comedy chapter n. " + ( index + 1 ), "Dante Alighieri",
 				"The Divine Comedy is composed of 14,233 lines that are divided into three cantiche (singular cantica) – Inferno (Hell), Purgatorio (Purgatory), and Paradiso (Paradise)",
 				"literature,poem,afterlife"
 		);
