@@ -12,9 +12,12 @@ import java.util.Locale;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisDefinitionContainerContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.cfg.MultiTenancyStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
@@ -54,6 +57,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final ConfigurationProperty<ElasticsearchDialectName> DIALECT =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DIALECT )
+					.as( ElasticsearchDialectName.class, ElasticsearchDialectName::of )
+					.withDefault( ElasticsearchBackendSettings.Defaults.DIALECT )
+					.build();
+
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY )
 					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
@@ -84,6 +93,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
+		ElasticsearchDialectName dialectName = DIALECT.get( propertySource );
+
 		ElasticsearchClientImplementor client = null;
 		try {
 			BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
@@ -92,8 +103,18 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 				client = clientFactoryHolder.get().create( propertySource, initialGsonProvider );
 			}
 
+			ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( client );
+
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
-			ElasticsearchDialect dialect = dialectFactory.createFromClusterVersion( client );
+			ElasticsearchDialect dialect;
+			if ( ElasticsearchDialectName.AUTO.equals( dialectName ) ) {
+				dialectName = dialectFactory.getAppropriateDialectName( version );
+				dialect = dialectFactory.create( dialectName );
+			}
+			else {
+				dialect = dialectFactory.create( dialectName );
+				dialectFactory.checkAppropriate( dialectName, version );
+			}
 
 			GsonProvider dialectSpecificGsonProvider =
 					DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
