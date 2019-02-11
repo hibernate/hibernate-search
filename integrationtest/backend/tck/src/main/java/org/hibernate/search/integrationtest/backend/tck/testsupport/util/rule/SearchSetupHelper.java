@@ -134,7 +134,7 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
-		public SearchIntegration setup() {
+		public PartialSetup setupFirstPhaseOnly() {
 			SearchIntegrationBuilder integrationBuilder = SearchIntegration.builder( propertySource );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
@@ -145,17 +145,23 @@ public class SearchSetupHelper implements TestRule {
 			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 			integrationPartialBuildStates.add( integrationPartialBuildState );
 
-			StubMapping mapping = integrationPartialBuildState.finalizeMapping(
-					mappingKey, StubMappingPartialBuildState::finalizeMapping
-			);
+			return () -> {
+				StubMapping mapping = integrationPartialBuildState.finalizeMapping(
+						mappingKey, StubMappingPartialBuildState::finalizeMapping
+				);
 
-			SearchIntegration integration = integrationPartialBuildState.finalizeIntegration( propertySource );
-			integrations.add( integration );
-			integrationPartialBuildStates.remove( integrationPartialBuildState );
+				SearchIntegration integration = integrationPartialBuildState.finalizeIntegration( propertySource );
+				integrations.add( integration );
+				integrationPartialBuildStates.remove( integrationPartialBuildState );
 
-			indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
+				indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
 
-			return integration;
+				return integration;
+			};
+		}
+
+		public SearchIntegration setup() {
+			return setupFirstPhaseOnly().doSecondPhase();
 		}
 
 	}
@@ -163,6 +169,12 @@ public class SearchSetupHelper implements TestRule {
 	public interface IndexSetupListener {
 
 		void onSetup(StubMappingIndexManager indexMapping);
+
+	}
+
+	public interface PartialSetup {
+
+		SearchIntegration doSecondPhase();
 
 	}
 

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
@@ -17,6 +18,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
+
+	@Override
+	public ElasticsearchDialectName getName() {
+		return ElasticsearchDialectName.ES_7;
+	}
 
 	@Override
 	public boolean isEmptyMappingPossible() {

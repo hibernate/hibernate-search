@@ -100,25 +100,32 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		ElasticsearchDialectName dialectName = DIALECT.get( propertySource );
 
+		BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
+		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		ElasticsearchClientImplementor client = null;
 		try {
-			BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
-			try ( BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder =
-					CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean ) ) {
-				client = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
-			}
+			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean );
 
-			ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( client );
-
+			ElasticsearchClientProvider clientProvider;
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			ElasticsearchDialect dialect;
 			if ( ElasticsearchDialectName.AUTO.equals( dialectName ) ) {
+				// We must determine the appropriate dialect, and thus instantiate the client, right now.
+				client = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
+				clientFactoryHolder.close(); // We won't need this anymore
+				clientProvider = new ElasticsearchClientProvider( client );
+
+				ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( client );
 				dialectName = dialectFactory.getAppropriateDialectName( version );
 				dialect = dialectFactory.create( dialectName );
 			}
 			else {
+				// We can delay the client instantiation to when the backend starts; we'll check that the dialect is appropriate then.
+				clientProvider = new ElasticsearchClientProvider(
+						clientFactoryHolder, defaultGsonProvider, dialectFactory, dialectName
+				);
+
 				dialect = dialectFactory.create( dialectName );
-				dialectFactory.checkAppropriate( dialectName, version );
 			}
 
 			GsonProvider dialectSpecificGsonProvider =
@@ -138,7 +145,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					getAnalysisDefinitionRegistry( backendContext, buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					client,
+					clientProvider,
 					dialectSpecificGsonProvider,
 					name,
 					workFactory,
@@ -150,7 +157,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			);
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( ElasticsearchClientImplementor::close, client );
+			new SuppressingCloser( e )
+					.push( BeanHolder::close, clientFactoryHolder )
+					.push( ElasticsearchClientImplementor::close, client );
 			throw e;
 		}
 	}

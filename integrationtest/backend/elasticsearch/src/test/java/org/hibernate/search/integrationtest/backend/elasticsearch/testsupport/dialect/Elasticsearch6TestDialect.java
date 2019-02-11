@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
@@ -18,6 +19,12 @@ import com.google.gson.JsonObject;
 
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch6TestDialect implements ElasticsearchTestDialect {
+
+	@Override
+	public ElasticsearchDialectName getName() {
+		return ElasticsearchDialectName.ES_6;
+	}
+
 	@Override
 	public boolean isEmptyMappingPossible() {
 		return true;

@@ -101,7 +101,7 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchClient client;
+	private final Supplier<ElasticsearchClient> clientSupplier;
 	private final GsonProvider gsonProvider;
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ErrorHandler errorHandler;
@@ -109,9 +109,10 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	private final ElasticsearchBatchingSharedWorkOrchestrator rootParallelOrchestrator;
 
 	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
-			ElasticsearchClient client, GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
+			Supplier<ElasticsearchClient> clientSupplier,
+			GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
 			ErrorHandler errorHandler) {
-		this.client = client;
+		this.clientSupplier = clientSupplier;
 		this.gsonProvider = gsonProvider;
 		this.workFactory = workFactory;
 		this.errorHandler = errorHandler;
@@ -239,12 +240,13 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 	}
 
 	private ElasticsearchRefreshableWorkExecutionContext createIgnoreDirtyWorkExecutionContext() {
-		return new ElasticsearchIgnoreRefreshWorkExecutionContext( client, gsonProvider );
+		return new ElasticsearchIgnoreRefreshWorkExecutionContext( clientSupplier.get(), gsonProvider );
 	}
 
 	private ElasticsearchRefreshableWorkExecutionContext createRefreshingWorkExecutionContext() {
 		return new ElasticsearchDefaultWorkExecutionContext(
-				client, gsonProvider, workFactory, errorHandler );
+				clientSupplier.get(), gsonProvider, workFactory, errorHandler
+		);
 	}
 
 }
