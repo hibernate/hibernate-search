@@ -54,7 +54,7 @@
             <property name="hibernate.search.backends.myBackend.type"
                       value="elasticsearch" /> <!--1-->
             <!--
-            <property name="hibernate.search.backends.myBackend.host"
+            <property name="hibernate.search.backends.myBackend.hosts"
                       value="https://elasticsearch.mycompany.com"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="ironman"/>
@@ -71,7 +71,7 @@
                 WARNING: if you update the property names below,
                 take care to also update the name of the commented properties just above.
              -->
-            <property name="hibernate.search.backends.myBackend.host"
+            <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.host.url}"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="${test.elasticsearch.host.username}"/>
@@ -137,7 +137,7 @@
                 WARNING: if you update the property names below,
                 take care to also update the name of the commented properties just above.
              -->
-            <property name="hibernate.search.backends.myBackend.host"
+            <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.host.url}"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="${test.elasticsearch.host.username}"/>

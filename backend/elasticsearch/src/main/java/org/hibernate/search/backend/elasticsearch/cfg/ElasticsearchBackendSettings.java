@@ -19,7 +19,7 @@ public final class ElasticsearchBackendSettings {
 	private ElasticsearchBackendSettings() {
 	}
 
-	public static final String HOST = "host";
+	public static final String HOSTS = "hosts";
 
 	public static final String USERNAME = "username";
 
@@ -31,9 +31,9 @@ public final class ElasticsearchBackendSettings {
 
 	public static final String CONNECTION_TIMEOUT = "connection_timeout";
 
-	public static final String MAX_TOTAL_CONNECTION = "max_total_connection";
+	public static final String MAX_CONNECTIONS = "max_connections";
 
-	public static final String MAX_TOTAL_CONNECTION_PER_ROUTE = "max_total_connection_per_route";
+	public static final String MAX_CONNECTIONS_PER_ROUTE = "max_connections_per_route";
 
 	public static final String DISCOVERY_ENABLED = "discovery.enabled";
 
@@ -55,12 +55,12 @@ public final class ElasticsearchBackendSettings {
 		private Defaults() {
 		}
 
-		public static final List<String> HOST = Collections.singletonList( "http://localhost:9200" );
+		public static final List<String> HOSTS = Collections.singletonList( "http://localhost:9200" );
 		public static final int REQUEST_TIMEOUT = 60000;
 		public static final int READ_TIMEOUT = 60000;
 		public static final int CONNECTION_TIMEOUT = 3000;
-		public static final int MAX_TOTAL_CONNECTION = 20;
-		public static final int MAX_TOTAL_CONNECTION_PER_ROUTE = 2;
+		public static final int MAX_CONNECTIONS = 20;
+		public static final int MAX_CONNECTIONS_PER_ROUTE = 2;
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final String DISCOVERY_SCHEME = "http";
