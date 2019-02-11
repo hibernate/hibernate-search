@@ -91,7 +91,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
-		GsonProvider initialGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
+		/*
+		 * The Elasticsearch client only converts JsonObjects to String and
+		 * vice-versa, it doesn't need a Gson instance that was specially
+		 * configured for a particular Elasticsearch version.
+		 */
+		GsonProvider defaultGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
 		ElasticsearchDialectName dialectName = DIALECT.get( propertySource );
 
@@ -100,7 +105,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			BeanProvider beanProvider = buildContext.getServiceManager().getBeanProvider();
 			try ( BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder =
 					CLIENT_FACTORY.getAndTransform( propertySource, beanProvider::getBean ) ) {
-				client = clientFactoryHolder.get().create( propertySource, initialGsonProvider );
+				client = clientFactoryHolder.get().create( propertySource, defaultGsonProvider );
 			}
 
 			ElasticsearchVersion version = ElasticsearchClientUtils.getElasticsearchVersion( client );
@@ -118,7 +123,6 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			GsonProvider dialectSpecificGsonProvider =
 					DefaultGsonProvider.create( dialect::createGsonBuilderBase, logPrettyPrinting );
-			client.init( dialectSpecificGsonProvider );
 
 			Gson userFacingGson = new GsonBuilder().setPrettyPrinting().create();
 

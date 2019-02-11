@@ -16,6 +16,6 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
  */
 public interface ElasticsearchClientFactory {
 
-	ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource, GsonProvider initialGsonProvider);
+	ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource, GsonProvider gsonProvider);
 
 }

@@ -117,13 +117,14 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	@Override
 	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			GsonProvider initialGsonProvider) {
+			GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		RestClient restClient = createClient( propertySource, requestTimeoutMs );
 		Sniffer sniffer = createSniffer( restClient, propertySource );
 
-		return new ElasticsearchClientImpl( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS, initialGsonProvider );
+		return new ElasticsearchClientImpl( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS,
+				gsonProvider.getGson(), gsonProvider.getLogHelper() );
 	}
 
 	private RestClient createClient(ConfigurationPropertySource propertySource, int maxRetryTimeoutMillis) {

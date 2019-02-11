@@ -33,7 +33,6 @@ import org.elasticsearch.client.sniff.Sniffer;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -63,21 +62,19 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final int requestTimeoutValue;
 	private final TimeUnit requestTimeoutUnit;
 
-	private volatile GsonProvider gsonProvider;
+	private final Gson gson;
+	private final JsonLogHelper jsonLogHelper;
 
-	public ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer, int requestTimeoutValue, TimeUnit requestTimeoutUnit,
-			GsonProvider initialGsonProvider) {
+	public ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
+			int requestTimeoutValue, TimeUnit requestTimeoutUnit,
+			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = Executors.newScheduledThreadPool( "Elasticsearch request timeout executor" );
 		this.requestTimeoutValue = requestTimeoutValue;
 		this.requestTimeoutUnit = requestTimeoutUnit;
-		this.gsonProvider = initialGsonProvider;
-	}
-
-	@Override
-	public void init(GsonProvider gsonProvider) {
-		this.gsonProvider = gsonProvider;
+		this.gson = gson;
+		this.jsonLogHelper = jsonLogHelper;
 	}
 
 	@Override
@@ -101,8 +98,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	}
 
 	private CompletableFuture<Response> send(ElasticsearchRequest elasticsearchRequest) {
-		Gson gson = gsonProvider.getGson();
-
 		CompletableFuture<Response> completableFuture = new CompletableFuture<>();
 
 		HttpEntity entity;
@@ -191,7 +186,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			return null;
 		}
 
-		Gson gson = gsonProvider.getGson();
 		Charset charset = getCharset( entity );
 		try ( InputStream inputStream = entity.getContent();
 				Reader reader = new InputStreamReader( inputStream, charset ) ) {
@@ -209,12 +203,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		long executionTimeNs = System.nanoTime() - start;
 		long executionTimeMs = TimeUnit.NANOSECONDS.toMillis( executionTimeNs );
 		if ( requestLog.isTraceEnabled() ) {
-			JsonLogHelper logHelper = gsonProvider.getLogHelper();
 			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
 					request.getBodyParts().size(), executionTimeMs,
 					response.getStatusCode(), response.getStatusMessage(),
-					logHelper.toString( request.getBodyParts() ),
-					logHelper.toString( response.getBody() ) );
+					jsonLogHelper.toString( request.getBodyParts() ),
+					jsonLogHelper.toString( response.getBody() ) );
 		}
 		else {
 			requestLog.executedRequest( request.getMethod(), request.getPath(), request.getParameters(),
