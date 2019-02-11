@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycl
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
@@ -82,7 +81,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
-	private final ElasticsearchClientImplementor client;
+	private final ElasticsearchClientProvider clientProvider;
 
 	private final String name;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
@@ -101,17 +100,18 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final IndexingBackendContext indexingContext;
 	private final SearchBackendContext searchContext;
 
-	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, GsonProvider dialectSpecificGsonProvider, String name,
+	ElasticsearchBackendImpl(ElasticsearchClientProvider clientProvider,
+			GsonProvider dialectSpecificGsonProvider, String name,
 			ElasticsearchWorkBuilderFactory workFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy) {
-		this.client = client;
+		this.clientProvider = clientProvider;
 		this.name = name;
 
 		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
 				"Elasticsearch parallel work orchestrator for backend " + name,
-				client, dialectSpecificGsonProvider, workFactory,
+				clientProvider, dialectSpecificGsonProvider, workFactory,
 				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
 				new LogErrorHandler()
 		);
@@ -152,7 +152,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchWorkOrchestrator::close, queryOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorProvider::close, orchestratorProvider );
 			// Close the client after the orchestrators, when we're sure all works have been performed
-			closer.push( ElasticsearchClientImplementor::close, client );
+			closer.push( ElasticsearchClientProvider::onStop, clientProvider );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );
@@ -161,6 +161,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public void start(BackendStartContext context) {
+		clientProvider.onStart( context.getConfigurationPropertySource() );
 		orchestratorProvider.start();
 		queryOrchestrator.start();
 	}
@@ -181,7 +182,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public <T> T getClient(Class<T> clientClass) {
-		return client.unwrap( clientClass );
+		return clientProvider.get().unwrap( clientClass );
 	}
 
 	@Override
