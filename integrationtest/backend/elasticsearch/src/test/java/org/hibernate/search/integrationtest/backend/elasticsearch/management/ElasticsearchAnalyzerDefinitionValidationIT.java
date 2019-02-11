@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
-
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -15,11 +13,12 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.co
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests for the analyzer validation feature when using automatic index management.
@@ -27,16 +26,13 @@ import org.junit.rules.ExpectedException;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionValidationIT")
 public class ElasticsearchAnalyzerDefinitionValidationIT {
 
-	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
+	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
@@ -133,14 +129,14 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "analyzer 'custom-analyzer':\n\tMissing analyzer" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure( "Missing analyzer" )
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -185,16 +181,17 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "analyzer 'custom-analyzer':\n"
-								+ "\tInvalid char filters. Expected '[custom-pattern-replace]',"
-								+ " actual is '[html_strip]'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure(
+								"Invalid char filters. Expected '[custom-pattern-replace]',"
+										+ " actual is '[html_strip]'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -239,16 +236,17 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "analyzer 'custom-analyzer':\n"
-								+ "\tInvalid tokenizer. Expected 'custom-edgeNGram',"
-								+ " actual is 'whitespace'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure(
+								"Invalid tokenizer. Expected 'custom-edgeNGram',"
+										+ " actual is 'whitespace'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -293,16 +291,17 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "analyzer 'custom-analyzer':\n"
-								+ "\tInvalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
-								+ " actual is '[standard, custom-word-delimiter]'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure(
+								"Invalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
+										+ " actual is '[standard, custom-word-delimiter]'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -332,14 +331,16 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "char filter 'custom-pattern-replace':\n\tMissing char filter" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure( "Missing analyzer" )
+						.charFilterContext( "custom-pattern-replace" )
+						.failure( "Missing char filter" )
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -370,14 +371,16 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "tokenizer 'custom-edgeNGram':\n\tMissing tokenizer" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure( "Missing analyzer" )
+						.tokenizerContext( "custom-edgeNGram" )
+						.failure( "Missing tokenizer" )
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -405,14 +408,16 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "token filter 'custom-keep-types':\n\tMissing token filter" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.analyzerContext( "custom-analyzer" )
+						.failure( "Missing analyzer" )
+						.tokenFilterContext( "custom-keep-types" )
+						.failure( "Missing token filter" )
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -457,15 +462,16 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "char filter 'custom-pattern-replace':\n\tInvalid type."
-								+ " Expected 'pattern_replace', actual is 'html_strip'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.charFilterContext( "custom-pattern-replace" )
+						.failure(
+								"Invalid type. Expected 'pattern_replace', actual is 'html_strip'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -510,15 +516,16 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "char filter 'custom-pattern-replace':\n"
-								+ "\tInvalid value for parameter 'pattern'. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.charFilterContext( "custom-pattern-replace" )
+						.failure(
+								"Invalid value for parameter 'pattern'. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -563,16 +570,17 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "char filter 'custom-pattern-replace':\n"
-								+ "\tInvalid value for parameter 'tags'."
-								+ " Expected '\"CASE_INSENSITIVE|COMMENTS\"', actual is 'null'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.charFilterContext( "custom-pattern-replace" )
+						.failure(
+								"Invalid value for parameter 'tags'."
+										+ " Expected '\"CASE_INSENSITIVE|COMMENTS\"', actual is 'null'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
 	@Test
@@ -618,18 +626,25 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "filter 'custom-word-delimiter':\n"
-								+ "\tInvalid value for parameter 'generate_number_parts'."
-								+ " Expected 'null', actual is '\"false\"'" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.tokenFilterContext( "custom-word-delimiter" )
+						.failure(
+								"Invalid value for parameter 'generate_number_parts'."
+										+ " Expected 'null', actual is '\"false\"'"
+						)
+						.build()
 		);
-
-		setup();
 	}
 
+	private void setupExpectingFailure(String failureReportPattern) {
+		SubTest.expectException( this::setup )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( failureReportPattern );
+	}
 
 	private void setup() {
 		withManagementStrategyConfiguration()
@@ -640,6 +655,8 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 				)
 				.setup();
 	}
+
+
 
 	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
 		return setupHelper.withDefaultConfiguration( BACKEND_NAME )

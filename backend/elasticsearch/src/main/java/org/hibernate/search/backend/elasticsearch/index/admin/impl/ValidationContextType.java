@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 enum ValidationContextType {
 
-	INDEX,
 	MAPPING_PROPERTY,
 	MAPPING_PROPERTY_FIELD,
 	ANALYZER,

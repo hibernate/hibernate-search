@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 
 /**
  * The administration client for a given Elasticsearch index.
@@ -61,8 +62,9 @@ public class ElasticsearchIndexAdministrationClient {
 		}
 	}
 
-	public void validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public void validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
+			ContextualFailureCollector failureCollector) {
 		schemaCreator.checkIndexExists( elasticsearchIndexName, executionOptions );
-		schemaValidator.validate( expectedMetadata );
+		schemaValidator.validate( expectedMetadata, failureCollector );
 	}
 }

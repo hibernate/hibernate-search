@@ -20,46 +20,6 @@ import org.jboss.logging.annotations.MessageBundle;
 public interface ElasticsearchValidationMessages {
 
 	@Message(
-			value = "index '%1$s'"
-	)
-	String indexContext(String name);
-
-	@Message(
-			value = "property '%1$s'"
-	)
-	String mappingPropertyContext(String path);
-
-	@Message(
-			value = "field '%1$s'"
-	)
-	String mappingPropertyFieldContext(String name);
-
-	@Message(
-			value = "analyzer '%1$s'"
-	)
-	String analyzerContext(String name);
-
-	@Message(
-			value = "normalizer '%1$s'"
-	)
-	String normalizerContext(String name);
-
-	@Message(
-			value = "char filter '%1$s'"
-	)
-	String charFilterContext(String name);
-
-	@Message(
-			value = "tokenizer '%1$s'"
-	)
-	String tokenizerContext(String name);
-
-	@Message(
-			value = "token filter '%1$s'"
-	)
-	String tokenFilterContext(String name);
-
-	@Message(
 			value = "Missing type mapping"
 	)
 	String mappingMissing();
