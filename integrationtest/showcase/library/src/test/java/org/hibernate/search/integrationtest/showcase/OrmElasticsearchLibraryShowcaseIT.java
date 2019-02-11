@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
 import org.hibernate.search.integrationtest.showcase.library.config.SessionFactoryConfig;
@@ -420,6 +421,24 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		} );
 	}
 
+	/**
+	 * This demonstrates how to define a projection for the query and how to set order.
+	 */
+	@Test
+	public void projectionAndOrder() {
+		withinTransaction( sessionFactory, this::initData );
+
+		withinSession( sessionFactory, session -> {
+			DocumentRepository documentRepo = repoFactory.createDocumentRepository( session );
+
+			List<String> results = documentRepo.getAuthorsOfBooksHavingTerms( "java", SortOrder.ASC );
+			assertThat( results ).containsExactly( "Mark Red", "Michele Violet", "Stuart Green" );
+
+			results = documentRepo.getAuthorsOfBooksHavingTerms( "Indonesia", SortOrder.DESC );
+			assertThat( results ).containsExactly( "Mark Red", "Mark Red" );
+		} );
+	}
+
 	@Test
 	public void aggregation() {
 		// TODO aggregation
@@ -435,6 +454,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				CALLIGRAPHY_ID,
 				new ISBN( "978-0-00-000001-1" ),
 				"Calligraphy for Dummies",
+				"Roger Blue",
 				"Learn to write artfully in ten lessons",
 				"calligraphy,art"
 		);
@@ -442,6 +462,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		Video javaDancing = documentRepo.createVideo(
 				JAVA_DANCING_ID,
 				"Java le dire à tout le monde",
+				"Michele Violet",
 				"A brief history of Java dancing in Paris during the early 20th century",
 				"java,dancing,history"
 		);
@@ -450,6 +471,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				INDONESIAN_ECONOMY_ID,
 				new ISBN( "978-0-00-000003-3" ),
 				"Comparative Study of the Economy of Java and other Indonesian Islands",
+				"Mark Red",
 				"Comparative study of the late 20th century economy of the main islands of Indonesia"
 						+ " with accurate projections over the next ten centuries",
 				"geography,economy,java,sumatra,borneo,sulawesi"
@@ -460,6 +482,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				new ISBN( "978-0-00-000004-4" ),
 				// Use varying case on purpose
 				"java for Dummies",
+				"Stuart Green",
 				"Learning the Java programming language in ten lessons",
 				"programming,language,java"
 		);
@@ -468,6 +491,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				ART_OF_COMPUTER_PROG_ID,
 				new ISBN( "978-0-00-000005-5" ),
 				"The Art of Computer Programming",
+				"Stuart Green",
 				"Quick review of basic computer programming principles in 965 chapters",
 				"programming"
 		);
@@ -476,6 +500,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 				THESAURUS_OF_LANGUAGES_ID,
 				new ISBN( "978-0-00-000006-6" ),
 				"Thesaurus of Indo-European Languages",
+				"Dorothy White",
 				"An entertaining list of about three thousand languages, most of which are long dead",
 				"geography,language"
 		);
@@ -483,6 +508,7 @@ public class OrmElasticsearchLibraryShowcaseIT {
 		Video livingOnIsland = documentRepo.createVideo(
 				LIVING_ON_ISLAND_ID,
 				"Living in an Island, Episode 3: Indonesia",
+				"Mark Red",
 				"A journey across Indonesia's smallest islands depicting how island way of life differs from mainland living",
 				"geography,java,sumatra,borneo,sulawesi"
 		);

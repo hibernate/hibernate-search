@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
 import org.hibernate.search.integrationtest.showcase.library.repository.DocumentRepository;
@@ -20,6 +21,7 @@ import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryService;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
 
 class DocumentRepositoryImpl extends DocumentRepository {
 	DocumentRepositoryImpl(EntityManager entityManager) {
@@ -141,6 +143,22 @@ class DocumentRepositoryImpl extends DocumentRepository {
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
+
+		return query.getResultList();
+	}
+
+	@Override
+	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
+		FullTextSearchTarget<Document> target = entityManager.search( Document.class );
+		FullTextQuery<String> query = target.query()
+				.asProjection( f -> f.field( "author", String.class ) )
+				.predicate( f -> f.match()
+						.onField( "title" ).boostedTo( 2.0f )
+						.orField( "summary" )
+						.matching( terms )
+				)
+				.sort( b -> b.byField( "author" ).order( order ) )
+				.build();
 
 		return query.getResultList();
 	}

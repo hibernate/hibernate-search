@@ -16,9 +16,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.integrationtest.showcase.library.analysis.LibraryAnalysisConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -43,6 +45,9 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 			sortable = Sortable.YES
 	)
 	private String title;
+
+	@GenericField( projectable = Projectable.YES, sortable = Sortable.YES)
+	private String author;
 
 	@Basic
 	@FullTextField(analyzer = LibraryAnalysisConfigurer.ANALYZER_DEFAULT)
@@ -74,6 +79,14 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 
 	public String getSummary() {
