@@ -19,16 +19,11 @@ public class Elasticsearch6Dialect implements ElasticsearchDialect {
 
 	@Override
 	public GsonBuilder createGsonBuilderBase() {
-		// No specific needs for ES5.
 		return new GsonBuilder();
 	}
 
 	@Override
 	public Elasticsearch6WorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
-		/*
-		 * The ES6 factory works fine with ES5 so far.
-		 * We may have to override some methods in the future if we add new work types, though.
-		 */
 		return new Elasticsearch6WorkBuilderFactory( gsonProvider );
 	}
 }
