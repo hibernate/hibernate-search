@@ -7,17 +7,26 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 class IndexManagerStartContextImpl implements IndexManagerStartContext {
 	private final ContextualFailureCollector failureCollector;
+	private final ConfigurationPropertySource configurationPropertySource;
 
-	IndexManagerStartContextImpl(ContextualFailureCollector failureCollector) {
+	IndexManagerStartContextImpl(ContextualFailureCollector failureCollector,
+			ConfigurationPropertySource configurationPropertySource) {
 		this.failureCollector = failureCollector;
+		this.configurationPropertySource = configurationPropertySource;
 	}
 
 	@Override
 	public ContextualFailureCollector getFailureCollector() {
 		return failureCollector;
+	}
+
+	@Override
+	public ConfigurationPropertySource getConfigurationPropertySource() {
+		return configurationPropertySource;
 	}
 }

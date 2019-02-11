@@ -145,7 +145,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 				partialBuildState.mappingKey,
 				mappingPartialBuildState -> mappingPartialBuildState.finalize( sessionFactoryImplementor )
 		);
-		SearchIntegration integration = partialBuildState.integrationBuildState.finalizeIntegration();
+		SearchIntegration integration = partialBuildState.integrationBuildState.finalizeIntegration( propertySource );
 
 		/*
 		 * Make the booted integration available to the user (through Search.getFullTextEntityManager(em))

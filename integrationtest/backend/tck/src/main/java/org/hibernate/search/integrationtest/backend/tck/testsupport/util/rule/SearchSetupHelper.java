@@ -150,7 +150,7 @@ public class SearchSetupHelper implements TestRule {
 				StubMapping mapping = integrationPartialBuildState.finalizeMapping(
 						mappingKey, StubMappingPartialBuildState::finalizeMapping
 				);
-				integration = integrationPartialBuildState.finalizeIntegration();
+				integration = integrationPartialBuildState.finalizeIntegration( propertySource );
 				mappingRepositories.add( integration );
 
 				indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
