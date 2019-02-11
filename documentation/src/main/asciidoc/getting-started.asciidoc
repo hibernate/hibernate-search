@@ -162,7 +162,7 @@ include::{resourcesdir}/META-INF/persistence.xml[tags=gettingstarted-configurati
 <1> Define a backend named "myBackend" relying on Elasticsearch technology.
 <2> The backend will attempt to connect to http://localhost:9200 by default.
 If you want to connect to another URL, uncomment these lines
-and set the value for the "host" property,
+and set the value for the "hosts" property,
 and optionally the username and password.
 <3> Make sure to use the backend we just defined for all indexes.
 ====

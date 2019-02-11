@@ -38,9 +38,9 @@ import org.hibernate.search.util.impl.common.SearchThreadFactory;
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
 
 	private static final ConfigurationProperty<List<String>> HOST =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOST )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
 					.asString().multivalued( Pattern.compile( "\\s+" ) )
-					.withDefault( ElasticsearchBackendSettings.Defaults.HOST )
+					.withDefault( ElasticsearchBackendSettings.Defaults.HOSTS )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> USERNAME =
@@ -72,15 +72,15 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_TOTAL_CONNECTION )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_CONNECTIONS )
 					.asInteger()
-					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_TOTAL_CONNECTION )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_CONNECTIONS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MAX_TOTAL_CONNECTION_PER_ROUTE =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_TOTAL_CONNECTION_PER_ROUTE )
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAX_CONNECTIONS_PER_ROUTE )
 					.asInteger()
-					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_TOTAL_CONNECTION_PER_ROUTE )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MAX_CONNECTIONS_PER_ROUTE )
 					.build();
 
 	private static final ConfigurationProperty<Boolean> DISCOVERY_ENABLED =
