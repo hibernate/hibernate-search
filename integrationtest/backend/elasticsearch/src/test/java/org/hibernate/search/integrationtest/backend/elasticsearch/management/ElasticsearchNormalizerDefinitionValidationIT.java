@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
-
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -15,11 +13,12 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.co
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests for the normalizer validation feature when using automatic index management.
@@ -27,16 +26,13 @@ import org.junit.rules.ExpectedException;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionValidationIT")
 public class ElasticsearchNormalizerDefinitionValidationIT {
 
-	private static final String VALIDATION_FAILED_MESSAGE_ID = "HSEARCH400033";
+	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
@@ -96,14 +92,21 @@ public class ElasticsearchNormalizerDefinitionValidationIT {
 
 		putMapping();
 
-		thrown.expect(
-				isException( SearchException.class )
-						.withMessage( VALIDATION_FAILED_MESSAGE_ID )
-						.withMessage( "normalizer 'custom-normalizer':\n\tMissing normalizer" )
-				.build()
+		setupExpectingFailure(
+				FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.normalizerContext( "custom-normalizer" )
+						.failure( "Missing normalizer" )
+						.build()
 		);
+	}
 
-		setup();
+	private void setupExpectingFailure(String failureReportPattern) {
+		SubTest.expectException( this::setup )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( failureReportPattern );
 	}
 
 	private void setup() {

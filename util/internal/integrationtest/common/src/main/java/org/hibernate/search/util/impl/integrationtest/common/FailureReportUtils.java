@@ -95,6 +95,30 @@ public final class FailureReportUtils {
 			return contextLiteral( "path '" + pathPattern + "'" );
 		}
 
+		public FailureReportPatternBuilder indexFieldContext(String exactPath) {
+			return contextLiteral( "field '" + exactPath + "'" );
+		}
+
+		public FailureReportPatternBuilder analyzerContext(String exactName) {
+			return contextLiteral( "analyzer '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder normalizerContext(String exactName) {
+			return contextLiteral( "normalizer '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder charFilterContext(String exactName) {
+			return contextLiteral( "char filter '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder tokenizerContext(String exactName) {
+			return contextLiteral( "tokenizer '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder tokenFilterContext(String exactName) {
+			return contextLiteral( "token filter '" + exactName + "'" );
+		}
+
 		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}

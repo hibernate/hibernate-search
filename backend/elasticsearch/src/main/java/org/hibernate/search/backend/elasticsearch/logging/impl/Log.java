@@ -14,7 +14,6 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchSchemaValidationException;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
@@ -104,11 +103,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$s.")
 	SearchException unexpectedIndexStatus(String indexName, String expected, String timeoutAndUnit,
 			@Cause Exception cause);
-
-	@Message(id = ID_OFFSET_2 + 33,
-			value = "An Elasticsearch schema validation failed: %1$s"
-	)
-	ElasticsearchSchemaValidationException schemaValidationFailed(String message);
 
 	@Message(id = ID_OFFSET_2 + 34,
 			value = "Could not retrieve the mappings from Elasticsearch for validation"

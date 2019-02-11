@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.management.impl;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.util.AssertionFailure;
 
 public class ElasticsearchIndexLifecycleStrategy {
@@ -23,7 +24,7 @@ public class ElasticsearchIndexLifecycleStrategy {
 		this.executionOptions = executionOptions;
 	}
 
-	public void onStart(ElasticsearchIndexAdministrationClient client) {
+	public void onStart(ElasticsearchIndexAdministrationClient client, IndexManagerStartContext context) {
 		switch ( strategyName ) {
 			case CREATE:
 				client.createIfAbsent( executionOptions );
@@ -36,7 +37,7 @@ public class ElasticsearchIndexLifecycleStrategy {
 				client.update( executionOptions );
 				break;
 			case VALIDATE:
-				client.validate( executionOptions );
+				client.validate( executionOptions, context.getFailureCollector() );
 				break;
 			default:
 				throw new AssertionFailure( "Unexpected index management strategy: " + strategyName );

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,11 +29,10 @@ import org.hibernate.search.backend.elasticsearch.index.admin.gson.impl.Analysis
 import org.hibernate.search.backend.elasticsearch.index.admin.gson.impl.AnalysisParameterEquivalenceRegistry;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.Analysis;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
 import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.jboss.logging.Messages;
 
@@ -51,8 +49,6 @@ import com.google.gson.JsonPrimitive;
  * @author Yoann Rodiere
  */
 public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaValidator {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ElasticsearchValidationMessages MESSAGES = Messages.getBundle( ElasticsearchValidationMessages.class );
 
@@ -132,34 +128,15 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	@Override
-	public void validate(IndexMetadata expectedIndexMetadata) {
+	public void validate(IndexMetadata expectedIndexMetadata, ContextualFailureCollector contextualFailureCollector) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
-		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-		errorCollector.push( ValidationContextType.INDEX, indexName.original );
-		try {
-			validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
-		}
-		finally {
-			errorCollector.pop();
-		}
 
-		Map<ValidationContext, List<String>> messagesByContext = errorCollector.getMessagesByContext();
-		if ( messagesByContext.isEmpty() ) {
-			return;
-		}
-		StringBuilder builder = new StringBuilder();
-		for ( Map.Entry<ValidationContext, List<String>> entry : messagesByContext.entrySet() ) {
-			ValidationContext context = entry.getKey();
-			List<String> messages = entry.getValue();
-
-			builder.append( "\n" ).append( formatContext( context ) );
-			for ( String message : messages ) {
-				builder.append( "\n\t" ).append( message );
-			}
-		}
-		throw log.schemaValidationFailed( builder.toString() );
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector(
+				contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+		);
+		validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 	}
 
 	@Override
@@ -168,94 +145,9 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
 
 		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-		errorCollector.push( ValidationContextType.INDEX, indexName.original );
-		try {
-			validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
-		}
-		finally {
-			errorCollector.pop();
-		}
+		validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
 
-		return errorCollector.getMessagesByContext().isEmpty();
-	}
-
-	/**
-	 * Format the validation context using the following format:
-	 * {@code contextElement1, contextElement2, ... , contextElementN:}.
-	 * <p>
-	 * Each element is rendered using {@link #MESSAGES}.
-	 * <p>
-	 * Multiple consecutive property contexts are squeezed into a single path
-	 * (e.g. "foo" followed by "bar" becomes "foo.bar".
-	 *
-	 * @param context The validation context to format.
-	 * @return The validation context rendered as a string.
-	 */
-	private String formatContext(ValidationContext context) {
-		StringBuilder builder = new StringBuilder();
-
-		StringBuilder pathBuilder = new StringBuilder();
-		for ( ValidationContextElement element : context.getElements() ) {
-			String name = element.getName();
-
-			if ( ValidationContextType.MAPPING_PROPERTY.equals( element.getType() ) ) {
-				// Try to concatenate property names into a path before we actually append them
-				if ( pathBuilder.length() > 0 ) {
-					pathBuilder.append( "." );
-				}
-				pathBuilder.append( name );
-			}
-			else {
-				if ( pathBuilder.length() > 0 ) {
-					// Append the accumulated path
-					appendContextElement( builder, ValidationContextType.MAPPING_PROPERTY, pathBuilder.toString() );
-					pathBuilder.setLength( 0 ); // Clear
-				}
-
-				appendContextElement( builder, element.getType(), element.getName() );
-			}
-		}
-
-		if ( pathBuilder.length() > 0 ) {
-			// Append the remaining accumulated path
-			appendContextElement( builder, ValidationContextType.MAPPING_PROPERTY, pathBuilder.toString() );
-		}
-
-		builder.append( ":" );
-
-		return builder.toString();
-	}
-
-	private void appendContextElement(StringBuilder builder, ValidationContextType type, String name) {
-		String formatted = formatContextElement( type, name );
-
-		if ( builder.length() > 0 ) {
-			builder.append( ", " );
-		}
-		builder.append( formatted );
-	}
-
-	private String formatContextElement(ValidationContextType type, String name) {
-		switch ( type ) {
-			case INDEX:
-				return MESSAGES.indexContext( name );
-			case MAPPING_PROPERTY:
-				return MESSAGES.mappingPropertyContext( name );
-			case MAPPING_PROPERTY_FIELD:
-				return MESSAGES.mappingPropertyFieldContext( name );
-			case ANALYZER:
-				return MESSAGES.analyzerContext( name );
-			case CHAR_FILTER:
-				return MESSAGES.charFilterContext( name );
-			case TOKENIZER:
-				return MESSAGES.tokenizerContext( name );
-			case TOKEN_FILTER:
-				return MESSAGES.tokenFilterContext( name );
-			case NORMALIZER:
-				return MESSAGES.normalizerContext( name );
-			default:
-				throw new AssertionFailure( "Unexpected validation context element type: " + type );
-		}
+		return !errorCollector.hasError();
 	}
 
 	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {

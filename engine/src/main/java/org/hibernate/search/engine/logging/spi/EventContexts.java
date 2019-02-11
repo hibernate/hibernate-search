@@ -95,7 +95,6 @@ public class EventContexts {
 		} );
 	}
 
-
 	public static EventContext indexSchemaRoot() {
 		return INDEX_SCHEMA_ROOT;
 	}
@@ -105,6 +104,56 @@ public class EventContexts {
 			@Override
 			public String render(String param) {
 				return MESSAGES.indexFieldAbsolutePath( param );
+			}
+		} );
+	}
+
+	public static EventContext fromAnalyzer(String analyzerName) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( analyzerName ) {
+			@Override
+			public String render(String param) {
+				String analyzerName = param == null ? "" : param;
+				return MESSAGES.analyzer( analyzerName );
+			}
+		} );
+	}
+
+	public static EventContext fromNormalizer(String normalizerName) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( normalizerName ) {
+			@Override
+			public String render(String param) {
+				String normalizerName = param == null ? "" : param;
+				return MESSAGES.normalizer( normalizerName );
+			}
+		} );
+	}
+
+	public static EventContext fromCharFilter(String charFilterName) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( charFilterName ) {
+			@Override
+			public String render(String param) {
+				String charFilterName = param == null ? "" : param;
+				return MESSAGES.charFilter( charFilterName );
+			}
+		} );
+	}
+
+	public static EventContext fromTokenizer(String tokenizerName) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( tokenizerName ) {
+			@Override
+			public String render(String param) {
+				String tokenizerName = param == null ? "" : param;
+				return MESSAGES.tokenizer( tokenizerName );
+			}
+		} );
+	}
+
+	public static EventContext fromTokenFilter(String tokenFilterName) {
+		return EventContext.create( new AbstractSimpleEventContextElement<String>( tokenFilterName ) {
+			@Override
+			public String render(String param) {
+				String tokenFilterName = param == null ? "" : param;
+				return MESSAGES.tokenFilter( tokenFilterName );
 			}
 		} );
 	}

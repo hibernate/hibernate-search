@@ -62,4 +62,19 @@ public interface EngineEventContextMessages {
 	@Message(value = "field '%1$s'")
 	String indexFieldAbsolutePath(String absolutePath);
 
+	@Message(value = "analyzer '%1$s'")
+	String analyzer(String name);
+
+	@Message(value = "normalizer '%1$s'")
+	String normalizer(String name);
+
+	@Message(value = "char filter '%1$s'")
+	String charFilter(String name);
+
+	@Message(value = "tokenizer '%1$s'")
+	String tokenizer(String name);
+
+	@Message(value = "token filter '%1$s'")
+	String tokenFilter(String name);
+
 }
