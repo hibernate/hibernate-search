@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
+import static org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName.ES_6;
+
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -26,55 +25,42 @@ public class ElasticsearchDialectFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<String> VERSION_ACCESSOR =
-			JsonAccessor.root().property( "version" ).property( "number" ).asString();
-
-	public ElasticsearchDialect createFromClusterVersion(ElasticsearchClient client) {
-		String version;
-		try {
-			version = getVersion( client );
+	public ElasticsearchDialect create(ElasticsearchDialectName dialectName) {
+		switch ( dialectName ) {
+			case ES_5_6:
+				return new Elasticsearch56Dialect();
+			case ES_6:
+				return new Elasticsearch6Dialect();
+			case AUTO:
+			default:
+				throw new AssertionFailure( "Unexpected dialect name in the create() method: " + dialectName );
 		}
-		catch (RuntimeException e) {
-			throw log.failedToDetectElasticsearchVersion( e );
-		}
+	}
 
-		if ( version.startsWith( "0." ) || version.startsWith( "1." ) || version.startsWith( "2." ) ) {
+	public ElasticsearchDialectName getAppropriateDialectName(ElasticsearchVersion version) {
+		if ( version.getMajor() < 5 ) {
 			throw log.unsupportedElasticsearchVersion( version );
 		}
-		else if ( version.startsWith( "5." ) ) {
-			if ( version.startsWith( "5.0." ) || version.startsWith( "5.1." )
-					|| version.startsWith( "5.2." ) || version.startsWith( "5.3." )
-					|| version.startsWith( "5.4." ) || version.startsWith( "5.5." ) ) {
-				throw log.unsupportedElasticsearchVersion( version );
-			}
-			else {
-				return new Elasticsearch56Dialect();
-			}
+		else if ( version.getMajor() == 5 && version.getMinor() < 6 ) {
+			throw log.unsupportedElasticsearchVersion( version );
+		}
+		else if ( version.getMajor() == 5 && version.getMinor() == 6 ) {
+			return ElasticsearchDialectName.ES_5_6;
 		}
 		else {
 			// Either the latest supported version, or a newer/unknown one
-			if ( !version.startsWith( "6." ) ) {
-				log.unexpectedElasticsearchVersion( version );
+			if ( version.getMajor() != 6 ) {
+				log.unknownElasticsearchVersion( version );
 			}
-			return new Elasticsearch6Dialect();
+			return ES_6;
 		}
 	}
 
-	private String getVersion(ElasticsearchClient client) {
-		ElasticsearchRequest request = ElasticsearchRequest.get().build();
-		ElasticsearchResponse response = null;
-		try {
-			response = client.submit( request ).join();
-
-			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
-				throw log.elasticsearchResponseIndicatesFailure();
-			}
-
-			return VERSION_ACCESSOR.get( response.getBody() )
-					.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
-		}
-		catch (RuntimeException e) {
-			throw log.elasticsearchRequestFailed( request, response, e );
+	public void checkAppropriate(ElasticsearchDialectName configuredDialectName, ElasticsearchVersion version) {
+		ElasticsearchDialectName appropriateDialectName = getAppropriateDialectName( version );
+		if ( !appropriateDialectName.equals( configuredDialectName ) ) {
+			throw log.unexpectedElasticsearchVersion( version, appropriateDialectName, configuredDialectName );
 		}
 	}
+
 }

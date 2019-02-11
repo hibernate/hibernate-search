@@ -7,9 +7,17 @@
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -19,6 +27,11 @@ import org.apache.http.HttpEntity;
  * @author Yoann Rodiere
  */
 public class ElasticsearchClientUtils {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final JsonAccessor<String> VERSION_ACCESSOR =
+			JsonAccessor.root().property( "version" ).property( "number" ).asString();
 
 	private ElasticsearchClientUtils() {
 		// Private constructor
@@ -34,6 +47,30 @@ public class ElasticsearchClientUtils {
 			return null;
 		}
 		return new GsonHttpEntity( gson, bodyParts );
+	}
+
+	public static ElasticsearchVersion getElasticsearchVersion(ElasticsearchClient client) {
+		try {
+			ElasticsearchRequest request = ElasticsearchRequest.get().build();
+			ElasticsearchResponse response = null;
+			try {
+				response = client.submit( request ).join();
+
+				if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
+					throw log.elasticsearchResponseIndicatesFailure();
+				}
+
+				return VERSION_ACCESSOR.get( response.getBody() )
+						.map( ElasticsearchVersion::of )
+						.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
+			}
+			catch (RuntimeException e) {
+				throw log.elasticsearchRequestFailed( request, response, e );
+			}
+		}
+		catch (RuntimeException e) {
+			throw log.failedToDetectElasticsearchVersion( e );
+		}
 	}
 
 }

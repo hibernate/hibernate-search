@@ -7,136 +7,122 @@
 package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 
-import java.util.concurrent.CompletableFuture;
-
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 
-import com.google.gson.JsonObject;
-import org.easymock.EasyMock;
-import org.easymock.EasyMockRunner;
-import org.easymock.Mock;
-
-@RunWith(EasyMockRunner.class)
 public class ElasticsearchDialectFactoryTest {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	private ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 
-	@Mock
-	private ElasticsearchClient clientMock;
+	@Test
+	public void inappropriate() {
+		SubTest.expectException(
+				() -> {
+					dialectFactory.checkAppropriate( ElasticsearchDialectName.ES_6, ElasticsearchVersion.of( "5.6.0" ) );
+				}
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "HSEARCH400556" )
+				.hasMessageContaining( "Unexpected Elasticsearch version" )
+				.hasMessageContaining( "'5.6.0'" )
+				.hasMessageContaining( ElasticsearchDialectName.ES_5_6.toString() )
+				.hasMessageContaining( ElasticsearchDialectName.ES_6.toString() );
+	}
 
 	@Test
 	public void es0() throws Exception {
-		doMock( "0.90.12" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'0.90.12'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "0.90.12" );
 	}
 
 	@Test
 	public void es10() throws Exception {
-		doMock( "1.0.0" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'1.0.0'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "1.0.0" );
 	}
 
 	@Test
 	public void es20() throws Exception {
-		doMock( "2.0.0" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'2.0.0'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "2.0.0" );
 	}
 
 	@Test
 	public void es24() throws Exception {
-		doMock( "2.4.4" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'2.4.4'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "2.4.4" );
 	}
 
 	@Test
 	public void es50() throws Exception {
-		doMock( "5.0.0" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'5.0.0'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "5.0.0" );
 	}
 
 	@Test
 	public void es52() throws Exception {
-		doMock( "5.2.0" );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "HSEARCH400081" );
-		thrown.expectMessage( "'5.2.0'" );
-		dialectFactory.createFromClusterVersion( clientMock );
+		testUnsupported( "5.2.0" );
 	}
 
 	@Test
-	public void es56() throws Exception {
-		testSuccess( "5.6.12", Elasticsearch56Dialect.class );
+	public void es56() {
+		testSuccess( "5.6.12", ElasticsearchDialectName.ES_5_6, Elasticsearch56Dialect.class );
 	}
 
 	@Test
-	public void es60() throws Exception {
-		testSuccess( "6.0.0", Elasticsearch6Dialect.class );
+	public void es60() {
+		testSuccess( "6.0.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
 	}
 
 	@Test
-	public void es66() throws Exception {
-		testSuccess( "6.6.0", Elasticsearch6Dialect.class );
+	public void es66() {
+		testSuccess( "6.6.0", ElasticsearchDialectName.ES_6, Elasticsearch6Dialect.class );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2748")
-	public void es70() throws Exception {
-		doMock( "7.0.0" );
+	public void es70() {
 		logged.expectMessage( "HSEARCH400085", "'7.0.0'" );
-		ElasticsearchDialect dialect = dialectFactory.createFromClusterVersion( clientMock );
-		assertThat( dialect ).isInstanceOf( Elasticsearch6Dialect.class );
+		ElasticsearchDialectName dialectName = dialectFactory.getAppropriateDialectName( ElasticsearchVersion.of( "7.0.0" ) );
+		assertThat( dialectName ).isEqualTo( ElasticsearchDialectName.ES_6 );
 	}
 
-	private void testSuccess(String versionString, Class<?> expectedDialectClass) throws Exception {
-		doMock( versionString );
+	private void testUnsupported(String unsupportedVersionString) {
+		for ( ElasticsearchDialectName name : ElasticsearchDialectName.values() ) {
+			SubTest.expectException(
+					"Test with unsupported version " + unsupportedVersionString + " with dialect name " + name,
+					() -> {
+						dialectFactory.getAppropriateDialectName( ElasticsearchVersion.of( unsupportedVersionString ) );
+					}
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "HSEARCH400081" )
+					.hasMessageContaining( "'" + unsupportedVersionString + "'" );
+		}
+	}
+
+	private void testSuccess(String versionString, ElasticsearchDialectName expectedDialectName, Class<?> expectedDialectClass) {
+		ElasticsearchVersion parsedVersion = ElasticsearchVersion.of( versionString );
+
+		ElasticsearchDialectName dialectName = dialectFactory.getAppropriateDialectName( parsedVersion );
+		assertThat( dialectName ).isEqualTo( expectedDialectName );
+
 		logged.expectMessage( "HSEARCH400085" ).never();
-		ElasticsearchDialect dialect = dialectFactory.createFromClusterVersion( clientMock );
+		ElasticsearchDialect dialect = dialectFactory.create( dialectName );
 		assertThat( dialect ).isInstanceOf( expectedDialectClass );
-	}
 
-	private void doMock(String versionString) throws Exception {
-		JsonObject versionObject = new JsonObject();
-		versionObject.addProperty( "number", versionString );
-		JsonObject responseBody = new JsonObject();
-		responseBody.add( "version", versionObject );
-		expect( clientMock.submit( EasyMock.anyObject() ) )
-				.andReturn( CompletableFuture.completedFuture( new ElasticsearchResponse( 200, "", responseBody ) ) );
-		replay( clientMock );
+		// Should not throw an exception
+		dialectFactory.checkAppropriate( expectedDialectName, parsedVersion );
 	}
 
 }

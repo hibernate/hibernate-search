@@ -12,6 +12,8 @@ import static org.jboss.logging.Logger.Level.WARN;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchDialectName;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
@@ -198,7 +200,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 81,
 			value = "An unsupported Elasticsearch version runs on the Elasticsearch cluster: '%s'."
 					+ " Please refer to the documentation to know which versions are supported." )
-	SearchException unsupportedElasticsearchVersion(String name);
+	SearchException unsupportedElasticsearchVersion(ElasticsearchVersion version);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 82,
@@ -211,7 +213,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_2 + 85,
 			value = "Hibernate Search may not work correctly, because an unknown Elasticsearch version runs on the Elasticsearch cluster: '%s'." )
-	void unexpectedElasticsearchVersion(String name);
+	void unknownElasticsearchVersion(ElasticsearchVersion version);
 
 	@Message(id = ID_OFFSET_2 + 86,
 			value = "Multiple normalizer definitions with the same name: '%1$s'. The normalizer names must be unique.")
@@ -460,4 +462,17 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 53,
 			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 54, value = "Invalid Elasticsearch version: '%1$s'."
+			+ " The version must be in the form 'x.y.z', where 'x', 'y' and 'z' are integers.")
+	SearchException invalidElasticsearchVersion(String versionString);
+
+	@Message(id = ID_OFFSET_3 + 55, value = "Invalid Elasticsearch dialect name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidDialectName(String normalizedValue, List<String> validValues);
+
+	@Message(id = ID_OFFSET_3 + 56, value = "Unexpected Elasticsearch version: '%1$s'."
+			+ " This version would require dialect '%2$s', but Hibernate Search was configured to use dialect '%3$s'.")
+	SearchException unexpectedElasticsearchVersion(ElasticsearchVersion actualVersion,
+			ElasticsearchDialectName appropriateDialectName, ElasticsearchDialectName configuredDialectName);
 }

@@ -45,6 +45,15 @@ public final class ElasticsearchBackendSettings {
 	public static final String HOSTS = "hosts";
 
 	/**
+	 * The dialect to use when interacting with the remote Elasticseearch cluster.
+	 * <p>
+	 * See {@link ElasticsearchDialectName} for accepted values.
+	 * <p>
+	 * Defaults to {@link ElasticsearchDialectName#AUTO}.
+	 */
+	public static final String DIALECT = "dialect";
+
+	/**
 	 * The username to send when connecting to the Elasticsearch servers (HTTP authentication).
 	 * <p>
 	 * Expects a String.
@@ -184,6 +193,7 @@ public final class ElasticsearchBackendSettings {
 		}
 
 		public static final List<String> HOSTS = Collections.singletonList( "http://localhost:9200" );
+		public static final ElasticsearchDialectName DIALECT = ElasticsearchDialectName.AUTO;
 		public static final int REQUEST_TIMEOUT = 60000;
 		public static final int READ_TIMEOUT = 60000;
 		public static final int CONNECTION_TIMEOUT = 3000;
