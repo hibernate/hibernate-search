@@ -60,7 +60,7 @@ public final class ElasticsearchBackendSettings {
 		public static final int READ_TIMEOUT = 60000;
 		public static final int CONNECTION_TIMEOUT = 3000;
 		public static final int MAX_CONNECTIONS = 20;
-		public static final int MAX_CONNECTIONS_PER_ROUTE = 2;
+		public static final int MAX_CONNECTIONS_PER_ROUTE = 10;
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final String DISCOVERY_SCHEME = "http";
