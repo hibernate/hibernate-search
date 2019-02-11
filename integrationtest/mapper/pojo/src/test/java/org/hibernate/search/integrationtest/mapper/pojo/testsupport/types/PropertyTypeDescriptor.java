@@ -55,7 +55,9 @@ public abstract class PropertyTypeDescriptor<V> {
 					new ZoneOffsetPropertyTypeDescriptor(),
 					new ZoneIdPropertyTypeDescriptor(),
 					new DurationPropertyTypeDescriptor(),
-					new PeriodPropertyTypeDescriptor()
+					new PeriodPropertyTypeDescriptor(),
+					new JavaNetURIPropertyTypeDescriptor(),
+					new JavaNetURLPropertyTypeDescriptor()
 			) );
 		}
 		return all;

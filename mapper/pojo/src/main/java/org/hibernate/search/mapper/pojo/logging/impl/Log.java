@@ -10,6 +10,10 @@ package org.hibernate.search.mapper.pojo.logging.impl;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
 import java.lang.reflect.Type;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -31,6 +35,8 @@ import org.hibernate.search.util.impl.common.logging.EnumFormatter;
 import org.hibernate.search.util.impl.common.logging.ToStringTreeAppendableMultilineFormatter;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.logging.TypeFormatter;
+import org.hibernate.search.util.impl.common.logging.URIFormatter;
+import org.hibernate.search.util.impl.common.logging.URLFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -322,4 +328,10 @@ public interface Log extends BasicLogger {
 	)
 	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
 			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> type);
+
+	@Message(id = ID_OFFSET_2 + 43, value = "Error on mapping back URI '%1$s' to URL.")
+	SearchException malformedURL(@FormatWith(URIFormatter.class) URI value, @Cause MalformedURLException e);
+
+	@Message(id = ID_OFFSET_2 + 44, value = "Error on mapping URL '%1$s' to URI.")
+	SearchException badURISyntax(@FormatWith(URLFormatter.class) URL value, @Cause URISyntaxException e);
 }

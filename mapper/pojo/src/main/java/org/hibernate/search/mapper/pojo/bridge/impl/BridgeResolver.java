@@ -9,6 +9,8 @@ package org.hibernate.search.mapper.pojo.bridge.impl;
 import java.lang.invoke.MethodHandles;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,6 +41,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIde
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
@@ -67,7 +70,6 @@ public final class BridgeResolver {
 
 	public BridgeResolver(TypePatternMatcherFactory typePatternMatcherFactory) {
 		// TODO add an extension point to override these maps, or at least to add defaults for other types
-		// TODO add defaults for other types (byte, char, Characeter, Double, double, boolean, Boolean, ...)
 
 		TypePatternMatcher concreteEnumPattern = typePatternMatcherFactory.createRawSuperTypeMatcher( Enum.class )
 				.and( typePatternMatcherFactory.createExactRawTypeMatcher( Enum.class ).negate() );
@@ -108,6 +110,8 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneId.class ) ) );
 		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Period.class ) ) );
 		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Duration.class ) ) );
+		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( URI.class ) ) );
+		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
