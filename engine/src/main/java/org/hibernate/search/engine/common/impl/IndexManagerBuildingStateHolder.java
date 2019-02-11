@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -58,8 +58,10 @@ class IndexManagerBuildingStateHolder {
 	private final ConfigurationPropertySource propertySource;
 	private final RootBuildContext rootBuildContext;
 
-	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new HashMap<>();
-	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new HashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new LinkedHashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new LinkedHashMap<>();
 
 	IndexManagerBuildingStateHolder(BeanProvider beanProvider, ConfigurationPropertySource propertySource,
 			RootBuildContext rootBuildContext) {
@@ -108,7 +110,8 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	Map<String, BackendImplementor<?>> getBackendsByName() {
-		Map<String, BackendImplementor<?>> backendsByName = new HashMap<>();
+		// Use a LinkedHashMap for deterministic iteration
+		Map<String, BackendImplementor<?>> backendsByName = new LinkedHashMap<>();
 		for ( Map.Entry<String, BackendBuildingState<?>> entry : backendBuildingStateByName.entrySet() ) {
 			backendsByName.put( entry.getKey(), entry.getValue().getBuilt() );
 		}
@@ -116,7 +119,8 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	Map<String, IndexManagerImplementor<?>> getIndexManagersByName() {
-		Map<String, IndexManagerImplementor<?>> indexManagersByName = new HashMap<>();
+		// Use a LinkedHashMap for deterministic iteration
+		Map<String, IndexManagerImplementor<?>> indexManagersByName = new LinkedHashMap<>();
 		for ( Map.Entry<String, IndexManagerBuildingStateImpl<?>> entry : indexManagerBuildingStateByName.entrySet() ) {
 			indexManagersByName.put( entry.getKey(), entry.getValue().getBuilt() );
 		}
