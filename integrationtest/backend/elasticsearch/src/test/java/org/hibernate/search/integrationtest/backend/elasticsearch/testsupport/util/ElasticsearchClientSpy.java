@@ -87,11 +87,6 @@ public class ElasticsearchClientSpy implements TestRule {
 		}
 
 		@Override
-		public void init(GsonProvider gsonProvider) {
-			delegate.init( gsonProvider );
-		}
-
-		@Override
 		public void close() throws IOException {
 			delegate.close();
 		}

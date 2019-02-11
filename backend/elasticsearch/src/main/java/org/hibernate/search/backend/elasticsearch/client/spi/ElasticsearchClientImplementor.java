@@ -8,13 +8,9 @@ package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import java.io.Closeable;
 
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-
 /**
- * An interface allowing to configure an {@link ElasticsearchClient} and to close it.
+ * An interface allowing to close an {@link ElasticsearchClient}.
  */
 public interface ElasticsearchClientImplementor extends ElasticsearchClient, Closeable {
-
-	void init(GsonProvider gsonProvider);
 
 }
