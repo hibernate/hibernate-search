@@ -10,6 +10,7 @@ import static org.junit.Assert.fail;
 
 import java.util.concurrent.Callable;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.jboss.logging.BasicLogger;
@@ -17,6 +18,7 @@ import org.jboss.logging.Logger;
 
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
+import org.hamcrest.Matcher;
 
 /**
  * A util allowing to run blocks of code as "sub-tests".
@@ -92,6 +94,11 @@ public class SubTest {
 		public AbstractThrowableAssert<?, Throwable> assertThrown() {
 			return new ThrowableAssert( thrown )
 					.as( description );
+		}
+
+		public ExceptionThrowingSubTest assertThrown(Matcher<? super Throwable> matcher) {
+			Assert.assertThat( thrown, matcher );
+			return this;
 		}
 	}
 
