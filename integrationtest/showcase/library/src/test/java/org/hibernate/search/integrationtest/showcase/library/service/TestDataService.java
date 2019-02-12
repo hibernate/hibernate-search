@@ -11,7 +11,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Locale;
 
 import org.hibernate.search.integrationtest.showcase.library.OrmLibraryShowcaseIT;
-import org.hibernate.search.integrationtest.showcase.library.OrmManualIndexingIT;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.BorrowalType;
@@ -38,9 +37,7 @@ public class TestDataService {
 	@Autowired
 	private BorrowalService borrowalService;
 
-	// TODO Init data is executed in a single transaction.
-	// It seems that spanning it across different transactions would cause index data lost.
-	public void initData() {
+	public void initDefaultDataSet() {
 		Book calligraphy = documentService.createBook(
 				OrmLibraryShowcaseIT.CALLIGRAPHY_ID,
 				"978-0-00-000001-1",
@@ -230,8 +227,8 @@ public class TestDataService {
 		assertThat( true ).isEqualTo( true );
 	}
 
-	public void createBooks() {
-		for ( int i = 0; i < OrmManualIndexingIT.NUMBER_OF_BOOKS; i++ ) {
+	public void initBooksDataSet(int numberOfBooks) {
+		for ( int i = 0; i < numberOfBooks; i++ ) {
 			String isbn = String.format( Locale.ROOT, "973-0-00-%06d-3", i );
 			documentService.createBook( i, isbn, "Divine Comedy chapter n. " + ( i + 1 ), "Dante Alighieri " + ( i + 1 ),
 					"The Divine Comedy is composed of 14,233 lines that are divided into three cantiche (singular cantica) – Inferno (Hell), Purgatorio (Purgatory), and Paradiso (Paradise)",

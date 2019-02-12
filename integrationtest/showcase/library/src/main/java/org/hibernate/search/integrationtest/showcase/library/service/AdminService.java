@@ -22,7 +22,7 @@ public class AdminService {
 	@Autowired
 	private EntityManager entityManager;
 
-	public MassIndexer createMassiveIndexer() {
+	public MassIndexer createMassIndexer() {
 		return Search.getFullTextEntityManager( entityManager ).createIndexer();
 	}
 }

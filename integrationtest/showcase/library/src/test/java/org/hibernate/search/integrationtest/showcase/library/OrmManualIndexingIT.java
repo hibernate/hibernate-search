@@ -32,7 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class OrmManualIndexingIT {
 
-	public static final int NUMBER_OF_BOOKS = 200;
+	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
 	static {
 		checkInvariants();
@@ -62,13 +62,13 @@ public class OrmManualIndexingIT {
 
 	@Before
 	public void initData() {
-		testDataService.createBooks();
+		testDataService.initBooksDataSet( NUMBER_OF_BOOKS );
 	}
 
 	@Test
 	public void testMassIndexing() {
 		assertThat( documentService.findAllIndexed() ).hasSize( 0 );
-		MassIndexer indexer = massiveIndexer.createMassiveIndexer();
+		MassIndexer indexer = massiveIndexer.createMassIndexer();
 		try {
 			indexer.startAndWait();
 		}
@@ -81,7 +81,7 @@ public class OrmManualIndexingIT {
 	@Test
 	public void testMassIndexingMonitor() {
 		assertThat( documentService.findAllIndexed() ).hasSize( 0 );
-		MassIndexer indexer = massiveIndexer.createMassiveIndexer();
+		MassIndexer indexer = massiveIndexer.createMassIndexer();
 		try {
 			/*
 			 * The default period for logging in the default mass indexing monitor is 50.
