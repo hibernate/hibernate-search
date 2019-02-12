@@ -41,6 +41,8 @@ public enum DataType {
 	FLOAT,
 	@SerializedName("byte")
 	BYTE,
+	@SerializedName("short")
+	SHORT,
 	@SerializedName("date")
 	DATE,
 	@SerializedName("boolean")

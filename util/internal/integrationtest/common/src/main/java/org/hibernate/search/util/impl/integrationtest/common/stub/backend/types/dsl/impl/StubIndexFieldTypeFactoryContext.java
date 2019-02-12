@@ -60,6 +60,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	}
 
 	@Override
+	public StandardIndexFieldTypeContext<?, Short> asShort() {
+		return as( Short.class );
+	}
+
+	@Override
 	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
 	}
