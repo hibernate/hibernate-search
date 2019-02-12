@@ -35,8 +35,6 @@ public class Borrowal extends AbstractEntity<Integer> {
 		this.account = account;
 		this.copy = copy;
 		this.type = type;
-		account.getBorrowals().add( this );
-		copy.getBorrowals().add( this );
 	}
 
 	@Override

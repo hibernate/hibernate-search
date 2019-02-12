@@ -51,7 +51,11 @@ public class BorrowalService {
 	}
 
 	public <D extends Document<C>, C extends DocumentCopy<D>> Borrowal borrow(Person user, Library library, Document document, int copyIndex, BorrowalType type) {
-		return borrowalRepo.save( new Borrowal( user.getAccount(), document.getCopy( library, copyIndex ), type ) );
+		DocumentCopy copy = getCopy( document, library, copyIndex );
+		Borrowal borrowal = new Borrowal( user.getAccount(), copy, type );
+		user.getAccount().getBorrowals().add( borrowal );
+		copy.getBorrowals().add( borrowal );
+		return borrowalRepo.save( borrowal );
 	}
 
 	public List<Person> listTopBorrowers(int offset, int limit) {
@@ -68,5 +72,17 @@ public class BorrowalService {
 
 	public List<Person> searchPerson(String terms, int offset, int limit) {
 		return personRepo.searchPerson( terms, offset, limit );
+	}
+
+	private DocumentCopy getCopy(Document<DocumentCopy<?>> document, Library library, int copyIndex) {
+		return document.getCopies().stream()
+				.filter( c -> c.getLibrary().equals( library ) )
+				.skip( copyIndex )
+				.findFirst()
+				.orElseThrow( () -> new IllegalStateException(
+						"The test setup is incorrect; could not find copy #" + copyIndex
+								+ " of document " + this
+								+ " for library " + library
+				) );
 	}
 }
