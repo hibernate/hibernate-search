@@ -29,9 +29,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.PersistentClass;
@@ -62,8 +60,8 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 					.withDefault( HibernateOrmMapperSpiSettings.Defaults.PROPERTY_HANDLE_FACTORY )
 					.build();
 
-	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
 	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
+			ReflectionManager ormReflectionManager,
 			ConfigurationPropertySource propertySource) {
 		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings();
 		Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new HashMap<>();
@@ -75,19 +73,6 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 
 		// TODO get the user lookup from Hibernate ORM?
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
-
-		ReflectionManager reflectionManager = null;
-		if ( metadata instanceof MetadataImplementor ) {
-			reflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext()
-					.getBootstrapContext().getReflectionManager();
-		}
-		if ( reflectionManager == null ) {
-			// Fall back to our own instance of JavaReflectionManager
-			// when metadata is not a MetadataImplementor or
-			// the reflection manager were not created by Hibernate yet.
-			reflectionManager = new JavaReflectionManager();
-		}
-
 		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
 
 		HibernateOrmPropertyHandleFactoryName propertyHandleFactoryName = PROPERTY_HANDLE_FACTORY.get( propertySource );
@@ -104,7 +89,7 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				typeMetadata, reflectionManager, annotationHelper, propertyHandleFactory
+				typeMetadata, ormReflectionManager, annotationHelper, propertyHandleFactory
 		);
 	}
 

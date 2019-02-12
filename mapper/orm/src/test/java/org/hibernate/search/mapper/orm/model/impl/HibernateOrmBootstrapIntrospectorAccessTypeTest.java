@@ -26,10 +26,12 @@ import javax.persistence.MapKeyClass;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.dialect.H2Dialect;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -280,12 +282,16 @@ public class HibernateOrmBootstrapIntrospectorAccessTypeTest {
 		}
 		Metadata metadata = metadataSources.buildMetadata();
 
+		MetadataImplementor metadataImplementor = (MetadataImplementor) metadata;
+		ReflectionManager reflectionManager = metadataImplementor.getTypeConfiguration()
+				.getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
+
 		Map<String, Object> properties = new HashMap<>();
 		if ( propertyHandleFactoryName != null ) {
 			properties.put( HibernateOrmMapperSpiSettings.PROPERTY_HANDLE_FACTORY, propertyHandleFactoryName );
 		}
 
-		return HibernateOrmBootstrapIntrospector.create( metadata, ConfigurationPropertySource.fromMap( properties ) );
+		return HibernateOrmBootstrapIntrospector.create( metadata, reflectionManager, ConfigurationPropertySource.fromMap( properties ) );
 	}
 
 	private static <T> T methodShouldNotBeCalled() {

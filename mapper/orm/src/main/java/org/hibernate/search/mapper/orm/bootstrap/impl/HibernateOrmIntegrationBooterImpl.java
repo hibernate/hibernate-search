@@ -9,8 +9,10 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
+import org.hibernate.boot.spi.BootstrapContext;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
@@ -46,11 +48,14 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
+	private final ReflectionManager reflectionManager;
 	private final HibernateOrmConfigurationPropertySource propertySource;
 
-	public HibernateOrmIntegrationBooterImpl(Metadata metadata, ServiceRegistryImplementor serviceRegistry) {
+	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
+	public HibernateOrmIntegrationBooterImpl(Metadata metadata, BootstrapContext bootstrapContext) {
 		this.metadata = metadata;
-		this.serviceRegistry = serviceRegistry;
+		this.serviceRegistry = (ServiceRegistryImplementor) bootstrapContext.getServiceRegistry();
+		this.reflectionManager = bootstrapContext.getReflectionManager();
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		this.propertySource = new HibernateOrmConfigurationPropertySource( configurationService );
 	}
@@ -106,7 +111,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, propertySource
+					metadata, reflectionManager, propertySource
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
