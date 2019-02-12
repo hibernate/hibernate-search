@@ -92,7 +92,7 @@ public class OrmLibraryShowcaseIT {
 
 	@Before
 	public void before() {
-		testDataService.initData();
+		testDataService.initDefaultDataSet();
 	}
 
 	@Test
