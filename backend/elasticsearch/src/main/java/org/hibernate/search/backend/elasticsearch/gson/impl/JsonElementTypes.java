@@ -236,6 +236,18 @@ public final class JsonElementTypes {
 		}
 	};
 
+	public static final JsonElementType<Short> SHORT = new JsonNumberType<Short>() {
+		@Override
+		protected Short nullUnsafeFromNumber(JsonPrimitive primitive) {
+			return primitive.getAsShort();
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName() + "(Short)";
+		}
+	};
+
 	public static final JsonElementType<JsonNull> NULL = new JsonElementType<JsonNull>() {
 		@Override
 		protected JsonNull nullUnsafeFromElement(JsonElement element) {
