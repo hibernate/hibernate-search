@@ -156,7 +156,6 @@
         <module>util/internal/integrationtest</module>
         <module>integrationtest</module>
         <module>documentation</module>
-        <module>legacy</module>
     </modules>
 
     <properties>
@@ -2540,6 +2539,19 @@
                 <jdbc.pass>searctru</jdbc.pass>
                 <jdbc.isolation>4096</jdbc.isolation>
             </properties>
+        </profile>
+
+        <profile>
+            <id>legacy</id>
+            <activation>
+                <property>
+                    <name>legacy.skip</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <modules>
+                <module>legacy</module>
+            </modules>
         </profile>
 
         <!--

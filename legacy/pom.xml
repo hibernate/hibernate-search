@@ -49,10 +49,6 @@
     </modules>
 
     <properties>
-        <!-- Skip tests in the legacy module by default -->
-        <surefire.legacy.skip>true</surefire.legacy.skip>
-        <failsafe.legacy.skip>${surefire.legacy.skip}</failsafe.legacy.skip>
-
         <!-- Skip plugin executions that are not relevant for legacy code -->
         <jqassistant.skip>true</jqassistant.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
@@ -768,15 +764,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <skip>${surefire.legacy.skip}</skip>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skip>${failsafe.legacy.skip}</skip>
                     <excludedGroups>
                         org.hibernate.search.testsupport.junit.PortedToSearch6,
                         org.hibernate.search.testsupport.junit.WillNotPortToSearch6
