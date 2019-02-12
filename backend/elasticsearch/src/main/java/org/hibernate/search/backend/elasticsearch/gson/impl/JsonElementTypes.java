@@ -129,6 +129,33 @@ public final class JsonElementTypes {
 		}
 	};
 
+	public static final JsonElementType<Character> CHARACTER = new JsonElementType<Character>() {
+		@Override
+		protected Character nullUnsafeFromElement(JsonElement element) {
+			return element.isJsonNull() ? null : element.getAsJsonPrimitive().getAsCharacter();
+		}
+
+		@Override
+		protected JsonElement nullUnsafeToElement(Character value) {
+			// The character is turned into a one character String
+			return new JsonPrimitive( value );
+		}
+
+		@Override
+		protected boolean nullUnsafeIsInstance(JsonElement element) {
+			if ( !element.isJsonPrimitive() || !element.getAsJsonPrimitive().isString() ) {
+				return false;
+			}
+
+			return ( element.getAsString().length() == 1 );
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName() + "(Character)";
+		}
+	};
+
 	private abstract static class JsonNumberType<T extends Number> extends JsonElementType<T> {
 		@Override
 		protected T nullUnsafeFromElement(JsonElement element) {
