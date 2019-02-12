@@ -397,7 +397,7 @@ stage('Default build') {
 					"} \
 					-Pdist -Pcoverage -Pjqassistant \
 					${enableDefaultEnvIT ? '' : '-DskipITs'} \
-					${enableDefaultEnvLegacyIT ? '-Dsurefire.legacy.skip=false -Dfailsafe.legacy.skip=false' : ''} \
+					${enableDefaultEnvLegacyIT ? '-Dlegacy.skip=false' : ''} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing

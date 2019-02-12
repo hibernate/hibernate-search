@@ -154,9 +154,8 @@ Here are some notable sub-directories:
   *  `showcase/library`: a sample application using Hibernate Search in a Spring Boot environment.
 * `legacy`: Legacy code from Search 5. This code is not part of the distributed JARs.
 Parts of it will progressively be re-integrated into the main (Search 6+) code base.
-Note that tests in this directory are disabled by default
-(they are only enabled when the properties `surefire.legacy.skip` and `failsafe.legacy.skip`
-are set to `false`).
+Note that compilation and tests in this directory are disabled by default
+(they are only enabled when the property `legacy.skip` is set to `false`).
 When enabled, Elasticsearch integration test in this directory 
 are executed against Elasticsearch 5.6 by default (instead of 6.0).
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
