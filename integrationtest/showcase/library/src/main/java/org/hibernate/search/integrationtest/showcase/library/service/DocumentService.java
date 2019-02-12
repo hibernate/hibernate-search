@@ -37,10 +37,6 @@ public class DocumentService {
 		return documentRepo.save( new Video( id, title, author, summary, tags ) );
 	}
 
-	public Document load(int id) {
-		return documentRepo.findById( id ).get();
-	}
-
 	public List<Book> findAllIndexed() {
 		return documentRepo.findAllIndexed();
 	}
