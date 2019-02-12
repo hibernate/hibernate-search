@@ -31,6 +31,7 @@ public abstract class FieldTypeDescriptor<F> {
 					new IntegerFieldTypeDescriptor(),
 					new LongFieldTypeDescriptor(),
 					new BooleanFieldTypeDescriptor(),
+					new CharacterFieldTypeDescriptor(),
 					new InstantFieldTypeDescriptor(),
 					new LocalDateFieldTypeDescriptor(),
 					new GeoPointFieldTypeDescriptor()
