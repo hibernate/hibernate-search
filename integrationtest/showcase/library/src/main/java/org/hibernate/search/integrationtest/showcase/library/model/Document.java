@@ -75,18 +75,6 @@ public abstract class Document<C extends DocumentCopy<?>> extends AbstractEntity
 		this.tags = tags;
 	}
 
-	public C getCopy(Library library, int copyIndex) {
-		return copies.stream()
-				.filter( c -> c.getLibrary().equals( library ) )
-				.skip( copyIndex )
-				.findFirst()
-				.orElseThrow( () -> new IllegalStateException(
-						"The test setup is incorrect; could not find copy #" + copyIndex
-								+ " of document " + this
-								+ " for library " + library
-				) );
-	}
-
 	@Override
 	public Integer getId() {
 		return id;

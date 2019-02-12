@@ -81,26 +81,6 @@ public class Library extends AbstractEntity<Integer> {
 		this.services = Arrays.asList( services );
 	}
 
-	public VideoCopy add(Video video, VideoMedium medium) {
-		VideoCopy copy = new VideoCopy();
-		copy.setLibrary( this );
-		copies.add( copy );
-		copy.setDocument( video );
-		video.getCopies().add( copy );
-		copy.setMedium( medium );
-		return copy;
-	}
-
-	public BookCopy add(Book book, BookMedium medium) {
-		BookCopy copy = new BookCopy();
-		copy.setLibrary( this );
-		copies.add( copy );
-		copy.setDocument( book );
-		book.getCopies().add( copy );
-		copy.setMedium( medium );
-		return copy;
-	}
-
 	@Override
 	public Integer getId() {
 		return id;

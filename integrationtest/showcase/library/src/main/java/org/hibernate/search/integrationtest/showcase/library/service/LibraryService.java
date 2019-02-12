@@ -38,11 +38,23 @@ public class LibraryService {
 	}
 
 	public BookCopy createCopyInLibrary(Library library, Book book, BookMedium medium) {
-		return copyRepo.save( library.add( book, medium ) );
+		BookCopy copy = new BookCopy();
+		copy.setLibrary( library );
+		library.getCopies().add( copy );
+		copy.setDocument( book );
+		book.getCopies().add( copy );
+		copy.setMedium( medium );
+		return copyRepo.save( copy );
 	}
 
 	public VideoCopy createCopyInLibrary(Library library, Video video, VideoMedium medium) {
-		return copyRepo.save( library.add( video, medium ) );
+		VideoCopy copy = new VideoCopy();
+		copy.setLibrary( library );
+		library.getCopies().add( copy );
+		copy.setDocument( video );
+		video.getCopies().add( copy );
+		copy.setMedium( medium );
+		return copyRepo.save( copy );
 	}
 
 	public List<Library> search(String terms, int offset, int limit) {
