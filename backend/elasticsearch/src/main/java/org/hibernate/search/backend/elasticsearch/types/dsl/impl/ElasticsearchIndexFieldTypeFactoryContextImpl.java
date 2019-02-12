@@ -58,6 +58,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( Character.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asCharacter();
 		}
+		else if ( Byte.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asByte();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
 		}
@@ -102,6 +105,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Character> asCharacter() {
 		return new ElasticsearchCharacterIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Byte> asByte() {
+		return new ElasticsearchByteIndexFieldTypeContext( this );
 	}
 
 	@Override

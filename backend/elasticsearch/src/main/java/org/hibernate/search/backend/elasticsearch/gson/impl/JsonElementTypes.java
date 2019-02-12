@@ -197,6 +197,18 @@ public final class JsonElementTypes {
 		}
 	};
 
+	public static final JsonElementType<Byte> BYTE = new JsonNumberType<Byte>() {
+		@Override
+		protected Byte nullUnsafeFromNumber(JsonPrimitive primitive) {
+			return primitive.getAsByte();
+		}
+
+		@Override
+		public String toString() {
+			return JsonPrimitive.class.getSimpleName() + "(Byte)";
+		}
+	};
+
 	public static final JsonElementType<JsonNull> NULL = new JsonElementType<JsonNull>() {
 		@Override
 		protected JsonNull nullUnsafeFromElement(JsonElement element) {

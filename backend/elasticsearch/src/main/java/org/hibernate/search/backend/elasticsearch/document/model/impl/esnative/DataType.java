@@ -39,6 +39,8 @@ public enum DataType {
 	DOUBLE,
 	@SerializedName("float")
 	FLOAT,
+	@SerializedName("byte")
+	BYTE,
 	@SerializedName("date")
 	DATE,
 	@SerializedName("boolean")
