@@ -169,11 +169,11 @@ public class OrmLibraryShowcaseIT {
 	public void search_single() {
 		Optional<Book> book = documentService.getByIsbn( "978-0-00-000001-1" );
 		assertTrue( book.isPresent() );
-		assertThat( book.get() ).isEqualTo( documentService.load( CALLIGRAPHY_ID ) );
+		assertThat( book.get().getId() ).isEqualTo( CALLIGRAPHY_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-5" );
 		assertTrue( book.isPresent() );
-		assertThat( book.get() ).isEqualTo( documentService.load( ART_OF_COMPUTER_PROG_ID ) );
+		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
 
 		book = documentService.getByIsbn( "978-0-00-000005-1" );
 		assertFalse( book.isPresent() );
@@ -181,7 +181,7 @@ public class OrmLibraryShowcaseIT {
 		// Test the normalizer
 		book = documentService.getByIsbn( "9780000000055" );
 		assertTrue( book.isPresent() );
-		assertThat( book.get() ).isEqualTo( documentService.load( ART_OF_COMPUTER_PROG_ID ) );
+		assertThat( book.get().getId() ).isEqualTo( ART_OF_COMPUTER_PROG_ID );
 	}
 
 	/**
