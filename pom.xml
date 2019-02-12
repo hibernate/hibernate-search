@@ -327,7 +327,7 @@
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.wildfly.plugin>1.2.1.Final</version.wildfly.plugin>
         <version.org.wildfly.build-tools>1.2.11.Final</version.org.wildfly.build-tools>
-        <version.jacoco.plugin>0.8.0</version.jacoco.plugin>
+        <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
 
