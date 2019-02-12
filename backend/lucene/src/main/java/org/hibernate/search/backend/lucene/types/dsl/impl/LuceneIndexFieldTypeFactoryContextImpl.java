@@ -66,6 +66,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( Short.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asShort();
 		}
+		else if ( Double.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asDouble();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
 		}
@@ -120,6 +123,11 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Short> asShort() {
 		return new LuceneShortIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Double> asDouble() {
+		return new LuceneDoubleIndexFieldTypeContext( this );
 	}
 
 	@Override

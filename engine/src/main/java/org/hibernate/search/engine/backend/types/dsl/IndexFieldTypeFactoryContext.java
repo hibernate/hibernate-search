@@ -35,6 +35,8 @@ public interface IndexFieldTypeFactoryContext {
 
 	StandardIndexFieldTypeContext<?, Short> asShort();
 
+	StandardIndexFieldTypeContext<?, Double> asDouble();
+
 	StandardIndexFieldTypeContext<?, LocalDate> asLocalDate();
 
 	StandardIndexFieldTypeContext<?, Instant> asInstant();
