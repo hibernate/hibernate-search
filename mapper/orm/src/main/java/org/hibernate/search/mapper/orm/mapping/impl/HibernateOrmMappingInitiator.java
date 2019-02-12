@@ -11,6 +11,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.hibernate.MultiTenancyStrategy;
+import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
@@ -51,9 +52,9 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.asBeanReference( HibernateOrmSearchMappingConfigurer.class )
 					.build();
 
-	public static HibernateOrmMappingInitiator create(Metadata metadata,
+	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
 			HibernateOrmConfigurationPropertySource propertySource) {
-		HibernateOrmBootstrapIntrospector introspector = new HibernateOrmBootstrapIntrospector( metadata );
+		HibernateOrmBootstrapIntrospector introspector = new HibernateOrmBootstrapIntrospector( metadata, reflectionManager );
 
 		return new HibernateOrmMappingInitiator(
 				metadata, propertySource,

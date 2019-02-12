@@ -29,9 +29,7 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
-import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
-import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -75,27 +73,14 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
-	public HibernateOrmBootstrapIntrospector(Metadata metadata) {
+	public HibernateOrmBootstrapIntrospector(Metadata metadata, ReflectionManager ormReflectionManager) {
 		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings();
 		this.typeMetadata = new HashMap<>();
 		collecPersistentTypes( this.typeMetadata, metadata.getEntityBindings() );
 		for ( PersistentClass persistentClass : persistentClasses ) {
 			collectEmbeddedTypesRecursively( this.typeMetadata, persistentClass.getPropertyIterator() );
 		}
-		ReflectionManager metadataReflectionManager = null;
-		if ( metadata instanceof MetadataImplementor ) {
-			metadataReflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
-		}
-		if ( metadataReflectionManager != null ) {
-			this.reflectionManager = metadataReflectionManager;
-		}
-		else {
-			// Fall back to our own instance of JavaReflectionManager
-			// when metadata is not a MetadataImplementor or
-			// the reflection manager were not created by Hibernate yet.
-			this.reflectionManager = new JavaReflectionManager();
-		}
+		this.reflectionManager = ormReflectionManager;
 
 		// TODO get the user lookup from Hibernate ORM?
 		this.lookup = MethodHandles.publicLookup();

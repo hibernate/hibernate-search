@@ -10,6 +10,8 @@ package org.hibernate.search.mapper.orm.bootstrap.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.spi.BootstrapContext;
+import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.DuplicationStrategy;
@@ -70,7 +72,10 @@ public class HibernateSearchIntegrator implements Integrator {
 		);
 		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
 
-		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, serviceRegistry );
+		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
+		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
+				.getMetadataBuildingContext().getBootstrapContext();
+		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, bootstrapContext );
 
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
 				booter,
