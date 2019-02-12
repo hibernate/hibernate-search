@@ -64,6 +64,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( Short.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asShort();
 		}
+		else if ( Double.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asDouble();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
 		}
@@ -118,6 +121,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Short> asShort() {
 		return new ElasticsearchShortIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Double> asDouble() {
+		return new ElasticsearchDoubleIndexFieldTypeContext( this );
 	}
 
 	@Override

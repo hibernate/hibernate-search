@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
+import java.math.BigDecimal;
+
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
@@ -105,4 +108,42 @@ public abstract class LuceneNumericDomain<E> {
 		}
 	};
 
+	public static final LuceneNumericDomain<Double> DOUBLE = new LuceneNumericDomain<Double>() {
+		@Override
+		public Double getMinValue() {
+			return Double.MIN_VALUE;
+		}
+
+		@Override
+		public Double getMaxValue() {
+			return Double.MAX_VALUE;
+		}
+
+		@Override
+		public Double getPreviousValue(Double value) {
+			return new BigDecimal( value ).subtract( BigDecimal.ONE ).doubleValue();
+		}
+
+		@Override
+		public Double getNextValue(Double value) {
+			return new BigDecimal( value ).add( BigDecimal.ONE ).doubleValue();
+		}
+
+		@Override
+		public Query createExactQuery(String absoluteFieldPath, Double value) {
+			return DoublePoint.newExactQuery( absoluteFieldPath, value );
+		}
+
+		@Override
+		public Query createRangeQuery(String absoluteFieldPath, Double lowerLimit, Double upperLimit) {
+			return DoublePoint.newRangeQuery(
+					absoluteFieldPath, lowerLimit, upperLimit
+			);
+		}
+
+		@Override
+		public SortField.Type getSortFieldType() {
+			return SortField.Type.DOUBLE;
+		}
+	};
 }
