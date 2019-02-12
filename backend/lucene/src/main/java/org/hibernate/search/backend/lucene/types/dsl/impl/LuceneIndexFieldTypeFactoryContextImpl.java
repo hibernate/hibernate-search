@@ -63,6 +63,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( Byte.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asByte();
 		}
+		else if ( Short.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asShort();
+		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
 		}
@@ -112,6 +115,11 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Byte> asByte() {
 		return new LuceneByteIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Short> asShort() {
+		return new LuceneShortIndexFieldTypeContext( this );
 	}
 
 	@Override
