@@ -44,7 +44,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = { "indexing.strategy=event" })
+@TestPropertySource(properties = {
+		"indexing.strategy=event",
+		// This is overridden in the Maven config, we just want a default when running from the IDE
+		"spring.profiles.active=lucene,test"
+})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class OrmLibraryShowcaseIT {
 
@@ -92,6 +96,7 @@ public class OrmLibraryShowcaseIT {
 
 	@Before
 	public void before() {
+		System.out.println( System.getenv() );
 		testDataService.initDefaultDataSet();
 	}
 

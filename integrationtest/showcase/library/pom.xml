@@ -134,8 +134,13 @@
                         <ELASTICSEARCH_URL>${test.elasticsearch.host.url}</ELASTICSEARCH_URL>
                         <ELASTICSEARCH_USERNAME>${test.elasticsearch.host.username}</ELASTICSEARCH_USERNAME>
                         <ELASTICSEARCH_PASSWORD>${test.elasticsearch.host.password}</ELASTICSEARCH_PASSWORD>
-                        <!-- ${random.uuid} is a Spring-defined property that ensures we use a different directory for each test -->
-                        <LUCENE_ROOT_PATH>${project.build.directory}/test-indexes/${random.uuid}</LUCENE_ROOT_PATH>
+                        <!--
+                             The test settings add a different suffix to this value for each test execution.
+                             We can't add this suffix (${random.uuid}) here due to IDEA limitations:
+                             IDEA just ignores this environment variable if it finds a reference to an unknown property
+                             such as "${random.uuid}".
+                         -->
+                        <LUCENE_ROOT_PATH>${project.build.directory}/test-indexes/</LUCENE_ROOT_PATH>
                     </environmentVariables>
                 </configuration>
 

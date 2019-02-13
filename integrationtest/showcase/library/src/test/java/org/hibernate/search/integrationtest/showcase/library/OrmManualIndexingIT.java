@@ -28,7 +28,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = { "indexing.strategy=manual" })
+@TestPropertySource(properties = {
+		"indexing.strategy=manual",
+		// This is overridden in the Maven config, we just want a default when running from the IDE
+		"spring.profiles.active=lucene,test"
+})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class OrmManualIndexingIT {
 
