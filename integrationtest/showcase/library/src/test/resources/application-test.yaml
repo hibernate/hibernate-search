@@ -12,6 +12,8 @@ spring.jpa:
             refresh_after_write: true
           log.json_pretty_printing: true
         lucene1:
+          # Hack to use a different directory for each test
+          root_directory: ${LUCENE_ROOT_PATH}/${random.uuid} # LUCENE_ROOT_PATH is an environment variable
           # Nothing to add here
 
 logging.level:
