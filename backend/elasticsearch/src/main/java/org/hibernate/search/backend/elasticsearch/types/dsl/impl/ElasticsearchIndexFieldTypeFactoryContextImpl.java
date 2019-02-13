@@ -166,8 +166,7 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	@Override
 	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
-		// TODO implement this on backend commits within the same HSEARCH-3047 issue
-		return null;
+		return new ElasticsearchZonedDateTimeIndexFieldTypeContext( this );
 	}
 
 	@Override
