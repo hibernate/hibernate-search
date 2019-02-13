@@ -12,12 +12,12 @@ import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.dirtiness.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 class PojoValueAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorValueNode {
 	private final PojoTypeAdditionalMetadataBuilder rootBuilder;

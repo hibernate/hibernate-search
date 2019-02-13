@@ -25,10 +25,10 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 

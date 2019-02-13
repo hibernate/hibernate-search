@@ -18,8 +18,8 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.reader.impl.MultiReaderFactory;
-import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
 
 /**
  * @author Guillaume Smet

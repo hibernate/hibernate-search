@@ -40,8 +40,8 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.common.spi.LogErrorHandler;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 

@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.reporting.EventContextElement;
 import org.hibernate.search.util.SearchException;
 
 import org.assertj.core.api.Assertions;

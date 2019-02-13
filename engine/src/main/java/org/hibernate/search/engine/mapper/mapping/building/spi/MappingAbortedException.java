@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+
 /**
  * An exception thrown by {@link Mapper#build()} when detecting that failures were
- * {@link org.hibernate.search.engine.logging.spi.ContextualFailureCollector#add(Throwable) collected}
+ * {@link ContextualFailureCollector#add(Throwable) collected}
  * and deciding to abort early to avoid a snowball effect creating too many failures,
  * which would make the failure report unclear.
  */

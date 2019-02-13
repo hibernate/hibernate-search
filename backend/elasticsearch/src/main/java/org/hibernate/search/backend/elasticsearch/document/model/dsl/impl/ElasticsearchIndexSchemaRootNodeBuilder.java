@@ -23,8 +23,8 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
 		implements IndexSchemaRootNodeBuilder {

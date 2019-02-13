@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
  * An object responsible for validating type mappings retrieved from an existing Elasticsearch instance

@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.MarkerBuildContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.engine.logging.spi.FailureCollector;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 public class PojoTypeAdditionalMetadataProvider {
 

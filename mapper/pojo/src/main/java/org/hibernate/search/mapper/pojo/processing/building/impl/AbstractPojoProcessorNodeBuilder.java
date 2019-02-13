@@ -7,11 +7,11 @@
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
-import org.hibernate.search.mapper.pojo.logging.spi.PojoEventContexts;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 abstract class AbstractPojoProcessorNodeBuilder {
 

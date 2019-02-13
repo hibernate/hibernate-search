@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.reporting.EventContextElement;
 
 import org.jboss.logging.Messages;
 

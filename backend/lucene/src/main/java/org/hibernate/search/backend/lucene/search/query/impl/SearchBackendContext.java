@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 
 public class SearchBackendContext {
 	private final EventContext eventContext;

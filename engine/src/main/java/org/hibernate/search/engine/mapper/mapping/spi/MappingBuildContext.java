@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.environment.service.spi.ServiceManager;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.SearchException;
 
 /**

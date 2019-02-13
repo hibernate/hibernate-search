@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.util.reporting.EventContextElement;
 
 /**
  * Tagging interface for objects used as a key to retrieve mappings in

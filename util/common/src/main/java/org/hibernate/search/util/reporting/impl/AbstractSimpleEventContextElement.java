@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.logging.spi;
+package org.hibernate.search.util.reporting.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.util.reporting.EventContextElement;
 
 /**
  * An abstract base for simple event context elements based on a single parameter

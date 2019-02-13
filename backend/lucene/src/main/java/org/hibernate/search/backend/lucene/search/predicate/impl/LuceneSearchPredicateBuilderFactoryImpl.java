@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 

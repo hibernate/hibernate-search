@@ -8,7 +8,7 @@ package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 class MappingBuildContextImpl extends DelegatingBuildContext implements MappingBuildContext {
 

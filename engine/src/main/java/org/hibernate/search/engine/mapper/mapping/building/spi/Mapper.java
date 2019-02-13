@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
@@ -40,7 +41,7 @@ public interface Mapper<M> {
 	 *
 	 * @return The mapping.
 	 * @throws MappingAbortedException When aborting the mapping due to
-	 * {@link org.hibernate.search.engine.logging.spi.ContextualFailureCollector#add(Throwable) collected} failures.
+	 * {@link ContextualFailureCollector#add(Throwable) collected} failures.
 	 */
 	MappingImplementor<M> build() throws MappingAbortedException;
 

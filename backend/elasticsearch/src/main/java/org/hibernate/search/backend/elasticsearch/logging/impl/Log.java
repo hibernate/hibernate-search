@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.MessageConstants;
 import org.hibernate.search.util.impl.common.logging.ClassFormatter;

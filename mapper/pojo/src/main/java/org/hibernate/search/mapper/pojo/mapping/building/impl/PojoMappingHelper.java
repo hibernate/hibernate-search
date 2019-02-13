@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
-import org.hibernate.search.engine.logging.spi.FailureCollector;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 public class PojoMappingHelper {
 

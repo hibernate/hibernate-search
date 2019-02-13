@@ -9,8 +9,8 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl.StubIndexFieldTypeFactoryContext;

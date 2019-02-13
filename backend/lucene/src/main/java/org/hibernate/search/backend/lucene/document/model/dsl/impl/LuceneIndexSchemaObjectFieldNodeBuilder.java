@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, LuceneIndexSchemaNodeContributor {

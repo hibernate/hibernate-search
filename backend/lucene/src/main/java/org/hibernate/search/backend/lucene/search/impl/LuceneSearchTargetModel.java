@@ -18,8 +18,8 @@ import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 public class LuceneSearchTargetModel {

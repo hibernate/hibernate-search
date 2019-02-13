@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.logging.spi.FailureCollector;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;

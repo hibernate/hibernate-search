@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStr
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import com.google.gson.Gson;
