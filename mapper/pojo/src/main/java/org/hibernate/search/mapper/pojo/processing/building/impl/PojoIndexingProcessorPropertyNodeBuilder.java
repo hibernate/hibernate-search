@@ -34,8 +34,8 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathProper
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorPropertyNode;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * A builder of {@link PojoIndexingProcessorPropertyNode}.

@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospe
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class JavaBeanMappingBuilder {
 

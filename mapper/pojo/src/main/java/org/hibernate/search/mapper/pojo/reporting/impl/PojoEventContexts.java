@@ -10,8 +10,8 @@ import java.lang.annotation.Annotation;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.reporting.impl.AbstractSimpleEventContextElement;
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 import org.jboss.logging.Messages;

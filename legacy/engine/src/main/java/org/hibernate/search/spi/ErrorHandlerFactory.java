@@ -13,7 +13,7 @@ import org.hibernate.search.exception.ErrorHandler;
 import org.hibernate.search.exception.impl.LogErrorHandler;
 import org.hibernate.search.util.StringHelper;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

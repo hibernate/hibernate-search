@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 final class CastingBeanReference<T> implements BeanReference<T> {
 	private final BeanReference<?> casted;

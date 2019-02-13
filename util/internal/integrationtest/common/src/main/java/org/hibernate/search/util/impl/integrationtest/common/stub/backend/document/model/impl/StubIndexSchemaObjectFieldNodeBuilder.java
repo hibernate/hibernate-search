@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.docum
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubExcludedIndexObjectFieldAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIncludedIndexObjectFieldAccessor;

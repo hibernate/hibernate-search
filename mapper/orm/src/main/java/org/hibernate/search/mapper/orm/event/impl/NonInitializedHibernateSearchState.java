@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * The implementation of EventsHibernateSearchState which the

@@ -16,7 +16,7 @@ import javax.batch.runtime.context.StepContext;
 import javax.inject.Inject;
 
 import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

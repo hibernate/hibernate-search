@@ -18,8 +18,8 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchLoadableSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
-import org.hibernate.search.util.logging.impl.DefaultLogCategories;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 

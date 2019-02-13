@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 class NoOpPojoImplicitReindexingResolverNode extends PojoImplicitReindexingResolverNode<Object, Object> {
 

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 public class IndexingBackendContext {
 

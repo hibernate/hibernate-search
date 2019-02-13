@@ -8,7 +8,7 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * A context allowing to add a sort element.
@@ -96,7 +96,7 @@ public interface SearchSortContainerContext {
 	 * @param extension The extension to the sort DSL.
 	 * @param <T> The type of context provided by the extension.
 	 * @return The extended context.
-	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
 	<T> T extension(SearchSortContainerContextExtension<T> extension);
 

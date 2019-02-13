@@ -11,8 +11,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.batchindexing.MassIndexerProgressMonitor;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

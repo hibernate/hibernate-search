@@ -15,7 +15,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMappingBuilder;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 public final class JavaBeanMappingSetupHelper

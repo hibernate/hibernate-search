@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBui
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {

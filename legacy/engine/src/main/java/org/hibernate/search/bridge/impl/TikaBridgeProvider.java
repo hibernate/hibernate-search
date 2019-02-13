@@ -16,8 +16,8 @@ import org.hibernate.search.annotations.TikaBridge;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.engine.service.spi.ServiceManager;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

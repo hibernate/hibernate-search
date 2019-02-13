@@ -57,7 +57,7 @@ import org.hibernate.search.spi.IndexedTypeMap;
 import org.hibernate.search.spi.IndexedTypeSet;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 import com.google.gson.JsonArray;

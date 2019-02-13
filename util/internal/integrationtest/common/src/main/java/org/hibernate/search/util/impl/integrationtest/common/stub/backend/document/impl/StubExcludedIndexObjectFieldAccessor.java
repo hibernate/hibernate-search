@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
 public class StubExcludedIndexObjectFieldAccessor implements IndexObjectFieldAccessor {

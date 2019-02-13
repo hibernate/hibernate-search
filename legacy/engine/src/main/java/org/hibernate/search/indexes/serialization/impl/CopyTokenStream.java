@@ -16,8 +16,8 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.util.AttributeImpl;
 
 import org.hibernate.search.indexes.serialization.spi.SerializableTokenStream;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

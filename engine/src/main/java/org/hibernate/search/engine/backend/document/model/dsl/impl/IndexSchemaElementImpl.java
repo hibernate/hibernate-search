@@ -20,8 +20,8 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.StringHelper;
 
 public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> implements IndexSchemaElement {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

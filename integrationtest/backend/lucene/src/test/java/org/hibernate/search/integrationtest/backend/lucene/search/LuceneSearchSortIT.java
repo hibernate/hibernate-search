@@ -23,7 +23,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Before;
 import org.junit.Rule;

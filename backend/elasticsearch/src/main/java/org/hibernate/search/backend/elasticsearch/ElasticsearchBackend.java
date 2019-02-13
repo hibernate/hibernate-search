@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch;
 
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.util.common.SearchException;
 
 public interface ElasticsearchBackend extends Backend {
 
@@ -18,7 +19,7 @@ public interface ElasticsearchBackend extends Backend {
 	 * @param clientClass The {@link Class} representing the expected client type
 	 * @param <T> The expected client type
 	 * @return The client.
-	 * @throws org.hibernate.search.util.SearchException if the underlying client does not implement the given class.
+	 * @throws SearchException if the underlying client does not implement the given class.
 	 */
 	<T> T getClient(Class<T> clientClass);
 

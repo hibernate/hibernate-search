@@ -15,8 +15,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.util.impl.common.Futures;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An abstract base for {@link ElasticsearchBarrierWorkOrchestrator} implementations,

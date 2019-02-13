@@ -20,7 +20,7 @@ import org.hibernate.search.engine.metadata.impl.PartialDocumentFieldMetadata;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
 import org.hibernate.search.engine.nulls.impl.MissingValueStrategy;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 public final class ElasticsearchMissingValueStrategy implements MissingValueStrategy {

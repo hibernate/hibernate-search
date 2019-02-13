@@ -20,7 +20,7 @@ import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContex
 import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class LuceneIndexSearchTargetContextBuilder implements IndexSearchTargetContextBuilder {

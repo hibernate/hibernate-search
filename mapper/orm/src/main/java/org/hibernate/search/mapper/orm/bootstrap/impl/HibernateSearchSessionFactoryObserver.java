@@ -26,9 +26,9 @@ import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingKey;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * A {@code SessionFactoryObserver} registered with Hibernate ORM during the integration phase.

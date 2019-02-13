@@ -18,9 +18,9 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
-import org.hibernate.search.util.impl.common.Futures;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.Throwables;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.Throwables;
 
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.

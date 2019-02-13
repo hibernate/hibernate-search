@@ -20,8 +20,8 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.indexes.LuceneEmbeddedIndexFamily;
 import org.hibernate.search.indexes.spi.IndexFamilyImplementor;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.util.Version;
 

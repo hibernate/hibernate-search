@@ -15,8 +15,8 @@ import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.impl.PojoElementImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * A node inside a {@link PojoIndexingProcessor} responsible for extracting the value of a property,

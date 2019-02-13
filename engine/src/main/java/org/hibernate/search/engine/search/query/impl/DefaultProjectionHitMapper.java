@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public class DefaultProjectionHitMapper<R, O> implements ProjectionHitMapper<R, O> {
 

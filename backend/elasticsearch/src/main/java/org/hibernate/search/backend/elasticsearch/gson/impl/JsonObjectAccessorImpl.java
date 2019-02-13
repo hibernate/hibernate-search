@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 
 import java.util.regex.Pattern;
 
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

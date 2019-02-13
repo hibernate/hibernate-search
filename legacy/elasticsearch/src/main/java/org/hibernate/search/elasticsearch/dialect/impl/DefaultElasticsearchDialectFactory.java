@@ -15,7 +15,7 @@ import org.hibernate.search.elasticsearch.dialect.impl.es56.Elasticsearch56Diale
 import org.hibernate.search.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchClientUtils;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

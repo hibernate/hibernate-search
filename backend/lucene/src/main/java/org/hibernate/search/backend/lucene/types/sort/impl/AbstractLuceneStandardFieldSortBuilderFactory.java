@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <F> The field type exposed to the mapper.

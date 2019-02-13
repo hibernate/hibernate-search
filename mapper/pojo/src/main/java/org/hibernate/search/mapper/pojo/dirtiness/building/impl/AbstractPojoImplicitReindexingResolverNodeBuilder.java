@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 abstract class AbstractPojoImplicitReindexingResolverNodeBuilder<T> {
 

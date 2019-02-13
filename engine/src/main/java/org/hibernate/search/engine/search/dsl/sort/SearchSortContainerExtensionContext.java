@@ -8,6 +8,8 @@ package org.hibernate.search.engine.search.dsl.sort;
 
 import java.util.function.Consumer;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchSortContainerContext}.
@@ -51,7 +53,7 @@ public interface SearchSortContainerExtensionContext {
 	 * was supported so far, throw an exception; otherwise do nothing.
 	 *
 	 * @return The next context.
-	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
+	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
 	NonEmptySortContext orElseFail();
 

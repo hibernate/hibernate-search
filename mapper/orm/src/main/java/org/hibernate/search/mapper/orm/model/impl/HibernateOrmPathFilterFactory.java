@@ -31,10 +31,10 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.path.spi.StringSetPojoPathFilter;
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A {@link PojoPathFilterFactory} suitable for use with Hibernate ORM,

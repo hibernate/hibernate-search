@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.common.impl.StringHelper;
 
 /**
  * @author Yoann Rodiere

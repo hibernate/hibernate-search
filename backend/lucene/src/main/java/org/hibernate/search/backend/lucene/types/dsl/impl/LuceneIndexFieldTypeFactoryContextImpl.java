@@ -19,8 +19,8 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalConte
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 /**

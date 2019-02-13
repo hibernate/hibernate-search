@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.Log;
 
 import org.hibernate.ScrollableResults;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -28,7 +28,7 @@ import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.engine.spi.DocumentExtractor;
 import org.hibernate.search.query.engine.spi.EntityInfo;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.hibernate.type.Type;
 

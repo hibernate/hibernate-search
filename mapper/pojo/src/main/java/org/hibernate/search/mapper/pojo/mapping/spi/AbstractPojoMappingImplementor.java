@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 public abstract class AbstractPojoMappingImplementor<M> implements MappingImplementor<M> {
 

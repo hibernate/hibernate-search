@@ -32,7 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Programm
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;

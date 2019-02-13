@@ -25,7 +25,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

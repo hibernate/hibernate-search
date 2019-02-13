@@ -17,14 +17,14 @@ import java.util.StringJoiner;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.reporting.EventContextElement;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.ToStringStyle;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
-import org.hibernate.search.util.reporting.impl.CommonEventContextMessages;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.ToStringStyle;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
+import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
 
 import org.jboss.logging.Messages;
 

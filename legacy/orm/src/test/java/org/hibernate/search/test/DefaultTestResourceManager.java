@@ -32,8 +32,8 @@ import org.hibernate.search.test.util.MultitenancyTestHelper;
 import org.hibernate.search.test.util.TestConfiguration;
 import org.hibernate.search.testsupport.TestConstants;
 import org.hibernate.search.util.impl.FileHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 

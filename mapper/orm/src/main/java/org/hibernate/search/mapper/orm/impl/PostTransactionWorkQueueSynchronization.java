@@ -14,7 +14,7 @@ import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Execute final work in the after transaction synchronization.

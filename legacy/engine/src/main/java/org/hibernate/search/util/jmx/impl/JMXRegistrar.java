@@ -22,8 +22,8 @@ import org.hibernate.search.jmx.IndexingProgressMonitorMBean;
 import org.hibernate.search.jmx.StatisticsInfoMBean;
 import org.hibernate.search.stat.Statistics;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

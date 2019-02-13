@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * A backend as viewed by Hibernate Search users.
  * <p>
@@ -24,7 +26,7 @@ public interface Backend {
 	 * @param clazz The {@link Class} representing the expected type
 	 * @param <T> The expected type
 	 * @return The unwrapped backend.
-	 * @throws org.hibernate.search.util.SearchException if the backend implementation does not support
+	 * @throws SearchException if the backend implementation does not support
 	 * unwrapping to the given class.
 	 */
 	<T> T unwrap(Class<T> clazz);

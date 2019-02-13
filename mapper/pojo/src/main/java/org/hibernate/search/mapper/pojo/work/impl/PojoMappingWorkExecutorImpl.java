@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMappingWorkExecutorImpl implements PojoMappingWorkExecutor {
 

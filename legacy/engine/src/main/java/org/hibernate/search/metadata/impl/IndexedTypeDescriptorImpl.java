@@ -22,8 +22,8 @@ import org.hibernate.search.metadata.IndexDescriptor;
 import org.hibernate.search.metadata.IndexedTypeDescriptor;
 import org.hibernate.search.metadata.PropertyDescriptor;
 import org.hibernate.search.spi.IndexedTypeIdentifier;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

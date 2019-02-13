@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.testsupport.util;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 @SuppressWarnings("unused")
 public abstract class TypeCapture<T> {

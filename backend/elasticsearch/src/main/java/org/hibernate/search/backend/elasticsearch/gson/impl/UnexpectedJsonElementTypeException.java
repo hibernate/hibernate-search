@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.gson.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 

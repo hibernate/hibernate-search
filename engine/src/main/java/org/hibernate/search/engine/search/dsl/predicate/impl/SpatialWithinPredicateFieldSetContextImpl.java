@@ -22,8 +22,8 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 class SpatialWithinPredicateFieldSetContextImpl<B>

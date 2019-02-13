@@ -15,7 +15,7 @@ import org.apache.avro.Protocol;
 import org.hibernate.search.indexes.serialization.avro.logging.impl.Log;
 import org.hibernate.search.util.impl.Closeables;
 import org.hibernate.search.util.impl.StreamHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

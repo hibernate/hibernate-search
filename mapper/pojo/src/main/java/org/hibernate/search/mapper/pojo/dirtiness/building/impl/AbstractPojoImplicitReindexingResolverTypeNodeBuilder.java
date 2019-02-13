@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 abstract class AbstractPojoImplicitReindexingResolverTypeNodeBuilder<T, U>
 		extends AbstractPojoImplicitReindexingResolverNodeBuilder<T> {

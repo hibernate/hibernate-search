@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.reporting.spi;
 
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.reporting.EventContextElement;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContextElement;
 
 /**
  * A failure collector without any context.

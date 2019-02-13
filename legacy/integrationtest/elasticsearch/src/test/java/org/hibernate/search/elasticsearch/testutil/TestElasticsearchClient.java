@@ -32,7 +32,7 @@ import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.hibernate.search.util.configuration.impl.MaskedProperty;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.junit.rules.ExternalResource;
 

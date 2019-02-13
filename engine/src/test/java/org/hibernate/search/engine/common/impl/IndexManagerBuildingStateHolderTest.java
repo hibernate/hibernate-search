@@ -12,7 +12,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanProviderPartialMock;
 import org.hibernate.search.engine.testsupport.util.AbstractConfigurationPropertySourcePartialMock;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
 import org.junit.Test;

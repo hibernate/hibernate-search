@@ -14,7 +14,7 @@ import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.Optional;
 
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public final class ReflectionUtils {
 

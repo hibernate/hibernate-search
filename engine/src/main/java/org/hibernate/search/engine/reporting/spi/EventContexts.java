@@ -8,12 +8,12 @@ package org.hibernate.search.engine.reporting.spi;
 
 import java.util.Set;
 
-import org.hibernate.search.util.reporting.impl.AbstractSimpleEventContextElement;
+import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.reporting.EventContextElement;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContextElement;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.jboss.logging.Messages;
 

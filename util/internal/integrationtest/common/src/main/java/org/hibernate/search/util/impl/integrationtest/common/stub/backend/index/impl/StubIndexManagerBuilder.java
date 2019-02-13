@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;

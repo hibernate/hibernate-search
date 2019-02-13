@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.environment.bean;
 
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 final class InstanceBeanReference<T> implements BeanReference<T> {
 

@@ -23,8 +23,8 @@ import org.hibernate.event.spi.EventType;
 import org.hibernate.event.spi.FlushEventListener;
 import org.hibernate.search.backend.TransactionContext;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import org.hibernate.service.Service;
 

@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneCustomAnalyz
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalyzerDefinitionWithTokenizerContext;
 import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneAnalysisComponentDefinitionContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.util.CharFilterFactory;

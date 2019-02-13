@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Common parent of all Runnable implementations for the batch indexing:

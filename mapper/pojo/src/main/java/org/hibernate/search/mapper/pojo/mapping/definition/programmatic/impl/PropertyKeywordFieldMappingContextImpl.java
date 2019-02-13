@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyKeywordFieldMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingContext;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class PropertyKeywordFieldMappingContextImpl

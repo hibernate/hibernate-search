@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 

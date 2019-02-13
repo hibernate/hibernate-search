@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * A factory for search sort builders.

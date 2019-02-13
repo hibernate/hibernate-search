@@ -19,9 +19,9 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.impl.common.Executors;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Executors;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

@@ -13,8 +13,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.Sort;
 import org.hibernate.search.indexes.spi.IndexManager;
 import org.hibernate.search.query.engine.impl.SortConfigurations;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

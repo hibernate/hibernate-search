@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 

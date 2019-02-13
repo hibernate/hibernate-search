@@ -9,8 +9,8 @@ package org.hibernate.search.engine.environment.bean;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 final class CompositeBeanHolder<T> implements BeanHolder<List<T>> {
 

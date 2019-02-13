@@ -22,7 +22,7 @@ import org.apache.lucene.util.SloppyMath;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A Lucene distance {@code Collector} for spatial searches.

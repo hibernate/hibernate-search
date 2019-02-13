@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * The main entry point for components looking to retrieve user-provided beans.

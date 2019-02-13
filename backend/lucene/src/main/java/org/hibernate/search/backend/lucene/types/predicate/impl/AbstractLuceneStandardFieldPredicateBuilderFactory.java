@@ -16,8 +16,8 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
-import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <F> The field type exposed to the mapper.

@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * An object responsible for dropping an indexes.

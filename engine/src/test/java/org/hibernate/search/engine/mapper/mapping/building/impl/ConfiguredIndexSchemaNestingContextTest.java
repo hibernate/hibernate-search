@@ -20,8 +20,8 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;

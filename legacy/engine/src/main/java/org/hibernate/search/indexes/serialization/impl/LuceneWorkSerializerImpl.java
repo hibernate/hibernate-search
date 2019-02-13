@@ -36,8 +36,8 @@ import org.hibernate.search.indexes.serialization.spi.LuceneWorkSerializer;
 import org.hibernate.search.indexes.serialization.spi.SerializationProvider;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
 import org.hibernate.search.spi.BuildContext;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 import static org.hibernate.search.indexes.serialization.impl.SerializationHelper.toByteArray;

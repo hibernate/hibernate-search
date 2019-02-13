@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 

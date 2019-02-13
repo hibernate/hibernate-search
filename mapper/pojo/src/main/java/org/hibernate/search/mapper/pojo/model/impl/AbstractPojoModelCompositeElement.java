@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNo
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @param <V> The type of the element, i.e. the type of values returned by accessors to this element.

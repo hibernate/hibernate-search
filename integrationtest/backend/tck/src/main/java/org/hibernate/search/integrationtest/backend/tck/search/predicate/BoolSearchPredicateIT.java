@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;

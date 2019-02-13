@@ -24,8 +24,8 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.function.TriFunction;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.function.TriFunction;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjectionFactoryContext<R, O> {

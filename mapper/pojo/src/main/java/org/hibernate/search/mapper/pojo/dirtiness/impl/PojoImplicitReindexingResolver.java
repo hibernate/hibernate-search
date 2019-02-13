@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 
 /**
  * An object responsible for resolving the set of entities that should be reindexed when a given entity changes.

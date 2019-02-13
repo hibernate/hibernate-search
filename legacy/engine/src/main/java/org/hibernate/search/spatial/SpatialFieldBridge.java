@@ -23,8 +23,8 @@ import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.bridge.spi.FieldType;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.spatial.impl.SpatialHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class SpatialFieldBridge implements MetadataProvidingFieldBridge, AppliedOnTypeAwareBridge {
 

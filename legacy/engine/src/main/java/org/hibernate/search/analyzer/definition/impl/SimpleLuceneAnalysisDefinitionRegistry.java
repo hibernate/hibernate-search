@@ -12,8 +12,8 @@ import java.util.TreeMap;
 
 import org.hibernate.search.annotations.AnalyzerDef;
 import org.hibernate.search.annotations.NormalizerDef;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

@@ -41,8 +41,8 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
-import org.hibernate.search.util.impl.common.ReflectionHelper;
-import org.hibernate.search.util.impl.common.StreamHelper;
+import org.hibernate.search.util.common.impl.ReflectionHelper;
+import org.hibernate.search.util.common.impl.StreamHelper;
 
 /**
  * @author Yoann Rodiere

@@ -15,8 +15,8 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.service.ServiceRegistry;
 
 public final class SimpleSessionFactoryBuilder {

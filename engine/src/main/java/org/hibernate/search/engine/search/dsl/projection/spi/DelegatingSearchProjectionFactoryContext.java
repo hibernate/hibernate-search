@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.function.TriFunction;
 
 public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchProjectionFactoryContext<R, O> {
 

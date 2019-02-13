@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.analysis.model.dsl.impl;
 
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 import org.apache.lucene.analysis.Analyzer;
 

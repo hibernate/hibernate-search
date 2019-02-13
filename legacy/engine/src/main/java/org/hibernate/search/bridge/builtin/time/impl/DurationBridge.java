@@ -16,8 +16,8 @@ import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.bridge.util.impl.ToStringNullMarker;
 import org.hibernate.search.metadata.NumericFieldSettingsDescriptor.NumericEncodingType;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

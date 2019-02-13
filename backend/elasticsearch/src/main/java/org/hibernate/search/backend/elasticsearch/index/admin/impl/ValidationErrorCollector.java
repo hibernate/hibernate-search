@@ -12,7 +12,7 @@ import java.util.Iterator;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 final class ValidationErrorCollector {
 

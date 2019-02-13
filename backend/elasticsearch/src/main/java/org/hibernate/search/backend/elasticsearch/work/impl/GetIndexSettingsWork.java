@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

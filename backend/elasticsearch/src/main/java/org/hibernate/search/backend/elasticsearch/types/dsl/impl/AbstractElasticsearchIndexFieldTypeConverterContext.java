@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterContext;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends AbstractElasticsearchIndexFieldTypeConverterContext<? extends S, F>, F>
 		implements IndexFieldTypeConverterContext<S, F> {

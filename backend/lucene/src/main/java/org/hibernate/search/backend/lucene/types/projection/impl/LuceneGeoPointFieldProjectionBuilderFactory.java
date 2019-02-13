@@ -17,7 +17,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldProjectionBuilderFactory {
 

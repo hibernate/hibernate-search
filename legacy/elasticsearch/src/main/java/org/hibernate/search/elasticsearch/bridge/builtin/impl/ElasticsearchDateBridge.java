@@ -21,7 +21,7 @@ import org.hibernate.search.bridge.spi.IgnoreAnalyzerBridge;
 import org.hibernate.search.bridge.util.impl.EncodingStringBridge;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
 import org.hibernate.search.elasticsearch.util.impl.ElasticsearchDateHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

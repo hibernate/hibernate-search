@@ -36,7 +36,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinit
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
 import org.hibernate.search.exception.AssertionFailure;
 import org.hibernate.search.util.impl.CollectionHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.jboss.logging.Messages;
 

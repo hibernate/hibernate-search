@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} applying a filter to decide whether to apply a delegate.

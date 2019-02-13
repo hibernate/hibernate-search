@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.impl.Contracts;
 
 public interface GeoPolygon {
 

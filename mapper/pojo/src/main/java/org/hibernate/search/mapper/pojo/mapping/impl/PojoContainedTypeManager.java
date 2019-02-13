@@ -14,8 +14,8 @@ import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.ToStringTreeAppendable;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * @param <E> The contained entity type.

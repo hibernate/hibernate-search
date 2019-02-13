@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.CompositeProjectionContext;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.function.TriFunction;
 
 
 public class CompositeProjectionContextImpl<T> implements CompositeProjectionContext<T> {

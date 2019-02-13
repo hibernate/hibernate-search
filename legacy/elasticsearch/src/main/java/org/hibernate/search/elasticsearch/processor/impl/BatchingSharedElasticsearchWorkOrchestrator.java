@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.Closer;
 import org.hibernate.search.util.impl.CollectionHelper;
 import org.hibernate.search.util.impl.Executors;
 import org.hibernate.search.util.impl.Futures;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 

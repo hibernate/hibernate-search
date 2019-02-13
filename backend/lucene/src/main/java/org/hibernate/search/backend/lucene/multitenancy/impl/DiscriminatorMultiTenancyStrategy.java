@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteAllEntriesWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.index;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * An index manager as viewed by Hibernate Search users.
  * <p>
@@ -23,7 +25,7 @@ public interface IndexManager {
 	 * @param clazz The {@link Class} representing the expected type
 	 * @param <T> The expected type
 	 * @return The unwrapped index manager.
-	 * @throws org.hibernate.search.util.SearchException if the index manager implementation does not support
+	 * @throws SearchException if the index manager implementation does not support
 	 * unwrapping to the given class.
 	 */
 	<T> T unwrap(Class<T> clazz);

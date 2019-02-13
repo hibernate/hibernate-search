@@ -21,9 +21,9 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 

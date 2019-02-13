@@ -12,8 +12,8 @@ import java.util.Map;
 import org.hibernate.search.analyzer.definition.LuceneAnalyzerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneNormalizerDefinitionContext;
 import org.hibernate.search.analyzer.definition.LuceneAnalysisDefinitionRegistryBuilder;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 

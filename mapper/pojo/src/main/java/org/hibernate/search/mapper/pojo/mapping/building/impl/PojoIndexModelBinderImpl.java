@@ -46,9 +46,9 @@ import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueN
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
 import org.hibernate.search.mapper.pojo.util.impl.ReflectionUtils;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * @author Yoann Rodiere

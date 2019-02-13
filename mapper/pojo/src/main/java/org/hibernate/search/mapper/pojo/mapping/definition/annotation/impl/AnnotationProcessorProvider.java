@@ -50,8 +50,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class AnnotationProcessorProvider {
 

@@ -19,8 +19,8 @@ import org.hibernate.search.store.impl.FSMasterDirectoryProvider;
 import org.hibernate.search.store.impl.FSSlaveDirectoryProvider;
 import org.hibernate.search.store.impl.RAMDirectoryProvider;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

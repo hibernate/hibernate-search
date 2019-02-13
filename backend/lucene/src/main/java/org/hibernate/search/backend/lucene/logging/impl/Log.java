@@ -23,11 +23,11 @@ import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBui
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.logging.impl.MessageConstants;
-import org.hibernate.search.util.logging.impl.ClassFormatter;
-import org.hibernate.search.util.logging.impl.EventContextFormatter;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.logging.impl.EventContextFormatter;
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.Cause;

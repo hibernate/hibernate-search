@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, O> {
 

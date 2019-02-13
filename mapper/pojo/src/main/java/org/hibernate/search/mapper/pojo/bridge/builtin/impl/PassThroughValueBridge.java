@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A pass-through value bridge, i.e. a bridge that passes the input value as-is to the underlying backend.

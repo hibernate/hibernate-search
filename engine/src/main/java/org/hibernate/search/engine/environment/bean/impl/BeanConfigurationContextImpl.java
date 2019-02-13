@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 final class BeanConfigurationContextImpl implements BeanConfigurationContext {
 

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.cfg.impl;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 public class MaskedConfigurationPropertySource implements ConfigurationPropertySource {
 	private final ConfigurationPropertySource propertiesToMask;

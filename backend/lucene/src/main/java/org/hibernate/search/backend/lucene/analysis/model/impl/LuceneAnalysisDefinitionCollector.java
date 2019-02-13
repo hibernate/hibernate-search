@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.analysis.model.impl;
 
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 import org.apache.lucene.analysis.Analyzer;
 
