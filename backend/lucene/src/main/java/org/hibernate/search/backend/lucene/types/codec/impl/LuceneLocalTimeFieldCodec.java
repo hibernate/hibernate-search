@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -21,12 +25,17 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCodec<LocalDateTime, Long> {
+public final class LuceneLocalTimeFieldCodec implements LuceneNumericFieldCodec<LocalTime, Long> {
 
-	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( LuceneLocalDateFieldCodec.FORMATTER )
-			.appendLiteral( 'T' )
-			.append( LuceneLocalTimeFieldCodec.FORMATTER )
+	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.appendValue( HOUR_OF_DAY, 2 )
+			.appendLiteral( ':' )
+			.appendValue( MINUTE_OF_HOUR, 2 )
+			.optionalStart()
+			.appendLiteral( ':' )
+			.appendValue( SECOND_OF_MINUTE, 2 )
+			.optionalStart()
+			.appendFraction( NANO_OF_SECOND, 3, 9, true )
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
@@ -34,13 +43,13 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 
 	private final boolean sortable;
 
-	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneLocalTimeFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDateTime value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalTime value) {
 		if ( value == null ) {
 			return;
 		}
@@ -59,7 +68,7 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 	}
 
 	@Override
-	public LocalDateTime decode(Document document, String absoluteFieldPath) {
+	public LocalTime decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -72,7 +81,7 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 			return null;
 		}
 
-		return LocalDateTime.parse( value, FORMATTER );
+		return LocalTime.parse( value, FORMATTER );
 	}
 
 	@Override
@@ -80,18 +89,18 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneLocalDateTimeFieldCodec.class != obj.getClass() ) {
+		if ( LuceneLocalTimeFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LuceneLocalDateTimeFieldCodec other = (LuceneLocalDateTimeFieldCodec) obj;
+		LuceneLocalTimeFieldCodec other = (LuceneLocalTimeFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
-	public Long encode(LocalDateTime value) {
-		return value == null ? null : value.toInstant( ZoneOffset.UTC ).toEpochMilli();
+	public Long encode(LocalTime value) {
+		return value == null ? null : value.toNanoOfDay();
 	}
 
 	@Override
