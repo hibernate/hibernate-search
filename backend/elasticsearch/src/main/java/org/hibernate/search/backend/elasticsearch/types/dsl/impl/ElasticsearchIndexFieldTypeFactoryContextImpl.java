@@ -64,6 +64,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( Short.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asShort();
 		}
+		else if ( Float.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asFloat();
+		}
 		else if ( Double.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asDouble();
 		}
@@ -121,6 +124,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Short> asShort() {
 		return new ElasticsearchShortIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Float> asFloat() {
+		return new ElasticsearchFloatIndexFieldTypeContext( this );
 	}
 
 	@Override
