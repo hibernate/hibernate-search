@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.NANO_OF_SECOND;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -34,14 +29,7 @@ class ElasticsearchLocalDateTimeIndexFieldTypeContext
 					new DateTimeFormatterBuilder()
 							.append( ElasticsearchLocalDateIndexFieldTypeContext.FORMATTER )
 							.appendLiteral( 'T' )
-							.appendValue( HOUR_OF_DAY, 2 )
-							.appendLiteral( ':' )
-							.appendValue( MINUTE_OF_HOUR, 2 )
-							.optionalStart()
-							.appendLiteral( ':' )
-							.appendValue( SECOND_OF_MINUTE, 2 )
-							.optionalStart()
-							.appendFraction( NANO_OF_SECOND, 3, 9, true )
+							.append( ElasticsearchLocalTimeIndexFieldTypeContext.FORMATTER )
 							.toFormatter( Locale.ROOT )
 							.withResolverStyle( ResolverStyle.STRICT )
 			);
