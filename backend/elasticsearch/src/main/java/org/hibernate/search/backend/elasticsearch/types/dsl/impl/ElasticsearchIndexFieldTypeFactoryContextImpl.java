@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -72,6 +73,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
+		}
+		else if ( LocalDateTime.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asLocalDateTime();
 		}
 		else if ( Instant.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInstant();
@@ -139,6 +143,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
 		return new ElasticsearchLocalDateIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
+		return new ElasticsearchLocalDateTimeIndexFieldTypeContext( this );
 	}
 
 	@Override
