@@ -8,6 +8,7 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.BootstrapContext;
@@ -23,6 +24,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
+import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
@@ -66,23 +68,31 @@ public class HibernateSearchIntegrator implements Integrator {
 			return;
 		}
 
-		HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
-				HibernateOrmIndexingStrategyName.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
-				DIRTY_PROCESSING_ENABLED.get( propertySource )
-		);
-		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
-
 		// TODO When we'll move to Hibernate ORM 6, use the bootstrapContext parameter passed to the integrate() method
 		BootstrapContext bootstrapContext = ( (MetadataImplementor) metadata ).getTypeConfiguration()
 				.getMetadataBuildingContext().getBootstrapContext();
 		HibernateOrmIntegrationBooterImpl booter = new HibernateOrmIntegrationBooterImpl( metadata, bootstrapContext );
 
+		// Listen to the session factory lifecycle to boot/shutdown Hibernate Search at the right time
+		CompletableFuture<SessionFactoryImplementor> sessionFactoryCreatedFuture = new CompletableFuture<>();
+		CompletableFuture<?> sessionFactoryClosingFuture = new CompletableFuture<>();
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
-				booter,
-				hibernateSearchEventListener
+				sessionFactoryCreatedFuture,
+				sessionFactoryClosingFuture
 		);
-
 		sessionFactory.addObserver( observer );
+
+		// Orchestrate bootstrap and shutdown
+		CompletableFuture<HibernateSearchContextService> contextFuture =
+				booter.orchestrateBootAndShutdown( sessionFactoryCreatedFuture, sessionFactoryClosingFuture );
+
+		// Listen to Hibernate ORM events to index automatically
+		HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
+				contextFuture,
+				HibernateOrmIndexingStrategyName.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
+				DIRTY_PROCESSING_ENABLED.get( propertySource )
+		);
+		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
 	}
 
 	@Override
