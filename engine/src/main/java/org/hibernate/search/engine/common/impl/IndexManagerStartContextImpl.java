@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 class IndexManagerStartContextImpl implements IndexManagerStartContext {
 	private final ContextualFailureCollector failureCollector;

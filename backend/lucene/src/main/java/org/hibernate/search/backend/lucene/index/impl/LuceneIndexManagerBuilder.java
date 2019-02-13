@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSc
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 

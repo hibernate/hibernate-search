@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.logging.spi;
+package org.hibernate.search.engine.reporting.spi;
 
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.util.EventContextElement;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.reporting.EventContextElement;
 
 /**
  * A failure collector without any context.

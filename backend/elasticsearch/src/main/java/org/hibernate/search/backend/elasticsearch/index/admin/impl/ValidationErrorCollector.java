@@ -10,8 +10,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
-import org.hibernate.search.engine.logging.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.AssertionFailure;
 
 final class ValidationErrorCollector {

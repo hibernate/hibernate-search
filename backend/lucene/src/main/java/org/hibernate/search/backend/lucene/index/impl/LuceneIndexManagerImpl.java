@@ -26,8 +26,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneStubIndexWor
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.common.Closer;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 

@@ -15,8 +15,8 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
-import org.hibernate.search.engine.logging.spi.EventContexts;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
 
 class LuceneIndexSchemaFieldNodeBuilder<F>
 		implements IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>>,

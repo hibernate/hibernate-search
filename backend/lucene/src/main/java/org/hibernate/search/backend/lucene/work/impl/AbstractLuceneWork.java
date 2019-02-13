@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.util.EventContext;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 /**
  * @author Guillaume Smet

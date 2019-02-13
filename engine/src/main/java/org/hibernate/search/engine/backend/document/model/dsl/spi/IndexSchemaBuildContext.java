@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.SearchException;
 
 public interface IndexSchemaBuildContext {

@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.RootTypeMapping;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 

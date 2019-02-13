@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.logging.spi.EventContexts;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.common.LoggerFactory;
 
 import org.apache.lucene.index.IndexReader;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.common.logging;
 
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 
 public class EventContextFormatter {
 

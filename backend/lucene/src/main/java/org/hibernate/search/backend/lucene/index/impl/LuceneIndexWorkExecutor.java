@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrateg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneIndexWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.util.EventContext;
+import org.hibernate.search.util.reporting.EventContext;
 
 class LuceneIndexWorkExecutor implements IndexWorkExecutor {
 

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util;
 
+import org.hibernate.search.util.reporting.EventContext;
+
 public class SearchException extends RuntimeException {
 	private final String messageWithoutContext;
 	private final EventContext context;
