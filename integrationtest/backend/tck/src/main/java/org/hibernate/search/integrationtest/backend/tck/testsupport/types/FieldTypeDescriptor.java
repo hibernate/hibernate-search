@@ -40,6 +40,7 @@ public abstract class FieldTypeDescriptor<F> {
 					new LocalDateFieldTypeDescriptor(),
 					new LocalDateTimeFieldTypeDescriptor(),
 					new LocalTimeFieldTypeDescriptor(),
+					new ZonedDateTimeFieldTypeDescriptor(),
 					new GeoPointFieldTypeDescriptor()
 			) );
 		}

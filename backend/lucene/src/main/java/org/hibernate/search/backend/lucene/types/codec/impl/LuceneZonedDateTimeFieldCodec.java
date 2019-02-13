@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -21,12 +20,19 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCodec<LocalDateTime, Long> {
+public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCodec<ZonedDateTime, Long> {
 
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( LuceneLocalDateFieldCodec.FORMATTER )
-			.appendLiteral( 'T' )
-			.append( LuceneLocalTimeFieldCodec.FORMATTER )
+	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.append( LuceneLocalDateTimeFieldCodec.FORMATTER )
+			// OffsetId is mandatory
+			.appendOffsetId()
+			// ZoneRegionId is optional
+			.optionalStart()
+				.appendLiteral( '[' )
+				.parseCaseSensitive()
+				.appendZoneRegionId()
+				.appendLiteral( ']' )
+			.optionalEnd()
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
@@ -34,13 +40,13 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 
 	private final boolean sortable;
 
-	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneZonedDateTimeFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDateTime value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, ZonedDateTime value) {
 		if ( value == null ) {
 			return;
 		}
@@ -59,7 +65,7 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 	}
 
 	@Override
-	public LocalDateTime decode(Document document, String absoluteFieldPath) {
+	public ZonedDateTime decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -72,7 +78,7 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 			return null;
 		}
 
-		return LocalDateTime.parse( value, FORMATTER );
+		return ZonedDateTime.parse( value, FORMATTER );
 	}
 
 	@Override
@@ -80,18 +86,18 @@ public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCo
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneLocalDateTimeFieldCodec.class != obj.getClass() ) {
+		if ( LuceneZonedDateTimeFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LuceneLocalDateTimeFieldCodec other = (LuceneLocalDateTimeFieldCodec) obj;
+		LuceneZonedDateTimeFieldCodec other = (LuceneZonedDateTimeFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
-	public Long encode(LocalDateTime value) {
-		return value == null ? null : value.toInstant( ZoneOffset.UTC ).toEpochMilli();
+	public Long encode(ZonedDateTime value) {
+		return value == null ? null : value.toInstant().toEpochMilli();
 	}
 
 	@Override
