@@ -145,7 +145,7 @@
 
     <modules>
         <module>build-config</module>
-        <module>util/internal/common</module>
+        <module>util/common</module>
         <module>util/internal/test</module>
         <module>engine</module>
         <module>backend/elasticsearch</module>
@@ -461,7 +461,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-common</artifactId>
+                <artifactId>hibernate-search-util-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

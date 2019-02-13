@@ -35,7 +35,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-common</artifactId>
+            <artifactId>hibernate-search-util-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
