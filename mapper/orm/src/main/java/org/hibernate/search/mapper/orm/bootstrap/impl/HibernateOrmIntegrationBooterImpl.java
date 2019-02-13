@@ -13,9 +13,11 @@ import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.registry.classloading.spi.ClassLoaderService;
 import org.hibernate.boot.spi.BootstrapContext;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.resource.beans.container.spi.BeanContainer;
+import org.hibernate.resource.beans.container.spi.ExtendedBeanManager;
 import org.hibernate.resource.beans.spi.ManagedBeanRegistry;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -48,6 +50,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private final Metadata metadata;
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
+	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
 	private final HibernateOrmConfigurationPropertySource propertySource;
 
 	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
@@ -57,10 +60,35 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		this.reflectionManager = bootstrapContext.getReflectionManager();
 		ConfigurationService configurationService = serviceRegistry.getService( ConfigurationService.class );
 		this.propertySource = new HibernateOrmConfigurationPropertySource( configurationService );
+
+		Optional<EnvironmentSynchronizer> providedEnvironmentSynchronizer = getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
+		if ( providedEnvironmentSynchronizer.isPresent() ) {
+			// Allow integrators to override the environment synchronizer with an ORM Service
+			this.environmentSynchronizer = providedEnvironmentSynchronizer;
+		}
+		else {
+			Object unknownBeanManager = configurationService.getSettings().get( AvailableSettings.CDI_BEAN_MANAGER );
+			if ( unknownBeanManager instanceof ExtendedBeanManager ) {
+				ExtendedBeanManager extendedBeanManager = (ExtendedBeanManager) unknownBeanManager;
+				ExtendedBeanManagerSynchronizer synchronizer = new ExtendedBeanManagerSynchronizer();
+				extendedBeanManager.registerLifecycleListener( synchronizer );
+				this.environmentSynchronizer = Optional.of( synchronizer );
+			}
+			else {
+				this.environmentSynchronizer = Optional.empty();
+			}
+		}
 	}
 
 	@Override
 	public void preBoot(BiConsumer<String, Object> propertyCollector) {
+		if ( environmentSynchronizer.isPresent() ) {
+			throw new AssertionFailure(
+					"Cannot pre-boot when an environment synchronizer is used to delay Hibernate Search's bootstrap: "
+					+ " we cannot both delay bootstrap and perform it earlier."
+			);
+		}
+
 		HibernateOrmIntegrationPartialBuildState partialBuildState = doBootFirstPhase();
 		propertyCollector.accept( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE, partialBuildState );
 	}
@@ -79,7 +107,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	}
 
 	Optional<EnvironmentSynchronizer> getEnvironmentSynchronizer() {
-		return getOrmServiceOrEmpty( EnvironmentSynchronizer.class );
+		return environmentSynchronizer;
 	}
 
 	HibernateSearchContextService boot(SessionFactoryImplementor sessionFactoryImplementor) {
