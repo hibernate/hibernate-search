@@ -62,6 +62,7 @@
                 (type:Type)
             WHERE
                 type.fqn =~ ".*\\.spi\\..*"
+                AND type.visibility = "public"
             SET
                 type:Spi, type:Public
             RETURN
@@ -78,6 +79,7 @@
                 (type:Type)
             WHERE
                 type.fqn =~ ".*\\.impl\\..*"
+                OR type.visibility <> "public"
             SET
                 type:Impl
             RETURN
