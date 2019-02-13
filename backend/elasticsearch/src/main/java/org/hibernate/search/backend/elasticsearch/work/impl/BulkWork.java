@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuil
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.impl.common.Futures;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.common.Throwables;
 
 import java.lang.invoke.MethodHandles;

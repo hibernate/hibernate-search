@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public class LuceneSearchTargetModel {
 

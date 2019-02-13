@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public final class ConvertUtils {
 

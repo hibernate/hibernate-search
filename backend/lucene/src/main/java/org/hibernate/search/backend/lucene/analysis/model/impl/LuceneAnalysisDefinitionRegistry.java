@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 

@@ -15,7 +15,7 @@ import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Analysis helpers that have no reason to be exposed publicly.

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 class MatchPredicateFieldSetContextImpl<B>

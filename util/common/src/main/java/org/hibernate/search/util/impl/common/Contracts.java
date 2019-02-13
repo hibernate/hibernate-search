@@ -9,7 +9,8 @@ package org.hibernate.search.util.impl.common;
 import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 
-import org.hibernate.search.util.impl.common.logging.Log;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public final class Contracts {
 

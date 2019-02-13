@@ -10,8 +10,8 @@ package org.hibernate.search.mapper.javabean.log.impl;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.MessageConstants;
-import org.hibernate.search.util.impl.common.logging.ClassFormatter;
+import org.hibernate.search.util.logging.impl.MessageConstants;
+import org.hibernate.search.util.logging.impl.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;

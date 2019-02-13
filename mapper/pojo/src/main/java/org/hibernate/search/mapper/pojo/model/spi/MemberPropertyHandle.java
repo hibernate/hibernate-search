@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Member;
 
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Yoann Rodiere

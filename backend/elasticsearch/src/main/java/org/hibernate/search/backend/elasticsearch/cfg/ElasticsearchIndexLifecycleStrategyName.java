@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
 import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Strategy for creating/deleting the indexes in Elasticsearch upon Hibernate Search initialization and shut-down.

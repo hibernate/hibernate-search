@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoTypeDocumentWorkExecuto
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 

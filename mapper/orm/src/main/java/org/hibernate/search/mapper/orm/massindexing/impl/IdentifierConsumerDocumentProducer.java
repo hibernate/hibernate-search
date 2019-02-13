@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.impl.common.Futures;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * This {@code SessionAwareRunnable} is consuming entity identifiers and

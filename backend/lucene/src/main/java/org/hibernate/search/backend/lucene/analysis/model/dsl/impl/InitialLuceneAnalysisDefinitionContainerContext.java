@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.analysis.model.dsl.LuceneNormalizerDe
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionCollector;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionContributor;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
 

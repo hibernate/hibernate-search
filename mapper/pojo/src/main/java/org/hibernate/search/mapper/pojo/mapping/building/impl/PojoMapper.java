@@ -47,7 +47,7 @@ import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatche
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 public class PojoMapper<M> implements Mapper<M> {

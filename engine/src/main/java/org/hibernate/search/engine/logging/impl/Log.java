@@ -17,8 +17,8 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.MessageConstants;
-import org.hibernate.search.util.impl.common.logging.ClassFormatter;
+import org.hibernate.search.util.logging.impl.MessageConstants;
+import org.hibernate.search.util.logging.impl.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;

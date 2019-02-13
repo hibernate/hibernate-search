@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A very simple implementation of {@code MassIndexerProgressMonitor} which

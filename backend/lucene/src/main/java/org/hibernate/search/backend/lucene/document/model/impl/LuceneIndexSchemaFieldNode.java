@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProj
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * @author Guillaume Smet

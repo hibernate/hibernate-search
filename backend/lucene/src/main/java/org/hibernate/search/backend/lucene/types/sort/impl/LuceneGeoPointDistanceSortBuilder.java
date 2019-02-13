@@ -17,7 +17,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortBuilder
 		implements DistanceSortBuilder<LuceneSearchSortBuilder> {

@@ -13,7 +13,7 @@ import java.util.List;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.impl.common.CollectionHelper;
 import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 final class ImmutableGeoPolygon implements GeoPolygon {
 

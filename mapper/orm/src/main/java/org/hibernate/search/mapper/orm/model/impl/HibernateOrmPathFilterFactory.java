@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.StringSetPojoPathFilter;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A {@link PojoPathFilterFactory} suitable for use with Hibernate ORM,
