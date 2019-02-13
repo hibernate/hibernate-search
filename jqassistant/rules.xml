@@ -144,20 +144,18 @@
         ]]></cypher>
     </concept>
 
-    <concept id="my-rules:InternalArtifacts">
+    <concept id="my-rules:UtilArtifacts">
         <requiresConcept refId="my-rules:HibernateSearch" />
         <description>
-            Contributes the :Internal label to strictly internal :Maven:Artifact nodes.
+            Contributes the :Util label to :Maven:Artifact nodes representing utils artifacts.
         </description>
         <cypher><![CDATA[
             MATCH
                 (artifact:Maven:Artifact:HibernateSearch)
             WHERE
-                artifact.type = "test-jar"
-                OR artifact.name =~ ".*-integrationtest-.*"
-                OR artifact.name =~ ".*-internal-.*"
+                artifact.name =~ ".*-util-.*"
             SET
-                artifact:Internal
+                artifact:Util
             RETURN
                 artifact
         ]]></cypher>
@@ -295,13 +293,13 @@
     </constraint>
 
     <constraint id="my-rules:TypesMayNotDependOnImplementationTypeFromOtherModules">
-        <requiresConcept refId="my-rules:InternalArtifacts" />
+        <requiresConcept refId="my-rules:UtilArtifacts" />
         <requiresConcept refId="my-rules:Test" />
         <requiresConcept refId="my-rules:Impl" />
         <description>
             Types must not depend on implementation types from other modules.
             SPIs must be used for such dependencies.
-            Exceptions are allowed only when the dependency type is in an internal module,
+            Exceptions are allowed only when the dependency type is in a util module,
             or the depending type is a test type.
         </description>
         <cypher><![CDATA[
@@ -311,7 +309,7 @@
                 artifact1 <> artifact2
                 // Exceptions
                 AND NOT type1:Test
-                AND NOT artifact2:Internal
+                AND NOT artifact2:Util
             RETURN
                 artifact1, type1, artifact2, type2
         ]]></cypher>
