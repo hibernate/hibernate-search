@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.orm.bootstrap.impl;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.function.BiConsumer;
 
 import org.hibernate.annotations.common.reflection.ReflectionManager;
@@ -94,25 +96,71 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		propertyCollector.accept( HibernateOrmMapperSpiSettings.INTEGRATION_PARTIAL_BUILD_STATE, partialBuildState );
 	}
 
-	private HibernateOrmIntegrationPartialBuildState getOrCreatePartialBuildState() {
+	CompletableFuture<HibernateSearchContextService> orchestrateBootAndShutdown(
+			CompletionStage<SessionFactoryImplementor> sessionFactoryReadyStage,
+			CompletionStage<?> sessionFactoryDestroyingStage) {
+		CompletableFuture<Void> environmentSynchronizerReadyStage = new CompletableFuture<>();
+		CompletableFuture<Void> environmentSynchronizerStartedDestroyingStage = new CompletableFuture<>();
+
+		if ( environmentSynchronizer.isPresent() ) {
+			environmentSynchronizer.get().whenEnvironmentDestroying( () -> environmentSynchronizerReadyStage.complete( null ) );
+			environmentSynchronizer.get().whenEnvironmentReady( () -> environmentSynchronizerStartedDestroyingStage.complete( null ) );
+		}
+		else {
+			/*
+			 * Assume the environment synchronizer is always ready.
+			 * Do not care about the "started destroying" event,
+			 * if it is not triggered then the session lifecycle will prevail.
+			 */
+			environmentSynchronizerReadyStage.complete( null );
+		}
+
+		/*
+		 * Boot is required as soon as both the environment synchronizer *and* the session factory are ready.
+		 */
+		CompletableFuture<SessionFactoryImplementor> bootRequiredStage =
+				environmentSynchronizerReadyStage.thenCombine(
+						sessionFactoryReadyStage, (ignored, sessionFactory) -> sessionFactory
+				);
+
+		/*
+		 * A shutdown is required as soon as the session factory starts being destroyed,
+		 * *or* the environment synchronizer signals destroying is starting.
+		 */
+		CompletionStage<?> shutdownRequiredStage = CompletableFuture.anyOf(
+				environmentSynchronizerStartedDestroyingStage, sessionFactoryDestroyingStage.toCompletableFuture()
+		);
+
+		/*
+		 * As soon as boot is required, we need to, well... boot.
+		 */
+		CompletableFuture<HibernateSearchContextService> contextBootedFuture =
+				bootRequiredStage.thenApply( this::bootNow );
+
+		/*
+		 * As soon as a shutdown is required,
+		 * we need to cancel the boot if it's still possible,
+		 * or shut down Hibernate Search if it already started.
+		 */
+		shutdownRequiredStage.thenRun( () -> bootRequiredStage.cancel( false ) );
+		shutdownRequiredStage.thenAcceptBoth( contextBootedFuture, (ignored, context) -> context.close() );
+
+		return contextBootedFuture;
+	}
+
+	private HibernateSearchContextService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		Optional<HibernateOrmIntegrationPartialBuildState> partialBuildStateOptional =
 				INTEGRATION_PARTIAL_BUILD_STATE.get( propertySource );
 
+		HibernateOrmIntegrationPartialBuildState partialBuildState;
 		if ( partialBuildStateOptional.isPresent() ) {
 			// The first phase of booting was already performed externally; just re-use the result
-			return partialBuildStateOptional.get();
+			partialBuildState = partialBuildStateOptional.get();
 		}
 		else {
-			return doBootFirstPhase();
+			partialBuildState = doBootFirstPhase();
 		}
-	}
 
-	Optional<EnvironmentSynchronizer> getEnvironmentSynchronizer() {
-		return environmentSynchronizer;
-	}
-
-	HibernateSearchContextService boot(SessionFactoryImplementor sessionFactoryImplementor) {
-		HibernateOrmIntegrationPartialBuildState partialBuildState = getOrCreatePartialBuildState();
 		try {
 			return doBootSecondPhase( partialBuildState, sessionFactoryImplementor );
 		}

@@ -53,9 +53,11 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	private final boolean eventProcessingEnabled;
 	private final boolean dirtyCheckingEnabled;
 
-	private volatile EventsHibernateSearchState state = new NonInitializedHibernateSearchState();
+	private volatile EventsHibernateSearchState state;
 
-	public HibernateSearchEventListener(boolean eventProcessingEnabled, boolean dirtyCheckingEnabled) {
+	public HibernateSearchEventListener(CompletableFuture<HibernateSearchContextService> contextFuture,
+			boolean eventProcessingEnabled, boolean dirtyCheckingEnabled) {
+		this.state = new InitializingHibernateSearchState( contextFuture.thenApply( this::doInitialize ) );
 		this.eventProcessingEnabled = eventProcessingEnabled;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
@@ -149,14 +151,6 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //			synchronization.beforeCompletion();
 //			synchronization.afterCompletion( Status.STATUS_COMMITTED );
 //		}
-	}
-
-	/**
-	 * Initialize method called by Hibernate Core when the SessionFactory starts.
-	 * @param contextFuture a completable future that will eventually hold the initialized {@link HibernateSearchContextService}
-	 */
-	public void initialize(CompletableFuture<HibernateSearchContextService> contextFuture) {
-		this.state = new InitializingHibernateSearchState( contextFuture.thenApply( this::doInitialize ) );
 	}
 
 	private HibernateSearchContextService doInitialize(HibernateSearchContextService context) {

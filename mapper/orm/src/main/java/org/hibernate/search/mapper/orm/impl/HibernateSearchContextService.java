@@ -29,7 +29,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.Service;
 
-public class HibernateSearchContextService implements Service {
+public class HibernateSearchContextService implements Service, AutoCloseable {
 
 	private volatile SearchIntegration integration;
 	private volatile HibernateOrmMapping mapping;
@@ -45,6 +45,13 @@ public class HibernateSearchContextService implements Service {
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
+
+	@Override
+	public void close() {
+		if ( integration != null ) {
+			integration.close();
+		}
+	}
 
 	public void initialize(SearchIntegration integration, HibernateOrmMapping mapping) {
 		this.integration = integration;
