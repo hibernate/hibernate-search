@@ -6,32 +6,39 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.NANO_OF_SECOND;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
-import java.time.format.SignStyle;
 import java.util.Locale;
+
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<LocalDate, Long> {
+public final class LuceneLocalDateTimeFieldCodec implements LuceneNumericFieldCodec<LocalDateTime, Long> {
 
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
-			.appendLiteral( '-' )
-			.appendValue( MONTH_OF_YEAR, 2 )
-			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
+	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.append( LuceneLocalDateFieldCodec.FORMATTER )
+			.appendLiteral( 'T' )
+			.appendValue( HOUR_OF_DAY, 2 )
+			.appendLiteral( ':' )
+			.appendValue( MINUTE_OF_HOUR, 2 )
+			.optionalStart()
+			.appendLiteral( ':' )
+			.appendValue( SECOND_OF_MINUTE, 2 )
+			.optionalStart()
+			.appendFraction( NANO_OF_SECOND, 3, 9, true )
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
@@ -39,13 +46,13 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 
 	private final boolean sortable;
 
-	public LuceneLocalDateFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneLocalDateTimeFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDateTime value) {
 		if ( value == null ) {
 			return;
 		}
@@ -64,7 +71,7 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 	}
 
 	@Override
-	public LocalDate decode(Document document, String absoluteFieldPath) {
+	public LocalDateTime decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -77,7 +84,7 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 			return null;
 		}
 
-		return LocalDate.parse( value, FORMATTER );
+		return LocalDateTime.parse( value, FORMATTER );
 	}
 
 	@Override
@@ -85,18 +92,18 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneLocalDateFieldCodec.class != obj.getClass() ) {
+		if ( LuceneLocalDateTimeFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LuceneLocalDateFieldCodec other = (LuceneLocalDateFieldCodec) obj;
+		LuceneLocalDateTimeFieldCodec other = (LuceneLocalDateTimeFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
-	public Long encode(LocalDate value) {
-		return value == null ? null : value.toEpochDay();
+	public Long encode(LocalDateTime value) {
+		return value == null ? null : value.atZone( ZoneOffset.UTC ).toInstant().toEpochMilli();
 	}
 
 	@Override

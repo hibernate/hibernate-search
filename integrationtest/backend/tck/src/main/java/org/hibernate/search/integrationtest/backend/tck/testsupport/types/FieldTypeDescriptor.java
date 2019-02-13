@@ -38,6 +38,7 @@ public abstract class FieldTypeDescriptor<F> {
 					new DoubleFieldTypeDescriptor(),
 					new InstantFieldTypeDescriptor(),
 					new LocalDateFieldTypeDescriptor(),
+					new LocalDateTimeFieldTypeDescriptor(),
 					new GeoPointFieldTypeDescriptor()
 			) );
 		}

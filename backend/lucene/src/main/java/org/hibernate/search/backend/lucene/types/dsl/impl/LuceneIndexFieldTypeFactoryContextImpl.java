@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -74,6 +75,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		}
 		else if ( LocalDate.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asLocalDate();
+		}
+		else if ( LocalDateTime.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asLocalDateTime();
 		}
 		else if ( Instant.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asInstant();
@@ -141,6 +145,11 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
 		return new LuceneLocalDateIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
+		return new LuceneLocalDateTimeIndexFieldTypeContext( this );
 	}
 
 	@Override
