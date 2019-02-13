@@ -11,6 +11,7 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.YEAR;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
@@ -34,16 +35,16 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 class ElasticsearchLocalDateIndexFieldTypeContext
 		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLocalDateIndexFieldTypeContext, LocalDate> {
 
-	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec(
-					new DateTimeFormatterBuilder()
-							.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
-							.appendLiteral( '-' )
-							.appendValue( MONTH_OF_YEAR, 2 )
-							.appendLiteral( '-' )
-							.appendValue( DAY_OF_MONTH, 2 )
-							.toFormatter( Locale.ROOT )
-							.withResolverStyle( ResolverStyle.STRICT )
-			);
+	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
+			.appendLiteral( '-' )
+			.appendValue( MONTH_OF_YEAR, 2 )
+			.appendLiteral( '-' )
+			.appendValue( DAY_OF_MONTH, 2 )
+			.toFormatter( Locale.ROOT )
+			.withResolverStyle( ResolverStyle.STRICT );
+
+	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec( FORMATTER );
 
 	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 

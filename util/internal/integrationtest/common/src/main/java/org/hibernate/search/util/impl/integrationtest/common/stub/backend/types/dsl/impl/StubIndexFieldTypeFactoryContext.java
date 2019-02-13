@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -77,6 +78,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, LocalDate> asLocalDate() {
 		return as( LocalDate.class );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, LocalDateTime> asLocalDateTime() {
+		return as( LocalDateTime.class );
 	}
 
 	@Override

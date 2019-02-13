@@ -26,7 +26,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<LocalDate, Long> {
 
-	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
 			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
 			.appendLiteral( '-' )
 			.appendValue( MONTH_OF_YEAR, 2 )
