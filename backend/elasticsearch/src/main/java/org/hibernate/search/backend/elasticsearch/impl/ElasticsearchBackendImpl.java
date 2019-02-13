@@ -43,7 +43,7 @@ import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 

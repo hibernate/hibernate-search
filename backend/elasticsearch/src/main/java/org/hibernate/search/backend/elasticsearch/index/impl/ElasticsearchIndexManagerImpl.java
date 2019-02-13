@@ -30,7 +30,7 @@ import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImpl
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 
 /**

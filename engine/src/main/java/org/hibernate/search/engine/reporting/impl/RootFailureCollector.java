@@ -21,7 +21,7 @@ import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.reporting.EventContextElement;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.common.ToStringStyle;
 import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
 import org.hibernate.search.util.reporting.impl.CommonEventContextMessages;

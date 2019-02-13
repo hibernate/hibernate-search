@@ -37,7 +37,7 @@ import org.hibernate.search.mapper.pojo.processing.building.impl.PojoIndexingPro
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.util.AssertionFailure;
 import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

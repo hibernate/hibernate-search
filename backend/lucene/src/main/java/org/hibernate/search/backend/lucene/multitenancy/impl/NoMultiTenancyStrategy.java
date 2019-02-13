@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneDeleteAllEntriesWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedUpdateEntryWork;
 import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 

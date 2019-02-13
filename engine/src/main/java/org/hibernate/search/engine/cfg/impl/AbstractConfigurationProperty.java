@@ -13,7 +13,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 abstract class AbstractConfigurationProperty<T> implements ConfigurationProperty<T> {
 

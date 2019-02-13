@@ -11,7 +11,7 @@ import javax.transaction.SystemException;
 
 import org.hibernate.StatelessSession;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * Wraps the execution of a {@code Runnable} in a JTA Transaction if necessary:

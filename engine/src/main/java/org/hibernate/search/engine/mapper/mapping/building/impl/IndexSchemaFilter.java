@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * A schema filter, responsible for deciding which parts of a mapping will actually make it to the index schema.

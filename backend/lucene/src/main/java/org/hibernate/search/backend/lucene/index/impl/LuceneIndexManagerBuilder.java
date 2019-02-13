@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 import org.apache.lucene.index.IndexWriter;

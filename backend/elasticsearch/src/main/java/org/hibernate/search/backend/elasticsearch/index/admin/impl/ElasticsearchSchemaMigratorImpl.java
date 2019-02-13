@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.I
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * The default {@link ElasticsearchSchemaMigrator} implementation.

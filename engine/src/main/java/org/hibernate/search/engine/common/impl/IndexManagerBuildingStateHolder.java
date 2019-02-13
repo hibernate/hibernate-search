@@ -33,7 +33,7 @@ import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBi
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.common.SuppressingCloser;
 
 

@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import org.hibernate.search.backend.lucene.index.impl.DirectoryProvider;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.MMapDirectory;

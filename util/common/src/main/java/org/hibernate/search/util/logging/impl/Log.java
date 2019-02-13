@@ -5,11 +5,9 @@
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 
-package org.hibernate.search.util.impl.common.logging;
+package org.hibernate.search.util.logging.impl;
 
 import static org.jboss.logging.Logger.Level.ERROR;
-
-import org.hibernate.search.util.impl.common.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;

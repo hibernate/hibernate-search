@@ -31,7 +31,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.reporting.EventContext;
 import org.hibernate.search.util.SearchException;
 import org.hibernate.search.util.function.TriFunction;
-import org.hibernate.search.util.impl.common.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
