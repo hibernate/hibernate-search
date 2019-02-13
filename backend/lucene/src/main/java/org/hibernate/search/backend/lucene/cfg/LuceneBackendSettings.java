@@ -17,6 +17,12 @@ public final class LuceneBackendSettings {
 	}
 
 	/**
+	 * The name to use for the {@link org.hibernate.search.engine.cfg.BackendSettings#TYPE backend type}
+	 * configuration property so that an Lucene backend is instantiated by Hibernate Search.
+	 */
+	public static final String TYPE_NAME = "lucene";
+
+	/**
 	 * The Lucene match version parameter. Highly recommended since Lucene 3.
 	 */
 	public static final String LUCENE_VERSION = "lucene_version";

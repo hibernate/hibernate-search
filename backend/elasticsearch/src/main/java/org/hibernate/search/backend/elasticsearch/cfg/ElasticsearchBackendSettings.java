@@ -19,6 +19,12 @@ public final class ElasticsearchBackendSettings {
 	private ElasticsearchBackendSettings() {
 	}
 
+	/**
+	 * The name to use for the {@link org.hibernate.search.engine.cfg.BackendSettings#TYPE backend type}
+	 * configuration property so that an Elasticsearch backend is instantiated by Hibernate Search.
+	 */
+	public static final String TYPE_NAME = "elasticsearch";
+
 	public static final String HOSTS = "hosts";
 
 	public static final String USERNAME = "username";
