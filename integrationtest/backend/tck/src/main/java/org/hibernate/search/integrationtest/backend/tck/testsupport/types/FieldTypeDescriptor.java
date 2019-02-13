@@ -29,6 +29,7 @@ public abstract class FieldTypeDescriptor<F> {
 					new AnalyzedStringFieldTypeDescriptor(),
 					new NormalizedStringFieldTypeDescriptor(),
 					new IntegerFieldTypeDescriptor(),
+					new FloatFieldTypeDescriptor(),
 					new LongFieldTypeDescriptor(),
 					new BooleanFieldTypeDescriptor(),
 					new CharacterFieldTypeDescriptor(),

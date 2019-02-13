@@ -6,9 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.math.BigDecimal;
-
 import org.apache.lucene.document.DoublePoint;
+import org.apache.lucene.document.FloatPoint;
 import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.search.Query;
@@ -105,6 +104,45 @@ public abstract class LuceneNumericDomain<E> {
 		@Override
 		public SortField.Type getSortFieldType() {
 			return SortField.Type.LONG;
+		}
+	};
+
+	public static final LuceneNumericDomain<Float> FLOAT = new LuceneNumericDomain<Float>() {
+		@Override
+		public Float getMinValue() {
+			return Float.MIN_VALUE;
+		}
+
+		@Override
+		public Float getMaxValue() {
+			return Float.MAX_VALUE;
+		}
+
+		@Override
+		public Float getPreviousValue(Float value) {
+			return Math.nextDown( value );
+		}
+
+		@Override
+		public Float getNextValue(Float value) {
+			return Math.nextUp( value );
+		}
+
+		@Override
+		public Query createExactQuery(String absoluteFieldPath, Float value) {
+			return FloatPoint.newExactQuery( absoluteFieldPath, value );
+		}
+
+		@Override
+		public Query createRangeQuery(String absoluteFieldPath, Float lowerLimit, Float upperLimit) {
+			return FloatPoint.newRangeQuery(
+					absoluteFieldPath, lowerLimit, upperLimit
+			);
+		}
+
+		@Override
+		public SortField.Type getSortFieldType() {
+			return SortField.Type.FLOAT;
 		}
 	};
 
