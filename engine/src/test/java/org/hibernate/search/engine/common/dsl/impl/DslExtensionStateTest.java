@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Rule;
 import org.junit.Test;

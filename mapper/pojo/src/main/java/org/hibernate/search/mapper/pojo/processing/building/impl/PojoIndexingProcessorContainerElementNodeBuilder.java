@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorContainerElementNode;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * A builder of {@link PojoIndexingProcessorContainerElementNode}.

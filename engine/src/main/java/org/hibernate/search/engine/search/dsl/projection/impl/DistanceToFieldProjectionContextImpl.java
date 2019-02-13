@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjecti
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 
 public class DistanceToFieldProjectionContextImpl implements DistanceToFieldProjectionContext {

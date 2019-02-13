@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 public final class PojoImplicitReindexingResolverBuildingHelper {
 

@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * An Elasticsearch client, allowing to perform requests to a remote cluster.
  *
@@ -27,7 +29,7 @@ public interface ElasticsearchClient {
 	 *
 	 * @param clientClass The {@link Class} representing the expected client type
 	 * @return The unwrapped client.
-	 * @throws org.hibernate.search.util.SearchException if the client implementation does not support
+	 * @throws SearchException if the client implementation does not support
 	 * unwrapping to the given class.
 	 */
 	<T> T unwrap(Class<T> clientClass);

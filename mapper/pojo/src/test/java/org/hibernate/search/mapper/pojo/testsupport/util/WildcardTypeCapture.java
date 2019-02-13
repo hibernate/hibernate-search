@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.testsupport.util;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 /**
  * A type capture used when the captured type cannot be used as a type argument to an anonymous type,

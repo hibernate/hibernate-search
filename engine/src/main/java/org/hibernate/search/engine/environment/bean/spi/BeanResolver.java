@@ -9,7 +9,7 @@ package org.hibernate.search.engine.environment.bean.spi;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The interface to be implemented by components providing beans to Hibernate Search.

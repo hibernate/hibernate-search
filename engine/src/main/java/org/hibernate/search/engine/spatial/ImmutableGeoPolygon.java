@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.impl.common.CollectionHelper;
-import org.hibernate.search.util.impl.common.Contracts;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.impl.Contracts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 final class ImmutableGeoPolygon implements GeoPolygon {
 

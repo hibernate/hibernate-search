@@ -14,8 +14,8 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * @param <S> The concrete type of this context.

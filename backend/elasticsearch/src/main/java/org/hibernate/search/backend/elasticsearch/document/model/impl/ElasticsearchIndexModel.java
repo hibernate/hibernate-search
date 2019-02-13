@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.I
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * @author Yoann Rodiere

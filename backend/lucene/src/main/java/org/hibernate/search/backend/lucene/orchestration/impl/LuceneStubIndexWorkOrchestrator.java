@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.apache.lucene.index.IndexWriter;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
-import org.hibernate.search.util.impl.common.Futures;
+import org.hibernate.search.util.common.impl.Futures;
 
 
 /**

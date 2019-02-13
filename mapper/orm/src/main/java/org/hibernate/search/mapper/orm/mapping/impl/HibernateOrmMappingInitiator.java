@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospec
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
-import org.hibernate.search.util.impl.common.StreamHelper;
+import org.hibernate.search.util.common.impl.StreamHelper;
 
 /*
  * TODO make the following additions to the Hibernate ORM specific mapping:

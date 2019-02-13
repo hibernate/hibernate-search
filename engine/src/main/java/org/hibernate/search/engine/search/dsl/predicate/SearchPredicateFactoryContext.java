@@ -10,6 +10,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * A context allowing to specify the type of a predicate.
@@ -138,7 +139,7 @@ public interface SearchPredicateFactoryContext {
 	 * @param extension The extension to the predicate DSL.
 	 * @param <T> The type of context provided by the extension.
 	 * @return The extended context.
-	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
 	<T> T extension(SearchPredicateFactoryContextExtension<T> extension);
 

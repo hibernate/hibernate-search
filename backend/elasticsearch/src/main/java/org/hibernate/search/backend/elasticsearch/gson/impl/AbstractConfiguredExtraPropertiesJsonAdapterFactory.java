@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractExtraPropertiesJsonAdapter.ExtraPropertyAdapter;
 import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractExtraPropertiesJsonAdapter.FieldAdapter;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

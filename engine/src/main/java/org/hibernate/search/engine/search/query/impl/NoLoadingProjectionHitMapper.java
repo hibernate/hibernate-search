@@ -11,7 +11,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public class NoLoadingProjectionHitMapper<R> implements ProjectionHitMapper<R, Void> {
 

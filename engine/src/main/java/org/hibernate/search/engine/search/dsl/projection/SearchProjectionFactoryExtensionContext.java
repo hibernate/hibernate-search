@@ -8,6 +8,8 @@ package org.hibernate.search.engine.search.dsl.projection;
 
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchProjectionFactoryContext}.
@@ -60,7 +62,7 @@ public interface SearchProjectionFactoryExtensionContext<P, R, O> {
 	 * otherwise return the projection created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @return The created projection.
-	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
+	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
 	SearchProjectionTerminalContext<P> orElseFail();
 

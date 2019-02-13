@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.dsl.sort;
 
-import org.hibernate.search.util.SearchException;
+import org.hibernate.search.util.common.SearchException;
 
 /**
  * The context used when defining the missing value behavior of a field sort.

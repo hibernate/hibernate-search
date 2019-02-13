@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoMappingWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {

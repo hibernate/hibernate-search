@@ -11,10 +11,10 @@ import java.io.Serializable;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.LogByteSizeMergePolicy;
 import org.hibernate.search.util.configuration.impl.ConfigurationParseHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-import org.hibernate.search.util.logging.impl.LoggerInfoStream;
+import org.hibernate.search.util.common.logging.impl.LoggerInfoStream;
 
 /**
  * Represents possible options to be applied to an

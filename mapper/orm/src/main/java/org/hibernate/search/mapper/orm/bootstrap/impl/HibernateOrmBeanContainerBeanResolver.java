@@ -12,7 +12,7 @@ import org.hibernate.resource.beans.spi.BeanInstanceProducer;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A {@link BeanResolver} relying on a Hibernate ORM {@link BeanContainer} to resolve beans.

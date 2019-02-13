@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.cfg;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.StringHelper;
+import org.hibernate.search.util.common.impl.StringHelper;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public enum MultiTenancyStrategyName {
 

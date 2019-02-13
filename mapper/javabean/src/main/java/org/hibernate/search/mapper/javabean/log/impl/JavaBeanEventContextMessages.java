@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.javabean.log.impl;
 
-import org.hibernate.search.util.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;

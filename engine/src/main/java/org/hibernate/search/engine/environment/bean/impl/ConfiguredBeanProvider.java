@@ -21,8 +21,8 @@ import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Contracts;
 
 public final class ConfiguredBeanProvider implements BeanProvider {
 

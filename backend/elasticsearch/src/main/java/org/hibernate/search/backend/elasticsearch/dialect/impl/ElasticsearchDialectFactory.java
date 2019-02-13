@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearc
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Allows to create an Elasticsearch dialect by detecting the version of a remote cluster.

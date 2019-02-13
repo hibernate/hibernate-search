@@ -9,7 +9,7 @@ package org.hibernate.search.engine.environment.bean.impl;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A BeanProvider that ignores the explicitly configured beans.

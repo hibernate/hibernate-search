@@ -32,7 +32,7 @@ import org.hibernate.search.backend.elasticsearch.index.settings.impl.esnative.I
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.util.impl.common.CollectionHelper;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.jboss.logging.Messages;
 

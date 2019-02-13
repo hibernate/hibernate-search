@@ -8,7 +8,7 @@ package org.hibernate.search.engine.reporting.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.util.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.spatial;
 
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * Distance units.

@@ -10,8 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Contracts;
 
 import com.google.gson.JsonElement;
 

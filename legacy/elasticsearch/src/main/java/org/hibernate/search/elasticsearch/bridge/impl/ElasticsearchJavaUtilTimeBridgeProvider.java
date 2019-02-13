@@ -19,7 +19,7 @@ import org.hibernate.search.bridge.impl.ExtendedBridgeProvider;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchCalendarBridge;
 import org.hibernate.search.elasticsearch.bridge.builtin.impl.ElasticsearchDateBridge;
 import org.hibernate.search.elasticsearch.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

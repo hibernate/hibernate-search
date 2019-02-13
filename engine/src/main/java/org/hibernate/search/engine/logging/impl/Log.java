@@ -15,10 +15,10 @@ import org.hibernate.search.engine.logging.spi.MappingKeyFormatter;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.logging.impl.MessageConstants;
-import org.hibernate.search.util.logging.impl.ClassFormatter;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.MessageConstants;
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;

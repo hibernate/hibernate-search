@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.impl.AggregatedClassLoader;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * Default implementation of {@code ClassResolver} using the old pre class loader service approach of

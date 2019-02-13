@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchCondit
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchContext;
 import org.hibernate.search.engine.search.dsl.predicate.MinimumShouldMatchNonEmptyContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 final class MinimumShouldMatchContextImpl<N> implements MinimumShouldMatchContext<N>,
 		MinimumShouldMatchConditionContext<N>, MinimumShouldMatchNonEmptyContext<N> {

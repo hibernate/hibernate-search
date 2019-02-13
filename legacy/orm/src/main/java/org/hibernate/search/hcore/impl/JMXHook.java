@@ -20,8 +20,8 @@ import org.hibernate.search.jmx.IndexControlMBean;
 import org.hibernate.search.orm.jmx.impl.IndexControl;
 import org.hibernate.search.util.jmx.impl.JMXRegistrar;
 import org.hibernate.search.util.StringHelper;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

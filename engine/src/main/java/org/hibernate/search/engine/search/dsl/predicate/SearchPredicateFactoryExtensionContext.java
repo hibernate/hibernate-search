@@ -8,6 +8,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 import java.util.function.Function;
 
+import org.hibernate.search.util.common.SearchException;
+
 /**
  * The context used when attempting to apply multiple extensions
  * to a {@link SearchPredicateFactoryContext}.
@@ -57,7 +59,7 @@ public interface SearchPredicateFactoryExtensionContext {
 	 * otherwise return the predicate created in the first succeeding {@code ifSupported} call.
 	 *
 	 * @return The created predicate.
-	 * @throws org.hibernate.search.util.SearchException If none of the previously passed extensions was supported.
+	 * @throws SearchException If none of the previously passed extensions was supported.
 	 */
 	SearchPredicateTerminalContext orElseFail();
 

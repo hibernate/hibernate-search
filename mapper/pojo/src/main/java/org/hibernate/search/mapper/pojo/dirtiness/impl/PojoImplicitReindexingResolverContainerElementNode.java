@@ -11,8 +11,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} dealing with a specific container type,

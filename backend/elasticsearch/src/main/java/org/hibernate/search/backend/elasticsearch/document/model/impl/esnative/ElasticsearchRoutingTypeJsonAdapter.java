@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl.esnative;
 
 import java.io.IOException;
 
-import org.hibernate.search.util.AssertionFailure;
+import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

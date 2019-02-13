@@ -8,8 +8,8 @@ package org.hibernate.search;
 
 import org.hibernate.Session;
 import org.hibernate.search.impl.ImplementationFactory;
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

@@ -8,8 +8,8 @@ package org.hibernate.search.query.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.util.logging.impl.Log;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.logging.impl.Log;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.BooleanQuery;
 

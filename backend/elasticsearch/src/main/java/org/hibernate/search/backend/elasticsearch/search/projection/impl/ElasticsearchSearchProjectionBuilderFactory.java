@@ -28,10 +28,10 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.reporting.EventContext;
-import org.hibernate.search.util.SearchException;
-import org.hibernate.search.util.function.TriFunction;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.function.TriFunction;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 

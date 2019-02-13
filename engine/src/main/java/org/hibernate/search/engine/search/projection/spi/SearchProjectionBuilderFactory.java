@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.function.TriFunction;
 
 /**
  * A factory for search projection builders.

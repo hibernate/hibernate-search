@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.function.TriFunction;
 
 public class StubCompositeTriFunctionSearchProjection<P1, P2, P3, T> implements StubCompositeSearchProjection<T> {
 

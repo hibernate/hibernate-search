@@ -13,7 +13,8 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.function.TriFunction;
 
 /**
  * A context allowing to create a projection.
@@ -220,7 +221,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	 * @param extension The extension to the projection DSL.
 	 * @param <T> The type of context provided by the extension.
 	 * @return The extended context.
-	 * @throws org.hibernate.search.util.SearchException If the extension cannot be applied (wrong underlying backend, ...).
+	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
 	<T> T extension(SearchProjectionFactoryContextExtension<T, R, O> extension);
 

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteAllEntr
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneUpdateEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexWork;
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * Defines how the additional information required by multiTenancy are handled.

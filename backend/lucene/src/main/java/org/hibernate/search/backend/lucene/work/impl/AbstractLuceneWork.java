@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.util.reporting.EventContext;
+import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 /**

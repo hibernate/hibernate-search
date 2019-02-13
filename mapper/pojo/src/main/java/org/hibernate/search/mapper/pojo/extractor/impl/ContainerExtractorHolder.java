@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 public class ContainerExtractorHolder<C, V> implements AutoCloseable {
 	private final ContainerExtractor<? super C, V> chain;

@@ -10,8 +10,8 @@ import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} working at the type level, but applying a cast before anything else.

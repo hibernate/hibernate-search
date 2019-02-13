@@ -29,7 +29,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.util.impl.common.SearchThreadFactory;
+import org.hibernate.search.util.common.impl.SearchThreadFactory;
 
 /**
  * @author Gunnar Morling

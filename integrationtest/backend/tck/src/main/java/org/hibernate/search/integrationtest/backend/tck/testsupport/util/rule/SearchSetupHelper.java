@@ -23,7 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
 
 import org.junit.rules.TestRule;

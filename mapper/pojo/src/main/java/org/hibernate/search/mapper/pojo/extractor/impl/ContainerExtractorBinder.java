@@ -32,9 +32,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.ExtractingTypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.util.impl.GenericTypeContext;
-import org.hibernate.search.util.AssertionFailure;
-import org.hibernate.search.util.logging.impl.LoggerFactory;
-import org.hibernate.search.util.impl.common.SuppressingCloser;
+import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * Binds {@link ContainerExtractorPath}s to a given input type,
@@ -134,7 +135,7 @@ public class ContainerExtractorBinder {
 	 * @param extractorPath The list of extractors to apply.
 	 * @param <C> The source type.
 	 * @return The bound extractor path.
-	 * @throws org.hibernate.search.util.SearchException if
+	 * @throws SearchException if
 	 * one of the extractors in the path cannot be applied.
 	 */
 	@SuppressWarnings({"rawtypes"}) // Checks are implemented using reflection

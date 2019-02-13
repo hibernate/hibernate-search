@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.pojo.dirtiness.impl;
 import java.util.Collection;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.common.Closer;
-import org.hibernate.search.util.impl.common.ToStringTreeBuilder;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
 /**
  * A {@link PojoImplicitReindexingResolverNode} working at the type level, without casting.

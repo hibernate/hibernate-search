@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.event.impl;
 
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
-import org.hibernate.search.util.impl.common.Contracts;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * The implementation of EventsHibernateSearchState used at runtime,

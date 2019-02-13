@@ -10,7 +10,7 @@ import static org.hibernate.search.backend.elasticsearch.search.projection.impl.
 
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.util.function.TriFunction;
+import org.hibernate.search.util.common.function.TriFunction;
 
 import com.google.gson.JsonObject;
 

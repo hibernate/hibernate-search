@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
-import org.hibernate.search.util.impl.common.Closer;
+import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * @author Yoann Rodiere
