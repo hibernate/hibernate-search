@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.codec.impl;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonElementTypes;
 
@@ -16,9 +17,10 @@ import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchInstantFieldCodec implements ElasticsearchFieldCodec<Instant> {
 
-	public static final ElasticsearchInstantFieldCodec INSTANCE = new ElasticsearchInstantFieldCodec();
+	private final DateTimeFormatter formatter;
 
-	private ElasticsearchInstantFieldCodec() {
+	public ElasticsearchInstantFieldCodec(DateTimeFormatter delegate) {
+		this.formatter = delegate;
 	}
 
 	@Override
@@ -26,7 +28,7 @@ public class ElasticsearchInstantFieldCodec implements ElasticsearchFieldCodec<I
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return new JsonPrimitive( value.toEpochMilli() );
+		return new JsonPrimitive( formatter.format( value ) );
 	}
 
 	@Override
@@ -34,12 +36,20 @@ public class ElasticsearchInstantFieldCodec implements ElasticsearchFieldCodec<I
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		Long time = JsonElementTypes.LONG.fromElement( element );
-		return Instant.ofEpochMilli( time );
+		String stringValue = JsonElementTypes.STRING.fromElement( element );
+		return formatter.parse( stringValue, Instant::from );
 	}
 
 	@Override
-	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> other) {
-		return INSTANCE == other;
+	public boolean isCompatibleWith(ElasticsearchFieldCodec<?> obj) {
+		if ( obj == this ) {
+			return true;
+		}
+		if ( obj.getClass() != getClass() ) {
+			return false;
+		}
+
+		ElasticsearchInstantFieldCodec other = (ElasticsearchInstantFieldCodec) obj;
+		return formatter.equals( other.formatter );
 	}
 }
