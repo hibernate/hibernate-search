@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -355,7 +356,7 @@ public class FieldSearchSortIT {
 
 	private boolean isJavaTimeType(Class<?> type) {
 		final Class<?>[] javaTimeTypes = { LocalDate.class, LocalDateTime.class, LocalTime.class, ZonedDateTime.class, Year.class, YearMonth.class, MonthDay.class,
-				OffsetDateTime.class, OffsetTime.class, ZoneOffset.class, ZoneId.class, Period.class, Duration.class
+				OffsetDateTime.class, OffsetTime.class, ZoneOffset.class, ZoneId.class, Period.class, Duration.class, Instant.class
 		};
 		return Arrays.asList( javaTimeTypes ).contains( type );
 	}
