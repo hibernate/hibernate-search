@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 import static org.junit.Assert.fail;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -34,15 +33,15 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<URL, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<URL, URI>() {
+		return Optional.of( new DefaultValueBridgeExpectations<URL, String>() {
 			@Override
 			public Class<URL> getProjectionType() {
 				return URL.class;
 			}
 
 			@Override
-			public Class<URI> getIndexFieldJavaType() {
-				return URI.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
@@ -60,17 +59,17 @@ public class JavaNetURLPropertyTypeDescriptor extends PropertyTypeDescriptor<URL
 			}
 
 			@Override
-			public List<URI> getDocumentFieldValues() {
-				List<URI> uris = Arrays.asList(
-						URI.create( "https://www.google.com" ),
-						URI.create( "https://twitter.com/Hibernate/status/1093118957194801152" ),
-						URI.create( "https://twitter.com/Hibernate/status/1092803949533507584" ),
-						URI.create( "https://access.redhat.com/" ),
-						URI.create( "https://access.redhat.com/products" ),
-						URI.create( "https://access.redhat.com/products/red-hat-fuse/" ),
-						URI.create( "https://access.redhat.com/products/red-hat-openshift-container-platform/" )
+			public List<String> getDocumentFieldValues() {
+				List<String> stringList = Arrays.asList(
+						"https://www.google.com",
+						"https://twitter.com/Hibernate/status/1093118957194801152",
+						"https://twitter.com/Hibernate/status/1092803949533507584",
+						"https://access.redhat.com/",
+						"https://access.redhat.com/products",
+						"https://access.redhat.com/products/red-hat-fuse/",
+						"https://access.redhat.com/products/red-hat-openshift-container-platform/"
 				);
-				return uris;
+				return stringList;
 			}
 
 			@Override

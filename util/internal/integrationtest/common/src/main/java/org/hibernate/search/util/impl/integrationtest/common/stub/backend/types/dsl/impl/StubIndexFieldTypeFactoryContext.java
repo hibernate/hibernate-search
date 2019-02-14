@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -116,10 +115,5 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
 		return as( GeoPoint.class );
-	}
-
-	@Override
-	public StandardIndexFieldTypeContext<?, URI> asUri() {
-		return as( URI.class );
 	}
 }

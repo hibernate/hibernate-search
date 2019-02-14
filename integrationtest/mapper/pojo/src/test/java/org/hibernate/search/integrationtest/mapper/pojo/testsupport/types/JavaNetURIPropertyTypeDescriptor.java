@@ -10,6 +10,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -18,6 +19,19 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI> {
+
+	private static final String[] STRING_URLS = {
+			"https://www.google.com",
+			"https://twitter.com/Hibernate/status/1093118957194801152",
+			"https://twitter.com/Hibernate/status/1092803949533507584",
+			"https://access.redhat.com/",
+			"https://access.redhat.com/products",
+			"https://access.redhat.com/products/red-hat-fuse/",
+			"https://access.redhat.com/products/red-hat-openshift-container-platform/",
+			"mailto:java-net@java.sun.com",
+			"urn:isbn:096139210x",
+			"file:///~calendar"
+	};
 
 	JavaNetURIPropertyTypeDescriptor() {
 		super( URI.class );
@@ -30,35 +44,25 @@ public class JavaNetURIPropertyTypeDescriptor extends PropertyTypeDescriptor<URI
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<URI, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<URI, URI>() {
+		return Optional.of( new DefaultValueBridgeExpectations<URI, String>() {
 			@Override
 			public Class<URI> getProjectionType() {
 				return URI.class;
 			}
 
 			@Override
-			public Class<URI> getIndexFieldJavaType() {
-				return URI.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
 			public List<URI> getEntityPropertyValues() {
-				List<URI> uris = Arrays.asList(
-						URI.create( "https://www.google.com" ),
-						URI.create( "https://twitter.com/Hibernate/status/1093118957194801152" ),
-						URI.create( "https://twitter.com/Hibernate/status/1092803949533507584" ),
-						URI.create( "https://access.redhat.com/" ),
-						URI.create( "https://access.redhat.com/products" ),
-						URI.create( "https://access.redhat.com/products/red-hat-fuse/" ),
-						URI.create( "https://access.redhat.com/products/red-hat-openshift-container-platform/" )
-				);
-				return uris;
+				return Arrays.stream( STRING_URLS ).map( s -> URI.create( s ) ).collect( Collectors.toList() );
 			}
 
 			@Override
-			public List<URI> getDocumentFieldValues() {
-				// same representation
-				return getEntityPropertyValues();
+			public List<String> getDocumentFieldValues() {
+				return Arrays.asList( STRING_URLS );
 			}
 
 			@Override
