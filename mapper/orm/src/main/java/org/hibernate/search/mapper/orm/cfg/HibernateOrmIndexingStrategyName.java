@@ -33,12 +33,12 @@ public enum HibernateOrmIndexingStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static HibernateOrmIndexingStrategyName parse(CharSequence charSequence) {
+	public static HibernateOrmIndexingStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				HibernateOrmIndexingStrategyName.values(),
 				HibernateOrmIndexingStrategyName::getExternalRepresentation,
 				log::invalidIndexingStrategyName,
-				charSequence
+				value
 		);
 	}
 

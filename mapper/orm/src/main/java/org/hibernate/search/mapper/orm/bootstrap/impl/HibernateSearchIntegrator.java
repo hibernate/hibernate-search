@@ -48,7 +48,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	private static final ConfigurationProperty<HibernateOrmIndexingStrategyName> INDEXING_MODE =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.INDEXING_STRATEGY )
-					.as( HibernateOrmIndexingStrategyName.class, HibernateOrmIndexingStrategyName::parse )
+					.as( HibernateOrmIndexingStrategyName.class, HibernateOrmIndexingStrategyName::of )
 					.withDefault( HibernateOrmMapperSettings.Defaults.INDEXING_STRATEGY )
 					.build();
 

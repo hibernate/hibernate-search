@@ -27,12 +27,12 @@ public enum MultiTenancyStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static MultiTenancyStrategyName parse(CharSequence charSequence) {
+	public static MultiTenancyStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				MultiTenancyStrategyName.values(),
 				MultiTenancyStrategyName::getExternalRepresentation,
 				log::invalidMultiTenancyStrategyName,
-				charSequence
+				value
 		);
 	}
 

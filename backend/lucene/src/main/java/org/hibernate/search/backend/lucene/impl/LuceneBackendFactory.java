@@ -68,7 +68,7 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
-					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::parse )
+					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
 					.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
 					.build();
 
