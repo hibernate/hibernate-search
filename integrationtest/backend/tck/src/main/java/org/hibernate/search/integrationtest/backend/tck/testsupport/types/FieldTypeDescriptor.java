@@ -32,7 +32,6 @@ public abstract class FieldTypeDescriptor<F> {
 					new FloatFieldTypeDescriptor(),
 					new LongFieldTypeDescriptor(),
 					new BooleanFieldTypeDescriptor(),
-					new CharacterFieldTypeDescriptor(),
 					new ByteFieldTypeDescriptor(),
 					new ShortFieldTypeDescriptor(),
 					new DoubleFieldTypeDescriptor(),

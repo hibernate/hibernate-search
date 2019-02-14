@@ -53,11 +53,6 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	}
 
 	@Override
-	public StandardIndexFieldTypeContext<?, Character> asCharacter() {
-		return as( Character.class );
-	}
-
-	@Override
 	public StandardIndexFieldTypeContext<?, Byte> asByte() {
 		return as( Byte.class );
 	}
