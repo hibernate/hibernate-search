@@ -456,5 +456,5 @@ Other features that you will probably want to use include
 <<mapper-orm-query-sort,sorts>> and <<mapper-orm-query-projection,projections>>.
 
 If you want to see an example project using Hibernate Search,
-you can also have a look at the ["Library" showcase](https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library),
+you can also have a look at the link:https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library["Library" showcase],
 a sample application using Hibernate Search in a Spring Boot environment.
