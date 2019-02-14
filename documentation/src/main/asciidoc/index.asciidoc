@@ -38,8 +38,6 @@ include::index-optimization.asciidoc[]
 
 include::monitoring.asciidoc[]
 
-include::spatial.asciidoc[]
-
 include::advanced-features.asciidoc[]
 
 include::internals.asciidoc[]

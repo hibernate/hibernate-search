@@ -130,6 +130,13 @@ On the other hand, this limitation allows keyword fields to be <<mapper-pojo-dir
 Keyword fields may be assigned a `normalizer`, referenced by its name.
 See <<analysis>> for more details about normalizers and full-text analysis.
 
+[[mapper-pojo-directfieldmapping-spatial-types]]
+=== Mapping spatial types
+// Search 5 anchors backward compatibility
+[[spatial]]
+
+include::todo-placeholder.asciidoc[]
+
 [[mapper-pojo-directfieldmapping-custom-types]]
 === Mapping custom property types
 
