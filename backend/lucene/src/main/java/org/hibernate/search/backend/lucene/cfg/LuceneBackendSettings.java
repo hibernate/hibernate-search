@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
+
 import org.apache.lucene.util.Version;
 
 /**
  * Configuration properties for Lucene backends.
+ * <p>
+ * Constants in this class are to be appended to a prefix to form a property key;
+ * see {@link org.hibernate.search.engine.cfg.BackendSettings} for details.
  */
 public final class LuceneBackendSettings {
 
@@ -18,21 +23,48 @@ public final class LuceneBackendSettings {
 
 	/**
 	 * The name to use for the {@link org.hibernate.search.engine.cfg.BackendSettings#TYPE backend type}
-	 * configuration property so that an Lucene backend is instantiated by Hibernate Search.
+	 * configuration property so that a Lucene backend is instantiated by Hibernate Search.
 	 */
 	public static final String TYPE_NAME = "lucene";
 
 	/**
-	 * The Lucene match version parameter. Highly recommended since Lucene 3.
+	 * The Lucene version to passed to analyzers when they are created.
+	 * <p>
+	 * This should be set in order to get consistent behavior when Lucene is upgraded.
+	 * <p>
+	 * Expects a {@link org.apache.lucene.util.Version},
+	 * or a String accepted by {@link org.apache.lucene.util.Version#parseLeniently(java.lang.String)}
+	 * <p>
+	 * Defaults to {@link Defaults#LUCENE_VERSION}, which may change when Hibernate Search or Lucene is upgraded,
+	 * and therefore is really not a good choice. You really should set this property with your own value.
 	 */
 	public static final String LUCENE_VERSION = "lucene_version";
 
+	// TODO HSEARCH-3440 document this property
 	public static final String DIRECTORY_PROVIDER = "directory_provider";
 
+	// TODO HSEARCH-3440 document this property
 	public static final String ROOT_DIRECTORY = "root_directory";
 
+	/**
+	 * The multi-tenancy strategy to use.
+	 * <p>
+	 * Expects a {@link MultiTenancyStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#MULTI_TENANCY_STRATEGY}.
+	 */
 	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy_strategy";
 
+	/**
+	 * The analysis configurer to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link LuceneAnalysisConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
 	public static final String ANALYSIS_CONFIGURER = "analysis_configurer";
 
 	/**
@@ -43,12 +75,6 @@ public final class LuceneBackendSettings {
 		private Defaults() {
 		}
 
-		/**
-		 * If nothing else is specified we use {@code Version.LATEST} as the default Lucene version. This version
-		 * parameter was introduced by Lucene to attempt providing backwards compatibility when upgrading Lucene versions
-		 * and not wanting to rebuild the index from scratch. It's highly recommended to specify a version, so that you
-		 * can upgrade Hibernate Search and control when to eventually upgrade the Lucene format.
-		 */
 		public static final Version LUCENE_VERSION = Version.LATEST;
 
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;

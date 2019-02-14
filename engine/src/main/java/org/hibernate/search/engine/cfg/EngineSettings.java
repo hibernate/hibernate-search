@@ -16,6 +16,10 @@ public final class EngineSettings {
 
 	/**
 	 * The name of the default backend to use when none is defined in the index configuration.
+	 * <p>
+	 * Expects a String.
+	 * <p>
+	 * Defaults to no value, meaning a backend must be {@link IndexSettings#BACKEND set for every single index}.
 	 */
 	public static final String DEFAULT_BACKEND = "default_backend";
 

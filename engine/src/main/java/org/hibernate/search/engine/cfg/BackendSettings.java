@@ -8,6 +8,10 @@ package org.hibernate.search.engine.cfg;
 
 /**
  * Configuration properties common to all Hibernate Search backends regardless of the underlying technology.
+ * <p>
+ * Constants in this class are to be appended to a prefix to form a property key.
+ * The exact prefix will depend on the integration, but should generally look like
+ * "{@code hibernate.search.backends.<backend name>.}".
  */
 public final class BackendSettings {
 
@@ -17,8 +21,10 @@ public final class BackendSettings {
 	/**
 	 * The type of the backend.
 	 * <p>
-	 * Should generally be provided as a String, such as "lucene" or "elasticsearch".
+	 * Expects a String, such as "lucene" or "elasticsearch".
 	 * See the documentation of your backend to find the appropriate value.
+	 * <p>
+	 * No default: this property must be set.
 	 */
 	public static final String TYPE = "type";
 

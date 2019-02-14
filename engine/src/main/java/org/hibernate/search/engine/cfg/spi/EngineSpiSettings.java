@@ -20,6 +20,16 @@ public class EngineSpiSettings {
 	private EngineSpiSettings() {
 	}
 
+	/**
+	 * The {@link BeanConfigurer} instances used to programmatically assign names to beans.
+	 * <p>
+	 * Expects a multi-valued reference to a bean of type {@link BeanConfigurer}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
+	 */
 	public static final String BEAN_CONFIGURERS = "bean_configurers";
 
 	/**
