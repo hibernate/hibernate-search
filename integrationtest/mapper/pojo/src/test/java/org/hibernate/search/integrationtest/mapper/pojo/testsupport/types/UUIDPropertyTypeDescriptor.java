@@ -57,15 +57,15 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<UUID, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<UUID, UUID>() {
+		return Optional.of( new DefaultValueBridgeExpectations<UUID, String>() {
 			@Override
 			public Class<UUID> getProjectionType() {
 				return UUID.class;
 			}
 
 			@Override
-			public Class<UUID> getIndexFieldJavaType() {
-				return UUID.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
@@ -74,8 +74,8 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 			}
 
 			@Override
-			public List<UUID> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<String> getDocumentFieldValues() {
+				return getStrings();
 			}
 
 			@Override
@@ -157,7 +157,8 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 				new UUID( Long.MIN_VALUE, 0L ),
 				new UUID( Long.MIN_VALUE, 1L ),
 				new UUID( Long.MAX_VALUE, Long.MIN_VALUE ),
-				new UUID( Long.MAX_VALUE, Long.MAX_VALUE )
+				new UUID( Long.MAX_VALUE, Long.MAX_VALUE ),
+				UUID.fromString( "8cea97f9-9696-4299-9f05-636a208b6c1f" )
 		);
 	}
 
@@ -168,7 +169,8 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 				"80000000-0000-0000-0000-000000000000",
 				"80000000-0000-0000-0000-000000000001",
 				"7fffffff-ffff-ffff-8000-000000000000",
-				"7fffffff-ffff-ffff-7fff-ffffffffffff"
+				"7fffffff-ffff-ffff-7fff-ffffffffffff",
+				"8cea97f9-9696-4299-9f05-636a208b6c1f"
 		);
 	}
 }
