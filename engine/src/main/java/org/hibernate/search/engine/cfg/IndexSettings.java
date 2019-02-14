@@ -8,6 +8,11 @@ package org.hibernate.search.engine.cfg;
 
 /**
  * Configuration properties common to all Hibernate Search indexes regardless of the underlying technology.
+ * <p>
+ * Constants in this class are to be appended to a prefix to form a property key.
+ * The exact prefix will depend on the integration, but should generally look like
+ * either "{@code hibernate.search.indexes.<index name>.}" (for per-index settings)
+ * or "{@code hibernate.search.backends.<backend name>.index_defaults.}" (for default index settings).
  */
 public final class IndexSettings {
 
@@ -16,6 +21,10 @@ public final class IndexSettings {
 
 	/**
 	 * The name of the backend to create the index in.
+	 * <p>
+	 * Expects a String.
+	 * <p>
+	 * Defaults to the name of the {@link EngineSettings#DEFAULT_BACKEND default backend}.
 	 */
 	public static final String BACKEND = "backend";
 

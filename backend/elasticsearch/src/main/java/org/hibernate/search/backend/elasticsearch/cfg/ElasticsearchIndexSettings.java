@@ -8,16 +8,41 @@ package org.hibernate.search.backend.elasticsearch.cfg;
 
 /**
  * Configuration properties for Elasticsearch indexes.
+ * <p>
+ * Constants in this class are to be appended to a prefix to form a property key;
+ * see {@link org.hibernate.search.engine.cfg.IndexSettings} for details.
  */
 public final class ElasticsearchIndexSettings {
 
 	private ElasticsearchIndexSettings() {
 	}
 
+	/**
+	 * The index lifecycle strategy to use, i.e. how to automatically administrate the index on startup/shutdown.
+	 * <p>
+	 * Expects an {@link ElasticsearchIndexLifecycleStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#LIFECYCLE_STRATEGY}.
+	 */
 	public static final String LIFECYCLE_STRATEGY = "lifecycle.strategy";
 
+	/**
+	 * The minimal required status of the index on startup, before Hibernate Search can start using it.
+	 * <p>
+	 * Expects an {@link ElasticsearchIndexStatus} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#LIFECYCLE_REQUIRED_STATUS}.
+	 */
 	public static final String LIFECYCLE_REQUIRED_STATUS = "lifecycle.required_status";
 
+	/**
+	 * The timeout when waiting for the {@link #LIFECYCLE_REQUIRED_STATUS required status}.
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT}.
+	 */
 	public static final String LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.required_status_wait_timeout";
 
 	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";
