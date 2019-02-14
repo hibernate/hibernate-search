@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
@@ -17,6 +18,8 @@ import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
 public final class LuceneInstantFieldCodec implements LuceneNumericFieldCodec<Instant, Long> {
+
+	static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
 
 	private final boolean projectable;
 
@@ -33,17 +36,17 @@ public final class LuceneInstantFieldCodec implements LuceneNumericFieldCodec<In
 			return;
 		}
 
-		long time = encode( value );
-
 		if ( projectable ) {
-			documentBuilder.addField( new StoredField( absoluteFieldPath, time ) );
+			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 		}
+
+		long valueToEpochDay = encode( value );
 
 		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, time ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
 		}
 
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, time ) );
+		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );
 	}
 
 	@Override
@@ -54,8 +57,13 @@ public final class LuceneInstantFieldCodec implements LuceneNumericFieldCodec<In
 			return null;
 		}
 
-		Long time = (Long) field.numericValue();
-		return Instant.ofEpochMilli( time );
+		String value = field.stringValue();
+
+		if ( value == null ) {
+			return null;
+		}
+
+		return FORMATTER.parse( value, Instant::from );
 	}
 
 	@Override
@@ -69,8 +77,7 @@ public final class LuceneInstantFieldCodec implements LuceneNumericFieldCodec<In
 
 		LuceneInstantFieldCodec other = (LuceneInstantFieldCodec) obj;
 
-		return ( projectable == other.projectable ) &&
-				( sortable == other.sortable );
+		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
