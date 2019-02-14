@@ -188,7 +188,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withouths
 To make these entities searchable, you will need to map them to an index structure.
 The mapping can be defined using annotations, or using a programmatic API;
 this getting started guide will show you a simple annotation mapping.
-For more details, refer to <<mapper-pojo>>.
+For more details, refer to <<mapper-orm>>.
 
 Below is an example of how the model above can be mapped.
 
@@ -214,7 +214,7 @@ Thus adding `@IndexedEmbedded` to the `authors` property of `Book`
 will add a single `authors.name` field to the `Book` index.
 This field will be populated automatically based on the content of the `authors` property,
 and the books will be reindexed automatically whenever the `name` property of their author changes.
-See <<mapper-pojo-indexedembedded>> for more information.
+See <<mapper-orm-indexedembedded>> for more information.
 <5> Entities that are only `@IndexedEmbedded` in other entities,
 but do not require to be searchable by themselves, do not need to be annotated with `@Indexed`.
 ====
@@ -224,9 +224,9 @@ Just remember that Hibernate Search allows more complex mappings:
 
 * Other `@*Field` annotations exist, some of them allowing full-text search,
 some of them allowing finer-grained configuration for field of a certain type.
-You can find out more about `@*Field` annotations in <<mapper-pojo-directfieldmapping>>.
+You can find out more about `@*Field` annotations in <<mapper-orm-directfieldmapping>>.
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
-See <<mapper-pojo-bridge>> for more information.
+See <<mapper-orm-bridge>> for more information.
 
 [[getting-started-indexing]]
 == Indexing
@@ -449,7 +449,7 @@ with the overall architecture of Hibernate Search (<<architecture>>)
 and explore the basic features in more detail.
 
 Two topics which were only briefly touched in this tutorial
-were analysis configuration (<<analysis>>) and bridges (<<mapper-pojo-bridge>>).
+were analysis configuration (<<analysis>>) and bridges (<<mapper-orm-bridge>>).
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include
