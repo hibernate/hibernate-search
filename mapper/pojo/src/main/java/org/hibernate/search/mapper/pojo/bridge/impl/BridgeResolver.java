@@ -48,6 +48,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateV
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -98,7 +99,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Double.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Double.class ) ) );
 		addValueBridgeForExactRawType( BigDecimal.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigDecimal.class ) ) );
 		addValueBridgeForExactRawType( BigInteger.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( BigInteger.class ) ) );
-		addValueBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( UUID.class ) ) );
+		addValueBridgeForExactRawType( UUID.class, ignored -> BeanHolder.of( new DefaultUUIDValueBridge() ) );
 		addValueBridgeForExactRawType( LocalDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalDateTime.class ) ) );
 		addValueBridgeForExactRawType( LocalTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( LocalTime.class ) ) );
 		addValueBridgeForExactRawType( ZonedDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZonedDateTime.class ) ) );
