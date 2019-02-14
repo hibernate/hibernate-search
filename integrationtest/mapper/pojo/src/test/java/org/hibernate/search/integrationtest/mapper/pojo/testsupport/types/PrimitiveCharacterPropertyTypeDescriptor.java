@@ -29,15 +29,15 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<Character, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Character, Character>() {
+		return Optional.of( new DefaultValueBridgeExpectations<Character, String>() {
 			@Override
 			public Class<Character> getProjectionType() {
 				return Character.class;
 			}
 
 			@Override
-			public Class<Character> getIndexFieldJavaType() {
-				return Character.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
@@ -51,8 +51,8 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 			}
 
 			@Override
-			public List<Character> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<String> getDocumentFieldValues() {
+				return Arrays.asList( Character.toString( Character.MIN_VALUE ), "7", "A", "a", "f", Character.toString( Character.MAX_VALUE ) );
 			}
 
 			@Override
