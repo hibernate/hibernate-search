@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -17,7 +17,7 @@ import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearMonthFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -25,35 +25,31 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
-class ElasticsearchLocalDateIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLocalDateIndexFieldTypeContext, LocalDate> {
+class ElasticsearchYearMonthIndexFieldTypeContext
+		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchYearMonthIndexFieldTypeContext, YearMonth> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchYearMonthIndexFieldTypeContext.FORMATTER )
+			.append( ElasticsearchYearIndexFieldTypeContext.FORMATTER )
 			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
+			.appendValue( MONTH_OF_YEAR, 2 )
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec( FORMATTER );
+	private static final ElasticsearchYearMonthFieldCodec DEFAULT_CODEC = new ElasticsearchYearMonthFieldCodec( FORMATTER );
 
-	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchYearMonthFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, LocalDate.class, DataType.DATE );
+	ElasticsearchYearMonthIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, YearMonth.class, DataType.DATE );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<LocalDate> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
+	protected ElasticsearchIndexFieldType<YearMonth> toIndexFieldType(PropertyMapping mapping) {
+		mapping.setFormat( Arrays.asList( "strict_year_month", "yyyyyyyyy-MM" ) );
 
-		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
+		ToDocumentFieldValueConverter<?, ? extends YearMonth> dslToIndexConverter =
 				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
+		FromDocumentFieldValueConverter<? super YearMonth, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
@@ -66,7 +62,7 @@ class ElasticsearchLocalDateIndexFieldTypeContext
 	}
 
 	@Override
-	protected ElasticsearchLocalDateIndexFieldTypeContext thisAsS() {
+	protected ElasticsearchYearMonthIndexFieldTypeContext thisAsS() {
 		return this;
 	}
 }
