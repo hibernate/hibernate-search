@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.environment.bean.BeanReference;
@@ -27,10 +27,10 @@ import org.hibernate.search.util.impl.common.Contracts;
 public final class ConfiguredBeanProvider implements BeanProvider {
 
 	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
-			ConfigurationProperty.forKey( EngineSettings.BEAN_CONFIGURERS )
+			ConfigurationProperty.forKey( EngineSpiSettings.BEAN_CONFIGURERS )
 					.asBeanReference( BeanConfigurer.class )
 					.multivalued( Pattern.compile( "\\s+" ) )
-					.withDefault( EngineSettings.Defaults.BEAN_CONFIGURERS )
+					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )
 					.build();
 
 	private final BeanResolver beanResolver;

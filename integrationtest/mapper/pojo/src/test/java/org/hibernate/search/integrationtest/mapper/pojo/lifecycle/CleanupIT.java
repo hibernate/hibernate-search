@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
@@ -353,7 +353,7 @@ public class CleanupIT {
 				 * that will return a BeanHolder that increments static counters
 				 * (so that we can check the bean holders are properly closed).
 				 */
-				.withProperty( EngineSettings.BEAN_CONFIGURERS, Arrays.asList(
+				.withProperty( EngineSpiSettings.BEAN_CONFIGURERS, Arrays.asList(
 						new BeanConfigurer() {
 							@Override
 							public void configure(BeanConfigurationContext context) {
