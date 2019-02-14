@@ -67,12 +67,12 @@ public enum ElasticsearchIndexLifecycleStrategyName {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static ElasticsearchIndexLifecycleStrategyName parse(CharSequence charSequence) {
+	public static ElasticsearchIndexLifecycleStrategyName of(String value) {
 		return StringHelper.parseDiscreteValues(
 				ElasticsearchIndexLifecycleStrategyName.values(),
 				ElasticsearchIndexLifecycleStrategyName::getExternalRepresentation,
 				log::invalidIndexLifecycleStrategyName,
-				charSequence
+				value
 		);
 	}
 

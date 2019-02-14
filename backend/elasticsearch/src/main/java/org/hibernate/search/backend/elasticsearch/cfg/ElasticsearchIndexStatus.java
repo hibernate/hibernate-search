@@ -21,12 +21,12 @@ public enum ElasticsearchIndexStatus {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// This method conforms to the MicroProfile Config specification. Do not change its signature.
-	public static ElasticsearchIndexStatus parse(CharSequence charSequence) {
+	public static ElasticsearchIndexStatus of(String value) {
 		return StringHelper.parseDiscreteValues(
 				ElasticsearchIndexStatus.values(),
 				ElasticsearchIndexStatus::getElasticsearchString,
 				log::invalidIndexStatus,
-				charSequence
+				value
 		);
 	}
 

@@ -111,17 +111,17 @@ public final class StringHelper {
 
 	public static <T> T parseDiscreteValues(T[] allowedValues, Function<T, String> stringRepresentationFunction,
 			BiFunction<String, List<String>, RuntimeException> invalidValueFunction,
-			CharSequence charSequence) {
-		final String normalizedCharSequence = charSequence.toString().trim().toLowerCase( Locale.ROOT );
+			String value) {
+		final String normalizedValue = value.trim().toLowerCase( Locale.ROOT );
 
-		for ( T value : allowedValues ) {
-			if ( stringRepresentationFunction.apply( value ).equals( normalizedCharSequence ) ) {
-				return value;
+		for ( T candidate : allowedValues ) {
+			if ( stringRepresentationFunction.apply( candidate ).equals( normalizedValue ) ) {
+				return candidate;
 			}
 		}
 
 		throw invalidValueFunction.apply(
-				normalizedCharSequence,
+				normalizedValue,
 				Arrays.stream( allowedValues )
 						.map( stringRepresentationFunction )
 						.collect( Collectors.toList() )
