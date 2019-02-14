@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Year;
+import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -92,6 +93,9 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		}
 		else if ( Year.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asYear();
+		}
+		else if ( YearMonth.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asYearMonth();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
@@ -178,6 +182,11 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Year> asYear() {
 		return new LuceneYearIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
+		return new LuceneYearMonthIndexFieldTypeContext( this );
 	}
 
 	@Override

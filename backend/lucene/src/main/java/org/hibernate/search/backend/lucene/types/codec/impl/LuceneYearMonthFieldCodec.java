@@ -6,27 +6,31 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.YEAR;
 
-import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
+import java.time.format.SignStyle;
+import java.time.temporal.ChronoField;
 import java.util.Locale;
+
+import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
-import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
-public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<LocalDate, Long> {
+public final class LuceneYearMonthFieldCodec implements LuceneNumericFieldCodec<YearMonth, Long> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( LuceneYearMonthFieldCodec.FORMATTER )
+			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
 			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
+			.appendValue( MONTH_OF_YEAR, 2 )
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
@@ -34,13 +38,13 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 
 	private final boolean sortable;
 
-	public LuceneLocalDateFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneYearMonthFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, LocalDate value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, YearMonth value) {
 		if ( value == null ) {
 			return;
 		}
@@ -49,17 +53,17 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 			documentBuilder.addField( new StoredField( absoluteFieldPath, FORMATTER.format( value ) ) );
 		}
 
-		long valueToEpochDay = encode( value );
+		long numericValue = encode( value );
 
 		if ( sortable ) {
-			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, valueToEpochDay ) );
+			documentBuilder.addField( new NumericDocValuesField( absoluteFieldPath, numericValue ) );
 		}
 
-		documentBuilder.addField( new LongPoint( absoluteFieldPath, valueToEpochDay ) );
+		documentBuilder.addField( new LongPoint( absoluteFieldPath, numericValue ) );
 	}
 
 	@Override
-	public LocalDate decode(Document document, String absoluteFieldPath) {
+	public YearMonth decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -72,7 +76,7 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 			return null;
 		}
 
-		return LocalDate.parse( value, FORMATTER );
+		return YearMonth.parse( value, FORMATTER );
 	}
 
 	@Override
@@ -80,18 +84,18 @@ public final class LuceneLocalDateFieldCodec implements LuceneNumericFieldCodec<
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneLocalDateFieldCodec.class != obj.getClass() ) {
+		if ( LuceneYearMonthFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LuceneLocalDateFieldCodec other = (LuceneLocalDateFieldCodec) obj;
+		LuceneYearMonthFieldCodec other = (LuceneYearMonthFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
-	public Long encode(LocalDate value) {
-		return value == null ? null : value.toEpochDay();
+	public Long encode(YearMonth value) {
+		return value == null ? null : value.getLong( ChronoField.PROLEPTIC_MONTH );
 	}
 
 	@Override
