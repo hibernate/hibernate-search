@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -100,9 +99,6 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
 		}
-		else if ( URI.class.equals( inputType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asUri();
-		}
 		else {
 			// TODO implement other types
 			throw log.cannotGuessFieldType( inputType, getEventContext() );
@@ -192,12 +188,6 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint() {
 		return new LuceneGeoPointIndexFieldTypeContext( this );
-	}
-
-	@Override
-	public StandardIndexFieldTypeContext<?, URI> asUri() {
-		// TODO implement this on backend commits within the same HSEARCH-3047 issue
-		return null;
 	}
 
 	@Override

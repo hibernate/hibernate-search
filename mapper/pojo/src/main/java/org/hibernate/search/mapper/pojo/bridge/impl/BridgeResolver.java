@@ -41,6 +41,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIde
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
@@ -110,7 +111,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneId.class ) ) );
 		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Period.class ) ) );
 		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Duration.class ) ) );
-		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( URI.class ) ) );
+		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new DefaultJavaNetURIValueBridge() ) );
 		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
 	}
 

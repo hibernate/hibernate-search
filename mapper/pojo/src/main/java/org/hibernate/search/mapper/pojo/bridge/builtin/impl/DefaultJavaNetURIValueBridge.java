@@ -7,8 +7,8 @@
 package org.hibernate.search.mapper.pojo.bridge.builtin.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, String> {
+public final class DefaultJavaNetURIValueBridge implements ValueBridge<URI, String> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,19 +30,19 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 
 	@Override
 	@SuppressWarnings("unchecked") // The bridge resolver performs the checks using reflection
-	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<URL> context) {
+	public StandardIndexFieldTypeContext<?, String> bind(ValueBridgeBindingContext<URI> context) {
 		return context.getTypeFactory().asString()
-				.projectionConverter( PojoDefaultURLFromDocumentFieldValueConverter.INSTANCE );
+				.projectionConverter( PojoDefaultURIFromDocumentFieldValueConverter.INSTANCE );
 	}
 
 	@Override
-	public String toIndexedValue(URL value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toExternalForm();
+	public String toIndexedValue(URI value, ValueBridgeToIndexedValueContext context) {
+		return value == null ? null : value.toString();
 	}
 
 	@Override
-	public URL cast(Object value) {
-		return (URL) value;
+	public URI cast(Object value) {
+		return (URI) value;
 	}
 
 	@Override
@@ -50,18 +50,18 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 		return getClass().equals( other.getClass() );
 	}
 
-	private static class PojoDefaultURLFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<String, URL> {
-		private static final PojoDefaultURLFromDocumentFieldValueConverter INSTANCE = new PojoDefaultURLFromDocumentFieldValueConverter();
+	private static class PojoDefaultURIFromDocumentFieldValueConverter
+			implements FromDocumentFieldValueConverter<String, URI> {
+		private static final PojoDefaultURIFromDocumentFieldValueConverter INSTANCE = new PojoDefaultURIFromDocumentFieldValueConverter();
 
 		@Override
 		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			return superTypeCandidate.isAssignableFrom( URL.class );
+			return superTypeCandidate.isAssignableFrom( URI.class );
 		}
 
 		@Override
-		public URL convert(String value, FromDocumentFieldValueConvertContext context) {
-			return value == null ? null : toURL( value );
+		public URI convert(String value, FromDocumentFieldValueConvertContext context) {
+			return value == null ? null : toURI( value );
 		}
 
 		@Override
@@ -69,12 +69,12 @@ public final class DefaultJavaNetURLValueBridge implements ValueBridge<URL, Stri
 			return INSTANCE.equals( other );
 		}
 
-		private static URL toURL(String value) {
+		private static URI toURI(String value) {
 			try {
-				return new URL( value );
+				return new URI( value );
 			}
-			catch (MalformedURLException e) {
-				throw log.malformedURL( value, e );
+			catch (URISyntaxException e) {
+				throw log.badURISyntax( value, e );
 			}
 		}
 	}

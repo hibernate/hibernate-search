@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.backend.types.dsl;
 
-import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,8 +57,6 @@ public interface IndexFieldTypeFactoryContext {
 	StandardIndexFieldTypeContext<?, YearMonth> asYearMonth();
 
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
-
-	StandardIndexFieldTypeContext<?, URI> asUri();
 
 	// TODO NumericBridgeProvider
 	// TODO JavaTimeBridgeProvider
