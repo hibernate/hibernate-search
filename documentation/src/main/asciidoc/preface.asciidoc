@@ -1,4 +1,4 @@
 [[preface]]
-== Preface
+= Preface
 
 include::todo-placeholder.asciidoc[]

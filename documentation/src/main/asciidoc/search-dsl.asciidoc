@@ -1,10 +1,10 @@
 [[search-dsl]]
-== Search DSLs
+= Search DSLs
 
 include::todo-placeholder.asciidoc[]
 
 [[search-dsl-predicate]]
-=== Predicate DSL
+== Predicate DSL
 
 include::todo-placeholder.asciidoc[]
 
@@ -13,7 +13,7 @@ TODO Include a detailed description of all available predicates.
 ////
 
 [[search-dsl-sort]]
-=== Sort DSL
+== Sort DSL
 
 include::todo-placeholder.asciidoc[]
 
@@ -23,7 +23,7 @@ include a detailed description of all available sorts.
 ////
 
 [[search-dsl-projection]]
-=== Projection DSL
+== Projection DSL
 
 include::todo-placeholder.asciidoc[]
 

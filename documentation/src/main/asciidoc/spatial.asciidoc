@@ -1,5 +1,5 @@
 [[spatial]]
-== Spatial
+= Spatial
 
 include::todo-placeholder.asciidoc[]
 

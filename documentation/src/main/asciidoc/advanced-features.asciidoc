@@ -1,5 +1,5 @@
 [[advanced-features]]
-== [[search-lucene-native]]Advanced features
+= [[search-lucene-native]]Advanced features
 // Search 5 anchors backward compatibility
 [[search-lucene-native]]
 

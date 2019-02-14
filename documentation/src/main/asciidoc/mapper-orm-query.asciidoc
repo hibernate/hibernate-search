@@ -1,12 +1,12 @@
 [[mapper-orm-query]]
-== Search query
+= Search query
 // Search 5 anchors backward compatibility
 [[search-query]]
 
 include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-query-concept]]
-=== Concept
+== Concept
 
 include::todo-placeholder.asciidoc[]
 
@@ -18,7 +18,7 @@ Also point to the various other sections (sort, projection, ...) where relevant.
 ////
 
 [[mapper-orm-query-sort]]
-=== Sort
+== Sort
 // Search 5 anchors backward compatibility
 [[query-sorting]]
 
@@ -60,7 +60,7 @@ To learn more about the field sort, and all the other types of sort,
 refer to <<search-dsl-sort>>.
 
 [[mapper-orm-query-projection]]
-=== Projection
+== Projection
 // Search 5 anchors backward compatibility
 [[projections]]
 

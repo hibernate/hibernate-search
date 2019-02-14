@@ -1,4 +1,4 @@
 [[backend-lucene]]
-== Lucene backend
+= Lucene backend
 
 include::todo-placeholder.asciidoc[]

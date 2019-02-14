@@ -1,5 +1,5 @@
 [[getting-started]]
-== Getting started
+= Getting started
 
 This section will guide you through the initial steps required
 to integrate Hibernate Search into your application.
@@ -16,7 +16,7 @@ for more detailed and up-to-date information.
 ====
 
 [[getting-started-compatibility]]
-=== Compatibility
+== Compatibility
 
 .Compatibility
 
@@ -31,7 +31,7 @@ for more detailed and up-to-date information.
 |===============
 
 [[getting-started-migrating]]
-=== Migration notes
+== Migration notes
 
 If you are upgrading an existing application from an earlier version of Hibernate Search to the latest release,
 make sure to check out the http://hibernate.org/search/documentation/migrate/[migration guide].
@@ -54,7 +54,7 @@ others because of more fundamental changes
 ====
 
 [[gettingstarted-dependencies]]
-=== Dependencies
+== Dependencies
 
 The Hibernate Search artifacts can be found in Maven's http://central.sonatype.org/[Central Repository].
 
@@ -118,7 +118,7 @@ copy the JARs from `dist/engine`, `dist/mapper/orm`, `dist/backend/elasticsearch
 and their respective `lib` subdirectories.
 
 [[getting-started-configuration]]
-=== Configuration
+== Configuration
 
 Once you have added all required dependencies to your application you have to add a couple of
 properties to your Hibernate ORM configuration file.
@@ -168,7 +168,7 @@ and optionally the username and password.
 ====
 
 [[getting-started-mapping]]
-=== Mapping
+== Mapping
 
 Let's assume that your application contains the Hibernate ORM managed classes `Book` and `Author`
 and you want to index them in order to search the books contained in your database.
@@ -229,7 +229,7 @@ You can find out more about `@*Field` annotations in <<mapper-pojo-directfieldma
 See <<mapper-pojo-bridge>> for more information.
 
 [[getting-started-indexing]]
-=== Indexing
+== Indexing
 
 Hibernate Search will transparently index every entity persisted,
 updated or removed through Hibernate ORM.
@@ -272,7 +272,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ====
 
 [[getting-started-searching]]
-=== Searching
+== Searching
 
 Once the data is indexed, you can perform search queries.
 
@@ -320,13 +320,13 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ====
 
 [[getting-started-analysis]]
-=== Analysis
+== Analysis
 
 Exact matches are well and good, but obviously not what you would expect from a full-text search engine.
 
 For non-exact matches, you will need to configure *analysis*.
 
-==== Concept
+=== Concept
 
 In the Lucene world (Lucene, Elasticsearch, Solr, ...),
 non-exact matches can be achieved by applying what is called an "analyzer"
@@ -346,7 +346,7 @@ or define your own by combining character filters, a tokenizer, and token filter
 The following section will give a reasonable example of a general-purpose analyzer.
 For more advanced use cases, refer to the <<analysis>> section.
 
-==== Configuration
+=== Configuration
 
 Once you know what analysis is and which analyzer you want to apply,
 you will need to define it, or at least give it a name in Hibernate Search.
@@ -441,7 +441,7 @@ include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsear
 ----
 ====
 
-=== What's next
+== What's next
 
 The above paragraphs helped you getting an overview of Hibernate Search.
 The next step after this tutorial is to get more familiar

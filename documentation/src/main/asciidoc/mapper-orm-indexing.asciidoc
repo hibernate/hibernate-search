@@ -1,13 +1,13 @@
 [[mapper-orm-indexing]]
-== Indexing
+= Indexing
 
 [[mapper-orm-indexing-automatic]]
-=== Automatic indexing
+== Automatic indexing
 
 include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-indexing-automatic-synchronization]]
-==== Synchronization with the index
+=== Synchronization with the index
 
 include::todo-placeholder.asciidoc[]
 
@@ -21,7 +21,7 @@ include::todo-placeholder.asciidoc[]
 // Link to ES doc explaining near-real-time: https://www.elastic.co/guide/en/elasticsearch/reference/current/getting-started-concepts.html#_near_realtime_nrt
 
 [[mapper-orm-indexing-explicit]]
-=== Explicit indexing
+== Explicit indexing
 // Search 5 anchors backward compatibility
 [[manual-index-changes]]
 
