@@ -1,0 +1,34 @@
+= Concepts
+
+[[concepts-full-text]]
+== Full-text search
+
+// TODO maybe give a short introduction to full-text search and full-text indexes?
+
+[[concepts-mapping]]
+== Mapping
+
+// TODO maybe explain what we mean by "mapping"?
+
+[[concepts-analysis]]
+== Analysis
+// Search 5 anchors backward compatibility
+[[analyzer]]
+
+[IMPORTANT]
+====
+This section is currently incomplete.
+A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+====
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed explanation of analysis, how it works and how to configure it in HSearch.
+We also need to explain the difference between analyzer and normalizer.
+////
+
+For more information about how to configure analysis,
+see the documentation of each backend:
+
+* <<backend-lucene-analysis,Analysis for the Lucene backend>>
+* <<backend-elasticsearch-analysis,Analysis for the Elasticsearch backend>>
