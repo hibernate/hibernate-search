@@ -1,5 +1,5 @@
 [[analysis]]
-== Analysis
+= Analysis
 // Search 5 anchors backward compatibility
 [[analyzer]]
 

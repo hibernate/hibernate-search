@@ -1,5 +1,5 @@
 [[backend-elasticsearch]]
-== Elasticsearch backend
+= Elasticsearch backend
 // Search 5 anchors backward compatibility
 [[elasticsearch-integration]]
 

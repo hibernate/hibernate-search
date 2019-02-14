@@ -1,5 +1,5 @@
 [[monitoring]]
-== Monitoring
+= Monitoring
 // Search 5 anchors backward compatibility
 [[search-monitoring]]
 

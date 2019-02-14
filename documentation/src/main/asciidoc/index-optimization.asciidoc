@@ -1,5 +1,5 @@
 [[index-optimization]]
-== Index Optimization
+= Index Optimization
 // Search 5 anchors backward compatibility
 [[search-optimize]]
 

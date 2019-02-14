@@ -1,5 +1,5 @@
 [[mapper-pojo]]
-== Mapping Java entities to the index structure
+= Mapping Java entities to the index structure
 // Search 5 anchors backward compatibility
 [[search-mapping]]
 
@@ -13,7 +13,7 @@ include a description of how to:
 ////
 
 [[mapper-pojo-directfieldmapping]]
-=== Direct field mapping
+== Direct field mapping
 
 include::todo-placeholder.asciidoc[]
 
@@ -88,7 +88,7 @@ i.e. whether the field value is stored in the index to allow later retrieval whe
 Value: `Projectable.YES`, `Projectable.NO`, `Projectable.DEFAULT`.
 
 [[mapper-pojo-directfieldmapping-annotations]]
-==== Available field annotations
+=== Available field annotations
 
 Various direct field mapping annotations exist,
 each offering its own set of customization options:
@@ -131,7 +131,7 @@ Keyword fields may be assigned a `normalizer`, referenced by its name.
 See <<analysis>> for more details about normalizers and full-text analysis.
 
 [[mapper-pojo-directfieldmapping-custom-types]]
-==== Mapping custom property types
+=== Mapping custom property types
 
 Even types that are not <<mapper-pojo-bridge-valuebridge-builtin,supported out of the box>> can be mapped.
 There are various solutions, some simple and some more powerful,
@@ -158,7 +158,7 @@ See <<mapper-pojo-containerextractor>> for more information on available extract
 See <<mapper-pojo-bridge>> for more information on custom bridges.
 
 [[mapper-pojo-bridge]]
-=== Bridges
+== Bridges
 // Search 5 anchors backward compatibility
 [[search-mapping-bridge]]
 
@@ -204,12 +204,12 @@ The corresponding annotation is `org.hibernate.search.integrationtest.showcase.l
 * `org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge` implements `TypeBridge`.
 The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBridge`.
 
-=== Value bridges
+== Value bridges
 
 include::todo-placeholder.asciidoc[]
 
 [[mapper-pojo-bridge-valuebridge-builtin]]
-==== Built-in value bridges
+=== Built-in value bridges
 
 IMPORTANT: There are few supported types at the moment.
 This will be solved before the 6.0.0.Final release, see https://hibernate.atlassian.net/browse/HSEARCH-3047[HSEARCH-3047].
@@ -226,12 +226,12 @@ meaning they are supported out-of-the box for <<mapper-pojo-directfieldmapping,d
 * `java.util.Date`
 * All enum types
 
-==== Type bridges and property bridges
+=== Type bridges and property bridges
 
 include::todo-placeholder.asciidoc[]
 
 [[mapper-pojo-indexedembedded]]
-=== Indexed-embedded
+== Indexed-embedded
 // Search 5 anchors backward compatibility
 [[search-mapping-associated]]
 
@@ -243,7 +243,7 @@ include a detailed description of @IndexedEmbedded
 ////
 
 [[mapper-pojo-containerextractor]]
-=== Container value extractors
+== Container value extractors
 
 include::todo-placeholder.asciidoc[]
 

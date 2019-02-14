@@ -1,5 +1,5 @@
 [[configuration]]
-== Configuration
+= Configuration
 // Search 5 anchors backward compatibility
 [[search-configuration]]
 

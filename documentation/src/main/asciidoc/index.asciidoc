@@ -8,6 +8,8 @@
 :docinfo:
 :title-logo-image: image:hibernate_logo_a.png[align=left,pdfwidth=33%]
 
+:leveloffset: +1
+
 include::preface.asciidoc[]
 
 :numbered:
@@ -45,3 +47,5 @@ include::internals.asciidoc[]
 include::further-reading.asciidoc[]
 
 include::credits.asciidoc[]
+
+:leveloffset: -1
