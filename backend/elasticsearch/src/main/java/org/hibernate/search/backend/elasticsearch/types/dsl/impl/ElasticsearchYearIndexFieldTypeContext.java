@@ -6,19 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.YEAR;
 
-import java.time.LocalDate;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
+import java.time.format.SignStyle;
 import java.util.Arrays;
 import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -26,37 +26,29 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-/**
- * @author Yoann Rodiere
- * @author Guillaume Smet
- */
-class ElasticsearchLocalDateIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLocalDateIndexFieldTypeContext, LocalDate> {
+class ElasticsearchYearIndexFieldTypeContext
+		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchYearIndexFieldTypeContext, Year> {
 
 	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchYearIndexFieldTypeContext.FORMATTER )
-			.appendLiteral( '-' )
-			.appendValue( MONTH_OF_YEAR, 2 )
-			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
+			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
-	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec( FORMATTER );
+	private static final ElasticsearchYearFieldCodec DEFAULT_CODEC = new ElasticsearchYearFieldCodec( FORMATTER );
 
-	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchYearFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
 
-	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, LocalDate.class, DataType.DATE );
+	ElasticsearchYearIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, Year.class, DataType.DATE );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<LocalDate> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
+	protected ElasticsearchIndexFieldType<Year> toIndexFieldType(PropertyMapping mapping) {
+		mapping.setFormat( Arrays.asList( "strict_year", "yyyyyyyyy" ) );
 
-		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
+		ToDocumentFieldValueConverter<?, ? extends Year> dslToIndexConverter =
 				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super LocalDate, ?> indexToProjectionConverter =
+		FromDocumentFieldValueConverter<? super Year, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
@@ -69,7 +61,7 @@ class ElasticsearchLocalDateIndexFieldTypeContext
 	}
 
 	@Override
-	protected ElasticsearchLocalDateIndexFieldTypeContext thisAsS() {
+	protected ElasticsearchYearIndexFieldTypeContext thisAsS() {
 		return this;
 	}
 }

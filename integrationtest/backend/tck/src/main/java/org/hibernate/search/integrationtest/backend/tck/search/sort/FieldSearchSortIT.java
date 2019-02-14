@@ -12,8 +12,10 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Year;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -121,10 +123,7 @@ public class FieldSearchSortIT {
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDateTime.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalTime.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !ZonedDateTime.class.equals( fieldModel.type ) )
+					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue().use( fieldModel.before1Value ) );
 				assertThat( query )
@@ -151,10 +150,7 @@ public class FieldSearchSortIT {
 			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
 			if (
 					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDate.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalDateTime.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !LocalTime.class.equals( fieldModel.type ) )
-					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !ZonedDateTime.class.equals( fieldModel.type ) )
+					&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
 						.use( new ValueWrapper<>( fieldModel.before1Value ) ) );
@@ -347,6 +343,11 @@ public class FieldSearchSortIT {
 						) );
 			}
 		}
+	}
+
+	private boolean isJavaTimeType(Class<?> type) {
+		final Class<?>[] javaTimeTypes = { LocalDate.class, LocalDateTime.class, LocalTime.class, ZonedDateTime.class, Year.class };
+		return Arrays.asList( javaTimeTypes ).contains( type );
 	}
 
 	private void initData() {

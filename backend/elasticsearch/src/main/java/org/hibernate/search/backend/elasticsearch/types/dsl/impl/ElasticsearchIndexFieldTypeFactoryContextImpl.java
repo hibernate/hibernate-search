@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Year;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -86,6 +87,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		}
 		else if ( ZonedDateTime.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asZonedDateTime();
+		}
+		else if ( Year.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asYear();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
@@ -167,6 +171,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
 		return new ElasticsearchZonedDateTimeIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Year> asYear() {
+		return new ElasticsearchYearIndexFieldTypeContext( this );
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Year;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -50,6 +51,8 @@ public interface IndexFieldTypeFactoryContext {
 	StandardIndexFieldTypeContext<?, Instant> asInstant();
 
 	StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime();
+
+	StandardIndexFieldTypeContext<?, Year> asYear();
 
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
