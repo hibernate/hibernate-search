@@ -60,9 +60,6 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 		else if ( Boolean.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBoolean();
 		}
-		else if ( Character.class.equals( inputType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asCharacter();
-		}
 		else if ( Byte.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asByte();
 		}
@@ -123,11 +120,6 @@ public class LuceneIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
 		return new LuceneBooleanIndexFieldTypeContext( this );
-	}
-
-	@Override
-	public StandardIndexFieldTypeContext<?, Character> asCharacter() {
-		return new LuceneCharacterIndexFieldTypeContext( this );
 	}
 
 	@Override

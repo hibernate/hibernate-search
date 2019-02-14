@@ -58,9 +58,6 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		else if ( Boolean.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asBoolean();
 		}
-		else if ( Character.class.equals( inputType ) ) {
-			return (StandardIndexFieldTypeContext<?, F>) asCharacter();
-		}
 		else if ( Byte.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asByte();
 		}
@@ -121,11 +118,6 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, Boolean> asBoolean() {
 		return new ElasticsearchBooleanIndexFieldTypeContext( this );
-	}
-
-	@Override
-	public StandardIndexFieldTypeContext<?, Character> asCharacter() {
-		return new ElasticsearchCharacterIndexFieldTypeContext( this );
 	}
 
 	@Override
