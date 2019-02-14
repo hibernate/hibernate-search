@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.Year;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -99,6 +100,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, ZonedDateTime> asZonedDateTime() {
 		return as( ZonedDateTime.class );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, Year> asYear() {
+		return as( Year.class );
 	}
 
 	@Override
