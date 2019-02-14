@@ -38,6 +38,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -92,7 +93,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Date.class, ignored -> BeanHolder.of( new DefaultJavaUtilDateValueBridge() ) );
 		addValueBridgeForExactRawType( Calendar.class, ignored -> BeanHolder.of( new DefaultJavaUtilCalendarValueBridge() ) );
 		addValueBridgeForTypePattern( concreteEnumPattern, ignored -> BeanHolder.of( new DefaultEnumValueBridge<>() ) );
-		addValueBridgeForExactRawType( Character.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Character.class ) ) );
+		addValueBridgeForExactRawType( Character.class, ignored -> BeanHolder.of( new DefaultCharacterValueBridge() ) );
 		addValueBridgeForExactRawType( Byte.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Byte.class ) ) );
 		addValueBridgeForExactRawType( Short.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Short.class ) ) );
 		addValueBridgeForExactRawType( Float.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Float.class ) ) );
