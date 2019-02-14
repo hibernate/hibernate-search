@@ -12,6 +12,23 @@ include a description of how to:
  * define a mapping programmatically.
 ////
 
+== Configuration
+
+include::todo-placeholder.asciidoc[]
+
+By default, Hibernate Search will automatically process mapping annotations for entity types,
+as well as nested types in those entity types, for instance embedded types.
+If you want to ignore these annotations, set `hibernate.search.enable_annotation_mapping` to `false`.
+
+To configure the mapping manually, you can set a mapping configurer.
+By setting `hibernate.search.mapping_configurer`
+to a <<configuration-property-types,bean reference>> of type `org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer`,
+you can use a programmatic API to define the mapping.
+
+// TODO add an example
+
+See <<mapper-orm-programmatic-mapping>> for more information about the programmatic mapping API.
+
 [[mapper-orm-directfieldmapping]]
 == Direct field mapping
 
@@ -110,7 +127,7 @@ match fields ignoring diacritics,
 ...
 +
 Full-text fields must be assigned an `analyzer`, referenced by its name.
-See <<analysis>> for more details about analyzers and full-text analysis.
+See <<concepts-analysis>> for more details about analyzers and full-text analysis.
 +
 IMPORTANT: Full-text fields cannot be sorted on.
 If you need to sort on the value of a property,
@@ -128,7 +145,7 @@ with the limitation that keyword fields only contain one token.
 On the other hand, this limitation allows keyword fields to be <<mapper-orm-directfieldmapping-sortable,sorted on>>.
 +
 Keyword fields may be assigned a `normalizer`, referenced by its name.
-See <<analysis>> for more details about normalizers and full-text analysis.
+See <<concepts-analysis>> for more details about normalizers and full-text analysis.
 
 [[mapper-orm-directfieldmapping-spatial-types]]
 === Mapping spatial types
@@ -256,4 +273,15 @@ include::todo-placeholder.asciidoc[]
 
 ////
 TODO Detailed description of container value extractors, list of built-in extractors, instructions to create one's own
+////
+
+[[mapper-orm-programmatic-mapping]]
+== Programmatic mapping
+// Search 5 anchors backward compatibility
+[[hsearch-mapping-programmaticapi]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO Detailed description of the programmatic mapping API.
 ////

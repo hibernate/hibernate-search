@@ -2,3 +2,128 @@
 = Lucene backend
 
 include::todo-placeholder.asciidoc[]
+
+[[backend-lucene-configuration]]
+== General configuration
+
+In order to define a Lucene backend,
+the `hibernate.search.backends.<backend name>.type` property must be set to `lucene`.
+
+All other configuration properties are optional,
+but the defaults might not suit everyone.
+In particular, you might want to set the location of your indexes in the filesystem.
+See below for the details of every configuration property.
+
+[[backend-lucene-configuration-directory-provider]]
+=== Directory provider
+// Search 5 anchors backward compatibility
+[[search-configuration-directory]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO HSEARCH-3440 document this
+
+=== Index format compatibility
+
+While Hibernate Search strives to offer a backwards compatible API,
+making it easy to port your application to newer versions,
+it still delegates to Apache Lucene to handle the index writing and searching.
+This creates a dependency to the Lucene index format.
+The Lucene developers of course attempt to keep a stable index format,
+but sometimes a change in the format can not be avoided.
+In those cases you either have to re-index all your data or use an index upgrade tool.
+Sometimes, Lucene is also able to read the old format so you don't need to take specific actions
+(besides making backup of your index).
+
+While an index format incompatibility is a rare event,
+it can happen more often that Lucene's Analyzer implementations might slightly change its behavior.
+This can lead to some documents not matching anymore, even though they used to.
+
+To avoid this analyzer incompatibility,
+Hibernate Search allows to configure to which version of Lucene
+the analyzers and other Lucene classes should conform their behavior.
+
+This configuration property is set at the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.lucene_version = LUCENE_47
+----
+
+Depending on the specific version of Lucene you're using,
+you might have different options available:
+see `org.apache.lucene.util.Version` contained in `lucene-core.jar`
+for a list of allowed values.
+
+When this option is not set, Hibernate Search will instruct Lucene to use the latest version,
+which is usually the best option for new projects.
+Still, it's recommended to define the version you're using explicitly in the configuration,
+so that when you happen to upgrade, Lucene the analyzers will not change behavior.
+You can then choose to update this value at a later time,
+for example when you have the chance to rebuild the index from scratch.
+
+[NOTE]
+====
+The setting will be applied consistently when using Hibernate Search APIs,
+but if you are also making use of Lucene bypassing Hibernate Search
+(for example when instantiating an Analyzer yourself),
+make sure to use the same value.
+====
+
+=== Other configuration properties
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
+
+[[backend-lucene-analysis]]
+== Analysis
+
+[IMPORTANT]
+====
+This section is currently incomplete.
+A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+====
+
+To configure analysis in a Lucene backend, you will need to:
+
+* Implement a bean that implements the `org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer` interface.
+* Configure your backend to use that bean by setting the configuration property
+`hibernate.search.backends.<backend name>.analysis_configurer`
+to a <<configuration-property-types,bean reference>> pointing to your bean.
+
+// TODO add a simple example: configurer implementation + settings
+
+To know which character filters, tokenizers and token filters are available,
+either browse the Lucene Javadoc or read the corresponding section on the
+link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki].
+
+[NOTE]
+====
+Why the reference to the Apache Solr wiki for Lucene?
+
+The analyzer factory framework was originally created in the Apache Solr project.
+Most of these implementations have been moved to Apache Lucene, but the
+documentation for these additional analyzers can still be found in the Solr Wiki. You might find
+other documentation referring to the "Solr Analyzer Framework"; just remember you don't need to
+depend on Apache Solr anymore: the required classes are part of the core Lucene distribution.
+====
+
+// TODO add detailed description of each use case: normalizer, analyzer, by instance, by factory, ...
+
+[[backend-lucene-multi-tenancy]]
+== Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+However, multi-tenancy must be enabled explicitly.
+To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy_strategy` property:
+
+* to `none` for single-tenancy;
+* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.

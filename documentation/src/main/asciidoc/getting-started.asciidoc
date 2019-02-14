@@ -344,7 +344,7 @@ In order to perform non-exact matches, you will need to either pick a pre-define
 or define your own by combining character filters, a tokenizer, and token filters.
 
 The following section will give a reasonable example of a general-purpose analyzer.
-For more advanced use cases, refer to the <<analysis>> section.
+For more advanced use cases, refer to the <<concepts-analysis>> section.
 
 === Configuration
 
@@ -449,7 +449,7 @@ with the overall architecture of Hibernate Search (<<architecture>>)
 and explore the basic features in more detail.
 
 Two topics which were only briefly touched in this tutorial
-were analysis configuration (<<analysis>>) and bridges (<<mapper-orm-bridge>>).
+were analysis configuration (<<concepts-analysis>>) and bridges (<<mapper-orm-bridge>>).
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include

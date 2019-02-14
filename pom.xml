@@ -165,6 +165,7 @@
         <!-- >>> Common -->
         <version.org.jboss.logging.jboss-logging>3.3.2.Final</version.org.jboss.logging.jboss-logging>
         <version.org.jboss.logging.jboss-logging-tools>2.1.0.Final</version.org.jboss.logging.jboss-logging-tools>
+        <javadoc.org.hibernate.search.url>https://docs.jboss.org/hibernate/search/${parsed-version.org.hibernate.search.majorVersion}.${parsed-version.org.hibernate.search.minorVersion}/api/</javadoc.org.hibernate.search.url>
 
         <!-- >>> Engine -->
         <!-- Nothing beyond common dependencies -->

@@ -5,15 +5,166 @@
 
 include::todo-placeholder.asciidoc[]
 
-////
-NOTE: We will need to re-organize the documentation about configuration.
-Main problems:
+== Configuration sources
 
-* Property keys are specific to the mapper: in ORM they start with hibernate.search.,
-but not in Infinispan. I guess we could just use the ORM keys and live with this.
-* The source used for configuration properties is specific to the mapper
-* In this section we used to document configuration properties that are completely specific to ORM,
-or completely specific to Lucene. Maybe move that to the specific sections for ORM and Lucene?
-* Yet some configuration principles are relevant for every mapper/backend, such as the hibernate.search.indexes.my_index
-hibernate.search.backends.my_backend property structure.
-////
+When using Hibernate Search within Hibernate ORM,
+configuration properties are retrieved from Hibernate ORM.
+
+This means that wherever you set Hibernate ORM properties,
+you can set Hibernate Search properties:
+
+* In a `hibernate.properties` file at the root of your classpath.
+* In `persistence.xml`, if you bootstrap Hibernate ORM with the JPA APIs
+* In JVM system properties (`-DmyProperty=myValue` passed to the `java` command)
+* In the configuration file of your framework,
+for example `application.yaml`/`application.properties` for Spring Boot.
+
+== Structure of configuration properties
+
+Configuration properties are all grouped under a common root.
+In the ORM integration, this root is `hibernate.search`,
+but other integrations (Infinispan, ...) may use a different one.
+This documentation will use `hibernate.search` in all examples.
+
+Under that root, we can distinguish between four categories of properties.
+
+Global properties::
+These properties potentially affect all Hibernate Search.
+They are generally located just under the `hibernate.search` root.
++
+Notable properties:
+
+* `hibernate.search.default_backend`: defines the name of the backend used by default on all indexes.
+
++
+Other global properties are explained in the relevant parts of this documentation:
+
+* <<mapper-orm-configuration,Hibernate ORM integration>>
+
+Backend properties::
+These properties affect a single backend.
+They are grouped under a common root that includes the backend name: `hibernate.search.backends.<backend name>`.
+The backend name is arbitrarily defined by the user: just pick a string, such as `myBackend` or `elasticsearch`,
+and make sure to use it consistently.
++
+Notable properties:
+
+* `hibernate.search.backends.<backend name>.type`: the type of the backend.
+Set this to either `lucene` or `elasticsearch`.
+
++
+Other backend properties are explained in the relevant parts of this documentation:
+
+* <<backend-lucene-configuration,Lucene backend>>
+* <<backend-elasticsearch-configuration,Elasticsearch backend>>
+
+Index properties::
+These properties affect either one or multiple indexes, depending on the root.
++
+With the root `hibernate.search.backends.<backend name>.index_defaults`,
+they set defaults for all indexes of the referenced backend.
++
+With the root `hibernate.search.indexes.<index name>`,
+they set the value for a specific index, overriding the defaults (if any).
+The index name must match the name defined in the mapping.
+For ORM entities, the default index name is the name of the indexed class, without the package:
+`org.mycompany.Book` will have `Book` as its default index name.
+Index names can be customized in the mapping.
+
++
+Notable properties:
+
+* `hibernate.search.indexes.<index name>.backend`: the backend to use for this index.
+Set this to the name of your backend.
+Note that you do not need to set this explicitly for each index,
+you can simply set the global property `hibernate.search.default_backend` (see above).
+
++
+Examples:
+
+* `hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy = validate`
+sets the `lifecycle.strategy` property for all indexes of the backend `myBackend`
+* `hibernate.search.indexes.Product.lifecycle.strategy = none`
+sets the `lifecycle.strategy` property for the `Product` index.
+
++
+Other index properties are explained in the relevant parts of this documentation:
+
+* <<backend-lucene-configuration,Lucene backend>>
+* <<backend-elasticsearch-configuration,Elasticsearch backend>>
+
+[[configuration-property-types]]
+== Type of configuration properties
+
+Property values can be set programmatically as Java objects,
+or through a configuration file as a string that will have to be parsed.
+
+Each configuration property in Hibernate Search has an assigned type,
+and this type defines the accepted values in both cases.
+
+Here are the definitions of all property types.
+
+[cols="h,2*", options="header"]
+|===============
+|Designation|Accepted Java objects|Accepted String format
+|String|`java.lang.String`|Any string
+|Boolean|`java.lang.Boolean`|`true` or `false` (case-insensitive)
+|Integer|`java.lang.Number` (will call .intValue())|Any string that can be parsed by `Integer.parseInt`
+|Long|`java.lang.Number` (will call .longValue())|Any string that can be parsed by `Long.parseLong`
+
+|Bean reference of type T
+|An instance of `T`
+or `org.hibernate.search.engine.environment.bean.BeanReference`
+or a reference by type as a `java.lang.Class`
+(see <<configuration-bean-resolution>>)
+|A reference by name as a `java.lang.String`
+(this can be a fully-qualified class name, see <<configuration-bean-resolution>>)
+
+|Multi-valued bean reference of type T
+|A `java.util.Collection` containing bean references (see above)
+|Whitespace separated string containing bean references (see above)
+|===============
+
+[[configuration-property-tracking]]
+== Configuration property tracking
+
+When using the ORM integration,
+Hibernate Search will track the parts of the provided configuration that are actually used
+and will log a warning if any configuration property is never used,
+because that might indicate a configuration issue.
+
+To disable this warning, set the `hibernate.search.enable_configuration_property_tracking`
+<<configuration-property-types,boolean property>> to `false`.
+
+[[configuration-bean-resolution]]
+== Bean resolution
+
+Hibernate Search allows to plug in references to custom beans in various places:
+configuration properties, mapping annotations, arguments to APIs, ...
+
+Everywhere a custom bean reference is expected, three types of references are accepted:
+
+* A reference by type, as a `java.lang.Class`.
+* A reference by name, as a `java.lang.String`.
+* A reference by type *and* name (through a `BeanReference`, see below).
+
+Bean resolution (i.e. the process of turning this reference into an object instance) happens as follows:
+
+* If a dependency injection framework is integrated into Hibernate ORM,
+the reference is first requested to the DI framework.
+Currently CDI and recent versions of Spring are supported.
+* Otherwise, or if the DI framework cannot find a matching bean definition,
+reflection is used to resolve the bean.
+References by name are turned into a reference by type by interpreting the bean name
+as the fully-qualified class name
+Reference by type are resolved by calling the public, no-argument constructor of the given type.
+References by type *and* name are resolved as a reference by name,
+then the resulting object is checked to be an instance of the given type.
+
+[TIP]
+====
+For experienced users, Hibernate Search also provides the `org.hibernate.search.engine.environment.bean.BeanReference` type,
+which is accepted in configuration properties and APIs.
+This interface allows to plug in custom instantiation and cleanup code.
+See the javadoc of this interface for details.
+====

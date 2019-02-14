@@ -4,3 +4,281 @@
 [[elasticsearch-integration]]
 
 include::todo-placeholder.asciidoc[]
+
+[[backend-elasticsearch-configuration]]
+== General configuration
+// Search 5 anchors backward compatibility
+[[elasticsearch-integration-configuration]]
+
+In order to define an Elasticsearch backend,
+the `hibernate.search.backends.<backend name>.type` property must be set to `elasticsearch`.
+
+All other configuration properties are optional,
+but the defaults might not suit everyone.
+In particular your production Elasticsearch cluster is probably not reachable at `http://localhost:9200`.
+See below for the details of every configuration property.
+
+[[backend-elasticsearch-configuration-client]]
+=== Client properties
+
+Hosts::
+[source]
+----
+hibernate.search.backends.<backend name>.hosts = http://localhost:9200 (default)`
+----
++
+The Elasticsearch host (or hosts) to send indexing requests and search queries to.
+Also defines the scheme (`http` or `https`) and port for each host.
++
+Expects a String representing an URI such as `http://localhost` or `https://es.mycompany.com:4400`,
+or a String containing multiple such URIs separated by whitespace characters,
+or a `Collection<String>` containing such URIs.
+
+HTTP authentication::
++
+[source]
+----
+hibernate.search.backends.<backend name>.username = ironman (default is empty)
+hibernate.search.backends.<backend name>.password = j@rv1s (default is empty)
+----
++
+The username and password to send when connecting to the Elasticsearch servers.
++
+[CAUTION]
+====
+If you use HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
+your password will be transmitted in clear text over the network.
+====
+
+Timeouts::
++
+[source]
+----
+hibernate.search.backends.<backend name>.request_timeout = 60000 (default)
+hibernate.search.backends.<backend name>.connection_timeout = 3000 (default)
+hibernate.search.backends.<backend name>.read_timeout = 60000 (default)
+----
+
+* `request_timeout` defines the timeout when executing a request.
+This includes the time needed to establish a connection,
+send the request and read the response.
+* `connection_timeout` defines the timeout when establishing a connection.
+* `read_timeout` defines the timeout when reading a response.
+
++
+These properties expect a positive <<configuration-property-types,Integer value>> in milliseconds, such as `3000`.
+
+Connections::
++
+[source]
+----
+hibernate.search.backends.<backend name>.max_connections = 20 (default)
+hibernate.search.backends.<backend name>.max_connections_per_route = 10 (default)
+----
+
+* `max_connections` defines maximum number of simultaneous connections
+to the Elasticsearch cluster, all hosts taken together.
+* `max_connections_per_route` defines maximum number of simultaneous connections
+to each host of the Elasticsearch cluster.
+
++
+These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
+
+[[backend-elasticsearch-configuration-discovery]]
+=== Discovery
+
+When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
+and will add those to the host list (see `hosts` in <<backend-elasticsearch-configuration-client>>).
+
+Automatic discovery is controlled by the following properties:
+
+[source]
+----
+hibernate.search.backends.<backend name>.discovery.enabled = false (default)
+hibernate.search.backends.<backend name>.discovery.refresh_interval = 10 (default)
+hibernate.search.backends.<backend name>.discovery.default_scheme = http (default)
+----
+
+* `discovery.enabled` defines whether the feature is enabled.
+Expects a boolean value.
+* `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
+Expects a positive integer, in seconds.
+* `discovery.default_scheme` defines the default scheme to use when connecting to automatically discovered nodes.
+Expects a String: either "http" or "https".
+
+[[backend-elasticsearch-configuration-logging]]
+=== Logging
+// Search 5 anchors backward compatibility
+[[elasticsearch-log-json-pretty-printing]]
+
+The `hibernate.search.backends.<backend name>.log.json_pretty_printing` <<configuration-property-types,boolean property>>
+defines whether JSON included in logs should be pretty-printed (indented, with line breaks).
+It defaults to `false`.
+
+[[backend-elasticsearch-configuration-index-refresh-after-write]]
+=== Refresh after write (per index)
+
+Refresh after write makes sure that writes to an index are executed synchronously and are visible
+as soon as the write returns.
+
+This is useful in unit tests.
+You should not rely on the synchronous behaviour for your production code except in rare cases,
+as Elasticsearch is optimized for asynchronous writes.
+
+This <<configuration-property-types,boolean property>> is set at the index level:
+
+[source]
+----
+hibernate.search.indexes.<index name>.refresh_after_write false (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.refresh_after_write false (default)
+----
+
+=== Other configuration properties
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
+
+=== Configuration of the Elasticsearch cluster
+// Search 5 anchors backward compatibility
+[[elasticsearch-integration-server-configuration]]
+
+include::todo-placeholder.asciidoc[]
+
+[[backend-elasticsearch-index-lifecycle]]
+== Index lifecycle
+// Search 5 anchors backward compatibility
+[[elasticsearch-schema-management-strategy]]
+
+Hibernate Search includes a feature named "index lifecycle management",
+where it will automatically create, validate, update, or drop an index on startup or shutdown.
+`hibernate.search.default.elasticsearch.index_schema_management_strategy CREATE` (default)
+
+The following strategies are available:
+
+[options="header"]
+|====
+|Value|Definition
+|`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
+Hibernate Search will **not even check** that the index already exists.
+|`validate`|The index, its existing mappings and analyzer definitions will be checked to be compatible with the mapping defined in your application.
+The index, its mappings and analyzer definitions will not be created, deleted nor altered.
+|`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
+Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
+|`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
+|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions to match the mapping defined in your application.
+This will delete all content from the indexes! Useful during development.
+|`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
+|====
+
+[NOTE]
+====
+Mapping validation is as permissive as possible.
+Fields or mappings that are unknown to Hibernate Search will be ignored,
+and settings that are more powerful than required will be deemed valid.
+For example, a field that is not marked as sortable in Hibernate Search
+but marked as `"docvalues": true` in Elasticsearch will be deemed valid.
+
+One exception: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
+====
+
+You can fine-tune the strategy using the following properties:
+
+[source]
+----
+hibernate.search.indexes.<index name>.lifecycle.strategy create (default)
+hibernate.search.indexes.<index name>.lifecycle.required_status green (default)
+hibernate.search.indexes.<index name>.lifecycle.required_status_wait_timeout 10000 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.required_status green (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.required_status_wait_timeout 10000 (default)
+----
+
+The properties `required_status` and `required_status_wait_timeout` define
+the minimal required status of the index on startup, before Hibernate Search can start using it,
+and the maximum time to wait for this status, as an <<configuration-property-types,integer value>> in milliseconds.
+These properties are ignored when the `none` strategy is selected,
+because the index will not be checked on startup (see above).
+
+[WARNING]
+====
+Since Elasticsearch on Amazon Web Services (AWS)
+https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
+the `update` strategy will fail when trying to update analyzer definitions
+on an AWS Elasticsearch cluster.
+
+The only workaround is to avoid the `update` strategy on AWS.
+====
+
+[WARNING]
+.Strategies in production environments
+====
+It is strongly recommended to use either `none` or `validate` in a production environment.
+
+The alternatives `drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
+unless you want to reindex everything upon every startup,
+and `update` may leave your mapping half-updated in case of conflict.
+
+To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
+updating the mapping may be impossible without manual intervention.
+In this case, the `update` strategy will prevent Hibernate Search from starting,
+but it may already have successfully updated the mappings for another index, making a rollback difficult.
+
+When updating analyzer definitions Hibernate Search will temporarily stop the affected indexes during the update.
+This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
+those clients should be synchronized in such a way that while Hibernate Search is starting, no other client needs to access the index.
+
+For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
+====
+
+[[backend-elasticsearch-analysis]]
+=== Analysis
+// Search 5 anchors backward compatibility
+[[elasticsearch-mapping-analyzer]]
+
+[IMPORTANT]
+====
+This section is currently incomplete.
+A decent introduction is included in the getting started guide: see <<getting-started-analysis>>.
+====
+
+To configure analysis in an Elasticsearch backend, you will need to:
+
+* Implement a bean that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
+* Configure your backend to use that bean by setting the configuration property
+`hibernate.search.backends.<backend name>.analysis_configurer`
+to a <<configuration-property-types,bean reference>> pointing to your bean.
+
+// TODO add a simple example: configurer implementation + settings
+
+To know which character filters, tokenizers and token filters are available,
+refer to the documentation:
+
+* If you want to use a built-in analyzer and not create your own:
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[analyzers];
+* If you want to define your own analyzer:
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html[character filters],
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html[tokenizers],
+https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html[token filters].
+
+
+// TODO add detailed description of each use case: normalizer, analyzer, custom, builtin type, ...
+
+[[backend-elasticsearch-multi-tenancy]]
+== Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+However, multi-tenancy must be enabled explicitly.
+To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy_strategy` property:
+
+* to `none` (the default) for single-tenancy;
+* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.

@@ -251,6 +251,7 @@
                         <tabsize>4</tabsize>
 
                         <hibernateSearchVersion>${project.version}</hibernateSearchVersion>
+                        <hibernateSearchJavadocUrl>${javadoc.org.hibernate.search.url}</hibernateSearchJavadocUrl>
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                     </attributes>

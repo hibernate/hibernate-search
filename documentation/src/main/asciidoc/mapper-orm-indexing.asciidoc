@@ -1,6 +1,23 @@
 [[mapper-orm-indexing]]
 = Indexing
 
+== Configuration
+
+The property `hibernate.search.indexing_strategy` controls how entities are indexed:
+
+* by default, or when set to `event`, each change to an indexed entity
+(persist, update, delete) through a Hibernate ORM Session/EntityManager
+will automatically lead to a similar modification to the index
+(see <<mapper-orm-indexing-automatic>>).
+* when set to `manual`, changes to entities are ignored,
+and indexing requires an explicit action (see <<mapper-orm-indexing-explicit>>).
+
+The <<configuration-property-types,boolean property>> `hibernate.search.enable_dirty_check` controls how Hibernate Search decides to reindex a updated entity:
+
+* by default, or when set to `true`, Hibernate Search will only trigger reindexing if the properties of the entity that changed
+are actually used as a source to generate the indexable document.
+* when set to `false`, Hibernate Search will trigger reindexing regardless of the entity properties that changed.
+
 [[mapper-orm-indexing-automatic]]
 == Automatic indexing
 
