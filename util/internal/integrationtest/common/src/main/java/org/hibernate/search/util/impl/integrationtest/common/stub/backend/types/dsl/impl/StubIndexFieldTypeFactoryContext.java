@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -111,6 +112,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
 		return as( MonthDay.class );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime() {
+		return as( OffsetDateTime.class );
 	}
 
 	@Override

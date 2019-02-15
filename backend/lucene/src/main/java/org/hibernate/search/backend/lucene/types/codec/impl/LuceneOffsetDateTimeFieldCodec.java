@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -20,17 +20,12 @@ import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.index.IndexableField;
 
-public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCodec<ZonedDateTime, Long> {
+public final class LuceneOffsetDateTimeFieldCodec implements LuceneNumericFieldCodec<OffsetDateTime, Long> {
 
-	private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( LuceneOffsetDateTimeFieldCodec.FORMATTER )
-			// ZoneRegionId is optional
-			.optionalStart()
-				.appendLiteral( '[' )
-				.parseCaseSensitive()
-				.appendZoneRegionId()
-				.appendLiteral( ']' )
-			.optionalEnd()
+	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.append( LuceneLocalDateTimeFieldCodec.FORMATTER )
+			// OffsetId is mandatory
+			.appendOffsetId()
 			.toFormatter( Locale.ROOT )
 			.withResolverStyle( ResolverStyle.STRICT );
 
@@ -38,13 +33,13 @@ public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCo
 
 	private final boolean sortable;
 
-	public LuceneZonedDateTimeFieldCodec(boolean projectable, boolean sortable) {
+	public LuceneOffsetDateTimeFieldCodec(boolean projectable, boolean sortable) {
 		this.projectable = projectable;
 		this.sortable = sortable;
 	}
 
 	@Override
-	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, ZonedDateTime value) {
+	public void encode(LuceneDocumentBuilder documentBuilder, String absoluteFieldPath, OffsetDateTime value) {
 		if ( value == null ) {
 			return;
 		}
@@ -63,7 +58,7 @@ public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCo
 	}
 
 	@Override
-	public ZonedDateTime decode(Document document, String absoluteFieldPath) {
+	public OffsetDateTime decode(Document document, String absoluteFieldPath) {
 		IndexableField field = document.getField( absoluteFieldPath );
 
 		if ( field == null ) {
@@ -76,7 +71,7 @@ public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCo
 			return null;
 		}
 
-		return ZonedDateTime.parse( value, FORMATTER );
+		return OffsetDateTime.parse( value, FORMATTER );
 	}
 
 	@Override
@@ -84,17 +79,17 @@ public final class LuceneZonedDateTimeFieldCodec implements LuceneNumericFieldCo
 		if ( this == obj ) {
 			return true;
 		}
-		if ( LuceneZonedDateTimeFieldCodec.class != obj.getClass() ) {
+		if ( LuceneOffsetDateTimeFieldCodec.class != obj.getClass() ) {
 			return false;
 		}
 
-		LuceneZonedDateTimeFieldCodec other = (LuceneZonedDateTimeFieldCodec) obj;
+		LuceneOffsetDateTimeFieldCodec other = (LuceneOffsetDateTimeFieldCodec) obj;
 
 		return ( projectable == other.projectable ) && ( sortable == other.sortable );
 	}
 
 	@Override
-	public Long encode(ZonedDateTime value) {
+	public Long encode(OffsetDateTime value) {
 		return value == null ? null : value.toInstant().toEpochMilli();
 	}
 
