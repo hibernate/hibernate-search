@@ -30,15 +30,15 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<Period, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Period, Period>() {
+		return Optional.of( new DefaultValueBridgeExpectations<Period, String>() {
 			@Override
 			public Class<Period> getProjectionType() {
 				return Period.class;
 			}
 
 			@Override
-			public Class<Period> getIndexFieldJavaType() {
-				return Period.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
@@ -46,15 +46,21 @@ public class PeriodPropertyTypeDescriptor extends PropertyTypeDescriptor<Period>
 				return Arrays.asList(
 						Period.ZERO,
 						Period.ofDays( 1 ),
-						Period.ofMonths( 3 ),
 						Period.ofMonths( 4 ),
-						Period.ofYears( 100 )
+						Period.ofYears( 2050 ),
+						Period.of( 1900, 12, 21 )
 				);
 			}
 
 			@Override
-			public List<Period> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<String> getDocumentFieldValues() {
+				return Arrays.asList(
+						"+0000000000+0000000000+0000000000",
+						"+0000000000+0000000000+0000000001",
+						"+0000000000+0000000004+0000000000",
+						"+0000002050+0000000000+0000000000",
+						"+0000001900+0000000012+0000000021"
+				);
 			}
 
 			@Override

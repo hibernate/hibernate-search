@@ -39,6 +39,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultBigIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultCharacterValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultDurationValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -47,6 +48,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLVal
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultPeriodValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBridge;
@@ -113,8 +115,8 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( OffsetTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetTime.class ) ) );
 		addValueBridgeForExactRawType( ZoneOffset.class, ignored -> BeanHolder.of( new DefaultZoneOffsetValueBridge() ) );
 		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new DefaultZoneIdValueBridge() ) );
-		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Period.class ) ) );
-		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Duration.class ) ) );
+		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new DefaultPeriodValueBridge() ) );
+		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new DefaultDurationValueBridge() ) );
 		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new DefaultJavaNetURIValueBridge() ) );
 		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
 	}
