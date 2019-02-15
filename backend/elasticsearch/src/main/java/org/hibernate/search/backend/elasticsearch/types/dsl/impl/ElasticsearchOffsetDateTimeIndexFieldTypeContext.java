@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.util.Arrays;
@@ -14,7 +15,7 @@ import java.util.Locale;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchOffsetDateTimeFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
@@ -22,36 +23,31 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-class ElasticsearchZonedDateTimeIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchZonedDateTimeIndexFieldTypeContext, ZonedDateTime> {
+class ElasticsearchOffsetDateTimeIndexFieldTypeContext
+		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchOffsetDateTimeIndexFieldTypeContext, OffsetDateTime> {
 
-	private static final ElasticsearchZonedDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchZonedDateTimeFieldCodec(
-		new DateTimeFormatterBuilder()
-				.append( ElasticsearchOffsetDateTimeIndexFieldTypeContext.FORMATTER )
-				// ZoneRegionId is optional
-				.optionalStart()
-					.appendLiteral( '[' )
-					.parseCaseSensitive()
-					.appendZoneRegionId()
-					.appendLiteral( ']' )
-				.optionalEnd()
-				.toFormatter( Locale.ROOT )
-				.withResolverStyle( ResolverStyle.STRICT )
-	);
+	public static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+			.append( ElasticsearchLocalDateTimeIndexFieldTypeContext.FORMATTER )
+			// OffsetId is mandatory
+			.appendOffsetId()
+			.toFormatter( Locale.ROOT )
+			.withResolverStyle( ResolverStyle.STRICT );
 
-	private final ElasticsearchZonedDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private static final ElasticsearchOffsetDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchOffsetDateTimeFieldCodec( FORMATTER );
 
-	ElasticsearchZonedDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, ZonedDateTime.class, DataType.DATE );
+	private final ElasticsearchOffsetDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+
+	ElasticsearchOffsetDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
+		super( buildContext, OffsetDateTime.class, DataType.DATE );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<ZonedDateTime> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" ) );
+	protected ElasticsearchIndexFieldType<OffsetDateTime> toIndexFieldType(PropertyMapping mapping) {
+		mapping.setFormat( Arrays.asList( "strict_date_time", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ" ) );
 
-		ToDocumentFieldValueConverter<?, ? extends ZonedDateTime> dslToIndexConverter =
+		ToDocumentFieldValueConverter<?, ? extends OffsetDateTime> dslToIndexConverter =
 				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super ZonedDateTime, ?> indexToProjectionConverter =
+		FromDocumentFieldValueConverter<? super OffsetDateTime, ?> indexToProjectionConverter =
 				createIndexToProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
@@ -64,7 +60,7 @@ class ElasticsearchZonedDateTimeIndexFieldTypeContext
 	}
 
 	@Override
-	protected ElasticsearchZonedDateTimeIndexFieldTypeContext thisAsS() {
+	protected ElasticsearchOffsetDateTimeIndexFieldTypeContext thisAsS() {
 		return this;
 	}
 }

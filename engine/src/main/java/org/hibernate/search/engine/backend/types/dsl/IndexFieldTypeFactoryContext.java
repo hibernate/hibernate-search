@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
+import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -56,6 +57,8 @@ public interface IndexFieldTypeFactoryContext {
 	StandardIndexFieldTypeContext<?, YearMonth> asYearMonth();
 
 	StandardIndexFieldTypeContext<?, MonthDay> asMonthDay();
+
+	StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime();
 
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
