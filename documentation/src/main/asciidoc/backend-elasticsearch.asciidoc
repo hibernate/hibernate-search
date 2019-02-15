@@ -190,15 +190,15 @@ You can fine-tune the strategy using the following properties:
 [source]
 ----
 hibernate.search.indexes.<index name>.lifecycle.strategy create (default)
-hibernate.search.indexes.<index name>.lifecycle.required_status green (default)
-hibernate.search.indexes.<index name>.lifecycle.required_status_wait_timeout 10000 (default)
+hibernate.search.indexes.<index name>.lifecycle.minimal_required_status green (default)
+hibernate.search.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
 # OR
 hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.required_status green (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.required_status_wait_timeout 10000 (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status_wait_timeout 10000 (default)
 ----
 
-The properties `required_status` and `required_status_wait_timeout` define
+The properties `minimal_required_status` and `minimal_required_status_wait_timeout` define
 the minimal required status of the index on startup, before Hibernate Search can start using it,
 and the maximum time to wait for this status, as an <<configuration-property-types,integer value>> in milliseconds.
 These properties are ignored when the `none` strategy is selected,

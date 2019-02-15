@@ -8,7 +8,7 @@ spring.jpa:
         elasticsearch1:
           index_defaults:
             lifecycle.strategy: drop-and-create-and-drop
-            lifecycle.required_status: yellow
+            lifecycle.minimal_required_status: yellow
             refresh_after_write: true
           log.json_pretty_printing: true
         lucene1:
