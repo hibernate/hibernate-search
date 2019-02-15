@@ -8,3 +8,6 @@ spring.datasource:
   url: ${JDBC_URL} # From environment variable
   username: ${JDBC_USERNAME} # From environment variable
   password: ${JDBC_PASSWORD} # From environment variable
+
+logging.level:
+  org.springframework.core.env: DEBUG

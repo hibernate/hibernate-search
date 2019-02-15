@@ -153,7 +153,8 @@
                         <configuration>
                             <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-lucene</reportNameSuffix>
                             <systemPropertyVariables>
-                                <spring.profiles.active>lucene,test</spring.profiles.active>
+                                <!-- See TestActiveProfilesResolver -->
+                                <test.backend>lucene</test.backend>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -165,7 +166,8 @@
                         <configuration>
                             <reportNameSuffix>${surefire.environment}-${surefire.executing-module}-elasticsearch</reportNameSuffix>
                             <systemPropertyVariables>
-                                <spring.profiles.active>elasticsearch,test</spring.profiles.active>
+                                <!-- See TestActiveProfilesResolver -->
+                                <test.backend>elasticsearch</test.backend>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
