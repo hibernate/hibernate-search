@@ -50,6 +50,8 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifie
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultShortIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultUUIDValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneIdValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultZoneOffsetValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.PassThroughValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
@@ -109,8 +111,8 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( MonthDay.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( MonthDay.class ) ) );
 		addValueBridgeForExactRawType( OffsetDateTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetDateTime.class ) ) );
 		addValueBridgeForExactRawType( OffsetTime.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( OffsetTime.class ) ) );
-		addValueBridgeForExactRawType( ZoneOffset.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneOffset.class ) ) );
-		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( ZoneId.class ) ) );
+		addValueBridgeForExactRawType( ZoneOffset.class, ignored -> BeanHolder.of( new DefaultZoneOffsetValueBridge() ) );
+		addValueBridgeForExactRawType( ZoneId.class, ignored -> BeanHolder.of( new DefaultZoneIdValueBridge() ) );
 		addValueBridgeForExactRawType( Period.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Period.class ) ) );
 		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new PassThroughValueBridge<>( Duration.class ) ) );
 		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new DefaultJavaNetURIValueBridge() ) );
