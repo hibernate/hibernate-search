@@ -30,15 +30,15 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<Duration, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<Duration, Duration>() {
+		return Optional.of( new DefaultValueBridgeExpectations<Duration, Long>() {
 			@Override
 			public Class<Duration> getProjectionType() {
 				return Duration.class;
 			}
 
 			@Override
-			public Class<Duration> getIndexFieldJavaType() {
-				return Duration.class;
+			public Class<Long> getIndexFieldJavaType() {
+				return Long.class;
 			}
 
 			@Override
@@ -53,8 +53,14 @@ public class DurationPropertyTypeDescriptor extends PropertyTypeDescriptor<Durat
 			}
 
 			@Override
-			public List<Duration> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<Long> getDocumentFieldValues() {
+				return Arrays.asList(
+						Duration.ZERO.toNanos(),
+						1L,
+						Duration.ofSeconds( 1, 123L ).toNanos(),
+						Duration.ofHours( 3 ).toNanos(),
+						Duration.ofDays( 7 ).toNanos()
+				);
 			}
 
 			@Override

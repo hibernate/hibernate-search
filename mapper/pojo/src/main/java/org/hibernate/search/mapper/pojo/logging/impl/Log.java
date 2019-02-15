@@ -46,8 +46,10 @@ import org.jboss.logging.annotations.ValidIdRanges;
 
 @MessageLogger(projectCode = MessageConstants.PROJECT_CODE)
 @ValidIdRanges({
-		@ValidIdRange(min = MessageConstants.MAPPER_POJO_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_ID_RANGE_MAX)
+		@ValidIdRange(min = MessageConstants.MAPPER_POJO_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
+		@ValidIdRange(min = 295, max = 295),
+		@ValidIdRange(min = 297, max = 297)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5. See the Lucene logger for examples.
 })
 public interface Log extends BasicLogger {
@@ -59,6 +61,12 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
+
+	@Message(id = ID_OFFSET_1 + 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
+	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_1 + 297, value = " Value of '%2$s' for type '%1$s' is too big for the conversion")
+	SearchException valueTooLargeForConversionException(@FormatWith(ClassFormatter.class) Class<?> type, Object duration, @Cause Exception ae);
 
 	// -----------------------------------
 	// New messages from Search 6 onwards
