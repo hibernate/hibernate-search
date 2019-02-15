@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -105,6 +106,11 @@ public class StubIndexFieldTypeFactoryContext implements IndexFieldTypeFactoryCo
 	@Override
 	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
 		return as( YearMonth.class );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
+		return as( MonthDay.class );
 	}
 
 	@Override
