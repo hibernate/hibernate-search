@@ -37,7 +37,7 @@ class ElasticsearchYearMonthIndexFieldTypeContext
 
 	private static final ElasticsearchYearMonthFieldCodec DEFAULT_CODEC = new ElasticsearchYearMonthFieldCodec( FORMATTER );
 
-	private final ElasticsearchYearMonthFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchYearMonthFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchYearMonthIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, YearMonth.class, DataType.DATE );

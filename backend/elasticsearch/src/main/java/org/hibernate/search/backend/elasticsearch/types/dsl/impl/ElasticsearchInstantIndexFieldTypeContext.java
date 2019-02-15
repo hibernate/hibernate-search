@@ -26,7 +26,7 @@ class ElasticsearchInstantIndexFieldTypeContext
 
 	private static final ElasticsearchInstantFieldCodec DEFAULT_CODEC = new ElasticsearchInstantFieldCodec( FORMATTER );
 
-	private final ElasticsearchInstantFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchInstantFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchInstantIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Instant.class, DataType.DATE );

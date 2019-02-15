@@ -39,7 +39,7 @@ class ElasticsearchZonedDateTimeIndexFieldTypeContext
 				.withResolverStyle( ResolverStyle.STRICT )
 	);
 
-	private final ElasticsearchZonedDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchZonedDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchZonedDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, ZonedDateTime.class, DataType.DATE );

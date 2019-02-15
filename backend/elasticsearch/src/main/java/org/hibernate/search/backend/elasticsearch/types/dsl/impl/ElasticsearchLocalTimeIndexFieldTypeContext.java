@@ -45,7 +45,7 @@ class ElasticsearchLocalTimeIndexFieldTypeContext
 
 	private static final ElasticsearchLocalTimeFieldCodec DEFAULT_CODEC = new ElasticsearchLocalTimeFieldCodec( FORMATTER );
 
-	private final ElasticsearchLocalTimeFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchLocalTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchLocalTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, LocalTime.class, DataType.DATE );

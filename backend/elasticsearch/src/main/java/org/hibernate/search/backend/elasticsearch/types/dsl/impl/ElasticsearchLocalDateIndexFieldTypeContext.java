@@ -41,7 +41,7 @@ class ElasticsearchLocalDateIndexFieldTypeContext
 
 	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec( FORMATTER );
 
-	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, LocalDate.class, DataType.DATE );

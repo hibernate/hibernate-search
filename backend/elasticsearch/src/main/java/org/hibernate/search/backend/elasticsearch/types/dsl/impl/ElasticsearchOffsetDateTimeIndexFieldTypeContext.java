@@ -35,7 +35,7 @@ class ElasticsearchOffsetDateTimeIndexFieldTypeContext
 
 	private static final ElasticsearchOffsetDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchOffsetDateTimeFieldCodec( FORMATTER );
 
-	private final ElasticsearchOffsetDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchOffsetDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchOffsetDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, OffsetDateTime.class, DataType.DATE );
