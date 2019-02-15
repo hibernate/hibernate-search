@@ -44,6 +44,7 @@ public abstract class FieldTypeDescriptor<F> {
 					new YearMonthFieldTypeDescriptor(),
 					new MonthDayFieldTypeDescriptor(),
 					new OffsetDateTimeFieldTypeDescriptor(),
+					new OffsetTimeFieldTypeDescriptor(),
 					new GeoPointFieldTypeDescriptor()
 			) );
 		}
