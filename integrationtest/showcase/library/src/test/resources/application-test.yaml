@@ -14,7 +14,6 @@ spring.jpa:
         lucene1:
           # Hack to use a different directory for each test
           root_directory: ${LUCENE_ROOT_PATH}/${random.uuid} # LUCENE_ROOT_PATH is an environment variable
-          # Nothing to add here
 
 logging.level:
   org.hibernate.SQL: DEBUG
@@ -22,3 +21,8 @@ logging.level:
   org.hibernate.search.fulltext_query: DEBUG
   org.hibernate.search.elasticsearch.request: DEBUG
   org.hibernate.search.backend.lucene: DEBUG
+
+# Default environment variable values for IDEs that are unable to extract them from the maven-failsafe configuration
+# These values are overridden when running tests from Intellij IDEA or directly from Maven
+JDBC_URL: jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1
+LUCENE_ROOT_PATH: target/test-indexes
