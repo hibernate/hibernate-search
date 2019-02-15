@@ -154,12 +154,12 @@ public class ElasticsearchIndexStatusCheckIT {
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS,
+						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
 						ElasticsearchIndexStatus.GREEN.getElasticsearchString()
 				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
-						ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT,
+						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				);
 	}

@@ -292,7 +292,7 @@ public class TestElasticsearchClient implements TestRule {
 				 * the indexes to never reach a green status
 				 */
 				.param( "wait_for_status", ElasticsearchIndexStatus.YELLOW.getElasticsearchString() )
-				.param( "timeout", ElasticsearchIndexSettings.Defaults.LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
+				.param( "timeout", ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}
 

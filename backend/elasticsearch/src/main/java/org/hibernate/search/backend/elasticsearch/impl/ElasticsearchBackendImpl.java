@@ -69,15 +69,15 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					.build();
 
 	private static final ConfigurationProperty<ElasticsearchIndexStatus> MANAGEMENT_REQUIRED_STATUS =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS )
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
 					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::of )
-					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_REQUIRED_STATUS )
+					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT )
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.asInteger()
-					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
 	private final ElasticsearchClientImplementor client;

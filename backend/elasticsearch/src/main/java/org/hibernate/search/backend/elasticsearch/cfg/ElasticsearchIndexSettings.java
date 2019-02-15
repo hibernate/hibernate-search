@@ -31,19 +31,19 @@ public final class ElasticsearchIndexSettings {
 	 * <p>
 	 * Expects an {@link ElasticsearchIndexStatus} value, or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link Defaults#LIFECYCLE_REQUIRED_STATUS}.
+	 * Defaults to {@link Defaults#LIFECYCLE_MINIMAL_REQUIRED_STATUS}.
 	 */
-	public static final String LIFECYCLE_REQUIRED_STATUS = "lifecycle.required_status";
+	public static final String LIFECYCLE_MINIMAL_REQUIRED_STATUS = "lifecycle.minimal_required_status";
 
 	/**
-	 * The timeout when waiting for the {@link #LIFECYCLE_REQUIRED_STATUS required status}.
+	 * The timeout when waiting for the {@link #LIFECYCLE_MINIMAL_REQUIRED_STATUS required status}.
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT}.
+	 * Defaults to {@link Defaults#LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT}.
 	 */
-	public static final String LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.required_status_wait_timeout";
+	public static final String LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.minimal_required_status_wait_timeout";
 
 	public static final String REFRESH_AFTER_WRITE = "refresh_after_write";
 
@@ -56,8 +56,8 @@ public final class ElasticsearchIndexSettings {
 		}
 
 		public static final ElasticsearchIndexLifecycleStrategyName LIFECYCLE_STRATEGY = ElasticsearchIndexLifecycleStrategyName.CREATE;
-		public static final ElasticsearchIndexStatus LIFECYCLE_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
-		public static final int LIFECYCLE_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
+		public static final ElasticsearchIndexStatus LIFECYCLE_MINIMAL_REQUIRED_STATUS = ElasticsearchIndexStatus.GREEN;
+		public static final int LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 		public static final boolean REFRESH_AFTER_WRITE = false;
 	}
 
