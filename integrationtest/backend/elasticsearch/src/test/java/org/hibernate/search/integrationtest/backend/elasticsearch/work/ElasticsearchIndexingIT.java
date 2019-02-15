@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientMock;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -41,7 +41,7 @@ public class ElasticsearchIndexingIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
-	public ElasticsearchClientMock clientMock = new ElasticsearchClientMock();
+	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
@@ -53,7 +53,7 @@ public class ElasticsearchIndexingIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientMock.getFactory()
+						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withIndex(
 						"MappedType", INDEX_NAME,
@@ -71,7 +71,7 @@ public class ElasticsearchIndexingIT {
 		workPlan.add( referenceProvider( "1", routingKey ), document -> {
 			indexAccessors.string.write( document, "text1" );
 		} );
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
 						.pathComponent( TYPE_NAME )
@@ -82,12 +82,12 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 		workPlan.execute().join();
-		clientMock.verifyExpectationsMet();
+		clientSpy.verifyExpectationsMet();
 
 		workPlan.update( referenceProvider( "1", routingKey ), document -> {
 			indexAccessors.string.write( document, "text2" );
 		} );
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
 						.pathComponent( TYPE_NAME )
@@ -98,10 +98,10 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 		workPlan.execute().join();
-		clientMock.verifyExpectationsMet();
+		clientSpy.verifyExpectationsMet();
 
 		workPlan.delete( referenceProvider( "1", routingKey ) );
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.delete()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
 						.pathComponent( TYPE_NAME )
@@ -111,7 +111,7 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 		workPlan.execute().join();
-		clientMock.verifyExpectationsMet();
+		clientSpy.verifyExpectationsMet();
 	}
 
 	private static class IndexAccessors {
