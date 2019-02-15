@@ -31,15 +31,15 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<ZoneId, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<ZoneId, ZoneId>() {
+		return Optional.of( new DefaultValueBridgeExpectations<ZoneId, String>() {
 			@Override
 			public Class<ZoneId> getProjectionType() {
 				return ZoneId.class;
 			}
 
 			@Override
-			public Class<ZoneId> getIndexFieldJavaType() {
-				return ZoneId.class;
+			public Class<String> getIndexFieldJavaType() {
+				return String.class;
 			}
 
 			@Override
@@ -55,8 +55,15 @@ public class ZoneIdPropertyTypeDescriptor extends PropertyTypeDescriptor<ZoneId>
 			}
 
 			@Override
-			public List<ZoneId> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<String> getDocumentFieldValues() {
+				return Arrays.asList(
+						ZoneOffset.MIN.getId(),
+						ZoneId.of( "America/Los_Angeles" ).getId(),
+						ZoneOffset.UTC.getId(),
+						ZoneId.of( "Europe/Paris" ).getId(),
+						ZoneOffset.ofHours( 7 ).getId(),
+						ZoneOffset.MAX.getId()
+				);
 			}
 
 			@Override

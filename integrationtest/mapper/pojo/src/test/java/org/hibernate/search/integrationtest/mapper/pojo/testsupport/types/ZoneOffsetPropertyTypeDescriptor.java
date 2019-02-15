@@ -30,15 +30,15 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 
 	@Override
 	public Optional<DefaultValueBridgeExpectations<ZoneOffset, ?>> getDefaultValueBridgeExpectations() {
-		return Optional.of( new DefaultValueBridgeExpectations<ZoneOffset, ZoneOffset>() {
+		return Optional.of( new DefaultValueBridgeExpectations<ZoneOffset, Integer>() {
 			@Override
 			public Class<ZoneOffset> getProjectionType() {
 				return ZoneOffset.class;
 			}
 
 			@Override
-			public Class<ZoneOffset> getIndexFieldJavaType() {
-				return ZoneOffset.class;
+			public Class<Integer> getIndexFieldJavaType() {
+				return Integer.class;
 			}
 
 			@Override
@@ -54,8 +54,15 @@ public class ZoneOffsetPropertyTypeDescriptor extends PropertyTypeDescriptor<Zon
 			}
 
 			@Override
-			public List<ZoneOffset> getDocumentFieldValues() {
-				return getEntityPropertyValues();
+			public List<Integer> getDocumentFieldValues() {
+				return Arrays.asList(
+						ZoneOffset.MIN.getTotalSeconds(),
+						ZoneOffset.ofHours( -1 ).getTotalSeconds(),
+						ZoneOffset.UTC.getTotalSeconds(),
+						ZoneOffset.ofHours( 1 ).getTotalSeconds(),
+						ZoneOffset.ofHours( 7 ).getTotalSeconds(),
+						ZoneOffset.MAX.getTotalSeconds()
+				);
 			}
 
 			@Override
