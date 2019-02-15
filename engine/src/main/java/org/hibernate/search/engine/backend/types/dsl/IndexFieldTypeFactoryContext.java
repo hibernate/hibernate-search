@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -60,9 +61,11 @@ public interface IndexFieldTypeFactoryContext {
 
 	StandardIndexFieldTypeContext<?, OffsetDateTime> asOffsetDateTime();
 
+	StandardIndexFieldTypeContext<?, OffsetTime> asOffsetTime();
+
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
-	// TODO JavaTimeBridgeProvider
+	// TODO HSEARCH-3487 add asBigDecimal() and asBigInteger() methods here
 
 	default <T> T extension(IndexFieldTypeFactoryContextExtension<T> extension) {
 		return extension.extendOrFail( this );
