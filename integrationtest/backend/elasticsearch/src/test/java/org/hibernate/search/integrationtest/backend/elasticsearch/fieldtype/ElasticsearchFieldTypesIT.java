@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientMock;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 
@@ -32,22 +32,22 @@ public class ElasticsearchFieldTypesIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
-	public ElasticsearchClientMock clientMock = new ElasticsearchClientMock();
+	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void addUpdateDelete_routing() {
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
 		);
 
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(), ElasticsearchRequestAssertionMode.STRICT
 		);
 
-		clientMock.expectNext(
+		clientSpy.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
 						.body( indexCreationPayload() )
@@ -57,7 +57,7 @@ public class ElasticsearchFieldTypesIT {
 
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientMock.getFactory()
+						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withIndex(
 						"MappedType", INDEX_NAME,
@@ -67,7 +67,7 @@ public class ElasticsearchFieldTypesIT {
 				)
 				.setup();
 
-		clientMock.verifyExpectationsMet();
+		clientSpy.verifyExpectationsMet();
 	}
 
 	private JsonObject indexCreationPayload() {
