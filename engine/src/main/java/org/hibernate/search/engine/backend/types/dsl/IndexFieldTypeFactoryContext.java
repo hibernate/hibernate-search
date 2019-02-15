@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -54,11 +55,11 @@ public interface IndexFieldTypeFactoryContext {
 
 	StandardIndexFieldTypeContext<?, YearMonth> asYearMonth();
 
+	StandardIndexFieldTypeContext<?, MonthDay> asMonthDay();
+
 	StandardIndexFieldTypeContext<?, GeoPoint> asGeoPoint();
 
-	// TODO NumericBridgeProvider
 	// TODO JavaTimeBridgeProvider
-	// TODO BasicJDKTypesBridgeProvider
 
 	default <T> T extension(IndexFieldTypeFactoryContextExtension<T> extension) {
 		return extension.extendOrFail( this );

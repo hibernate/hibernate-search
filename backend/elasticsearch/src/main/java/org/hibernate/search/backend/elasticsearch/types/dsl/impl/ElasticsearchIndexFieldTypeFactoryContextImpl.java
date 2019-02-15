@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZonedDateTime;
@@ -90,6 +91,9 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 		}
 		else if ( YearMonth.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asYearMonth();
+		}
+		else if ( MonthDay.class.equals( inputType ) ) {
+			return (StandardIndexFieldTypeContext<?, F>) asMonthDay();
 		}
 		else if ( GeoPoint.class.equals( inputType ) ) {
 			return (StandardIndexFieldTypeContext<?, F>) asGeoPoint();
@@ -173,6 +177,11 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public StandardIndexFieldTypeContext<?, YearMonth> asYearMonth() {
 		return new ElasticsearchYearMonthIndexFieldTypeContext( this );
+	}
+
+	@Override
+	public StandardIndexFieldTypeContext<?, MonthDay> asMonthDay() {
+		return new ElasticsearchMonthDayIndexFieldTypeContext( this );
 	}
 
 	@Override
