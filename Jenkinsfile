@@ -150,6 +150,9 @@ stage('Configure') {
 	}
 
 	properties([
+			buildDiscarder(
+					logRotator(daysToKeepStr: '90')
+			),
 			pipelineTriggers(
 					// HSEARCH-3417: do not add snapshotDependencies() here, this was known to cause problems.
 					[
