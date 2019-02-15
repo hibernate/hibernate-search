@@ -39,7 +39,7 @@ class ElasticsearchMonthDayIndexFieldTypeContext
 
 	private static final ElasticsearchMonthDayFieldCodec DEFAULT_CODEC = new ElasticsearchMonthDayFieldCodec( FORMATTER );
 
-	private final ElasticsearchMonthDayFieldCodec codec = DEFAULT_CODEC; // TODO add method to allow customization
+	private final ElasticsearchMonthDayFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
 
 	ElasticsearchMonthDayIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, MonthDay.class, DataType.DATE );
