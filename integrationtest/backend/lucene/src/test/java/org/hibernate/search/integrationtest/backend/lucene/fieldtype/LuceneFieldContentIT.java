@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.fieldtype;
 
 
-import static org.hibernate.search.integrationtest.backend.lucene.LuceneExtensionIT.containsDocument;
+import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
