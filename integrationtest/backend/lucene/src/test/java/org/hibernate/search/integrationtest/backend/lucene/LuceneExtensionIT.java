@@ -562,7 +562,7 @@ public class LuceneExtensionIT {
 		);
 	}
 
-	private static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
+	public static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
 		return allDocuments -> {
 			Optional<? extends Document> found = allDocuments.stream()
 					.filter( doc -> id.equals( doc.get( LuceneFields.idFieldName() ) ) )
