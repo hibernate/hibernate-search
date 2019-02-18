@@ -298,11 +298,11 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						UnknownTypeJsonAccessor accessor = accessorBuilder.buildForPath( fieldPath );
 						String stringValue = field.stringValue();
 						Number numericValue = field.numericValue();
-						if ( stringValue != null ) {
-							accessor.add( root, new JsonPrimitive( stringValue ) );
-						}
-						else if ( numericValue != null ) {
+						if ( numericValue != null ) {
 							accessor.add( root, new JsonPrimitive( numericValue ) );
+						}
+						else if ( stringValue != null ) {
+							accessor.add( root, new JsonPrimitive( stringValue ) );
 						}
 						else {
 							accessor.add( root, null );
@@ -335,6 +335,10 @@ class ElasticsearchIndexWorkVisitor implements IndexWorkVisitor<IndexingMonitor,
 						Boolean value = (Boolean) twoWayStringBridge.stringToObject( field.stringValue() );
 
 						accessor.add( root, value != null ? new JsonPrimitive( value ) : null );
+					}
+					else if (ExtendedFieldType.OBJECT.equals(type)) {
+						String stringValue = field.stringValue();
+						accessor.add( root, stringValue != null ? new JsonParser().parse(stringValue) : null );
 					}
 					else {
 						Number numericValue = field.numericValue();
