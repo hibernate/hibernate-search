@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
+import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -41,7 +41,6 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -560,18 +559,6 @@ public class LuceneExtensionIT {
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
 		);
-	}
-
-	public static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
-		return allDocuments -> {
-			Optional<? extends Document> found = allDocuments.stream()
-					.filter( doc -> id.equals( doc.get( LuceneFields.idFieldName() ) ) )
-					.findFirst();
-			Assertions.assertThat( found )
-					.as( "Document with ID '" + id + "'" )
-					.isNotEmpty();
-			assertions.accept( new DocumentAssert( found.get() ).as( id ) );
-		};
 	}
 
 	private static class IndexAccessors {

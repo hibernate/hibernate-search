@@ -8,8 +8,11 @@ package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -24,6 +27,28 @@ import org.assertj.core.api.iterable.Extractor;
 
 public class DocumentAssert {
 	private static final String INTERNAL_FIELDS_PREFIX = "__HSEARCH_";
+
+	/**
+	 * Creates a consumer that checks that a list of documents contains a document with the given ID,
+	 * and that this document passes the given assertion.
+	 * <p>
+	 * The consumer should generally be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
+	 *
+	 * @param id The ID of the document that should be contained within the list.
+	 * @param assertions An assertion that should pass on the document with the given id.
+	 * @return A consumer to be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
+	 */
+	public static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
+		return allDocuments -> {
+			Optional<? extends Document> found = allDocuments.stream()
+					.filter( doc -> id.equals( doc.get( LuceneFields.idFieldName() ) ) )
+					.findFirst();
+			Assertions.assertThat( found )
+					.as( "Document with ID '" + id + "'" )
+					.isNotEmpty();
+			assertions.accept( new DocumentAssert( found.get() ).as( id ) );
+		};
+	}
 
 	private final Document actual;
 	private String name;
