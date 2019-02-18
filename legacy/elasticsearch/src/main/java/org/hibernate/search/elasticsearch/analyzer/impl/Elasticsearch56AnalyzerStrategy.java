@@ -30,7 +30,7 @@ import org.hibernate.search.engine.service.spi.ServiceReference;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
 import org.hibernate.search.util.impl.ReflectionHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 
 /**
  * An {@link AnalyzerStrategy} for Elasticsearch 5.6:

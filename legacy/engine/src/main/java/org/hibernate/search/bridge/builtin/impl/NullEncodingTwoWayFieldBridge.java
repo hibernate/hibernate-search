@@ -17,8 +17,8 @@ import org.hibernate.search.bridge.spi.NullMarker;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptor;
 import org.hibernate.search.bridge.util.impl.BridgeAdaptorUtils;
 import org.hibernate.search.engine.nulls.codec.impl.NullMarkerCodec;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

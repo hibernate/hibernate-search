@@ -32,8 +32,8 @@ import org.hibernate.search.bridge.TikaParseContextProvider;
 import org.hibernate.search.bridge.TikaParserProvider;
 import org.hibernate.search.bridge.spi.FieldMetadataBuilder;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 import static org.apache.tika.io.IOUtils.closeQuietly;

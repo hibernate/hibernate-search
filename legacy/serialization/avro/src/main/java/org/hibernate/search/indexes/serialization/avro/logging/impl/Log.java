@@ -9,7 +9,7 @@ package org.hibernate.search.indexes.serialization.avro.logging.impl;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.util.common.logging.impl.BaseHibernateSearchLogger;
+import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
 import org.jboss.logging.Logger.Level;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;

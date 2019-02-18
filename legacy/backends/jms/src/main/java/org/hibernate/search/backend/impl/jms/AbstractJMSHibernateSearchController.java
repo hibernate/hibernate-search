@@ -17,8 +17,8 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.OperationDispatcher;
 import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.spi.SearchIntegrator;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

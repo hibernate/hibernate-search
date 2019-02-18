@@ -16,7 +16,7 @@ import org.hibernate.search.elasticsearch.settings.impl.model.CharFilterDefiniti
 import org.hibernate.search.elasticsearch.settings.impl.model.NormalizerDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenFilterDefinition;
 import org.hibernate.search.elasticsearch.settings.impl.model.TokenizerDefinition;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

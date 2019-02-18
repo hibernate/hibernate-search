@@ -23,7 +23,7 @@ import javax.persistence.PersistenceUnit;
 
 import org.hibernate.search.jsr352.context.jpa.spi.EntityManagerFactoryRegistry;
 import org.hibernate.search.jsr352.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**

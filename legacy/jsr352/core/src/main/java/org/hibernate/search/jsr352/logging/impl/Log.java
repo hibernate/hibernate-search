@@ -13,8 +13,8 @@ import static org.jboss.logging.Logger.Level.TRACE;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJobParameters;
-import org.hibernate.search.util.common.logging.impl.BaseHibernateSearchLogger;
-import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
+import org.hibernate.search.util.logging.impl.ClassFormatter;
 
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;

@@ -8,8 +8,8 @@ package org.hibernate.search.backend.jgroups.logging.impl;
 
 import java.util.Properties;
 import org.hibernate.search.exception.SearchException;
-import org.hibernate.search.util.common.logging.impl.BaseHibernateSearchLogger;
-import org.hibernate.search.util.common.logging.impl.ClassFormatter;
+import org.hibernate.search.util.logging.impl.BaseHibernateSearchLogger;
+import org.hibernate.search.util.logging.impl.ClassFormatter;
 import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;

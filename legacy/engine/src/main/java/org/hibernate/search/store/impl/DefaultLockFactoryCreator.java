@@ -22,8 +22,8 @@ import org.hibernate.search.spi.BuildContext;
 import org.hibernate.search.store.LockFactoryProvider;
 import org.hibernate.search.store.spi.LockFactoryCreator;
 import org.hibernate.search.util.impl.ClassLoaderHelper;
-import org.hibernate.search.util.common.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.logging.impl.Log;
+import org.hibernate.search.util.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 
 /**
