@@ -56,6 +56,7 @@ import java.lang.invoke.MethodHandles;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonParser;
 
 /**
  * Converts {@link LuceneWork}s into corresponding {@link ElasticsearchWork}s. Instances are specific
