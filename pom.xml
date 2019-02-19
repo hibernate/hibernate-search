@@ -387,6 +387,9 @@
         <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
         <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
 
+        <failsafe.wildfly.skip>false</failsafe.wildfly.skip>
+        <failsafe.osgi.skip>false</failsafe.osgi.skip>
+
         <!--
             Should be set by submodules.
             Used by integration tests modules that execute tests from another module.
@@ -2042,6 +2045,20 @@
             <modules>
                 <module>integrationtest/jdk9-modules</module>
             </modules>
+        </profile>
+
+        <profile>
+            <id>jdk12+</id>
+            <activation>
+                <jdk>[12,)</jdk>
+            </activation>
+            <!-- Skip the OSGi and WildFly integration tests with JDK >= 12 -->
+            <properties>
+                <!-- see https://github.com/jbossas/jboss-classfilewriter/issues/18 -->
+                <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
+                <!-- no specific issue was reported yet -->
+                <failsafe.osgi.skip>true</failsafe.osgi.skip>
+            </properties>
         </profile>
 
         <profile>
