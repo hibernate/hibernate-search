@@ -26,7 +26,7 @@ public interface MassIndexer {
 	 * Defaults to 1.
 	 *
 	 * @param threadsToIndexObjects  number of entity types to be indexed in parallel
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer typesToIndexInParallel(int threadsToIndexObjects);
 
@@ -34,21 +34,21 @@ public interface MassIndexer {
 	 * Set the number of threads to be used to load
 	 * the root entities.
 	 * @param numberOfThreads the number of threads
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer threadsToLoadObjects(int numberOfThreads);
 
 	/**
 	 * Sets the batch size used to load the root entities.
 	 * @param batchSize the batch size
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer batchSizeToLoadObjects(int batchSize);
 
 	/**
 	 * Deprecated: value is ignored.
 	 * @param numberOfThreads the number of threads
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 * @deprecated Being ignored: this method will be removed.
 	 */
 	@Deprecated
@@ -58,31 +58,31 @@ public interface MassIndexer {
 	 * Override the default <code>MassIndexerProgressMonitor</code>.
 	 *
 	 * @param monitor this instance will receive updates about the massindexing progress.
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer progressMonitor(MassIndexerProgressMonitor monitor);
 
 	/**
 	 * Sets the cache interaction mode for the data loading tasks.
-	 * Defaults to <tt>CacheMode.IGNORE</tt>.
+	 * Defaults to {@code CacheMode.IGNORE}.
 	 * @param cacheMode the cache interaction mode
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer cacheMode(CacheMode cacheMode);
 
 	/**
-	 * If index optimization has to be started at the end of the indexing process. Defaults to <tt>true</tt>.
+	 * If index optimization has to be started at the end of the indexing process. Defaults to {@code true}.
 	 * @param optimize {@code true} to enable the index optimization at the end of the indexing process
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer optimizeOnFinish(boolean optimize);
 
 	/**
 	 * If index optimization should be run before starting,
-	 * after the purgeAll. Has no effect if <tt>purgeAll</tt> is set to false.
-	 * Defaults to <tt>true</tt>.
+	 * after the purgeAll. Has no effect if {@code purgeAll} is set to false.
+	 * Defaults to {@code true}.
 	 * @param optimize {@code true} to enable the index optimization after purge
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer optimizeAfterPurge(boolean optimize);
 
@@ -92,7 +92,7 @@ public interface MassIndexer {
 	 * entities in the index: otherwise search results may be duplicated.
 	 * Defaults to true.
 	 * @param purgeAll if {@code true} all entities will be removed from the index before starting the indexing
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer purgeAllOnStart(boolean purgeAll);
 
@@ -103,7 +103,7 @@ public interface MassIndexer {
 	 * As a results the index will not be consistent
 	 * with the database: use only for testing on an (undefined) subset of database data.
 	 * @param maximum the maximum number of objects to index
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer limitIndexedObjectsTo(long maximum);
 
@@ -128,7 +128,7 @@ public interface MassIndexer {
 	 * for example MySQL might benefit from using {@link Integer#MIN_VALUE}
 	 * otherwise it will attempt to preload everything in memory.
 	 * @param idFetchSize the fetch size to be used when loading primary keys
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexer idFetchSize(int idFetchSize);
 
