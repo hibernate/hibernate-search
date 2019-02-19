@@ -105,7 +105,7 @@ public final class Executors {
 	public static class BlockPolicy implements RejectedExecutionHandler {
 
 		/**
-		 * Creates a <tt>BlockPolicy</tt>.
+		 * Creates a {@code BlockPolicy}.
 		 */
 		public BlockPolicy() {
 		}
