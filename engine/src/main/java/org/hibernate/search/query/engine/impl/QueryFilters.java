@@ -61,7 +61,7 @@ public final class QueryFilters {
 	}
 
 	/**
-	 * @return <tt>true</tt> if this contains to filters to be applied.
+	 * @return {@code true} if this contains to filters to be applied.
 	 */
 	public boolean isEmpty() {
 		return filterQueries.isEmpty();

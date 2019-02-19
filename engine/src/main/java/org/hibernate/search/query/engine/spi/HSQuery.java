@@ -114,9 +114,9 @@ public interface HSQuery extends ProjectionConstants {
 
 	/**
 	 * Set the first element to retrieve. If not set, elements will be
-	 * retrieved beginning from element <tt>0</tt>.
+	 * retrieved beginning from element {@code 0}.
 	 *
-	 * @param firstResult a element number, numbered from <tt>0</tt>
+	 * @param firstResult a element number, numbered from {@code 0}
 	 * @return {@code this}  to allow for method chaining
 	 */
 	HSQuery firstResult(int firstResult);
