@@ -168,7 +168,9 @@ stage('Configure') {
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkITEnvironment(version: '8', tool: 'OpenJDK 8 Latest', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 					new JdkITEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: ITEnvironmentStatus.SUPPORTED),
-					new JdkITEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: ITEnvironmentStatus.EXPERIMENTAL)
+					new JdkITEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: ITEnvironmentStatus.EXPERIMENTAL,
+							// Elasticsearch won't run on JDK13
+							elasticsearchTool: 'OpenJDK 11 Latest')
 			],
 			database: [
 					new DatabaseITEnvironment(dbName: 'h2', mavenProfile: 'h2', status: ITEnvironmentStatus.USED_IN_DEFAULT_BUILD),
@@ -418,9 +420,11 @@ stage('Non-default environment ITs') {
 	environments.content.jdk.enabled.each { JdkITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
 			node(NODE_PATTERN_BASE) {
+				def elasticsearchJdkTool = itEnv.elasticsearchTool ? tool(name: itEnv.elasticsearchTool, type: 'jdk') : null
 				helper.withMavenWorkspace(jdk: itEnv.tool) {
 					mavenNonDefaultIT itEnv, """ \
 							clean install --fail-at-end \
+							${elasticsearchJdkTool ? "-Dtest.elasticsearch.java_home=$elasticsearchJdkTool" : ""} \
 					"""
 				}
 			}
@@ -580,6 +584,7 @@ abstract class ITEnvironment {
 class JdkITEnvironment extends ITEnvironment {
 	String version
 	String tool
+	String elasticsearchTool
 	String getTag() { "jdk-$version" }
 }
 
