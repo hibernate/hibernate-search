@@ -62,7 +62,16 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 						calendar( "2000-02-29T12:00:00.00", "UTC" ),
 
 						// Two date/times that could be ambiguous due to a daylight saving time switch
-						calendar( "2011-10-30T02:50:00.00", "CET" )
+						calendar(
+								LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+										.withEarlierOffsetAtOverlap().toInstant().toEpochMilli(),
+								"CET"
+						),
+						calendar(
+								LocalDateTime.parse( "2011-10-30T02:50:00.00" ).atZone( ZoneId.of( "CET" ) )
+										.withLaterOffsetAtOverlap().toInstant().toEpochMilli(),
+								"CET"
+						)
 				);
 				return calendars;
 			}
@@ -82,7 +91,8 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 						zonedDateTime( "2000-02-29T12:00:00.00", "UTC" ),
 
 						// Two date/times that could be ambiguous due to a daylight saving time switch
-						zonedDateTime( "2011-10-30T02:50:00.00", "CET" )
+						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withEarlierOffsetAtOverlap(),
+						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withLaterOffsetAtOverlap()
 				);
 				return zonedDateTimes;
 			}
