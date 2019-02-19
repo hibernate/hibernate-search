@@ -259,11 +259,11 @@ To know which character filters, tokenizers and token filters are available,
 refer to the documentation:
 
 * If you want to use a built-in analyzer and not create your own:
-https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html[analyzers];
+{elasticsearchDocUrl}/analysis-analyzers.html[analyzers];
 * If you want to define your own analyzer:
-https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-charfilters.html[character filters],
-https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenizers.html[tokenizers],
-https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-tokenfilters.html[token filters].
+{elasticsearchDocUrl}/analysis-charfilters.html[character filters],
+{elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
+{elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
 
 
 // TODO add detailed description of each use case: normalizer, analyzer, custom, builtin type, ...

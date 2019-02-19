@@ -254,6 +254,7 @@
                         <hibernateSearchJavadocUrl>${javadoc.org.hibernate.search.url}</hibernateSearchJavadocUrl>
                         <hibernateVersion>${version.org.hibernate}</hibernateVersion>
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
+                        <elasticsearchDocUrl>${documentation.org.elasticsearch.url}</elasticsearchDocUrl>
                     </attributes>
                 </configuration>
             </plugin>
