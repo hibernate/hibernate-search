@@ -333,9 +333,9 @@ public interface Log extends BasicLogger {
 	SearchException invalidContainerExtractorReferencingBothBuiltinExtractorAndExplicitType(@FormatWith(EnumFormatter.class) BuiltinContainerExtractor value,
 			@FormatWith(ClassFormatter.class) Class<? extends ContainerExtractor> type);
 
-	@Message(id = ID_OFFSET_2 + 43, value = "Error converting URI '%1$s' to URL.")
+	@Message(id = ID_OFFSET_2 + 43, value = "Error creating URL from String '%1$s'.")
 	SearchException malformedURL(String value, @Cause MalformedURLException e);
 
-	@Message(id = ID_OFFSET_2 + 44, value = "Error converting URL '%1$s' to URI.")
+	@Message(id = ID_OFFSET_2 + 44, value = "Error creating URI from String '%1$s'.")
 	SearchException badURISyntax(String value, @Cause URISyntaxException e);
 }
