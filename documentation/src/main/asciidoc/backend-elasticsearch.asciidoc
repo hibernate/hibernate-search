@@ -235,6 +235,47 @@ those clients should be synchronized in such a way that while Hibernate Search i
 For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
 ====
 
+[[backend-elasticsearch-field-types]]
+== Field types
+
+[NOTE]
+====
+Some types are not supported directly by the Elasticsearch backend,
+but will work anyway because they are "bridged" by the mapper.
+For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
+which is supported by the Elasticsearch backend.
+See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
+====
+
+[cols="l,1",options="header"]
+.Field types supported by the Elasticsearch backend
+|====
+|Field type|link:{elasticsearchDocUrl}/mapping-types.html[Data type] in Elasticsearch
+|java.lang.String|`text` if an analyzer is defined, `keyword` otherwise
+|java.lang.Byte|`byte`
+|java.lang.Short|`short`
+|java.lang.Integer|`integer`
+|java.lang.Long|`long`
+|java.lang.Double|`double`
+|java.lang.Float|`float`
+|java.lang.Boolean|`boolean`
+|java.math.BigDecimal|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
+|java.math.BigInteger|Not supported yet; see https://hibernate.atlassian.net/browse/HSEARCH-3487[HSEARCH-3487]
+|java.time.Instant|`date` with default format (`"strict_date_optional_time\|\|epoch_millis"`)
+|java.time.LocalDate|`date` with `format: "strict_date\|\|yyyyyyyyy-MM-dd"`
+|java.time.LocalTime|`date` with `format: "strict_hour_minute_second_fraction\|\|HH:mm:ss.SSSSSSSSS"`
+|java.time.LocalDateTime|`date` with `format: "strict_date_hour_minute_second_fraction\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"`
+|java.time.ZonedDateTime|`date` with `format: "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']"`
+|java.time.OffsetDateTime|`date` with `format: "strict_date_time\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ"`
+|java.time.OffsetTime|`date` with `format: "strict_time"`
+|java.time.Year|`date` with `format: "strict_year\|\|yyyyyyyyy"`
+|java.time.YearMonth|`date` with `format: "strict_year_month\|\|yyyyyyyyy-MM"`
+|java.time.MonthDay|`date` with `format: "--MM-dd"`
+|org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
+|====
+
+// TODO also document "extension" types
+
 [[backend-elasticsearch-analysis]]
 === Analysis
 // Search 5 anchors backward compatibility

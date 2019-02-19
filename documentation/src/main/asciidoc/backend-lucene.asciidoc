@@ -78,6 +78,47 @@ You can find a full reference of available properties in the Hibernate Search ja
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
 
+[[backend-lucene-field-types]]
+== Field types
+
+[NOTE]
+====
+Some types are not supported directly by the Elasticsearch backend,
+but will work anyway because they are "bridged" by the mapper.
+For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
+which is supported by the Elasticsearch backend.
+See <<mapper-orm-bridge-valuebridge-builtin>> for more information.
+====
+
+[cols="l",options="header"]
+.Field types supported by the Lucene backend
+|====
+|Field type
+|java.lang.String
+|java.lang.Byte
+|java.lang.Short
+|java.lang.Integer
+|java.lang.Long
+|java.lang.Double
+|java.lang.Float
+|java.lang.Boolean
+|java.math.BigDecimal
+|java.math.BigInteger
+|java.time.Instant
+|java.time.LocalDate
+|java.time.LocalTime
+|java.time.LocalDateTime
+|java.time.ZonedDateTime
+|java.time.OffsetDateTime
+|java.time.OffsetTime
+|java.time.Year
+|java.time.YearMonth
+|java.time.MonthDay
+|org.hibernate.search.engine.spatial.GeoPoint
+|====
+
+// TODO also document "extension" types
+
 [[backend-lucene-analysis]]
 == Analysis
 
