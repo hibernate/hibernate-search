@@ -409,6 +409,7 @@
 
         <!-- Elasticsearch tests properties -->
 
+        <test.elasticsearch.java_home>${java.home}</test.elasticsearch.java_home>
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
@@ -1512,6 +1513,9 @@
                         <version>${test.elasticsearch.host.version}</version>
                         <timeout>90</timeout><!-- Make it work on our slow CI -->
                         <autoCreateIndex>false</autoCreateIndex>
+                        <environmentVariables>
+                            <JAVA_HOME>${test.elasticsearch.java_home}</JAVA_HOME>
+                        </environmentVariables>
                     </configuration>
                     <!-- Different executions from 2.x: the "start" goal has been renamed in version 5  -->
                     <executions>
