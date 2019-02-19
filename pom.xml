@@ -1520,6 +1520,7 @@
                                 <head>Experimental</head>
                             </tag>
                         </tags>
+                        <additionalOptions>${javadoc.additionalOptions.java-version}</additionalOptions>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -2058,6 +2059,8 @@
                 <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
                 <!-- no specific issue was reported yet -->
                 <failsafe.osgi.skip>true</failsafe.osgi.skip>
+                <!-- https://bugs.openjdk.java.net/browse/JDK-8212233?focusedCommentId=14245762 -->
+                <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
             </properties>
         </profile>
 
