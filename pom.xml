@@ -398,6 +398,9 @@
         <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
         <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco}</failsafe.jvm.args>
 
+        <failsafe.wildfly.skip>false</failsafe.wildfly.skip>
+        <failsafe.osgi.skip>false</failsafe.osgi.skip>
+
         <!--
             Should be set by submodules.
             Used by integration tests modules that execute tests from another module.
@@ -2052,6 +2055,9 @@
                 <arquillian.wildfly.jvm.args.java-version>
                     -Djdk.attach.allowAttachSelf=true
                 </arquillian.wildfly.jvm.args.java-version>
+                <!-- Skip the OSGi and WildFly integration tests with JDK 11 -->
+                <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
+                <failsafe.osgi.skip>true</failsafe.osgi.skip>
             </properties>
             <modules>
                 <module>integrationtest/jdk9-modules</module>

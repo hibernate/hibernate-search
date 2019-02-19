@@ -171,6 +171,7 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <skip>${failsafe.osgi.skip}</skip>
                     <systemPropertyVariables>
                         <maven.settings.localRepository>${settings.localRepository}</maven.settings.localRepository>
                         <maven.jboss.public.repo.url>${jboss.public.repo.url}</maven.jboss.public.repo.url>

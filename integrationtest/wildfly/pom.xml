@@ -277,6 +277,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <skip>${failsafe.wildfly.skip}</skip>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
