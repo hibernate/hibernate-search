@@ -46,7 +46,7 @@ public interface FullTextQuery extends Query, ProjectionConstants {
 
 	/**
 	 * Allows to set a single Lucene filter.
-	 * @deprecated: use the {@link org.hibernate.search.annotations.FullTextFilterDef} approach,
+	 * @deprecated use the {@link org.hibernate.search.annotations.FullTextFilterDef} approach,
 	 *     or use a {@link org.apache.lucene.search.BooleanQuery} and add a clause using
 	 *     {@link org.apache.lucene.search.BooleanClause.Occur#FILTER}.
 	 *

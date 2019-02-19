@@ -19,7 +19,7 @@ public interface MassIndexerWithTenant extends MassIndexer {
 	 * Set the tenant that is associated to this {@link MassIndexer}.
 	 *
 	 * @param tenantIdentifier the identifier of the tenant associated this {@link MassIndexer}
-	 * @return <tt>this</tt> for method chaining
+	 * @return {@code this} for method chaining
 	 */
 	MassIndexerWithTenant tenantIdentifier(String tenantIdentifier);
 }

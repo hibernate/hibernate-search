@@ -127,10 +127,10 @@ public final class MassIndexingJob {
 		 * The string that allows to select how you want to reference the {@link EntityManagerFactory}.
 		 * Possible values are:
 		 * <ul>
-		 * <li><tt>persistence-unit-name</tt> (the default): use the persistence unit name defined
-		 * in <tt>persistence.xml</tt>.
-		 * <li><tt>session-factory-name</tt>: use the session factory name defined in the Hibernate
-		 * configuration by the <tt>hibernate.session_factory_name</tt> configuration property.
+		 * <li>{@code persistence-unit-name} (the default): use the persistence unit name defined
+		 * in {@code persistence.xml}.
+		 * <li>{@code session-factory-name}: use the session factory name defined in the Hibernate
+		 * configuration by the {@code hibernate.session_factory_name} configuration property.
 		 * </ul>
 		 *
 		 * @param namespace the name of namespace to use
