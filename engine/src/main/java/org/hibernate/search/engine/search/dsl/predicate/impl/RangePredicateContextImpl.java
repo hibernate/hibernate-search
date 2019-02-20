@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-
 class RangePredicateContextImpl<B> implements RangePredicateContext {
 
 	private final RangePredicateFieldSetContextImpl.CommonState<B> commonState;
@@ -26,4 +25,9 @@ class RangePredicateContextImpl<B> implements RangePredicateContext {
 		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
+	@Override
+	public RangePredicateContextImpl boostedTo(float boost) {
+		this.commonState.setPredicateLevelBoost( boost );
+		return this;
+	}
 }

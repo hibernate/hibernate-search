@@ -32,6 +32,8 @@ class MatchPredicateFieldSetContextImpl<B>
 	private final List<String> absoluteFieldPaths;
 	private final List<MatchPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
+	private Float boost;
+
 	MatchPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
@@ -49,12 +51,13 @@ class MatchPredicateFieldSetContextImpl<B>
 
 	@Override
 	public MatchPredicateFieldSetContext boostedTo(float boost) {
-		predicateBuilders.forEach( b -> b.boost( boost ) );
+		this.boost = boost;
 		return this;
 	}
 
 	@Override
 	public SearchPredicateTerminalContext matching(Object value) {
+		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
 		return commonState.matching( value );
 	}
 

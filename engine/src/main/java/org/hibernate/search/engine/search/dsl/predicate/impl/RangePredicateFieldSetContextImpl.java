@@ -35,6 +35,8 @@ class RangePredicateFieldSetContextImpl<B>
 	private final List<String> absoluteFieldPaths;
 	private final List<RangePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
+	private Float boost;
+
 	RangePredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
@@ -53,22 +55,25 @@ class RangePredicateFieldSetContextImpl<B>
 
 	@Override
 	public RangePredicateFieldSetContext boostedTo(float boost) {
-		predicateBuilders.forEach( b -> b.boost( boost ) );
+		this.boost = boost;
 		return this;
 	}
 
 	@Override
 	public RangePredicateFromContext from(Object value) {
+		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
 		return fromContext.from( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext above(Object value) {
+		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
 		return commonState.above( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext below(Object value) {
+		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
 		return commonState.below( value );
 	}
 
