@@ -5,6 +5,8 @@ include::todo-placeholder.asciidoc[]
 
 :leveloffset: +1
 
+include::mapper-orm-configuration.asciidoc[]
+
 include::mapper-orm-mapping.asciidoc[]
 
 include::mapper-orm-indexing.asciidoc[]

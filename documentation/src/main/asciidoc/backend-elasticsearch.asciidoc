@@ -22,9 +22,10 @@ See below for the details of every configuration property.
 === Client properties
 
 Hosts::
++
 [source]
 ----
-hibernate.search.backends.<backend name>.hosts = http://localhost:9200 (default)`
+hibernate.search.backends.<backend name>.hosts = http://localhost:9200 (default)
 ----
 +
 The Elasticsearch host (or hosts) to send indexing requests and search queries to.
