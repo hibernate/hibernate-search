@@ -1,4 +1,4 @@
-[[mapper-orm]]
+[[mapper-orm-mapping]]
 = Mapping ORM entities to indexes
 // Search 5 anchors backward compatibility
 [[search-mapping]]
