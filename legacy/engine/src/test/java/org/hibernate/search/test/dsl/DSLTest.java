@@ -40,6 +40,7 @@ import org.hibernate.search.query.dsl.BooleanJunction;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.query.dsl.impl.ConnectedTermMatchingContext;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
@@ -637,6 +638,7 @@ public class DSLTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testPhraseQuery() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
