@@ -25,4 +25,10 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 	public MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
+
+	@Override
+	public MatchPredicateContextImpl boostedTo(float boost) {
+		this.commonState.setPredicateLevelBoost( boost );
+		return this;
+	}
 }

@@ -89,9 +89,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinCirclePredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
 			predicateBuilder.circle( center, radius, unit );
-			if ( boost != null ) {
-				predicateBuilder.boost( boost );
-			}
+			commonState.applyPredicateAndFieldBoosts( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
@@ -100,9 +98,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinPolygonPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
 			predicateBuilder.polygon( polygon );
-			if ( boost != null ) {
-				predicateBuilder.boost( boost );
-			}
+			commonState.applyPredicateAndFieldBoosts( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
@@ -111,9 +107,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinBoundingBoxPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
 			predicateBuilder.boundingBox( boundingBox );
-			if ( boost != null ) {
-				predicateBuilder.boost( boost );
-			}
+			commonState.applyPredicateAndFieldBoosts( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}

@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The context used when starting to define a match predicate.
  */
-public interface MatchPredicateContext {
+public interface MatchPredicateContext extends SearchPredicateNoFieldContext<MatchPredicateContext> {
 
 	// TODO wildcard, fuzzy. Or maybe a separate context?
 

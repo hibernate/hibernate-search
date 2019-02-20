@@ -12,12 +12,14 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMultiFieldPredicateCommonState.FieldSetContext<B>>
 		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
+	private Float predicateLevelBoost;
 
 	AbstractMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
@@ -33,6 +35,28 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 
 	List<F> getFieldSetContexts() {
 		return fieldSetContexts;
+	}
+
+	void setPredicateLevelBoost(Float boost) {
+		this.predicateLevelBoost = boost;
+	}
+
+	void applyPredicateAndFieldBoosts(Float fieldBoost, List<? extends SearchPredicateBuilder> predicateBuilders) {
+		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
+			applyPredicateAndFieldBoosts( fieldBoost, predicateBuilder );
+		}
+	}
+
+	void applyPredicateAndFieldBoosts(Float fieldBoost, SearchPredicateBuilder predicateBuilder) {
+		if ( predicateLevelBoost != null && fieldBoost != null ) {
+			predicateBuilder.boost( predicateLevelBoost * fieldBoost );
+		}
+		else if ( predicateLevelBoost != null ) {
+			predicateBuilder.boost( predicateLevelBoost );
+		}
+		else if ( fieldBoost != null ) {
+			predicateBuilder.boost( fieldBoost );
+		}
 	}
 
 	@Override
