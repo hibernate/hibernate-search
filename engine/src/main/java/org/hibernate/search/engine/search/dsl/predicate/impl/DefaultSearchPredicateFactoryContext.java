@@ -14,6 +14,7 @@ import org.hibernate.search.engine.search.dsl.predicate.MatchAllPredicateContext
 import org.hibernate.search.engine.search.dsl.predicate.MatchIdPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
@@ -61,6 +62,11 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	@Override
 	public RangePredicateContext range() {
 		return new RangePredicateContextImpl<>( factory );
+	}
+
+	@Override
+	public PhrasePredicateContext phrase() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

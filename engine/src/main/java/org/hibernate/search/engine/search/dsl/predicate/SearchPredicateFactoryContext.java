@@ -131,6 +131,15 @@ public interface SearchPredicateFactoryContext {
 	RangePredicateContext range();
 
 	/**
+	 * Match documents where targeted fields have a value that contains a given phrase.
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * @see PhrasePredicateContext
+	 */
+	PhrasePredicateContext phrase();
+
+	/**
 	 * Match documents where a
 	 * {@link org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage#NESTED nested object}
 	 * matches a given predicate.
