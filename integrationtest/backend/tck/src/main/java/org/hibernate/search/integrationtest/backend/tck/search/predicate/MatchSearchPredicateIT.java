@@ -187,7 +187,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void boost() {
+	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
@@ -210,6 +210,43 @@ public class MatchSearchPredicateIT {
 				.asReference()
 				.predicate( root -> root.bool()
 						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 42 )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	public void predicateLevelBoost() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						.should( f -> f.match().boostedTo( 7 ).onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						.should( f -> f.match().boostedTo( 39 ).onField( indexMapping.string1Field.relativeFieldName )
 								.matching( indexMapping.string1Field.document1Value.indexedValue )
 						)
 						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )

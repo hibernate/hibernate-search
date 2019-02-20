@@ -127,7 +127,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	}
 
 	@Test
-	public void boost() {
+	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SearchQuery<DocumentReference> query = searchTarget.query()
@@ -146,6 +146,35 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ) )
+						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+	}
+
+	@Test
+	public void predicateLevelBoost() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.spatial().within().onField( "geoPoint" ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ) )
+						.should( f.match().boostedTo( 7 ).onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.spatial().boostedTo( 39 ).within().onField( "geoPoint" ).boundingBox( CHEZ_MARGOTTE_BOUNDING_BOX ) )
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
