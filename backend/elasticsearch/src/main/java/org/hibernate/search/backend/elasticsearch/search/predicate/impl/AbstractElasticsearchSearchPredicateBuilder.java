@@ -44,15 +44,28 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
-		// TODO handle withConstantScore value here!
-
-		if ( boost != null ) {
+		// in case of withConstantScore boots is set by constant_score clause
+		if ( boost != null && !withConstantScore ) {
 			BOOST_ACCESSOR.set( innerObject, boost );
 		}
 
-		return doBuild( context, outerObject, innerObject );
+		JsonObject result = doBuild( context, outerObject, innerObject );
+		return ( withConstantScore ) ? applyConstantScore( result ) : result;
 	}
 
 	protected abstract JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject);
+
+	private JsonObject applyConstantScore(JsonObject filter) {
+		JsonObject constantScore = new JsonObject();
+		constantScore.add( "filter", filter );
+		if ( boost != null ) {
+			BOOST_ACCESSOR.set( constantScore, boost );
+		}
+
+		JsonObject result = new JsonObject();
+		result.add( "constant_score", constantScore );
+
+		return result;
+	}
 }
