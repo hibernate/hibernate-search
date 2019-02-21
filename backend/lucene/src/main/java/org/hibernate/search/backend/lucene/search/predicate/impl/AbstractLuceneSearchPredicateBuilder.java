@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BoostQuery;
+import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
 
 
@@ -38,15 +39,18 @@ abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBu
 
 	@Override
 	public final Query build(LuceneSearchPredicateContext context) {
+		Query query = doBuild( context );
 
-		// TODO handle withConstantScore value here!
-
+		// the boost should be applied on top of the constant score,
+		// otherwise the boost will simply be ignored
+		if ( withConstantScore ) {
+			query = new ConstantScoreQuery( query );
+		}
 		if ( boost != null ) {
-			return new BoostQuery( doBuild( context ), boost );
+			query = new BoostQuery( query, boost );
 		}
-		else {
-			return doBuild( context );
-		}
+
+		return query;
 	}
 
 	protected abstract Query doBuild(LuceneSearchPredicateContext context);
