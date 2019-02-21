@@ -456,4 +456,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 52, value = "Invalid index lifecycle strategy name: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidIndexLifecycleStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_3 + 53,
+			value = "Text predicates (phrase, fuzzy, wildcard) are not supported by this field's type.")
+	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
 }

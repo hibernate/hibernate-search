@@ -66,7 +66,7 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public PhrasePredicateContext phrase() {
-		throw new UnsupportedOperationException();
+		return new PhrasePredicateContextImpl<>( factory );
 	}
 
 	@Override

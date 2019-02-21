@@ -64,6 +64,8 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	RangePredicateBuilder<B> range(String absoluteFieldPath, DslConverter dslConverter);
 
+	PhrasePredicateBuilder<B> phrase(String absoluteFieldPath);
+
 	NestedPredicateBuilder<B> nested(String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<B> spatialWithinCircle(String absoluteFieldPath);

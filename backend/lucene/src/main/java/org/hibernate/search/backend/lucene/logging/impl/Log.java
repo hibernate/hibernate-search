@@ -414,4 +414,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 69,
 			value = "An IOException occurred while generating an Explanation.")
 	SearchException ioExceptionOnExplain(@Cause IOException e);
+
+	@Message(id = ID_OFFSET_2 + 70,
+			value = "Text predicates (phrase, fuzzy, wildcard) are not supported by this field's type.")
+	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
 }

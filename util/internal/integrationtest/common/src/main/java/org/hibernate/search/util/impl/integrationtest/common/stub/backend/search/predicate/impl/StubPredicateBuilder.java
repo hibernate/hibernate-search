@@ -11,6 +11,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
@@ -25,6 +26,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 		MatchIdPredicateBuilder<StubPredicateBuilder>,
 		MatchPredicateBuilder<StubPredicateBuilder>,
 		RangePredicateBuilder<StubPredicateBuilder>,
+		PhrasePredicateBuilder<StubPredicateBuilder>,
 		NestedPredicateBuilder<StubPredicateBuilder>,
 		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
 		SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
@@ -88,6 +90,16 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 
 	@Override
 	public void excludeUpperLimit() {
+		// No-op
+	}
+
+	@Override
+	public void slop(int slop) {
+		// No-op
+	}
+
+	@Override
+	public void phrase(String phrase) {
 		// No-op
 	}
 

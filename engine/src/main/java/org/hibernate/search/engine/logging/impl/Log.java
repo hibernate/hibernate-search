@@ -250,4 +250,15 @@ public interface Log extends BasicLogger {
 			value = "It is not possible to use per-field boosts together with withConstantScore option"
 	)
 	SearchException perFieldBoostWithConstantScore();
+
+	@Message(id = ID_OFFSET_2 + 52,
+			value = "Invalid phrase: the phrase to match in phrase predicates must be non-null."
+					+ " Null phrase was passed to phrase predicate on fields %1$s.")
+	SearchException phrasePredicateCannotMatchNullPhrase(List<String> strings);
+
+	@Message(id = ID_OFFSET_2 + 53,
+			value = "Invalid slop: %1$d. The slop must be positive or zero.")
+	SearchException invalidPhrasePredicateSlop(int slop);
+
+
 }

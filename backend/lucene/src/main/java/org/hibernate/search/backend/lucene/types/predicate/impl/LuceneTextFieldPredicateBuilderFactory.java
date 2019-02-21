@@ -11,9 +11,11 @@ import java.util.Objects;
 import org.apache.lucene.util.QueryBuilder;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 public final class LuceneTextFieldPredicateBuilderFactory<F>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
@@ -51,5 +53,10 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	public LuceneTextRangePredicateBuilder<?> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
 		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+	}
+
+	@Override
+	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(String absoluteFieldPath) {
+		return new LuceneTextPhrasePredicateBuilder( absoluteFieldPath, codec, queryBuilder );
 	}
 }

@@ -16,7 +16,7 @@ import org.apache.lucene.search.Query;
 /**
  * @author Guillaume Smet
  */
-abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
+public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
 		LuceneSearchPredicateBuilder {
 
 	private Float boost;
