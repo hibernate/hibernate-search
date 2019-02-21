@@ -117,7 +117,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_withDslConverter() {
+	public void withDslConverter() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -135,7 +135,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_withDslConverter_usingRawValues() {
+	public void withDslConverter_usingRawValues() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -152,7 +152,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_emptyStringBeforeAnalysis() {
+	public void emptyStringBeforeAnalysis() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
@@ -167,7 +167,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_noTokenAfterAnalysis() {
+	public void noTokenAfterAnalysis() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		MainFieldModel fieldModel = indexMapping.analyzedStringField;
@@ -183,7 +183,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void unsupported_field_types() {
+	public void error_unsupportedFieldTypes() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
@@ -204,7 +204,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_error_null() {
+	public void error_null() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -469,7 +469,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multi_fields() {
+	public void multiFields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// onField(...).orField(...)
@@ -555,7 +555,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiField_withDslConverter() {
+	public void multiFields_withDslConverter() {
 		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
 				.asReference()
 				.predicate( f -> f.match()
@@ -583,7 +583,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void unknown_field() {
+	public void error_unknownField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		SubTest.expectException(
