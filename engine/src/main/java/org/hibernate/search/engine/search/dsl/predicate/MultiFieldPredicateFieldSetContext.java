@@ -23,8 +23,7 @@ public interface MultiFieldPredicateFieldSetContext<S> {
 	 */
 	S boostedTo(float boost);
 
-	// TODO other methods from QueryCustomization/FieldCustomization
-//	S withConstantScore();
-//	S withFilter();
+	// TODO HSEARCH-3312 add field customization method: S ignoreAnalyzer();
+	// TODO HSEARCH-3257 add field customization method: S ignoreFieldBridge();
 
 }
