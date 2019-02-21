@@ -177,6 +177,7 @@ public class DSLTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testFuzzyQuery() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 
@@ -195,6 +196,7 @@ public class DSLTest {
 	}
 
 	@Test
+	@Category(PortedToSearch6.class)
 	public void testFuzzyQueryOnMultipleFields() throws Exception {
 		final QueryBuilder monthQb = helper.queryBuilder( Month.class );
 

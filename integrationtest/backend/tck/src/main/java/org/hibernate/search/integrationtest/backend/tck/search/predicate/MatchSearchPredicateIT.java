@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -36,6 +37,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -469,6 +471,260 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
+	public void fuzzy() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery =
+				text -> searchTarget.query()
+						.asReference()
+						.predicate( f -> f.match()
+								.fuzzy()
+								.onField( absoluteFieldPath )
+								.matching( text ) )
+						.build();
+
+		// max edit distance = default (2), ignored prefix length = default (0)
+		assertThat( createQuery.apply( "another word" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther ord" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "ather wd" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "ater w" ) )
+				.hasNoHits();
+	}
+
+	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
+	public void fuzzy_maxEditDistance() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+		BiFunction<String, Integer, SearchQuery<DocumentReference>> createQuery =
+				(text, maxEditDistance) -> searchTarget.query()
+						.asReference()
+						.predicate( f -> f.match()
+								.fuzzy( maxEditDistance )
+								.onField( absoluteFieldPath )
+								.matching( text ) )
+						.build();
+
+		// max edit distance = 2
+		assertThat( createQuery.apply( "another word", 2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther ord", 2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "ather wd", 2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "ater w", 2 ) )
+				.hasNoHits();
+
+		// max edit distance = 1
+		assertThat( createQuery.apply( "another word", 1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther ord", 1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "ather wd", 1 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( "ater w", 1 ) )
+				.hasNoHits();
+
+		// max edit distance = 0
+		assertThat( createQuery.apply( "another word", 0 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther ord", 0 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( "ather wd", 0 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( "ater w", 0 ) )
+				.hasNoHits();
+	}
+
+	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQuery")
+	public void fuzzy_exactPrefixLength() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+		BiFunction<String, Integer, SearchQuery<DocumentReference>> createQuery =
+				(text, exactPrefixLength) -> searchTarget.query()
+						.asReference()
+						.predicate( f -> f.match()
+								.fuzzy( 1, exactPrefixLength )
+								.onField( absoluteFieldPath )
+								.matching( text ) )
+						.build();
+
+		// exact prefix length = 0
+		assertThat( createQuery.apply( "another word", 0 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther wod", 0 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "aother wrd", 0 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "nother ord", 0 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+
+		// exact prefix length = 1
+		assertThat( createQuery.apply( "another word", 1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther wod", 1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "aother wrd", 1 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "nother ord", 1 ) )
+				.hasNoHits();
+
+		// exact prefix length = 2
+		assertThat( createQuery.apply( "another word", 2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "anther wod", 2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "aother wrd", 2 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( "nother ord", 2 ) )
+				.hasNoHits();
+	}
+
+	@Test
+	public void fuzzy_normalizedStringField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		String absoluteFieldPath = indexMapping.normalizedStringField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery;
+
+		createQuery = param -> searchTarget.query()
+				.asReference()
+				.predicate( f -> f.match().fuzzy().onField( absoluteFieldPath ).matching( param ) )
+				.build();
+		assertThat( createQuery.apply( "Irving" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "Irvin" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "rvin" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "rin" ) )
+				.hasNoHits();
+
+		createQuery = param -> searchTarget.query()
+				.asReference()
+				.predicate( f -> f.match().fuzzy( 2, 1 ).onField( absoluteFieldPath )
+						.matching( param ) )
+				.build();
+		assertThat( createQuery.apply( "Irving" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "irving" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "Irvin" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "rving" ) )
+				.hasNoHits();
+	}
+
+	@Test
+	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testFuzzyQueryOnMultipleFields")
+	public void fuzzy_multipleFields() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		String absoluteFieldPath1 = indexMapping.analyzedStringField.relativeFieldName;
+		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery;
+
+		createQuery = param -> searchTarget.query()
+				.asReference()
+				.predicate( f -> f.match().fuzzy().onFields( absoluteFieldPath1, absoluteFieldPath2 ).matching( param ) )
+				.build();
+		assertThat( createQuery.apply( "word" ) ) // distance 1 from doc1:field2, 0 from doc2:field1
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( createQuery.apply( "wd" ) ) // distance 3 from doc1:field2, 2 from doc2:field1
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		assertThat( createQuery.apply( "worldss" ) ) // distance 2 from doc1:field2, 3 from doc2:field1
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( createQuery.apply( "wl" ) ) // distance 3 from doc1:field2, 3 from doc2:field1
+				.hasNoHits();
+	}
+
+	@Test
+	public void error_fuzzy_unsupportedFieldType() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.fuzzyUnsupportedFieldModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+			Object valueToMatch = fieldModel.document1Value.indexedValue;
+
+			SubTest.expectException(
+					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().match().fuzzy()
+							.onField( absoluteFieldPath ).matching( valueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Text predicates" )
+					.hasMessageContaining( "not supported by" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+
+			SubTest.expectException(
+					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().match().fuzzy( 1 )
+							.onField( absoluteFieldPath ).matching( valueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Text predicates" )
+					.hasMessageContaining( "not supported by" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+
+			SubTest.expectException(
+					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath,
+					() -> searchTarget.predicate().match().fuzzy( 1, 1 )
+							.onField( absoluteFieldPath ).matching( valueToMatch )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Text predicates" )
+					.hasMessageContaining( "not supported by" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					) );
+		}
+	}
+
+	@Test
+	public void error_fuzzy_invalidMaxEditDistance() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SubTest.expectException(
+				() -> searchTarget.predicate().match().fuzzy( 3 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Invalid maximum edit distance" )
+				.hasMessageContaining( "0, 1 or 2" );
+
+		SubTest.expectException(
+				() -> searchTarget.predicate().match().fuzzy( -1 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Invalid maximum edit distance" )
+				.hasMessageContaining( "0, 1 or 2" );
+	}
+
+	@Test
+	public void error_fuzzy_invalidPrefixLength() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SubTest.expectException(
+				() -> searchTarget.predicate().match().fuzzy( 1, -1 )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Invalid exact prefix length" )
+				.hasMessageContaining( "positive or zero" );
+	}
+
+	@Test
 	public void multiFields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -764,6 +1020,9 @@ public class MatchSearchPredicateIT {
 			indexMapping.string3Field.document1Value.write( document );
 			indexMapping.string1FieldWithDslConverter.document1Value.write( document );
 			indexMapping.string2FieldWithDslConverter.document1Value.write( document );
+			indexMapping.analyzedStringField.document1Value.write( document );
+			indexMapping.analyzedStringField2.document1Value.write( document );
+			indexMapping.normalizedStringField.document1Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -774,6 +1033,9 @@ public class MatchSearchPredicateIT {
 			indexMapping.string3Field.document2Value.write( document );
 			indexMapping.string1FieldWithDslConverter.document2Value.write( document );
 			indexMapping.string2FieldWithDslConverter.document2Value.write( document );
+			indexMapping.analyzedStringField.document2Value.write( document );
+			indexMapping.analyzedStringField2.document2Value.write( document );
+			indexMapping.normalizedStringField.document2Value.write( document );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
@@ -782,6 +1044,9 @@ public class MatchSearchPredicateIT {
 			indexMapping.string3Field.document3Value.write( document );
 			indexMapping.string1FieldWithDslConverter.document3Value.write( document );
 			indexMapping.string2FieldWithDslConverter.document3Value.write( document );
+			indexMapping.analyzedStringField.document3Value.write( document );
+			indexMapping.analyzedStringField2.document3Value.write( document );
+			indexMapping.normalizedStringField.document3Value.write( document );
 		} );
 		workPlan.execute().join();
 
@@ -838,21 +1103,32 @@ public class MatchSearchPredicateIT {
 		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels = new ArrayList<>();
 		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<String>> fuzzySupportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> fuzzyUnsupportedFieldModels = new ArrayList<>();
 
 		final MainFieldModel string1Field;
 		final MainFieldModel string2Field;
 		final MainFieldModel string3Field;
 		final MainFieldModel analyzedStringField;
+		final MainFieldModel analyzedStringField2;
+		final MainFieldModel normalizedStringField;
 
 		final MainFieldModel string1FieldWithDslConverter;
 		final MainFieldModel string2FieldWithDslConverter;
 
+		@SuppressWarnings("unchecked")
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_", ignored -> { },
 					(typeDescriptor, expectations, model) -> {
 						if ( expectations.isMatchPredicateSupported() ) {
 							supportedFieldModels.add( model );
+							if ( String.class.equals( typeDescriptor.getJavaType() ) ) {
+								fuzzySupportedFieldModels.add( (ByTypeFieldModel<String>) model );
+							}
+							else {
+								fuzzyUnsupportedFieldModels.add( model );
+							}
 						}
 						else {
 							unsupportedFieldModels.add( model );
@@ -884,6 +1160,16 @@ public class MatchSearchPredicateIT {
 					"quick brown fox", "another word", "a"
 			)
 					.map( root, "analyzedString" );
+			analyzedStringField2 = MainFieldModel.mapper(
+					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
+					"another world", "blue whale", "the"
+			)
+					.map( root, "analyzedString2" );
+			normalizedStringField = MainFieldModel.mapper(
+					c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ),
+					"Irving", "Auster", "Coe"
+			)
+					.map( root, "normalizedString" );
 			string1FieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
 					"thread", "local", "company"
