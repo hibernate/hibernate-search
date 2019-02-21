@@ -23,8 +23,4 @@ public interface SearchPredicateNoFieldContext<S> {
 	 */
 	S boostedTo(float boost);
 
-	// TODO other methods from QueryCustomization
-//	S withConstantScore();
-//	S withFilter();
-
 }

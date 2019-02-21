@@ -61,19 +61,19 @@ class RangePredicateFieldSetContextImpl<B>
 
 	@Override
 	public RangePredicateFromContext from(Object value) {
-		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
+		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return fromContext.from( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext above(Object value) {
-		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
+		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.above( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext below(Object value) {
-		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
+		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.below( value );
 	}
 

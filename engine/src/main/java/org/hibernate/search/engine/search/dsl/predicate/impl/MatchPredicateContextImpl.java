@@ -31,4 +31,10 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 		this.commonState.setPredicateLevelBoost( boost );
 		return this;
 	}
+
+	@Override
+	public MatchPredicateContext withConstantScore() {
+		this.commonState.withConstantScore();
+		return this;
+	}
 }

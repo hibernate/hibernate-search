@@ -43,6 +43,12 @@ class BooleanJunctionPredicateContextImpl<B>
 	}
 
 	@Override
+	public BooleanJunctionPredicateContext withConstantScore() {
+		builder.withConstantScore();
+		return this;
+	}
+
+	@Override
 	public BooleanJunctionPredicateContext must(SearchPredicate searchPredicate) {
 		builder.must( factory.toImplementation( searchPredicate ) );
 		return this;

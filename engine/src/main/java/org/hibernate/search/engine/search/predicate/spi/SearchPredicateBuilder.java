@@ -17,6 +17,8 @@ public interface SearchPredicateBuilder<B> {
 
 	void boost(float boost);
 
+	void withConstantScore();
+
 	/**
 	 * @return An implementation-specific view of this builder,
 	 * allowing the backend to call a {@code build()} method in particular.
