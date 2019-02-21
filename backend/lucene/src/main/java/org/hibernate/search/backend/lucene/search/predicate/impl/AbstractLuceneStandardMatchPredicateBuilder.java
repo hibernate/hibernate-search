@@ -47,6 +47,11 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	}
 
 	@Override
+	public void fuzzy(int maxEditDistance, int exactPrefixLength) {
+		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+	}
+
+	@Override
 	public void value(Object value) {
 		try {
 			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );

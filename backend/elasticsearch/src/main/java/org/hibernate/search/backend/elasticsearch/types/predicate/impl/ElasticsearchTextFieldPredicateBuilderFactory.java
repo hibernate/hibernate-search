@@ -6,9 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 
 public class ElasticsearchTextFieldPredicateBuilderFactory
@@ -19,6 +22,12 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 			ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
 			ElasticsearchFieldCodec<String> codec) {
 		super( converter, rawConverter, codec );
+	}
+
+	@Override
+	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
 	@Override

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
+package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
 
@@ -12,6 +12,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -24,7 +27,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
+class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -41,7 +44,7 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 
 	private JsonElement value;
 
-	public ElasticsearchMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
+	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
 			ElasticsearchFieldCodec<F> codec) {
@@ -49,6 +52,11 @@ public class ElasticsearchMatchPredicateBuilder<F> extends AbstractElasticsearch
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.dslToIndexConverter = dslToIndexConverter;
 		this.codec = codec;
+	}
+
+	@Override
+	public void fuzzy(int maxEditDistance, int exactPrefixLength) {
+		throw log.textPredicatesNotSupportedByFieldType( EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 	}
 
 	@Override

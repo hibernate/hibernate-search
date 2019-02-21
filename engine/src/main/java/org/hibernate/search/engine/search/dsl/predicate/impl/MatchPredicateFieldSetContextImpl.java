@@ -75,11 +75,25 @@ class MatchPredicateFieldSetContextImpl<B>
 	static class CommonState<B> extends AbstractMultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
+		private Integer maxEditDistance;
+		private Integer exactPrefixLength;
+
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 
-		public SearchPredicateTerminalContext matching(Object value) {
+		void fuzzy(int maxEditDistance, int exactPrefixLength) {
+			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
+				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
+			}
+			if ( exactPrefixLength < 0 ) {
+				throw log.invalidExactPrefixLength( exactPrefixLength );
+			}
+			this.maxEditDistance = maxEditDistance;
+			this.exactPrefixLength = exactPrefixLength;
+		}
+
+		SearchPredicateTerminalContext matching(Object value) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
@@ -90,6 +104,9 @@ class MatchPredicateFieldSetContextImpl<B>
 
 					// Fieldset contexts won't be accessed anymore, it's time to apply their options
 					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
+					if ( maxEditDistance != null ) {
+						predicateBuilder.fuzzy( maxEditDistance, exactPrefixLength );
+					}
 				}
 			}
 			return this;

@@ -69,6 +69,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
+	public void fuzzy(int maxEditDistance, int exactPrefixLength) {
+		// No-op
+	}
+
+	@Override
 	public void value(Object value) {
 		// No-op
 	}

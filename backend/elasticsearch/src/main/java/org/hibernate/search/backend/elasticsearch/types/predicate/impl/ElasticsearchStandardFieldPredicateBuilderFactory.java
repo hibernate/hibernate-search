@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchMatchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -32,7 +31,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
-	private final ElasticsearchFieldCodec<F> codec;
+	protected final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldPredicateBuilderFactory(
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
@@ -58,7 +57,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new ElasticsearchMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
 	@Override
@@ -99,7 +98,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 		);
 	}
 
-	private ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+	protected final ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
 		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

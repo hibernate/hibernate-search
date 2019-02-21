@@ -8,6 +8,8 @@ package org.hibernate.search.engine.search.predicate.spi;
 
 public interface MatchPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
+	void fuzzy(int maxEditDistance, int exactPrefixLength);
+
 	void value(Object value);
 
 }

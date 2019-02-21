@@ -23,8 +23,9 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 	}
 
 	@Override
-	public MatchPredicateContext fuzzy(int maxEditDistance, int nonFuzzyPrefixLength) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public MatchPredicateContext fuzzy(int maxEditDistance, int exactPrefixLength) {
+		commonState.fuzzy( maxEditDistance, exactPrefixLength );
+		return this;
 	}
 
 	@Override

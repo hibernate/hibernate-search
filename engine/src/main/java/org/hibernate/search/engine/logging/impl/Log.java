@@ -260,5 +260,13 @@ public interface Log extends BasicLogger {
 			value = "Invalid slop: %1$d. The slop must be positive or zero.")
 	SearchException invalidPhrasePredicateSlop(int slop);
 
+	@Message(id = ID_OFFSET_2 + 54,
+			value = "Invalid maximum edit distance: %1$d. The value must be 0, 1 or 2.")
+	SearchException invalidFuzzyMaximumEditDistance(int maximumEditDistance);
+
+	@Message(id = ID_OFFSET_2 + 55,
+			value = "Invalid exact prefix length: %1$d. The value must be positive or zero.")
+	SearchException invalidExactPrefixLength(int exactPrefixLength);
+
 
 }
