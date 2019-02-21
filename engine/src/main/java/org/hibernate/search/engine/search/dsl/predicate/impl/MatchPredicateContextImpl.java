@@ -23,6 +23,11 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 	}
 
 	@Override
+	public MatchPredicateContext fuzzy(int maxEditDistance, int nonFuzzyPrefixLength) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
 	public MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.ENABLED );
 	}
