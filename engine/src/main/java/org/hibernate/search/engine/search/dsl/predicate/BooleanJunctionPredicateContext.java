@@ -63,7 +63,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
  * Matching "should" clauses are taken into account in score computation.
  */
 public interface BooleanJunctionPredicateContext extends
-		SearchPredicateNoFieldContext<BooleanJunctionPredicateContext>, SearchPredicateTerminalContext {
+		SearchPredicateScoreContext<BooleanJunctionPredicateContext>, SearchPredicateTerminalContext {
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.

@@ -20,6 +20,7 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 
 	private final List<F> fieldSetContexts = new ArrayList<>();
 	private Float predicateLevelBoost;
+	private boolean withConstantScore = false;
 
 	AbstractMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
@@ -41,13 +42,17 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 		this.predicateLevelBoost = boost;
 	}
 
-	void applyPredicateAndFieldBoosts(Float fieldBoost, List<? extends SearchPredicateBuilder> predicateBuilders) {
+	void applyBoostAndConstantScore(Float fieldBoost, List<? extends SearchPredicateBuilder> predicateBuilders) {
 		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
-			applyPredicateAndFieldBoosts( fieldBoost, predicateBuilder );
+			applyBoostAndConstantScore( fieldBoost, predicateBuilder );
 		}
 	}
 
-	void applyPredicateAndFieldBoosts(Float fieldBoost, SearchPredicateBuilder predicateBuilder) {
+	void withConstantScore() {
+		withConstantScore = true;
+	}
+
+	void applyBoostAndConstantScore(Float fieldBoost, SearchPredicateBuilder predicateBuilder) {
 		if ( predicateLevelBoost != null && fieldBoost != null ) {
 			predicateBuilder.boost( predicateLevelBoost * fieldBoost );
 		}
@@ -56,6 +61,10 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 		}
 		else if ( fieldBoost != null ) {
 			predicateBuilder.boost( fieldBoost );
+		}
+
+		if ( withConstantScore ) {
+			predicateBuilder.withConstantScore();
 		}
 	}
 

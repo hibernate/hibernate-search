@@ -19,10 +19,16 @@ abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBu
 		LuceneSearchPredicateBuilder {
 
 	private Float boost;
+	private boolean withConstantScore;
 
 	@Override
 	public void boost(float boost) {
 		this.boost = boost;
+	}
+
+	@Override
+	public void withConstantScore() {
+		this.withConstantScore = true;
 	}
 
 	@Override
@@ -32,6 +38,9 @@ abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBu
 
 	@Override
 	public final Query build(LuceneSearchPredicateContext context) {
+
+		// TODO handle withConstantScore value here!
+
 		if ( boost != null ) {
 			return new BoostQuery( doBuild( context ), boost );
 		}

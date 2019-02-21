@@ -22,10 +22,16 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
 	private Float boost;
+	private boolean withConstantScore = false;
 
 	@Override
 	public void boost(float boost) {
 		this.boost = boost;
+	}
+
+	@Override
+	public void withConstantScore() {
+		this.withConstantScore = true;
 	}
 
 	@Override
@@ -37,6 +43,8 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	public final JsonObject build(ElasticsearchSearchPredicateContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
+
+		// TODO handle withConstantScore value here!
 
 		if ( boost != null ) {
 			BOOST_ACCESSOR.set( innerObject, boost );

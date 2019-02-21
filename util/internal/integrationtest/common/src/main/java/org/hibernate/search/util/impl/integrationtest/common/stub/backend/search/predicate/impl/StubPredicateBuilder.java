@@ -97,6 +97,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
+	public void withConstantScore() {
+		// No-op
+	}
+
+	@Override
 	public void circle(GeoPoint center, double radius, DistanceUnit unit) {
 		// No-op
 	}

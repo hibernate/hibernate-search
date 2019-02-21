@@ -57,7 +57,7 @@ class MatchPredicateFieldSetContextImpl<B>
 
 	@Override
 	public SearchPredicateTerminalContext matching(Object value) {
-		commonState.applyPredicateAndFieldBoosts( boost, predicateBuilders );
+		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.matching( value );
 	}
 
