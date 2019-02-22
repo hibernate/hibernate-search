@@ -11,12 +11,14 @@ import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.AnalyzerWrapper;
+import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 /**
  * @author Guillaume Smet
  */
-public final class ScopedAnalyzer extends AnalyzerWrapper {
+public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 
 	private final Analyzer globalAnalyzer;
 
