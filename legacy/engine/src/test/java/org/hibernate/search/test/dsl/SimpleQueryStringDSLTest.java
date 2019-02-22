@@ -15,11 +15,13 @@ import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.dsl.DSLTest.MappingFactory;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.junit.SearchFactoryHolder;
 import org.hibernate.search.testsupport.junit.SearchITHelper;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
@@ -42,6 +44,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
+	@Category(PortedToSearch6.class)
 	public void testSimpleQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
@@ -83,6 +86,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
+	@Category(PortedToSearch6.class)
 	public void testBoost() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
@@ -109,6 +113,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
+	@Category(PortedToSearch6.class)
 	public void testFuzzy() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
@@ -125,6 +130,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
+	@Category(PortedToSearch6.class)
 	public void testAnalyzer() {
 		QueryBuilder qb = getBookQueryBuilder();
 
@@ -165,6 +171,7 @@ public class SimpleQueryStringDSLTest {
 	}
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
+	@Category(PortedToSearch6.class)
 	public void testNullQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
@@ -181,6 +188,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
+	@Category(PortedToSearch6.class)
 	public void testEmptyQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
@@ -197,6 +205,7 @@ public class SimpleQueryStringDSLTest {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2700")
+	@Category(PortedToSearch6.class)
 	public void testBlankQueryString() {
 		QueryBuilder qb = getCoffeeQueryBuilder();
 
