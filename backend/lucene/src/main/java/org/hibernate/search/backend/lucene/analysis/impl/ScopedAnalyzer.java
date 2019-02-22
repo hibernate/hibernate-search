@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.AnalyzerWrapper;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
+import org.apache.lucene.analysis.core.KeywordAnalyzer;
 
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
@@ -20,13 +20,12 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
  */
 public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 
-	private final Analyzer globalAnalyzer;
+	private static final Analyzer DEFAULT_ANALYZER = new KeywordAnalyzer();
 
 	private final Map<String, Analyzer> scopedAnalyzers;
 
-	private ScopedAnalyzer(Analyzer globalAnalyzer, Map<String, Analyzer> scopedAnalyzers) {
+	private ScopedAnalyzer(Map<String, Analyzer> scopedAnalyzers) {
 		super( PER_FIELD_REUSE_STRATEGY );
-		this.globalAnalyzer = globalAnalyzer;
 		this.scopedAnalyzers = CollectionHelper.toImmutableMap( scopedAnalyzers );
 	}
 
@@ -35,7 +34,7 @@ public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 		Analyzer analyzer = scopedAnalyzers.get( absoluteFieldPath );
 
 		if ( analyzer == null ) {
-			return globalAnalyzer;
+			return DEFAULT_ANALYZER;
 		}
 
 		return analyzer;
@@ -43,20 +42,14 @@ public final class ScopedAnalyzer extends DelegatingAnalyzerWrapper {
 
 	public static class Builder {
 
-		private final Analyzer globalAnalyzer;
-
 		private final Map<String, Analyzer> scopedAnalyzers = new HashMap<>();
-
-		public Builder(Analyzer globalAnalyzer) {
-			this.globalAnalyzer = globalAnalyzer;
-		}
 
 		public void setAnalyzer(String absoluteFieldPath, Analyzer analyzer) {
 			this.scopedAnalyzers.put( absoluteFieldPath, analyzer );
 		}
 
 		public ScopedAnalyzer build() {
-			return new ScopedAnalyzer( globalAnalyzer, scopedAnalyzers );
+			return new ScopedAnalyzer( scopedAnalyzers );
 		}
 	}
 }
