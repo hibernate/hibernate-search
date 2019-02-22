@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 
 /**
@@ -72,6 +73,11 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	@Override
 	public NestedPredicateContext nested() {
 		return delegate.nested();
+	}
+
+	@Override
+	public SimpleQueryStringPredicateContext simpleQueryString() {
+		return delegate.simpleQueryString();
 	}
 
 	@Override

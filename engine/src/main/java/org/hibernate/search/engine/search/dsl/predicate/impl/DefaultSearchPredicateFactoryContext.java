@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryExtensionContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
@@ -72,6 +73,11 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	@Override
 	public NestedPredicateContext nested() {
 		return new NestedPredicateContextImpl<>( factory, this );
+	}
+
+	@Override
+	public SimpleQueryStringPredicateContext simpleQueryString() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override

@@ -151,6 +151,21 @@ public interface SearchPredicateFactoryContext {
 	NestedPredicateContext nested();
 
 	/**
+	 * Match documents according to a given query string,
+	 * with a simple query language adapted to end users.
+	 * <p>
+	 * Note that by default, unless the query string contains explicit operators,
+	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
+	 * This makes sense when sorting results by relevance, but is not ideal otherwise.
+	 * See {@link SimpleQueryStringPredicateFieldSetContext#withAndAsDefaultOperator()} to change this behavior.
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * @see SimpleQueryStringPredicateContext
+	 */
+	SimpleQueryStringPredicateContext simpleQueryString();
+
+	/**
 	 * Access the different types of spatial predicates.
 	 *
 	 * @return A context allowing to define the type of spatial predicate.
