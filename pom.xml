@@ -181,6 +181,8 @@
         <version.org.hibernate>5.3.8.Final</version.org.hibernate>
         <version.org.hibernate.commons.annotations>5.0.5.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
+        <!-- Overridden to  -->
+        <version.net.bytebuddy>1.9.5</version.net.bytebuddy>
 
         <version.org.apache.lucene>5.5.5</version.org.apache.lucene>
         <version.feature-pack.org.apache.lucene>5.5.5.hibernate05</version.feature-pack.org.apache.lucene>
@@ -452,6 +454,11 @@
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-envers</artifactId>
                 <version>${version.org.hibernate}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${version.net.bytebuddy}</version>
             </dependency>
             <dependency>
                 <groupId>org.hibernate</groupId>
