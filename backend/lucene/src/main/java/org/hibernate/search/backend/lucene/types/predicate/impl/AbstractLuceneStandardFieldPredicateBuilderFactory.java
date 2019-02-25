@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -30,8 +31,6 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final ToDocumentFieldValueConverter<?, ? extends F> converter;
-
-	// TODO use rawConverter to builder predicates
 	final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	final C codec;
@@ -79,5 +78,9 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
+	}
+
+	protected ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

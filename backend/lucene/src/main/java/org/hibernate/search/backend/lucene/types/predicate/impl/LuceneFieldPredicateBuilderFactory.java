@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -48,7 +49,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 	boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other);
 
 	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath);
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath);

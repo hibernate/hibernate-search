@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
@@ -28,8 +29,6 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-
-	// TODO passing rawConverter to builder predicate
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	private final ElasticsearchFieldCodec<F> codec;
@@ -55,8 +54,8 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
-		return new ElasticsearchMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+		return new ElasticsearchMatchPredicateBuilder<>( searchContext, absoluteFieldPath, ( dslConverter.isEnabled() ) ? converter : rawConverter, codec );
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -60,7 +61,7 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	BooleanJunctionPredicateBuilder<B> bool();
 
-	MatchPredicateBuilder<B> match(String absoluteFieldPath);
+	MatchPredicateBuilder<B> match(String absoluteFieldPath, DslConverter dslConverter);
 
 	RangePredicateBuilder<B> range(String absoluteFieldPath);
 
