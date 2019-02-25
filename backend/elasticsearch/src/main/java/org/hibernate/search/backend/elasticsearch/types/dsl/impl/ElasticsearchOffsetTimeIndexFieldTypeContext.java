@@ -52,7 +52,7 @@ class ElasticsearchOffsetTimeIndexFieldTypeContext
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
 				mapping

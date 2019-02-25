@@ -28,12 +28,17 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+
+	// TODO passing rawConverter to builder predicate
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldPredicateBuilderFactory(
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

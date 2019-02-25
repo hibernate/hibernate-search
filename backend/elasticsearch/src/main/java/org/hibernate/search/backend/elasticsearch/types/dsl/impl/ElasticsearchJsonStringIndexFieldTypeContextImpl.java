@@ -53,7 +53,7 @@ class ElasticsearchJsonStringIndexFieldTypeContextImpl
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
 				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslToIndexConverter, codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( true, indexToProjectionConverter, codec ),
 				mapping
