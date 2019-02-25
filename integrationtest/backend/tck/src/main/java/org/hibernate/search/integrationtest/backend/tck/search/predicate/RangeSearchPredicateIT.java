@@ -393,6 +393,47 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
+	public void predicateLevelBoost_andFieldLevelBoost() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						// 2 * 3 => boost x6
+						.should( c -> c.range().boostedTo( 2 ).onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 3 )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
+						)
+						// 7 * 1 => boost x7
+						.should( c -> c.range().boostedTo( 7 ).onField( indexMapping.string1Field.relativeFieldName )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						// 39 * 0.5 => boost x19.5
+						.should( c -> c.range().boostedTo( 39 ).onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 0.5f )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
+						)
+						// 3 * 3 => boost x9
+						.should( c -> c.range().boostedTo( 3 ).onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 3 )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+	}
+
+	@Test
 	public void multi_fields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
