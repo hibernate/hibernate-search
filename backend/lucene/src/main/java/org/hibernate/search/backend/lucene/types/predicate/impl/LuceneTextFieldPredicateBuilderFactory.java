@@ -19,10 +19,10 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 
 	private final QueryBuilder queryBuilder;
 
-	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+	public LuceneTextFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
-		super( converter, codec );
+		super( converter, rawConverter, codec );
 		this.queryBuilder = queryBuilder;
 	}
 

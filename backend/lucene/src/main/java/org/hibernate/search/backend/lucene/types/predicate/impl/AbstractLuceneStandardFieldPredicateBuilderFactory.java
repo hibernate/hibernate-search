@@ -30,13 +30,19 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	final ToDocumentFieldValueConverter<?, ? extends F> converter;
+
+	// TODO use rawConverter to builder predicates
+	final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+
 	final C codec;
 
-	AbstractLuceneStandardFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter,
+	AbstractLuceneStandardFieldPredicateBuilderFactory(ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			C codec) {
 		Contracts.assertNotNull( converter, "converter" );
+		Contracts.assertNotNull( rawConverter, "rawConverter" );
 		Contracts.assertNotNull( codec, "codec" );
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

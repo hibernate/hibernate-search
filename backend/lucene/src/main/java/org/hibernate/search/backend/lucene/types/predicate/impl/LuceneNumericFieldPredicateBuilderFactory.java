@@ -20,9 +20,9 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneNumericFieldCodec<F, E>> {
 
 	public LuceneNumericFieldPredicateBuilderFactory(
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneNumericFieldCodec<F, E> codec) {
-		super( converter, codec );
+		super( converter, rawConverter, codec );
 	}
 
 	@Override

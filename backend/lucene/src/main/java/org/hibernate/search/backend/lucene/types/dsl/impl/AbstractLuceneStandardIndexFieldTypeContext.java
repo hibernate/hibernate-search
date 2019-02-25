@@ -68,8 +68,11 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	}
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
-		return dslToIndexConverter == null ? new PassThroughToDocumentFieldValueConverter<>( fieldType )
-				: dslToIndexConverter;
+		return dslToIndexConverter == null ? createRawConverter() : dslToIndexConverter;
+	}
+
+	protected final ToDocumentFieldValueConverter<F, ? extends F> createRawConverter() {
+		return new PassThroughToDocumentFieldValueConverter<>( fieldType );
 	}
 
 	protected final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {

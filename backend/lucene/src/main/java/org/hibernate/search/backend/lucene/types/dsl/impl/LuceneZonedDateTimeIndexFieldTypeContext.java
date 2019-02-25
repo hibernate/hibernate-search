@@ -45,7 +45,7 @@ class LuceneZonedDateTimeIndexFieldTypeContext
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, codec ),
+				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
 				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
