@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 class RangePredicateContextImpl<B> implements RangePredicateContext {
@@ -22,7 +23,12 @@ class RangePredicateContextImpl<B> implements RangePredicateContext {
 
 	@Override
 	public RangePredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
-		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.ENABLED );
+	}
+
+	@Override
+	public RangePredicateFieldSetContext onRawFields(String ... absoluteFieldPaths) {
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
 	}
 
 	@Override

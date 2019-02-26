@@ -12,12 +12,14 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -104,6 +106,23 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
+	public void above_withDslConverter_usingRawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			SearchQuery<DocumentReference> query = searchTarget.query()
+					.asReference()
+					.predicate( f -> f.range().onRawField( absoluteFieldPath ).above( fieldModel.predicateLowerBound ) )
+					.build();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+		}
+	}
+
+	@Test
 	public void above_include_exclude() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -162,6 +181,23 @@ public class RangeSearchPredicateIT {
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
+					.build();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+	}
+
+	@Test
+	public void below_withDslConverter_usingRawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			SearchQuery<DocumentReference> query = searchTarget.query()
+					.asReference()
+					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( fieldModel.predicateUpperBound ) )
 					.build();
 
 			assertThat( query )
@@ -230,6 +266,24 @@ public class RangeSearchPredicateIT {
 			SearchQuery<DocumentReference> query = searchTarget.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
+					.build();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+		}
+	}
+
+	@Test
+	public void fromTo_withDslConverter_usingRawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			SearchQuery<DocumentReference> query = searchTarget.query()
+					.asReference()
+					.predicate( f -> f.range().onRawField( absoluteFieldPath )
+							.from( fieldModel.predicateLowerBound ).to( fieldModel.predicateUpperBound ) )
 					.build();
 
 			assertThat( query )
@@ -561,6 +615,32 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
+	public void multiField_withDslConverter() {
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.range().onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+						.below( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
+				)
+				.build();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void multiFields_withDslConverter_usingRawValues() {
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.range().onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue )
+				)
+				.build();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
 	public void range_error_null() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -719,6 +799,8 @@ public class RangeSearchPredicateIT {
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
 			indexMapping.string3Field.document1Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document1Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document1Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -727,6 +809,8 @@ public class RangeSearchPredicateIT {
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
 			indexMapping.string3Field.document2Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document2Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document2Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
@@ -735,6 +819,8 @@ public class RangeSearchPredicateIT {
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
 			indexMapping.string3Field.document3Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document3Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document3Value.write( document );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -758,6 +844,9 @@ public class RangeSearchPredicateIT {
 		final MainFieldModel string2Field;
 		final MainFieldModel string3Field;
 
+		final MainFieldModel string1FieldWithDslConverter;
+		final MainFieldModel string2FieldWithDslConverter;
+
 		IndexMapping(IndexSchemaElement root) {
 			supportedFieldModels = mapByTypeFields(
 					root, "supported_", ignored -> { },
@@ -777,6 +866,16 @@ public class RangeSearchPredicateIT {
 					.map( root, "string2" );
 			string3Field = MainFieldModel.mapper( "eee", "ooo", "zzz" )
 					.map( root, "string3" );
+			string1FieldWithDslConverter = MainFieldModel.mapper(
+					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					"ccc", "mmm", "xxx"
+			)
+					.map( root, "string1FieldWithDslConverter" );
+			string2FieldWithDslConverter = MainFieldModel.mapper(
+					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					"ddd", "nnn", "yyy"
+			)
+					.map( root, "string2FieldWithDslConverter" );
 		}
 	}
 
@@ -823,6 +922,15 @@ public class RangeSearchPredicateIT {
 				String document1Value, String document2Value, String document3Value) {
 			return StandardFieldMapper.of(
 					f -> f.asString(),
+					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+			);
+		}
+
+		static StandardFieldMapper<String, MainFieldModel> mapper(
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration,
+				String document1Value, String document2Value, String document3Value) {
+			return StandardFieldMapper.of(
+					configuration,
 					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
 			);
 		}

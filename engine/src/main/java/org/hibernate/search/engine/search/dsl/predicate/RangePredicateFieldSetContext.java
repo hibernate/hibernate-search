@@ -40,6 +40,41 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	RangePredicateFieldSetContext orFields(String ... absoluteFieldPaths);
 
 	/**
+	 * Alternative version of {@link #orField(String)} to target the given field in the range predicate.
+	 * <p>
+	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
+	 * in order to provide range boundary values within ({@code from}, {@code to}, {@code below}, {@code above})
+	 * using the same format the date field is stored on the backend.
+	 * <p>
+	 * If no {@code DslConverter} are defined on the field,
+	 * it will have the same behaviour of {@link #orField(String)}.
+	 *
+	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
+	 * @return {@code this}, for method chaining.
+	 *
+	 * @see RangePredicateContext#onRawField(String)
+	 */
+	default RangePredicateFieldSetContext orRawField(String absoluteFieldPath) {
+		return orRawFields( absoluteFieldPath );
+	}
+
+	/**
+	 * Alternative version of {@link #orFields(String...)} to target the given fields in the range predicate.
+	 * <p>
+	 * Equivalent to {@link #orRawField(String)} followed by multiple calls to
+	 * {@link RangePredicateFieldSetContext#orRawField(String)},
+	 * the only difference being that calls to {@link RangePredicateFieldSetContext#boostedTo(float)}
+	 * and other field-specific settings on the returned context will only need to be done once
+	 * and will apply to all the fields passed to this method.
+	 *
+	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
+	 * @return {@code this}, for method chaining.
+	 *
+	 * @see RangePredicateContext#onRawFields(String...)
+	 */
+	RangePredicateFieldSetContext orRawFields(String... absoluteFieldPaths);
+
+	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
 	 * and "lower than" another value (to be provided in following calls).
 	 * <p>

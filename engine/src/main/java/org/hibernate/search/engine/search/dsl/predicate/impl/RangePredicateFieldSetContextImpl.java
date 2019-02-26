@@ -37,20 +37,24 @@ class RangePredicateFieldSetContextImpl<B>
 
 	private Float fieldSetBoost;
 
-	RangePredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
+	RangePredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths, DslConverter dslConverter) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			// TODO use DslConverter option
-			predicateBuilders.add( predicateFactory.range( absoluteFieldPath, DslConverter.ENABLED ) );
+			predicateBuilders.add( predicateFactory.range( absoluteFieldPath, dslConverter ) );
 		}
 	}
 
 	@Override
 	public RangePredicateFieldSetContext orFields(String... absoluteFieldPaths) {
-		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.ENABLED );
+	}
+
+	@Override
+	public RangePredicateFieldSetContext orRawFields(String... absoluteFieldPaths) {
+		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
 	}
 
 	@Override
