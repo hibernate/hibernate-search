@@ -182,6 +182,37 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
+	public void byField_withDslConverters_usingRawValues() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
+			) {
+				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.before1Value ) );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.between1And2Value ) );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.between2And3Value ) );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
+				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.after3Value ) );
+				assertThat( query )
+						.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+			}
+		}
+	}
+
+	@Test
 	public void byField_inFlattenedObject() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
 			SearchQuery<DocumentReference> query;

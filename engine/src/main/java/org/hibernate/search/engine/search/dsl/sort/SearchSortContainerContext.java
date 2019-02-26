@@ -49,6 +49,27 @@ public interface SearchSortContainerContext {
 	FieldSortContext byField(String absoluteFieldPath);
 
 	/**
+	 * Alternative version of {@link #byField(String)} to order elements by the value of a specific field.
+	 * <p>
+	 * The default order is <strong>ascending</strong>.
+	 * <p>
+	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
+	 * in order to provide missing values within {@link FieldSortContext#onMissingValue()}
+	 * using the same format the date field is stored on the backend.
+	 * <p>
+	 * If no {@code DslConverter} are defined on the field,
+	 * it will have the same behaviour of {@link #byField(String)}.
+	 *
+	 * @param absoluteFieldPath The absolute path of the index field to sort by
+	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}
+	 * or {@link SearchSortTerminalContext#toSort() get the resulting sort}.
+	 * @throws SearchException If the sort field type could not be automatically determined.
+	 *
+	 * @see #byField(String)
+	 */
+	FieldSortContext byRawField(String absoluteFieldPath);
+
+	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.

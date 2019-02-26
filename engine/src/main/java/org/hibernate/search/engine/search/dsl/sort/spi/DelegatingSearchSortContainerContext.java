@@ -45,6 +45,11 @@ public class DelegatingSearchSortContainerContext implements SearchSortContainer
 	}
 
 	@Override
+	public FieldSortContext byRawField(String absoluteFieldPath) {
+		return delegate.byRawField( absoluteFieldPath );
+	}
+
+	@Override
 	public DistanceSortContext byDistance(String absoluteFieldPath, GeoPoint location) {
 		return delegate.byDistance( absoluteFieldPath, location );
 	}

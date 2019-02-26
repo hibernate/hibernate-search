@@ -27,11 +27,9 @@ class FieldSortContextImpl<B>
 
 	FieldSortContextImpl(SearchSortContainerContext containerContext,
 			SearchSortBuilderFactory<?, B> factory, SearchSortDslContext<?> dslContext,
-			String absoluteFieldPath) {
+			String absoluteFieldPath, DslConverter dslConverter) {
 		super( containerContext, dslContext );
-
-		// TODO use DslConverter option
-		this.builder = factory.field( absoluteFieldPath, DslConverter.ENABLED );
+		this.builder = factory.field( absoluteFieldPath, dslConverter );
 	}
 
 	@Override
