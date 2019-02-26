@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
@@ -23,7 +24,12 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 
 	@Override
 	public MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
-		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
+		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.ENABLED );
+	}
+
+	@Override
+	public MatchPredicateFieldSetContext onRawFields(String ... absoluteFieldPaths) {
+		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
 	}
 
 	@Override

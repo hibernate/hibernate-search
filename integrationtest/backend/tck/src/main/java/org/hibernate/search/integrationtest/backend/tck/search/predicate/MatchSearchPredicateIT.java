@@ -117,6 +117,23 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void match_withDslConverterDslConverter_usingRawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String absoluteFieldPath = fieldModel.relativeFieldName;
+
+			SearchQuery<DocumentReference> query = searchTarget.query()
+					.asReference()
+					.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue ) )
+					.build();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		}
+	}
+
+	@Test
 	public void match_emptyStringBeforeAnalysis() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -520,6 +537,34 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void multiField_withDslConverter() {
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.match()
+						.onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+						.matching( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue ) )
+				)
+				.build();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
+	public void multiFields_withDslConverter_usingRawValues() {
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.match()
+						.onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue )
+				)
+				.build();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
 	public void unknown_field() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -618,6 +663,8 @@ public class MatchSearchPredicateIT {
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );
 			indexMapping.string3Field.document1Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document1Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document1Value.write( document );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -626,12 +673,16 @@ public class MatchSearchPredicateIT {
 			indexMapping.string1Field.document2Value.write( document );
 			indexMapping.string2Field.document2Value.write( document );
 			indexMapping.string3Field.document2Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document2Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document2Value.write( document );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
 			indexMapping.string3Field.document3Value.write( document );
+			indexMapping.string1FieldWithDslConverter.document3Value.write( document );
+			indexMapping.string2FieldWithDslConverter.document3Value.write( document );
 		} );
 		workPlan.execute().join();
 
@@ -663,6 +714,9 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel string3Field;
 		final MainFieldModel analyzedStringField;
 
+		final MainFieldModel string1FieldWithDslConverter;
+		final MainFieldModel string2FieldWithDslConverter;
+
 		IndexMapping(IndexSchemaElement root) {
 			supportedFieldModels = mapByTypeFields(
 					root, "supported_", ignored -> { },
@@ -693,6 +747,16 @@ public class MatchSearchPredicateIT {
 					"a word", "another word", "a"
 			)
 					.map( root, "analyzedString" );
+			string1FieldWithDslConverter = MainFieldModel.mapper(
+					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					"thread", "local", "company"
+			)
+					.map( root, "string1FieldWithDslConverter" );
+			string2FieldWithDslConverter = MainFieldModel.mapper(
+					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					"Mapper", "ORM", "Pojo"
+			)
+					.map( root, "string2FieldWithDslConverter" );
 		}
 	}
 
