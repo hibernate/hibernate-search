@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -27,8 +28,6 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	private final boolean sortable;
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-
-	// TODO passing rawConverter to sort builder
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	private final ElasticsearchFieldCodec<F> codec;
@@ -45,10 +44,10 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath) {
+			String absoluteFieldPath, DslConverter dslConverter) {
 		checkSortable( absoluteFieldPath, sortable );
 
-		return new ElasticsearchFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+		return new ElasticsearchFieldSortBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
 	@Override
@@ -80,5 +79,9 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 			throw log.unsortableField( absoluteFieldPath,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
+	}
+
+	private ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

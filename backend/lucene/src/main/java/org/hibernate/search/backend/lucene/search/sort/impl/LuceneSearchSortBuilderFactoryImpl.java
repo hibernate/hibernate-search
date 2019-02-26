@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
@@ -72,10 +73,10 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	}
 
 	@Override
-	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath) {
+	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createFieldSortBuilder( searchContext, absoluteFieldPath );
+				.createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -29,10 +30,8 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 
 	private final boolean sortable;
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
-
-	// TODO use rawConverter to builder predicates
-	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	protected final C codec;
 
@@ -74,5 +73,9 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 			throw log.unsortableField( absoluteFieldPath,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
+	}
+
+	protected ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

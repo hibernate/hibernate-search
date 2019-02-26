@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 public class LuceneTextFieldSortBuilderFactory<F>
@@ -23,9 +24,9 @@ public class LuceneTextFieldSortBuilderFactory<F>
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
 		checkSortable( absoluteFieldPath );
 
-		return new LuceneTextFieldSortBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+		return new LuceneTextFieldSortBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 }
