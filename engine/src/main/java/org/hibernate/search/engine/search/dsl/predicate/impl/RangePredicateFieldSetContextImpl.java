@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateTerminalCo
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -42,7 +43,8 @@ class RangePredicateFieldSetContextImpl<B>
 		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
+			// TODO use DslConverter option
+			predicateBuilders.add( predicateFactory.range( absoluteFieldPath, DslConverter.ENABLED ) );
 		}
 	}
 

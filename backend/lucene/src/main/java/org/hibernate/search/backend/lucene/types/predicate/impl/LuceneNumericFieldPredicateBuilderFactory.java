@@ -34,7 +34,7 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 }

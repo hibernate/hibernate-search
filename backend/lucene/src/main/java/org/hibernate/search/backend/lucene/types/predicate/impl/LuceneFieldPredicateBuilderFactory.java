@@ -52,7 +52,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath);
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);

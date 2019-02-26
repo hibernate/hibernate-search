@@ -60,7 +60,7 @@ public class StubSearchPredicateBuilderFactory
 	}
 
 	@Override
-	public RangePredicateBuilder<StubPredicateBuilder> range(String absoluteFieldPath) {
+	public RangePredicateBuilder<StubPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
 		return new StubPredicateBuilder();
 	}
 

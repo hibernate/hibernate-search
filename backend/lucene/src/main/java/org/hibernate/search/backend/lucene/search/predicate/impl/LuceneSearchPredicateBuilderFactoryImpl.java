@@ -91,10 +91,10 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	}
 
 	@Override
-	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath) {
+	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createRangePredicateBuilder( searchContext, absoluteFieldPath );
+				.createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override

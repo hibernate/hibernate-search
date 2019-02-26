@@ -53,7 +53,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath);
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath);

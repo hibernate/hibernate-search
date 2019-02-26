@@ -44,7 +44,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory implements LuceneF
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

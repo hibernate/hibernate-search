@@ -63,7 +63,7 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	MatchPredicateBuilder<B> match(String absoluteFieldPath, DslConverter dslConverter);
 
-	RangePredicateBuilder<B> range(String absoluteFieldPath);
+	RangePredicateBuilder<B> range(String absoluteFieldPath, DslConverter dslConverter);
 
 	NestedPredicateBuilder<B> nested(String absoluteFieldPath);
 

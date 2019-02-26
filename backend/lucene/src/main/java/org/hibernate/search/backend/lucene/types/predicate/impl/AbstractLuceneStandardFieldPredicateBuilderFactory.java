@@ -30,8 +30,8 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	final C codec;
 

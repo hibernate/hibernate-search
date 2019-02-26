@@ -49,7 +49,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 
 	@Override
 	public LuceneTextRangePredicateBuilder<?> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 }

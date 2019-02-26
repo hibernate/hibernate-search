@@ -55,13 +55,13 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new ElasticsearchMatchPredicateBuilder<>( searchContext, absoluteFieldPath, ( dslConverter.isEnabled() ) ? converter : rawConverter, codec );
+		return new ElasticsearchMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
-		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
 	@Override
@@ -86,5 +86,9 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
+	}
+
+	private ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }
