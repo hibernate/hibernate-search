@@ -57,7 +57,7 @@ class ElasticsearchZonedDateTimeIndexFieldTypeContext
 		return new ElasticsearchIndexFieldType<>(
 				codec,
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createRawConverter(), codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
 				mapping
 		);

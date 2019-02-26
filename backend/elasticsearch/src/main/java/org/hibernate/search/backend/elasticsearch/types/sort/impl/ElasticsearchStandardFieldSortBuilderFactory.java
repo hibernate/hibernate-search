@@ -27,13 +27,18 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	private final boolean sortable;
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+
+	// TODO passing rawConverter to sort builder
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.sortable = sortable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 
