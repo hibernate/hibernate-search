@@ -16,9 +16,9 @@ public class LuceneTextFieldSortBuilderFactory<F>
 		extends AbstractLuceneStandardFieldSortBuilderFactory<F, LuceneTextFieldCodec<F>> {
 
 	public LuceneTextFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec) {
-		super( sortable, converter, codec );
+		super( sortable, converter, rawConverter, codec );
 	}
 
 	@Override

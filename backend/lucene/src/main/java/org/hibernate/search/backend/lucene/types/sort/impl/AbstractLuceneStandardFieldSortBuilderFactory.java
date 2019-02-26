@@ -30,13 +30,18 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 	private final boolean sortable;
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+
+	// TODO use rawConverter to builder predicates
+	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+
 	protected final C codec;
 
 	protected AbstractLuceneStandardFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			C codec) {
 		this.sortable = sortable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

@@ -103,7 +103,7 @@ class LuceneStringIndexFieldTypeContext
 		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec, queryBuilder ),
-				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneTextFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createRawConverter(), codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec ),
 				analyzerOrNormalizer
 		);

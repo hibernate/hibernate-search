@@ -44,7 +44,7 @@ class LuceneBooleanIndexFieldTypeContext
 		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
-				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, codec ),
+				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createRawConverter(), codec ),
 				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
 		);
 	}
