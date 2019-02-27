@@ -11,7 +11,7 @@ import java.util.Collection;
 /**
  * The context used when defining a match on an identifier.
  */
-public interface MatchIdPredicateContext extends SearchPredicateTerminalContext {
+public interface MatchIdPredicateContext {
 
 	/**
 	 * Target the identifier with the given id.
@@ -22,7 +22,7 @@ public interface MatchIdPredicateContext extends SearchPredicateTerminalContext 
 	 * @param value the value of the id we want to match.
 	 * @return {@code this} for method chaining.
 	 */
-	MatchIdPredicateContext matching(Object value);
+	MatchIdPredicateTerminalContext matching(Object value);
 
 	/**
 	 * Target the identifiers matching any of the values in a collection.
@@ -30,8 +30,8 @@ public interface MatchIdPredicateContext extends SearchPredicateTerminalContext 
 	 * @param values the collection of identifiers to match.
 	 * @return {@code this} for method chaining.
 	 */
-	default MatchIdPredicateContext matchingAny(Collection<Object> values) {
-		MatchIdPredicateContext context = null;
+	default MatchIdPredicateTerminalContext matchingAny(Collection<Object> values) {
+		MatchIdPredicateTerminalContext context = null;
 		for ( Object value : values ) {
 			context = matching( value );
 		}
