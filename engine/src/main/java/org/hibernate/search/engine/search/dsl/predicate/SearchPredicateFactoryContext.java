@@ -84,6 +84,13 @@ public interface SearchPredicateFactoryContext {
 	 */
 	MatchAllPredicateContext matchAll();
 
+	/**
+	 * Match documents where the identifier is among the given values.
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * @see MatchIdPredicateContext
+	 */
 	MatchIdPredicateContext id();
 
 	/**
