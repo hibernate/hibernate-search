@@ -187,6 +187,19 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void perFieldBoostWithConstantScore_error() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SubTest.expectException(
+				"HSEARCH000551: It is not possible to use per-field boosts together with withConstantScore option",
+				() -> searchTarget.predicate().match().withConstantScore().onField( indexMapping.string1Field.relativeFieldName ).boostedTo( 2.1f )
+						.matching( indexMapping.string1Field.document1Value.indexedValue )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class );
+	}
+
+	@Test
 	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 

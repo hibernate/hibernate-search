@@ -245,4 +245,9 @@ public interface Log extends BasicLogger {
 					+ " Set the property '%2$s' to a supported value or set '%3$s' to set a default value for all indexes."
 	)
 	SearchException indexBackendCannotBeNullOrEmpty(String indexName, String key, String defaultKey);
+
+	@Message(id = ID_OFFSET_2 + 51,
+			value = "It is not possible to use per-field boosts together with withConstantScore option"
+	)
+	SearchException perFieldBoostWithConstantScore();
 }
