@@ -59,4 +59,12 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(String absoluteFieldPath) {
 		return new LuceneTextPhrasePredicateBuilder( absoluteFieldPath, codec, queryBuilder );
 	}
+
+	@Override
+	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+			String absoluteFieldPath) {
+		return new LuceneSimpleQueryStringPredicateBuilderFieldContext(
+				queryBuilder == null ? null : queryBuilder.getAnalyzer()
+		);
+	}
 }

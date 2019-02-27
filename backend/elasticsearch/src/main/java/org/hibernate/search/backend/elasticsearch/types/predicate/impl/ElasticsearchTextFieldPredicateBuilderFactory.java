@@ -35,4 +35,10 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 			String absoluteFieldPath) {
 		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath );
 	}
+
+	@Override
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+			String absoluteFieldPath) {
+		return new ElasticsearchSimpleQueryStringPredicateBuilderFieldContext( absoluteFieldPath );
+	}
 }

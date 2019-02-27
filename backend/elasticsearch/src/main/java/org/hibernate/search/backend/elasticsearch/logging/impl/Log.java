@@ -458,6 +458,6 @@ public interface Log extends BasicLogger {
 	SearchException invalidIndexLifecycleStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_3 + 53,
-			value = "Text predicates (phrase, fuzzy, wildcard) are not supported by this field's type.")
+			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
 }

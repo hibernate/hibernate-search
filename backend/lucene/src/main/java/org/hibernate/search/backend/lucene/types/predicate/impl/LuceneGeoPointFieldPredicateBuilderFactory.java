@@ -59,6 +59,14 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory implements LuceneF
 	}
 
 	@Override
+	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+			String absoluteFieldPath) {
+		throw log.textPredicatesNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
+	}
+
+	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
 		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );

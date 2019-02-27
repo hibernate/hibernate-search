@@ -18,7 +18,19 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMultiFieldPredicateCommonState.FieldSetContext<B>>
+/**
+ * A common state for a multi-field predicate context
+ * that will simply create one predicate per field and a boolean query to join the predicates.
+ * <p>
+ * This abstract class is appropriate if the predicate supports targeting multiple fields at the DSL level,
+ * but not at the backend SPI level (like for range predicates, for example).
+ * Some predicate support targeting multiple fields at the backend SPI level,
+ * like the simple query string predicate.
+ *
+ * @param <B> The implementation type of builders.
+ * @param <F> The type of field set contexts.
+ */
+abstract class AbstractBooleanMultiFieldPredicateCommonState<B, F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetContext<B>>
 		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -27,7 +39,7 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 	private Float predicateLevelBoost;
 	private boolean withConstantScore = false;
 
-	AbstractMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
+	AbstractBooleanMultiFieldPredicateCommonState(SearchPredicateBuilderFactory<?, B> factory) {
 		super( factory );
 	}
 

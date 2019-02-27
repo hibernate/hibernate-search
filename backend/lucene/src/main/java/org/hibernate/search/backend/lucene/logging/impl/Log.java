@@ -416,6 +416,6 @@ public interface Log extends BasicLogger {
 	SearchException ioExceptionOnExplain(@Cause IOException e);
 
 	@Message(id = ID_OFFSET_2 + 70,
-			value = "Text predicates (phrase, fuzzy, wildcard) are not supported by this field's type.")
+			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
 }

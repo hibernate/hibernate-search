@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -27,6 +28,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 		MatchPredicateBuilder<StubPredicateBuilder>,
 		RangePredicateBuilder<StubPredicateBuilder>,
 		PhrasePredicateBuilder<StubPredicateBuilder>,
+		SimpleQueryStringPredicateBuilder<StubPredicateBuilder>,
 		NestedPredicateBuilder<StubPredicateBuilder>,
 		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
 		SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
@@ -109,6 +111,21 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
+	public FieldContext field(String absoluteFieldPath) {
+		return new StubFieldContext();
+	}
+
+	@Override
+	public void withAndAsDefaultOperator() {
+		// No-op
+	}
+
+	@Override
+	public void simpleQueryString(String simpleQueryString) {
+		// No-op
+	}
+
+	@Override
 	public void boost(float boost) {
 		// No-op
 	}
@@ -140,6 +157,14 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 
 	void simulateBuild() {
 		// No-op, just simulates a call on this object
+	}
+
+	private static class StubFieldContext implements SimpleQueryStringPredicateBuilder.FieldContext {
+
+		@Override
+		public void boost(float boost) {
+			// No-op
+		}
 	}
 
 }

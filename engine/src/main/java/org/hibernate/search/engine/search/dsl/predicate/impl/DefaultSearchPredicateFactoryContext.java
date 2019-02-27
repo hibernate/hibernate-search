@@ -77,7 +77,7 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public SimpleQueryStringPredicateContext simpleQueryString() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new SimpleQueryStringPredicateContextImpl<>( factory );
 	}
 
 	@Override

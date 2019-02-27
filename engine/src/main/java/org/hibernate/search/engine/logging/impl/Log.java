@@ -7,6 +7,7 @@
 
 package org.hibernate.search.engine.logging.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
@@ -49,6 +50,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 242,
 			value = "Hibernate Search failed to initialize component '%1$s' as class '%2$s' doesn't have a public no-arguments constructor")
 	SearchException noPublicNoArgConstructor(String componentName, @FormatWith(ClassFormatter.class) Class<?> clazz);
+
+	@Message(id = ID_OFFSET_1 + 334,
+			value = "Invalid simple query string: the string must be non-null."
+					+ " Null value was passed to simple query string predicate on fields %1$s.")
+	SearchException simpleQueryStringCannotBeNull(Collection<String> strings);
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 

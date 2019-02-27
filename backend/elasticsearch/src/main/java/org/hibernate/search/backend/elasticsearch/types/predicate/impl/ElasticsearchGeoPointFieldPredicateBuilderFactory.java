@@ -63,6 +63,14 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements Elasti
 	}
 
 	@Override
+	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+			String absoluteFieldPath) {
+		throw log.textPredicatesNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
+	}
+
+	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
 		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );

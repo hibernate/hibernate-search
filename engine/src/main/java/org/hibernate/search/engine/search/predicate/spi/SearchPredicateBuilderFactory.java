@@ -68,10 +68,11 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	NestedPredicateBuilder<B> nested(String absoluteFieldPath);
 
+	SimpleQueryStringPredicateBuilder<B> simpleQueryString();
+
 	SpatialWithinCirclePredicateBuilder<B> spatialWithinCircle(String absoluteFieldPath);
 
 	SpatialWithinPolygonPredicateBuilder<B> spatialWithinPolygon(String absoluteFieldPath);
 
 	SpatialWithinBoundingBoxPredicateBuilder<B> spatialWithinBoundingBox(String absoluteFieldPath);
-
 }

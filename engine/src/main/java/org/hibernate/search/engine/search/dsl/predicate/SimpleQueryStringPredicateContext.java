@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The context used when starting to define a simple query string predicate.
  */
-public interface SimpleQueryStringPredicateContext {
+public interface SimpleQueryStringPredicateContext extends SearchPredicateScoreContext<SimpleQueryStringPredicateContext> {
 
 	// TODO HSEARCH-3312 allow analyzer/normalizer override
 

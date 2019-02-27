@@ -67,6 +67,14 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	}
 
 	@Override
+	public LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
+			String absoluteFieldPath) {
+		throw log.textPredicatesNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
+	}
+
+	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.spatialPredicatesNotSupportedByFieldType(

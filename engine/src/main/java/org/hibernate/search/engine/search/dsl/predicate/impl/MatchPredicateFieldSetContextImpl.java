@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class MatchPredicateFieldSetContextImpl<B>
-		implements MatchPredicateFieldSetContext, AbstractMultiFieldPredicateCommonState.FieldSetContext<B> {
+		implements MatchPredicateFieldSetContext, AbstractBooleanMultiFieldPredicateCommonState.FieldSetContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -72,7 +72,7 @@ class MatchPredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends AbstractMultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
 			implements SearchPredicateTerminalContext {
 
 		private Integer maxEditDistance;
