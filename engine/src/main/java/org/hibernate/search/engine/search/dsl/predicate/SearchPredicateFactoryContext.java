@@ -173,9 +173,6 @@ public interface SearchPredicateFactoryContext {
 	 */
 	SpatialPredicateContext spatial();
 
-	// TODO ids query (Type + list of IDs? Just IDs? See https://www.elastic.co/guide/en/elasticsearch/reference/5.5/query-dsl-ids-query.html)
-	// TODO other queries (spatial, ...)
-
 	/**
 	 * Extend the current context with the given extension,
 	 * resulting in an extended context offering different types of predicates.
