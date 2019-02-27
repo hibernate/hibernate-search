@@ -16,7 +16,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
 import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
-import org.hibernate.search.integrationtest.showcase.library.model.ISBN;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
@@ -59,8 +58,8 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
 				fullTextSession.search( Book.class ).query()
 						.asEntity()
-						// TODO allow to bypass the bridge in the DSL
-						.predicate( f -> f.match().onField( "isbn" ).matching( new ISBN( isbnAsString ) ) )
+						// onRawField option allows to bypass the bridge in the DSL
+						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
 						.build();
 
 		return Optional.ofNullable( query.uniqueResult() );
