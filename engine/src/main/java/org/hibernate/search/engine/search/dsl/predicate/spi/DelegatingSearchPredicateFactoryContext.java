@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateContext;
 
 /**
  * A delegating {@link SearchPredicateFactoryContext}.
@@ -68,6 +69,11 @@ public class DelegatingSearchPredicateFactoryContext implements SearchPredicateF
 	@Override
 	public PhrasePredicateContext phrase() {
 		return delegate.phrase();
+	}
+
+	@Override
+	public WildcardPredicateContext wildcard() {
+		return delegate.wildcard();
 	}
 
 	@Override

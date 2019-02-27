@@ -147,6 +147,20 @@ public interface SearchPredicateFactoryContext {
 	PhrasePredicateContext phrase();
 
 	/**
+	 * Match documents where targeted fields contain a term that matches a given pattern,
+	 * such as {@code inter*on} or {@code pa?t}.
+	 * <p>
+	 * Note that such patterns are <strong>not analyzed</strong>,
+	 * thus any character that is not a wildcard must match exactly the content of the index
+	 * (including uppercase letters, diacritics, ...).
+	 *
+	 * @return A context allowing to define the predicate more precisely
+	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.
+	 * @see WildcardPredicateContext
+	 */
+	WildcardPredicateContext wildcard();
+
+	/**
 	 * Match documents where a
 	 * {@link org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage#NESTED nested object}
 	 * matches a given predicate.

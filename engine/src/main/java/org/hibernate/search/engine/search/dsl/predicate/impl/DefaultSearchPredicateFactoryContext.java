@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.SpatialPredicateContext;
+import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
@@ -68,6 +69,11 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 	@Override
 	public PhrasePredicateContext phrase() {
 		return new PhrasePredicateContextImpl<>( factory );
+	}
+
+	@Override
+	public WildcardPredicateContext wildcard() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override
