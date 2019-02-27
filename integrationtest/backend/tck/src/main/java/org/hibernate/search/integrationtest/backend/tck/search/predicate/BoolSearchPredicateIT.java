@@ -407,6 +407,70 @@ public class BoolSearchPredicateIT {
 	}
 
 	@Test
+	public void withConstantScore() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						// 0.287682
+						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+
+						// withConstantScore 0.287682 => 1
+						.should( f.bool().withConstantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						// withConstantScore 0.287682 => 1
+						.should( f.bool().withConstantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+
+						// 0.287682
+						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	public void predicateLevelBoost_withConstantScore() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.should( f.bool().withConstantScore().boostedTo( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.bool().withConstantScore().boostedTo( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) ) )
+						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
 	public void must_should() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 

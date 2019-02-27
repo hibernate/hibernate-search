@@ -315,6 +315,84 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void withConstantScore() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						// 0.287682
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						// withConstantScore 0.287682 => 1
+						.should( f -> f.match().withConstantScore().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						// withConstantScore 0.287682 => 1
+						.should( f -> f.match().withConstantScore().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						// 0.287682
+						.should( f -> f.match().onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
+	public void predicateLevelBoost_withConstantScore() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						.should( f -> f.match().withConstantScore().boostedTo( 7 ).onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						.should( f -> f.match().withConstantScore().boostedTo( 39 ).onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( root -> root.bool()
+						.should( f -> f.match().withConstantScore().boostedTo( 39 ).onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document1Value.indexedValue )
+						)
+						.should( f -> f.match().withConstantScore().boostedTo( 7 ).onField( indexMapping.string1Field.relativeFieldName )
+								.matching( indexMapping.string1Field.document3Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+	}
+
+	@Test
 	public void multi_fields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
