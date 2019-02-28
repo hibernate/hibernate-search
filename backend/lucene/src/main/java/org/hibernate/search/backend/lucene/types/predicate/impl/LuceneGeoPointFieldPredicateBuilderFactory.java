@@ -30,7 +30,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory implements LuceneF
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
+	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
 		return INSTANCE == other;
 	}
 

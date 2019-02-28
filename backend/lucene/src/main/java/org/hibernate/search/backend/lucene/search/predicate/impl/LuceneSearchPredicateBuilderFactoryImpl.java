@@ -86,7 +86,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createMatchPredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
@@ -140,8 +140,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 		@Override
 		public boolean areCompatible(LuceneFieldPredicateBuilderFactory component1,
-				LuceneFieldPredicateBuilderFactory component2) {
-			return component1.isDslCompatibleWith( component2 );
+				LuceneFieldPredicateBuilderFactory component2, DslConverter dslConverter) {
+			return component1.isDslCompatibleWith( component2, dslConverter );
 		}
 
 		@Override

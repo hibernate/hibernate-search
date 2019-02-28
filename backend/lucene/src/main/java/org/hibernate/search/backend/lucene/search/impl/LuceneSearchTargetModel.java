@@ -19,6 +19,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -74,6 +75,12 @@ public class LuceneSearchTargetModel {
 
 	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
+		// by default dsl converter check is enabled
+		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
+	}
+
+	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
@@ -89,7 +96,7 @@ public class LuceneSearchTargetModel {
 					indexModelForSelectedSchemaNode = indexModel;
 					selectedComponent = component;
 				}
-				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component ) ) {
+				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component, dslConverter ) ) {
 					throw componentRetrievalStrategy.createCompatibilityException(
 							absoluteFieldPath,
 							selectedComponent,

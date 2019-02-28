@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeCompo
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.projection.spi.CompositeProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjectionBuilder;
@@ -148,7 +149,8 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 		@Override
 		public boolean areCompatible(LuceneFieldProjectionBuilderFactory component1,
-				LuceneFieldProjectionBuilderFactory component2) {
+				LuceneFieldProjectionBuilderFactory component2, DslConverter dslConverter) {
+			// TODO HSEARCH-3257 handle dslConverter option
 			return component1.isDslCompatibleWith( component2 );
 		}
 

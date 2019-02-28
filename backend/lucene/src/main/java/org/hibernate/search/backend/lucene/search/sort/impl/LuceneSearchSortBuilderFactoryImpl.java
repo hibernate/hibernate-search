@@ -111,7 +111,8 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 		@Override
 		public boolean areCompatible(LuceneFieldSortBuilderFactory component1,
-				LuceneFieldSortBuilderFactory component2) {
+				LuceneFieldSortBuilderFactory component2, DslConverter dslConverter) {
+			// TODO handle dslConverter option
 			return component1.isDslCompatibleWith( component2 );
 		}
 

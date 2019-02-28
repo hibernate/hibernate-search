@@ -43,10 +43,11 @@ public interface LuceneFieldPredicateBuilderFactory {
 	 * @see org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldPredicateBuilderFactory}, never {@code null}.
+	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other);
+	boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter);
 
 	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);

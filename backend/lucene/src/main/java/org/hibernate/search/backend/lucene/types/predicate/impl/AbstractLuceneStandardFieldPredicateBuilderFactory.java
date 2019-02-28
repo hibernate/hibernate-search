@@ -46,14 +46,16 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
+	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
 				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
-		return converter.isCompatibleWith( castedOther.converter )
-				&& codec.isCompatibleWith( castedOther.codec );
+		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
+			return false;
+		}
+		return !dslConverter.isEnabled() || converter.isCompatibleWith( castedOther.converter );
 	}
 
 	@Override

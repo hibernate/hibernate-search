@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.impl;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 
@@ -14,7 +15,7 @@ public interface IndexSchemaFieldNodeComponentRetrievalStrategy<T> {
 
 	T extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode);
 
-	boolean areCompatible(T component1, T component2);
+	boolean areCompatible(T component1, T component2, DslConverter dslConverter);
 
 	SearchException createCompatibilityException(String absoluteFieldPath, T component1, T component2,
 			EventContext context);

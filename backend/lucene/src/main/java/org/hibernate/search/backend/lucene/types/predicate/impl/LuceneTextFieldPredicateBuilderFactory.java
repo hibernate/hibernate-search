@@ -28,8 +28,8 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other) {
-		if ( !super.isDslCompatibleWith( other ) ) {
+	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+		if ( !super.isDslCompatibleWith( other, dslConverter ) ) {
 			return false;
 		}
 		LuceneTextFieldPredicateBuilderFactory<?> castedOther = (LuceneTextFieldPredicateBuilderFactory<?>) other;
