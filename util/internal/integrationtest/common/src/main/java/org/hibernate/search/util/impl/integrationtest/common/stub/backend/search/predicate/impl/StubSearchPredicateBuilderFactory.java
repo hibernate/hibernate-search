@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;

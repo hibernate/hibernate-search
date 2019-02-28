@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.search.SearchSort;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 

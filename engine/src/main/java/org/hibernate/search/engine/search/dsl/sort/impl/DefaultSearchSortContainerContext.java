@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExt
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerExtensionContext;
 import org.hibernate.search.engine.search.dsl.sort.spi.NonEmptySortContextImpl;
 import org.hibernate.search.engine.search.dsl.sort.spi.SearchSortDslContext;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 

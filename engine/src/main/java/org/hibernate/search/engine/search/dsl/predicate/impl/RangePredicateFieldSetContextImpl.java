@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.dsl.predicate.RangePredicateTerminalCo
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
-import org.hibernate.search.engine.search.predicate.DslConverter;
+import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
