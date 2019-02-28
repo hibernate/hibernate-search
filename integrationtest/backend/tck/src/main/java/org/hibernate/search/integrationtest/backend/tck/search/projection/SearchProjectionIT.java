@@ -316,7 +316,7 @@ public class SearchProjectionIT {
 
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query()
-				.asProjection( root -> root.<String>extension()
+				.asProjection( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								shouldNotBeCalled()
@@ -336,7 +336,7 @@ public class SearchProjectionIT {
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query()
-				.asProjection( root -> root.<String>extension()
+				.asProjection( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								shouldNotBeCalled()

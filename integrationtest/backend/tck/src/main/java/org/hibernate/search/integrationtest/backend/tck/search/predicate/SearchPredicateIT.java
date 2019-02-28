@@ -221,7 +221,7 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, second supported
 		query = searchTarget.query()
 				.asReference()
-				.predicate( root -> root.extension()
+				.predicate( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
 								shouldNotBeCalled()
@@ -241,7 +241,7 @@ public class SearchPredicateIT {
 		// Conditional extensions with orElse - two, both unsupported
 		query = searchTarget.query()
 				.asReference()
-				.predicate( root -> root.extension()
+				.predicate( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
 								shouldNotBeCalled()
