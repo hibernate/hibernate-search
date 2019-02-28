@@ -46,6 +46,7 @@ public class MatchSearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
+	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -53,14 +54,17 @@ public class MatchSearchPredicateIT {
 	private static final String EMPTY = "empty";
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
+	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
 
+	private StubMappingIndexManager indexManager;
 	private StubMappingIndexManager compatibleIndexManager;
+	private StubMappingIndexManager rawFieldCompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -74,6 +78,11 @@ public class MatchSearchPredicateIT {
 						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
 						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
+				)
+				.withIndex(
+						RAW_FIELD_COMPATIBLE_INDEX_NAME + "Type", RAW_FIELD_COMPATIBLE_INDEX_NAME,
+						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.setup();
 
@@ -633,7 +642,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex() {
+	public void multiIndex_withCompatibleIndexManager_usingField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -649,6 +658,47 @@ public class MatchSearchPredicateIT {
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 					b.doc( INDEX_NAME, DOCUMENT_1 );
 					b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+				} );
+			} );
+		}
+	}
+
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SubTest.expectException(
+					() -> {
+						indexManager.createSearchTarget( rawFieldCompatibleIndexManager )
+								.predicate().match().onField( fieldModel.relativeFieldName );
+					}
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_usingRawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String absoluteFieldPath = model.relativeFieldName;
+				Object valueToMatch = model.predicateParameterValue;
+
+				SearchQuery<DocumentReference> query = searchTarget.query()
+						.asReference()
+						.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( valueToMatch ) )
+						.build();
+
+				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+					b.doc( INDEX_NAME, DOCUMENT_1 );
+					b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 				} );
 			} );
 		}
@@ -690,6 +740,12 @@ public class MatchSearchPredicateIT {
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+		} );
+		workPlan.execute().join();
+
+		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		workPlan.execute().join();
 
@@ -757,6 +813,17 @@ public class MatchSearchPredicateIT {
 					"Mapper", "ORM", "Pojo"
 			)
 					.map( root, "string2FieldWithDslConverter" );
+		}
+	}
+
+	private static class RawFieldCompatibleIndexMapping {
+		final List<ByTypeFieldModel<?>> supportedFieldModels;
+
+		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					MatchPredicateExpectations::isMatchPredicateSupported
+			);
 		}
 	}
 
