@@ -96,14 +96,12 @@ public interface Log extends BasicLogger {
 	SearchException cannotAddMultiplePredicatesToNestedPredicate();
 
 	@Message(id = ID_OFFSET_2 + 11,
-			value = "Invalid value: the value to match in match predicates must be non-null."
-					+ " Null value was passed to match predicate on fields %1$s")
-	SearchException matchPredicateCannotMatchNullValue(List<String> strings);
+			value = "Invalid value: the value to match in match predicates must be non-null.")
+	SearchException matchPredicateCannotMatchNullValue(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 12,
-			value = "Invalid value: at least one bound in range predicates must be non-null."
-					+ " Null bounds were passed to range predicate on fields %1$s")
-	SearchException rangePredicateCannotMatchNullValue(List<String> strings);
+			value = "Invalid value: at least one bound in range predicates must be non-null.")
+	SearchException rangePredicateCannotMatchNullValue(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 13,
 			value = "Cannot map type '%1$s' to index '%2$s', because this type is abstract."
@@ -258,9 +256,8 @@ public interface Log extends BasicLogger {
 	SearchException perFieldBoostWithConstantScore();
 
 	@Message(id = ID_OFFSET_2 + 52,
-			value = "Invalid phrase: the phrase to match in phrase predicates must be non-null."
-					+ " Null phrase was passed to phrase predicate on fields %1$s.")
-	SearchException phrasePredicateCannotMatchNullPhrase(List<String> strings);
+			value = "Invalid phrase: the phrase to match in phrase predicates must be non-null.")
+	SearchException phrasePredicateCannotMatchNullPhrase(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 53,
 			value = "Invalid slop: %1$d. The slop must be positive or zero.")
@@ -275,9 +272,8 @@ public interface Log extends BasicLogger {
 	SearchException invalidExactPrefixLength(int exactPrefixLength);
 
 	@Message(id = ID_OFFSET_2 + 56,
-			value = "Invalid pattern: the pattern to match in wildcard predicates must be non-null."
-					+ " Null pattern was passed to wildcard predicate on fields %1$s.")
-	SearchException wildcardPredicateCannotMatchNullPattern(List<String> fields);
+			value = "Invalid pattern: the pattern to match in wildcard predicates must be non-null.")
+	SearchException wildcardPredicateCannotMatchNullPattern(@Param EventContext context);
 
 
 }

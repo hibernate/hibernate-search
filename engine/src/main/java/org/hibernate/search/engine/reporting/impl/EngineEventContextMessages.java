@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.reporting.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -61,6 +62,9 @@ public interface EngineEventContextMessages {
 
 	@Message(value = "field '%1$s'")
 	String indexFieldAbsolutePath(String absolutePath);
+
+	@Message(value = "fields %1$s")
+	String indexFieldAbsolutePaths(List<String> absolutePaths);
 
 	@Message(value = "analyzer '%1$s'")
 	String analyzer(String name);

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
@@ -66,6 +65,11 @@ class MatchPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
+	public List<String> getAbsoluteFieldPaths() {
+		return absoluteFieldPaths;
+	}
+
+	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( MatchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
 			collector.accept( predicateBuilder.toImplementation() );
@@ -95,7 +99,7 @@ class MatchPredicateFieldSetContextImpl<B>
 
 		SearchPredicateTerminalContext matching(Object value) {
 			if ( value == null ) {
-				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
+				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
 
 			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
@@ -110,11 +114,6 @@ class MatchPredicateFieldSetContextImpl<B>
 				}
 			}
 			return this;
-		}
-
-		private List<String> collectAbsoluteFieldPaths() {
-			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
 		}
 
 	}

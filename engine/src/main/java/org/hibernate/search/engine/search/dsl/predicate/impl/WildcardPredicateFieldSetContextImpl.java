@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldSetContext;
@@ -60,6 +59,11 @@ class WildcardPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
+	public List<String> getAbsoluteFieldPaths() {
+		return absoluteFieldPaths;
+	}
+
+	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( WildcardPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
 			collector.accept( predicateBuilder.toImplementation() );
@@ -75,7 +79,7 @@ class WildcardPredicateFieldSetContextImpl<B>
 
 		private SearchPredicateTerminalContext matching(String wildcardPattern) {
 			if ( wildcardPattern == null ) {
-				throw log.wildcardPredicateCannotMatchNullPattern( collectAbsoluteFieldPaths() );
+				throw log.wildcardPredicateCannotMatchNullPattern( getEventContext() );
 			}
 			for ( WildcardPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( WildcardPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
@@ -86,11 +90,6 @@ class WildcardPredicateFieldSetContextImpl<B>
 				}
 			}
 			return this;
-		}
-
-		private List<String> collectAbsoluteFieldPaths() {
-			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
 		}
 
 	}

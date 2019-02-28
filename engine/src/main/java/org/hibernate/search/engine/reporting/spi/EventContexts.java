@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.reporting.spi;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
@@ -105,6 +106,15 @@ public class EventContexts {
 			@Override
 			public String render(String param) {
 				return MESSAGES.indexFieldAbsolutePath( param );
+			}
+		} );
+	}
+
+	public static EventContext fromIndexFieldAbsolutePaths(List<String> absolutePaths) {
+		return EventContext.create( new AbstractSimpleEventContextElement<List<String>>( absolutePaths ) {
+			@Override
+			public String render(List<String> param) {
+				return MESSAGES.indexFieldAbsolutePaths( param );
 			}
 		} );
 	}

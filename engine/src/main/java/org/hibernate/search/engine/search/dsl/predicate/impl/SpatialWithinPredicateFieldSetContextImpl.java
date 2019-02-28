@@ -79,6 +79,11 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
+	public List<String> getAbsoluteFieldPaths() {
+		return absoluteFieldPaths;
+	}
+
+	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( SearchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
 			collector.accept( predicateBuilder.toImplementation() );

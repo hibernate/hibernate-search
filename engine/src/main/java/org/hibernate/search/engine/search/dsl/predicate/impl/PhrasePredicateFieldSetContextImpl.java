@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldSetContext;
@@ -60,6 +59,11 @@ class PhrasePredicateFieldSetContextImpl<B>
 	}
 
 	@Override
+	public List<String> getAbsoluteFieldPaths() {
+		return absoluteFieldPaths;
+	}
+
+	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( PhrasePredicateBuilder<B> predicateBuilder : predicateBuilders ) {
 			collector.accept( predicateBuilder.toImplementation() );
@@ -84,7 +88,7 @@ class PhrasePredicateFieldSetContextImpl<B>
 
 		private SearchPredicateTerminalContext matching(String phrase) {
 			if ( phrase == null ) {
-				throw log.phrasePredicateCannotMatchNullPhrase( collectAbsoluteFieldPaths() );
+				throw log.phrasePredicateCannotMatchNullPhrase( getEventContext() );
 			}
 
 			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
@@ -97,11 +101,6 @@ class PhrasePredicateFieldSetContextImpl<B>
 				}
 			}
 			return this;
-		}
-
-		private List<String> collectAbsoluteFieldPaths() {
-			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
 		}
 
 	}

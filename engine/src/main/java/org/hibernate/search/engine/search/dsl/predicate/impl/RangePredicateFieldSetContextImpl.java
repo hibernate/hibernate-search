@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -76,6 +75,11 @@ class RangePredicateFieldSetContextImpl<B>
 	@Override
 	public RangePredicateTerminalContext below(Object value) {
 		return commonState.below( value );
+	}
+
+	@Override
+	public List<String> getAbsoluteFieldPaths() {
+		return absoluteFieldPaths;
 	}
 
 	@Override
@@ -156,11 +160,6 @@ class RangePredicateFieldSetContextImpl<B>
 			}
 		}
 
-		private List<String> collectAbsoluteFieldPaths() {
-			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
-		}
-
 		private void applyPerFieldSetOptions() {
 			for ( RangePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( RangePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
@@ -171,7 +170,7 @@ class RangePredicateFieldSetContextImpl<B>
 
 		private void checkHasNonNullBound() {
 			if ( !hasNonNullBound ) {
-				throw log.rangePredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
+				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
 			}
 		}
 
