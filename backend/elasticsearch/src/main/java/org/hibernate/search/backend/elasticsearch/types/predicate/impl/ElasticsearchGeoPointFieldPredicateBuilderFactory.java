@@ -15,15 +15,14 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
-import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
+public class ElasticsearchGeoPointFieldPredicateBuilderFactory
+		extends AbstractElasticsearchFieldPredicateBuilderFactory {
 
 	public static final ElasticsearchGeoPointFieldPredicateBuilderFactory INSTANCE = new ElasticsearchGeoPointFieldPredicateBuilderFactory();
 
@@ -51,30 +50,6 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements Elasti
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
 		throw log.rangePredicatesNotSupportedByGeoPoint(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
-	}
-
-	@Override
-	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
-	}
-
-	@Override
-	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath) {
-		throw log.textPredicatesNotSupportedByFieldType(
-				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-		);
-	}
-
-	@Override
-	public ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(
-			String absoluteFieldPath) {
-		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
 	}
