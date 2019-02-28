@@ -28,6 +28,7 @@ import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -104,6 +105,13 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		return searchTargetModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
 				.createPhrasePredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
+		return searchTargetModel
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
+				.createWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

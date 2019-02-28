@@ -20,6 +20,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements ElasticsearchFieldPredicateBuilderFactory {
@@ -56,6 +57,14 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements Elasti
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
+			String absoluteFieldPath) {
+		throw log.textPredicatesNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
+	}
+
+	@Override
+	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )

@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -28,6 +29,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 		MatchPredicateBuilder<StubPredicateBuilder>,
 		RangePredicateBuilder<StubPredicateBuilder>,
 		PhrasePredicateBuilder<StubPredicateBuilder>,
+		WildcardPredicateBuilder<StubPredicateBuilder>,
 		SimpleQueryStringPredicateBuilder<StubPredicateBuilder>,
 		NestedPredicateBuilder<StubPredicateBuilder>,
 		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
@@ -107,6 +109,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 
 	@Override
 	public void phrase(String phrase) {
+		// No-op
+	}
+
+	@Override
+	public void pattern(String wildcardPattern) {
 		// No-op
 	}
 

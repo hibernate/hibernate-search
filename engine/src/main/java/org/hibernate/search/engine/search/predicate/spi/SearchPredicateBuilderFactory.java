@@ -66,6 +66,8 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	PhrasePredicateBuilder<B> phrase(String absoluteFieldPath);
 
+	WildcardPredicateBuilder<B> wildcard(String absoluteFieldPath);
+
 	NestedPredicateBuilder<B> nested(String absoluteFieldPath);
 
 	SimpleQueryStringPredicateBuilder<B> simpleQueryString();

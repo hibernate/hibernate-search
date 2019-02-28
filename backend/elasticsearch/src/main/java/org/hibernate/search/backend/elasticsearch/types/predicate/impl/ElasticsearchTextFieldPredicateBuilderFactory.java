@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 public class ElasticsearchTextFieldPredicateBuilderFactory
 		extends ElasticsearchStandardFieldPredicateBuilderFactory<String> {
@@ -34,6 +35,12 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
 			String absoluteFieldPath) {
 		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath );
+	}
+
+	@Override
+	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
+			String absoluteFieldPath) {
+		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

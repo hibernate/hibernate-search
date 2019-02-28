@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 public final class LuceneTextFieldPredicateBuilderFactory<F>
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, LuceneTextFieldCodec<F>> {
@@ -58,6 +59,12 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(String absoluteFieldPath) {
 		return new LuceneTextPhrasePredicateBuilder( absoluteFieldPath, codec, queryBuilder );
+	}
+
+	@Override
+	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
+			String absoluteFieldPath) {
+		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override

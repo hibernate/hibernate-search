@@ -274,5 +274,10 @@ public interface Log extends BasicLogger {
 			value = "Invalid exact prefix length: %1$d. The value must be positive or zero.")
 	SearchException invalidExactPrefixLength(int exactPrefixLength);
 
+	@Message(id = ID_OFFSET_2 + 56,
+			value = "Invalid pattern: the pattern to match in wildcard predicates must be non-null."
+					+ " Null pattern was passed to wildcard predicate on fields %1$s.")
+	SearchException wildcardPredicateCannotMatchNullPattern(List<String> fields);
+
 
 }

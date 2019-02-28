@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 /**
  * A field-scoped factory for search predicate builders.
@@ -57,6 +58,9 @@ public interface LuceneFieldPredicateBuilderFactory {
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
+			String absoluteFieldPath);
+
+	WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);
 
 	LuceneSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(String absoluteFieldPath);

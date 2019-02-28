@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
 /**
  * A field-scoped factory for search predicate builders.
@@ -58,6 +59,9 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
 
 	PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
+			String absoluteFieldPath);
+
+	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);
 
 	ElasticsearchSimpleQueryStringPredicateBuilderFieldContext createSimpleQueryStringFieldContext(String absoluteFieldPath);

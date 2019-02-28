@@ -73,7 +73,7 @@ public class DefaultSearchPredicateFactoryContext<B> implements SearchPredicateF
 
 	@Override
 	public WildcardPredicateContext wildcard() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new WildcardPredicateContextImpl<>( factory );
 	}
 
 	@Override

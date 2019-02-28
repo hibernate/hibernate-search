@@ -19,6 +19,7 @@ import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinBoundingBoxPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class LuceneGeoPointFieldPredicateBuilderFactory implements LuceneFieldPredicateBuilderFactory {
@@ -53,6 +54,14 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory implements LuceneF
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(String absoluteFieldPath) {
+		throw log.textPredicatesNotSupportedByFieldType(
+				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+		);
+	}
+
+	@Override
+	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
+			String absoluteFieldPath) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
