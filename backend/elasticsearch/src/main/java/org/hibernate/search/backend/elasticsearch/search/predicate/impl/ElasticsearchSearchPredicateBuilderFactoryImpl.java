@@ -92,7 +92,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
