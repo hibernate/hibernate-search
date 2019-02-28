@@ -35,7 +35,7 @@ class RangePredicateFieldSetContextImpl<B>
 	private final List<String> absoluteFieldPaths;
 	private final List<RangePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
-	private Float boost;
+	private Float fieldSetBoost;
 
 	RangePredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
@@ -55,31 +55,31 @@ class RangePredicateFieldSetContextImpl<B>
 
 	@Override
 	public RangePredicateFieldSetContext boostedTo(float boost) {
-		this.boost = boost;
+		this.fieldSetBoost = boost;
 		return this;
 	}
 
 	@Override
 	public RangePredicateFromContext from(Object value) {
-		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return fromContext.from( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext above(Object value) {
-		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.above( value );
 	}
 
 	@Override
 	public RangePredicateTerminalContext below(Object value) {
-		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.below( value );
 	}
 
 	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( RangePredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+			// Perform last-minute changes, since it's the last call that will be made on this field set context
+			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
+
 			collector.accept( predicateBuilder.toImplementation() );
 		}
 	}
@@ -110,28 +110,50 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		RangePredicateTerminalContext above(Object value) {
-			excludeUpperLimit = false;
-			if ( value != null ) {
-				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
-			}
+			// Fieldset contexts won't be accessed anymore, it's time to apply their options
+			applyPerFieldSetOptions();
+
+			doAbove( value );
 			checkHasNonNullBound();
 			return this;
 		}
 
 		RangePredicateTerminalContext below(Object value) {
+			// Fieldset contexts won't be accessed anymore, it's time to apply their options
+			applyPerFieldSetOptions();
+
+			doBelow( value );
+			checkHasNonNullBound();
+			return this;
+		}
+
+		private void doAbove(Object value) {
+			excludeUpperLimit = false;
+			if ( value != null ) {
+				hasNonNullBound = true;
+				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+			}
+		}
+
+		private void doBelow(Object value) {
 			excludeUpperLimit = true;
 			if ( value != null ) {
 				hasNonNullBound = true;
 				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
 			}
-			checkHasNonNullBound();
-			return this;
 		}
 
 		private List<String> collectAbsoluteFieldPaths() {
 			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
+		}
+
+		private void applyPerFieldSetOptions() {
+			for ( RangePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( RangePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
+				}
+			}
 		}
 
 		private void checkHasNonNullBound() {
@@ -156,7 +178,9 @@ class RangePredicateFieldSetContextImpl<B>
 
 		@Override
 		public RangePredicateTerminalContext to(Object value) {
-			return delegate.below( value );
+			delegate.doBelow( value );
+			delegate.checkHasNonNullBound();
+			return delegate;
 		}
 
 		@Override
@@ -166,10 +190,10 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		RangePredicateFromContext from(Object value) {
-			if ( value != null ) {
-				delegate.hasNonNullBound = true;
-				delegate.getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
-			}
+			// Fieldset contexts won't be accessed anymore, it's time to apply their options
+			delegate.applyPerFieldSetOptions();
+
+			delegate.doAbove( value );
 			return this;
 		}
 	}

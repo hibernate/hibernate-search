@@ -35,7 +35,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 
 	private final List<SearchPredicateBuilder<B>> predicateBuilders;
 
-	private Float boost;
+	private Float fieldSetBoost;
 
 	SpatialWithinPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
@@ -51,7 +51,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 
 	@Override
 	public SpatialWithinPredicateFieldSetContext boostedTo(float boost) {
-		this.boost = boost;
+		this.fieldSetBoost = boost;
 		return this;
 	}
 
@@ -89,7 +89,6 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinCirclePredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinCircle( absoluteFieldPath );
 			predicateBuilder.circle( center, radius, unit );
-			commonState.applyBoostAndConstantScore( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
@@ -98,7 +97,6 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinPolygonPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinPolygon( absoluteFieldPath );
 			predicateBuilder.polygon( polygon );
-			commonState.applyBoostAndConstantScore( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
@@ -107,7 +105,6 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			SpatialWithinBoundingBoxPredicateBuilder<B> predicateBuilder = commonState.getFactory().spatialWithinBoundingBox( absoluteFieldPath );
 			predicateBuilder.boundingBox( boundingBox );
-			commonState.applyBoostAndConstantScore( boost, predicateBuilder );
 			predicateBuilders.add( predicateBuilder );
 		}
 	}
@@ -119,28 +116,43 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 			super( factory );
 		}
 
-		public SearchPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit) {
+		SearchPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
+
+				// Fieldset contexts won't be accessed anymore, it's time to apply their options
+				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
 		}
 
-		public SearchPredicateTerminalContext polygon(GeoPolygon polygon) {
+		SearchPredicateTerminalContext polygon(GeoPolygon polygon) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinPolygonQueryBuilders( polygon );
+
+				// Fieldset contexts won't be accessed anymore, it's time to apply their options
+				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
 		}
 
-		public SearchPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox) {
+		SearchPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
+
+				// Fieldset contexts won't be accessed anymore, it's time to apply their options
+				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
+		}
+
+		private void applyPerFieldSetOptions(SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext) {
+			for ( SearchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+				applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
+			}
 		}
 	}
 }

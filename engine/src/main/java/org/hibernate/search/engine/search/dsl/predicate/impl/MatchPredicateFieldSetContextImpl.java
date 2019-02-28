@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
@@ -32,7 +31,7 @@ class MatchPredicateFieldSetContextImpl<B>
 	private final List<String> absoluteFieldPaths;
 	private final List<MatchPredicateBuilder<B>> predicateBuilders = new ArrayList<>();
 
-	private Float boost;
+	private Float fieldSetBoost;
 
 	MatchPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
@@ -51,13 +50,12 @@ class MatchPredicateFieldSetContextImpl<B>
 
 	@Override
 	public MatchPredicateFieldSetContext boostedTo(float boost) {
-		this.boost = boost;
+		this.fieldSetBoost = boost;
 		return this;
 	}
 
 	@Override
 	public SearchPredicateTerminalContext matching(Object value) {
-		commonState.applyBoostAndConstantScore( boost, predicateBuilders );
 		return commonState.matching( value );
 	}
 
@@ -79,17 +77,21 @@ class MatchPredicateFieldSetContextImpl<B>
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( collectAbsoluteFieldPaths() );
 			}
-			getQueryBuilders().forEach( b -> b.value( value ) );
+
+			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.value( value );
+
+					// Fieldset contexts won't be accessed anymore, it's time to apply their options
+					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
+				}
+			}
 			return this;
 		}
 
 		private List<String> collectAbsoluteFieldPaths() {
 			return getFieldSetContexts().stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
-		}
-
-		private Stream<MatchPredicateBuilder<B>> getQueryBuilders() {
-			return getFieldSetContexts().stream().flatMap( f -> f.predicateBuilders.stream() );
 		}
 
 	}

@@ -47,17 +47,11 @@ abstract class AbstractMultiFieldPredicateCommonState<B, F extends AbstractMulti
 		this.predicateLevelBoost = boost;
 	}
 
-	void applyBoostAndConstantScore(Float fieldBoost, List<? extends SearchPredicateBuilder> predicateBuilders) {
-		for ( SearchPredicateBuilder predicateBuilder : predicateBuilders ) {
-			applyBoostAndConstantScore( fieldBoost, predicateBuilder );
-		}
-	}
-
 	void withConstantScore() {
 		withConstantScore = true;
 	}
 
-	void applyBoostAndConstantScore(Float fieldBoost, SearchPredicateBuilder predicateBuilder) {
+	void applyBoostAndConstantScore(Float fieldBoost, SearchPredicateBuilder<?> predicateBuilder) {
 		if ( fieldBoost != null && withConstantScore ) {
 			// another good option would be the one to simply ignore the fieldBoost
 			// when the option withConstantScore is defined
