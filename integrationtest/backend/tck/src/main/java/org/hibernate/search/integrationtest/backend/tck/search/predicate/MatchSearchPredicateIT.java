@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -47,6 +48,7 @@ public class MatchSearchPredicateIT {
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
+	private static final String NOT_COMPATIBLE_INDEX_NAME = "IndexWithInCompatibleFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -65,6 +67,7 @@ public class MatchSearchPredicateIT {
 	private StubMappingIndexManager indexManager;
 	private StubMappingIndexManager compatibleIndexManager;
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
+	private StubMappingIndexManager notCompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -83,6 +86,11 @@ public class MatchSearchPredicateIT {
 						RAW_FIELD_COMPATIBLE_INDEX_NAME + "Type", RAW_FIELD_COMPATIBLE_INDEX_NAME,
 						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
+				)
+				.withIndex(
+						NOT_COMPATIBLE_INDEX_NAME + "Type", NOT_COMPATIBLE_INDEX_NAME,
+						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.notCompatibleIndexManager = indexManager
 				)
 				.setup();
 
@@ -126,7 +134,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void match_withDslConverterDslConverter_usingRawValues() {
+	public void match_withDslConverter_usingRawValues() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -704,6 +712,46 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
+	@Test
+	public void multiIndex_withNoCompatibleIndexManager_usingField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> searchTarget.predicate().match().onField( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
+	@Test
+	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> searchTarget.predicate().match().onRawField( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
@@ -827,6 +875,27 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
+	private static class NotCompatibleIndexMapping {
+		NotCompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * but with an incompatible type.
+			 */
+			mapByTypeSupportedIncompatibleFields(
+					root, "supported_",
+					(type, context) -> {
+						// Just try to pick a different, also supported type
+						if ( Integer.class.equals( type.getJavaType() ) ) {
+							return context.asLong();
+						}
+						else {
+							return context.asInteger();
+						}
+					}
+			);
+		}
+	}
+
 	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
 			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
 			Predicate<MatchPredicateExpectations<?>> predicate) {
@@ -849,6 +918,24 @@ public class MatchSearchPredicateIT {
 				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
 		)
 				.map( parent, prefix + typeDescriptor.getUniqueName() );
+	}
+
+	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
+				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		return IncompatibleFieldModel.mapper(
+				context -> configuration.apply( typeDescriptor, context )
+		)
+				.map( parent, name );
 	}
 
 	private static class ValueModel<F> {
@@ -907,6 +994,22 @@ public class MatchSearchPredicateIT {
 			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
 			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
 			this.predicateParameterValue = expectations.getMatchingDocument1Value();
+		}
+	}
+
+	private static class IncompatibleFieldModel<F> {
+		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
+			return StandardFieldMapper.of(
+					configuration,
+					(accessor, name) -> new IncompatibleFieldModel<>( name )
+			);
+		}
+
+		final String relativeFieldName;
+
+		private IncompatibleFieldModel(String relativeFieldName) {
+			this.relativeFieldName = relativeFieldName;
 		}
 	}
 }
