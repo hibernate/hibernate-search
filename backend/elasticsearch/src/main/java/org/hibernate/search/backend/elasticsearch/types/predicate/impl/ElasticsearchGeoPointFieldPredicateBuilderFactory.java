@@ -33,7 +33,7 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory implements Elasti
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other) {
+	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
 		return getClass().equals( other.getClass() );
 	}
 

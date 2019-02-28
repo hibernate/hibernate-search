@@ -42,14 +42,16 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F> implements Ela
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other) {
+	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		ElasticsearchStandardFieldPredicateBuilderFactory<?> castedOther =
 				(ElasticsearchStandardFieldPredicateBuilderFactory<?>) other;
-		return converter.isCompatibleWith( castedOther.converter )
-				&& codec.isCompatibleWith( castedOther.codec );
+		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
+			return false;
+		}
+		return !dslConverter.isEnabled() || converter.isCompatibleWith( castedOther.converter );
 	}
 
 	@Override

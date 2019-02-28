@@ -44,10 +44,11 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
 	 *
 	 * @param other Another {@link ElasticsearchFieldPredicateBuilderFactory}, never {@code null}.
+	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other);
+	boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter);
 
 	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);

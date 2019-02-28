@@ -106,7 +106,8 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 		@Override
 		public boolean areCompatible(ElasticsearchFieldSortBuilderFactory component1,
-				ElasticsearchFieldSortBuilderFactory component2) {
+				ElasticsearchFieldSortBuilderFactory component2, DslConverter dslConverter) {
+			// TODO handle dslConverter option
 			return component1.isDslCompatibleWith( component2 );
 		}
 
