@@ -47,8 +47,9 @@ public interface ElasticsearchFieldSortBuilderFactory {
 	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
 	 * *
 	 * @param other Another {@link ElasticsearchFieldSortBuilderFactory}, never {@code null}.
+	 * @param converter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given sort builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory other);
+	boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory other, DslConverter converter);
 }

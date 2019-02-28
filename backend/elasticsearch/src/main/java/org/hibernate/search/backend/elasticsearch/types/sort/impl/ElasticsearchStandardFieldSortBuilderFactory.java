@@ -59,7 +59,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj) {
+	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj, DslConverter dslConverter) {
 		if ( this == obj ) {
 			return true;
 		}
@@ -69,9 +69,10 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 
 		ElasticsearchStandardFieldSortBuilderFactory<?> other = (ElasticsearchStandardFieldSortBuilderFactory<?>) obj;
 
-		return sortable == other.sortable
-				&& converter.isCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec );
+		if ( sortable != other.sortable || !codec.isCompatibleWith( other.codec ) ) {
+			return false;
+		}
+		return !dslConverter.isEnabled() || converter.isCompatibleWith( other.converter );
 	}
 
 	private static void checkSortable(String absoluteFieldPath, boolean sortable) {

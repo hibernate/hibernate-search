@@ -47,7 +47,7 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory implements Elasticsear
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj) {
+	public boolean isDslCompatibleWith(ElasticsearchFieldSortBuilderFactory obj, DslConverter converter) {
 		if ( obj.getClass() != this.getClass() ) {
 			return false;
 		}

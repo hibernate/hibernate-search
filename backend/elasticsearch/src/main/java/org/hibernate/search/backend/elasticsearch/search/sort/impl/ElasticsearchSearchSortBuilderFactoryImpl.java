@@ -73,7 +73,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
@@ -107,8 +107,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		@Override
 		public boolean areCompatible(ElasticsearchFieldSortBuilderFactory component1,
 				ElasticsearchFieldSortBuilderFactory component2, DslConverter dslConverter) {
-			// TODO handle dslConverter option
-			return component1.isDslCompatibleWith( component2 );
+			return component1.isDslCompatibleWith( component2, dslConverter );
 		}
 
 		@Override
