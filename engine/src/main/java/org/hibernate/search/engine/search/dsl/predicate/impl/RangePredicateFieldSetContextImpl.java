@@ -30,7 +30,6 @@ class RangePredicateFieldSetContextImpl<B>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final CommonState<B> commonState;
-	private final RangePredicateFromContextImpl<B> fromContext;
 
 	private final List<String> absoluteFieldPaths;
 	private final List<RangePredicateBuilder<B>> predicateBuilders = new ArrayList<>();
@@ -45,7 +44,6 @@ class RangePredicateFieldSetContextImpl<B>
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
 			predicateBuilders.add( predicateFactory.range( absoluteFieldPath ) );
 		}
-		this.fromContext = new RangePredicateFromContextImpl<>( commonState );
 	}
 
 	@Override
@@ -61,7 +59,7 @@ class RangePredicateFieldSetContextImpl<B>
 
 	@Override
 	public RangePredicateFromContext from(Object value) {
-		return fromContext.from( value );
+		return commonState.from( value );
 	}
 
 	@Override
@@ -107,6 +105,14 @@ class RangePredicateFieldSetContextImpl<B>
 			// Just in case from() was called, but not to()
 			checkHasNonNullBound();
 			return super.toImplementation();
+		}
+
+		RangePredicateFromContext from(Object value) {
+			// Fieldset contexts won't be accessed anymore, it's time to apply their options
+			applyPerFieldSetOptions();
+
+			doAbove( value );
+			return new RangePredicateFromContextImpl<>( this );
 		}
 
 		RangePredicateTerminalContext above(Object value) {
@@ -186,14 +192,6 @@ class RangePredicateFieldSetContextImpl<B>
 		@Override
 		public RangePredicateFromContext excludeLimit() {
 			delegate.getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
-			return this;
-		}
-
-		RangePredicateFromContext from(Object value) {
-			// Fieldset contexts won't be accessed anymore, it's time to apply their options
-			delegate.applyPerFieldSetOptions();
-
-			delegate.doAbove( value );
 			return this;
 		}
 	}
