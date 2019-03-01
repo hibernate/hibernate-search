@@ -183,6 +183,35 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	}
 
 	@Test
+	public void predicateLevelBoost_multiFields() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.spatial().boostedTo( 0.1f ).within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
+						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.spatial().boostedTo( 39 ).within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
+						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
+	}
+
+	@Test
 	public void multi_fields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 

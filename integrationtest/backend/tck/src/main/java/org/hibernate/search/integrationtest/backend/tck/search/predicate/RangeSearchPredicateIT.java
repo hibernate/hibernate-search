@@ -434,6 +434,47 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
+	public void predicateLevelBoost_multiFields() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		SearchQuery<DocumentReference> query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.range().boostedTo( 2 ).onField( indexMapping.string1Field.relativeFieldName )
+								.orField( indexMapping.string2Field.relativeFieldName )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
+						)
+						.should( f.range().boostedTo( 7 ).onField( indexMapping.string1Field.relativeFieldName )
+								.orField( indexMapping.string2Field.relativeFieldName )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+
+		query = searchTarget.query()
+				.asReference()
+				.predicate( f -> f.bool()
+						.should( f.range().boostedTo( 39 ).onField( indexMapping.string1Field.relativeFieldName )
+								.orField( indexMapping.string2Field.relativeFieldName )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
+						)
+						.should( f.range().boostedTo( 3 ).onField( indexMapping.string1Field.relativeFieldName )
+								.orField( indexMapping.string2Field.relativeFieldName )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
+						)
+				)
+				.sort( c -> c.byScore() )
+				.build();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
+	}
+
+	@Test
 	public void multi_fields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
