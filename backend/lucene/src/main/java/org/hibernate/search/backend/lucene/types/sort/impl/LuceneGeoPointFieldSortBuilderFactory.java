@@ -44,7 +44,7 @@ public class LuceneGeoPointFieldSortBuilderFactory implements LuceneFieldSortBui
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj) {
+	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj, DslConverter dslConverter) {
 		if ( obj.getClass() != this.getClass() ) {
 			return false;
 		}

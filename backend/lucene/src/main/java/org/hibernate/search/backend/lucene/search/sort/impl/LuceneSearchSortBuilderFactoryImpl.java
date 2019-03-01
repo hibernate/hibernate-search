@@ -75,7 +75,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
 		return searchTargetModel
-				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
+				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
@@ -112,8 +112,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 		@Override
 		public boolean areCompatible(LuceneFieldSortBuilderFactory component1,
 				LuceneFieldSortBuilderFactory component2, DslConverter dslConverter) {
-			// TODO handle dslConverter option
-			return component1.isDslCompatibleWith( component2 );
+			return component1.isDslCompatibleWith( component2, dslConverter );
 		}
 
 		@Override

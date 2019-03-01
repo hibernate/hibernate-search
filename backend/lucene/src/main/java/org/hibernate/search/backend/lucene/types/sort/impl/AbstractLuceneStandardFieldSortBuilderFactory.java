@@ -53,7 +53,7 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj) {
+	public boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory obj, DslConverter dslConverter) {
 		if ( this == obj ) {
 			return true;
 		}
@@ -63,9 +63,10 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 
 		AbstractLuceneStandardFieldSortBuilderFactory<?, ?> other = (AbstractLuceneStandardFieldSortBuilderFactory<?, ?>) obj;
 
-		return sortable == other.sortable
-				&& converter.isCompatibleWith( other.converter )
-				&& codec.isCompatibleWith( other.codec );
+		if ( sortable != other.sortable || !codec.isCompatibleWith( other.codec ) ) {
+			return false;
+		}
+		return !dslConverter.isEnabled() || converter.isCompatibleWith( other.converter );
 	}
 
 	protected void checkSortable(String absoluteFieldPath) {

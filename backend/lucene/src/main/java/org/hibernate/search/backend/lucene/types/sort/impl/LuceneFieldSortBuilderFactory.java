@@ -47,8 +47,9 @@ public interface LuceneFieldSortBuilderFactory {
 	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
 	 *
 	 * @param other Another {@link LuceneFieldSortBuilderFactory}, never {@code null}.
+	 * @param converter whether {@code ENABLED}, converters will also be taken in account for the matching
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other);
+	boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other, DslConverter converter);
 }
