@@ -26,7 +26,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
@@ -64,11 +67,17 @@ import org.junit.rules.ExpectedException;
 public class FieldSearchSortIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
+	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
+	private static final String NOT_COMPATIBLE_INDEX_NAME = "IndexWithInCompatibleFields";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY = "empty";
+
+	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
+	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -77,7 +86,12 @@ public class FieldSearchSortIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
+	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
+
 	private StubMappingIndexManager indexManager;
+	private StubMappingIndexManager compatibleIndexManager;
+	private StubMappingIndexManager rawFieldCompatibleIndexManager;
+	private StubMappingIndexManager notCompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -87,13 +101,31 @@ public class FieldSearchSortIT {
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
+				.withIndex(
+						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleIndexManager = indexManager
+				)
+				.withIndex(
+						RAW_FIELD_COMPATIBLE_INDEX_NAME + "Type", RAW_FIELD_COMPATIBLE_INDEX_NAME,
+						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
+				)
+				.withIndex(
+						NOT_COMPATIBLE_INDEX_NAME + "Type", NOT_COMPATIBLE_INDEX_NAME,
+						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.notCompatibleIndexManager = indexManager
+				)
 				.setup();
 
 		initData();
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		return simpleQuery( sortContributor, indexManager.createSearchTarget() );
+	}
+
+	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingSearchTarget searchTarget) {
 		return searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
@@ -385,6 +417,139 @@ public class FieldSearchSortIT {
 		}
 	}
 
+	@Test
+	public void multiIndex_withCompatibleIndexManager_usingField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
+			) {
+				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.before1Value ), searchTarget );
+
+				/*
+				 * Not testing the ordering of results here because some documents have the same value.
+				 * It's not what we want tot test anyway: we just want to check that fields are correctly
+				 * detected as compatible and that no exception is thrown.
+				 */
+				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+					b.doc( INDEX_NAME, EMPTY );
+					b.doc( INDEX_NAME, DOCUMENT_1 );
+					b.doc( INDEX_NAME, DOCUMENT_2 );
+					b.doc( INDEX_NAME, DOCUMENT_3 );
+					b.doc( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+				} );
+			}
+		}
+	}
+
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> {
+						simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+					}
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a sort" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_usingRawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			// Eventually we will remove any restriction here. See the issues: HSEARCH-3254 HSEARCH-3255 and HSEARCH-3387.
+			if (
+					( TckConfiguration.get().getBackendFeatures().stringTypeOnMissingValueUse() || !String.class.equals( fieldModel.type ) )
+							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
+			) {
+				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+						.use( fieldModel.before1Value ), searchTarget );
+
+				/*
+				 * Not testing the ordering of results here because some documents have the same value.
+				 * It's not what we want tot test anyway: we just want to check that fields are correctly
+				 * detected as compatible and that no exception is thrown.
+				 */
+				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+					b.doc( INDEX_NAME, EMPTY );
+					b.doc( INDEX_NAME, DOCUMENT_1 );
+					b.doc( INDEX_NAME, DOCUMENT_2 );
+					b.doc( INDEX_NAME, DOCUMENT_3 );
+					b.doc( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+				} );
+			}
+		}
+	}
+
+	@Test
+	public void multiIndex_withNoCompatibleIndexManager_usingField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> {
+						simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+					}
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a sort" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
+	@Test
+	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> {
+						simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+					}
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Multiple conflicting types to build a sort" )
+					.hasMessageContaining( "'" + fieldPath + "'" )
+					.satisfies( FailureReportUtils.hasContext(
+							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+					) );
+		}
+	}
+
 	private boolean isJavaTimeType(Class<?> type) {
 		final Class<?>[] javaTimeTypes = { LocalDate.class, LocalDateTime.class, LocalTime.class, ZonedDateTime.class, Year.class, YearMonth.class, MonthDay.class,
 				OffsetDateTime.class, OffsetTime.class, ZoneOffset.class, ZoneId.class, Period.class, Duration.class, Instant.class
@@ -450,7 +615,19 @@ public class FieldSearchSortIT {
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
+		workPlan.execute().join();
 
+		workPlan = compatibleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+		} );
+		workPlan.execute().join();
+
+		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
+		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+		} );
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
@@ -527,6 +704,38 @@ public class FieldSearchSortIT {
 		}
 	}
 
+	private static class RawFieldCompatibleIndexMapping {
+		final List<ByTypeFieldModel<?>> supportedFieldModels;
+
+		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+			supportedFieldModels = mapByTypeFields(
+					root, "supported_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					FieldSortExpectations::isFieldSortSupported
+			);
+		}
+	}
+
+	private static class NotCompatibleIndexMapping {
+		NotCompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * but with an incompatible type.
+			 */
+			mapByTypeSupportedIncompatibleFields(
+					root, "supported_",
+					(type, context) -> {
+						// Just try to pick a different, also supported type
+						if ( Integer.class.equals( type.getJavaType() ) ) {
+							return context.asLong();
+						}
+						else {
+							return context.asInteger();
+						}
+					}
+			);
+		}
+	}
+
 	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
 			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
 			Predicate<FieldSortExpectations<?>> predicate) {
@@ -549,6 +758,24 @@ public class FieldSearchSortIT {
 				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, typeDescriptor.getJavaType(), expectations )
 		)
 				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+	}
+
+	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
+				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
+				.collect( Collectors.toList() );
+	}
+
+	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
+			FieldTypeDescriptor<F> typeDescriptor,
+			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
+		String name = prefix + typeDescriptor.getUniqueName();
+		return IncompatibleFieldModel.mapper(
+				context -> configuration.apply( typeDescriptor, context )
+		)
+				.map( parent, name );
 	}
 
 	private static class ValueModel<F> {
@@ -614,6 +841,22 @@ public class FieldSearchSortIT {
 			this.between1And2Value = expectations.getBetweenDocument1And2Value();
 			this.between2And3Value = expectations.getBetweenDocument2And3Value();
 			this.after3Value = expectations.getAfterDocument3Value();
+		}
+	}
+
+	private static class IncompatibleFieldModel<F> {
+		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
+				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
+			return StandardFieldMapper.of(
+					configuration,
+					(accessor, name) -> new IncompatibleFieldModel<>( name )
+			);
+		}
+
+		final String relativeFieldName;
+
+		private IncompatibleFieldModel(String relativeFieldName) {
+			this.relativeFieldName = relativeFieldName;
 		}
 	}
 }
