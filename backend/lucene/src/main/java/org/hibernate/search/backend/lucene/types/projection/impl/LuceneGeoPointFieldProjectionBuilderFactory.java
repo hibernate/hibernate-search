@@ -26,13 +26,18 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 	private final boolean projectable;
 
 	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> converter;
+
+	// TODO passing rawConverter to the projection builder
+	private final FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter;
+
 	private final LuceneFieldCodec<GeoPoint> codec;
 
 	public LuceneGeoPointFieldProjectionBuilderFactory(boolean projectable,
 			LuceneFieldCodec<GeoPoint> codec,
-			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter) {
+			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter, FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter) {
 		this.projectable = projectable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

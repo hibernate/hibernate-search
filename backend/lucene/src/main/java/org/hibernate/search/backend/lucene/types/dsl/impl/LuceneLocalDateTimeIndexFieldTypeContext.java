@@ -45,9 +45,9 @@ class LuceneLocalDateTimeIndexFieldTypeContext
 
 		return new LuceneIndexFieldType<>(
 				codec,
-				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, createRawConverter(), codec ),
-				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createRawConverter(), codec ),
-				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, codec )
+				new LuceneNumericFieldPredicateBuilderFactory<>( dslToIndexConverter, createToDocumentRawConverter(), codec ),
+				new LuceneNumericFieldSortBuilderFactory<>( resolvedSortable, dslToIndexConverter, createToDocumentRawConverter(), codec ),
+				new LuceneStandardFieldProjectionBuilderFactory<>( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec )
 		);
 	}
 

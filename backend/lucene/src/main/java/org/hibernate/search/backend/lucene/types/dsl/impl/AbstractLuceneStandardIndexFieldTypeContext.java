@@ -68,10 +68,10 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 	}
 
 	protected final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
-		return dslToIndexConverter == null ? createRawConverter() : dslToIndexConverter;
+		return dslToIndexConverter == null ? createToDocumentRawConverter() : dslToIndexConverter;
 	}
 
-	protected final ToDocumentFieldValueConverter<F, ? extends F> createRawConverter() {
+	protected final ToDocumentFieldValueConverter<F, ? extends F> createToDocumentRawConverter() {
 		return new PassThroughToDocumentFieldValueConverter<>( fieldType );
 	}
 
@@ -81,8 +81,11 @@ abstract class AbstractLuceneStandardIndexFieldTypeContext<S extends AbstractLuc
 		 * with an explicit message.
 		 * Currently we create a pass-through converter because users have no way to bypass the converter.
 		 */
-		return indexToProjectionConverter == null ? new PassThroughFromDocumentFieldValueConverter<>( fieldType )
-				: indexToProjectionConverter;
+		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
+	}
+
+	protected final FromDocumentFieldValueConverter<? super F, F> createFromDocumentRawConverter() {
+		return new PassThroughFromDocumentFieldValueConverter<>( fieldType );
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {

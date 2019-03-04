@@ -29,13 +29,18 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 	private final boolean projectable;
 
 	private final FromDocumentFieldValueConverter<? super F, ?> converter;
+
+	// TODO passing rawConverter to the projection builder
+	private final FromDocumentFieldValueConverter<? super F, F> rawConverter;
+
 	private final LuceneFieldCodec<F> codec;
 
 	public LuceneStandardFieldProjectionBuilderFactory(boolean projectable,
-			FromDocumentFieldValueConverter<? super F, ?> converter,
+			FromDocumentFieldValueConverter<? super F, ?> converter, FromDocumentFieldValueConverter<? super F, F> rawConverter,
 			LuceneFieldCodec<F> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

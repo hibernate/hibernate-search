@@ -48,7 +48,7 @@ class LuceneGeoPointIndexFieldTypeContext
 				codec,
 				LuceneGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter )
+				new LuceneGeoPointFieldProjectionBuilderFactory( resolvedProjectable, codec, indexToProjectionConverter, createFromDocumentRawConverter() )
 		);
 	}
 
