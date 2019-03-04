@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 

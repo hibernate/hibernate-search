@@ -8,8 +8,6 @@ package org.hibernate.search.engine.search.query.spi;
 
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.SearchQuery;
-
 /**
  * A builder for search queries.
  *

@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;

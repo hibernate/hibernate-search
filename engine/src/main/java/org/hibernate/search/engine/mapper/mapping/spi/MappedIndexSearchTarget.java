@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;

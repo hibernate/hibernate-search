@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchResult;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 

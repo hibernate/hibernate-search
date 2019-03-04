@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchResult;
 
 import com.google.gson.JsonObject;
 

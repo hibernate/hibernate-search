@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.smoke;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.time.LocalDate;
@@ -17,13 +17,14 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomPropertyBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
+import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchResult;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorPath;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
@@ -416,7 +417,7 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<PojoReference> query = manager.search(
+			JavaBeanSearchQuery<PojoReference> query = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.query()
@@ -438,12 +439,15 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			assertThat( query )
-					.hasHitsExactOrder(
+
+			JavaBeanSearchResult<PojoReference> result = query.execute();
+			assertThat( result.getHits() )
+					.containsExactly(
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
 							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
-					)
-					.hasHitCount( 6 );
+					);
+			assertThat( result.getHitCount() ).isEqualTo( 6L );
+
 			backendMock.verifyExpectationsMet();
 		}
 	}
@@ -455,7 +459,7 @@ public class ProgrammaticMappingSmokeIT {
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
-			SearchQuery<String> query = searchTarget
+			JavaBeanSearchQuery<String> query = searchTarget
 					.query()
 					.asProjection( f -> f.field( "myTextField", String.class ) )
 					.predicate( f -> f.matchAll() )
@@ -475,12 +479,14 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			assertThat( query )
-					.hasHitsExactOrder(
+			JavaBeanSearchResult<String> result = query.execute();
+			assertThat( result.getHits() )
+					.containsExactly(
 							"text1",
 							null
-					)
-					.hasHitCount( 2L );
+					);
+			assertThat( result.getHitCount() ).isEqualTo( 2L );
+
 			backendMock.verifyExpectationsMet();
 		}
 	}
@@ -492,7 +498,7 @@ public class ProgrammaticMappingSmokeIT {
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
-			SearchQuery<List<?>> query = searchTarget
+			JavaBeanSearchQuery<List<?>> query = searchTarget
 					.query()
 					.asProjections(
 							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
@@ -526,8 +532,9 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			assertThat( query )
-					.hasHitsExactOrder(
+			JavaBeanSearchResult<List<?>> result = query.execute();
+			assertThat( result.getHits() )
+					.containsExactly(
 							Arrays.asList(
 									"text1",
 									new PojoReferenceImpl( IndexedEntity.class, 0 ),
@@ -542,8 +549,9 @@ public class ProgrammaticMappingSmokeIT {
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null
 							)
-					)
-					.hasHitCount( 2L );
+					);
+			assertThat( result.getHitCount() ).isEqualTo( 2L );
+
 			backendMock.verifyExpectationsMet();
 		}
 	}

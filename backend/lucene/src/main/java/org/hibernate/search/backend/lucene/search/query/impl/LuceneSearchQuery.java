@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchResult;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;

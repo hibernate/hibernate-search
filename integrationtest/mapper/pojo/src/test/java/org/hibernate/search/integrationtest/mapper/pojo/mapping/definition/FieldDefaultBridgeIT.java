@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,16 +21,15 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
+import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -126,7 +127,7 @@ public class FieldDefaultBridgeIT<V, F> {
 	@Test
 	public void projection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() ).query()
+			JavaBeanSearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() ).query()
 					.asProjection( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -142,8 +143,8 @@ public class FieldDefaultBridgeIT<V, F> {
 					)
 			);
 
-			SearchResultAssert.<Object>assertThat( query )
-					.hasHitsExactOrder( getPropertyValues().toArray() );
+			Assertions.<Object>assertThat( query.execute().getHits() )
+					.containsExactly( getPropertyValues().toArray() );
 		}
 	}
 
@@ -160,29 +161,29 @@ public class FieldDefaultBridgeIT<V, F> {
 				new ToDocumentFieldValueConvertContextImpl( new JavaBeanMappingContext() );
 
 		// isCompatibleWith must return true when appropriate
-		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
-		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
-		Assertions.assertThat(
+		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
+		assertThat(
 				dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentFieldValueConverter() ) )
 				.isFalse();
 
 		// convert and convertUnknown must behave appropriately on valid input
-		Assertions.assertThat(
+		assertThat(
 				dslToIndexConverter.convert( null, toDocumentConvertContext )
 		)
 				.isNull();
-		Assertions.assertThat(
+		assertThat(
 				dslToIndexConverter.convertUnknown( null, toDocumentConvertContext )
 		)
 				.isNull();
 		Iterator<F> fieldValuesIterator = getDocumentFieldValues().iterator();
 		for ( V propertyValue : getPropertyValues() ) {
 			F fieldValue = fieldValuesIterator.next();
-			Assertions.assertThat(
+			assertThat(
 					dslToIndexConverter.convert( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
-			Assertions.assertThat(
+			assertThat(
 					dslToIndexConverter.convertUnknown( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
@@ -216,26 +217,26 @@ public class FieldDefaultBridgeIT<V, F> {
 				);
 
 		// isCompatibleWith must return true when appropriate
-		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
-		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( compatibleIndexToProjectionConverter ) )
+		assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
+		assertThat( indexToProjectionConverter.isCompatibleWith( compatibleIndexToProjectionConverter ) )
 				.isTrue();
-		Assertions.assertThat( indexToProjectionConverter.isCompatibleWith( new IncompatibleFromDocumentFieldValueConverter() ) )
+		assertThat( indexToProjectionConverter.isCompatibleWith( new IncompatibleFromDocumentFieldValueConverter() ) )
 				.isFalse();
 
 		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
-		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();
-		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( expectations.getProjectionType() ) ).isTrue();
-		Assertions.assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( IncompatibleType.class ) ).isFalse();
+		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();
+		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( expectations.getProjectionType() ) ).isTrue();
+		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( IncompatibleType.class ) ).isFalse();
 
 		// convert must behave appropriately on valid input
-		Assertions.assertThat(
+		assertThat(
 				indexToProjectionConverter.convert( null, fromDocumentConvertContext )
 		)
 				.isNull();
 		Iterator<V> propertyValuesIterator = getPropertyValues().iterator();
 		for ( F fieldValue : getDocumentFieldValues() ) {
 			V propertyValue = propertyValuesIterator.next();
-			Assertions.assertThat(
+			assertThat(
 					indexToProjectionConverter.convert( fieldValue, fromDocumentConvertContext )
 			)
 					.isEqualTo( propertyValue );

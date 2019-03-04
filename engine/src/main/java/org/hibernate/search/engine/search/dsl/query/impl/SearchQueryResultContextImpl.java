@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.query.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;

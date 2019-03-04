@@ -14,10 +14,10 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.SearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.spi.SimpleSearchResult;
+import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
