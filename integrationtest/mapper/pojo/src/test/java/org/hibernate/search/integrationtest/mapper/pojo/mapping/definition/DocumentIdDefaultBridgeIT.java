@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
-import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
@@ -16,12 +16,12 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
+import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -38,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.assertj.core.api.Assertions;
 import org.easymock.Capture;
 
 /**
@@ -136,14 +135,14 @@ public class DocumentIdDefaultBridgeIT<I> {
 						)
 				);
 
-				SearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
+				JavaBeanSearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
 						.query()
 						.asReference()
 						.predicate( f -> f.matchAll() )
 						.build();
 
-				assertThat( query )
-						.hasHitsExactOrder( new PojoReferenceImpl(
+				assertThat( query.execute().getHits() )
+						.containsExactly( new PojoReferenceImpl(
 								expectations.getTypeWithIdentifierBridge1(),
 								entityIdentifierValue
 						) );
@@ -165,20 +164,20 @@ public class DocumentIdDefaultBridgeIT<I> {
 				new ToDocumentIdentifierValueConvertContextImpl( new JavaBeanMappingContext() );
 
 		// isCompatibleWith must return true when appropriate
-		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
-		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
-		Assertions.assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentIdentifierValueConverter() ) )
+		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
+		assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
+		assertThat( dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentIdentifierValueConverter() ) )
 				.isFalse();
 
 		// convert and convertUnknown must behave appropriately on valid input
 		Iterator<String> documentIdentifierIterator = expectations.getDocumentIdentifierValues().iterator();
 		for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
 			String documentIdentifierValue = documentIdentifierIterator.next();
-			Assertions.assertThat(
+			assertThat(
 					dslToIndexConverter.convert( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );
-			Assertions.assertThat(
+			assertThat(
 					dslToIndexConverter.convertUnknown( entityIdentifierValue, convertContext )
 			)
 					.isEqualTo( documentIdentifierValue );

@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
-import org.hibernate.search.engine.search.SearchQuery;
-import org.hibernate.search.engine.search.SearchResult;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;

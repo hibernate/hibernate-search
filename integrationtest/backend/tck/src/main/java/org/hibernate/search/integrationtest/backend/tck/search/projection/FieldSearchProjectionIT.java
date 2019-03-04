@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -279,7 +279,7 @@ public class FieldSearchProjectionIT {
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
-			SearchQuery<ValueWrapper> query;
+					SearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = searchTarget.query()

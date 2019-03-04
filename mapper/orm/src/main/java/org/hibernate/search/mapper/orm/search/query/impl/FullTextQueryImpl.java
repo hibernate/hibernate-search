@@ -35,7 +35,7 @@ import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.engine.search.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
