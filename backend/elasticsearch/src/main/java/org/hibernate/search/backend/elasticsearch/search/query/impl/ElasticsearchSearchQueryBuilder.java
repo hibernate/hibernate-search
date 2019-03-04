@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
@@ -72,7 +72,7 @@ class ElasticsearchSearchQueryBuilder<T>
 		this.routingKeys.add( routingKey );
 	}
 
-	private SearchQuery<T> build() {
+	private IndexSearchQuery<T> build() {
 		JsonObject payload = new JsonObject();
 
 		JsonObject jsonQuery = getJsonQuery();
@@ -93,7 +93,7 @@ class ElasticsearchSearchQueryBuilder<T>
 		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
 				new ElasticsearchSearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
-		return new ElasticsearchSearchQuery<>(
+		return new ElasticsearchIndexSearchQuery<>(
 				workFactory, queryOrchestrator,
 				indexNames, sessionContext, routingKeys,
 				payload,
@@ -106,7 +106,7 @@ class ElasticsearchSearchQueryBuilder<T>
 	}
 
 	@Override
-	public <Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		return searchQueryWrapperFactory.apply( build() );
 	}
 }

@@ -13,7 +13,7 @@ import java.util.Collections;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -71,7 +71,7 @@ public class ProvidedIdIT {
 					)
 			);
 
-			JavaBeanSearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
 					.query()
 					.asReference()
 					.predicate( f -> f.matchAll() )

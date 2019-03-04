@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 
 import com.google.gson.JsonObject;
 
@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
+public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
@@ -38,7 +38,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	private Long firstResultIndex;
 	private Long maxResultsCount;
 
-	public ElasticsearchSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
+	public ElasticsearchIndexSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
 			SessionContextImplementor sessionContext,
@@ -74,7 +74,7 @@ public class ElasticsearchSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
-	public SearchResult<T> execute() {
+	public IndexSearchResult<T> execute() {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )

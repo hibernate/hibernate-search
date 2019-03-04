@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -21,13 +21,13 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext<Q> {
 
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
-	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
+	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
 	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
 	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
 
 	public SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector) {
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;

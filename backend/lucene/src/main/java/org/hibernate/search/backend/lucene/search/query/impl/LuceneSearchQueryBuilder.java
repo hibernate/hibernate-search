@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
@@ -70,7 +70,7 @@ class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQ
 		throw new UnsupportedOperationException( "Routing keys are not supported by the Lucene backend yet." );
 	}
 
-	private SearchQuery<T> build() {
+	private IndexSearchQuery<T> build() {
 		LuceneSearchResultExtractor<T> searchResultExtractor = new LuceneSearchResultExtractorImpl<>(
 				storedFieldVisitor, rootProjection, projectionHitMapper
 		);
@@ -79,7 +79,7 @@ class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQ
 		luceneQueryBuilder.add( elementCollector.toLuceneQueryPredicate(), Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
 
-		return new LuceneSearchQuery<>(
+		return new LuceneIndexSearchQuery<>(
 				queryOrchestrator, workFactory,
 				searchTargetModel.getIndexNames(), searchTargetModel.getReaderProviders(),
 				sessionContext,
@@ -90,7 +90,7 @@ class LuceneSearchQueryBuilder<T> implements SearchQueryBuilder<T, LuceneSearchQ
 	}
 
 	@Override
-	public <Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		return searchQueryWrapperFactory.apply( build() );
 	}
 }

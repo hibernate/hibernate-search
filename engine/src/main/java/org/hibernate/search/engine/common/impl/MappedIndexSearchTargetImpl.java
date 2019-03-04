@@ -13,7 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.impl.DefaultSearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -52,7 +52,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		ProjectionHitMapper<R, T> projectionHitMapper =
 				new DefaultProjectionHitMapper<>( documentReferenceTransformer, objectLoader );
 
@@ -66,7 +66,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 
 	@Override
 	public <Q> SearchQueryResultContext<Q> queryAsReference(SessionContextImplementor sessionContext,
-			Function<SearchQuery<R>, Q> searchQueryWrapperFactory) {
+			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory) {
 		ProjectionHitMapper<R, Void> referenceHitMapper = new NoLoadingProjectionHitMapper<>( documentReferenceTransformer );
 
 		SearchQueryBuilder<R, C> builder = searchTargetContext.getSearchQueryBuilderFactory()
@@ -80,7 +80,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<T> projection) {
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory, SearchProjection<T> projection) {
 		ProjectionHitMapper<R, O> projectionHitMapper =
 				new DefaultProjectionHitMapper<>( documentReferenceTransformer, objectLoader );
 
@@ -96,7 +96,7 @@ class MappedIndexSearchTargetImpl<C, R, O> implements MappedIndexSearchTarget<R,
 	public <Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		ProjectionHitMapper<R, O> projectionHitMapper =
 				new DefaultProjectionHitMapper<>( documentReferenceTransformer, objectLoader );

@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
+import org.hibernate.search.engine.search.query.spi.SimpleIndexSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubSearchWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
@@ -54,7 +54,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 		this.behavior = behavior;
 	}
 
-	public <U> SearchResult<U> verify(SearchWorkCall<U> actualCall) {
+	public <U> IndexSearchResult<U> verify(SearchWorkCall<U> actualCall) {
 		assertThat( actualCall.indexNames )
 				.as( "Search work did not target the expected indexes: " )
 				.isEqualTo( indexNames );
@@ -64,7 +64,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 
 		long totalHitCount = behavior.getTotalHitCount();
 
-		return new SimpleSearchResult<>(
+		return new SimpleIndexSearchResult<>(
 				totalHitCount,
 				getResults(
 						actualCall.convertContext,

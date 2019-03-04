@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContextExtension;
@@ -85,7 +85,7 @@ public class SearchSortIT {
 		initData();
 	}
 
-	private SearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
+	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		return searchTarget.query()
 				.asReference()
@@ -101,8 +101,8 @@ public class SearchSortIT {
 		 * Thus we just test that the order stays the same over several calls.
 		 */
 
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
-		SearchResult<DocumentReference> firstCallResult = query.execute();
+		IndexSearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
+		IndexSearchResult<DocumentReference> firstCallResult = query.execute();
 		assertThat( firstCallResult ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();
@@ -123,7 +123,7 @@ public class SearchSortIT {
 	@Test
 	public void byScore() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query;
+		IndexSearchQuery<DocumentReference> query;
 
 		SearchPredicate predicate = searchTarget.predicate()
 				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
@@ -156,7 +156,7 @@ public class SearchSortIT {
 	@Test
 	public void separateSort() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query;
+		IndexSearchQuery<DocumentReference> query;
 
 		SearchSort sortAsc = searchTarget.sort()
 				.byField( "string" ).asc().onMissingValue().sortLast()
@@ -215,7 +215,7 @@ public class SearchSortIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		SearchQuery<DocumentReference> query;
+		IndexSearchQuery<DocumentReference> query;
 
 		query = simpleQuery( cachingContributor );
 		assertThat( query )
@@ -230,7 +230,7 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_asc() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
+		IndexSearchQuery<DocumentReference> query = simpleQuery( b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
@@ -250,7 +250,7 @@ public class SearchSortIT {
 				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
 		);
 
-		SearchQuery<DocumentReference> query = simpleQuery(
+		IndexSearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.byDistance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
 		assertThat( query )
@@ -274,7 +274,7 @@ public class SearchSortIT {
 
 	@Test
 	public void extension() {
-		SearchQuery<DocumentReference> query;
+		IndexSearchQuery<DocumentReference> query;
 
 		// Mandatory extension
 		query = simpleQuery( c -> c
@@ -465,7 +465,7 @@ public class SearchSortIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

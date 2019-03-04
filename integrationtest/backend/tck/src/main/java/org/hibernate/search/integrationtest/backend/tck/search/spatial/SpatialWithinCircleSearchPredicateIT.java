@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -36,7 +36,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void within_circle() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" )
@@ -114,7 +114,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within()
@@ -155,7 +155,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void predicateLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.123f ).within()
@@ -196,7 +196,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void predicateLevelBoost_andFieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 0.123 * 4 => boost x0.492
@@ -241,7 +241,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 	public void predicateLevelBoost_multiFields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.123f ).within()
@@ -284,7 +284,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 
 		// onField(...).orField(...)
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.spatial().within()
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
