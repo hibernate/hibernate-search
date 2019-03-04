@@ -50,13 +50,14 @@ public interface MatchPredicateContext extends SearchPredicateScoreContext<Match
 	MatchPredicateFieldSetContext onFields(String ... absoluteFieldPaths);
 
 	/**
-	 * Alternative version of {@link #onField(String)} to target the given field in the match predicate.
+	 * Target the given <strong>raw</strong> field in the match predicate.
 	 * <p>
-	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
-	 * in order to provide a value in {@link MatchPredicateFieldSetContext#matching(Object)} exactly as it is stored in the backend.
+	 * Using this method instead of {@link #onField(String)} will disable some of the conversion applied to
+	 * arguments to {@link MatchPredicateFieldSetContext#matching(Object)},
+	 * allowing to pass values directly to the backend.
 	 * <p>
-	 * If no {@code DslConverter} are defined on the field,
-	 * it will have the same behaviour of {@link #onField(String)}.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-rawfield">there</a> for more information
+	 * about raw fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return A {@link MatchPredicateFieldSetContext} (see {@link #onField(String)} for details).
@@ -66,7 +67,7 @@ public interface MatchPredicateContext extends SearchPredicateScoreContext<Match
 	}
 
 	/**
-	 * Alternative version of {@link #onFields(String...)} to target the given fields in the match predicate.
+	 * Target the given <strong>raw</strong> fields in the match predicate.
 	 * <p>
 	 * Equivalent to {@link #onRawField(String)} followed by multiple calls to
 	 * {@link MatchPredicateFieldSetContext#orRawField(String)},
@@ -78,8 +79,6 @@ public interface MatchPredicateContext extends SearchPredicateScoreContext<Match
 	 * @return A {@link MatchPredicateFieldSetContext} (see {@link #onField(String)} for details).
 	 *
 	 * @see #onRawField(String)
-	 * @see #onFields(String...)
-	 * @see #onField(String)
 	 */
 	MatchPredicateFieldSetContext onRawFields(String... absoluteFieldPaths);
 }

@@ -15,7 +15,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * Target the given field in the range predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link RangePredicateContext#onField(String)} for more information on targeted fields.
+	 * See {@link RangePredicateContext#onField(String)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return {@code this}, for method chaining.
@@ -30,7 +30,7 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * Target the given fields in the range predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link RangePredicateContext#onFields(String...)} for more information on targeted fields.
+	 * See {@link RangePredicateContext#onFields(String...)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return {@code this}, for method chaining.
@@ -40,14 +40,10 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	RangePredicateFieldSetContext orFields(String ... absoluteFieldPaths);
 
 	/**
-	 * Alternative version of {@link #orField(String)} to target the given field in the range predicate.
+	 * Target the given <strong>raw</strong> fields in the range predicate,
+	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
-	 * in order to provide range boundary values within ({@code from}, {@code to}, {@code below}, {@code above})
-	 * using the same format the date field is stored on the backend.
-	 * <p>
-	 * If no {@code DslConverter} are defined on the field,
-	 * it will have the same behaviour of {@link #orField(String)}.
+	 * See {@link RangePredicateContext#onFields(String...)} for more information about targeting raw fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return {@code this}, for method chaining.
@@ -59,13 +55,10 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	}
 
 	/**
-	 * Alternative version of {@link #orFields(String...)} to target the given fields in the range predicate.
+	 * Target the given <strong>raw</strong> fields in the match predicate,
+	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * Equivalent to {@link #orRawField(String)} followed by multiple calls to
-	 * {@link RangePredicateFieldSetContext#orRawField(String)},
-	 * the only difference being that calls to {@link RangePredicateFieldSetContext#boostedTo(float)}
-	 * and other field-specific settings on the returned context will only need to be done once
-	 * and will apply to all the fields passed to this method.
+	 * See {@link RangePredicateContext#onRawFields(String...)} for more information about targeting raw fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return {@code this}, for method chaining.

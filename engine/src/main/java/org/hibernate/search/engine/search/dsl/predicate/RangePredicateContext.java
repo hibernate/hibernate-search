@@ -48,14 +48,15 @@ public interface RangePredicateContext extends SearchPredicateNoFieldContext<Ran
 	RangePredicateFieldSetContext onFields(String ... absoluteFieldPaths);
 
 	/**
-	 * Alternative version of {@link #onField(String)} to target the given field in the range predicate.
+	 * Target the given <strong>raw</strong> field in the range predicate.
 	 * <p>
-	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
-	 * in order to provide range boundary values within ({@code from}, {@code to}, {@code below}, {@code above})
-	 * using the same format the date field is stored on the backend.
+	 * Using this method instead of {@link #onField(String)} will disable some of the conversion applied to
+	 * arguments to {@link RangePredicateFieldSetContext#from(Object)},
+	 * {@link RangePredicateFieldSetContext#below(Object)}, etc.,
+	 * allowing to pass values directly to the backend.
 	 * <p>
-	 * If no {@code DslConverter} are defined on the field,
-	 * it will have the same behaviour of {@link #onField(String)}.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-rawfield">there</a> for more information
+	 * about raw fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return A {@link RangePredicateFieldSetContext} (see {@link #onField(String)} for details).
@@ -65,7 +66,7 @@ public interface RangePredicateContext extends SearchPredicateNoFieldContext<Ran
 	}
 
 	/**
-	 * Alternative version of {@link #onFields(String...)} to target the given fields in the range predicate.
+	 * Target the given <strong>raw</strong> fields in the range predicate.
 	 * <p>
 	 * Equivalent to {@link #onRawField(String)} followed by multiple calls to
 	 * {@link RangePredicateFieldSetContext#orRawField(String)},
@@ -77,8 +78,6 @@ public interface RangePredicateContext extends SearchPredicateNoFieldContext<Ran
 	 * @return A {@link RangePredicateFieldSetContext} (see {@link #onField(String)} for details).
 	 *
 	 * @see #onRawField(String)
-	 * @see #onFields(String...)
-	 * @see #onField(String)
 	 */
 	RangePredicateFieldSetContext onRawFields(String... absoluteFieldPaths);
 }

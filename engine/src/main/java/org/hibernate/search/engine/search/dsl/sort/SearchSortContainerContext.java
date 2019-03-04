@@ -49,16 +49,20 @@ public interface SearchSortContainerContext {
 	FieldSortContext byField(String absoluteFieldPath);
 
 	/**
-	 * Alternative version of {@link #byField(String)} to order elements by the value of a specific field.
+	 * Order elements by the value of a specific <strong>raw</strong> field.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
 	 * <p>
-	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
-	 * in order to provide missing values within {@link FieldSortContext#onMissingValue()}
-	 * using the same format the date field is stored on the backend.
+	 * Using this method instead of {@link #byField(String)} will disable some of the conversion applied to
+	 * arguments to {@link FieldSortMissingValueContext#use(Object)},
+	 * allowing to pass values directly to the backend.
 	 * <p>
-	 * If no {@code DslConverter} are defined on the field,
-	 * it will have the same behaviour of {@link #byField(String)}.
+	 * This is useful when the type of the indexed property is not the same as the type of search parameters.
+	 * For example one may use a custom bridge implementing {@code ValueBridge<MyType, String>}
+	 * to translate a property from a custom type to a string when indexing.
+	 * When targeting that field with {@code byField},
+	 * Hibernate Search will expect arguments to {@link FieldSortMissingValueContext#use(Object)} to be instances of the custom type;
+	 * with {@code byRawField}, it will expect strings.
 	 *
 	 * @param absoluteFieldPath The absolute path of the index field to sort by
 	 * @return A context allowing to define the sort more precisely, {@link NonEmptySortContext#then() chain other sorts}

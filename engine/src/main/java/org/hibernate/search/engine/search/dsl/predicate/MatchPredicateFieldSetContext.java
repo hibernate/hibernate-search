@@ -15,7 +15,7 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * Target the given field in the match predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link MatchPredicateContext#onField(String)} for more information on targeted fields.
+	 * See {@link MatchPredicateContext#onField(String)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return {@code this}, for method chaining.
@@ -30,7 +30,7 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * Target the given fields in the match predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * See {@link MatchPredicateContext#onFields(String...)} for more information on targeted fields.
+	 * See {@link MatchPredicateContext#onFields(String...)} for more information about targeting fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return {@code this}, for method chaining.
@@ -40,13 +40,10 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	MatchPredicateFieldSetContext orFields(String ... absoluteFieldPaths);
 
 	/**
-	 * Alternative version of {@link #orField(String)} to target the given field in the match predicate.
+	 * Target the given <strong>raw</strong> field in the match predicate
+	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * Using this method it is possible to bypass any {@code DslConverter} defined on the field,
-	 * in order to provide a value in {@link MatchPredicateFieldSetContext#matching(Object)} exactly as it is stored in the backend.
-	 * <p>
-	 * If no {@code DslConverter} are defined on the field,
-	 * it will have the same behaviour of {@link #orField(String)}.
+	 * See {@link MatchPredicateContext#onRawField(String)} for more information about targeting raw fields.
 	 *
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return {@code this}, for method chaining.
@@ -58,13 +55,10 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 	}
 
 	/**
-	 * Alternative version of {@link #orFields(String...)} to target the given fields in the match predicate.
+	 * Target the given <strong>raw</strong> fields in the match predicate,
+	 * as an alternative to the already-targeted fields.
 	 * <p>
-	 * Equivalent to {@link #orRawField(String)} followed by multiple calls to
-	 * {@link MatchPredicateFieldSetContext#orRawField(String)},
-	 * the only difference being that calls to {@link MatchPredicateFieldSetContext#boostedTo(float)}
-	 * and other field-specific settings on the returned context will only need to be done once
-	 * and will apply to all the fields passed to this method.
+	 * See {@link MatchPredicateContext#onRawFields(String...)} for more information about targeting raw fields.
 	 *
 	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
 	 * @return {@code this}, for method chaining.

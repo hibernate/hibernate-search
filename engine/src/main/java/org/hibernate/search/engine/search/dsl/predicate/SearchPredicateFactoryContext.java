@@ -37,6 +37,10 @@ import org.hibernate.search.util.common.SearchException;
  * if you mapped a custom enum type, then this same enum type will be expected throughout the predicate DSL,
  * even if it is stored as a {@link String} in the index.
  * <p>
+ * Note it is possible to skip some of the conversion performed by Hibernate Search and by targeting "raw" fields,
+ * and in that case the expected type of arguments will be different;
+ * see <a href="#commonconcepts-rawfield">Raw fields</a> for details.
+ * <p>
  * Sometimes a predicate targets <em>multiple</em> fields, either explicitly
  * (multiple field names passed to the {@code onFields} method when defining the predicate)
  * or implicitly (multiple targeted indexes).
@@ -52,6 +56,22 @@ import org.hibernate.search.util.common.SearchException;
  * Note that custom bridges have the ability to customize the expected type of arguments in the DSL:
  * for example they could accept {@link String} arguments when targeting {@link Integer} fields.
  * See the documentation of bridges for more information on custom bridges.
+ *
+ * <h4 id="commonconcepts-rawfield">Raw fields</h4>
+ *
+ * Some predicates allow to target "raw fields" using an {@code onRawField(String)} method instead of {@code onField(String)}.
+ * Targeting a raw field means some of the usual conversion will be skipped when Hibernate Search processes
+ * predicate arguments such as the value to match.
+ * <p>
+ * This is useful when the type of the indexed property is not the same as the type of search arguments.
+ * For example one may use a custom bridge implementing {@code ValueBridge<MyType, String>}
+ * to translate a property from a custom type to a string when indexing.
+ * When targeting that field with {@code onField},
+ * Hibernate Search will expect predicate arguments to be instances of the custom type;
+ * with {@code onRawField}, it will expect strings.
+ * <p>
+ * For details about conversions applied by built-in bridges,
+ * please refer to the reference documentation.
  */
 public interface SearchPredicateFactoryContext {
 
