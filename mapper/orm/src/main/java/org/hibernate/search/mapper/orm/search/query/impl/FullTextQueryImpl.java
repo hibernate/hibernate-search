@@ -35,23 +35,23 @@ import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
 public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements FullTextQuery<R> {
 
-	private final SearchQuery<R> searchQuery;
+	private final IndexSearchQuery<R> delegate;
 
 	private final MutableObjectLoadingOptions loadingOptions;
 
 	private Integer firstResult;
 	private Integer maxResults;
 
-	public FullTextQueryImpl(SearchQuery<R> searchQuery, SessionImplementor sessionImplementor,
+	public FullTextQueryImpl(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
 			MutableObjectLoadingOptions loadingOptions) {
 		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
-		this.searchQuery = searchQuery;
+		this.delegate = delegate;
 		this.loadingOptions = loadingOptions;
 	}
 
@@ -61,8 +61,8 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 		if ( type.equals( FullTextQuery.class ) ) {
 			return (T) this;
 		}
-		else if ( type.equals( SearchQuery.class ) ) {
-			return (T) searchQuery;
+		else if ( type.equals( IndexSearchQuery.class ) ) {
+			return (T) delegate;
 		}
 		else {
 			return super.unwrap( type );
@@ -132,7 +132,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 
 	protected List<R> doHibernateSearchList() {
 		// TODO handle timeouts
-		final List<R> results = searchQuery.execute().getHits();
+		final List<R> results = delegate.execute().getHits();
 		// TODO apply the result transformer?
 		return results;
 	}
@@ -140,7 +140,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	@Override
 	public long getResultSize() {
 		try {
-			return searchQuery.executeCount();
+			return delegate.executeCount();
 		}
 		catch (QueryExecutionRequestException e) {
 			throw new IllegalStateException( e );
@@ -162,7 +162,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 							+ ") parameter passed in to setMaxResults"
 			);
 		}
-		searchQuery.setMaxResults( (long) maxResults );
+		delegate.setMaxResults( (long) maxResults );
 		this.maxResults = maxResults;
 		return this;
 	}
@@ -183,7 +183,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 							+ ") parameter passed in to setFirstResult"
 			);
 		}
-		searchQuery.setFirstResult( (long) firstResult );
+		delegate.setFirstResult( (long) firstResult );
 		this.firstResult = firstResult;
 		return this;
 	}
@@ -366,7 +366,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 
 	@Override
 	public String getQueryString() {
-		return searchQuery.getQueryString();
+		return delegate.getQueryString();
 	}
 
 	@Override

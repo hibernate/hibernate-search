@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
@@ -338,7 +338,7 @@ public class BackendMock implements TestRule {
 		}
 
 		@Override
-		public <T> SearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
+		public <T> IndexSearchResult<T> executeSearchWork(List<String> indexNames, StubSearchWork work,
 				FromDocumentFieldValueConvertContext convertContext,
 				ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 			return searchCalls.verify(

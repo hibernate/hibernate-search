@@ -22,6 +22,6 @@ public interface SearchQueryBuilder<T, C> {
 
 	// TODO add more arguments, such as faceting options
 
-	<Q> Q build(Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
+	<Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
 
 }

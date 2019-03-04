@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
@@ -53,7 +53,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(ObjectLoader<PojoReference, T> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		return getIndexSearchTarget().queryAsLoadedObject(
 				sessionContext, objectLoader, searchQueryWrapperFactory
 		);
@@ -61,7 +61,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	@Override
 	public <Q> SearchQueryResultContext<Q> queryAsReference(
-			Function<SearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
+			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
 		return getIndexSearchTarget().queryAsReference(
 				sessionContext, searchQueryWrapperFactory
 		);
@@ -69,7 +69,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection) {
 		return getIndexSearchTarget().queryAsProjection(
 				sessionContext, objectLoader, searchQueryWrapperFactory,
@@ -79,7 +79,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	@Override
 	public <Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
-			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
 		return getIndexSearchTarget().queryAsProjections(
 				sessionContext, objectLoader, searchQueryWrapperFactory,

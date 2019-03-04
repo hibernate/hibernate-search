@@ -10,8 +10,8 @@ import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.Offset;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -31,7 +31,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceProjection() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -41,7 +41,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
-		SearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -53,7 +53,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceProjection_unit() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -64,7 +64,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
-		SearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 0.430d, Offset.offset( 0.010d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1.300d, Offset.offset( 0.010d ) );
@@ -76,7 +76,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceProjection_several() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -89,7 +89,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
-		SearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -113,7 +113,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -127,7 +127,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						.byDistance( "geoPoint", center )
 				)
 				.build();
-		SearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -139,7 +139,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceProjection_longCalculatedField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -152,7 +152,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.build();
-		SearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );

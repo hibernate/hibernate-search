@@ -14,10 +14,10 @@ import java.util.List;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionTransformContext;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.query.spi.LoadingResult;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
+import org.hibernate.search.engine.search.query.spi.SimpleIndexSearchResult;
 
 /**
  * A search result from the backend that offers a method to load data from the mapper.
@@ -50,7 +50,7 @@ public class LuceneLoadableSearchResult<T> {
 		return hitCount;
 	}
 
-	SearchResult<T> loadBlocking(SessionContextImplementor sessionContext) {
+	IndexSearchResult<T> loadBlocking(SessionContextImplementor sessionContext) {
 		SearchProjectionTransformContext transformContext = new SearchProjectionTransformContext( sessionContext );
 
 		LoadingResult<?> loadingResult = projectionHitMapper.loadBlocking();
@@ -67,6 +67,6 @@ public class LuceneLoadableSearchResult<T> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new SimpleSearchResult<>( hitCount, loadedHits );
+		return new SimpleIndexSearchResult<>( hitCount, loadedHits );
 	}
 }

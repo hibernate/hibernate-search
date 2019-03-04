@@ -13,8 +13,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
@@ -25,22 +25,22 @@ import org.assertj.core.internal.Failures;
 
 public class SearchResultAssert<T> {
 
-	public static <T> SearchResultAssert<T> assertThat(SearchQuery<? extends T> searchQuery) {
+	public static <T> SearchResultAssert<T> assertThat(IndexSearchQuery<? extends T> searchQuery) {
 		return SearchResultAssert.<T>assertThat( searchQuery.execute() ).fromQuery( searchQuery );
 	}
 
-	public static <T> SearchResultAssert<T> assertThat(SearchResult<? extends T> actual) {
+	public static <T> SearchResultAssert<T> assertThat(IndexSearchResult<? extends T> actual) {
 		return new SearchResultAssert<>( actual );
 	}
 
-	private final SearchResult<? extends T> actual;
+	private final IndexSearchResult<? extends T> actual;
 	private String queryDescription = "<unknown>";
 
-	private SearchResultAssert(SearchResult<? extends T> actual) {
+	private SearchResultAssert(IndexSearchResult<? extends T> actual) {
 		this.actual = actual;
 	}
 
-	public SearchResultAssert<T> fromQuery(SearchQuery<?> query) {
+	public SearchResultAssert<T> fromQuery(IndexSearchQuery<?> query) {
 		this.queryDescription = query.toString();
 		return this;
 	}

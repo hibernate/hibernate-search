@@ -48,7 +48,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
@@ -97,7 +97,7 @@ public class LuceneExtensionIT {
 	public void predicate_fromLuceneQuery() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( LuceneExtension.get() )
@@ -132,7 +132,7 @@ public class LuceneExtensionIT {
 				.should( predicate3 )
 				.toPredicate();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( booleanPredicate )
 				.build();
@@ -145,7 +145,7 @@ public class LuceneExtensionIT {
 	public void sort_fromLuceneSortField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
@@ -205,7 +205,7 @@ public class LuceneExtensionIT {
 				.orElseFail()
 				.toSort();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
@@ -274,7 +274,7 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_nativeQuery() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
@@ -289,7 +289,7 @@ public class LuceneExtensionIT {
 	public void projection_nativeField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<Integer> query = searchTarget.query()
+		IndexSearchQuery<Integer> query = searchTarget.query()
 				.asProjection( f -> f.field( "nativeField", Integer.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.build();
@@ -302,7 +302,7 @@ public class LuceneExtensionIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
 		// let's check that it's possible to query the field beforehand
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
@@ -329,7 +329,7 @@ public class LuceneExtensionIT {
 	public void sort_nativeField_nativeSort() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
@@ -343,7 +343,7 @@ public class LuceneExtensionIT {
 	public void projection_document() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<Document> query = searchTarget.query()
+		IndexSearchQuery<Document> query = searchTarget.query()
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
@@ -403,7 +403,7 @@ public class LuceneExtensionIT {
 	public void projection_documentAndField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.extension( LuceneExtension.get() ).document(),
@@ -431,7 +431,7 @@ public class LuceneExtensionIT {
 	public void projection_explanation() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<Explanation> query = searchTarget.query()
+		IndexSearchQuery<Explanation> query = searchTarget.query()
 				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
@@ -551,7 +551,7 @@ public class LuceneExtensionIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

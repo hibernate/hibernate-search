@@ -26,7 +26,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expect
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -127,7 +127,7 @@ public class FieldDefaultBridgeIT<V, F> {
 	@Test
 	public void projection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() ).query()
+			SearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() ).query()
 					.asProjection( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
 					.predicate( f -> f.matchAll() )
 					.build();

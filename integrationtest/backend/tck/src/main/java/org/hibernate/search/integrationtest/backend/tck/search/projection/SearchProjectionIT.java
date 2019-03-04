@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeConte
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
@@ -90,7 +90,7 @@ public class SearchProjectionIT {
 	public void noProjections() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjections()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -102,7 +102,7 @@ public class SearchProjectionIT {
 	public void references() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query;
+		IndexSearchQuery<List<?>> query;
 		DocumentReference document1Reference = reference( INDEX_NAME, DOCUMENT_1 );
 		DocumentReference document2Reference = reference( INDEX_NAME, DOCUMENT_2 );
 		DocumentReference document3Reference = reference( INDEX_NAME, DOCUMENT_3 );
@@ -183,7 +183,7 @@ public class SearchProjectionIT {
 
 		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
 				indexManager.createSearchTarget( referenceTransformerMock );
-		SearchQuery<List<?>> query;
+		IndexSearchQuery<List<?>> query;
 
 		/*
 		 * Note to test writers: make sure to assign these projections to variables,
@@ -218,13 +218,13 @@ public class SearchProjectionIT {
 	public void score() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<Float> query = searchTarget.query()
+		IndexSearchQuery<Float> query = searchTarget.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byScore().desc() )
 				.build();
 
-		SearchResult<Float> result = query.execute();
+		IndexSearchResult<Float> result = query.execute();
 		assertThat( result ).hasHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );
@@ -244,7 +244,7 @@ public class SearchProjectionIT {
 	public void mixed() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query;
+		IndexSearchQuery<List<?>> query;
 
 		query = searchTarget.query()
 				.asProjection( f ->
@@ -283,7 +283,7 @@ public class SearchProjectionIT {
 	@Test
 	public void extension() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<String> query;
+		IndexSearchQuery<String> query;
 
 		// Mandatory extension
 		query = searchTarget.query()
@@ -381,7 +381,7 @@ public class SearchProjectionIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

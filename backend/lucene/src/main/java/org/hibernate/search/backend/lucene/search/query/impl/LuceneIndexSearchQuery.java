@@ -14,8 +14,8 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.engine.search.query.spi.SearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -24,7 +24,7 @@ import org.apache.lucene.search.Sort;
 /**
  * @author Guillaume Smet
  */
-public class LuceneSearchQuery<T> implements SearchQuery<T> {
+public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 
 	private final LuceneQueryWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
@@ -39,7 +39,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	private Long firstResultIndex = 0L;
 	private Long maxResultsCount;
 
-	public LuceneSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
+	public LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
 			Query luceneQuery, Sort luceneSort,
@@ -76,7 +76,7 @@ public class LuceneSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
-	public SearchResult<T> execute() {
+	public IndexSearchResult<T> execute() {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,

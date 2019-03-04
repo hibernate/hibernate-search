@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
@@ -30,19 +30,19 @@ public interface PojoSearchTargetDelegate<E, O> {
 
 	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
 			ObjectLoader<PojoReference, T> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
 
 	<Q> SearchQueryResultContext<Q> queryAsReference(
-			Function<SearchQuery<PojoReference>, Q> searchQueryWrapperFactory);
+			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory);
 
 	<T, Q> SearchQueryResultContext<Q> queryAsProjection(
 			ObjectLoader<PojoReference, O> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection);
 
 	<Q> SearchQueryResultContext<Q> queryAsProjections(
 			ObjectLoader<PojoReference, O> objectLoader,
-			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
 
 	SearchPredicateFactoryContext predicate();

@@ -10,21 +10,20 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface JavaBeanQueryResultDefinitionContext {
 
-	SearchQueryResultContext<JavaBeanSearchQuery<PojoReference>> asReference();
+	SearchQueryResultContext<SearchQuery<PojoReference>> asReference();
 
-	<T> SearchQueryResultContext<JavaBeanSearchQuery<T>> asProjection(
+	<T> SearchQueryResultContext<SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
-	<T> SearchQueryResultContext<JavaBeanSearchQuery<T>> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<SearchQuery<T>> asProjection(SearchProjection<T> projection);
 
-	SearchQueryResultContext<JavaBeanSearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 }

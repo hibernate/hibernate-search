@@ -26,7 +26,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -84,7 +84,7 @@ public class ElasticsearchExtensionIT {
 	public void predicate_fromJsonString() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
@@ -146,7 +146,7 @@ public class ElasticsearchExtensionIT {
 				.should( predicate4 )
 				.toPredicate();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( booleanPredicate )
 				.build();
@@ -159,7 +159,7 @@ public class ElasticsearchExtensionIT {
 	public void sort_fromJsonString() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
@@ -218,7 +218,7 @@ public class ElasticsearchExtensionIT {
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
@@ -253,7 +253,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_document() throws JSONException {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = searchTarget.query()
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
@@ -283,7 +283,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_documentAndField() throws JSONException {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = searchTarget.query()
 				.asProjection( f ->
 						f.composite(
 								f.extension( ElasticsearchExtension.get() ).source(),
@@ -314,7 +314,7 @@ public class ElasticsearchExtensionIT {
 	public void projection_explanation() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = searchTarget.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
@@ -440,7 +440,7 @@ public class ElasticsearchExtensionIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

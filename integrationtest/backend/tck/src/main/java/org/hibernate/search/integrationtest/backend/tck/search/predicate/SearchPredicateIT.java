@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
@@ -68,7 +68,7 @@ public class SearchPredicateIT {
 	public void match_fluid() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -83,7 +83,7 @@ public class SearchPredicateIT {
 
 		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( predicate )
 				.build();
@@ -96,7 +96,7 @@ public class SearchPredicateIT {
 	public void match_lambda() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -124,7 +124,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( cachingPredicateProducer.apply( searchTarget.predicate() ) )
 				.build();
@@ -162,7 +162,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
 				.build();
@@ -187,7 +187,7 @@ public class SearchPredicateIT {
 	@Test
 	public void extension() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query;
+		IndexSearchQuery<DocumentReference> query;
 
 		// Mandatory extension
 		query = searchTarget.query()
@@ -273,7 +273,7 @@ public class SearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
 import org.hibernate.search.engine.search.SearchProjection;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
@@ -32,11 +32,11 @@ public interface MappedIndexSearchTarget<R, O> {
 	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, T> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory);
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory);
 
 	<Q> SearchQueryResultContext<Q> queryAsReference(
 			SessionContextImplementor sessionContext,
-			Function<SearchQuery<R>, Q> searchQueryWrapperFactory);
+			Function<IndexSearchQuery<R>, Q> searchQueryWrapperFactory);
 
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
@@ -47,7 +47,7 @@ public interface MappedIndexSearchTarget<R, O> {
 	<T, Q> SearchQueryResultContext<Q> queryAsProjection(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection);
 
 	SearchPredicateFactoryContext predicate();
@@ -61,7 +61,7 @@ public interface MappedIndexSearchTarget<R, O> {
 	<Q> SearchQueryResultContext<Q> queryAsProjections(
 			SessionContextImplementor sessionContext,
 			ObjectLoader<R, O> objectLoader,
-			Function<SearchQuery<List<?>>, Q> searchQueryWrapperFactory,
+			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
 
 	SearchSortContainerContext sort();

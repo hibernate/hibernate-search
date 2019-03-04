@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.query.impl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchPredicate;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
@@ -23,13 +23,13 @@ public final class SearchQueryResultContextImpl<T, C, Q>
 
 	private final SearchTargetContext<C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
-	private final Function<SearchQuery<T>, Q> searchQueryWrapperFactory;
+	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
 
 	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
 	public SearchQueryResultContextImpl(SearchTargetContext<C> targetContext,
 			SearchQueryBuilder<T, C> searchQueryBuilder,
-			Function<SearchQuery<T>, Q> searchQueryWrapperFactory) {
+			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.targetContext = targetContext;
 		this.searchQueryBuilder = searchQueryBuilder;
 		this.searchQueryWrapperFactory = searchQueryWrapperFactory;

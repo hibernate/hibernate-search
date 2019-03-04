@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expect
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -135,7 +135,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 						)
 				);
 
-				JavaBeanSearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
+				SearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
 						.query()
 						.asReference()
 						.predicate( f -> f.matchAll() )

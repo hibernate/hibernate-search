@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -115,7 +115,7 @@ public class SearchMultiIndexIT {
 	public void search_across_multiple_indexes() {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -130,7 +130,7 @@ public class SearchMultiIndexIT {
 	public void sort_across_multiple_indexes() {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
@@ -159,7 +159,7 @@ public class SearchMultiIndexIT {
 	public void projection_across_multiple_indexes() {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
-		SearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = searchTarget.query()
 				.asProjection( f -> f.field( "sortField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -176,7 +176,7 @@ public class SearchMultiIndexIT {
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
 
 		// Predicate
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.build();
@@ -191,7 +191,7 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		SearchQuery<String> projectionQuery = searchTarget.query()
+		IndexSearchQuery<String> projectionQuery = searchTarget.query()
 				.asProjection( f -> f.field( "additionalField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -319,7 +319,7 @@ public class SearchMultiIndexIT {
 		workPlan.execute().join();
 
 		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

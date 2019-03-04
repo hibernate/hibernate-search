@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -115,7 +115,7 @@ public class WildcardSearchPredicateIT {
 	public void wildcard() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> searchTarget.query().asReference()
+		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> searchTarget.query().asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( queryString ) )
 				.build();
 
@@ -139,7 +139,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -153,7 +153,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.build();
@@ -204,7 +204,7 @@ public class WildcardSearchPredicateIT {
 	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.wildcard()
 						.onField( indexMapping.analyzedStringField1.relativeFieldName ).boostedTo( 42 )
@@ -235,7 +235,7 @@ public class WildcardSearchPredicateIT {
 	public void predicateLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.wildcard().onField( indexMapping.analyzedStringField1.relativeFieldName )
@@ -274,7 +274,7 @@ public class WildcardSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery;
+		Function<String, IndexSearchQuery<DocumentReference>> createQuery;
 
 		// onField(...)
 
@@ -394,7 +394,7 @@ public class WildcardSearchPredicateIT {
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -411,7 +411,7 @@ public class WildcardSearchPredicateIT {
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -481,7 +481,7 @@ public class WildcardSearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

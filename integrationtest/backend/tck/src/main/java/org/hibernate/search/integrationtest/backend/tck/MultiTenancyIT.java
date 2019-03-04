@@ -23,7 +23,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -87,7 +87,7 @@ public class MultiTenancyIT {
 	public void search_only_returns_elements_of_the_selected_tenant() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -116,7 +116,7 @@ public class MultiTenancyIT {
 	public void id_predicate_takes_tenantId_into_account() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -143,7 +143,7 @@ public class MultiTenancyIT {
 	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -179,14 +179,14 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -232,7 +232,7 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -252,7 +252,7 @@ public class MultiTenancyIT {
 
 		// The tenant 2 has been updated properly.
 
-		SearchQuery<List<?>> query = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<List<?>> query = searchTarget.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -367,7 +367,7 @@ public class MultiTenancyIT {
 				.setup();
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -457,7 +457,7 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
+		IndexSearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -561,14 +561,14 @@ public class MultiTenancyIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		SearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),

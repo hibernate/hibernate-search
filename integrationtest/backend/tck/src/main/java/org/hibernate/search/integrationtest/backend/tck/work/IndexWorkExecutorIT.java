@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -128,7 +128,7 @@ public class IndexWorkExecutorIT {
 	}
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubSessionContext sessionContext) {
-		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query( sessionContext )
+		IndexSearchQuery<DocumentReference> query = indexManager.createSearchTarget().query( sessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

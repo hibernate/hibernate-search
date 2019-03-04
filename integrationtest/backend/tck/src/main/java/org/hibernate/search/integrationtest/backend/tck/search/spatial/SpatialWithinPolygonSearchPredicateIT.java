@@ -14,7 +14,7 @@ import java.util.List;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.common.SearchException;
@@ -58,7 +58,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void within_polygon() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ) )
 				.build();
@@ -95,7 +95,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void fieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -124,7 +124,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.1f ).within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -153,7 +153,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost_andFieldLevelBoost() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 0.1 * 7 => boost x0.7
@@ -186,7 +186,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 	public void predicateLevelBoost_multiFields() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.1f ).within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -217,7 +217,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		// onField(...).orField(...)
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ) )
 				.build();

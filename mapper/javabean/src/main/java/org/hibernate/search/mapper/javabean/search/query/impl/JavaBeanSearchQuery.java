@@ -6,21 +6,21 @@
  */
 package org.hibernate.search.mapper.javabean.search.query.impl;
 
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchQuery;
-import org.hibernate.search.mapper.javabean.search.query.JavaBeanSearchResult;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
+import org.hibernate.search.mapper.javabean.search.query.SearchResult;
 
-public class JavaBeanSearchQueryImpl<T> implements JavaBeanSearchQuery<T> {
+public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
 
-	private final SearchQuery<T> delegate;
+	private final IndexSearchQuery<T> delegate;
 
-	public JavaBeanSearchQueryImpl(SearchQuery<T> delegate) {
+	public JavaBeanSearchQuery(IndexSearchQuery<T> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public JavaBeanSearchResult<T> execute() {
-		return new JavaBeanSearchResultImpl( delegate.execute() );
+	public SearchResult<T> execute() {
+		return new JavaBeanSearchResult( delegate.execute() );
 	}
 
 	@Override

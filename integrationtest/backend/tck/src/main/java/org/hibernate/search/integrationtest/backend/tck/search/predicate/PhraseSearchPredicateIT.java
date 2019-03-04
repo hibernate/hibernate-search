@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.query.spi.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -122,7 +122,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.build();
@@ -141,7 +141,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.build();
@@ -156,7 +156,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 				.build();
@@ -170,7 +170,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.build();
@@ -184,7 +184,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				// Use stopwords, which should be removed by the analysis
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
@@ -237,7 +237,7 @@ public class PhraseSearchPredicateIT {
 	public void slop() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<Integer, SearchQuery<DocumentReference>> createQuery = slop -> searchTarget.query().asReference()
+		Function<Integer, IndexSearchQuery<DocumentReference>> createQuery = slop -> searchTarget.query().asReference()
 				.predicate( f -> f.phrase().withSlop( slop ).onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.build();
 
@@ -278,7 +278,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase()
 						.onField( absoluteFieldPath1 ).boostedTo( 42 )
@@ -311,7 +311,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().onField( absoluteFieldPath1 )
@@ -350,7 +350,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.phrase().withConstantScore().boostedTo( 7 )
@@ -393,7 +393,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
-		Function<String, SearchQuery<DocumentReference>> createQuery;
+		Function<String, IndexSearchQuery<DocumentReference>> createQuery;
 
 		// onField(...)
 
@@ -537,7 +537,7 @@ public class PhraseSearchPredicateIT {
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.build();
@@ -554,7 +554,7 @@ public class PhraseSearchPredicateIT {
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
 				.build();
@@ -628,7 +628,7 @@ public class PhraseSearchPredicateIT {
 
 		// Check that all documents are searchable
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = searchTarget.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

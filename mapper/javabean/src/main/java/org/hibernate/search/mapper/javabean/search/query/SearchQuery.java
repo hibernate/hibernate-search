@@ -4,17 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.search.query.spi;
-
-import java.util.List;
+package org.hibernate.search.mapper.javabean.search.query;
 
 /**
  * @param <T> The type of results.
  */
-public interface SearchResult<T> {
+public interface SearchQuery<T> {
 
-	long getHitCount();
+	SearchResult<T> execute();
 
-	List<T> getHits();
+	long executeCount();
+
+	void setFirstResult(Long firstResultIndex);
+
+	void setMaxResults(Long maxResultsCount);
+
+	String getQueryString();
 
 }

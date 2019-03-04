@@ -8,11 +8,11 @@ package org.hibernate.search.engine.search.query.spi;
 
 import java.util.List;
 
-public final class SimpleSearchResult<T> implements SearchResult<T> {
+public final class SimpleIndexSearchResult<T> implements IndexSearchResult<T> {
 	private final long hitCount;
 	private final List<T> hits;
 
-	public SimpleSearchResult(long hitCount, List<T> hits) {
+	public SimpleIndexSearchResult(long hitCount, List<T> hits) {
 		this.hitCount = hitCount;
 		this.hits = hits;
 	}
