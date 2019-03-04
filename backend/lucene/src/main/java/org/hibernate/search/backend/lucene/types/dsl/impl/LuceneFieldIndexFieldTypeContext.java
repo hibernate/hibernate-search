@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.types.IndexFieldType;
 class LuceneFieldIndexFieldTypeContext<F>
 		implements IndexFieldTypeTerminalContext<F> {
 
-	private final FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
+	private final FromDocumentFieldValueConverter<? super F, F> indexToProjectionConverter;
 	private final LuceneFieldContributor<F> fieldContributor;
 	private final LuceneFieldValueExtractor<F> fieldValueExtractor;
 
@@ -41,7 +41,7 @@ class LuceneFieldIndexFieldTypeContext<F>
 				codec,
 				null,
 				null,
-				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, indexToProjectionConverter, codec )
+				new LuceneStandardFieldProjectionBuilderFactory<>( fieldValueExtractor != null, indexToProjectionConverter, indexToProjectionConverter, codec )
 		);
 	}
 }
