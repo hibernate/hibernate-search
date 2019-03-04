@@ -8,9 +8,13 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -45,11 +49,11 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 			@Override
 			public List<Date> getEntityPropertyValues() {
 				return Arrays.asList(
-						new Date( Long.MIN_VALUE ),
-						date( "1970-01-01T00:00:00.00Z" ),
-						date( "1970-01-09T13:28:59.00Z" ),
-						date( "2017-11-06T19:19:00.54Z" ),
-						new Date( Long.MAX_VALUE )
+						date( Long.MIN_VALUE ),
+						date( 1970, 1, 1, 0, 0, 0, 0 ),
+						date( 1970, 1, 9, 13, 28, 59, 0 ),
+						date( 2017, 11, 6, 19, 19, 0, 540 ),
+						date( Long.MAX_VALUE )
 				);
 			}
 
@@ -84,8 +88,16 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 		} );
 	}
 
-	private static Date date(String toParse) {
-		return Date.from( Instant.parse( toParse ) );
+	private static Date date(long epochMilli) {
+		return new Date( epochMilli );
+	}
+
+	private static Date date(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+		Calendar calendar = new GregorianCalendar( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
+		calendar.clear();
+		calendar.set( year, month - 1, day, hour, minute, second );
+		calendar.set( Calendar.MILLISECOND, millisecond );
+		return calendar.getTime();
 	}
 
 	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)

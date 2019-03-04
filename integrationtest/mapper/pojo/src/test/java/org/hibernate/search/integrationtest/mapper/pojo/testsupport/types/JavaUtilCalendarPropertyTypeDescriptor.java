@@ -12,6 +12,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,17 +50,17 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 
 			@Override
 			public List<Calendar> getEntityPropertyValues() {
-				List<Calendar> calendars = Arrays.asList(
-						calendar( "1930-01-01T00:00:00.00", "GMT+18:00" ),
-						calendar( "1970-01-01T00:00:00.00", "Europe/Paris" ),
-						calendar( "1970-01-09T13:28:59.00", "Europe/Paris" ),
-						calendar( "2017-11-06T19:19:00.54", "Europe/Paris" ),
-						calendar( "2017-11-06T19:19:00.54", "America/Chicago" ),
-						calendar( Long.MAX_VALUE, "Europe/Paris" ),
+				return Arrays.asList(
+						calendar( 1930, 1, 1, 0, 0, 0, 0, "GMT+18:00" ),
+						calendar( 1970, 1, 1, 0, 0, 0, 0, "Europe/Paris" ),
+						calendar( 1970, 1, 9, 13, 28, 59, 0, "Europe/Paris" ),
+						calendar( 2017, 11, 6, 19, 19, 0, 540, "Europe/Paris" ),
+						calendar( 2017, 11, 6, 19, 19, 0, 540, "America/Chicago" ),
+						calendar( Long.MAX_VALUE, "UTC" ),
 						calendar( Long.MAX_VALUE, "GMT-18:00" ),
 
-						// a february 29th on a leap year
-						calendar( "2000-02-29T12:00:00.00", "UTC" ),
+						// A february 29th on a leap year
+						calendar( 2000, 2, 29, 12, 0, 0, 0, "UTC" ),
 
 						// Two date/times that could be ambiguous due to a daylight saving time switch
 						calendar(
@@ -73,18 +74,17 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 								"CET"
 						)
 				);
-				return calendars;
 			}
 
 			@Override
 			public List<ZonedDateTime> getDocumentFieldValues() {
-				List<ZonedDateTime> zonedDateTimes = Arrays.asList(
+				return Arrays.asList(
 						zonedDateTime( "1930-01-01T00:00:00.00", "GMT+18:00" ),
 						zonedDateTime( "1970-01-01T00:00:00.00", "Europe/Paris" ),
 						zonedDateTime( "1970-01-09T13:28:59.00", "Europe/Paris" ),
 						zonedDateTime( "2017-11-06T19:19:00.54", "Europe/Paris" ),
 						zonedDateTime( "2017-11-06T19:19:00.54", "America/Chicago" ),
-						zonedDateTime( Long.MAX_VALUE, "Europe/Paris" ),
+						zonedDateTime( Long.MAX_VALUE, "UTC" ),
 						zonedDateTime( Long.MAX_VALUE, "GMT-18:00" ),
 
 						// a february 29th on a leap year
@@ -94,7 +94,6 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withEarlierOffsetAtOverlap(),
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withLaterOffsetAtOverlap()
 				);
-				return zonedDateTimes;
 			}
 
 			@Override
@@ -125,18 +124,24 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 		return LocalDateTime.parse( toParse ).atZone( ZoneId.of( zoneId ) );
 	}
 
-	private static Calendar calendar(String toParse, String timeZone) {
-		long epochMilli = LocalDateTime.parse( toParse ).atZone( ZoneId.of( timeZone ) ).toInstant().toEpochMilli();
-		return calendar( epochMilli, timeZone );
+	private static Calendar calendar(long epochMilli, String timeZone) {
+		// See below, we want to use the default locale
+		Calendar calendar = GregorianCalendar.getInstance( TimeZone.getTimeZone( timeZone ), Locale.getDefault() );
+		calendar.setTimeInMillis( epochMilli );
+		return calendar;
 	}
 
-	private static Calendar calendar(long epochMilli, String timeZone) {
+	private static Calendar calendar(int year, int month, int day, int hour, int minute, int second, int millisecond,
+			String timeZone) {
 		// Even though we generally do not want our tests to be locale-sensitive,
 		// here we indeed want to use the default Locale,
 		// because that's the locale used when creating a new calendar in the bridge.
 		// We expect this test to work regardless of the default Locale.
-		Calendar calendar = Calendar.getInstance( TimeZone.getTimeZone( timeZone ), Locale.getDefault() );
-		calendar.setTimeInMillis( epochMilli );
+		Locale locale = Locale.getDefault();
+		Calendar calendar = new GregorianCalendar( TimeZone.getTimeZone( timeZone ), locale );
+		calendar.clear();
+		calendar.set( year, month - 1, day, hour, minute, second );
+		calendar.set( Calendar.MILLISECOND, millisecond );
 		return calendar;
 	}
 
