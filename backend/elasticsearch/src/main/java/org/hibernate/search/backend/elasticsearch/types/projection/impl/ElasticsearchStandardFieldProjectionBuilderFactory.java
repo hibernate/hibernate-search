@@ -25,13 +25,18 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 	private final boolean projectable;
 
 	private final FromDocumentFieldValueConverter<? super F, ?> converter;
+
+	// TODO passing rawConverter to the projection builder
+	private final FromDocumentFieldValueConverter<? super F, F> rawConverter;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldProjectionBuilderFactory(boolean projectable,
-			FromDocumentFieldValueConverter<? super F, ?> converter,
+			FromDocumentFieldValueConverter<? super F, ?> converter, FromDocumentFieldValueConverter<? super F, F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

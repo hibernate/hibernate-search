@@ -37,7 +37,7 @@ class ElasticsearchGeoPointIndexFieldTypeContext
 				codec,
 				ElasticsearchGeoPointFieldPredicateBuilderFactory.INSTANCE,
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
-				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, indexToProjectionConverter, codec ),
+				new ElasticsearchGeoPointFieldProjectionBuilderFactory( resolvedProjectable, indexToProjectionConverter, createFromDocumentRawConverter(), codec ),
 				mapping
 		);
 	}
