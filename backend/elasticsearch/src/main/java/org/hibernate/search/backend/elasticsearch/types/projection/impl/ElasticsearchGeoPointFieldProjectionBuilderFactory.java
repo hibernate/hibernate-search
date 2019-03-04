@@ -26,13 +26,18 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 	private final boolean projectable;
 
 	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> converter;
+
+	// TODO passing rawConverter to the projection builder
+	private final FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter;
+
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	public ElasticsearchGeoPointFieldProjectionBuilderFactory(boolean projectable,
-			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter,
+			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter, FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 

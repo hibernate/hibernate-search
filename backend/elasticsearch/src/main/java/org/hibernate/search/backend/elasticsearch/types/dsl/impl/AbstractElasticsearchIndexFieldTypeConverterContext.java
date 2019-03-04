@@ -48,10 +48,10 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends Abs
 	}
 
 	final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
-		return dslToIndexConverter == null ? createRawConverter() : dslToIndexConverter;
+		return dslToIndexConverter == null ? createToDocumentRawConverter() : dslToIndexConverter;
 	}
 
-	final ToDocumentFieldValueConverter<F, ? extends F> createRawConverter() {
+	final ToDocumentFieldValueConverter<F, ? extends F> createToDocumentRawConverter() {
 		return new PassThroughToDocumentFieldValueConverter<>( fieldType );
 	}
 
@@ -61,7 +61,10 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends Abs
 		 * with an explicit message.
 		 * Currently we create a pass-through converter because users have no way to bypass the converter.
 		 */
-		return indexToProjectionConverter == null ? new PassThroughFromDocumentFieldValueConverter<>( fieldType )
-				: indexToProjectionConverter;
+		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
+	}
+
+	final FromDocumentFieldValueConverter<? super F, F> createFromDocumentRawConverter() {
+		return new PassThroughFromDocumentFieldValueConverter<>( fieldType );
 	}
 }
