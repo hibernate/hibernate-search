@@ -53,7 +53,12 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						date( 1970, 1, 1, 0, 0, 0, 0 ),
 						date( 1970, 1, 9, 13, 28, 59, 0 ),
 						date( 2017, 11, 6, 19, 19, 0, 540 ),
-						date( Long.MAX_VALUE )
+						date( Long.MAX_VALUE ),
+
+						// A february 29th on a leap year
+						date( 2000, 2, 29, 12, 0, 0, 0 ),
+						// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
+						date( 1500, 2, 29, 12, 0, 0, 0 )
 				);
 			}
 
@@ -64,7 +69,12 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						Instant.parse( "1970-01-01T00:00:00.00Z" ),
 						Instant.parse( "1970-01-09T13:28:59.00Z" ),
 						Instant.parse( "2017-11-06T19:19:00.54Z" ),
-						Instant.ofEpochMilli( Long.MAX_VALUE )
+						Instant.ofEpochMilli( Long.MAX_VALUE ),
+
+						Instant.parse( "2000-02-29T12:00:00.0Z" ),
+						// The Julian calendar is 10 days late at this point
+						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
+						Instant.parse( "1500-03-10T12:00:00.0Z" )
 				);
 			}
 

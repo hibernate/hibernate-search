@@ -61,6 +61,8 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 
 						// A february 29th on a leap year
 						calendar( 2000, 2, 29, 12, 0, 0, 0, "UTC" ),
+						// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
+						calendar( 1500, 2, 29, 12, 0, 0, 0, "UTC" ),
 
 						// Two date/times that could be ambiguous due to a daylight saving time switch
 						calendar(
@@ -87,10 +89,11 @@ public class JavaUtilCalendarPropertyTypeDescriptor extends PropertyTypeDescript
 						zonedDateTime( Long.MAX_VALUE, "UTC" ),
 						zonedDateTime( Long.MAX_VALUE, "GMT-18:00" ),
 
-						// a february 29th on a leap year
 						zonedDateTime( "2000-02-29T12:00:00.00", "UTC" ),
+						// The Julian calendar is 10 days late at this point
+						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
+						zonedDateTime( "1500-03-10T12:00:00.00", "UTC" ),
 
-						// Two date/times that could be ambiguous due to a daylight saving time switch
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withEarlierOffsetAtOverlap(),
 						zonedDateTime( "2011-10-30T02:50:00.00", "CET" ).withLaterOffsetAtOverlap()
 				);
