@@ -71,7 +71,7 @@ public class BoolSearchPredicateIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

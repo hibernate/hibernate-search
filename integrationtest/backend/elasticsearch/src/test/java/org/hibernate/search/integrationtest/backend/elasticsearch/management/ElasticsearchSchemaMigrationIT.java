@@ -110,7 +110,7 @@ public class ElasticsearchSchemaMigrationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType1", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
@@ -119,7 +119,7 @@ public class ElasticsearchSchemaMigrationIT {
 						indexManager -> { }
 				)
 				.withIndex(
-						"MappedType2", INDEX2_NAME,
+						INDEX2_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
@@ -128,7 +128,7 @@ public class ElasticsearchSchemaMigrationIT {
 						indexManager -> { }
 				)
 				.withIndex(
-						"MappedType3", INDEX3_NAME,
+						INDEX3_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field(
@@ -211,7 +211,7 @@ public class ElasticsearchSchemaMigrationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
@@ -257,7 +257,7 @@ public class ElasticsearchSchemaMigrationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
@@ -302,7 +302,7 @@ public class ElasticsearchSchemaMigrationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
@@ -350,7 +350,7 @@ public class ElasticsearchSchemaMigrationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
@@ -392,7 +392,7 @@ public class ElasticsearchSchemaMigrationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field(
@@ -437,7 +437,7 @@ public class ElasticsearchSchemaMigrationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field(

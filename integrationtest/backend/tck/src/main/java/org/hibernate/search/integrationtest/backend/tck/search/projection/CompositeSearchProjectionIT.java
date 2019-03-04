@@ -66,7 +66,7 @@ public class CompositeSearchProjectionIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

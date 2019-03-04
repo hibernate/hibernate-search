@@ -73,22 +73,22 @@ public class RangeSearchPredicateIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withIndex(
-						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
+						COMPATIBLE_INDEX_NAME,
 						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME + "Type", RAW_FIELD_COMPATIBLE_INDEX_NAME,
+						RAW_FIELD_COMPATIBLE_INDEX_NAME,
 						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.withIndex(
-						INCOMPATIBLE_INDEX_NAME + "Type", INCOMPATIBLE_INDEX_NAME,
+						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
 				)

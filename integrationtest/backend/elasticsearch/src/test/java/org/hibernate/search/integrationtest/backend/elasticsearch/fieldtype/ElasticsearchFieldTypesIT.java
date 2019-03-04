@@ -60,7 +60,7 @@ public class ElasticsearchFieldTypesIT {
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> {
 						}

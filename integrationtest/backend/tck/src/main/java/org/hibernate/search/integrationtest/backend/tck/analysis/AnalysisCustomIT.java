@@ -235,7 +235,7 @@ public class AnalysisCustomIT {
 			Function<StringIndexFieldTypeContext<?>, IndexFieldTypeTerminalContext<String>> typeContributor) {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> {
 							IndexFieldAccessor<String> accessor = ctx.getSchemaElement().field(
 									fieldName,

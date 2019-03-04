@@ -77,7 +77,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 	private void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "field", f -> f.asString() )

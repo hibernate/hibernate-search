@@ -73,7 +73,7 @@ public class MultiTenancyIT {
 	public void setup() {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -342,7 +342,7 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -360,7 +360,7 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
+						"IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -383,7 +383,7 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
+						"IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -411,7 +411,7 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
+						"IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -439,7 +439,7 @@ public class MultiTenancyIT {
 
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", "IndexName-using_multi_tenancy_for_delete_while_disabled_throws_exception",
+						"IndexName-using_multi_tenancy_for_delete_while_disabled_throws_exception",
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

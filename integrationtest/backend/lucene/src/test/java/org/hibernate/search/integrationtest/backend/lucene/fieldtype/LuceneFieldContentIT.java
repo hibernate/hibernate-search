@@ -47,7 +47,7 @@ public class LuceneFieldContentIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( "myLuceneBackend" )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

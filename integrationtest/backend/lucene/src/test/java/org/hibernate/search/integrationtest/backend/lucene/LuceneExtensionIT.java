@@ -84,7 +84,7 @@ public class LuceneExtensionIT {
 	public void setup() {
 		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

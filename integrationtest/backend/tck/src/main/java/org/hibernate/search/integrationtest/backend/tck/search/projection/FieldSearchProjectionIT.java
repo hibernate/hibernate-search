@@ -80,22 +80,22 @@ public class FieldSearchProjectionIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withIndex(
-						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
+						COMPATIBLE_INDEX_NAME,
 						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
-						"MappedTypeWithIncompatibleFieldProjectionConverters", RAW_FIELD_COMPATIBLE_INDEX_NAME,
+						RAW_FIELD_COMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleFieldProjectionConvertersIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.withIndex(
-						"MappedTypeWithIncompatibleFieldTypes", INCOMPATIBLE_INDEX_NAME,
+						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleFieldTypesIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
 				)

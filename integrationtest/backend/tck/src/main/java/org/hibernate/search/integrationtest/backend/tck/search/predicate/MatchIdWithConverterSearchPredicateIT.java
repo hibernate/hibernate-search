@@ -60,7 +60,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						(ctx) -> {
 							ctx.idDslConverter( ID_CONVERTER );
 							// Nothing else to do, we don't need any field in the mapping

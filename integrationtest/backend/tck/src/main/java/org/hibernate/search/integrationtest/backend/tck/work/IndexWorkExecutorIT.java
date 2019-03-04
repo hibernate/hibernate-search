@@ -59,7 +59,7 @@ public class IndexWorkExecutorIT {
 	public void runOptimizePurgeAndFlushInSequence() {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
@@ -85,7 +85,7 @@ public class IndexWorkExecutorIT {
 	public void runOptimizePurgeAndFlushWithMultiTenancy() {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
-						"MappedType", INDEX_NAME,
+						INDEX_NAME,
 						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)

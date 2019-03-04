@@ -113,6 +113,11 @@ public class SearchSetupHelper implements TestRule {
 			);
 		}
 
+		public SetupContext withIndex(String rawIndexName,
+				Consumer<IndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
+			return withIndex( rawIndexName + "_Type", rawIndexName, mappingContributor, listener );
+		}
+
 		public SetupContext withIndex(String typeName, String rawIndexName,
 				Consumer<IndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
 			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );

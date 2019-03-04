@@ -127,7 +127,7 @@ public class ElasticsearchSchemaValidationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType1", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
@@ -136,7 +136,7 @@ public class ElasticsearchSchemaValidationIT {
 						indexManager -> { }
 				)
 				.withIndex(
-						"MappedType2", INDEX2_NAME,
+						INDEX2_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
@@ -145,7 +145,7 @@ public class ElasticsearchSchemaValidationIT {
 						indexManager -> { }
 				)
 				.withIndex(
-						"MappedType3", INDEX3_NAME,
+						INDEX3_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field(
@@ -167,7 +167,7 @@ public class ElasticsearchSchemaValidationIT {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -191,7 +191,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -216,7 +216,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -237,7 +237,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -263,7 +263,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -288,7 +288,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -315,7 +315,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -344,7 +344,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType1", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field(
@@ -385,7 +385,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType1", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field(
@@ -425,7 +425,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType1", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
@@ -467,7 +467,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType1", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
@@ -505,7 +505,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithLocalDateField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithLocalDateField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -544,7 +544,7 @@ public class ElasticsearchSchemaValidationIT {
 
 		withManagementStrategyConfiguration()
 				.withIndex(
-						"MappedType1", INDEX1_NAME,
+						INDEX1_NAME,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLong() )
@@ -586,7 +586,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedTypeName", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									IndexSchemaObjectField objectField =
@@ -623,7 +623,7 @@ public class ElasticsearchSchemaValidationIT {
 				);
 
 		setupExpectingFailure(
-				() -> setupSimpleIndexWithKeywordField( "MappedType1", INDEX1_NAME ),
+				() -> setupSimpleIndexWithKeywordField( INDEX1_NAME ),
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -666,7 +666,7 @@ public class ElasticsearchSchemaValidationIT {
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
 						.withIndex(
-								"MappedType1", INDEX1_NAME,
+								INDEX1_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
@@ -675,7 +675,7 @@ public class ElasticsearchSchemaValidationIT {
 								indexManager -> { }
 						)
 						.withIndex(
-								"MappedType2", INDEX2_NAME,
+								INDEX2_NAME,
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
@@ -828,10 +828,10 @@ public class ElasticsearchSchemaValidationIT {
 				.hasMessageMatching( failureReportRegex );
 	}
 
-	private void setupSimpleIndexWithKeywordField(String typeName, String indexName) {
+	private void setupSimpleIndexWithKeywordField(String indexName) {
 		withManagementStrategyConfiguration()
 				.withIndex(
-						typeName, indexName,
+						indexName,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString() )
@@ -843,10 +843,10 @@ public class ElasticsearchSchemaValidationIT {
 				.setup();
 	}
 
-	private void setupSimpleIndexWithLocalDateField(String typeName, String indexName) {
+	private void setupSimpleIndexWithLocalDateField(String indexName) {
 		withManagementStrategyConfiguration()
 				.withIndex(
-						typeName, indexName,
+						indexName,
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )

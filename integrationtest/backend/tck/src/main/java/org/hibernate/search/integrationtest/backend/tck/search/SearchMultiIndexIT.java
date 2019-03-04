@@ -89,12 +89,12 @@ public class SearchMultiIndexIT {
 	public void setup() {
 		setupHelper.withDefaultConfiguration( BACKEND_1 )
 				.withIndex(
-						"MappedType_1_1", INDEX_NAME_1_1,
+						INDEX_NAME_1_1,
 						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
 						indexMapping -> this.indexManager_1_1 = indexMapping
 				)
 				.withIndex(
-						"MappedType_1_2", INDEX_NAME_1_2,
+						INDEX_NAME_1_2,
 						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
 						indexMapping -> this.indexManager_1_2 = indexMapping
 				)
@@ -102,7 +102,7 @@ public class SearchMultiIndexIT {
 
 		setupHelper.withDefaultConfiguration( BACKEND_2 )
 				.withIndex(
-						"MappedType_2_1", INDEX_NAME_2_1,
+						INDEX_NAME_2_1,
 						ctx -> this.indexAccessors_2_1 = new IndexAccessors_2_1( ctx.getSchemaElement() ),
 						indexMapping -> this.indexManager_2_1 = indexMapping
 				)
