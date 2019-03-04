@@ -26,11 +26,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
@@ -42,6 +39,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -69,7 +67,7 @@ public class FieldSearchSortIT {
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String NOT_COMPATIBLE_INDEX_NAME = "IndexWithInCompatibleFields";
+	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
@@ -86,12 +84,15 @@ public class FieldSearchSortIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-
 	private StubMappingIndexManager indexManager;
+
+	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
+
+	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-	private StubMappingIndexManager notCompatibleIndexManager;
+
+	private StubMappingIndexManager incompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -103,7 +104,7 @@ public class FieldSearchSortIT {
 				)
 				.withIndex(
 						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
@@ -112,9 +113,9 @@ public class FieldSearchSortIT {
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.withIndex(
-						NOT_COMPATIBLE_INDEX_NAME + "Type", NOT_COMPATIBLE_INDEX_NAME,
-						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.notCompatibleIndexManager = indexManager
+						INCOMPATIBLE_INDEX_NAME + "Type", INCOMPATIBLE_INDEX_NAME,
+						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleIndexManager = indexManager
 				)
 				.setup();
 
@@ -506,7 +507,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withNoCompatibleIndexManager_usingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -522,14 +523,14 @@ public class FieldSearchSortIT {
 					.hasMessageContaining( "Multiple conflicting types to build a sort" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
 					) );
 		}
 	}
 
 	@Test
 	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -545,7 +546,7 @@ public class FieldSearchSortIT {
 					.hasMessageContaining( "Multiple conflicting types to build a sort" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
 					) );
 		}
 	}
@@ -619,8 +620,8 @@ public class FieldSearchSortIT {
 
 		workPlan = compatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		workPlan.execute().join();
 
@@ -631,19 +632,46 @@ public class FieldSearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		query = compatibleIndexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.build();
+		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = rawFieldCompatibleIndexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.build();
+		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+	}
+
+	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
+		FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isPresent() )
+				.forEach( action );
+	}
+
+	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			FieldModelConsumer<FieldSortExpectations<?>, ByTypeFieldModel<?>> consumer) {
+		forEachTypeDescriptor( typeDescriptor -> {
+			// Safe, see forEachTypeDescriptor
+			FieldSortExpectations<?> expectations = typeDescriptor.getFieldSortExpectations().get();
+			ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
+					.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+			consumer.accept( typeDescriptor, expectations, fieldModel );
+		} );
 	}
 
 	private static class IndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
-		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
-		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
-		final List<ByTypeFieldModel<?>> supportedNonSortableFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> supportedNonSortableFieldModels = new ArrayList<>();
 
 		final MainFieldModel identicalForFirstTwo;
 		final MainFieldModel identicalForLastTwo;
@@ -652,21 +680,32 @@ public class FieldSearchSortIT {
 		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapByTypeFields(
-					root, "supported_", ignored -> { },
-					FieldSortExpectations::isFieldSortSupported
+			mapByTypeFields(
+					root, "byType_", ignored -> { },
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isFieldSortSupported() ) {
+							supportedFieldModels.add( model );
+						}
+						else {
+							unsupportedFieldModels.add( model );
+						}
+					}
 			);
-			supportedFieldWithDslConverterModels = mapByTypeFields(
-					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
-					FieldSortExpectations::isFieldSortSupported
+			mapByTypeFields(
+					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isFieldSortSupported() ) {
+							supportedFieldWithDslConverterModels.add( model );
+						}
+					}
 			);
-			unsupportedFieldModels = mapByTypeFields(
-					root, "unsupported_", ignored -> { },
-					e -> !e.isFieldSortSupported()
-			);
-			supportedNonSortableFieldModels = mapByTypeFields(
-					root, "supported_nonSortable_", c -> c.sortable( Sortable.NO ),
-					FieldSortExpectations::isFieldSortSupported
+			mapByTypeFields(
+					root, "byType_nonSortable_", c -> c.sortable( Sortable.NO ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isFieldSortSupported() ) {
+							supportedNonSortableFieldModels.add( model );
+						}
+					}
 			);
 
 			identicalForFirstTwo = MainFieldModel.mapper(
@@ -686,96 +725,63 @@ public class FieldSearchSortIT {
 	private static class ObjectMapping {
 		final String relativeFieldName;
 		final IndexObjectFieldAccessor self;
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
-		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
 
 		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.createAccessor();
-			supportedFieldModels = mapByTypeFields(
-					objectField, "supported_", ignored -> { },
-					FieldSortExpectations::isFieldSortSupported
-			);
-			unsupportedFieldModels = mapByTypeFields(
-					objectField, "unsupported_", ignored -> { },
-					e -> !e.isFieldSortSupported()
-			);
-		}
-	}
-
-	private static class RawFieldCompatibleIndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
-
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapByTypeFields(
-					root, "supported_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
-					FieldSortExpectations::isFieldSortSupported
-			);
-		}
-	}
-
-	private static class NotCompatibleIndexMapping {
-		NotCompatibleIndexMapping(IndexSchemaElement root) {
-			/*
-			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
-			 * but with an incompatible type.
-			 */
-			mapByTypeSupportedIncompatibleFields(
-					root, "supported_",
-					(type, context) -> {
-						// Just try to pick a different, also supported type
-						if ( Integer.class.equals( type.getJavaType() ) ) {
-							return context.asLong();
+			mapByTypeFields(
+					objectField, "byType_", ignored -> { },
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isFieldSortSupported() ) {
+							supportedFieldModels.add( model );
 						}
 						else {
-							return context.asInteger();
+							unsupportedFieldModels.add( model );
 						}
 					}
 			);
 		}
 	}
 
-	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
-			Predicate<FieldSortExpectations<?>> predicate) {
-		return FieldTypeDescriptor.getAll().stream()
-				.filter(
-						typeDescriptor -> typeDescriptor.getFieldSortExpectations().isPresent()
-								&& predicate.test( typeDescriptor.getFieldSortExpectations().get() )
-				)
-				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
-				.collect( Collectors.toList() );
+	private static class RawFieldCompatibleIndexMapping {
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+
+		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * but with an incompatible DSL converter.
+			 */
+			mapByTypeFields(
+					root, "byType_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isFieldSortSupported() ) {
+							supportedFieldModels.add( model );
+						}
+					}
+			);
+		}
 	}
 
-	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
-			FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-		FieldSortExpectations<F> expectations = typeDescriptor.getFieldSortExpectations().get(); // Safe, see caller
-		return StandardFieldMapper.of(
-				typeDescriptor::configure,
-				c -> c.sortable( Sortable.YES ),
-				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, typeDescriptor.getJavaType(), expectations )
-		)
-				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
-	}
-
-	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
-			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
-		return FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
-				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
-				.collect( Collectors.toList() );
-	}
-
-	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
-			FieldTypeDescriptor<F> typeDescriptor,
-			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
-		String name = prefix + typeDescriptor.getUniqueName();
-		return IncompatibleFieldModel.mapper(
-				context -> configuration.apply( typeDescriptor, context )
-		)
-				.map( parent, name );
+	private static class IncompatibleIndexMapping {
+		IncompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * but with an incompatible type.
+			 */
+			forEachTypeDescriptor( typeDescriptor -> {
+				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
+				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
+					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
+				}
+				else {
+					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
+				}
+				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
+			} );
+		}
 	}
 
 	private static class ValueModel<F> {
@@ -818,6 +824,16 @@ public class FieldSearchSortIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
+			// Safe, see caller
+			FieldSortExpectations<F> expectations = typeDescriptor.getFieldSortExpectations().get();
+			return StandardFieldMapper.of(
+					typeDescriptor::configure,
+					c -> c.sortable( Sortable.YES ),
+					(accessor, name) -> new ByTypeFieldModel<>( accessor, name, typeDescriptor.getJavaType(), expectations )
+			);
+		}
+
 		final String relativeFieldName;
 		final Class<F> type;
 
@@ -844,12 +860,12 @@ public class FieldSearchSortIT {
 		}
 	}
 
-	private static class IncompatibleFieldModel<F> {
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
+	private static class IncompatibleFieldModel {
+		static <F> StandardFieldMapper<F, IncompatibleFieldModel> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new IncompatibleFieldModel<>( name )
+					(accessor, name) -> new IncompatibleFieldModel( name )
 			);
 		}
 

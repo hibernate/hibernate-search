@@ -11,32 +11,30 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
-import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.DocumentReference;
-import org.hibernate.search.engine.search.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -48,7 +46,7 @@ public class MatchSearchPredicateIT {
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String NOT_COMPATIBLE_INDEX_NAME = "IndexWithInCompatibleFields";
+	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
 
 	private static final String DOCUMENT_1 = "document1";
 	private static final String DOCUMENT_2 = "document2";
@@ -62,12 +60,15 @@ public class MatchSearchPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-
 	private StubMappingIndexManager indexManager;
+
+	private IndexMapping compatibleIndexMapping;
 	private StubMappingIndexManager compatibleIndexManager;
+
+	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
 	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-	private StubMappingIndexManager notCompatibleIndexManager;
+
+	private StubMappingIndexManager incompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -79,7 +80,7 @@ public class MatchSearchPredicateIT {
 				)
 				.withIndex(
 						"CompatibleMappedType", COMPATIBLE_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.compatibleIndexManager = indexManager
 				)
 				.withIndex(
@@ -88,9 +89,9 @@ public class MatchSearchPredicateIT {
 						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
 				)
 				.withIndex(
-						NOT_COMPATIBLE_INDEX_NAME + "Type", NOT_COMPATIBLE_INDEX_NAME,
-						ctx -> new NotCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.notCompatibleIndexManager = indexManager
+						INCOMPATIBLE_INDEX_NAME + "Type", INCOMPATIBLE_INDEX_NAME,
+						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleIndexManager = indexManager
 				)
 				.setup();
 
@@ -713,8 +714,8 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_usingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndexManager_usingField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -727,14 +728,14 @@ public class MatchSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
 					) );
 		}
 	}
 
 	@Test
-	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( notCompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndexManager_usingRawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -747,7 +748,7 @@ public class MatchSearchPredicateIT {
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
 					.satisfies( FailureReportUtils.hasContext(
-							EventContexts.fromIndexNames( INDEX_NAME, NOT_COMPATIBLE_INDEX_NAME )
+							EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
 					) );
 		}
 	}
@@ -786,8 +787,8 @@ public class MatchSearchPredicateIT {
 
 		workPlan = compatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
-			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
+			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
 		workPlan.execute().join();
 
@@ -798,20 +799,45 @@ public class MatchSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		SearchQuery<DocumentReference> query = searchTarget.query()
+		SearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY,
-				DOCUMENT_3
-		);
+		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		query = compatibleIndexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.build();
+		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+		query = rawFieldCompatibleIndexManager.createSearchTarget().query()
+				.asReference()
+				.predicate( f -> f.matchAll() )
+				.build();
+		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+	}
+
+	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
+		FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getMatchPredicateExpectations().isPresent() )
+				.forEach( action );
+	}
+
+	private static void mapByTypeFields(IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
+			FieldModelConsumer<MatchPredicateExpectations<?>, ByTypeFieldModel<?>> consumer) {
+		forEachTypeDescriptor( typeDescriptor -> {
+			// Safe, see forEachTypeDescriptor
+			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
+			ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
+					.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
+			consumer.accept( typeDescriptor, expectations, fieldModel );
+		} );
 	}
 
 	private static class IndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
-		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels;
-		final List<ByTypeFieldModel<?>> unsupportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> supportedFieldWithDslConverterModels = new ArrayList<>();
+		final List<ByTypeFieldModel<?>> unsupportedFieldModels = new ArrayList<>();
 
 		final MainFieldModel string1Field;
 		final MainFieldModel string2Field;
@@ -822,17 +848,24 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel string2FieldWithDslConverter;
 
 		IndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapByTypeFields(
-					root, "supported_", ignored -> { },
-					MatchPredicateExpectations::isMatchPredicateSupported
+			mapByTypeFields(
+					root, "byType_", ignored -> { },
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isMatchPredicateSupported() ) {
+							supportedFieldModels.add( model );
+						}
+						else {
+							unsupportedFieldModels.add( model );
+						}
+					}
 			);
-			supportedFieldWithDslConverterModels = mapByTypeFields(
-					root, "supported_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
-					MatchPredicateExpectations::isMatchPredicateSupported
-			);
-			unsupportedFieldModels = mapByTypeFields(
-					root, "supported_converted_", ignored -> { },
-					e -> !e.isMatchPredicateSupported()
+			mapByTypeFields(
+					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isMatchPredicateSupported() ) {
+							supportedFieldWithDslConverterModels.add( model );
+						}
+					}
 			);
 			string1Field = MainFieldModel.mapper(
 					"Irving", "Auster", "Coe"
@@ -848,7 +881,7 @@ public class MatchSearchPredicateIT {
 					.map( root, "string3" );
 			analyzedStringField = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ),
-					"a word", "another word", "a"
+					"quick brown fox", "another word", "a"
 			)
 					.map( root, "analyzedString" );
 			string1FieldWithDslConverter = MainFieldModel.mapper(
@@ -865,77 +898,41 @@ public class MatchSearchPredicateIT {
 	}
 
 	private static class RawFieldCompatibleIndexMapping {
-		final List<ByTypeFieldModel<?>> supportedFieldModels;
+		final List<ByTypeFieldModel<?>> supportedFieldModels = new ArrayList<>();
 
 		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
-			supportedFieldModels = mapByTypeFields(
-					root, "supported_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
-					MatchPredicateExpectations::isMatchPredicateSupported
-			);
-		}
-	}
-
-	private static class NotCompatibleIndexMapping {
-		NotCompatibleIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
-			 * but with an incompatible type.
+			 * but with an incompatible DSL converter.
 			 */
-			mapByTypeSupportedIncompatibleFields(
-					root, "supported_",
-					(type, context) -> {
-						// Just try to pick a different, also supported type
-						if ( Integer.class.equals( type.getJavaType() ) ) {
-							return context.asLong();
-						}
-						else {
-							return context.asInteger();
+			mapByTypeFields(
+					root, "byType_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					(typeDescriptor, expectations, model) -> {
+						if ( expectations.isMatchPredicateSupported() ) {
+							supportedFieldModels.add( model );
 						}
 					}
 			);
 		}
 	}
 
-	private static List<ByTypeFieldModel<?>> mapByTypeFields(IndexSchemaElement root, String prefix,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration,
-			Predicate<MatchPredicateExpectations<?>> predicate) {
-		return FieldTypeDescriptor.getAll().stream()
-				.filter(
-						typeDescriptor -> typeDescriptor.getMatchPredicateExpectations().isPresent()
-						&& predicate.test( typeDescriptor.getMatchPredicateExpectations().get() )
-				)
-				.map( typeDescriptor -> mapByTypeField( root, prefix, typeDescriptor, additionalConfiguration ) )
-				.collect( Collectors.toList() );
-	}
-
-	private static <F> ByTypeFieldModel<F> mapByTypeField(IndexSchemaElement parent, String prefix,
-			FieldTypeDescriptor<F> typeDescriptor,
-			Consumer<StandardIndexFieldTypeContext<?, ?>> additionalConfiguration) {
-		MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get(); // Safe, see caller
-		return StandardFieldMapper.of(
-				typeDescriptor::configure,
-				additionalConfiguration,
-				(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
-		)
-				.map( parent, prefix + typeDescriptor.getUniqueName() );
-	}
-
-	private static List<IncompatibleFieldModel<?>> mapByTypeSupportedIncompatibleFields(IndexSchemaElement root, String prefix,
-			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
-		return FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldProjectionExpectations().isPresent() )
-				.map( typeDescriptor -> mapByTypeIncompatibleField( root, prefix, typeDescriptor, configuration ) )
-				.collect( Collectors.toList() );
-	}
-
-	private static <F> IncompatibleFieldModel<?> mapByTypeIncompatibleField(IndexSchemaElement parent, String prefix,
-			FieldTypeDescriptor<F> typeDescriptor,
-			BiFunction<FieldTypeDescriptor<?>, IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> configuration) {
-		String name = prefix + typeDescriptor.getUniqueName();
-		return IncompatibleFieldModel.mapper(
-				context -> configuration.apply( typeDescriptor, context )
-		)
-				.map( parent, name );
+	private static class IncompatibleIndexMapping {
+		IncompatibleIndexMapping(IndexSchemaElement root) {
+			/*
+			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
+			 * but with an incompatible type.
+			 */
+			forEachTypeDescriptor( typeDescriptor -> {
+				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
+				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
+					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
+				}
+				else {
+					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
+				}
+				mapper.map( root, "byType_" + typeDescriptor.getUniqueName() );
+			} );
+		}
 	}
 
 	private static class ValueModel<F> {
@@ -982,6 +979,15 @@ public class MatchSearchPredicateIT {
 	}
 
 	private static class ByTypeFieldModel<F> {
+		static <F> StandardFieldMapper<F, ByTypeFieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
+			// Safe, see caller
+			MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get();
+			return StandardFieldMapper.of(
+					typeDescriptor::configure,
+					(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
+			);
+		}
+
 		final String relativeFieldName;
 		final ValueModel<F> document1Value;
 		final ValueModel<F> document2Value;
@@ -997,13 +1003,10 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
-	private static class IncompatibleFieldModel<F> {
-		static <F> StandardFieldMapper<F, IncompatibleFieldModel<F>> mapper(
+	private static class IncompatibleFieldModel {
+		static <F> StandardFieldMapper<?, IncompatibleFieldModel> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
-			return StandardFieldMapper.of(
-					configuration,
-					(accessor, name) -> new IncompatibleFieldModel<>( name )
-			);
+			return StandardFieldMapper.of( configuration, (accessor, name) -> new IncompatibleFieldModel( name ) );
 		}
 
 		final String relativeFieldName;
