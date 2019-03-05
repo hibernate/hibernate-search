@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.session.spi;
 
 import java.util.Collection;
 
-import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
@@ -17,9 +17,9 @@ public interface HibernateOrmSearchManager extends AutoCloseable {
 	@Override
 	void close();
 
-	<T> HibernateOrmSearchTarget<T> search(Class<T> targetedType);
+	<T> FullTextSearchTarget<T> search(Class<T> targetedType);
 
-	<T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
+	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
 
 	/**
 	 * @return A new work plan for this manager, maintaining its state (list of works) independently from the manager.
