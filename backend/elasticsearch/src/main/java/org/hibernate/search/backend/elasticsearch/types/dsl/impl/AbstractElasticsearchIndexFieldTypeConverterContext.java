@@ -56,11 +56,6 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends Abs
 	}
 
 	final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
-		/*
-		 * TODO HSEARCH-3257 when no projection converter is configured, create a projection converter that will throw an exception
-		 * with an explicit message.
-		 * Currently we create a pass-through converter because users have no way to bypass the converter.
-		 */
 		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
 	}
 
