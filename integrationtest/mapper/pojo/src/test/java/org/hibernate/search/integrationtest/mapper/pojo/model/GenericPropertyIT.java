@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.mapper.pojo.model;
 
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -60,7 +60,7 @@ public class GenericPropertyIT {
 
 	@Test
 	public void index() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			GenericEntity<String> genericEntity = new GenericEntity<>();
@@ -70,7 +70,7 @@ public class GenericPropertyIT {
 			entity1.setGenericProperty( genericEntity );
 			genericEntity.setParent( entity1 );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> b

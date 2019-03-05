@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
 import org.hibernate.search.mapper.pojo.model.PojoModelElementAccessor;
@@ -66,13 +66,13 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void index() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b
@@ -89,7 +89,7 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void index_multiTenancy() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManagerWithOptions()
+		try ( SearchSession session = mapping.createSessionWithOptions()
 				.tenantId( "myTenantId" )
 				.build() ) {
 			IndexedEntity entity1 = new IndexedEntity();
@@ -97,7 +97,7 @@ public class ProgrammaticMappingRoutingIT {
 			entity1.setCategory( EntityCategory.CATEGORY_2 );
 			entity1.setValue( "val1" );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( b -> b
@@ -115,8 +115,8 @@ public class ProgrammaticMappingRoutingIT {
 
 	@Test
 	public void search() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<PojoReference> query = session.search( IndexedEntity.class )
 					.asReference()
 					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )

@@ -7,15 +7,12 @@
 package org.hibernate.search.mapper.javabean.session;
 
 
-/**
- * @author Yoann Rodiere
- */
-public interface JavaBeanSearchManagerBuilder {
+public interface SearchSessionBuilder {
 
 	// TODO other options (default query timeout, default query hints, ...)
 
-	JavaBeanSearchManagerBuilder tenantId(String tenantId);
+	SearchSessionBuilder tenantId(String tenantId);
 
-	JavaBeanSearchManager build();
+	SearchSession build();
 
 }

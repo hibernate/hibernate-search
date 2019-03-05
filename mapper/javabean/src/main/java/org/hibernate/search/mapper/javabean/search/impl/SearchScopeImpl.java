@@ -9,23 +9,23 @@ package org.hibernate.search.mapper.javabean.search.impl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
-import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
-import org.hibernate.search.mapper.javabean.search.dsl.query.impl.JavaBeanQueryResultDefinitionContextImpl;
+import org.hibernate.search.mapper.javabean.search.SearchScope;
+import org.hibernate.search.mapper.javabean.search.dsl.query.SearchQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.search.dsl.query.impl.SearchQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class JavaBeanSearchScopeImpl implements JavaBeanSearchScope {
+public class SearchScopeImpl implements SearchScope {
 
 	private final PojoSearchScopeDelegate<?, PojoReference> delegate;
 
-	public JavaBeanSearchScopeImpl(PojoSearchScopeDelegate<?, PojoReference> delegate) {
+	public SearchScopeImpl(PojoSearchScopeDelegate<?, PojoReference> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public JavaBeanQueryResultDefinitionContext search() {
-		return new JavaBeanQueryResultDefinitionContextImpl( delegate );
+	public SearchQueryResultDefinitionContext search() {
+		return new SearchQueryResultDefinitionContextImpl( delegate );
 	}
 
 	@Override

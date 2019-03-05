@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.GeoPointBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.annotation.Longitude;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -66,7 +66,7 @@ public class AnnotationMappingGeoPointBridgeIT {
 
 	@Test
 	public void index() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			GeoPointOnTypeEntity entity1 = new GeoPointOnTypeEntity();
 			entity1.setId( 1 );
 			entity1.setHomeLatitude( 1.1d );
@@ -90,9 +90,9 @@ public class AnnotationMappingGeoPointBridgeIT {
 			entity3.setId( 3 );
 			entity3.setCoord( new CustomCoordinates( 3.1d, 3.2d ) );
 
-			manager.getMainWorkPlan().add( entity1 );
-			manager.getMainWorkPlan().add( entity2 );
-			manager.getMainWorkPlan().add( entity3 );
+			session.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity2 );
+			session.getMainWorkPlan().add( entity3 );
 
 			backendMock.expectWorks( GeoPointOnTypeEntity.INDEX )
 					.add( "1", b -> b

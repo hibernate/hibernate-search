@@ -24,12 +24,12 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeB
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
+import org.hibernate.search.mapper.javabean.search.SearchScope;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractor;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ContainerExtractorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
@@ -157,7 +157,7 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void index() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 			entity1.setId( 1 );
 			entity1.setText( "this is text (1)" );
@@ -212,13 +212,13 @@ public class AnnotationMappingSmokeIT {
 			entity2.getEmbeddingAsMap().add( entity5 );
 			entity3.getEmbeddingAsMap().add( entity5 );
 
-			manager.getMainWorkPlan().add( entity1 );
-			manager.getMainWorkPlan().add( entity2 );
-			manager.getMainWorkPlan().add( entity4 );
-			manager.getMainWorkPlan().delete( entity1 );
-			manager.getMainWorkPlan().add( entity3 );
-			manager.getMainWorkPlan().add( entity5 );
-			manager.getMainWorkPlan().add( entity6 );
+			session.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity2 );
+			session.getMainWorkPlan().add( entity4 );
+			session.getMainWorkPlan().delete( entity1 );
+			session.getMainWorkPlan().add( entity3 );
+			session.getMainWorkPlan().add( entity5 );
+			session.getMainWorkPlan().add( entity6 );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "2", b -> b
@@ -360,8 +360,8 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void search() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<PojoReference> query = manager.search(
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<PojoReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.asReference()
@@ -397,8 +397,8 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void search_singleElementProjection() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<String> query = manager.search(
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<String> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.asProjection( f -> f.field( "myTextField", String.class ) )
@@ -433,8 +433,8 @@ public class AnnotationMappingSmokeIT {
 
 	@Test
 	public void search_multipleElementsProjection() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchScope scope = manager.scope(
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchScope scope = session.scope(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 

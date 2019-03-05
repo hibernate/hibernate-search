@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -95,10 +95,10 @@ public class DocumentIdDefaultBridgeIT<I> {
 
 	@Test
 	public void indexing() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			for ( I entityIdentifierValue : expectations.getEntityIdentifierValues() ) {
 				Object entity = expectations.instantiateTypeWithIdentifierBridge1( entityIdentifierValue );
-				manager.getMainWorkPlan().add( entity );
+				session.getMainWorkPlan().add( entity );
 			}
 
 			BackendMock.WorkCallListContext expectationSetter = backendMock.expectWorks(
@@ -117,7 +117,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 
 	@Test
 	public void projection() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			Iterator<I> entityIdentifierIterator = expectations.getEntityIdentifierValues().iterator();
 			for ( String documentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
 				I entityIdentifierValue = entityIdentifierIterator.next();
@@ -135,7 +135,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 						)
 				);
 
-				SearchQuery<PojoReference> query = manager.search( expectations.getTypeWithIdentifierBridge1() )
+				SearchQuery<PojoReference> query = session.search( expectations.getTypeWithIdentifierBridge1() )
 						.asReference()
 						.predicate( f -> f.matchAll() )
 						.build();

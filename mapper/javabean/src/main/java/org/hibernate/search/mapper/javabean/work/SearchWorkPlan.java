@@ -16,7 +16,7 @@ package org.hibernate.search.mapper.javabean.work;
  * <p>
  * This contract is not thread-safe.
  */
-public interface JavaBeanWorkPlan {
+public interface SearchWorkPlan {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.

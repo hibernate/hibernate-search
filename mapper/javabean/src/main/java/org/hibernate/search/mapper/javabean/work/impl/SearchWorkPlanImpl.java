@@ -8,14 +8,14 @@ package org.hibernate.search.mapper.javabean.work.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
+import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
-public class JavaBeanWorkPlanImpl implements JavaBeanWorkPlan {
+public class SearchWorkPlanImpl implements SearchWorkPlan {
 
 	private final PojoWorkPlan delegate;
 
-	public JavaBeanWorkPlanImpl(PojoWorkPlan delegate) {
+	public SearchWorkPlanImpl(PojoWorkPlan delegate) {
 		this.delegate = delegate;
 	}
 

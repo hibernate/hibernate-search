@@ -14,7 +14,7 @@ import java.util.Collections;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -49,10 +49,10 @@ public class ProvidedIdIT {
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
-			manager.getMainWorkPlan().add( "42", entity1 );
+			session.getMainWorkPlan().add( "42", entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "42", b -> { } )
@@ -61,7 +61,7 @@ public class ProvidedIdIT {
 		backendMock.verifyExpectationsMet();
 
 		// Searching
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
 					Collections.singletonList( INDEX_NAME ),
 					b -> { },
@@ -71,7 +71,7 @@ public class ProvidedIdIT {
 					)
 			);
 
-			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
+			SearchQuery<PojoReference> query = session.search( IndexedEntity.class )
 					.asReference()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -92,11 +92,11 @@ public class ProvidedIdIT {
 		JavaBeanMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity1 = new IndexedEntity();
 
 			SubTest.expectException(
-					() -> manager.getMainWorkPlan().add( entity1 )
+					() -> session.getMainWorkPlan().add( entity1 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

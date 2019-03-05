@@ -27,7 +27,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -100,11 +100,11 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	@Test
 	public void indexing() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			int id = 0;
 			for ( V propertyValue : getPropertyValues() ) {
 				Object entity = expectations.instantiateTypeWithValueBridge1( id, propertyValue );
-				manager.getMainWorkPlan().add( entity );
+				session.getMainWorkPlan().add( entity );
 				++id;
 			}
 
@@ -126,8 +126,8 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	@Test
 	public void projection() {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			SearchQuery<V> query = manager.search( expectations.getTypeWithValueBridge1() )
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
 					.asProjection( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
 					.predicate( f -> f.matchAll() )
 					.build();

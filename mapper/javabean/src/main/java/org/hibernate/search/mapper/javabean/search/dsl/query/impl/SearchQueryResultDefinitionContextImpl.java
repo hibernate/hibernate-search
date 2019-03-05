@@ -14,16 +14,16 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
-import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
+import org.hibernate.search.mapper.javabean.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.impl.JavaBeanSearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class JavaBeanQueryResultDefinitionContextImpl implements JavaBeanQueryResultDefinitionContext {
+public class SearchQueryResultDefinitionContextImpl implements SearchQueryResultDefinitionContext {
 	private final PojoSearchScopeDelegate<?, PojoReference> searchScopeDelegate;
 
-	public JavaBeanQueryResultDefinitionContextImpl(PojoSearchScopeDelegate<?, PojoReference> searchScopeDelegate) {
+	public SearchQueryResultDefinitionContextImpl(PojoSearchScopeDelegate<?, PojoReference> searchScopeDelegate) {
 		this.searchScopeDelegate = searchScopeDelegate;
 	}
 

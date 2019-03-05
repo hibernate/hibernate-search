@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -236,10 +236,10 @@ public class KeywordFieldIT {
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = newEntityFunction.apply( 1, propertyValue );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b

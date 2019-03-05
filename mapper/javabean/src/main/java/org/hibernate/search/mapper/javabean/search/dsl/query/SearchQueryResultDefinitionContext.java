@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public interface JavaBeanQueryResultDefinitionContext {
+public interface SearchQueryResultDefinitionContext {
 
 	SearchQueryResultContext<SearchQuery<PojoReference>> asReference();
 

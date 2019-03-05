@@ -19,7 +19,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.Startup
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -437,10 +437,10 @@ public class IndexedEmbeddedBaseIT {
 	private <E> void doTestEmbeddedRuntime(JavaBeanMapping mapping,
 			Function<Integer, E> newEntityFunction,
 			Consumer<StubDocumentNode.Builder> expectedDocumentContributor) {
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = newEntityFunction.apply( 1 );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", expectedDocumentContributor )
