@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoMappingWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
@@ -54,9 +54,9 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoSearchManagerDelegate createSearchManagerDelegate(
+	public PojoSearchSessionDelegate createSearchSessionDelegate(
 			AbstractPojoSessionContextImplementor sessionContextImplementor) {
-		return new PojoSearchManagerDelegateImpl(
+		return new PojoSearchSessionDelegateImpl(
 				indexedTypeManagers, containedTypeManagers,
 				sessionContextImplementor
 		);

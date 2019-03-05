@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingC
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
+import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
@@ -31,7 +31,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 /**
  * The actual implementation of {@link SearchSession}.
  */
-public class HibernateOrmSearchSession extends AbstractPojoSearchManager
+public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSessionImplementor, SearchSession {
 	private final SessionImplementor sessionImplementor;
 
