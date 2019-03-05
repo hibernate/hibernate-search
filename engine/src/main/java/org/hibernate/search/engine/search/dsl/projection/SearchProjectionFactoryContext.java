@@ -73,6 +73,30 @@ public interface SearchProjectionFactoryContext<R, O> {
 	FieldProjectionContext<Object> field(String absoluteFieldPath);
 
 	/**
+	 * Project to a field of the indexed document.
+	 *
+	 * Unlike {@link #field(String, Class)} this method bypass any {@code DslConverter} defined on the field,
+	 * so that the values will be provided exactly as they are stored in the backend.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param type The resulting type of the projection.
+	 * @param <T> The resulting type of the projection.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> type);
+
+	/**
+	 * Project to a field of the indexed document without specifying a type.
+	 *
+	 * Unlike {@link #field(String)} this method bypass any {@code DslConverter} defined on the field,
+	 * so that the values will be provided exactly as they are stored in the backend.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	FieldProjectionContext<Object> rawField(String absoluteFieldPath);
+
+	/**
 	 * Project on the score of the hit.
 	 *
 	 * @return A context allowing to define the projection more precisely.

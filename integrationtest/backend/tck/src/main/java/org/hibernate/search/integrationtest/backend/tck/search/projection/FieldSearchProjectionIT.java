@@ -266,6 +266,29 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
+	public void withProjectionConverters_rawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
+
+				assertThat(
+						searchTarget.query()
+								.asProjection( f -> f.rawField( fieldPath, model.type ) )
+								.predicate( f -> f.matchAll() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
+			} );
+		}
+	}
+
+	@Test
 	public void error_invalidProjectionType_withProjectionConverter() {
 		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
 

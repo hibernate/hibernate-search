@@ -22,6 +22,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
+import org.hibernate.search.engine.search.predicate.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -45,11 +46,23 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> clazz) {
 		Contracts.assertNotNull( clazz, "clazz" );
 
-		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz );
+		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, ProjectionConverter.ENABLED );
 	}
 
 	@Override
 	public FieldProjectionContext<Object> field(String absoluteFieldPath) {
+		return field( absoluteFieldPath, Object.class );
+	}
+
+	@Override
+	public <T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> clazz) {
+		Contracts.assertNotNull( clazz, "clazz" );
+
+		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, ProjectionConverter.DISABLED );
+	}
+
+	@Override
+	public FieldProjectionContext<Object> rawField(String absoluteFieldPath) {
 		return field( absoluteFieldPath, Object.class );
 	}
 

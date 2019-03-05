@@ -58,6 +58,16 @@ public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchPro
 	}
 
 	@Override
+	public <T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> type) {
+		return delegate.rawField( absoluteFieldPath, type );
+	}
+
+	@Override
+	public FieldProjectionContext<Object> rawField(String absoluteFieldPath) {
+		return delegate.rawField( absoluteFieldPath );
+	}
+
+	@Override
 	public ScoreProjectionContext score() {
 		return delegate.score();
 	}
