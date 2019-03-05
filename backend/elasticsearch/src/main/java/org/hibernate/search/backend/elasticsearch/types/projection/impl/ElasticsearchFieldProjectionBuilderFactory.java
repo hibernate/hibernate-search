@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.projection.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.search.predicate.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -25,7 +26,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 public interface ElasticsearchFieldProjectionBuilderFactory {
 
 	<T> FieldProjectionBuilder<T> createFieldValueProjectionBuilder(String absoluteFieldPath,
-			Class<T> expectedType);
+			Class<T> expectedType, ProjectionConverter projectionConverter);
 
 	DistanceToFieldProjectionBuilder createDistanceProjectionBuilder(String absoluteFieldPath, GeoPoint center);
 

@@ -11,6 +11,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.predicate.spi.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
@@ -24,7 +25,7 @@ public interface SearchProjectionBuilderFactory {
 
 	DocumentReferenceProjectionBuilder documentReference();
 
-	<T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz);
+	<T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter);
 
 	<O> ObjectProjectionBuilder<O> object();
 
