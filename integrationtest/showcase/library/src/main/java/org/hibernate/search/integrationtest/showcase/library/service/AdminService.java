@@ -23,6 +23,6 @@ public class AdminService {
 	private EntityManager entityManager;
 
 	public MassIndexer createMassIndexer() {
-		return Search.getFullTextEntityManager( entityManager ).createIndexer();
+		return Search.getFullTextSession( entityManager ).createIndexer();
 	}
 }

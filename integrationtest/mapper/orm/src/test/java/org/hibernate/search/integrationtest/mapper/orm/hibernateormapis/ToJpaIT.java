@@ -20,8 +20,8 @@ import javax.persistence.TypedQuery;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
-import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -81,16 +81,16 @@ public class ToJpaIT {
 	@Test
 	public void toJpaEntityManager() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
-			assertThat( ftEntityManager.toJpaEntityManager() ).isSameAs( entityManager );
+			FullTextSession ftSession = Search.getFullTextSession( entityManager );
+			assertThat( ftSession.toJpaEntityManager() ).isSameAs( entityManager );
 		} );
 	}
 
 	@Test
 	public void toJpaQuery() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( ftEntityManager ).toJpaQuery();
+			FullTextSession ftSession = Search.getFullTextSession( entityManager );
+			TypedQuery<IndexedEntity> query = createSimpleQuery( ftSession ).toJpaQuery();
 			assertThat( query ).isNotNull();
 		} );
 	}
@@ -98,8 +98,8 @@ public class ToJpaIT {
 	@Test
 	public void getResultList() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( ftEntityManager ).toJpaQuery();
+			FullTextSession ftSession = Search.getFullTextSession( entityManager );
+			TypedQuery<IndexedEntity> query = createSimpleQuery( ftSession ).toJpaQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -123,8 +123,8 @@ public class ToJpaIT {
 	@Test
 	public void getSingleResult() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( ftEntityManager ).toJpaQuery();
+			FullTextSession ftSession = Search.getFullTextSession( entityManager );
+			TypedQuery<IndexedEntity> query = createSimpleQuery( ftSession ).toJpaQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -173,8 +173,8 @@ public class ToJpaIT {
 	@Test
 	public void pagination() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
-			FullTextEntityManager ftEntityManager = Search.getFullTextEntityManager( entityManager );
-			TypedQuery<IndexedEntity> query = createSimpleQuery( ftEntityManager ).toJpaQuery();
+			FullTextSession ftSession = Search.getFullTextSession( entityManager );
+			TypedQuery<IndexedEntity> query = createSimpleQuery( ftSession ).toJpaQuery();
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );
@@ -197,8 +197,8 @@ public class ToJpaIT {
 		} );
 	}
 
-	private FullTextQuery<IndexedEntity> createSimpleQuery(FullTextEntityManager ftEntityManager) {
-		return ftEntityManager.search( IndexedEntity.class )
+	private FullTextQuery<IndexedEntity> createSimpleQuery(FullTextSession ftSession) {
+		return ftSession.search( IndexedEntity.class )
 				.query()
 				.asEntity()
 				.predicate( f -> f.matchAll() )

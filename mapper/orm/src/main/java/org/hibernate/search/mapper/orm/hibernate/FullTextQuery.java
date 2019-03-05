@@ -6,9 +6,29 @@
  */
 package org.hibernate.search.mapper.orm.hibernate;
 
+import java.util.List;
+import java.util.Optional;
+import javax.persistence.TypedQuery;
+
 import org.hibernate.query.Query;
 
-public interface FullTextQuery<T> extends org.hibernate.search.mapper.orm.jpa.FullTextQuery<T> {
+public interface FullTextQuery<T> {
+
+	List<T> getResultList();
+
+	T getSingleResult();
+
+	Optional<T> getOptionalResult();
+
+	long getResultSize();
+
+	FullTextQuery<T> setMaxResults(int maxResults);
+
+	FullTextQuery<T> setFirstResult(int firstResult);
+
+	FullTextQuery<T> setFetchSize(int fetchSize);
+
+	TypedQuery<T> toJpaQuery();
 
 	Query<T> toHibernateOrmQuery();
 

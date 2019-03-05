@@ -18,9 +18,8 @@ import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
-import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,7 +35,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<Book> findAllIndexed() {
-		FullTextQuery<Book> query = Search.getFullTextEntityManager( entityManager )
+		FullTextQuery<Book> query = Search.getFullTextSession( entityManager )
 				.search( Book.class )
 				.query().asEntity()
 				.predicate( p -> p.matchAll() )
@@ -52,7 +51,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			return Optional.empty();
 		}
 
-		FullTextQuery<Book> query = Search.getFullTextEntityManager( entityManager ).search( Book.class ).query()
+		FullTextQuery<Book> query = Search.getFullTextSession( entityManager ).search( Book.class ).query()
 						.asEntity()
 						// onRawField option allows to bypass the bridge in the DSL
 						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
@@ -63,7 +62,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
-		FullTextQuery<Book> query = Search.getFullTextEntityManager( entityManager ).search( Book.class ).query()
+		FullTextQuery<Book> query = Search.getFullTextSession( entityManager ).search( Book.class ).query()
 				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
@@ -91,7 +90,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryServiceOption> libraryServices,
 			int offset, int limit) {
-		FullTextQuery<Document<?>> query = Search.getFullTextEntityManager( entityManager ).search( DOCUMENT_CLASS ).query()
+		FullTextQuery<Document<?>> query = Search.getFullTextSession( entityManager ).search( DOCUMENT_CLASS ).query()
 				.asEntity()
 				.predicate( f -> f.bool( b -> {
 					// Match query
@@ -150,7 +149,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 	@Override
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
-		FullTextSearchTarget<Document> target = Search.getFullTextEntityManager( entityManager ).search( Document.class );
+		FullTextSearchTarget<Document> target = Search.getFullTextSession( entityManager ).search( Document.class );
 		FullTextQuery<String> query = target.query()
 				.asProjection( f -> f.field( "author", String.class ) )
 				.predicate( f -> f.match()

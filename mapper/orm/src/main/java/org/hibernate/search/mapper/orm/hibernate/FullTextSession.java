@@ -8,16 +8,20 @@ package org.hibernate.search.mapper.orm.hibernate;
 
 import java.util.Collection;
 
+import javax.persistence.EntityManager;
+
 import org.hibernate.Session;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
-public interface FullTextSession extends FullTextEntityManager {
+public interface FullTextSession {
 
-	@Override
 	<T> FullTextSearchTarget<T> search(Class<T> type);
 
-	@Override
 	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);
+
+	MassIndexer createIndexer(Class<?>... types);
+
+	EntityManager toJpaEntityManager();
 
 	Session toHibernateOrmSession();
 

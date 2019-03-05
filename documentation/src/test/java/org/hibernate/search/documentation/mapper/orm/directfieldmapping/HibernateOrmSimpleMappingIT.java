@@ -15,9 +15,9 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
-import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -97,9 +97,9 @@ public class HibernateOrmSimpleMappingIT {
 	public void sort_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::sort-simple-objects[]
-			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextEntityManager.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
 
 			FullTextQuery<Book> query = searchTarget.query() // <1>
 					.asEntity()
@@ -122,9 +122,9 @@ public class HibernateOrmSimpleMappingIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::sort-simple-lambda[]
-			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextEntityManager.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
 
 			FullTextQuery<Book> query = searchTarget.query()
 					.asEntity()
@@ -147,9 +147,9 @@ public class HibernateOrmSimpleMappingIT {
 	public void projection_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-simple-objects[]
-			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextEntityManager.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
 
 			FullTextQuery<String> query = searchTarget.query() // <1>
 					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() ) // <2>
@@ -165,9 +165,9 @@ public class HibernateOrmSimpleMappingIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-simple-lambda[]
-			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<String> query = fullTextEntityManager.search( Book.class ).query()
+			FullTextQuery<String> query = fullTextSession.search( Book.class ).query()
 					.asProjection( f -> f.field( "title", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -184,9 +184,9 @@ public class HibernateOrmSimpleMappingIT {
 	public void projection_advanced() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-advanced[]
-			FullTextEntityManager fullTextEntityManager = Search.getFullTextEntityManager( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextEntityManager.search( Book.class ).query()
+			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextSession.search( Book.class ).query()
 					.asProjection( f ->
 							f.composite(
 									MyEntityAndScoreBean::new,

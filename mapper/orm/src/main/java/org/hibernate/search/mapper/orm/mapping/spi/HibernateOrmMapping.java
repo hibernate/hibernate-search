@@ -37,7 +37,7 @@ public interface HibernateOrmMapping {
 	/**
 	 * @param type A Java type.
 	 * @return {@code true} if this type is searchable
-	 * (i.e. it can be passed to {@link org.hibernate.search.mapper.orm.jpa.FullTextEntityManager#search(Class)}),
+	 * (i.e. it can be passed to {@link org.hibernate.search.mapper.orm.hibernate.FullTextSession#search(Class)}),
 	 * {@code false} if it is not.
 	 */
 	boolean isSearchable(Class<?> type);

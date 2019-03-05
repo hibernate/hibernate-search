@@ -265,7 +265,7 @@ To that end, you can use the mass indexer API, as shown in the following code:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
 ----
-<1> Get the Hibernate Search-specific version of the `EntityManager`, called `FullTextEntityManager`.
+<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
 <2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
 <3> It is possible to set the number of threads to be used. For the complete option list see <<manual-index-changes>>.
 <4> Invoke the batch indexing process.
@@ -286,7 +286,7 @@ matches the string `Refactoring: Improving the Design of Existing Code` *exactly
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
 ----
-<1> Get the Hibernate Search-specific version of the `EntityManager`, called `FullTextEntityManager`.
+<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
 <2> Create a "search target", representing the indexed types that will be queried.
 <3> Use the "search target" to start creating the query.
 <4> Define the results expected from the query; here we expect managed Hibernate ORM entities,

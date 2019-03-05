@@ -8,13 +8,12 @@ package org.hibernate.search.integrationtest.showcase.library.repository.indexse
 
 import java.util.Collections;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.jpa.FullTextQuery;
-import org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
+import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -44,7 +43,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 			return Collections.emptyList();
 		}
 
-		FullTextSearchTarget<Person> target = Search.getFullTextEntityManager( entityManager ).search( Person.class );
+		FullTextSearchTarget<Person> target = Search.getFullTextSession( entityManager ).search( Person.class );
 
 		FullTextQuery<Person> query = target.query()
 				.asEntity()
@@ -62,7 +61,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 	}
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, int offset, int limit) {
-		FullTextSearchTarget<Person> target = Search.getFullTextEntityManager( entityManager ).search( Person.class );
+		FullTextSearchTarget<Person> target = Search.getFullTextSession( entityManager ).search( Person.class );
 
 		FullTextQuery<Person> query = target.query()
 				.asEntity()

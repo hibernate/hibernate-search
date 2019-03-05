@@ -58,10 +58,7 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
-		if ( type.equals( org.hibernate.search.mapper.orm.jpa.FullTextQuery.class ) ) {
-			return (T) this;
-		}
-		else if ( type.equals( FullTextQuery.class ) ) {
+		if ( type.equals( FullTextQuery.class ) ) {
 			return (T) this;
 		}
 		else if ( type.equals( SearchQuery.class ) ) {
