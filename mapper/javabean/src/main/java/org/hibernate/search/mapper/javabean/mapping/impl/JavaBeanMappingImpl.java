@@ -8,10 +8,10 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.CloseableJavaBeanMapping;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
-import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchManagerImpl;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 
@@ -30,16 +30,16 @@ public class JavaBeanMappingImpl extends AbstractPojoMappingImplementor<JavaBean
 	}
 
 	@Override
-	public JavaBeanSearchManager createSearchManager() {
+	public SearchSession createSession() {
 		return createSearchManagerBuilder().build();
 	}
 
 	@Override
-	public JavaBeanSearchManagerBuilder createSearchManagerWithOptions() {
+	public SearchSessionBuilder createSessionWithOptions() {
 		return createSearchManagerBuilder();
 	}
 
-	private JavaBeanSearchManagerBuilder createSearchManagerBuilder() {
-		return new JavaBeanSearchManagerImpl.JavaBeanSearchManagerBuilderImpl( getDelegate(), mappingContext );
+	private SearchSessionBuilder createSearchManagerBuilder() {
+		return new JavaBeanSearchSession.JavaBeanSearchSessionBuilder( getDelegate(), mappingContext );
 	}
 }

@@ -10,22 +10,22 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
-import org.hibernate.search.mapper.javabean.search.impl.JavaBeanSearchScopeImpl;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.search.SearchScope;
+import org.hibernate.search.mapper.javabean.search.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
-import org.hibernate.search.mapper.javabean.work.JavaBeanWorkPlan;
-import org.hibernate.search.mapper.javabean.work.impl.JavaBeanWorkPlanImpl;
+import org.hibernate.search.mapper.javabean.work.SearchWorkPlan;
+import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
 
-public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager implements JavaBeanSearchManager {
-	private JavaBeanWorkPlanImpl workPlan;
+public class JavaBeanSearchSession extends AbstractPojoSearchManager implements SearchSession {
+	private SearchWorkPlanImpl workPlan;
 
-	private JavaBeanSearchManagerImpl(JavaBeanSearchManagerBuilderImpl builder) {
+	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
 		super( builder );
 	}
 
@@ -38,31 +38,32 @@ public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager impleme
 	}
 
 	@Override
-	public <T> JavaBeanSearchScope scope(Collection<? extends Class<? extends T>> targetedTypes) {
-		return new JavaBeanSearchScopeImpl(
+	public <T> SearchScope scope(Collection<? extends Class<? extends T>> targetedTypes) {
+		return new SearchScopeImpl(
 				getDelegate().createPojoSearchScope( targetedTypes )
 		);
 	}
 
 	@Override
-	public JavaBeanWorkPlan getMainWorkPlan() {
+	public SearchWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			workPlan = new JavaBeanWorkPlanImpl( getDelegate().createWorkPlan() );
+			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan() );
 		}
 		return workPlan;
 	}
 
-	public static class JavaBeanSearchManagerBuilderImpl extends AbstractBuilder<JavaBeanSearchManagerImpl> implements JavaBeanSearchManagerBuilder {
+	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>
+			implements SearchSessionBuilder {
 		private final JavaBeanMappingContext mappingContext;
 		private String tenantId;
 
-		public JavaBeanSearchManagerBuilderImpl(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext) {
+		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate, JavaBeanMappingContext mappingContext) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
 		}
 
 		@Override
-		public JavaBeanSearchManagerBuilderImpl tenantId(String tenantId) {
+		public JavaBeanSearchSessionBuilder tenantId(String tenantId) {
 			this.tenantId = tenantId;
 			return this;
 		}
@@ -73,8 +74,8 @@ public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager impleme
 		}
 
 		@Override
-		public JavaBeanSearchManagerImpl build() {
-			return new JavaBeanSearchManagerImpl( this );
+		public JavaBeanSearchSession build() {
+			return new JavaBeanSearchSession( this );
 		}
 	}
 }

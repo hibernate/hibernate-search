@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -108,11 +108,11 @@ public class BridgeIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
 			entity.stringProperty = "some string";
-			manager.getMainWorkPlan().add( entity );
+			session.getMainWorkPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
@@ -173,11 +173,11 @@ public class BridgeIT {
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			IndexedEntity entity = new IndexedEntity();
 			entity.id = 1;
 			entity.stringProperty = "some string";
-			manager.getMainWorkPlan().add( entity );
+			session.getMainWorkPlan().add( entity );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )

@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingImpl;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingDefinitionContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingDefinitionContext;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -47,7 +47,7 @@ public final class JavaBeanMappingBuilder {
 
 	/**
 	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link JavaBeanSearchManager#getMainWorkPlan() work plan}.
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
 	 * @return {@code this}, for call chaining.
 	 */
 	public JavaBeanMappingBuilder addEntityType(Class<?> type) {
@@ -57,7 +57,7 @@ public final class JavaBeanMappingBuilder {
 
 	/**
 	 * @param types The types to be considered as entity types, i.e. types that may be indexed
-	 * and whose instances be added/updated/deleted through the {@link JavaBeanSearchManager#getMainWorkPlan() work plan}.
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#getMainWorkPlan() work plan}.
 	 * @return {@code this}, for call chaining.
 	 */
 	public JavaBeanMappingBuilder addEntityTypes(Set<Class<?>> types) {

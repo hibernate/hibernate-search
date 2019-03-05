@@ -9,14 +9,14 @@ package org.hibernate.search.mapper.javabean;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 
 public interface JavaBeanMapping {
 
-	JavaBeanSearchManager createSearchManager();
+	SearchSession createSession();
 
-	JavaBeanSearchManagerBuilder createSearchManagerWithOptions();
+	SearchSessionBuilder createSessionWithOptions();
 
 	static JavaBeanMappingBuilder builder() {
 		return builder( MethodHandles.publicLookup() );

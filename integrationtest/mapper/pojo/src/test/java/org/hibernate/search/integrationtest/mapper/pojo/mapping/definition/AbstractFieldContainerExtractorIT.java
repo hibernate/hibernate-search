@@ -27,7 +27,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -299,10 +299,10 @@ public abstract class AbstractFieldContainerExtractorIT {
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = testModel.newEntity( 1, propertyValue );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b
@@ -329,10 +329,10 @@ public abstract class AbstractFieldContainerExtractorIT {
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
-		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
+		try ( SearchSession session = mapping.createSession() ) {
 			E entity1 = testModel.newEntity( 1, propertyValue );
 
-			manager.getMainWorkPlan().add( entity1 );
+			session.getMainWorkPlan().add( entity1 );
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> { } )
