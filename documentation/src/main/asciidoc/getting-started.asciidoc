@@ -284,28 +284,36 @@ matches the string `Refactoring: Improving the Design of Existing Code` *exactly
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-lambdas]
+----
+<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
+<2> Initiate a search query on the index mapped to the `Book` entity.
+<3> Define the results expected from the query; here we expect managed Hibernate ORM entities,
+but other options are available.
+<4> Define that only documents matching the given predicate should be returned.
+The predicate is created using a factory `f` passed as an argument to the lambda expression.
+<5> Build the query.
+<6> Fetch the results.
+====
+
+If for some reason you don't want to use lambdas, you can use an alternative, object-based syntax,
+but it will be a bit more verbose:
+
+.Using Hibernate Search to query the indexes - object-based syntax
+====
+[source, JAVA, indent=0]
+----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
 ----
 <1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
 <2> Create a "search target", representing the indexed types that will be queried.
-<3> Use the "search target" to start creating the query.
+<3> Initiate a search query from the search target.
 <4> Define the results expected from the query; here we expect managed Hibernate ORM entities,
 but other options are available.
 <5> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search target as the query.
 <6> Build the query.
 <7> Fetch the results.
-====
-
-If this first example looks too verbose to you, you can use an alternative, lambda-based syntax
-that spares you the declaration of a variable for the search target:
-
-.Using Hibernate Search to query the indexes - lambda syntax
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-lambdas]
-----
 ====
 
 It is possible to get just the result size, using `getResultSize()` method.

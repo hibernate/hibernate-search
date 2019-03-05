@@ -124,17 +124,17 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-lambdas[]
 			// Not shown: get the entity manager and open a transaction
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class )
-					.asEntity()
-					.predicate( factory -> factory.match()
+			FullTextQuery<Book> query = fullTextSession.search( Book.class ) // <2>
+					.asEntity() // <3>
+					.predicate( f -> f.match() // <4>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.build();
+					.build(); // <5>
 
-			List<Book> result = query.getResultList();
+			List<Book> result = query.getResultList(); // <6>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 
@@ -149,7 +149,7 @@ public class GettingStartedWithoutAnalysisIT {
 
 			FullTextQuery<Book> query = fullTextSession.search( Book.class )
 					.asEntity()
-					.predicate( factory -> factory.match()
+					.predicate( f -> f.match()
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
