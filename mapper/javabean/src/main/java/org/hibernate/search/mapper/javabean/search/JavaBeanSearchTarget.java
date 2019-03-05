@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface JavaBeanSearchTarget {
 
-	JavaBeanQueryResultDefinitionContext query();
+	JavaBeanQueryResultDefinitionContext search();
 
 	SearchPredicateFactoryContext predicate();
 

@@ -38,7 +38,7 @@ public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager impleme
 	}
 
 	@Override
-	public <T> JavaBeanSearchTarget search(Collection<? extends Class<? extends T>> targetedTypes) {
+	public <T> JavaBeanSearchTarget target(Collection<? extends Class<? extends T>> targetedTypes) {
 		return new JavaBeanSearchTargetImpl(
 				getDelegate().createPojoSearchTarget( targetedTypes )
 		);

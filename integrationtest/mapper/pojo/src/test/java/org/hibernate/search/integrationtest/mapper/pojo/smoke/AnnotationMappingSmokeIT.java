@@ -364,7 +364,6 @@ public class AnnotationMappingSmokeIT {
 			SearchQuery<PojoReference> query = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
-					.query()
 					.asReference()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -399,12 +398,9 @@ public class AnnotationMappingSmokeIT {
 	@Test
 	public void search_singleElementProjection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchTarget searchTarget = manager.search(
+			SearchQuery<String> query = manager.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
-			);
-
-			SearchQuery<String> query = searchTarget
-					.query()
+			)
 					.asProjection( f -> f.field( "myTextField", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -438,12 +434,11 @@ public class AnnotationMappingSmokeIT {
 	@Test
 	public void search_multipleElementsProjection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchTarget searchTarget = manager.search(
+			JavaBeanSearchTarget searchTarget = manager.target(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
-			SearchQuery<List<?>> query = searchTarget
-					.query()
+			SearchQuery<List<?>> query = searchTarget.search()
 					.asProjections(
 							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
 							searchTarget.projection().reference().toProjection(),
