@@ -4,21 +4,21 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.impl;
+package org.hibernate.search.mapper.orm.search.impl;
 
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
+public class FullTextSearchTargetImpl<T> implements FullTextSearchTarget<T> {
 
 	private final HibernateOrmSearchTarget<T> delegate;
 
-	FullTextSearchTargetImpl(HibernateOrmSearchTarget<T> delegate) {
+	public FullTextSearchTargetImpl(HibernateOrmSearchTarget<T> delegate) {
 		this.delegate = delegate;
 	}
 

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.spi;
 import java.util.Set;
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
@@ -37,7 +38,7 @@ public interface HibernateOrmMapping {
 	/**
 	 * @param type A Java type.
 	 * @return {@code true} if this type is searchable
-	 * (i.e. it can be passed to {@link org.hibernate.search.mapper.orm.hibernate.FullTextSession#search(Class)}),
+	 * (i.e. it can be passed to {@link FullTextSession#search(Class)}),
 	 * {@code false} if it is not.
 	 */
 	boolean isSearchable(Class<?> type);

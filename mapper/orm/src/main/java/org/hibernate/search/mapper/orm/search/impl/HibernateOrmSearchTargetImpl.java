@@ -8,7 +8,8 @@ package org.hibernate.search.mapper.orm.search.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.impl.FullTextQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;

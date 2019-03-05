@@ -16,7 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;

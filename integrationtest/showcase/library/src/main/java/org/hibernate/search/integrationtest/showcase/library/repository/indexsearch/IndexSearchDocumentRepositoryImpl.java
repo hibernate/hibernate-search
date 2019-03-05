@@ -18,8 +18,8 @@ import org.hibernate.search.integrationtest.showcase.library.model.BookMedium;
 import org.hibernate.search.integrationtest.showcase.library.model.Document;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

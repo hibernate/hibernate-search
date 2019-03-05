@@ -16,8 +16,8 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.integrationtest.java.module.entity.Author;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
