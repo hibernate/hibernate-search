@@ -22,7 +22,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -40,8 +40,8 @@ public class HibernateSearchContextService implements Service {
 	 */
 	private boolean enlistInTransaction = false;
 
-	private static final String SEARCH_MANAGER_KEY =
-			HibernateSearchContextService.class.getName() + "#SEARCH_MANAGER_KEY";
+	private static final String FULL_TEXT_SESSION_KEY =
+			HibernateSearchContextService.class.getName() + "#FULL_TEXT_SESSION_KEY";
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
@@ -72,23 +72,23 @@ public class HibernateSearchContextService implements Service {
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
-	 * @return The {@link HibernateOrmSearchManager} to use within the context of the given session.
+	 * @return The {@link FullTextSessionImplementor} to use within the context of the given session.
 	 */
 	@SuppressWarnings("unchecked")
-	public HibernateOrmSearchManager getSearchManager(SessionImplementor sessionImplementor) {
-		TransientReference<HibernateOrmSearchManager> reference =
-				(TransientReference<HibernateOrmSearchManager>) sessionImplementor.getProperties().get( SEARCH_MANAGER_KEY );
+	public FullTextSessionImplementor getFullTextSession(SessionImplementor sessionImplementor) {
+		TransientReference<FullTextSessionImplementor> reference =
+				(TransientReference<FullTextSessionImplementor>) sessionImplementor.getProperties().get( FULL_TEXT_SESSION_KEY );
 		@SuppressWarnings("resource") // The listener below handles closing
-		HibernateOrmSearchManager searchManager = reference == null ? null : reference.get();
-		if ( searchManager == null ) {
-			searchManager = getMapping().createSearchManager( sessionImplementor );
-			reference = new TransientReference<>( searchManager );
-			sessionImplementor.setProperty( SEARCH_MANAGER_KEY, reference );
+				FullTextSessionImplementor fullTextSession = reference == null ? null : reference.get();
+		if ( fullTextSession == null ) {
+			fullTextSession = getMapping().createFullTextSession( sessionImplementor );
+			reference = new TransientReference<>( fullTextSession );
+			sessionImplementor.setProperty( FULL_TEXT_SESSION_KEY, reference );
 
 			// Make sure we will ultimately close the query manager
-			sessionImplementor.getEventListenerManager().addListener( new SearchManagerClosingListener( sessionImplementor ) );
+			sessionImplementor.getEventListenerManager().addListener( new FullTextSessionClosingListener( sessionImplementor ) );
 		}
-		return searchManager;
+		return fullTextSession;
 	}
 
 	/**
@@ -98,7 +98,7 @@ public class HibernateSearchContextService implements Service {
 	 */
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor sessionImplementor) {
-		HibernateOrmSearchManager searchManager = getSearchManager( sessionImplementor );
+		FullTextSessionImplementor fullTextSession = getFullTextSession( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
 			TransientReference<Map<Transaction, PojoWorkPlan>> reference =
@@ -112,7 +112,7 @@ public class HibernateSearchContextService implements Service {
 			}
 			PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
 			if ( workPlan == null ) {
-				workPlan = searchManager.createWorkPlan();
+				workPlan = fullTextSession.createWorkPlan();
 				workPlanPerTransaction.put( transactionIdentifier, workPlan );
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
 						workPlan, workPlanPerTransaction, transactionIdentifier
@@ -196,21 +196,21 @@ public class HibernateSearchContextService implements Service {
 				.isJta();
 	}
 
-	private static class SearchManagerClosingListener extends BaseSessionEventListener {
+	private static class FullTextSessionClosingListener extends BaseSessionEventListener {
 		private final SessionImplementor sessionImplementor;
 
-		private SearchManagerClosingListener(SessionImplementor sessionImplementor) {
+		private FullTextSessionClosingListener(SessionImplementor sessionImplementor) {
 			this.sessionImplementor = sessionImplementor;
 		}
 
 		@Override
 		public void end() {
 			@SuppressWarnings("unchecked") // This key "belongs" to us, we know what we put in there.
-			TransientReference<HibernateOrmSearchManager> reference =
-					(TransientReference<HibernateOrmSearchManager>) sessionImplementor.getProperties().get( SEARCH_MANAGER_KEY );
-			HibernateOrmSearchManager searchManager = reference == null ? null : reference.get();
-			if ( searchManager != null ) {
-				searchManager.close();
+			TransientReference<FullTextSessionImplementor> reference =
+					(TransientReference<FullTextSessionImplementor>) sessionImplementor.getProperties().get( FULL_TEXT_SESSION_KEY );
+			FullTextSessionImplementor fullTextSession = reference == null ? null : reference.get();
+			if ( fullTextSession != null ) {
+				fullTextSession.close();
 			}
 		}
 	}

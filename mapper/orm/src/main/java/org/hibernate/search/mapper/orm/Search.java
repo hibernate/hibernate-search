@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
-import org.hibernate.search.mapper.orm.session.impl.FullTextSessionImpl;
+import org.hibernate.search.mapper.orm.session.impl.LazyInitFullTextSession;
 
 public final class Search {
 
@@ -28,7 +28,7 @@ public final class Search {
 	}
 
 	private static FullTextSession createFullTextSession(SessionImplementor sessionImplementor) {
-		return new FullTextSessionImpl( sessionImplementor );
+		return new LazyInitFullTextSession( sessionImplementor );
 	}
 
 }

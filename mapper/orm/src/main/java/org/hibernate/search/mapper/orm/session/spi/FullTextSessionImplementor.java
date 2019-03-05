@@ -6,25 +6,19 @@
  */
 package org.hibernate.search.mapper.orm.session.spi;
 
-import java.util.Collection;
-
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
-public interface HibernateOrmSearchManager extends AutoCloseable {
+public interface FullTextSessionImplementor extends AutoCloseable, FullTextSession {
 
 	@Override
 	void close();
 
-	<T> FullTextSearchTarget<T> search(Class<T> targetedType);
-
-	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes);
-
 	/**
-	 * @return A new work plan for this manager, maintaining its state (list of works) independently from the manager.
+	 * @return A new work plan for this session, maintaining its state (list of works) independently from the session.
 	 * Calling {@link PojoWorkPlan#execute()} is required to actually execute works,
-	 * the manager will <strong>not</strong> do it automatically upon closing.
+	 * the session will <strong>not</strong> do it automatically upon closing.
 	 */
 	PojoWorkPlan createWorkPlan();
 

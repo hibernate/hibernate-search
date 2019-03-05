@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.mapper.orm.session.spi;
 
-public interface HibernateOrmSearchManagerBuilder {
+public interface FullTextSessionBuilder {
 
 	// TODO other options (default query timeout, default query hints, ...)
 
-	HibernateOrmSearchManager build();
+	FullTextSessionImplementor build();
 
 }

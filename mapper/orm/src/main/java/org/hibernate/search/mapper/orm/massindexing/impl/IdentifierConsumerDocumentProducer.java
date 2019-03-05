@@ -28,7 +28,7 @@ import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -114,8 +114,8 @@ public class IdentifierConsumerDocumentProducer implements Runnable {
 	}
 
 	private void loadAllFromQueue(SessionImplementor session) throws Exception {
-		try ( HibernateOrmSearchManager searchManager = mapping.createSearchManager( session ) ) {
-			PojoSessionWorkExecutor workExecutor = searchManager.createSessionWorkExecutor();
+		try ( FullTextSessionImplementor fullTextSession = mapping.createFullTextSession( session ) ) {
+			PojoSessionWorkExecutor workExecutor = fullTextSession.createSessionWorkExecutor();
 			List<Serializable> idList;
 			do {
 				idList = source.take();
