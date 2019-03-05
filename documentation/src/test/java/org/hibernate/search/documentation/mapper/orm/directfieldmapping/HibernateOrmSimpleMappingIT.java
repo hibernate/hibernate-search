@@ -15,9 +15,9 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.search.spi;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface HibernateOrmSearchTarget<T> {

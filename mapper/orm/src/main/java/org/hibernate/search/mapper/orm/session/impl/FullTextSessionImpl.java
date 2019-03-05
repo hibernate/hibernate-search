@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.impl;
+package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
 
@@ -12,9 +12,11 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.impl.FullTextSearchTargetImpl;
+import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 

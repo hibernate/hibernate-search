@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.search.impl;
+package org.hibernate.search.mapper.orm.search.dsl.query.impl;
 
 import java.util.List;
 import java.util.function.Function;
@@ -14,21 +14,21 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQuery;
-import org.hibernate.search.mapper.orm.hibernate.FullTextQueryResultDefinitionContext;
-import org.hibernate.search.mapper.orm.impl.FullTextQueryImpl;
+import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.query.impl.FullTextQueryImpl;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.mapper.orm.search.loading.impl.ObjectLoaderBuilder;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
 
-class FullTextQueryResultDefinitionContextImpl<O>
+public class FullTextQueryResultDefinitionContextImpl<O>
 		implements FullTextQueryResultDefinitionContext<O> {
 	private final PojoSearchTargetDelegate<O, O> searchTargetDelegate;
 	private final SessionImplementor sessionImplementor;
 	private final ObjectLoaderBuilder<O> objectLoaderBuilder;
 
-	FullTextQueryResultDefinitionContextImpl(
+	public FullTextQueryResultDefinitionContextImpl(
 			PojoSearchTargetDelegate<O, O> searchTargetDelegate,
 			SessionImplementor sessionImplementor) {
 		this.searchTargetDelegate = searchTargetDelegate;
