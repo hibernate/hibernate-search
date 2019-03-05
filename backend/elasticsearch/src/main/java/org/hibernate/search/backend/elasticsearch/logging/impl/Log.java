@@ -460,4 +460,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 53,
 			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 54, value = "Projection on field `%1$s` is not allowed, since bridge did not specify a bind back for this field. " +
+			"Please define a projection converter or use .rawField(`%1$s`) to extract the raw values bypassing the bridge.")
+	SearchException projectionConverterRequired(String absoluteFieldPath, @Param EventContext context);
 }

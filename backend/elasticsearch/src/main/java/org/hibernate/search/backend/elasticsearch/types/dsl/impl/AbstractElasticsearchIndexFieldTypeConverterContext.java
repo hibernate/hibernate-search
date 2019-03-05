@@ -56,11 +56,18 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends Abs
 	}
 
 	final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
-		/*
-		 * TODO HSEARCH-3512 Throw an exception when the field is non projectable due to the bridge.
-		 * E.g. if the field is bridged and the bridge did not specify a "FromIndexFieldValueConverter".
-		 */
-		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
+		if ( indexToProjectionConverter != null ) {
+			// this case corresponds to a two-way bridge
+			return indexToProjectionConverter;
+		}
+
+		if ( dslToIndexConverter != null ) {
+			// this case corresponds to a one-way bridge
+			return null;
+		}
+
+		// this case corresponds to no bridge
+		return createFromDocumentRawConverter();
 	}
 
 	final FromDocumentFieldValueConverter<? super F, F> createFromDocumentRawConverter() {

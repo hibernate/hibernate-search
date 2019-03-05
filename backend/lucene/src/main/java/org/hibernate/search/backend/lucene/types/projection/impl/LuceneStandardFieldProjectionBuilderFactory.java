@@ -49,6 +49,11 @@ public class LuceneStandardFieldProjectionBuilderFactory<F> implements LuceneFie
 			Class<T> expectedType, ProjectionConverter projectionConverter) {
 		checkProjectable( absoluteFieldPath, projectable );
 
+		if ( projectionConverter.isEnabled() && converter == null ) {
+			throw log.projectionConverterRequired( absoluteFieldPath,
+					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
+		}
+
 		if ( projectionConverter.isEnabled() && !converter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
