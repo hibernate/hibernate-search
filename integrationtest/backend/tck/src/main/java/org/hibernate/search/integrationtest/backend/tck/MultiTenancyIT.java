@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -85,9 +85,9 @@ public class MultiTenancyIT {
 
 	@Test
 	public void search_only_returns_elements_of_the_selected_tenant() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -98,7 +98,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
-		query = searchTarget.query( tenant2SessionContext )
+		query = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -114,9 +114,9 @@ public class MultiTenancyIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3421")
 	public void id_predicate_takes_tenantId_into_account() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -127,7 +127,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
-		query = searchTarget.query( tenant2SessionContext )
+		query = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -141,9 +141,9 @@ public class MultiTenancyIT {
 
 	@Test
 	public void search_on_nested_object_only_returns_elements_of_the_tenant() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -158,11 +158,11 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
-		query = searchTarget.query( tenant2SessionContext )
+		query = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
-								searchTarget.projection().field( "string", String.class ),
-								searchTarget.projection().field( "integer", Integer.class )
+								f.field( "string", String.class ),
+								f.field( "integer", Integer.class )
 						)
 				)
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
@@ -178,15 +178,15 @@ public class MultiTenancyIT {
 	public void delete_only_deletes_elements_of_the_tenant() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant2SessionContext )
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		IndexSearchQuery<List<?>> projectionQuery = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<List<?>> projectionQuery = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -206,7 +206,7 @@ public class MultiTenancyIT {
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
-		projectionQuery = searchTarget.query( tenant2SessionContext )
+		projectionQuery = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -219,7 +219,7 @@ public class MultiTenancyIT {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
-		query = searchTarget.query( tenant1SessionContext )
+		query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -231,8 +231,8 @@ public class MultiTenancyIT {
 	public void update_only_updates_elements_of_the_tenant() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> checkQuery = searchTarget.query( tenant2SessionContext )
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -252,7 +252,7 @@ public class MultiTenancyIT {
 
 		// The tenant 2 has been updated properly.
 
-		IndexSearchQuery<List<?>> query = searchTarget.query( tenant2SessionContext )
+		IndexSearchQuery<List<?>> query = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -263,7 +263,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
-		query = searchTarget.query( tenant2SessionContext )
+		query = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -280,7 +280,7 @@ public class MultiTenancyIT {
 
 		// The tenant 1 has not been updated.
 
-		query = searchTarget.query( tenant1SessionContext )
+		query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -291,7 +291,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasNoHits();
 
-		query = searchTarget.query( tenant1SessionContext )
+		query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -306,7 +306,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasNoHits();
 
-		query = searchTarget.query( tenant1SessionContext )
+		query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -317,7 +317,7 @@ public class MultiTenancyIT {
 				.build();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
-		query = searchTarget.query( tenant1SessionContext )
+		query = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -366,8 +366,8 @@ public class MultiTenancyIT {
 				)
 				.setup();
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -456,8 +456,8 @@ public class MultiTenancyIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query( new StubSessionContext() )
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query( new StubSessionContext() )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -560,15 +560,15 @@ public class MultiTenancyIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query( tenant1SessionContext )
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		IndexSearchQuery<List<?>> projectionQuery = searchTarget.query( tenant1SessionContext )
+		IndexSearchQuery<List<?>> projectionQuery = scope.query( tenant1SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -582,14 +582,14 @@ public class MultiTenancyIT {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_2 );
 		} );
 
-		query = searchTarget.query( tenant2SessionContext )
+		query = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		projectionQuery = searchTarget.query( tenant2SessionContext )
+		projectionQuery = scope.query( tenant2SessionContext )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),

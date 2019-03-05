@@ -84,12 +84,12 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 
 	@Override
 	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
-		return new StubIndexSearchTargetContext.Builder( backend, mappingContext, name, rootSchemaNode );
+		return new StubIndexSearchScope.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
 
 	@Override
 	public void addTo(IndexSearchScopeBuilder builder) {
-		((StubIndexSearchTargetContext.Builder) builder ).add( backend, name, rootSchemaNode );
+		((StubIndexSearchScope.Builder) builder ).add( backend, name, rootSchemaNode );
 	}
 
 	@Override

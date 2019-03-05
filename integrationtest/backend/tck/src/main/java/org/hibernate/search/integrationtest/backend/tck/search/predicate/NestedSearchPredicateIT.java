@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -70,9 +70,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -112,9 +112,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_onlySecondLevel() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
@@ -152,9 +152,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_conditionOnFirstLevel() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -185,9 +185,9 @@ public class NestedSearchPredicateIT {
 
 	@Test
 	public void search_nestedOnTwoLevels_separatePredicates() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchPredicate predicate1 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" )
+		SearchPredicate predicate1 = scope.predicate().nested().onObjectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
 						.must( f.match()
 								.onField( "nestedObject.nestedObject.field1" )
@@ -199,7 +199,7 @@ public class NestedSearchPredicateIT {
 				)
 				.toPredicate();
 
-		SearchPredicate predicate2 = searchTarget.predicate().nested().onObjectField( "nestedObject.nestedObject" )
+		SearchPredicate predicate2 = scope.predicate().nested().onObjectField( "nestedObject.nestedObject" )
 				.nest( f -> f.bool()
 						.must( f.match()
 								.onField( "nestedObject.nestedObject.field1" )
@@ -211,7 +211,7 @@ public class NestedSearchPredicateIT {
 				)
 				.toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -344,8 +344,8 @@ public class NestedSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

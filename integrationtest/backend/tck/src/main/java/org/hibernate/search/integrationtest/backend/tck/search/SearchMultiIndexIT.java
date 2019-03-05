@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -113,9 +113,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_across_multiple_indexes() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -128,9 +128,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void sort_across_multiple_indexes() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
@@ -142,7 +142,7 @@ public class SearchMultiIndexIT {
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).desc() )
@@ -157,9 +157,9 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void projection_across_multiple_indexes() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "sortField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -173,10 +173,10 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		// Predicate
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
 				.build();
@@ -191,7 +191,7 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		IndexSearchQuery<String> projectionQuery = searchTarget.query()
+		IndexSearchQuery<String> projectionQuery = scope.query()
 				.asProjection( f -> f.field( "additionalField", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -205,12 +205,12 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void unknown_field_throws_exception() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		// Predicate
 		SubTest.expectException(
 				"predicate on unknown field with multiple targeted indexes",
-				() -> searchTarget.predicate().match().onField( "unknownField" )
+				() -> scope.predicate().match().onField( "unknownField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -226,7 +226,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"sort on unknown field with multiple targeted indexes",
-				() -> searchTarget.sort().byField( "unknownField" )
+				() -> scope.sort().byField( "unknownField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -242,7 +242,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on unknown field with multiple targeted indexes",
-				() -> searchTarget.projection().field( "unknownField", Object.class )
+				() -> scope.projection().field( "unknownField", Object.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -258,11 +258,11 @@ public class SearchMultiIndexIT {
 
 	@Test
 	public void search_with_incompatible_types_throws_exception() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
 		SubTest.expectException(
 				"predicate on field with different type among the targeted indexes",
-				() -> searchTarget.predicate().match().onField( "differentTypesField" )
+				() -> scope.predicate().match().onField( "differentTypesField" )
 						.matching( DIFFERENT_TYPES_FIELD_1_1_1 )
 		)
 				.assertThrown()
@@ -271,7 +271,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"projection on field with different type among the targeted indexes",
-				() -> searchTarget.projection().field( "differentTypesField" ).toProjection()
+				() -> scope.projection().field( "differentTypesField" ).toProjection()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -279,7 +279,7 @@ public class SearchMultiIndexIT {
 
 		SubTest.expectException(
 				"sort on field with different type among the targeted indexes",
-				() -> searchTarget.sort().byField( "differentTypesField" )
+				() -> scope.sort().byField( "differentTypesField" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -290,7 +290,7 @@ public class SearchMultiIndexIT {
 	public void search_across_backends_throws_exception() {
 		SubTest.expectException(
 				"search across multiple backends",
-				() -> indexManager_1_1.createSearchTarget( indexManager_2_1 )
+				() -> indexManager_1_1.createSearchScope( indexManager_2_1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -318,8 +318,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -337,8 +337,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_1_2.createSearchTarget();
-		query = searchTarget.query()
+		scope = indexManager_1_2.createSearchScope();
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -357,8 +357,8 @@ public class SearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_2_1.createSearchTarget();
-		query = searchTarget.query()
+		scope = indexManager_2_1.createSearchScope();
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

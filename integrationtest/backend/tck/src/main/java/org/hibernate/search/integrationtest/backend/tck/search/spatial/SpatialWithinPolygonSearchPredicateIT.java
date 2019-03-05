@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -56,9 +56,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void within_polygon() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ) )
 				.build();
@@ -66,7 +66,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_1 ) )
 				.build();
@@ -77,11 +77,11 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void unsupported_field_types() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SubTest.expectException(
 				"spatial().within().polygon() predicate on field with unsupported type",
-				() -> searchTarget.predicate().spatial().within().onField( "string" ).polygon( POLYGON_1 )
+				() -> scope.predicate().spatial().within().onField( "string" ).polygon( POLYGON_1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -93,9 +93,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -107,7 +107,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().within().onField( "geoPoint" ).boostedTo( 42 ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -122,9 +122,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.1f ).within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -136,7 +136,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 39 ).within().onField( "geoPoint" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -151,9 +151,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void predicateLevelBoost_andFieldLevelBoost() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 0.1 * 7 => boost x0.7
@@ -167,7 +167,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						// 39 * 10 => boost x390
@@ -184,9 +184,9 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void predicateLevelBoost_multiFields() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 0.1f ).within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -198,7 +198,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.spatial().boostedTo( 39 ).within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( CHEZ_MARGOTTE_POLYGON ) )
@@ -213,11 +213,11 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void multi_fields() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// onField(...).orField(...)
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ) )
 				.build();
@@ -225,7 +225,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_2_1 ) )
 				.build();
@@ -235,7 +235,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		// onField().orFields(...)
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2 )
@@ -245,7 +245,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_1_1 )
@@ -255,7 +255,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2_2 )
@@ -267,7 +267,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 		// onFields(...)
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_2 ) )
 				.build();
@@ -275,7 +275,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ) )
 				.build();
@@ -286,11 +286,11 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void polygon_error_null() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SubTest.expectException(
 				"spatial().within().boundingBox() predicate with null polygon",
-				() -> searchTarget.predicate().spatial().within().onField( "geoPoint" ).polygon( null )
+				() -> scope.predicate().spatial().within().onField( "geoPoint" ).polygon( null )
 		)
 				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
@@ -299,11 +299,11 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 
 	@Test
 	public void unknown_field() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SubTest.expectException(
 				"spatial().within().polygon() predicate on unknown field",
-				() -> searchTarget.predicate().spatial().within().onField( "unknown_field" )
+				() -> scope.predicate().spatial().within().onField( "unknown_field" )
 						.polygon( POLYGON_1 ).toPredicate()
 		)
 				.assertThrown()

@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -213,9 +213,9 @@ public class AnalysisCustomIT {
 	}
 
 	private SearchResultAssert<DocumentReference> assertMatchQuery(String valueToMatch) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
 				.build();
@@ -266,8 +266,8 @@ public class AnalysisCustomIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchPredicate;
@@ -58,9 +58,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -71,9 +71,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll_except() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ) ) )
 				.build();
@@ -81,8 +81,8 @@ public class MatchAllSearchPredicateIT {
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
-		query = searchTarget.query()
+		SearchPredicate searchPredicate = scope.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate ) )
 				.build();
@@ -92,9 +92,9 @@ public class MatchAllSearchPredicateIT {
 
 	@Test
 	public void matchAll_multipleExcepts() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll()
 						.except( f.match().onField( "string" ).matching( STRING_1 ) )
@@ -105,10 +105,10 @@ public class MatchAllSearchPredicateIT {
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 
-		SearchPredicate searchPredicate1 = searchTarget.predicate().match().onField( "string" ).matching( STRING_3 ).toPredicate();
-		SearchPredicate searchPredicate2 = searchTarget.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
+		SearchPredicate searchPredicate1 = scope.predicate().match().onField( "string" ).matching( STRING_3 ).toPredicate();
+		SearchPredicate searchPredicate2 = scope.predicate().match().onField( "string" ).matching( STRING_2 ).toPredicate();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
 				.build();
@@ -132,8 +132,8 @@ public class MatchAllSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

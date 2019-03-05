@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -62,8 +62,8 @@ public class LuceneSearchSortIT {
 	}
 
 	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		return searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -94,8 +94,8 @@ public class LuceneSearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

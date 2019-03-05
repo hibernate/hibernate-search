@@ -135,11 +135,11 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			SearchScope<Book> searchTarget = ftSession.scope( Book.class );
+			SearchScope<Book> scope = ftSession.scope( Book.class );
 
-			FullTextQuery<String> query = searchTarget.search()
+			FullTextQuery<String> query = scope.search()
 					.asProjection(
-							searchTarget.projection().field( "title", String.class ).toProjection()
+							scope.projection().field( "title", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -170,14 +170,14 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			SearchScope<Book> searchTarget = ftSession.scope( Book.class );
+			SearchScope<Book> scope = ftSession.scope( Book.class );
 
-			FullTextQuery<List<?>> query = searchTarget.search()
+			FullTextQuery<List<?>> query = scope.search()
 					.asProjections(
-							searchTarget.projection().field( "title", String.class ).toProjection(),
-							searchTarget.projection().reference().toProjection(),
-							searchTarget.projection().documentReference().toProjection(),
-							searchTarget.projection().field( "author", String.class ).toProjection()
+							scope.projection().field( "title", String.class ).toProjection(),
+							scope.projection().reference().toProjection(),
+							scope.projection().documentReference().toProjection(),
+							scope.projection().field( "author", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
 					.build();

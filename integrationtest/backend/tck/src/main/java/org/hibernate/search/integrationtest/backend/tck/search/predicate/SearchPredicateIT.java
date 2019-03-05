@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalC
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -66,9 +66,9 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_fluid() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -79,11 +79,11 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_search_predicate() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
+		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( STRING_1 ).toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.build();
@@ -94,9 +94,9 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_lambda() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
 				.build();
@@ -107,7 +107,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_caching_root() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -124,9 +124,9 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
-				.predicate( cachingPredicateProducer.apply( searchTarget.predicate() ) )
+				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
 				.build();
 
 		assertThat( query )
@@ -134,9 +134,9 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
-				.predicate( cachingPredicateProducer.apply( searchTarget.predicate() ) )
+				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
 				.build();
 
 		assertThat( query )
@@ -145,7 +145,7 @@ public class SearchPredicateIT {
 
 	@Test
 	public void match_caching_nonRoot() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		AtomicReference<SearchPredicate> cache = new AtomicReference<>();
 
@@ -162,7 +162,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).hasValue( null );
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
 				.build();
@@ -172,7 +172,7 @@ public class SearchPredicateIT {
 
 		Assertions.assertThat( cache ).doesNotHaveValue( null );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( cachingPredicateProducer.apply( f ) )
@@ -186,11 +186,11 @@ public class SearchPredicateIT {
 
 	@Test
 	public void extension() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<DocumentReference> query;
 
 		// Mandatory extension
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
@@ -200,7 +200,7 @@ public class SearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both supported
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
@@ -219,7 +219,7 @@ public class SearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, second supported
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.extension()
 						.ifSupported(
@@ -239,7 +239,7 @@ public class SearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// Conditional extensions with orElse - two, both unsupported
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.extension()
 						.ifSupported(
@@ -272,8 +272,8 @@ public class SearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

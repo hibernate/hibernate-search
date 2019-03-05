@@ -102,11 +102,11 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
 
-			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class ); // <2>
+			SearchScope<Book> scope = fullTextSession.scope( Book.class ); // <2>
 
-			FullTextQuery<Book> query = searchTarget.search() // <3>
+			FullTextQuery<Book> query = scope.search() // <3>
 					.asEntity() // <4>
-					.predicate( searchTarget.predicate().match() // <5>
+					.predicate( scope.predicate().match() // <5>
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()

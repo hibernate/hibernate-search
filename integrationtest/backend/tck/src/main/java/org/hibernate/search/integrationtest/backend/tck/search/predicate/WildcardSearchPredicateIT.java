@@ -32,7 +32,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
@@ -113,9 +113,9 @@ public class WildcardSearchPredicateIT {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.DSLTest.testWildcardQuery")
 	public void wildcard() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
-		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> searchTarget.query().asReference()
+		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( queryString ) )
 				.build();
 
@@ -136,10 +136,10 @@ public class WildcardSearchPredicateIT {
 	 */
 	@Test
 	public void withDslConverter() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -150,10 +150,10 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void emptyString() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( fieldModel.relativeFieldName ).matching( "" ) )
 				.build();
@@ -164,14 +164,14 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void error_unsupportedFieldType() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
 					"wildcard() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> searchTarget.predicate().wildcard().onField( absoluteFieldPath )
+					() -> scope.predicate().wildcard().onField( absoluteFieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -186,12 +186,12 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void error_null() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
 				"wildcard() predicate with null pattern",
-				() -> searchTarget.predicate().wildcard().onField( absoluteFieldPath ).matching( null )
+				() -> scope.predicate().wildcard().onField( absoluteFieldPath ).matching( null )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -202,9 +202,9 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void fieldLevelBoost() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard()
 						.onField( indexMapping.analyzedStringField1.relativeFieldName ).boostedTo( 42 )
@@ -217,7 +217,7 @@ public class WildcardSearchPredicateIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard()
 						.onField( indexMapping.analyzedStringField1.relativeFieldName )
@@ -233,9 +233,9 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void predicateLevelBoost() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.wildcard().onField( indexMapping.analyzedStringField1.relativeFieldName )
@@ -251,7 +251,7 @@ public class WildcardSearchPredicateIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.wildcard().boostedTo( 39 ).onField( indexMapping.analyzedStringField1.relativeFieldName )
@@ -270,7 +270,7 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void multiFields() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath1 = indexMapping.analyzedStringField1.relativeFieldName;
 		String absoluteFieldPath2 = indexMapping.analyzedStringField2.relativeFieldName;
 		String absoluteFieldPath3 = indexMapping.analyzedStringField3.relativeFieldName;
@@ -278,7 +278,7 @@ public class WildcardSearchPredicateIT {
 
 		// onField(...)
 
-		createQuery = pattern -> searchTarget.query().asReference()
+		createQuery = pattern -> scope.query().asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath1 )
 						.matching( pattern )
 				)
@@ -293,7 +293,7 @@ public class WildcardSearchPredicateIT {
 
 		// onField(...).orField(...)
 
-		createQuery = pattern -> searchTarget.query().asReference()
+		createQuery = pattern -> scope.query().asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath1 )
 						.orField( absoluteFieldPath2 )
 						.matching( pattern )
@@ -309,7 +309,7 @@ public class WildcardSearchPredicateIT {
 
 		// onField().orFields(...)
 
-		createQuery = pattern -> searchTarget.query()
+		createQuery = pattern -> scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath1 )
 						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
@@ -326,7 +326,7 @@ public class WildcardSearchPredicateIT {
 
 		// onFields(...)
 
-		createQuery = pattern -> searchTarget.query()
+		createQuery = pattern -> scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onFields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( pattern )
@@ -343,12 +343,12 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void error_unknownField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
 				"wildcard() predicate with unknown field",
-				() -> searchTarget.predicate().wildcard().onField( "unknown_field" )
+				() -> scope.predicate().wildcard().onField( "unknown_field" )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -357,7 +357,7 @@ public class WildcardSearchPredicateIT {
 
 		SubTest.expectException(
 				"wildcard() predicate with unknown field",
-				() -> searchTarget.predicate().wildcard()
+				() -> scope.predicate().wildcard()
 						.onFields( absoluteFieldPath, "unknown_field" )
 		)
 				.assertThrown()
@@ -367,7 +367,7 @@ public class WildcardSearchPredicateIT {
 
 		SubTest.expectException(
 				"wildcard() predicate with unknown field",
-				() -> searchTarget.predicate().wildcard().onField( absoluteFieldPath )
+				() -> scope.predicate().wildcard().onField( absoluteFieldPath )
 						.orField( "unknown_field" )
 		)
 				.assertThrown()
@@ -377,7 +377,7 @@ public class WildcardSearchPredicateIT {
 
 		SubTest.expectException(
 				"wildcard() predicate with unknown field",
-				() -> searchTarget.predicate().wildcard().onField( absoluteFieldPath )
+				() -> scope.predicate().wildcard().onField( absoluteFieldPath )
 						.orFields( "unknown_field" )
 		)
 				.assertThrown()
@@ -388,13 +388,13 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget(
+		StubMappingSearchScope scope = indexManager.createSearchScope(
 				compatibleIndexManager
 		);
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -407,11 +407,11 @@ public class WildcardSearchPredicateIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.build();
@@ -431,7 +431,7 @@ public class WildcardSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> {
-					indexManager.createSearchTarget( incompatibleIndexManager )
+					indexManager.createSearchScope( incompatibleIndexManager )
 							.predicate().wildcard().onField( absoluteFieldPath );
 				}
 		)
@@ -480,19 +480,19 @@ public class WildcardSearchPredicateIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
-		query = compatibleIndexManager.createSearchTarget().query()
+		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createSearchTarget().query()
+		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

@@ -38,7 +38,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 
 import org.junit.Assert;
 import org.junit.Assume;
@@ -86,8 +86,8 @@ public class SearchSortIT {
 	}
 
 	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		return searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -122,13 +122,13 @@ public class SearchSortIT {
 
 	@Test
 	public void byScore() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<DocumentReference> query;
 
-		SearchPredicate predicate = searchTarget.predicate()
+		SearchPredicate predicate = scope.predicate()
 				.match().onField( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore() )
@@ -136,7 +136,7 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().desc() )
@@ -144,7 +144,7 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().asc() )
@@ -155,14 +155,14 @@ public class SearchSortIT {
 
 	@Test
 	public void separateSort() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<DocumentReference> query;
 
-		SearchSort sortAsc = searchTarget.sort()
+		SearchSort sortAsc = scope.sort()
 				.byField( "string" ).asc().onMissingValue().sortLast()
 				.toSort();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortAsc )
@@ -170,7 +170,7 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortAsc ) )
@@ -178,11 +178,11 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
-		SearchSort sortDesc = searchTarget.sort()
+		SearchSort sortDesc = scope.sort()
 				.byField( "string" ).desc().onMissingValue().sortLast()
 				.toSort();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortDesc )
@@ -190,7 +190,7 @@ public class SearchSortIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortDesc ) )
@@ -464,8 +464,8 @@ public class SearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

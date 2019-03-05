@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
@@ -63,9 +63,9 @@ public class IndexSearchQueryIT {
 
 	@Test
 	public void paging() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -76,7 +76,7 @@ public class IndexSearchQueryIT {
 				.hasHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -88,7 +88,7 @@ public class IndexSearchQueryIT {
 				.hasHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -99,7 +99,7 @@ public class IndexSearchQueryIT {
 				.hasHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -114,9 +114,9 @@ public class IndexSearchQueryIT {
 
 	@Test
 	public void paging_reuse_query() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -141,7 +141,7 @@ public class IndexSearchQueryIT {
 				.hasHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -157,9 +157,9 @@ public class IndexSearchQueryIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3389")
 	public void maxResults_zero() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
@@ -173,9 +173,9 @@ public class IndexSearchQueryIT {
 
 	@Test
 	public void getQueryString() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.build();
@@ -185,9 +185,9 @@ public class IndexSearchQueryIT {
 
 	@Test
 	public void queryWrapper() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		QueryWrapper queryWrapper = searchTarget.query()
+		QueryWrapper queryWrapper = scope.query()
 				.asReference( QueryWrapper::new )
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
 				.build();
@@ -209,8 +209,8 @@ public class IndexSearchQueryIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

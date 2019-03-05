@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -58,9 +58,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_match() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
 				.build();
@@ -68,7 +68,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ) )
 				.build();
@@ -76,7 +76,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
 				.hasHitCount( 3 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "integer" ).matching( 1 ) )
 				.build();
@@ -84,7 +84,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
 				.build();
@@ -92,7 +92,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ) )
 				.build();
@@ -103,9 +103,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_range() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
 				.build();
@@ -113,7 +113,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ) )
 				.build();
@@ -121,7 +121,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ) )
 				.build();
@@ -129,7 +129,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "localDate" )
 						.from( LocalDate.of( 2018, 1, 2 ) )
@@ -140,7 +140,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ) )
 				.build();
@@ -151,9 +151,9 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_boolean() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "integer" ).matching( 1 ) )
@@ -164,7 +164,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
@@ -175,7 +175,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
@@ -189,10 +189,10 @@ public class SmokeIT {
 
 	@Test
 	public void predicate_nested() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
@@ -204,7 +204,7 @@ public class SmokeIT {
 				.hasHitCount( 1 );
 
 		// With nested storage, we expect direct queries to never match
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 				.build();
@@ -213,7 +213,7 @@ public class SmokeIT {
 				.hasHitCount( 0 );
 
 		// ... and predicates within nested queries to be unable to match on different objects
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -227,7 +227,7 @@ public class SmokeIT {
 				.hasHitCount( 0 );
 
 		// ... but predicates should still be able to match on the same object
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -243,10 +243,10 @@ public class SmokeIT {
 
 	@Test
 	public void separatePredicate() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchPredicate predicate = searchTarget.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		SearchPredicate predicate = scope.predicate().match().onField( "string" ).matching( "text 1" ).toPredicate();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.build();
@@ -254,8 +254,8 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
 
-		predicate = searchTarget.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
-		query = searchTarget.query()
+		predicate = scope.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
+		query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.build();
@@ -263,11 +263,11 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
 
-		predicate = searchTarget.predicate().bool()
+		predicate = scope.predicate().bool()
 				.should( f -> f.match().onField( "integer" ).matching( 1 ) )
 				.should( f -> f.match().onField( "integer" ).matching( 2 ) )
 				.toPredicate();
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( predicate )
 				.build();
@@ -339,8 +339,8 @@ public class SmokeIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

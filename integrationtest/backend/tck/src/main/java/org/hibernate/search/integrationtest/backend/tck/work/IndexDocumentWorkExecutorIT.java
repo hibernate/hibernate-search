@@ -70,7 +70,7 @@ public class IndexDocumentWorkExecutorIT {
 		CompletableFuture.allOf( tasks ).join();
 		workExecutor.flush().join();
 
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
