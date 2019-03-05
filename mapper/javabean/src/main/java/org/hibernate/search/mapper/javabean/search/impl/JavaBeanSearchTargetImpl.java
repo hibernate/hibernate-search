@@ -24,7 +24,7 @@ public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
 	}
 
 	@Override
-	public JavaBeanQueryResultDefinitionContext query() {
+	public JavaBeanQueryResultDefinitionContext search() {
 		return new JavaBeanQueryResultDefinitionContextImpl( delegate );
 	}
 

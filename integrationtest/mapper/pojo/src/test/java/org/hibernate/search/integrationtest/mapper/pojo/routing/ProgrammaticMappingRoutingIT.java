@@ -117,7 +117,6 @@ public class ProgrammaticMappingRoutingIT {
 	public void search() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
 			SearchQuery<PojoReference> query = manager.search( IndexedEntity.class )
-					.query()
 					.asReference()
 					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )
