@@ -8,12 +8,8 @@ package org.hibernate.search.mapper.orm.hibernate;
 
 import org.hibernate.query.Query;
 
-public interface FullTextQuery<T> extends Query<T>, org.hibernate.search.mapper.orm.jpa.FullTextQuery<T> {
+public interface FullTextQuery<T> extends org.hibernate.search.mapper.orm.jpa.FullTextQuery<T> {
 
-	// TODO facets
-
-	// TODO timeouts
-
-	// TODO explain
+	Query<T> toHibernateOrmQuery();
 
 }

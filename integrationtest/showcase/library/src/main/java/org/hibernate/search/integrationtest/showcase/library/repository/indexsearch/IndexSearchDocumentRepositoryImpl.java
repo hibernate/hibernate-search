@@ -52,17 +52,13 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			return Optional.empty();
 		}
 
-		// Must use Hibernate ORM types (as opposed to JPA types) to benefit from query.uniqueResult()
-		FullTextSession fullTextSession = Search.getFullTextEntityManager( entityManager ).unwrap( FullTextSession.class );
-
-		org.hibernate.search.mapper.orm.hibernate.FullTextQuery<Book> query =
-				fullTextSession.search( Book.class ).query()
+		FullTextQuery<Book> query = Search.getFullTextEntityManager( entityManager ).search( Book.class ).query()
 						.asEntity()
 						// onRawField option allows to bypass the bridge in the DSL
 						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
 						.build();
 
-		return Optional.ofNullable( query.uniqueResult() );
+		return query.getOptionalResult();
 	}
 
 	@Override
