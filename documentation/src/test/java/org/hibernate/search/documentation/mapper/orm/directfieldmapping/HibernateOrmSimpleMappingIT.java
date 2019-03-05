@@ -101,18 +101,18 @@ public class HibernateOrmSimpleMappingIT {
 
 			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
 
-			FullTextQuery<Book> query = searchTarget.search() // <1>
+			FullTextQuery<Book> query = searchTarget.search()
 					.asEntity()
 					.predicate( searchTarget.predicate().matchAll().toPredicate() )
 					.sort(
-							searchTarget.sort() // <2>
+							searchTarget.sort()
 							.byField( "pageCount" ).desc()
 							.then().byField( "title_sort" )
 							.toSort()
 					)
 					.build();
 
-			List<Book> result = query.getResultList(); // <3>
+			List<Book> result = query.getResultList();
 			// end::sort-simple-objects[]
 
 			assertThat( result )
@@ -121,21 +121,19 @@ public class HibernateOrmSimpleMappingIT {
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::sort-simple-lambda[]
+			// tag::sort-simple-lambdas[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
-
-			FullTextQuery<Book> query = searchTarget.search()
+			FullTextQuery<Book> query = fullTextSession.search( Book.class ) // <1>
 					.asEntity()
 					.predicate( f -> f.matchAll() )
-					.sort( f -> f.byField( "pageCount" ).desc()
+					.sort( f -> f.byField( "pageCount" ).desc() // <2>
 							.then().byField( "title_sort" )
 					)
 					.build();
 
 			List<Book> result = query.getResultList(); // <3>
-			// end::sort-simple-lambda[]
+			// end::sort-simple-lambdas[]
 
 			assertThat( result )
 					.extracting( "title" )
@@ -151,12 +149,12 @@ public class HibernateOrmSimpleMappingIT {
 
 			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
 
-			FullTextQuery<String> query = searchTarget.search() // <1>
-					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() ) // <2>
+			FullTextQuery<String> query = searchTarget.search()
+					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() )
 					.predicate( searchTarget.predicate().matchAll().toPredicate() )
 					.build();
 
-			List<String> result = query.getResultList(); // <3>
+			List<String> result = query.getResultList();
 			// end::projection-simple-objects[]
 
 			assertThat( result )
@@ -164,16 +162,16 @@ public class HibernateOrmSimpleMappingIT {
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			// tag::projection-simple-lambda[]
+			// tag::projection-simple-lambdas[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<String> query = fullTextSession.search( Book.class )
-					.asProjection( f -> f.field( "title", String.class ) )
+			FullTextQuery<String> query = fullTextSession.search( Book.class ) // <1>
+					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
 					.build();
 
-			List<String> result = query.getResultList();
-			// end::projection-simple-lambda[]
+			List<String> result = query.getResultList(); // <3>
+			// end::projection-simple-lambdas[]
 
 			assertThat( result )
 					.containsExactlyInAnyOrder( BOOK1_TITLE, BOOK2_TITLE, BOOK3_TITLE );
@@ -187,13 +185,11 @@ public class HibernateOrmSimpleMappingIT {
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
 			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextSession.search( Book.class )
-					.asProjection( f ->
-							f.composite(
-									MyEntityAndScoreBean::new,
-									f.object(),
-									f.score()
-							)
-					)
+					.asProjection( f -> f.composite(
+							MyEntityAndScoreBean::new,
+							f.object(),
+							f.score()
+					) )
 					.predicate( f -> f.matchAll() )
 					.build();
 
