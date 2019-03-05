@@ -289,6 +289,44 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
+	public void withDslConverters_rawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
+
+				assertThat(
+						searchTarget.query()
+								.asProjection( f -> f.rawField( fieldPath, model.type ) )
+								.predicate( f -> f.matchAll() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
+			} );
+		}
+	}
+
+	@Test
+	public void withDslConverters_values() {
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			SubTest.expectException(
+					() -> indexManager.createSearchTarget().projection().field( fieldPath )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Projection on field `" + fieldPath + "`" )
+					.hasMessageContaining( "since bridge did not specify a bind back for this field" );
+		}
+	}
+
+	@Test
 	public void error_invalidProjectionType_withProjectionConverter() {
 		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
 
@@ -485,6 +523,7 @@ public class FieldSearchProjectionIT {
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 
 			indexMapping.string1Field.document1Value.write( document );
 
@@ -499,6 +538,7 @@ public class FieldSearchProjectionIT {
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 
 			indexMapping.string1Field.document2Value.write( document );
 
@@ -513,6 +553,7 @@ public class FieldSearchProjectionIT {
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
+			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
 
 			indexMapping.string1Field.document3Value.write( document );
 
@@ -569,6 +610,7 @@ public class FieldSearchProjectionIT {
 		final List<FieldModel<?>> supportedFieldModels = new ArrayList<>();
 		final List<FieldModel<?>> supportedFieldWithProjectionConverterModels = new ArrayList<>();
 		final List<FieldModel<?>> supportedNonProjectableFieldModels = new ArrayList<>();
+		final List<FieldModel<?>> supportedFieldWithDslConverterModels = new ArrayList<>();
 
 		final FieldModel<String> string1Field;
 
@@ -592,6 +634,12 @@ public class FieldSearchProjectionIT {
 					root, "byType_nonProjectable_", c -> c.projectable( Projectable.NO ),
 					(typeDescriptor, expectations, model) -> {
 						supportedNonProjectableFieldModels.add( model );
+					}
+			);
+			mapByTypeFields(
+					root, "byType_oneWayBridge_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					(typeDescriptor, expectations, model) -> {
+						supportedFieldWithDslConverterModels.add( model );
 					}
 			);
 
