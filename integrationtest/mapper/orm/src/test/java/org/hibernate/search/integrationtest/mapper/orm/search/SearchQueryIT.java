@@ -19,9 +19,9 @@ import javax.persistence.Table;
 import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
@@ -74,9 +74,9 @@ public class SearchQueryIT {
 	@Test
 	public void asEntity() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			FullTextQuery<Book> query = ftSession.search( Book.class )
+			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -105,9 +105,9 @@ public class SearchQueryIT {
 	@Test
 	public void offsetAndLimit() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			FullTextQuery<Book> query = ftSession.search( Book.class )
+			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -133,11 +133,11 @@ public class SearchQueryIT {
 	@Test
 	public void asProjection_searchProjectionObject_single() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			SearchScope<Book> scope = ftSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			FullTextQuery<String> query = scope.search()
+			SearchQuery<String> query = scope.search()
 					.asProjection(
 							scope.projection().field( "title", String.class ).toProjection()
 					)
@@ -168,11 +168,11 @@ public class SearchQueryIT {
 	@Test
 	public void asProjection_searchProjectionObject_multiple() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			SearchScope<Book> scope = ftSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			FullTextQuery<List<?>> query = scope.search()
+			SearchQuery<List<?>> query = scope.search()
 					.asProjections(
 							scope.projection().field( "title", String.class ).toProjection(),
 							scope.projection().reference().toProjection(),
@@ -236,9 +236,9 @@ public class SearchQueryIT {
 	@Test
 	public void asProjection_lambda() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			FullTextQuery<Book_Author_Score> query = ftSession.search( Book.class )
+			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
 					.asProjection( f ->
 							f.composite(
 									Book_Author_Score::new,
@@ -286,9 +286,9 @@ public class SearchQueryIT {
 	@Test
 	public void asProjection_compositeAndLoading() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
+			SearchSession searchSession = Search.getSearchSession( session );
 
-			FullTextQuery<Book_Author_Score> query = ftSession.search( Book.class )
+			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
 					.asProjection( f ->
 							f.composite(
 									Book_Author_Score::new,

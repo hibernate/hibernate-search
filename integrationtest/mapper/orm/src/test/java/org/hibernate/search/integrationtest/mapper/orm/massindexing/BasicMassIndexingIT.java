@@ -16,7 +16,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -64,8 +64,8 @@ public class BasicMassIndexingIT {
 	@Test
 	public void defaultMassIndexerStartAndWait() throws Exception {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			MassIndexer indexer = ftSession.createIndexer();
+			SearchSession searchSession = Search.getSearchSession( session );
+			MassIndexer indexer = searchSession.createIndexer();
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads

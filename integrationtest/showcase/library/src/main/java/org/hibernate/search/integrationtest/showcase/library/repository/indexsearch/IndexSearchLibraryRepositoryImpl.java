@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,7 +26,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
-		FullTextQuery<Library> query = Search.getFullTextSession( entityManager )
+		SearchQuery<Library> query = Search.getSearchSession( entityManager )
 				.search( Library.class )
 				.asEntity()
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )

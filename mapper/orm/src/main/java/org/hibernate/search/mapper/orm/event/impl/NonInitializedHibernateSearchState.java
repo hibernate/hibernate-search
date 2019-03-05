@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * The implementation of EventsHibernateSearchState which the
- * FullTextIndexEventListener will be pointing to before
+ * HibernateSearchEventListener will be pointing to before
  * we start initialization of Hibernate Search.
  * This should never be needed, but the parallel initialization
  * of multiple frameworks is tricky to predict:

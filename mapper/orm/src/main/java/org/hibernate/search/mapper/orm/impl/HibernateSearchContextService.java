@@ -22,7 +22,7 @@ import org.hibernate.engine.spi.ActionQueue;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -40,8 +40,8 @@ public class HibernateSearchContextService implements Service {
 	 */
 	private boolean enlistInTransaction = false;
 
-	private static final String FULL_TEXT_SESSION_KEY =
-			HibernateSearchContextService.class.getName() + "#FULL_TEXT_SESSION_KEY";
+	private static final String SEARCH_SESSION_KEY =
+			HibernateSearchContextService.class.getName() + "#SEARCH_SESSION_KEY";
 
 	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
 			HibernateSearchContextService.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
@@ -72,23 +72,24 @@ public class HibernateSearchContextService implements Service {
 	/**
 	 * @param sessionImplementor A Hibernate session
 	 *
-	 * @return The {@link FullTextSessionImplementor} to use within the context of the given session.
+	 * @return The {@link SearchSessionImplementor} to use within the context of the given session.
 	 */
 	@SuppressWarnings("unchecked")
-	public FullTextSessionImplementor getFullTextSession(SessionImplementor sessionImplementor) {
-		TransientReference<FullTextSessionImplementor> reference =
-				(TransientReference<FullTextSessionImplementor>) sessionImplementor.getProperties().get( FULL_TEXT_SESSION_KEY );
+	public SearchSessionImplementor getSearchSession(SessionImplementor sessionImplementor) {
+		TransientReference<SearchSessionImplementor> reference =
+				(TransientReference<SearchSessionImplementor>) sessionImplementor.getProperties().get(
+						SEARCH_SESSION_KEY );
 		@SuppressWarnings("resource") // The listener below handles closing
-				FullTextSessionImplementor fullTextSession = reference == null ? null : reference.get();
-		if ( fullTextSession == null ) {
-			fullTextSession = getMapping().createFullTextSession( sessionImplementor );
-			reference = new TransientReference<>( fullTextSession );
-			sessionImplementor.setProperty( FULL_TEXT_SESSION_KEY, reference );
+		SearchSessionImplementor searchSession = reference == null ? null : reference.get();
+		if ( searchSession == null ) {
+			searchSession = getMapping().createSession( sessionImplementor );
+			reference = new TransientReference<>( searchSession );
+			sessionImplementor.setProperty( SEARCH_SESSION_KEY, reference );
 
 			// Make sure we will ultimately close the query manager
-			sessionImplementor.getEventListenerManager().addListener( new FullTextSessionClosingListener( sessionImplementor ) );
+			sessionImplementor.getEventListenerManager().addListener( new SearchSessionClosingListener( sessionImplementor ) );
 		}
-		return fullTextSession;
+		return searchSession;
 	}
 
 	/**
@@ -98,7 +99,7 @@ public class HibernateSearchContextService implements Service {
 	 */
 	@SuppressWarnings("unchecked")
 	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor sessionImplementor) {
-		FullTextSessionImplementor fullTextSession = getFullTextSession( sessionImplementor );
+		SearchSessionImplementor searchSession = getSearchSession( sessionImplementor );
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			final Transaction transactionIdentifier = sessionImplementor.accessTransaction();
 			TransientReference<Map<Transaction, PojoWorkPlan>> reference =
@@ -112,7 +113,7 @@ public class HibernateSearchContextService implements Service {
 			}
 			PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
 			if ( workPlan == null ) {
-				workPlan = fullTextSession.createWorkPlan();
+				workPlan = searchSession.createWorkPlan();
 				workPlanPerTransaction.put( transactionIdentifier, workPlan );
 				Synchronization txSync = createTransactionWorkQueueSynchronization(
 						workPlan, workPlanPerTransaction, transactionIdentifier
@@ -124,7 +125,7 @@ public class HibernateSearchContextService implements Service {
 		/*
 		 * TODO handle the "simulated" transaction when "a Flush listener is registered".
 		 * See:
-		 *  - FullTextIndexEventListener (in Search 5 and here)
+		 *  - HibernateSearchEventListener (in Search 5 and here)
 		 *  - the else block in org.hibernate.search.event.impl.EventSourceTransactionContext#registerSynchronization in Search 5
 		else if ( some condition ) {
 			throw new UnsupportedOperationException( "Not implemented yet" );
@@ -196,21 +197,22 @@ public class HibernateSearchContextService implements Service {
 				.isJta();
 	}
 
-	private static class FullTextSessionClosingListener extends BaseSessionEventListener {
+	private static class SearchSessionClosingListener extends BaseSessionEventListener {
 		private final SessionImplementor sessionImplementor;
 
-		private FullTextSessionClosingListener(SessionImplementor sessionImplementor) {
+		private SearchSessionClosingListener(SessionImplementor sessionImplementor) {
 			this.sessionImplementor = sessionImplementor;
 		}
 
 		@Override
 		public void end() {
 			@SuppressWarnings("unchecked") // This key "belongs" to us, we know what we put in there.
-			TransientReference<FullTextSessionImplementor> reference =
-					(TransientReference<FullTextSessionImplementor>) sessionImplementor.getProperties().get( FULL_TEXT_SESSION_KEY );
-			FullTextSessionImplementor fullTextSession = reference == null ? null : reference.get();
-			if ( fullTextSession != null ) {
-				fullTextSession.close();
+			TransientReference<SearchSessionImplementor> reference =
+					(TransientReference<SearchSessionImplementor>) sessionImplementor.getProperties().get(
+							SEARCH_SESSION_KEY );
+			SearchSessionImplementor searchSession = reference == null ? null : reference.get();
+			if ( searchSession != null ) {
+				searchSession.close();
 			}
 		}
 	}

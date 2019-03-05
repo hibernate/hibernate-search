@@ -168,7 +168,7 @@ public interface Log extends BasicLogger {
 	SearchException cannotFindReadableProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			String propertyName);
 
-	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a FullTextSession using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
+	@Message(id = ID_OFFSET_2 + 11, value = "Mapping service cannot create a SearchSession using a different session factory. Expected: '%1$s'. In use: '%2$s'.")
 	SearchException usingDifferentSessionFactories(SessionFactory expectedSessionFactory, SessionFactory usedSessionFactory);
 
 	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")

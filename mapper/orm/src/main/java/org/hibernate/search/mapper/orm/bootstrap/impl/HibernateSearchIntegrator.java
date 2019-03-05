@@ -22,7 +22,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.spi.EnvironmentSynchronizer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -68,11 +68,11 @@ public class HibernateSearchIntegrator implements Integrator {
 			return;
 		}
 
-		FullTextIndexEventListener fullTextIndexEventListener = new FullTextIndexEventListener(
+		HibernateSearchEventListener hibernateSearchEventListener = new HibernateSearchEventListener(
 				HibernateOrmIndexingStrategyName.EVENT.equals( INDEXING_MODE.get( propertySource ) ),
 				DIRTY_PROCESSING_ENABLED.get( propertySource )
 		);
-		registerHibernateSearchEventListener( fullTextIndexEventListener, serviceRegistry );
+		registerHibernateSearchEventListener( hibernateSearchEventListener, serviceRegistry );
 
 		ClassLoaderService hibernateOrmClassLoaderService = serviceRegistry.getService( ClassLoaderService.class );
 		ServiceBinding<EnvironmentSynchronizer> environmentSynchronizerBinding =
@@ -82,7 +82,7 @@ public class HibernateSearchIntegrator implements Integrator {
 		HibernateSearchSessionFactoryObserver observer = new HibernateSearchSessionFactoryObserver(
 				metadata,
 				propertySource,
-				fullTextIndexEventListener,
+				hibernateSearchEventListener,
 				hibernateOrmClassLoaderService,
 				environmentSynchronizerBinding == null ? null : serviceRegistry.getService( EnvironmentSynchronizer.class ),
 				managedBeanRegistryServiceBinding == null ? null : serviceRegistry.getService( ManagedBeanRegistry.class )
@@ -96,9 +96,9 @@ public class HibernateSearchIntegrator implements Integrator {
 		// Nothing to do, Hibernate Search shuts down automatically when the SessionFactory is closed
 	}
 
-	private void registerHibernateSearchEventListener(FullTextIndexEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {
+	private void registerHibernateSearchEventListener(HibernateSearchEventListener eventListener, SessionFactoryServiceRegistry serviceRegistry) {
 		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-		listenerRegistry.addDuplicationStrategy( new KeepIfSameClassDuplicationStrategy( FullTextIndexEventListener.class ) );
+		listenerRegistry.addDuplicationStrategy( new KeepIfSameClassDuplicationStrategy( HibernateSearchEventListener.class ) );
 
 		listenerRegistry.appendListeners( EventType.POST_INSERT, eventListener );
 		listenerRegistry.appendListeners( EventType.POST_UPDATE, eventListener );

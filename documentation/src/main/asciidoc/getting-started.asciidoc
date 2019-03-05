@@ -265,7 +265,7 @@ To that end, you can use the mass indexer API, as shown in the following code:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
 ----
-<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
 <3> It is possible to set the number of threads to be used. For the complete option list see <<manual-index-changes>>.
 <4> Invoke the batch indexing process.
@@ -286,7 +286,7 @@ matches the string `Refactoring: Improving the Design of Existing Code` *exactly
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-lambdas]
 ----
-<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Initiate a search query on the index mapped to the `Book` entity.
 <3> Define the results expected from the query; here we expect managed Hibernate ORM entities,
 but other options are available.
@@ -305,7 +305,7 @@ but it will be a bit more verbose:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
 ----
-<1> Get a Hibernate Search session, called `FullTextSession`, from the `EntityManager`.
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create a "search scope", representing the indexed types that will be queried.
 <3> Initiate a search query targeting the search scope.
 <4> Define the results expected from the query; here we expect managed Hibernate ORM entities,

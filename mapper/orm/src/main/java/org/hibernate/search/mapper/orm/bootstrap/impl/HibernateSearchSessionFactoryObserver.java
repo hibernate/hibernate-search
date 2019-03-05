@@ -20,7 +20,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.event.impl.FullTextIndexEventListener;
+import org.hibernate.search.mapper.orm.event.impl.HibernateSearchEventListener;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMappingInitiator;
@@ -45,7 +45,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	private final ClassLoaderService hibernateOrmClassLoaderService;
 	private final EnvironmentSynchronizer environmentSynchronizer;
 	private final ManagedBeanRegistry managedBeanRegistry;
-	private final FullTextIndexEventListener listener;
+	private final HibernateSearchEventListener listener;
 	private final Metadata metadata;
 
 	private final CompletableFuture<HibernateSearchContextService> contextFuture = new CompletableFuture<>();
@@ -59,7 +59,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 	HibernateSearchSessionFactoryObserver(
 			Metadata metadata,
 			HibernateOrmConfigurationPropertySource propertySource,
-			FullTextIndexEventListener listener,
+			HibernateSearchEventListener listener,
 			ClassLoaderService hibernateOrmClassLoaderService,
 			EnvironmentSynchronizer environmentSynchronizer,
 			ManagedBeanRegistry managedBeanRegistry) {

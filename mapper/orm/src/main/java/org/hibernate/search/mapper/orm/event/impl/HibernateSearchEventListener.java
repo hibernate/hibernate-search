@@ -41,7 +41,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
  */
-public final class FullTextIndexEventListener implements PostDeleteEventListener,
+public final class HibernateSearchEventListener implements PostDeleteEventListener,
 		PostInsertEventListener, PostUpdateEventListener,
 		PostCollectionRecreateEventListener, PostCollectionRemoveEventListener,
 		PostCollectionUpdateEventListener, FlushEventListener {
@@ -55,13 +55,13 @@ public final class FullTextIndexEventListener implements PostDeleteEventListener
 
 	private volatile EventsHibernateSearchState state = new NonInitializedHibernateSearchState();
 
-	public FullTextIndexEventListener(boolean eventProcessingEnabled, boolean dirtyCheckingEnabled) {
+	public HibernateSearchEventListener(boolean eventProcessingEnabled, boolean dirtyCheckingEnabled) {
 		this.eventProcessingEnabled = eventProcessingEnabled;
 		this.dirtyCheckingEnabled = dirtyCheckingEnabled;
 	}
 
 	// TODO handle the "simulated" transaction when a Flush listener is registered
-	//only used by the FullTextIndexEventListener instance playing in the FlushEventListener role.
+	//only used by the HibernateSearchEventListener instance playing in the FlushEventListener role.
 	// make sure the Synchronization doesn't contain references to Session, otherwise we'll leak memory.
 //	private final Map<Session, Synchronization> flushSynch = Maps.createIdentityWeakKeyConcurrentMap( 64, 32 );
 

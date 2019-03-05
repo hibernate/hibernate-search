@@ -14,8 +14,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
 import org.junit.After;
@@ -77,9 +77,9 @@ public class GettingStartedWithAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching[]
 			// Not shown: get the entity manager and open a transaction
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class )
+			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
@@ -97,10 +97,10 @@ public class GettingStartedWithAnalysisIT {
 
 		// Also test the other terms mentioned in the getting started guide
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
-				FullTextQuery<Book> query = fullTextSession.search( Book.class )
+				SearchQuery<Book> query = searchSession.search( Book.class )
 						.asEntity()
 						.predicate( factory -> factory.match()
 								.onFields( "title", "authors.name" )

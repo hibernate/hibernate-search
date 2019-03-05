@@ -15,21 +15,21 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.SearchScope;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
 
 /**
- * A lazily initializing {@link FullTextSession}.
+ * A lazily initializing {@link SearchSession}.
  * <p>
- * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#getFullTextSession(Session)}
+ * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#getSearchSession(Session)}
  * before Hibernate Search is fully initialized, which can be useful in CDI/Spring environments.
  */
-public class LazyInitFullTextSession implements FullTextSession {
+public class LazyInitSearchSession implements SearchSession {
 
 	private final SessionImplementor sessionImplementor;
-	private FullTextSessionImplementor delegate;
+	private SearchSessionImplementor delegate;
 
-	public LazyInitFullTextSession(SessionImplementor sessionImplementor) {
+	public LazyInitSearchSession(SessionImplementor sessionImplementor) {
 		this.sessionImplementor = sessionImplementor;
 	}
 
@@ -53,11 +53,11 @@ public class LazyInitFullTextSession implements FullTextSession {
 		return getDelegate().createIndexer( types );
 	}
 
-	private FullTextSessionImplementor getDelegate() {
+	private SearchSessionImplementor getDelegate() {
 		if ( delegate == null ) {
 			HibernateSearchContextService contextService = sessionImplementor.getSessionFactory().getServiceRegistry()
 					.getService( HibernateSearchContextService.class );
-			delegate = contextService.getFullTextSession( sessionImplementor );
+			delegate = contextService.getSearchSession( sessionImplementor );
 		}
 		return delegate;
 	}

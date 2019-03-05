@@ -14,15 +14,15 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
 
-public interface FullTextSession {
+public interface SearchSession {
 
-	default <T> FullTextQueryResultDefinitionContext<T> search(Class<T> type) {
+	default <T> SearchQueryResultDefinitionContext<T> search(Class<T> type) {
 		return scope( type ).search();
 	}
 
-	default <T> FullTextQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
+	default <T> SearchQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
 		return scope( types ).search();
 	}
 
