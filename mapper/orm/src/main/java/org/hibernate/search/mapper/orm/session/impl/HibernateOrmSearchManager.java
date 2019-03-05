@@ -14,8 +14,8 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.search.impl.FullTextSearchTargetImpl;
+import org.hibernate.search.mapper.orm.search.SearchScope;
+import org.hibernate.search.mapper.orm.search.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 import org.hibernate.search.mapper.orm.session.spi.FullTextSessionBuilder;
@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionC
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
@@ -56,9 +56,9 @@ public class HibernateOrmSearchManager extends AbstractPojoSearchManager
 	}
 
 	@Override
-	public <T> FullTextSearchTarget<T> target(Collection<? extends Class<? extends T>> types) {
-		PojoSearchTargetDelegate<T, T> searchTargetDelegate = getDelegate().createPojoSearchTarget( types );
-		return new FullTextSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+		PojoSearchScopeDelegate<T, T> searchScopeDelegate = getDelegate().createPojoSearchScope( types );
+		return new SearchScopeImpl<>( searchScopeDelegate, sessionImplementor );
 	}
 
 	@Override

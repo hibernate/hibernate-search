@@ -22,7 +22,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.CustomTypeB
 import org.hibernate.search.integrationtest.mapper.pojo.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
+import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.SearchResult;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -490,7 +490,7 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search_multipleElementsProjection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchTarget searchTarget = manager.target(
+			JavaBeanSearchScope searchTarget = manager.scope(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 

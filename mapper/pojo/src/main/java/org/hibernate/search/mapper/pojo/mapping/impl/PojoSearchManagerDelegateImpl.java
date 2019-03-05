@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -37,7 +37,7 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 	}
 
 	@Override
-	public <E, O> PojoSearchTargetDelegate<E, O> createPojoSearchTarget(
+	public <E, O> PojoSearchScopeDelegate<E, O> createPojoSearchScope(
 			Collection<? extends Class<? extends E>> targetedTypes) {
 		if ( targetedTypes.isEmpty() ) {
 			throw log.cannotSearchOnEmptyTarget();
@@ -51,7 +51,7 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 			);
 		}
 
-		return new PojoSearchTargetDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
+		return new PojoSearchScopeDelegateImpl<>( indexedTypeManagers, targetedTypeManagers, sessionContext );
 	}
 
 	@Override

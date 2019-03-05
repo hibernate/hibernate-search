@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 
-public interface IndexSearchTargetContextBuilder {
+public interface IndexSearchScopeBuilder {
 
-	SearchTargetContext<?> build();
+	IndexSearchScope<?> build();
 
 }

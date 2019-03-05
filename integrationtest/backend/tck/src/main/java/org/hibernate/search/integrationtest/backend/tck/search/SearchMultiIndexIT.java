@@ -294,7 +294,7 @@ public class SearchMultiIndexIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "A search query cannot target multiple" )
+				.hasMessageContaining( "A search query cannot have a scope spanning multiple" )
 				.hasMessageContaining( "backends" );
 	}
 

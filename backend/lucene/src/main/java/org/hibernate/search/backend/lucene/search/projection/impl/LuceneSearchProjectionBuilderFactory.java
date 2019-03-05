@@ -15,7 +15,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
@@ -45,10 +45,10 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new ProjectionBuilderFactoryRetrievalStrategy();
 
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel scopeModel;
 
-	public LuceneSearchProjectionBuilderFactory(LuceneSearchTargetModel searchTargetModel) {
-		this.searchTargetModel = searchTargetModel;
+	public LuceneSearchProjectionBuilderFactory(LuceneSearchScopeModel scopeModel) {
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
 	}
@@ -80,7 +80,7 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}

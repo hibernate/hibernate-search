@@ -38,9 +38,9 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 
 	IndexWorkExecutor createWorkExecutor();
 
-	IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext);
+	IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext);
 
-	void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder);
+	void addTo(IndexSearchScopeBuilder builder);
 
 	@Override
 	void close();

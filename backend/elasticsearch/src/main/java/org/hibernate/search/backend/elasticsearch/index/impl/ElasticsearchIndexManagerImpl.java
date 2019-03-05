@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -117,20 +117,20 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
-		return new ElasticsearchIndexSearchTargetContextBuilder( searchBackendContext, mappingContext, this );
+	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
+		return new ElasticsearchIndexSearchScopeBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
-		if ( !( searchTargetBuilder instanceof ElasticsearchIndexSearchTargetContextBuilder ) ) {
-			throw log.cannotMixElasticsearchSearchTargetWithOtherType(
-					searchTargetBuilder, this, searchBackendContext.getEventContext()
+	public void addTo(IndexSearchScopeBuilder builder) {
+		if ( !( builder instanceof ElasticsearchIndexSearchScopeBuilder ) ) {
+			throw log.cannotMixElasticsearchSearchScopeWithOtherType(
+					builder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		ElasticsearchIndexSearchTargetContextBuilder esSearchTargetBuilder = (ElasticsearchIndexSearchTargetContextBuilder) searchTargetBuilder;
-		esSearchTargetBuilder.add( searchBackendContext, this );
+		ElasticsearchIndexSearchScopeBuilder esBuilder = (ElasticsearchIndexSearchScopeBuilder) builder;
+		esBuilder.add( searchBackendContext, this );
 	}
 
 	@Override

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneQueryWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.mapper.session.context.spi.SessionContextImplementor;
@@ -44,7 +44,7 @@ public class SearchBackendContext {
 	}
 
 	<T> LuceneSearchQueryBuilder<T> createSearchQueryBuilder(
-			LuceneSearchTargetModel searchTargetModel,
+			LuceneSearchScopeModel scopeModel,
 			SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			LuceneSearchProjection<?, T> rootProjection) {
@@ -57,7 +57,7 @@ public class SearchBackendContext {
 				workFactory,
 				orchestrator,
 				multiTenancyStrategy,
-				searchTargetModel,
+				scopeModel,
 				sessionContext,
 				storedFieldFilterBuilder.build(),
 				projectionHitMapper,

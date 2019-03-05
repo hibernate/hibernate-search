@@ -164,8 +164,8 @@ The idea is that when you search, you will mainly target index fields,
 not properties of mapped objects (though they may happen to have the same name).
 
 As a result, mapper APIs only define entry points for searching so as to offer more natural ways of defining
-the search target and to provide additional settings.
-For example `PojoSearchManager#search` allows to define the search target
+the search scope and to provide additional settings.
+For example `PojoSearchManager#search` allows to define the search scope
 using the Java classes of mapped types instead of index names.
 But somewhere along the API calls, mappers end up exposing generic APIs,
 for instance `SearchQueryResultDefinitionContext` or `SearchPredicateContainerContext`.
@@ -176,7 +176,7 @@ such as `SearchPredicateFactory` or `FieldSortBuilder`.
 
 Note that the APIs implemented by the engine include ways for the mapper to wrap the resulting search query
 (`SearchQueryWrappingDefinitionResultContext#asWrappedQuery`).
-Also, the SPIs implemented by backends allow mappers to inject an "object loader" (see `IndexSearchTarget.query`)
+Also, the SPIs implemented by backends allow mappers to inject an "object loader" (see `SearchQueryBuilderFactory.asObject`)
 that will essentially transform document references into the object that was initially indexed.
 
 == POJO mapper

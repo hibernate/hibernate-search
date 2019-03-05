@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
@@ -37,12 +37,12 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	private final ElasticsearchSearchContext searchContext;
 
-	private final ElasticsearchSearchTargetModel searchTargetModel;
+	private final ElasticsearchSearchScopeModel scopeModel;
 
 	public ElasticsearchSearchSortBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
-			ElasticsearchSearchTargetModel searchTargetModel) {
+			ElasticsearchSearchScopeModel scopeModel) {
 		this.searchContext = searchContext;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -72,14 +72,14 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 
 	@Override
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceSortBuilder( absoluteFieldPath, location );
 	}

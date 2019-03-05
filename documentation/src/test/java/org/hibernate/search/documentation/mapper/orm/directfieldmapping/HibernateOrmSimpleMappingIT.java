@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -99,7 +99,7 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::sort-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
+			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class );
 
 			FullTextQuery<Book> query = searchTarget.search()
 					.asEntity()
@@ -147,7 +147,7 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
+			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class );
 
 			FullTextQuery<String> query = searchTarget.search()
 					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() )

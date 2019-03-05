@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
@@ -44,12 +44,12 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel scopeModel;
 
 	public LuceneSearchPredicateBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneSearchTargetModel searchTargetModel) {
+			LuceneSearchScopeModel scopeModel) {
 		this.searchContext = searchContext;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
-		return new LuceneMatchIdPredicateBuilder( searchContext, searchTargetModel.getIdDslConverter() );
+		return new LuceneMatchIdPredicateBuilder( searchContext, scopeModel.getIdDslConverter() );
 	}
 
 	@Override
@@ -88,47 +88,47 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath, DslConverter dslConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createMatchPredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> phrase(String absoluteFieldPath) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
 				.createPhrasePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
 				.createWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> simpleQueryString() {
-		return new LuceneSimpleQueryStringPredicateBuilder( searchTargetModel );
+		return new LuceneSimpleQueryStringPredicateBuilder( scopeModel );
 	}
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
@@ -136,14 +136,14 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinBoundingBox(
 			String absoluteFieldPath) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public NestedPredicateBuilder<LuceneSearchPredicateBuilder> nested(String absoluteFieldPath) {
-		searchTargetModel.checkNestedField( absoluteFieldPath );
+		scopeModel.checkNestedField( absoluteFieldPath );
 		return new LuceneNestedPredicateBuilder( absoluteFieldPath );
 	}
 

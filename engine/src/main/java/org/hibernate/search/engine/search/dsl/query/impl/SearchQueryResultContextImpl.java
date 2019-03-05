@@ -14,20 +14,20 @@ import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryCo
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
 public final class SearchQueryResultContextImpl<T, C, Q>
 		implements SearchQueryResultContext<Q> {
 
-	private final SearchTargetContext<C> targetContext;
+	private final IndexSearchScope<C> targetContext;
 	private final SearchQueryBuilder<T, C> searchQueryBuilder;
 	private final Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory;
 
 	private final SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector;
 
-	public SearchQueryResultContextImpl(SearchTargetContext<C> targetContext,
+	public SearchQueryResultContextImpl(IndexSearchScope<C> targetContext,
 			SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		this.targetContext = targetContext;

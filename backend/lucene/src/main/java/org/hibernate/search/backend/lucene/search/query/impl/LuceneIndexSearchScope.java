@@ -8,41 +8,41 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilderFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactoryImpl;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 
 /**
  * @author Guillaume Smet
  */
-public class LuceneSearchTargetContext
-		implements SearchTargetContext<LuceneSearchQueryElementCollector> {
+public class LuceneIndexSearchScope
+		implements IndexSearchScope<LuceneSearchQueryElementCollector> {
 
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel model;
 	private final LuceneSearchPredicateBuilderFactoryImpl searchPredicateFactory;
 	private final LuceneSearchSortBuilderFactoryImpl searchSortFactory;
 	private final LuceneSearchQueryBuilderFactory searchQueryFactory;
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
-	public LuceneSearchTargetContext(SearchBackendContext searchBackendContext,
+	public LuceneIndexSearchScope(SearchBackendContext searchBackendContext,
 			MappingContextImplementor mappingContext,
-			LuceneSearchTargetModel searchTargetModel) {
+			LuceneSearchScopeModel model) {
 		LuceneSearchContext searchContext = new LuceneSearchContext( mappingContext );
-		this.searchTargetModel = searchTargetModel;
-		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, searchTargetModel );
-		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, searchTargetModel );
-		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( searchTargetModel );
-		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( searchBackendContext, searchTargetModel, this.searchProjectionFactory );
+		this.model = model;
+		this.searchPredicateFactory = new LuceneSearchPredicateBuilderFactoryImpl( searchContext, model );
+		this.searchSortFactory = new LuceneSearchSortBuilderFactoryImpl( searchContext, model );
+		this.searchProjectionFactory = new LuceneSearchProjectionBuilderFactory( model );
+		this.searchQueryFactory = new LuceneSearchQueryBuilderFactory( searchBackendContext, model, this.searchProjectionFactory );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "indexNames=" ).append( searchTargetModel.getIndexNames() )
+				.append( "indexNames=" ).append( model.getIndexNames() )
 				.append( "]" )
 				.toString();
 	}

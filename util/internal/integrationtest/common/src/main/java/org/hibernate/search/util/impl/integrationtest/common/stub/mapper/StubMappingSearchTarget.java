@@ -6,20 +6,20 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
- * A wrapper around {@link MappedIndexSearchTarget} providing some syntactic sugar,
+ * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  * <p>
  * This is a simpler version of {@link GenericStubMappingSearchTarget} that allows user to skip the generic parameters.
  */
 public class StubMappingSearchTarget extends GenericStubMappingSearchTarget<DocumentReference, DocumentReference> {
 
-	StubMappingSearchTarget(MappedIndexSearchTarget<DocumentReference, DocumentReference> indexSearchTarget) {
+	StubMappingSearchTarget(MappedIndexSearchScope<DocumentReference, DocumentReference> indexSearchTarget) {
 		super( indexSearchTarget );
 	}
 

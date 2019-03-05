@@ -10,40 +10,40 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
 import org.hibernate.search.mapper.orm.search.dsl.query.impl.FullTextQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class FullTextSearchTargetImpl<O> implements FullTextSearchTarget<O> {
+public class SearchScopeImpl<O> implements SearchScope<O> {
 
-	private final PojoSearchTargetDelegate<O, O> searchTargetDelegate;
+	private final PojoSearchScopeDelegate<O, O> delegate;
 	private final SessionImplementor sessionImplementor;
 
-	public FullTextSearchTargetImpl(PojoSearchTargetDelegate<O, O> searchTargetDelegate,
+	public SearchScopeImpl(PojoSearchScopeDelegate<O, O> delegate,
 			SessionImplementor sessionImplementor) {
-		this.searchTargetDelegate = searchTargetDelegate;
+		this.delegate = delegate;
 		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
 	public FullTextQueryResultDefinitionContext<O> search() {
-		return new FullTextQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
+		return new FullTextQueryResultDefinitionContextImpl<>( delegate, sessionImplementor );
 	}
 
 	@Override
 	public SearchPredicateFactoryContext predicate() {
-		return searchTargetDelegate.predicate();
+		return delegate.predicate();
 	}
 
 	@Override
 	public SearchSortContainerContext sort() {
-		return searchTargetDelegate.sort();
+		return delegate.sort();
 	}
 
 	@Override
 	public SearchProjectionFactoryContext<PojoReference, O> projection() {
-		return searchTargetDelegate.projection();
+		return delegate.projection();
 	}
 }

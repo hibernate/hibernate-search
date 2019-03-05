@@ -12,9 +12,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -95,20 +95,20 @@ class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexSearchTargetContextBuilder createSearchTargetContextBuilder(MappingContextImplementor mappingContext) {
-		return new LuceneIndexSearchTargetContextBuilder( searchBackendContext, mappingContext, this );
+	public IndexSearchScopeBuilder createSearchScopeBuilder(MappingContextImplementor mappingContext) {
+		return new LuceneIndexSearchScopeBuilder( searchBackendContext, mappingContext, this );
 	}
 
 	@Override
-	public void addToSearchTarget(IndexSearchTargetContextBuilder searchTargetBuilder) {
-		if ( ! (searchTargetBuilder instanceof LuceneIndexSearchTargetContextBuilder ) ) {
-			throw log.cannotMixLuceneSearchTargetWithOtherType(
-					searchTargetBuilder, this, searchBackendContext.getEventContext()
+	public void addTo(IndexSearchScopeBuilder builder) {
+		if ( ! ( builder instanceof LuceneIndexSearchScopeBuilder ) ) {
+			throw log.cannotMixLuceneSearchScopeWithOtherType(
+					builder, this, searchBackendContext.getEventContext()
 			);
 		}
 
-		LuceneIndexSearchTargetContextBuilder luceneSearchTargetBuilder = (LuceneIndexSearchTargetContextBuilder) searchTargetBuilder;
-		luceneSearchTargetBuilder.add( searchBackendContext, this );
+		LuceneIndexSearchScopeBuilder luceneBuilder = (LuceneIndexSearchScopeBuilder) builder;
+		luceneBuilder.add( searchBackendContext, this );
 	}
 
 	@Override

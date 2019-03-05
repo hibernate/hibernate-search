@@ -4,18 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.impl;
+package org.hibernate.search.backend.lucene.search.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+import org.hibernate.search.backend.lucene.index.spi.ReaderProvider;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -23,50 +23,48 @@ import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class ElasticsearchSearchTargetModel {
+public class LuceneSearchScopeModel {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Set<String> hibernateSearchIndexNames;
-	private final Set<URLEncodedString> elasticsearchIndexNames;
+	private final Set<LuceneIndexModel> indexModels;
+	private final Set<String> indexNames;
+	private final Set<ReaderProvider> readerProviders;
 
-	public ElasticsearchSearchTargetModel(Set<ElasticsearchIndexModel> indexModels) {
+	public LuceneSearchScopeModel(Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
 		this.indexModels = indexModels;
-		this.hibernateSearchIndexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getHibernateSearchIndexName )
+		this.indexNames = indexModels.stream()
+				.map( LuceneIndexModel::getIndexName )
 				.collect( Collectors.toSet() );
-		this.elasticsearchIndexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getElasticsearchIndexName )
-				.collect( Collectors.toSet() );
+		this.readerProviders = readerProviders;
 	}
 
-	public Set<String> getHibernateSearchIndexNames() {
-		return hibernateSearchIndexNames;
-	}
-
-	public Set<URLEncodedString> getElasticsearchIndexNames() {
-		return elasticsearchIndexNames;
+	public Set<String> getIndexNames() {
+		return indexNames;
 	}
 
 	public EventContext getIndexesEventContext() {
-		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
+		return EventContexts.fromIndexNames( indexNames );
+	}
+
+	public Set<ReaderProvider> getReaderProviders() {
+		return readerProviders;
 	}
 
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
-		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
-		ElasticsearchIndexModel indexModelForSelectedIdConverter = iterator.next();
+		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
+		LuceneIndexModel indexModelForSelectedIdConverter = iterator.next();
 		ToDocumentIdentifierValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
 
 		while ( iterator.hasNext() ) {
-			ElasticsearchIndexModel indexModel = iterator.next();
+			LuceneIndexModel indexModel = iterator.next();
 			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
 				throw log.conflictingIdentifierTypesForPredicate(
 						selectedIdConverter, idConverter,
 						EventContexts.fromIndexNames(
-								indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
-								indexModel.getHibernateSearchIndexName()
+								indexModelForSelectedIdConverter.getIndexName(),
+								indexModel.getIndexName()
 						)
 				);
 			}
@@ -83,12 +81,12 @@ public class ElasticsearchSearchTargetModel {
 
 	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
-		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
-		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
+		LuceneIndexModel indexModelForSelectedSchemaNode = null;
+		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
 
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 
 			if ( schemaNode != null ) {
 				T component = componentRetrievalStrategy.extractComponent( schemaNode );
@@ -104,8 +102,8 @@ public class ElasticsearchSearchTargetModel {
 							selectedComponent,
 							component,
 							EventContexts.fromIndexNames(
-									indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-									indexModel.getHibernateSearchIndexName()
+									indexModelForSelectedSchemaNode.getIndexName(),
+									indexModel.getIndexName()
 							)
 					);
 				}
@@ -120,8 +118,8 @@ public class ElasticsearchSearchTargetModel {
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 
-		for ( ElasticsearchIndexModel indexModel : indexModels ) {
-			ElasticsearchIndexSchemaObjectNode schemaNode = indexModel.getObjectNode( absoluteFieldPath );
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			LuceneIndexSchemaObjectNode schemaNode = indexModel.getObjectNode( absoluteFieldPath );
 			if ( schemaNode != null ) {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
@@ -132,8 +130,8 @@ public class ElasticsearchSearchTargetModel {
 			}
 		}
 		if ( !found ) {
-			for ( ElasticsearchIndexModel indexModel : indexModels ) {
-				ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
+			for ( LuceneIndexModel indexModel : indexModels ) {
+				LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(
 							absoluteFieldPath, indexModel.getEventContext()

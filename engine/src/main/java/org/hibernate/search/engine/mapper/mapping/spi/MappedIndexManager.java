@@ -32,8 +32,8 @@ public interface MappedIndexManager<D extends DocumentElement> {
 
 	IndexWorkExecutor createWorkExecutor();
 
-	<R, O> MappedIndexSearchTargetBuilder<R, O> createSearchTargetBuilder(MappingContextImplementor mappingContext,
+	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext,
 			Function<DocumentReference, R> documentReferenceTransformer);
 
-	void addToSearchTarget(MappedIndexSearchTargetBuilder<?, ?> builder);
+	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder);
 }

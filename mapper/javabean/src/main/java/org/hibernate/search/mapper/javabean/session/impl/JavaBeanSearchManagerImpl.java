@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanMappingContext;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
-import org.hibernate.search.mapper.javabean.search.impl.JavaBeanSearchTargetImpl;
+import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
+import org.hibernate.search.mapper.javabean.search.impl.JavaBeanSearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManager;
 import org.hibernate.search.mapper.javabean.session.JavaBeanSearchManagerBuilder;
 import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanSessionContext;
@@ -38,9 +38,9 @@ public class JavaBeanSearchManagerImpl extends AbstractPojoSearchManager impleme
 	}
 
 	@Override
-	public <T> JavaBeanSearchTarget target(Collection<? extends Class<? extends T>> targetedTypes) {
-		return new JavaBeanSearchTargetImpl(
-				getDelegate().createPojoSearchTarget( targetedTypes )
+	public <T> JavaBeanSearchScope scope(Collection<? extends Class<? extends T>> targetedTypes) {
+		return new JavaBeanSearchScopeImpl(
+				getDelegate().createPojoSearchScope( targetedTypes )
 		);
 	}
 

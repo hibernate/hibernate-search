@@ -9,17 +9,17 @@ package org.hibernate.search.mapper.javabean.search.impl;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.javabean.search.JavaBeanSearchTarget;
+import org.hibernate.search.mapper.javabean.search.JavaBeanSearchScope;
 import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResultDefinitionContext;
 import org.hibernate.search.mapper.javabean.search.dsl.query.impl.JavaBeanQueryResultDefinitionContextImpl;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
-public class JavaBeanSearchTargetImpl implements JavaBeanSearchTarget {
+public class JavaBeanSearchScopeImpl implements JavaBeanSearchScope {
 
-	private final PojoSearchTargetDelegate<?, PojoReference> delegate;
+	private final PojoSearchScopeDelegate<?, PojoReference> delegate;
 
-	public JavaBeanSearchTargetImpl(PojoSearchTargetDelegate<?, PojoReference> delegate) {
+	public JavaBeanSearchScopeImpl(PojoSearchScopeDelegate<?, PojoReference> delegate) {
 		this.delegate = delegate;
 	}
 

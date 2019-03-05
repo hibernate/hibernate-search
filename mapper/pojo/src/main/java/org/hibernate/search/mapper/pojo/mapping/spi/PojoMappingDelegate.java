@@ -38,7 +38,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	/**
 	 * @param type A Java type.
 	 * @return {@code true} if this type is searchable
-	 * (i.e. it can be passed to {@link PojoSearchManagerDelegate#createPojoSearchTarget(Collection)}),
+	 * (i.e. it can be passed to {@link PojoSearchManagerDelegate#createPojoSearchScope(Collection)}),
 	 * {@code false} if it is not.
 	 */
 	boolean isSearchable(Class<?> type);
