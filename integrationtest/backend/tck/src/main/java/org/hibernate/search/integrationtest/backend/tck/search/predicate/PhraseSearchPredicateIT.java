@@ -125,7 +125,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -144,7 +144,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -159,7 +159,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
@@ -173,7 +173,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -188,7 +188,7 @@ public class PhraseSearchPredicateIT {
 				.asReference()
 				// Use stopwords, which should be removed by the analysis
 				.predicate( f -> f.phrase().onField( fieldModel.relativeFieldName ).matching( "the a" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -239,7 +239,7 @@ public class PhraseSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<Integer, IndexSearchQuery<DocumentReference>> createQuery = slop -> scope.query().asReference()
 				.predicate( f -> f.phrase().withSlop( slop ).onField( absoluteFieldPath ).matching( PHRASE_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( 0 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -286,7 +286,7 @@ public class PhraseSearchPredicateIT {
 						.matching( PHRASE_1 )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -299,7 +299,7 @@ public class PhraseSearchPredicateIT {
 						.matching( PHRASE_1 )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
@@ -322,7 +322,7 @@ public class PhraseSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
@@ -338,7 +338,7 @@ public class PhraseSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -363,7 +363,7 @@ public class PhraseSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
@@ -381,7 +381,7 @@ public class PhraseSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -401,7 +401,7 @@ public class PhraseSearchPredicateIT {
 				.predicate( f -> f.phrase().onField( absoluteFieldPath1 )
 						.matching( phrase )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -417,7 +417,7 @@ public class PhraseSearchPredicateIT {
 						.orField( absoluteFieldPath2 )
 						.matching( phrase )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -434,7 +434,7 @@ public class PhraseSearchPredicateIT {
 						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( phrase )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3, DOCUMENT_5 );
@@ -451,7 +451,7 @@ public class PhraseSearchPredicateIT {
 						.onFields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( phrase )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PHRASE_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -540,7 +540,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -557,7 +557,7 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -631,18 +631,18 @@ public class PhraseSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 

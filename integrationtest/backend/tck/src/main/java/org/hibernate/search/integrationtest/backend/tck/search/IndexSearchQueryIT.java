@@ -69,7 +69,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setFirstResult( 1L );
 
 		assertThat( query )
@@ -80,7 +80,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setFirstResult( 1L );
 		query.setMaxResults( 1L );
 
@@ -92,7 +92,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setMaxResults( 2L );
 
 		assertThat( query )
@@ -103,7 +103,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setFirstResult( null );
 		query.setMaxResults( null );
 
@@ -120,7 +120,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setFirstResult( 1L );
 
 		assertThat( query )
@@ -145,7 +145,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setFirstResult( null );
 		query.setMaxResults( null );
 
@@ -163,7 +163,7 @@ public class IndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
-				.build();
+				.toQuery();
 		query.setMaxResults( 0L );
 
 		assertThat( query )
@@ -178,7 +178,7 @@ public class IndexSearchQueryIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
 	}
@@ -190,7 +190,7 @@ public class IndexSearchQueryIT {
 		QueryWrapper queryWrapper = scope.query()
 				.asReference( QueryWrapper::new )
 				.predicate( f -> f.match().onField( "string" ).matching( "platypus" ) )
-				.build();
+				.toQuery();
 		assertThat( queryWrapper.query.getQueryString() ).contains( "platypus" );
 	}
 
@@ -213,7 +213,7 @@ public class IndexSearchQueryIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 

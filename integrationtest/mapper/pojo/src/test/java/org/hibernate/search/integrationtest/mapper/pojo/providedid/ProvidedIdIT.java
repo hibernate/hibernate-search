@@ -74,7 +74,7 @@ public class ProvidedIdIT {
 			SearchQuery<PojoReference> query = session.search( IndexedEntity.class )
 					.asReference()
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			assertThat( query.execute().getHits() )
 					.containsExactly( new PojoReferenceImpl( IndexedEntity.class, "42" ) );

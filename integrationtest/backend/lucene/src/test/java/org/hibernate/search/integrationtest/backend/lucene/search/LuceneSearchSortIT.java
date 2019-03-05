@@ -67,7 +67,7 @@ public class LuceneSearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -98,7 +98,7 @@ public class LuceneSearchSortIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 

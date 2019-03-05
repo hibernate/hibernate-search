@@ -88,7 +88,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
@@ -100,7 +100,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asObject()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
@@ -122,7 +122,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<StubTransformedReference> referencesQuery = scope.query( objectLoaderMock )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		EasyMock.expect( referenceTransformerMock.apply( referenceMatcher( mainReference ) ) )
 				.andReturn( mainTransformedReference );
@@ -164,7 +164,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<StubLoadedObject> objectsQuery = scope.query( objectLoaderMock )
 				.asObject()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
 
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock );
@@ -210,7 +210,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( projectionsQuery ).hasListHitsAnyOrder( b -> {
 			b.list( STRING_VALUE, mainReference, mainTransformedReference, mainLoadedObject );
 			b.list( null, emptyReference, emptyTransformedReference, emptyLoadedObject );
@@ -245,7 +245,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		EasyMock.expect( hitTransformerMock.apply( projectionMatcher(
 				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
@@ -314,7 +314,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
 
 		EasyMock.verify( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
@@ -327,14 +327,14 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertEquals( 2L, query.executeCount() );
 
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
-				.build();
+				.toQuery();
 
 		assertEquals( 1L, query.executeCount() );
 
@@ -342,7 +342,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( 1L );
 		assertEquals( 2L, query.executeCount() );
@@ -359,14 +359,14 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertEquals( 2L, query.executeCount() );
 
 		query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
-				.build();
+				.toQuery();
 
 		assertEquals( 1L, query.executeCount() );
 	}
@@ -400,7 +400,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}

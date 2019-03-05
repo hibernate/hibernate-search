@@ -91,7 +91,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
@@ -102,7 +102,7 @@ public class LuceneSearchMultiIndexIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "additionalField" ).desc().onMissingValue().sortLast() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
@@ -130,7 +130,7 @@ public class LuceneSearchMultiIndexIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
@@ -147,7 +147,7 @@ public class LuceneSearchMultiIndexIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}
 

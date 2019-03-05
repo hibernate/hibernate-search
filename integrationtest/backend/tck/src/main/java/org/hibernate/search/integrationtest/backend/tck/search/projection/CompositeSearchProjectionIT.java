@@ -87,7 +87,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				Arrays.asList( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -108,7 +108,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				Arrays.asList( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -130,7 +130,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -152,7 +152,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -173,7 +173,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book( indexMapping.title.document1Value.indexedValue ),
@@ -194,7 +194,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book( indexMapping.title.document1Value.indexedValue ),
@@ -216,7 +216,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -238,7 +238,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ),
@@ -261,7 +261,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Tri( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue,
@@ -287,7 +287,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Tri( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue,
@@ -316,7 +316,7 @@ public class CompositeSearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				new Book_Bi_Score( new Book_Bi( indexMapping.author.document1Value.indexedValue, indexMapping.title.document1Value.indexedValue ), 1.0F ),
@@ -350,7 +350,7 @@ public class CompositeSearchProjectionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

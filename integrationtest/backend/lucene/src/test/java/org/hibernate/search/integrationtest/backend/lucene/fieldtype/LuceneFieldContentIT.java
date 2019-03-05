@@ -64,7 +64,7 @@ public class LuceneFieldContentIT {
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		List<Document> result = query.execute().getHits();
 		Assertions.assertThat( result )

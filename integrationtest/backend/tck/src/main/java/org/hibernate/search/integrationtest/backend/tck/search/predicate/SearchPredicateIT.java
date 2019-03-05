@@ -71,7 +71,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -86,7 +86,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( predicate )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -99,7 +99,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -127,7 +127,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -137,7 +137,7 @@ public class SearchPredicateIT {
 		query = scope.query()
 				.asReference()
 				.predicate( cachingPredicateProducer.apply( scope.predicate() ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -165,7 +165,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool().must( cachingPredicateProducer.apply( f ) ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -178,7 +178,7 @@ public class SearchPredicateIT {
 						.should( cachingPredicateProducer.apply( f ) )
 						.should( f.match().onField( "string" ).matching( STRING_2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -195,7 +195,7 @@ public class SearchPredicateIT {
 				.predicate( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
@@ -214,7 +214,7 @@ public class SearchPredicateIT {
 						)
 						.orElseFail()
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
@@ -234,7 +234,7 @@ public class SearchPredicateIT {
 								shouldNotBeCalled()
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
@@ -254,7 +254,7 @@ public class SearchPredicateIT {
 								c -> c.match().onField( "string" ).matching( STRING_1 )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
@@ -276,7 +276,7 @@ public class SearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}
 

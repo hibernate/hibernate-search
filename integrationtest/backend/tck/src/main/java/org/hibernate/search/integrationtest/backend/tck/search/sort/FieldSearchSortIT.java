@@ -131,7 +131,7 @@ public class FieldSearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -340,7 +340,7 @@ public class FieldSearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -361,7 +361,7 @@ public class FieldSearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -382,7 +382,7 @@ public class FieldSearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -635,17 +635,17 @@ public class FieldSearchSortIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 

@@ -89,7 +89,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -100,7 +100,7 @@ public class BoolSearchPredicateIT {
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasNoHits();
 
@@ -110,7 +110,7 @@ public class BoolSearchPredicateIT {
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -125,7 +125,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.must( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -140,7 +140,7 @@ public class BoolSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate(	f -> f.bool().must( predicate ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -155,7 +155,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -166,7 +166,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -182,7 +182,7 @@ public class BoolSearchPredicateIT {
 						.should( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -201,7 +201,7 @@ public class BoolSearchPredicateIT {
 						.should( predicate1 )
 						.should( predicate2 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -216,7 +216,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -227,7 +227,7 @@ public class BoolSearchPredicateIT {
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -242,7 +242,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.mustNot( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -259,7 +259,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.mustNot( predicate )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -274,7 +274,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -285,7 +285,7 @@ public class BoolSearchPredicateIT {
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.filter( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasNoHits();
 
@@ -295,7 +295,7 @@ public class BoolSearchPredicateIT {
 						.filter( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.filter( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -310,7 +310,7 @@ public class BoolSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.filter( f2 -> f2.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -325,7 +325,7 @@ public class BoolSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate(	f -> f.bool().filter( predicate ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -342,7 +342,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -358,7 +358,7 @@ public class BoolSearchPredicateIT {
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasNoHits();
 
@@ -368,7 +368,7 @@ public class BoolSearchPredicateIT {
 						.must( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -386,7 +386,7 @@ public class BoolSearchPredicateIT {
 										.should( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 						)
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -400,7 +400,7 @@ public class BoolSearchPredicateIT {
 						)
 						.mustNot( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -420,7 +420,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().withConstantScore().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -435,7 +435,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -452,7 +452,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().withConstantScore().boostedTo( 39 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -464,7 +464,7 @@ public class BoolSearchPredicateIT {
 						.should( f.bool().withConstantScore().boostedTo( 7 ).must( f.match().onField( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -485,7 +485,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -498,7 +498,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -519,7 +519,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -532,7 +532,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -554,7 +554,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -568,7 +568,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -586,7 +586,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -600,7 +600,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -614,7 +614,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -627,7 +627,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -645,7 +645,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -659,7 +659,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -673,7 +673,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -691,7 +691,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -705,7 +705,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -719,7 +719,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -732,7 +732,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -750,7 +750,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -764,7 +764,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -778,7 +778,7 @@ public class BoolSearchPredicateIT {
 						.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().onField( "field3" ).matching( FIELD3_VALUE3 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -799,7 +799,7 @@ public class BoolSearchPredicateIT {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.must( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -811,7 +811,7 @@ public class BoolSearchPredicateIT {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -824,7 +824,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -838,7 +838,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -853,7 +853,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -869,7 +869,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -886,7 +886,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -909,7 +909,7 @@ public class BoolSearchPredicateIT {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -922,7 +922,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE2 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -936,7 +936,7 @@ public class BoolSearchPredicateIT {
 					b.should( f.match().onField( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().onField( "field2" ).matching( FIELD2_VALUE3 ) );
 				} ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -1017,7 +1017,7 @@ public class BoolSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 

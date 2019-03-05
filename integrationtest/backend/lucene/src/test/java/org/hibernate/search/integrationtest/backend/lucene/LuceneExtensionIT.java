@@ -110,7 +110,7 @@ public class LuceneExtensionIT {
 								.fromLuceneQuery( LatLonPoint.newDistanceQuery( "geoPoint", 40, -70, 200_000 ) )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
@@ -135,7 +135,7 @@ public class LuceneExtensionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( booleanPredicate )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
 				.hasHitCount( 3 );
@@ -156,7 +156,7 @@ public class LuceneExtensionIT {
 						.then().extension( LuceneExtension.get() )
 								.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
@@ -176,7 +176,7 @@ public class LuceneExtensionIT {
 								)
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID
@@ -209,7 +209,7 @@ public class LuceneExtensionIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1 ).then().by( sort2 ).then().by( sort3 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID );
 
@@ -226,7 +226,7 @@ public class LuceneExtensionIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, FOURTH_ID, FIFTH_ID );
 	}
@@ -240,7 +240,7 @@ public class LuceneExtensionIT {
 				() -> scope.query()
 						.asReference()
 						.predicate( f -> f.match().onField( "nativeField" ).matching( "37" ) )
-						.build()
+						.toQuery()
 				)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -260,7 +260,7 @@ public class LuceneExtensionIT {
 						.asReference()
 						.predicate( f -> f.matchAll() )
 						.sort( c -> c.byField( "nativeField" ) )
-						.build()
+						.toQuery()
 				)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -279,7 +279,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField", "37" ) ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
@@ -292,7 +292,7 @@ public class LuceneExtensionIT {
 		IndexSearchQuery<Integer> query = scope.query()
 				.asProjection( f -> f.field( "nativeField", Integer.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( 37 );
 	}
@@ -307,7 +307,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.extension( LuceneExtension.get() )
 						.fromLuceneQuery( new TermQuery( new Term( "nativeField_unsupportedProjection", "37" ) ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
@@ -333,7 +333,7 @@ public class LuceneExtensionIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, FIRST_ID, FIFTH_ID, SECOND_ID, FOURTH_ID );
@@ -348,7 +348,7 @@ public class LuceneExtensionIT {
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		List<Document> result = query.execute().getHits();
 		Assertions.assertThat( result )
@@ -411,7 +411,7 @@ public class LuceneExtensionIT {
 						)
 				)
 				.predicate( f -> f.id().matching( FIRST_ID ) )
-				.build();
+				.toQuery();
 
 		List<Document> result = query.execute().getHits().stream()
 				.map( list -> (Document) list.get( 0 ) )
@@ -434,7 +434,7 @@ public class LuceneExtensionIT {
 		IndexSearchQuery<Explanation> query = scope.query()
 				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
-				.build();
+				.toQuery();
 
 		List<Explanation> result = query.execute().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -554,7 +554,7 @@ public class LuceneExtensionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID

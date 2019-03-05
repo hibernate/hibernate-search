@@ -218,7 +218,7 @@ public class AnalysisCustomIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( indexMapping.field.relativeFieldName ).matching( valueToMatch ) )
-				.build();
+				.toQuery();
 
 		return assertThat( query );
 	}
@@ -270,7 +270,7 @@ public class AnalysisCustomIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> {
 					for ( String documentId : documentIds ) {

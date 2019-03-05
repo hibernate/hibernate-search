@@ -73,7 +73,7 @@ public class IndexDocumentWorkExecutorIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		Assertions.assertThat( query.executeCount() ).isEqualTo( NUMBER_OF_BOOKS );
 	}

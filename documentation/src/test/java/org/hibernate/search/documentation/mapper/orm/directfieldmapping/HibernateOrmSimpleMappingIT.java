@@ -110,7 +110,7 @@ public class HibernateOrmSimpleMappingIT {
 							.then().byField( "title_sort" )
 							.toSort()
 					)
-					.build();
+					.toQuery();
 
 			List<Book> result = query.getResultList();
 			// end::sort-simple-objects[]
@@ -130,7 +130,7 @@ public class HibernateOrmSimpleMappingIT {
 					.sort( f -> f.byField( "pageCount" ).desc() // <2>
 							.then().byField( "title_sort" )
 					)
-					.build();
+					.toQuery();
 
 			List<Book> result = query.getResultList(); // <3>
 			// end::sort-simple-lambdas[]
@@ -152,7 +152,7 @@ public class HibernateOrmSimpleMappingIT {
 			SearchQuery<String> query = scope.search()
 					.asProjection( scope.projection().field( "title", String.class ).toProjection() )
 					.predicate( scope.predicate().matchAll().toPredicate() )
-					.build();
+					.toQuery();
 
 			List<String> result = query.getResultList();
 			// end::projection-simple-objects[]
@@ -168,7 +168,7 @@ public class HibernateOrmSimpleMappingIT {
 			SearchQuery<String> query = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			List<String> result = query.getResultList(); // <3>
 			// end::projection-simple-lambdas[]
@@ -191,7 +191,7 @@ public class HibernateOrmSimpleMappingIT {
 							f.score()
 					) )
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			List<MyEntityAndScoreBean<Book>> result = query.getResultList();
 			// end::projection-advanced[]

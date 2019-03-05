@@ -128,7 +128,7 @@ public class ObjectFieldStorageIT {
 						.must( f.match().onField( "flattenedObject.integer" ).matching( MATCHING_INTEGER ) )
 						.must( f.match().onField( "flattenedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
@@ -143,7 +143,7 @@ public class ObjectFieldStorageIT {
 								.must( f.match().onField( "nestedObject.localDate" ).matching( MATCHING_LOCAL_DATE ) )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
@@ -166,7 +166,7 @@ public class ObjectFieldStorageIT {
 								.from( MATCHING_LOCAL_DATE.minusDays( 1 ) ).to( MATCHING_LOCAL_DATE.plusDays( 1 ) )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
@@ -187,7 +187,7 @@ public class ObjectFieldStorageIT {
 								)
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
@@ -323,7 +323,7 @@ public class ObjectFieldStorageIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(
 						INDEX_NAME,

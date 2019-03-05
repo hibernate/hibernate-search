@@ -63,7 +63,7 @@ public class SmokeIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( "text 1" ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -71,7 +71,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string_analyzed" ).matching( "text" ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
 				.hasHitCount( 3 );
@@ -79,7 +79,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "integer" ).matching( 1 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -87,7 +87,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -95,7 +95,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "flattenedObject.string" ).matching( "text 1_1" ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -108,7 +108,7 @@ public class SmokeIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "string" ).from( "text 2" ).to( "text 42" ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
@@ -116,7 +116,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "string_analyzed" ).from( "2" ).to( "42" ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
@@ -124,7 +124,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "integer" ).from( 2 ).to( 42 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasHitCount( 2 );
@@ -135,7 +135,7 @@ public class SmokeIT {
 						.from( LocalDate.of( 2018, 1, 2 ) )
 						.to( LocalDate.of( 2018, 2, 23 ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
@@ -143,7 +143,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( "flattenedObject.integer" ).from( 201 ).to( 242 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
 				.hasHitCount( 1 );
@@ -159,7 +159,7 @@ public class SmokeIT {
 						.should( f.match().onField( "integer" ).matching( 1 ) )
 						.should( f.match().onField( "integer" ).matching( 2 ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
@@ -170,7 +170,7 @@ public class SmokeIT {
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.filter( f.match().onField( "integer" ).matching( 1 ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -181,7 +181,7 @@ public class SmokeIT {
 						.must( f.match().onField( "string_analyzed" ).matching( "text" ) )
 						.mustNot( f.match().onField( "integer" ).matching( 2 ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3" )
 				.hasHitCount( 2 );
@@ -198,7 +198,7 @@ public class SmokeIT {
 						.must( f.match().onField( "flattenedObject.string" ).matching( "text 1_2" ) )
 						.must( f.match().onField( "flattenedObject.integer" ).matching( 101 ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -207,7 +207,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "nestedObject.integer" ).matching( 101 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasNoHits()
 				.hasHitCount( 0 );
@@ -221,7 +221,7 @@ public class SmokeIT {
 								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasNoHits()
 				.hasHitCount( 0 );
@@ -235,7 +235,7 @@ public class SmokeIT {
 								.must( f.match().onField( "nestedObject.integer" ).matching( 101 ) )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -249,7 +249,7 @@ public class SmokeIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( predicate )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasHitCount( 1 );
@@ -258,7 +258,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( predicate )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
@@ -270,7 +270,7 @@ public class SmokeIT {
 		query = scope.query()
 				.asReference()
 				.predicate( predicate )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
 				.hasHitCount( 2 );
@@ -343,7 +343,7 @@ public class SmokeIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );
 	}

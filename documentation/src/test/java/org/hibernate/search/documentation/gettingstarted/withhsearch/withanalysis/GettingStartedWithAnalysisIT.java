@@ -85,7 +85,7 @@ public class GettingStartedWithAnalysisIT {
 							.onFields( "title", "authors.name" )
 							.matching( "refactor" )
 					)
-					.build();
+					.toQuery();
 
 			List<Book> result = query.getResultList();
 			// Not shown: commit the transaction and close the entity manager
@@ -106,7 +106,7 @@ public class GettingStartedWithAnalysisIT {
 								.onFields( "title", "authors.name" )
 								.matching( term )
 						)
-						.build();
+						.toQuery();
 				List<Book> result = query.getResultList();
 				assertThat( result ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )

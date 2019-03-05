@@ -59,7 +59,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -67,7 +67,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).boundingBox( BOUNDING_BOX_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -78,7 +78,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.boundingBox( BOUNDING_BOX_2.getTopLeft().getLatitude(), BOUNDING_BOX_2.getTopLeft().getLongitude(),
 								BOUNDING_BOX_2.getBottomRight().getLatitude(), BOUNDING_BOX_2.getBottomRight().getLongitude() )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -89,7 +89,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.boundingBox( BOUNDING_BOX_1.getTopLeft().getLatitude(), BOUNDING_BOX_1.getTopLeft().getLongitude(),
 								BOUNDING_BOX_1.getBottomRight().getLatitude(), BOUNDING_BOX_1.getBottomRight().getLongitude() )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -104,7 +104,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" )
 						.boundingBox( GeoBoundingBox.of( GeoPoint.of( 25, 23 ), GeoPoint.of( 24, 26 ) ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, ADDITIONAL_POINT_1_ID, ADDITIONAL_POINT_2_ID );
@@ -137,7 +137,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -149,7 +149,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -166,7 +166,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().boostedTo( 7 ).onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -178,7 +178,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -197,7 +197,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().boostedTo( 3 ).onField( "string" ).boostedTo( 3 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -211,7 +211,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().boostedTo( 2 ).onField( "string" ).boostedTo( 4 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -228,7 +228,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -240,7 +240,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -255,7 +255,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -263,7 +263,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).boundingBox( BOUNDING_BOX_2_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -275,7 +275,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_2 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -285,7 +285,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_1_1 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -295,7 +295,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.boundingBox( BOUNDING_BOX_2_2 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -305,7 +305,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -313,7 +313,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).boundingBox( BOUNDING_BOX_1_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -366,7 +366,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID, ADDITIONAL_POINT_1_ID,
 				ADDITIONAL_POINT_2_ID );
 	}

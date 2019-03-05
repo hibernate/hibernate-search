@@ -118,7 +118,7 @@ public class SearchMultiIndexIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -134,7 +134,7 @@ public class SearchMultiIndexIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).asc() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
@@ -146,7 +146,7 @@ public class SearchMultiIndexIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "sortField" ).desc() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
@@ -162,7 +162,7 @@ public class SearchMultiIndexIT {
 		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "sortField", String.class ) )
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
 				SORT_FIELD_1_1_1,
@@ -179,7 +179,7 @@ public class SearchMultiIndexIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "additionalField" ).matching( ADDITIONAL_FIELD_1_1_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1 );
 
@@ -194,7 +194,7 @@ public class SearchMultiIndexIT {
 		IndexSearchQuery<String> projectionQuery = scope.query()
 				.asProjection( f -> f.field( "additionalField", String.class ) )
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( projectionQuery ).hasHitsAnyOrder(
 			ADDITIONAL_FIELD_1_1_1,
@@ -322,7 +322,7 @@ public class SearchMultiIndexIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
 		// Backend 1 / Index 2
@@ -341,7 +341,7 @@ public class SearchMultiIndexIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 
 		// Backend 2 / Index 1
@@ -361,7 +361,7 @@ public class SearchMultiIndexIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_2_1, DOCUMENT_2_1_1, DOCUMENT_2_1_2 );
 	}
 

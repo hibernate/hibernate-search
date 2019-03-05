@@ -120,7 +120,7 @@ public class ProgrammaticMappingRoutingIT {
 					.asReference()
 					.predicate( f -> f.match().onField( "value" ).matching( "val1" ) )
 					.routing( "category_2" )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchReferences(
 					Collections.singletonList( IndexedEntity.INDEX ),

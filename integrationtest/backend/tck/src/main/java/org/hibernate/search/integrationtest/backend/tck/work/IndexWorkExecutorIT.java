@@ -131,7 +131,7 @@ public class IndexWorkExecutorIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query( sessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		Assertions.assertThat( query.executeCount() ).isEqualTo( bookNumber );
 	}

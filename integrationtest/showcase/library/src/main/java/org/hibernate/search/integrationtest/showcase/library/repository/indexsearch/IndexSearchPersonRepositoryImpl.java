@@ -49,7 +49,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 					c.byField( "lastName_sort" );
 					c.byField( "firstName_sort" );
 				} )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
@@ -62,7 +62,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 				.asEntity()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( borrowalsCountField ).desc() )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );

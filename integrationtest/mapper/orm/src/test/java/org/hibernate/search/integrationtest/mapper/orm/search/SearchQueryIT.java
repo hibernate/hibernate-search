@@ -79,7 +79,7 @@ public class SearchQueryIT {
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
@@ -110,7 +110,7 @@ public class SearchQueryIT {
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			query.setFirstResult( 2 );
 			query.setMaxResults( 3 );
@@ -142,7 +142,7 @@ public class SearchQueryIT {
 							scope.projection().field( "title", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchProjection(
 					Arrays.asList( Book.INDEX ),
@@ -180,7 +180,7 @@ public class SearchQueryIT {
 							scope.projection().field( "author", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchProjection(
 					Arrays.asList( Book.INDEX ),
@@ -251,7 +251,7 @@ public class SearchQueryIT {
 							)
 					)
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchProjection(
 					Arrays.asList( Book.INDEX ),
@@ -301,7 +301,7 @@ public class SearchQueryIT {
 							)
 					)
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchProjection(
 					Arrays.asList( Book.INDEX ),

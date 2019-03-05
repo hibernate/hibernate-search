@@ -111,7 +111,7 @@ public class MatchSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -129,7 +129,7 @@ public class MatchSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -146,7 +146,7 @@ public class MatchSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -162,7 +162,7 @@ public class MatchSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -178,7 +178,7 @@ public class MatchSearchPredicateIT {
 				.asReference()
 				// Use a stopword, which should be removed by the analysis
 				.predicate( f -> f.match().onField( fieldModel.relativeFieldName ).matching( "a" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -251,7 +251,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -267,7 +267,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -288,7 +288,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -304,7 +304,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -327,7 +327,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -345,7 +345,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -368,7 +368,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -386,7 +386,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -407,7 +407,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -423,7 +423,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -446,7 +446,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -464,7 +464,7 @@ public class MatchSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -482,7 +482,7 @@ public class MatchSearchPredicateIT {
 								.fuzzy()
 								.onField( absoluteFieldPath )
 								.matching( text ) )
-						.build();
+						.toQuery();
 
 		// max edit distance = default (2), ignored prefix length = default (0)
 		assertThat( createQuery.apply( "another word" ) )
@@ -507,7 +507,7 @@ public class MatchSearchPredicateIT {
 								.fuzzy( maxEditDistance )
 								.onField( absoluteFieldPath )
 								.matching( text ) )
-						.build();
+						.toQuery();
 
 		// max edit distance = 2
 		assertThat( createQuery.apply( "another word", 2 ) )
@@ -552,7 +552,7 @@ public class MatchSearchPredicateIT {
 								.fuzzy( 1, exactPrefixLength )
 								.onField( absoluteFieldPath )
 								.matching( text ) )
-						.build();
+						.toQuery();
 
 		// exact prefix length = 0
 		assertThat( createQuery.apply( "another word", 0 ) )
@@ -594,7 +594,7 @@ public class MatchSearchPredicateIT {
 		createQuery = param -> scope.query()
 				.asReference()
 				.predicate( f -> f.match().fuzzy().onField( absoluteFieldPath ).matching( param ) )
-				.build();
+				.toQuery();
 		assertThat( createQuery.apply( "Irving" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		assertThat( createQuery.apply( "Irvin" ) )
@@ -608,7 +608,7 @@ public class MatchSearchPredicateIT {
 				.asReference()
 				.predicate( f -> f.match().fuzzy( 2, 1 ).onField( absoluteFieldPath )
 						.matching( param ) )
-				.build();
+				.toQuery();
 		assertThat( createQuery.apply( "Irving" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 		assertThat( createQuery.apply( "irving" ) )
@@ -630,7 +630,7 @@ public class MatchSearchPredicateIT {
 		createQuery = param -> scope.query()
 				.asReference()
 				.predicate( f -> f.match().fuzzy().onFields( absoluteFieldPath1, absoluteFieldPath2 ).matching( param ) )
-				.build();
+				.toQuery();
 		assertThat( createQuery.apply( "word" ) ) // distance 1 from doc1:field2, 0 from doc2:field1
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		assertThat( createQuery.apply( "wd" ) ) // distance 3 from doc1:field2, 2 from doc2:field1
@@ -736,7 +736,7 @@ public class MatchSearchPredicateIT {
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -747,7 +747,7 @@ public class MatchSearchPredicateIT {
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -760,7 +760,7 @@ public class MatchSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -771,7 +771,7 @@ public class MatchSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -782,7 +782,7 @@ public class MatchSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string3Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -794,7 +794,7 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -804,7 +804,7 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.matching( indexMapping.string2Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -819,7 +819,7 @@ public class MatchSearchPredicateIT {
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.matching( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
@@ -833,7 +833,7 @@ public class MatchSearchPredicateIT {
 						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
@@ -918,7 +918,7 @@ public class MatchSearchPredicateIT {
 				IndexSearchQuery<DocumentReference> query = scope.query()
 						.asReference()
 						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch ) )
-						.build();
+						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 					b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -959,7 +959,7 @@ public class MatchSearchPredicateIT {
 				IndexSearchQuery<DocumentReference> query = scope.query()
 						.asReference()
 						.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( valueToMatch ) )
-						.build();
+						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 					b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -1067,17 +1067,17 @@ public class MatchSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 

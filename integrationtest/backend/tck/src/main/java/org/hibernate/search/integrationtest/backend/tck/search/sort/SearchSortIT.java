@@ -91,7 +91,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -132,7 +132,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
@@ -140,7 +140,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().desc() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
@@ -148,7 +148,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( predicate )
 				.sort( c -> c.byScore().asc() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
@@ -166,7 +166,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortAsc )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
@@ -174,7 +174,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortAsc ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 
@@ -186,7 +186,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortDesc )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
@@ -194,7 +194,7 @@ public class SearchSortIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sortDesc ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
@@ -468,7 +468,7 @@ public class SearchSortIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 

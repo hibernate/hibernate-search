@@ -104,7 +104,7 @@ public class NestedSearchPredicateIT {
 								)
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
@@ -144,7 +144,7 @@ public class NestedSearchPredicateIT {
 								)
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
 				.hasHitCount( 2 );
@@ -177,7 +177,7 @@ public class NestedSearchPredicateIT {
 								)
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
 				.hasHitCount( 1 );
@@ -221,7 +221,7 @@ public class NestedSearchPredicateIT {
 								.must( predicate2 )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
 				.hasHitCount( 1 );
@@ -348,7 +348,7 @@ public class NestedSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(
 						INDEX_NAME,

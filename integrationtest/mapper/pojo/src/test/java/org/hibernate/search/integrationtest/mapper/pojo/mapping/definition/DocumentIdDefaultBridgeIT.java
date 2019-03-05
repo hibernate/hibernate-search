@@ -138,7 +138,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 				SearchQuery<PojoReference> query = session.search( expectations.getTypeWithIdentifierBridge1() )
 						.asReference()
 						.predicate( f -> f.matchAll() )
-						.build();
+						.toQuery();
 
 				assertThat( query.execute().getHits() )
 						.containsExactly( new PojoReferenceImpl(

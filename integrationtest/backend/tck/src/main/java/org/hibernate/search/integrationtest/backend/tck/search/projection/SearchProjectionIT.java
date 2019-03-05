@@ -93,7 +93,7 @@ public class SearchProjectionIT {
 		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjections()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasHitCount( 4 );
 	}
@@ -126,7 +126,7 @@ public class SearchProjectionIT {
 						objectProjection
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1Reference, document1Reference );
 			b.list( document2Reference, document2Reference, document2Reference );
@@ -203,7 +203,7 @@ public class SearchProjectionIT {
 						objectProjection
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1TransformedReference, document1LoadedObject );
 			b.list( document2Reference, document2TransformedReference, document2LoadedObject );
@@ -222,7 +222,7 @@ public class SearchProjectionIT {
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byScore().desc() )
-				.build();
+				.toQuery();
 
 		IndexSearchResult<Float> result = query.execute();
 		assertThat( result ).hasHitCount( 2 );
@@ -255,7 +255,7 @@ public class SearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list(
 					indexMapping.string1Field.document1Value.indexedValue,
@@ -291,7 +291,7 @@ public class SearchProjectionIT {
 						.extendedProjection( "string1", String.class )
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
@@ -310,7 +310,7 @@ public class SearchProjectionIT {
 						.orElseFail()
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
@@ -330,7 +330,7 @@ public class SearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
@@ -350,7 +350,7 @@ public class SearchProjectionIT {
 						)
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 	}
@@ -384,7 +384,7 @@ public class SearchProjectionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
