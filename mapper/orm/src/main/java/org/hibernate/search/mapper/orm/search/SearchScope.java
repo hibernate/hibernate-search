@@ -9,12 +9,12 @@ package org.hibernate.search.mapper.orm.search;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
+import org.hibernate.search.mapper.orm.search.dsl.query.SearchQueryResultDefinitionContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface SearchScope<T> {
 
-	FullTextQueryResultDefinitionContext<T> search();
+	SearchQueryResultDefinitionContext<T> search();
 
 	SearchPredicateFactoryContext predicate();
 

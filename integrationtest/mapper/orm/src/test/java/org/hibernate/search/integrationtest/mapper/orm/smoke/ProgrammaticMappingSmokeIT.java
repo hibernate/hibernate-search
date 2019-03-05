@@ -32,8 +32,8 @@ import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.CustomTypeBr
 import org.hibernate.search.integrationtest.mapper.orm.smoke.bridge.IntegerAsStringValueBridge;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingDefinitionContainerContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
@@ -295,8 +295,8 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<ParentIndexedEntity> query = ftSession.search(
+			SearchSession searchSession = Search.getSearchSession( session );
+			SearchQuery<ParentIndexedEntity> query = searchSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.asEntity()

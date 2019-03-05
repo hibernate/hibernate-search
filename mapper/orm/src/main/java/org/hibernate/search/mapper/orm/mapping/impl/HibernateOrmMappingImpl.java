@@ -16,9 +16,9 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionBuilder;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
@@ -43,13 +43,13 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 	}
 
 	@Override
-	public FullTextSessionImplementor createFullTextSession(EntityManager entityManager) {
-		return createFullTextSessionBuilder( entityManager ).build();
+	public SearchSessionImplementor createSession(EntityManager entityManager) {
+		return createSessionBuilder( entityManager ).build();
 	}
 
 	@Override
-	public FullTextSessionBuilder createFullTextSessionWithOptions(EntityManager entityManager) {
-		return createFullTextSessionBuilder( entityManager );
+	public SearchSessionBuilder createSessionWithOptions(EntityManager entityManager) {
+		return createSessionBuilder( entityManager );
 	}
 
 	@Override
@@ -82,7 +82,7 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 		return getDelegate().createMappingWorkExecutor();
 	}
 
-	private FullTextSessionBuilder createFullTextSessionBuilder(EntityManager entityManager) {
+	private SearchSessionBuilder createSessionBuilder(EntityManager entityManager) {
 		SessionImplementor sessionImplementor = entityManager.unwrap( SessionImplementor.class );
 
 		SessionFactory expectedSessionFactory = mappingContext.getSessionFactory();
@@ -92,6 +92,6 @@ public class HibernateOrmMappingImpl extends AbstractPojoMappingImplementor<Hibe
 			throw log.usingDifferentSessionFactories( expectedSessionFactory, givenSessionFactory );
 		}
 
-		return new HibernateOrmSearchManager.HibernateOrmSearchManagerBuilder( getDelegate(), mappingContext, sessionImplementor );
+		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder( getDelegate(), mappingContext, sessionImplementor );
 	}
 }

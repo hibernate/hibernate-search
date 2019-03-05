@@ -16,8 +16,8 @@ import org.hibernate.boot.SessionFactoryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.search.integrationtest.java.module.entity.Author;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 public class AuthorService implements AutoCloseable {
@@ -59,8 +59,8 @@ public class AuthorService implements AutoCloseable {
 
 	public List<Author> search(String term) {
 		try ( Session session = sessionFactory.openSession() ) {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<Author> query = ftSession.search( Author.class )
+			SearchSession ftSession = Search.getSearchSession( session );
+			SearchQuery<Author> query = ftSession.search( Author.class )
 					.asEntity()
 					.predicate( p -> p.match().onField( "name" ).matching( term ) )
 					.build();

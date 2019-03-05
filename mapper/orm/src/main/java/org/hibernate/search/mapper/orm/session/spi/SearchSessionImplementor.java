@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.session.spi;
 
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
-public interface FullTextSessionImplementor extends AutoCloseable, FullTextSession {
+public interface SearchSessionImplementor extends AutoCloseable, SearchSession {
 
 	@Override
 	void close();

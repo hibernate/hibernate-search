@@ -12,7 +12,7 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.query.Query;
 
-public interface FullTextQuery<T> {
+public interface SearchQuery<T> {
 
 	List<T> getResultList();
 
@@ -22,11 +22,11 @@ public interface FullTextQuery<T> {
 
 	long getResultSize();
 
-	FullTextQuery<T> setMaxResults(int maxResults);
+	SearchQuery<T> setMaxResults(int maxResults);
 
-	FullTextQuery<T> setFirstResult(int firstResult);
+	SearchQuery<T> setFirstResult(int firstResult);
 
-	FullTextQuery<T> setFetchSize(int fetchSize);
+	SearchQuery<T> setFetchSize(int fetchSize);
 
 	TypedQuery<T> toJpaQuery();
 

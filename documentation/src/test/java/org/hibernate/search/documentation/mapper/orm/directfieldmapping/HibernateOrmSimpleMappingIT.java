@@ -15,9 +15,9 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -97,11 +97,11 @@ public class HibernateOrmSimpleMappingIT {
 	public void sort_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::sort-simple-objects[]
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchScope<Book> scope = fullTextSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			FullTextQuery<Book> query = scope.search()
+			SearchQuery<Book> query = scope.search()
 					.asEntity()
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort(
@@ -122,9 +122,9 @@ public class HibernateOrmSimpleMappingIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::sort-simple-lambdas[]
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class ) // <1>
+			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc() // <2>
@@ -145,11 +145,11 @@ public class HibernateOrmSimpleMappingIT {
 	public void projection_simple() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-simple-objects[]
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			SearchScope<Book> scope = fullTextSession.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			FullTextQuery<String> query = scope.search()
+			SearchQuery<String> query = scope.search()
 					.asProjection( scope.projection().field( "title", String.class ).toProjection() )
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.build();
@@ -163,9 +163,9 @@ public class HibernateOrmSimpleMappingIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-simple-lambdas[]
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			FullTextQuery<String> query = fullTextSession.search( Book.class ) // <1>
+			SearchQuery<String> query = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -182,9 +182,9 @@ public class HibernateOrmSimpleMappingIT {
 	public void projection_advanced() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::projection-advanced[]
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextSession.search( Book.class )
+			SearchQuery<MyEntityAndScoreBean<Book>> query = searchSession.search( Book.class )
 					.asProjection( f -> f.composite(
 							MyEntityAndScoreBean::new,
 							f.object(),

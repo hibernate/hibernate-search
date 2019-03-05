@@ -13,18 +13,18 @@ import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTerminalContext;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-public interface FullTextQueryResultDefinitionContext<O> {
+public interface SearchQueryResultDefinitionContext<O> {
 
-	SearchQueryResultContext<? extends FullTextQuery<O>> asEntity();
+	SearchQueryResultContext<? extends SearchQuery<O>> asEntity();
 
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
+	<T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
-	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(SearchProjection<T> projection);
+	<T> SearchQueryResultContext<? extends SearchQuery<T>> asProjection(SearchProjection<T> projection);
 
-	SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections);
+	SearchQueryResultContext<? extends SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 
 }

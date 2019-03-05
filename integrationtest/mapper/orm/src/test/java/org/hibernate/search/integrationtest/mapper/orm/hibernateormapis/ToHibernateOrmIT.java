@@ -18,8 +18,8 @@ import javax.persistence.Table;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -78,16 +78,16 @@ public class ToHibernateOrmIT {
 	@Test
 	public void toHibernateOrmSession() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			assertThat( ftSession.toHibernateOrmSession() ).isSameAs( session );
+			SearchSession searchSession = Search.getSearchSession( session );
+			assertThat( searchSession.toHibernateOrmSession() ).isSameAs( session );
 		} );
 	}
 
 	@Test
 	public void toHibernateOrmQuery() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( ftSession ).toHibernateOrmQuery();
+			SearchSession searchSession = Search.getSearchSession( session );
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
 			assertThat( query ).isNotNull();
 		} );
 	}
@@ -95,8 +95,8 @@ public class ToHibernateOrmIT {
 	@Test
 	public void list() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( ftSession ).toHibernateOrmQuery();
+			SearchSession searchSession = Search.getSearchSession( session );
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -120,8 +120,8 @@ public class ToHibernateOrmIT {
 	@Test
 	public void uniqueResult() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( ftSession ).toHibernateOrmQuery();
+			SearchSession searchSession = Search.getSearchSession( session );
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -166,8 +166,8 @@ public class ToHibernateOrmIT {
 	@Test
 	public void pagination() {
 		OrmUtils.withinSession( sessionFactory, session -> {
-			FullTextSession ftSession = Search.getFullTextSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( ftSession ).toHibernateOrmQuery();
+			SearchSession searchSession = Search.getSearchSession( session );
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );
@@ -190,8 +190,8 @@ public class ToHibernateOrmIT {
 		} );
 	}
 
-	private FullTextQuery<IndexedEntity> createSimpleQuery(FullTextSession ftSession) {
-		return ftSession.search( IndexedEntity.class )
+	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
+		return searchSession.search( IndexedEntity.class )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
 				.build();

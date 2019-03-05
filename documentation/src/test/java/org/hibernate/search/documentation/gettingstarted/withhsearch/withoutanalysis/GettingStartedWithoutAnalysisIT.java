@@ -15,9 +15,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
+import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -84,9 +84,9 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			try {
 			// tag::manual-index[]
-				FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
+				SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
-				MassIndexer indexer = fullTextSession.createIndexer( Book.class ) // <2>
+				MassIndexer indexer = searchSession.createIndexer( Book.class ) // <2>
 						.threadsToLoadObjects( 7 ); // <3>
 
 				indexer.startAndWait(); // <4>
@@ -100,11 +100,11 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-objects[]
 			// Not shown: get the entity manager and open a transaction
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
+			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
-			SearchScope<Book> scope = fullTextSession.scope( Book.class ); // <2>
+			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
-			FullTextQuery<Book> query = scope.search() // <3>
+			SearchQuery<Book> query = scope.search() // <3>
 					.asEntity() // <4>
 					.predicate( scope.predicate().match() // <5>
 							.onFields( "title", "authors.name" )
@@ -124,9 +124,9 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::searching-lambdas[]
 			// Not shown: get the entity manager and open a transaction
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
+			SearchSession searchSession = Search.getSearchSession( entityManager ); // <1>
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class ) // <2>
+			SearchQuery<Book> query = searchSession.search( Book.class ) // <2>
 					.asEntity() // <3>
 					.predicate( f -> f.match() // <4>
 							.onFields( "title", "authors.name" )
@@ -145,9 +145,9 @@ public class GettingStartedWithoutAnalysisIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::counting[]
 			// Not shown: get the entity manager and open a transaction
-			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
+			SearchSession searchSession = Search.getSearchSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class )
+			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
 					.predicate( f -> f.match()
 							.onFields( "title", "authors.name" )

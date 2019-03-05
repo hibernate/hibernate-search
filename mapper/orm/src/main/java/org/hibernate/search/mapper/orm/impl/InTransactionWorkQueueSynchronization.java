@@ -46,7 +46,7 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 			CompletableFuture<?> future = workPlan.execute();
 			/*
 			 * TODO decide whether we want the sync/async setting to be scoped per index,
-			 * or per EntityManager/FullTextSession, or both (with one scope overriding the other).
+			 * or per EntityManager/SearchSession, or both (with one scope overriding the other).
 			 * See also PostTransactionWorkQueueSynchronization#afterCompletion
 			 */
 			future.join();

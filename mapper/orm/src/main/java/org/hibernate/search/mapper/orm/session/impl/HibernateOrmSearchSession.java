@@ -16,9 +16,9 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.search.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.orm.session.FullTextSession;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
-import org.hibernate.search.mapper.orm.session.spi.FullTextSessionBuilder;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionImplementor;
+import org.hibernate.search.mapper.orm.session.spi.SearchSessionBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
@@ -29,13 +29,13 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionC
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
 /**
- * The actual implementation of {@link FullTextSession}.
+ * The actual implementation of {@link SearchSession}.
  */
-public class HibernateOrmSearchManager extends AbstractPojoSearchManager
-		implements FullTextSessionImplementor, FullTextSession {
+public class HibernateOrmSearchSession extends AbstractPojoSearchManager
+		implements SearchSessionImplementor, SearchSession {
 	private final SessionImplementor sessionImplementor;
 
-	private HibernateOrmSearchManager(HibernateOrmSearchManagerBuilder builder) {
+	private HibernateOrmSearchSession(HibernateOrmSearchSessionBuilder builder) {
 		super( builder );
 		this.sessionImplementor = builder.sessionImplementor;
 	}
@@ -81,12 +81,12 @@ public class HibernateOrmSearchManager extends AbstractPojoSearchManager
 		return getDelegate().createSessionWorkExecutor();
 	}
 
-	public static class HibernateOrmSearchManagerBuilder extends AbstractBuilder<HibernateOrmSearchManager>
-			implements FullTextSessionBuilder {
+	public static class HibernateOrmSearchSessionBuilder extends AbstractBuilder<HibernateOrmSearchSession>
+			implements SearchSessionBuilder {
 		private final HibernateOrmMappingContextImpl mappingContext;
 		private final SessionImplementor sessionImplementor;
 
-		public HibernateOrmSearchManagerBuilder(PojoMappingDelegate mappingDelegate,
+		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
 				HibernateOrmMappingContextImpl mappingContext,
 				SessionImplementor sessionImplementor) {
 			super( mappingDelegate );
@@ -100,8 +100,8 @@ public class HibernateOrmSearchManager extends AbstractPojoSearchManager
 		}
 
 		@Override
-		public HibernateOrmSearchManager build() {
-			return new HibernateOrmSearchManager( this );
+		public HibernateOrmSearchSession build() {
+			return new HibernateOrmSearchSession( this );
 		}
 	}
 }
