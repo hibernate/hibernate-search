@@ -14,13 +14,13 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchManagerDelegate;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
+class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -28,7 +28,7 @@ class PojoSearchManagerDelegateImpl implements PojoSearchManagerDelegate {
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 	private final AbstractPojoSessionContextImplementor sessionContext;
 
-	PojoSearchManagerDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+	PojoSearchSessionDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers,
 			AbstractPojoSessionContextImplementor sessionContext) {
 		this.indexedTypeManagers = indexedTypeManagers;

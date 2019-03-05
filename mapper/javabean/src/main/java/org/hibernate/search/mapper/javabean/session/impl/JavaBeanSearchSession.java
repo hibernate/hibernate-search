@@ -20,9 +20,9 @@ import org.hibernate.search.mapper.javabean.work.impl.SearchWorkPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
-import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchManager;
+import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 
-public class JavaBeanSearchSession extends AbstractPojoSearchManager implements SearchSession {
+public class JavaBeanSearchSession extends AbstractPojoSearchSession implements SearchSession {
 	private SearchWorkPlanImpl workPlan;
 
 	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
 
-public interface PojoSearchManagerDelegate {
+public interface PojoSearchSessionDelegate {
 
 	<E, O> PojoSearchScopeDelegate<E, O> createPojoSearchScope(Collection<? extends Class<? extends E>> targetedTypes);
 

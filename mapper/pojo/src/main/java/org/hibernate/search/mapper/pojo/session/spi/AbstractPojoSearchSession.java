@@ -10,19 +10,19 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 
 
-public abstract class AbstractPojoSearchManager {
+public abstract class AbstractPojoSearchSession {
 
-	private final PojoSearchManagerDelegate delegate;
+	private final PojoSearchSessionDelegate delegate;
 
-	protected AbstractPojoSearchManager(AbstractBuilder<? extends AbstractPojoSearchManager> builder) {
-		this.delegate = builder.mappingDelegate.createSearchManagerDelegate( builder.buildSessionContext() );
+	protected AbstractPojoSearchSession(AbstractBuilder<? extends AbstractPojoSearchSession> builder) {
+		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( builder.buildSessionContext() );
 	}
 
-	protected final PojoSearchManagerDelegate getDelegate() {
+	protected final PojoSearchSessionDelegate getDelegate() {
 		return delegate;
 	}
 
-	protected abstract static class AbstractBuilder<T extends AbstractPojoSearchManager> {
+	protected abstract static class AbstractBuilder<T extends AbstractPojoSearchSession> {
 
 		private final PojoMappingDelegate mappingDelegate;
 
