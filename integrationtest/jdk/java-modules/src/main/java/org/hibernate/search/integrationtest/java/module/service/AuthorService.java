@@ -60,7 +60,7 @@ public class AuthorService implements AutoCloseable {
 	public List<Author> search(String term) {
 		try ( Session session = sessionFactory.openSession() ) {
 			FullTextSession ftSession = Search.getFullTextSession( session );
-			FullTextQuery<Author> query = ftSession.search( Author.class ).query()
+			FullTextQuery<Author> query = ftSession.search( Author.class )
 					.asEntity()
 					.predicate( p -> p.match().onField( "name" ).matching( term ) )
 					.build();

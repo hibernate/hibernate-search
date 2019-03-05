@@ -28,7 +28,7 @@ public class FullTextSearchTargetImpl<O> implements FullTextSearchTarget<O> {
 	}
 
 	@Override
-	public FullTextQueryResultDefinitionContext<O> query() {
+	public FullTextQueryResultDefinitionContext<O> search() {
 		return new FullTextQueryResultDefinitionContextImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 

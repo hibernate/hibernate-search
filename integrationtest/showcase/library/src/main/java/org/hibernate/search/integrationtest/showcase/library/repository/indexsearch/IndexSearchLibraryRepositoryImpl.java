@@ -27,7 +27,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 			return Collections.emptyList();
 		}
 		FullTextQuery<Library> query = Search.getFullTextSession( entityManager )
-				.search( Library.class ).query()
+				.search( Library.class )
 				.asEntity()
 				.predicate( f -> f.match().onField( "name" ).matching( terms ) )
 				.sort( c -> {

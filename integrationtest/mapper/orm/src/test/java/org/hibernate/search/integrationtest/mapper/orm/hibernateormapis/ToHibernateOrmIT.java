@@ -192,7 +192,6 @@ public class ToHibernateOrmIT {
 
 	private FullTextQuery<IndexedEntity> createSimpleQuery(FullTextSession ftSession) {
 		return ftSession.search( IndexedEntity.class )
-				.query()
 				.asEntity()
 				.predicate( f -> f.matchAll() )
 				.build();

@@ -77,7 +77,6 @@ public class SearchQueryIT {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
 			FullTextQuery<Book> query = ftSession.search( Book.class )
-					.query()
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -109,7 +108,6 @@ public class SearchQueryIT {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
 			FullTextQuery<Book> query = ftSession.search( Book.class )
-					.query()
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -137,10 +135,9 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			FullTextSearchTarget<Book> searchTarget = ftSession.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = ftSession.target( Book.class );
 
-			FullTextQuery<String> query = searchTarget
-					.query()
+			FullTextQuery<String> query = searchTarget.search()
 					.asProjection(
 							searchTarget.projection().field( "title", String.class ).toProjection()
 					)
@@ -173,10 +170,9 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			FullTextSearchTarget<Book> searchTarget = ftSession.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = ftSession.target( Book.class );
 
-			FullTextQuery<List<?>> query = searchTarget
-					.query()
+			FullTextQuery<List<?>> query = searchTarget.search()
 					.asProjections(
 							searchTarget.projection().field( "title", String.class ).toProjection(),
 							searchTarget.projection().reference().toProjection(),
@@ -243,7 +239,6 @@ public class SearchQueryIT {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
 			FullTextQuery<Book_Author_Score> query = ftSession.search( Book.class )
-					.query()
 					.asProjection( f ->
 							f.composite(
 									Book_Author_Score::new,
@@ -294,7 +289,6 @@ public class SearchQueryIT {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
 			FullTextQuery<Book_Author_Score> query = ftSession.search( Book.class )
-					.query()
 					.asProjection( f ->
 							f.composite(
 									Book_Author_Score::new,

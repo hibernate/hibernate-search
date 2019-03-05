@@ -299,7 +299,6 @@ public class ProgrammaticMappingSmokeIT {
 			FullTextQuery<ParentIndexedEntity> query = ftSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
-					.query()
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.build();

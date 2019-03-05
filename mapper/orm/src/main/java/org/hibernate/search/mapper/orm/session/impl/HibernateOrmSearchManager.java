@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.session.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.persistence.EntityManager;
 
@@ -57,13 +56,8 @@ public class HibernateOrmSearchManager extends AbstractPojoSearchManager
 	}
 
 	@Override
-	public <T> FullTextSearchTarget<T> search(Class<T> targetedType) {
-		return search( Collections.singleton( targetedType ) );
-	}
-
-	@Override
-	public <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
-		PojoSearchTargetDelegate<T, T> searchTargetDelegate = getDelegate().createPojoSearchTarget( targetedTypes );
+	public <T> FullTextSearchTarget<T> target(Collection<? extends Class<? extends T>> types) {
+		PojoSearchTargetDelegate<T, T> searchTargetDelegate = getDelegate().createPojoSearchTarget( types );
 		return new FullTextSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
