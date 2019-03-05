@@ -13,24 +13,24 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.query.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackend;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 
 public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQueryElementCollector> {
 
 	private final StubBackend backend;
-	private final StubSearchTargetModel searchTargetModel;
+	private final StubSearchScopeModel scopeModel;
 	private final StubSearchWork.Builder workBuilder;
 	private final FromDocumentFieldValueConvertContext convertContext;
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final StubSearchProjection<T> rootProjection;
 
-	public StubSearchQueryBuilder(StubBackend backend, StubSearchTargetModel searchTargetModel,
+	public StubSearchQueryBuilder(StubBackend backend, StubSearchScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
 			FromDocumentFieldValueConvertContext convertContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, StubSearchProjection<T> rootProjection) {
 		this.backend = backend;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 		this.workBuilder = StubSearchWork.builder( resultType );
 		this.convertContext = convertContext;
 		this.projectionHitMapper = projectionHitMapper;
@@ -50,7 +50,7 @@ public class StubSearchQueryBuilder<T> implements SearchQueryBuilder<T, StubQuer
 	@Override
 	public <Q> Q build(Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
 		StubIndexSearchQuery<T> searchQuery = new StubIndexSearchQuery<>(
-				backend, searchTargetModel.getIndexNames(), workBuilder, convertContext,
+				backend, scopeModel.getIndexNames(), workBuilder, convertContext,
 				projectionHitMapper, rootProjection
 		);
 

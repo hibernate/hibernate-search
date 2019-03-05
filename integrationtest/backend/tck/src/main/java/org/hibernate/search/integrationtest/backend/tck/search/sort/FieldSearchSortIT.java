@@ -43,7 +43,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldM
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -123,11 +123,11 @@ public class FieldSearchSortIT {
 	}
 
 	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		return simpleQuery( sortContributor, indexManager.createSearchTarget() );
+		return simpleQuery( sortContributor, indexManager.createSearchScope() );
 	}
 
-	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingSearchTarget searchTarget) {
-		return searchTarget.query()
+	private IndexSearchQuery<DocumentReference> simpleQuery(Consumer<? super SearchSortContainerContext> sortContributor, StubMappingSearchScope scope) {
+		return scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -308,13 +308,13 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void error_unsortable() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedNonSortableFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException( () -> {
-					searchTarget.sort().byField( fieldPath );
+					scope.sort().byField( fieldPath );
 			} ).assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Sorting is not enabled for field" )
@@ -327,7 +327,7 @@ public class FieldSearchSortIT {
 		Assume.assumeTrue( "Errors on attempt to sort on unknown fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on unknown fields
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = "unknownField";
 
@@ -336,7 +336,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
+		scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -348,7 +348,7 @@ public class FieldSearchSortIT {
 		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on object fields
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName;
 
@@ -357,7 +357,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
+		scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -369,7 +369,7 @@ public class FieldSearchSortIT {
 		Assume.assumeTrue( "Errors on attempt to sort on object fields are not supported yet", false );
 		// TODO throw an error on attempts to sort on object fields
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName;
 
@@ -378,7 +378,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( absoluteFieldPath );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.query()
+		scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( absoluteFieldPath ) )
@@ -387,7 +387,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void error_invalidType() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		List<ByTypeFieldModel<?>> fieldModels = new ArrayList<>();
 		fieldModels.addAll( indexMapping.supportedFieldModels );
@@ -403,7 +403,7 @@ public class FieldSearchSortIT {
 			) {
 				SubTest.expectException(
 						"byField() sort with invalid parameter type for onMissingValue().use() on field " + absoluteFieldPath,
-						() -> searchTarget.sort().byField( absoluteFieldPath ).onMissingValue()
+						() -> scope.sort().byField( absoluteFieldPath ).onMissingValue()
 								.use( invalidValueToMatch )
 				)
 						.assertThrown()
@@ -420,7 +420,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withCompatibleIndexManager_usingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			IndexSearchQuery<DocumentReference> query;
@@ -432,7 +432,7 @@ public class FieldSearchSortIT {
 							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.before1Value ), searchTarget );
+						.use( fieldModel.before1Value ), scope );
 
 				/*
 				 * Not testing the ordering of results here because some documents have the same value.
@@ -452,7 +452,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -460,7 +460,7 @@ public class FieldSearchSortIT {
 			SubTest.expectException(
 					() -> {
 						simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), scope );
 					}
 			)
 					.assertThrown()
@@ -475,7 +475,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withRawFieldCompatibleIndexManager_usingRawField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			IndexSearchQuery<DocumentReference> query;
@@ -487,7 +487,7 @@ public class FieldSearchSortIT {
 							&& ( TckConfiguration.get().getBackendFeatures().localDateTypeOnMissingValueUse() || !isJavaTimeType( fieldModel.type ) )
 			) {
 				query = simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
-						.use( fieldModel.before1Value ), searchTarget );
+						.use( fieldModel.before1Value ), scope );
 
 				/*
 				 * Not testing the ordering of results here because some documents have the same value.
@@ -507,7 +507,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withNoCompatibleIndexManager_usingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -515,7 +515,7 @@ public class FieldSearchSortIT {
 			SubTest.expectException(
 					() -> {
 						simpleQuery( b -> b.byField( fieldPath ).asc().onMissingValue()
-								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), scope );
 					}
 			)
 					.assertThrown()
@@ -530,7 +530,7 @@ public class FieldSearchSortIT {
 
 	@Test
 	public void multiIndex_withNoCompatibleIndexManager_usingRawField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -538,7 +538,7 @@ public class FieldSearchSortIT {
 			SubTest.expectException(
 					() -> {
 						simpleQuery( b -> b.byRawField( fieldPath ).asc().onMissingValue()
-								.use( new ValueWrapper<>( fieldModel.before1Value ) ), searchTarget );
+								.use( new ValueWrapper<>( fieldModel.before1Value ) ), scope );
 					}
 			)
 					.assertThrown()
@@ -632,17 +632,17 @@ public class FieldSearchSortIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createSearchTarget().query()
+		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
-		query = rawFieldCompatibleIndexManager.createSearchTarget().query()
+		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

@@ -27,15 +27,15 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.function.TriFunction;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 
 public class StubSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
-	private final StubSearchTargetModel targetModel;
+	private final StubSearchScopeModel scopeModel;
 
-	public StubSearchProjectionBuilderFactory(StubSearchTargetModel targetModel) {
-		this.targetModel = targetModel;
+	public StubSearchProjectionBuilderFactory(StubSearchScopeModel scopeModel) {
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class StubSearchProjectionBuilderFactory implements SearchProjectionBuild
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
-		StubFieldConverter<?> converter = targetModel.getFieldConverter( absoluteFieldPath );
+		StubFieldConverter<?> converter = scopeModel.getFieldConverter( absoluteFieldPath );
 		return new FieldProjectionBuilder<T>() {
 			@Override
 			public SearchProjection<T> build() {

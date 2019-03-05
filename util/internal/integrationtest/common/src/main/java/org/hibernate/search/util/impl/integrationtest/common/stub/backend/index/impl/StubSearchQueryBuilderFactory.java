@@ -19,7 +19,7 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchQueryBuilder;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchTargetModel;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubSearchScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubCompositeListSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubObjectSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubReferenceSearchProjection;
@@ -27,18 +27,18 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 
 class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQueryElementCollector> {
 	private final StubBackend backend;
-	private final StubSearchTargetModel targetModel;
+	private final StubSearchScopeModel scopeModel;
 
-	StubSearchQueryBuilderFactory(StubBackend backend, StubSearchTargetModel targetModel) {
+	StubSearchQueryBuilderFactory(StubBackend backend, StubSearchScopeModel scopeModel) {
 		this.backend = backend;
-		this.targetModel = targetModel;
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
 	public <O> SearchQueryBuilder<O, StubQueryElementCollector> asObject(SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, O> projectionHitMapper) {
 		return new StubSearchQueryBuilder<>(
-				backend, targetModel, StubSearchWork.ResultType.OBJECTS,
+				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				StubObjectSearchProjection.get()
@@ -49,7 +49,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asReference(SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper) {
 		return new StubSearchQueryBuilder<>(
-				backend, targetModel, StubSearchWork.ResultType.REFERENCES,
+				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				StubReferenceSearchProjection.get()
@@ -60,7 +60,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	public <T> SearchQueryBuilder<T, StubQueryElementCollector> asProjection(SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<T> projection) {
 		return new StubSearchQueryBuilder<>(
-				backend, targetModel, StubSearchWork.ResultType.PROJECTIONS,
+				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				(StubSearchProjection<T>) projection
@@ -71,7 +71,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	public SearchQueryBuilder<List<?>, StubQueryElementCollector> asProjections(SessionContextImplementor sessionContext,
 			ProjectionHitMapper<?, ?> projectionHitMapper, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
-				backend, targetModel, StubSearchWork.ResultType.PROJECTIONS,
+				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
 				new FromDocumentFieldValueConvertContextImpl( sessionContext ),
 				projectionHitMapper,
 				createRootProjection( projections )

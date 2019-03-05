@@ -15,12 +15,12 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionCon
  * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  * <p>
- * This is a simpler version of {@link GenericStubMappingSearchTarget} that allows user to skip the generic parameters.
+ * This is a simpler version of {@link GenericStubMappingSearchScope} that allows user to skip the generic parameters.
  */
-public class StubMappingSearchTarget extends GenericStubMappingSearchTarget<DocumentReference, DocumentReference> {
+public class StubMappingSearchScope extends GenericStubMappingSearchScope<DocumentReference, DocumentReference> {
 
-	StubMappingSearchTarget(MappedIndexSearchScope<DocumentReference, DocumentReference> indexSearchTarget) {
-		super( indexSearchTarget );
+	StubMappingSearchScope(MappedIndexSearchScope<DocumentReference, DocumentReference> delegate) {
+		super( delegate );
 	}
 
 	public StubMappingQueryResultDefinitionContext<DocumentReference, DocumentReference> query() {

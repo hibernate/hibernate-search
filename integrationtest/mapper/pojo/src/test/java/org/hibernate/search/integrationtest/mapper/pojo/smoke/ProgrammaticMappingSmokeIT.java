@@ -490,17 +490,17 @@ public class ProgrammaticMappingSmokeIT {
 	@Test
 	public void search_multipleElementsProjection() {
 		try ( JavaBeanSearchManager manager = mapping.createSearchManager() ) {
-			JavaBeanSearchScope searchTarget = manager.scope(
+			JavaBeanSearchScope scope = manager.scope(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			);
 
-			SearchQuery<List<?>> query = searchTarget.search()
+			SearchQuery<List<?>> query = scope.search()
 					.asProjections(
-							searchTarget.projection().field( "myTextField", String.class ).toProjection(),
-							searchTarget.projection().reference().toProjection(),
-							searchTarget.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
-							searchTarget.projection().documentReference().toProjection(),
-							searchTarget.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
+							scope.projection().field( "myTextField", String.class ).toProjection(),
+							scope.projection().reference().toProjection(),
+							scope.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),
+							scope.projection().documentReference().toProjection(),
+							scope.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
 					.build();

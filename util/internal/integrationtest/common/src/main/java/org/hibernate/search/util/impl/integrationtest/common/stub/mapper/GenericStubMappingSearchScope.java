@@ -17,12 +17,12 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionCon
  * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
-public class GenericStubMappingSearchTarget<R, O> {
+public class GenericStubMappingSearchScope<R, O> {
 
-	private final MappedIndexSearchScope<R, O> indexSearchTarget;
+	private final MappedIndexSearchScope<R, O> delegate;
 
-	GenericStubMappingSearchTarget(MappedIndexSearchScope<R, O> indexSearchTarget) {
-		this.indexSearchTarget = indexSearchTarget;
+	GenericStubMappingSearchScope(MappedIndexSearchScope<R, O> delegate) {
+		this.delegate = delegate;
 	}
 
 	public StubMappingQueryResultDefinitionContext<R, O> query(ObjectLoader<R, O> objectLoader) {
@@ -32,20 +32,20 @@ public class GenericStubMappingSearchTarget<R, O> {
 	public StubMappingQueryResultDefinitionContext<R, O> query(StubSessionContext sessionContext,
 			ObjectLoader<R, O> objectLoader) {
 		return new StubMappingQueryResultDefinitionContext<>(
-				indexSearchTarget, sessionContext,
+				delegate, sessionContext,
 				objectLoader
 		);
 	}
 
 	public SearchPredicateFactoryContext predicate() {
-		return indexSearchTarget.predicate();
+		return delegate.predicate();
 	}
 
 	public SearchSortContainerContext sort() {
-		return indexSearchTarget.sort();
+		return delegate.sort();
 	}
 
 	public SearchProjectionFactoryContext<R, O> projection() {
-		return indexSearchTarget.projection();
+		return delegate.projection();
 	}
 }

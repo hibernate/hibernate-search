@@ -37,7 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
@@ -106,14 +106,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void simple() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -129,13 +129,13 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void noClass() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			IndexSearchQuery<Object> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			query = searchTarget.query()
+			query = scope.query()
 					.asProjection( f -> f.field( fieldPath ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -150,9 +150,9 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void validSuperClass() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<CharSequence> query = searchTarget.query()
+		IndexSearchQuery<CharSequence> query = scope.query()
 				.asProjection( f ->
 						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class )
 				)
@@ -173,14 +173,14 @@ public class FieldSearchProjectionIT {
 		thrown.expectMessage( "must not be null" );
 		thrown.expectMessage( "clazz" );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, null ).toProjection();
+		scope.projection().field( indexMapping.string1Field.relativeFieldName, null ).toProjection();
 	}
 
 	@Test
 	public void error_invalidProjectionType() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -189,7 +189,7 @@ public class FieldSearchProjectionIT {
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
 			SubTest.expectException(
-					() -> searchTarget.projection().field( fieldPath, wrongType ).toProjection()
+					() -> scope.projection().field( fieldPath, wrongType ).toProjection()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -201,7 +201,7 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_invalidProjectionType_rawField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
@@ -210,7 +210,7 @@ public class FieldSearchProjectionIT {
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
 			SubTest.expectException(
-					() -> searchTarget.projection().rawField( fieldPath, wrongType ).toProjection()
+					() -> scope.projection().rawField( fieldPath, wrongType ).toProjection()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -222,50 +222,50 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_unknownField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "unknownField" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.projection().field( "unknownField", Object.class );
+		scope.projection().field( "unknownField", Object.class );
 	}
 
 	@Test
 	public void error_objectField_nested() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "nestedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.projection().field( "nestedObject", Object.class );
+		scope.projection().field( "nestedObject", Object.class );
 	}
 
 	@Test
 	public void error_objectField_flattened() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "flattenedObject" );
 		thrown.expectMessage( INDEX_NAME );
 
-		searchTarget.projection().field( "flattenedObject", Object.class );
+		scope.projection().field( "flattenedObject", Object.class );
 	}
 
 	@Test
 	public void error_nonProjectable() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedNonProjectableFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 			Class<?> fieldType = fieldModel.type;
 
 			SubTest.expectException( () -> {
-				searchTarget.projection().field( fieldPath, fieldType ).toProjection();
+				scope.projection().field( fieldPath, fieldType ).toProjection();
 			} ).assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Projections are not enabled for field" )
@@ -275,14 +275,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			@SuppressWarnings("rawtypes") // The projection DSL only allows to work with raw types, not with parameterized types
 					IndexSearchQuery<ValueWrapper> query;
 			String fieldPath = fieldModel.relativeFieldName;
 
-			query = searchTarget.query()
+			query = scope.query()
 					.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -297,14 +297,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters_rawValues() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.rawField( fieldPath, model.type ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -320,14 +320,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void withProjectionConverters_rawValues_withoutType() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.rawField( fieldPath ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -350,9 +350,9 @@ public class FieldSearchProjectionIT {
 		thrown.expectMessage( "for projection on field" );
 		thrown.expectMessage( fieldModel.relativeFieldName );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		searchTarget.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
+		scope.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
 	}
 
 	/**
@@ -360,14 +360,14 @@ public class FieldSearchProjectionIT {
 	 */
 	@Test
 	public void duplicated() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f ->
 										f.composite(
 												f.field( fieldPath, model.type ),
@@ -388,14 +388,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void inFlattenedObject() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection(
 										f -> f.field( fieldPath, model.type )
 								)
@@ -416,14 +416,14 @@ public class FieldSearchProjectionIT {
 		Assume.assumeTrue( "Projections on fields within nested object fields are not supported yet", false );
 		// TODO HSEARCH-3062 support projections on fields within nested object fields
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -451,14 +451,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void multiIndex() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -475,14 +475,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void multiIndex_withProjectionConverters() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( compatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = model.relativeFieldName;
 
 				assertThat(
-						searchTarget.query()
+						scope.query()
 								.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
 								.predicate( f -> f.matchAll() )
 								.build()
@@ -499,14 +499,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_multiIndex_incompatibleType() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( incompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
 					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> searchTarget.projection().field( fieldPath )
+					() -> scope.projection().field( fieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -517,14 +517,14 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_multiIndex_incompatibleProjectionConverter() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget( rawFieldCompatibleIndexManager );
+		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
 					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> searchTarget.projection().field( fieldPath, ValueWrapper.class )
+					() -> scope.projection().field( fieldPath, ValueWrapper.class )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -588,12 +588,12 @@ public class FieldSearchProjectionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		IndexSearchQuery<DocumentReference> query = indexManager.createSearchTarget().query()
+		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = compatibleIndexManager.createSearchTarget().query()
+		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

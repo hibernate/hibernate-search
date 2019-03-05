@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -118,9 +118,9 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_match() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.match().onField( "flattenedObject.string" ).matching( MATCHING_STRING ) )
@@ -133,7 +133,7 @@ public class ObjectFieldStorageIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -151,9 +151,9 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_range() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.must( f.range().onField( "flattenedObject.string" )
@@ -171,7 +171,7 @@ public class ObjectFieldStorageIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
 				.hasHitCount( 1 );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.nested().onObjectField( "nestedObject" )
 						.nest( f.bool()
@@ -195,32 +195,32 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void search_error_nonNestedField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject'" );
 		thrown.expectMessage( "is not stored as nested" );
-		searchTarget.predicate().nested().onObjectField( "flattenedObject" );
+		scope.predicate().nested().onObjectField( "flattenedObject" );
 	}
 
 	@Test
 	public void search_error_nonObjectField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "'flattenedObject.string'" );
 		thrown.expectMessage( "is not an object field" );
-		searchTarget.predicate().nested().onObjectField( "flattenedObject.string" );
+		scope.predicate().nested().onObjectField( "flattenedObject.string" );
 	}
 
 	@Test
 	public void search_error_missingField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Unknown field" );
 		thrown.expectMessage( "'doesNotExist'" );
-		searchTarget.predicate().nested().onObjectField( "doesNotExist" );
+		scope.predicate().nested().onObjectField( "doesNotExist" );
 	}
 
 	private void initData() {
@@ -319,8 +319,8 @@ public class ObjectFieldStorageIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

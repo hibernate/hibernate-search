@@ -99,13 +99,13 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::sort-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class );
+			SearchScope<Book> scope = fullTextSession.scope( Book.class );
 
-			FullTextQuery<Book> query = searchTarget.search()
+			FullTextQuery<Book> query = scope.search()
 					.asEntity()
-					.predicate( searchTarget.predicate().matchAll().toPredicate() )
+					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort(
-							searchTarget.sort()
+							scope.sort()
 							.byField( "pageCount" ).desc()
 							.then().byField( "title_sort" )
 							.toSort()
@@ -147,11 +147,11 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class );
+			SearchScope<Book> scope = fullTextSession.scope( Book.class );
 
-			FullTextQuery<String> query = searchTarget.search()
-					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() )
-					.predicate( searchTarget.predicate().matchAll().toPredicate() )
+			FullTextQuery<String> query = scope.search()
+					.asProjection( scope.projection().field( "title", String.class ).toProjection() )
+					.predicate( scope.predicate().matchAll().toPredicate() )
 					.build();
 
 			List<String> result = query.getResultList();

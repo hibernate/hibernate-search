@@ -20,7 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -85,9 +85,9 @@ public class LuceneSearchMultiIndexIT {
 
 	@Test
 	public void field_in_one_index_only_is_supported_for_sorting() {
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget( indexManager_1_2 );
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope( indexManager_1_2 );
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "additionalField" ).asc().onMissingValue().sortLast() )
@@ -98,7 +98,7 @@ public class LuceneSearchMultiIndexIT {
 			c.doc( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 		} );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "additionalField" ).desc().onMissingValue().sortLast() )
@@ -126,8 +126,8 @@ public class LuceneSearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		StubMappingSearchTarget searchTarget = indexManager_1_1.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager_1_1.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -143,8 +143,8 @@ public class LuceneSearchMultiIndexIT {
 
 		workPlan.execute().join();
 
-		searchTarget = indexManager_1_2.createSearchTarget();
-		query = searchTarget.query()
+		scope = indexManager_1_2.createSearchScope();
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

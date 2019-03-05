@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -82,9 +82,9 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void predicate_fromJsonString() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
@@ -117,13 +117,13 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void predicate_fromJsonString_separatePredicate() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchPredicate predicate1 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
+		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'match': {'string': 'text 1'}}" ).toPredicate();
-		SearchPredicate predicate2 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
+		SearchPredicate predicate2 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'match': {'integer': 2}}" ).toPredicate();
-		SearchPredicate predicate3 = searchTarget.predicate().extension( ElasticsearchExtension.get() )
+		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJsonString(
 						"{"
 							+ "'geo_distance': {"
@@ -137,16 +137,16 @@ public class ElasticsearchExtensionIT {
 				)
 				.toPredicate();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchPredicate predicate4 = searchTarget.predicate().match().onField( "yearDays" )
+		SearchPredicate predicate4 = scope.predicate().match().onField( "yearDays" )
 				.matching( "'2018:12'" ).toPredicate();
-		SearchPredicate booleanPredicate = searchTarget.predicate().bool()
+		SearchPredicate booleanPredicate = scope.predicate().bool()
 				.should( predicate1 )
 				.should( predicate2 )
 				.should( predicate3 )
 				.should( predicate4 )
 				.toPredicate();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( booleanPredicate )
 				.build();
@@ -157,9 +157,9 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void sort_fromJsonString() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
@@ -179,7 +179,7 @@ public class ElasticsearchExtensionIT {
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
 		);
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c
@@ -201,24 +201,24 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void sort_fromJsonString_separateSort() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		SearchSort sort1Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'asc'}" )
 				.toSort();
-		SearchSort sort2Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort2Asc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'asc'}" )
 				.toSort();
-		SearchSort sort3Asc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort3Asc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'asc'}" )
 				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchSort sort4Asc = searchTarget.sort()
+		SearchSort sort4Asc = scope.sort()
 				.byField( "sort4" ).asc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
@@ -226,21 +226,21 @@ public class ElasticsearchExtensionIT {
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
-		SearchSort sort1Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort1': 'desc'}" )
 				.toSort();
-		SearchSort sort2Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort2Desc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort2': 'desc'}" )
 				.toSort();
-		SearchSort sort3Desc = searchTarget.sort().extension( ElasticsearchExtension.get() )
+		SearchSort sort3Desc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJsonString( "{'sort3': 'desc'}" )
 				.toSort();
-		SearchSort sort4Desc = searchTarget.sort()
+		SearchSort sort4Desc = scope.sort()
 				.byField( "sort4" ).desc().onMissingValue().sortLast()
 				.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				.toSort();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
@@ -251,9 +251,9 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void projection_document() throws JSONException {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = scope.query()
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
@@ -281,9 +281,9 @@ public class ElasticsearchExtensionIT {
 	 */
 	@Test
 	public void projection_documentAndField() throws JSONException {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.extension( ElasticsearchExtension.get() ).source(),
@@ -312,9 +312,9 @@ public class ElasticsearchExtensionIT {
 
 	@Test
 	public void projection_explanation() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.build();
@@ -439,8 +439,8 @@ public class ElasticsearchExtensionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

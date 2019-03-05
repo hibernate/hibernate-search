@@ -33,10 +33,10 @@ import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -83,9 +83,9 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void references_noReferenceTransformer() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -95,9 +95,9 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void objects_noObjectLoading() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asObject()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -116,10 +116,10 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		ObjectLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				EasyMock.createMock( StubObjectLoader.class );
 
-		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
-				indexManager.createSearchTarget( referenceTransformerMock );
+		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createSearchScope( referenceTransformerMock );
 
-		IndexSearchQuery<StubTransformedReference> referencesQuery = searchTarget.query( objectLoaderMock )
+		IndexSearchQuery<StubTransformedReference> referencesQuery = scope.query( objectLoaderMock )
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -158,10 +158,10 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		);
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
 
-		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
-				indexManager.createSearchTarget( referenceTransformerMock );
+		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createSearchScope( referenceTransformerMock );
 
-		IndexSearchQuery<StubLoadedObject> objectsQuery = searchTarget.query( objectLoaderMock )
+		IndexSearchQuery<StubLoadedObject> objectsQuery = scope.query( objectLoaderMock )
 				.asObject()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -197,10 +197,10 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		);
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
 
-		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
-				indexManager.createSearchTarget( referenceTransformerMock );
+		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createSearchScope( referenceTransformerMock );
 
-		IndexSearchQuery<List<?>> projectionsQuery = searchTarget.query( objectLoaderMock )
+		IndexSearchQuery<List<?>> projectionsQuery = scope.query( objectLoaderMock )
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -221,7 +221,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void projections_hitTransformer() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
@@ -230,7 +230,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 		Function<List<?>, StubTransformedHit> hitTransformerMock = EasyMock.createMock( StubHitTransformer.class );
 
-		IndexSearchQuery<StubTransformedHit> query = searchTarget.query()
+		IndexSearchQuery<StubTransformedHit> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								hitTransformerMock,
@@ -300,10 +300,10 @@ public class IndexSearchResultLoadingOrTransformingIT {
 				.andReturn( emptyTransformedHit );
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock, hitTransformerMock );
 
-		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
-				indexManager.createSearchTarget( referenceTransformerMock );
+		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createSearchScope( referenceTransformerMock );
 
-		IndexSearchQuery<StubTransformedHit> query = searchTarget.query( objectLoaderMock )
+		IndexSearchQuery<StubTransformedHit> query = scope.query( objectLoaderMock )
 				.asProjection( f ->
 						f.composite(
 								hitTransformerMock,
@@ -322,16 +322,16 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void countQuery() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertEquals( 2L, query.executeCount() );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.build();
@@ -339,7 +339,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		assertEquals( 1L, query.executeCount() );
 
 		// Using setFirstResult/setMaxResult should not affect the count
-		query = searchTarget.query()
+		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -354,16 +354,16 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 	@Test
 	public void countQueryWithProjection() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<String> query = searchTarget.query()
+		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.matchAll() )
 				.build();
 
 		assertEquals( 2L, query.executeCount() );
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.build();
@@ -396,8 +396,8 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

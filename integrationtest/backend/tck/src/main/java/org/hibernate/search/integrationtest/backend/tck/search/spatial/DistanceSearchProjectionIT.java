@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
@@ -29,9 +29,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -51,9 +51,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_unit() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -74,9 +74,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_several() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -109,11 +109,11 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_distanceSort() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -137,9 +137,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceProjection_longCalculatedField() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( "string", String.class ),
@@ -166,8 +166,8 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "Distance related operations are not supported" );
 		thrown.expectMessage( "string" );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		searchTarget.projection()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		scope.projection()
 				.distance( "string", GeoPoint.of( 43.749828, 1.854172 ) )
 				.toProjection();
 	}
@@ -178,8 +178,8 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "center" );
 		thrown.expectMessage( "must not be null" );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		searchTarget.projection()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		scope.projection()
 				.distance( "geoPoint", null )
 				.toProjection();
 	}
@@ -190,25 +190,25 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		thrown.expectMessage( "unit" );
 		thrown.expectMessage( "must not be null" );
 
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		searchTarget.projection()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		scope.projection()
 				.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ).unit( null )
 				.toProjection();
 	}
 
 	@Test
 	public void distanceProjection_nonProjectable() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SubTest.expectException( () -> {
-			searchTarget.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
+			scope.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
 		} ).assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( "nonProjectableGeoPoint" );
 
 		SubTest.expectException( () -> {
-			searchTarget.projection().distance( "nonProjectableGeoPoint", GeoPoint.of( 43d, 4d ) ).toProjection();
+			scope.projection().distance( "nonProjectableGeoPoint", GeoPoint.of( 43d, 4d ) ).toProjection();
 		} ).assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
@@ -217,10 +217,10 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 	@Test
 	public void distanceSort_unsortable() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		SubTest.expectException( () -> {
-			searchTarget.sort().byDistance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );
+			scope.sort().byDistance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );
 		} ).assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )

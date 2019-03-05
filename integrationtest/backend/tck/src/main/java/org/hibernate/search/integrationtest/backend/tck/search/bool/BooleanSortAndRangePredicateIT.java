@@ -29,7 +29,7 @@ import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSe
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortIT;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -76,8 +76,8 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private IndexSearchQuery<DocumentReference> sortQuery(Consumer<? super SearchSortContainerContext> sortContributor) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		return searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
@@ -85,8 +85,8 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private IndexSearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		return searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		return scope.query()
 				.asReference()
 				.predicate( rangePredicate )
 				.build();
@@ -131,8 +131,8 @@ public class BooleanSortAndRangePredicateIT {
 
 	@Test
 	public void rangeFromToSortByFieldQuery() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
 				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
@@ -198,8 +198,8 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void checkAllDocumentsAreSearchable() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

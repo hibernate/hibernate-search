@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -77,9 +77,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeList_fromSearchProjectionObjects() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
@@ -98,9 +98,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeList_fromTerminalContexts() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( indexMapping.author.relativeFieldName, String.class ),
@@ -119,9 +119,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeList_transformer_fromSearchProjectionObjects() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Bi> query = searchTarget.query()
+		IndexSearchQuery<Book_Bi> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								this::listToBook_Bi,
@@ -141,9 +141,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeList_transformer_fromTerminalContext() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Bi> query = searchTarget.query()
+		IndexSearchQuery<Book_Bi> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								this::listToBook_Bi,
@@ -163,9 +163,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeFunction_fromSearchProjectionObjects() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book> query = searchTarget.query()
+		IndexSearchQuery<Book> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book::new,
@@ -184,9 +184,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeFunction_fromTerminalContext() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book> query = searchTarget.query()
+		IndexSearchQuery<Book> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book::new,
@@ -205,9 +205,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeBiFunction_fromSearchProjectionObjects() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Bi> query = searchTarget.query()
+		IndexSearchQuery<Book_Bi> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book_Bi::new,
@@ -227,9 +227,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeBiFunction_fromTerminalContexts() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Bi> query = searchTarget.query()
+		IndexSearchQuery<Book_Bi> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book_Bi::new,
@@ -249,9 +249,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeTriFunction_fromSearchProjectionObjects() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Tri> query = searchTarget.query()
+		IndexSearchQuery<Book_Tri> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book_Tri::new,
@@ -275,9 +275,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void compositeTriFunction_fromTerminalContexts() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Tri> query = searchTarget.query()
+		IndexSearchQuery<Book_Tri> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book_Tri::new,
@@ -301,9 +301,9 @@ public class CompositeSearchProjectionIT {
 
 	@Test
 	public void nestedComposite() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Book_Bi_Score> query = searchTarget.query()
+		IndexSearchQuery<Book_Bi_Score> query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								Book_Bi_Score::new,
@@ -346,8 +346,8 @@ public class CompositeSearchProjectionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

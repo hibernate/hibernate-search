@@ -38,10 +38,10 @@ import org.hibernate.search.integrationtest.backend.tck.search.StubObjectLoader;
 import org.hibernate.search.integrationtest.backend.tck.search.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingSearchScope;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchTarget;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -88,9 +88,9 @@ public class SearchProjectionIT {
 
 	@Test
 	public void noProjections() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<List<?>> query = searchTarget.query()
+		IndexSearchQuery<List<?>> query = scope.query()
 				.asProjections()
 				.predicate( f -> f.matchAll() )
 				.build();
@@ -100,7 +100,7 @@ public class SearchProjectionIT {
 
 	@Test
 	public void references() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		IndexSearchQuery<List<?>> query;
 		DocumentReference document1Reference = reference( INDEX_NAME, DOCUMENT_1 );
@@ -113,13 +113,13 @@ public class SearchProjectionIT {
 		 * just so that tests do not compile if someone changes the APIs in an incorrect way.
 		 */
 		SearchProjection<DocumentReference> documentReferenceProjection =
-				searchTarget.projection().documentReference().toProjection();
+				scope.projection().documentReference().toProjection();
 		SearchProjection<DocumentReference> referenceProjection =
-				searchTarget.projection().reference().toProjection();
+				scope.projection().reference().toProjection();
 		SearchProjection<DocumentReference> objectProjection =
-				searchTarget.projection().object().toProjection();
+				scope.projection().object().toProjection();
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjections(
 						documentReferenceProjection,
 						referenceProjection,
@@ -181,8 +181,8 @@ public class SearchProjectionIT {
 		);
 		EasyMock.replay( referenceTransformerMock, objectLoaderMock );
 
-		GenericStubMappingSearchTarget<StubTransformedReference, StubLoadedObject> searchTarget =
-				indexManager.createSearchTarget( referenceTransformerMock );
+		GenericStubMappingSearchScope<StubTransformedReference, StubLoadedObject> scope =
+				indexManager.createSearchScope( referenceTransformerMock );
 		IndexSearchQuery<List<?>> query;
 
 		/*
@@ -190,13 +190,13 @@ public class SearchProjectionIT {
 		 * just so that tests do not compile if someone changes the APIs in an incorrect way.
 		 */
 		SearchProjection<DocumentReference> documentReferenceProjection =
-				searchTarget.projection().documentReference().toProjection();
+				scope.projection().documentReference().toProjection();
 		SearchProjection<StubTransformedReference> referenceProjection =
-				searchTarget.projection().reference().toProjection();
+				scope.projection().reference().toProjection();
 		SearchProjection<StubLoadedObject> objectProjection =
-				searchTarget.projection().object().toProjection();
+				scope.projection().object().toProjection();
 
-		query = searchTarget.query( objectLoaderMock )
+		query = scope.query( objectLoaderMock )
 				.asProjections(
 						documentReferenceProjection,
 						referenceProjection,
@@ -216,9 +216,9 @@ public class SearchProjectionIT {
 
 	@Test
 	public void score() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		IndexSearchQuery<Float> query = searchTarget.query()
+		IndexSearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
 				.predicate( f -> f.match().onField( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( c -> c.byScore().desc() )
@@ -242,11 +242,11 @@ public class SearchProjectionIT {
 	 */
 	@Test
 	public void mixed() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		IndexSearchQuery<List<?>> query;
 
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f ->
 						f.composite(
 								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
@@ -282,11 +282,11 @@ public class SearchProjectionIT {
 
 	@Test
 	public void extension() {
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+		StubMappingSearchScope scope = indexManager.createSearchScope();
 		IndexSearchQuery<String> query;
 
 		// Mandatory extension
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f -> f.extension( new SupportedExtension<>() )
 						.extendedProjection( "string1", String.class )
 				)
@@ -296,7 +296,7 @@ public class SearchProjectionIT {
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, both supported
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f -> f.<String>extension()
 						// FIXME find some way to forbid using the context passed to the consumers twice... ?
 						.ifSupported(
@@ -315,7 +315,7 @@ public class SearchProjectionIT {
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, second supported
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
@@ -335,7 +335,7 @@ public class SearchProjectionIT {
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
 
 		// Conditional extensions with orElse - two, both unsupported
-		query = searchTarget.query()
+		query = scope.query()
 				.asProjection( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
@@ -380,8 +380,8 @@ public class SearchProjectionIT {
 		workPlan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
-		IndexSearchQuery<DocumentReference> query = searchTarget.query()
+		StubMappingSearchScope scope = indexManager.createSearchScope();
+		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.build();

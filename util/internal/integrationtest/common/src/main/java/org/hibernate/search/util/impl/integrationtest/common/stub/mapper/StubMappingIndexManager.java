@@ -53,34 +53,34 @@ public class StubMappingIndexManager {
 	/**
 	 * @return A search target scoped to this index only.
 	 */
-	public StubMappingSearchTarget createSearchTarget() {
+	public StubMappingSearchScope createSearchScope() {
 		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
 				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
-		return new StubMappingSearchTarget( builder.build() );
+		return new StubMappingSearchScope( builder.build() );
 	}
 
 	/**
 	 * @return A search target scoped to this index and the given other indexes.
 	 */
-	public StubMappingSearchTarget createSearchTarget(StubMappingIndexManager... others) {
+	public StubMappingSearchScope createSearchScope(StubMappingIndexManager... others) {
 		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
 				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new StubMappingSearchTarget( builder.build() );
+		return new StubMappingSearchScope( builder.build() );
 	}
 
 	/**
 	 * @return A search target scoped to this index and the given other indexes.
 	 */
-	public <R, O> GenericStubMappingSearchTarget<R, O> createSearchTarget(
+	public <R, O> GenericStubMappingSearchScope<R, O> createSearchScope(
 			Function<DocumentReference, R> documentReferenceTransformer, StubMappingIndexManager... others) {
 		MappedIndexSearchScopeBuilder<R, O> builder =
 				indexManager.createSearchScopeBuilder( new StubMappingContext(), documentReferenceTransformer );
 		for ( StubMappingIndexManager other : others ) {
 			other.indexManager.addTo( builder );
 		}
-		return new GenericStubMappingSearchTarget<>( builder.build() );
+		return new GenericStubMappingSearchScope<>( builder.build() );
 	}
 }
