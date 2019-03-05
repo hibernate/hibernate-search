@@ -411,6 +411,31 @@
         ]]></cypher>
     </constraint>
 
+    <constraint id="my-rules:TypeNamesShouldBeUniqueInInterdependentModules">
+        <requiresConcept refId="my-rules:TypeMetadata" />
+        <requiresConcept refId="my-rules:HibernateSearch" />
+        <requiresConcept refId="my-rules:Api" />
+        <requiresConcept refId="my-rules:Spi" />
+        <requiresConcept refId="my-rules:Impl" />
+        <description>
+            The simple (non-qualified) name of public Hibernate Search types should be unique.
+            Exceptions are only allowed when the two types sharing an identical name:
+            - are located in two modules that do not depend on each other
+            - or are both nested types.
+        </description>
+        <cypher><![CDATA[
+            MATCH (artifact1:Maven:Artifact)-[:DEPENDS_ON *0]->(artifact2:Maven:Artifact)
+            MATCH (artifact1:Maven:Artifact)-[:CONTAINS]->(type1:Type:HibernateSearch:Public)
+            MATCH (artifact2:Maven:Artifact)-[:CONTAINS]->(type2:Type:HibernateSearch:Public)
+            WHERE
+                type1 <> type2
+                AND type1.nameWithoutContainingTypeName = type2.nameWithoutContainingTypeName
+                AND NOT (type1.name =~ ".*\\$.*" AND type2.name =~ ".*\\$.*")
+            RETURN
+                type1, type2
+        ]]></cypher>
+    </constraint>
+
     <group id="default">
         <includeConstraint refId="my-rules:PublicTypesMayNotExtendInternalTypes" />
         <includeConstraint refId="my-rules:PublicMethodsMayNotExposeInternalTypes" />
@@ -422,6 +447,7 @@
         <includeConstraint refId="my-rules:TypesShouldUseImplSuffixWithRestraint" />
         <includeConstraint refId="my-rules:AbstractTypesShouldUseAbstractPrefix" />
         <includeConstraint refId="my-rules:TypesExtendingTypeFromAnotherModuleMustHaveModuleSpecificKeywordInName" />
+        <includeConstraint refId="my-rules:TypeNamesShouldBeUniqueInInterdependentModules" />
     </group>
 
 </jqa:jqassistant-rules>
