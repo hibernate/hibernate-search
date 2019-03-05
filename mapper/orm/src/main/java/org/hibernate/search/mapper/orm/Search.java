@@ -21,21 +21,11 @@ public final class Search {
 	}
 
 	public static FullTextSession getFullTextSession(Session session) {
-		if ( session instanceof FullTextSession ) {
-			return (FullTextSession) session;
-		}
-		else {
-			return createFullTextSession( session.unwrap( SessionImplementor.class ) );
-		}
+		return createFullTextSession( session.unwrap( SessionImplementor.class ) );
 	}
 
 	public static FullTextEntityManager getFullTextEntityManager(EntityManager entityManager) {
-		if ( entityManager instanceof FullTextEntityManager ) {
-			return (FullTextEntityManager) entityManager;
-		}
-		else {
-			return createFullTextSession( entityManager.unwrap( SessionImplementor.class ) );
-		}
+		return createFullTextSession( entityManager.unwrap( SessionImplementor.class ) );
 	}
 
 	private static FullTextSession createFullTextSession(SessionImplementor sessionImplementor) {

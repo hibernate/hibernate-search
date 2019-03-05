@@ -318,7 +318,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			List<ParentIndexedEntity> result = query.list();
+			List<ParentIndexedEntity> result = query.getResultList();
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( result )
 					.containsExactly(

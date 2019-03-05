@@ -11,11 +11,14 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 
-public interface FullTextEntityManager extends EntityManager {
+public interface FullTextEntityManager {
 
 	<T> FullTextSearchTarget<T> search(Class<T> type);
 
 	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);
 
 	MassIndexer createIndexer(Class<?>... types);
+
+	EntityManager toJpaEntityManager();
+
 }

@@ -12,11 +12,13 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
 import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
 
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
@@ -25,6 +27,7 @@ import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.hql.internal.QueryExecutionRequestException;
+import org.hibernate.query.Query;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -70,8 +73,23 @@ public class FullTextQueryImpl<R> extends AbstractProducedQuery<R> implements Fu
 	}
 
 	@Override
+	public TypedQuery<R> toJpaQuery() {
+		return this;
+	}
+
+	@Override
+	public Query<R> toHibernateOrmQuery() {
+		return this;
+	}
+
+	@Override
 	public List<R> getResultList() {
 		return list();
+	}
+
+	@Override
+	public Optional<R> getOptionalResult() {
+		return Optional.ofNullable( uniqueResult() );
 	}
 
 	/**

@@ -11,12 +11,14 @@ import java.util.Collection;
 import org.hibernate.Session;
 import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 
-public interface FullTextSession extends Session, FullTextEntityManager {
+public interface FullTextSession extends FullTextEntityManager {
 
 	@Override
 	<T> FullTextSearchTarget<T> search(Class<T> type);
 
 	@Override
 	<T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types);
+
+	Session toHibernateOrmSession();
 
 }

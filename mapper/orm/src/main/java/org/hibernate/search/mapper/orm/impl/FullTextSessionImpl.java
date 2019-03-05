@@ -8,35 +8,34 @@ package org.hibernate.search.mapper.orm.impl;
 
 import java.util.Collection;
 
-import org.hibernate.engine.spi.SessionDelegatorBaseImpl;
+import javax.persistence.EntityManager;
+
+import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 
-public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements FullTextSession {
+public class FullTextSessionImpl implements FullTextSession {
 
-	private transient HibernateOrmSearchManager searchManager = null;
+	private final SessionImplementor delegate;
+
+	private HibernateOrmSearchManager searchManager = null;
 
 	public FullTextSessionImpl(SessionImplementor delegate) {
-		super( delegate );
+		this.delegate = delegate;
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T unwrap(Class<T> type) {
-		if ( type.equals( FullTextEntityManager.class ) ) {
-			return (T) this;
-		}
-		else if ( type.equals( FullTextSession.class ) ) {
-			return (T) this;
-		}
-		else {
-			return super.unwrap( type );
-		}
+	public EntityManager toJpaEntityManager() {
+		return delegate;
+	}
+
+	@Override
+	public Session toHibernateOrmSession() {
+		return delegate;
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class FullTextSessionImpl extends SessionDelegatorBaseImpl implements Ful
 			types = new Class<?>[] { Object.class };
 		}
 
-		return new MassIndexerImpl( getFactory(), getTenantIdentifier(), types );
+		return new MassIndexerImpl( delegate.getFactory(), delegate.getTenantIdentifier(), types );
 	}
 
 	private HibernateOrmSearchManager getSearchManager() {
