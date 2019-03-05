@@ -99,9 +99,9 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::sort-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
 
-			FullTextQuery<Book> query = searchTarget.query() // <1>
+			FullTextQuery<Book> query = searchTarget.search() // <1>
 					.asEntity()
 					.predicate( searchTarget.predicate().matchAll().toPredicate() )
 					.sort(
@@ -124,9 +124,9 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::sort-simple-lambda[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
 
-			FullTextQuery<Book> query = searchTarget.query()
+			FullTextQuery<Book> query = searchTarget.search()
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.sort( f -> f.byField( "pageCount" ).desc()
@@ -149,9 +149,9 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-simple-objects[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class );
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class );
 
-			FullTextQuery<String> query = searchTarget.query() // <1>
+			FullTextQuery<String> query = searchTarget.search() // <1>
 					.asProjection( searchTarget.projection().field( "title", String.class ).toProjection() ) // <2>
 					.predicate( searchTarget.predicate().matchAll().toPredicate() )
 					.build();
@@ -167,7 +167,7 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-simple-lambda[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<String> query = fullTextSession.search( Book.class ).query()
+			FullTextQuery<String> query = fullTextSession.search( Book.class )
 					.asProjection( f -> f.field( "title", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.build();
@@ -186,7 +186,7 @@ public class HibernateOrmSimpleMappingIT {
 			// tag::projection-advanced[]
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextSession.search( Book.class ).query()
+			FullTextQuery<MyEntityAndScoreBean<Book>> query = fullTextSession.search( Book.class )
 					.asProjection( f ->
 							f.composite(
 									MyEntityAndScoreBean::new,

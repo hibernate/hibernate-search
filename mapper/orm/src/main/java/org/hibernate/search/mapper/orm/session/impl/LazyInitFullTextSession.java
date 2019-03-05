@@ -44,13 +44,8 @@ public class LazyInitFullTextSession implements FullTextSession {
 	}
 
 	@Override
-	public final <T> FullTextSearchTarget<T> search(Class<T> type) {
-		return getDelegate().search( type );
-	}
-
-	@Override
-	public final <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types) {
-		return getDelegate().search( types );
+	public <T> FullTextSearchTarget<T> target(Collection<? extends Class<? extends T>> types) {
+		return getDelegate().target( types );
 	}
 
 	@Override

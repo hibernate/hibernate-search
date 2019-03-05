@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import org.hibernate.search.integrationtest.showcase.library.model.Person;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,9 +42,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 			return Collections.emptyList();
 		}
 
-		FullTextSearchTarget<Person> target = Search.getFullTextSession( entityManager ).search( Person.class );
-
-		FullTextQuery<Person> query = target.query()
+		FullTextQuery<Person> query = Search.getFullTextSession( entityManager ).search( Person.class )
 				.asEntity()
 				.predicate( f -> f.match().onFields( "firstName", "lastName" ).matching( terms ) )
 				.sort( c -> {
@@ -61,9 +58,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 	}
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, int offset, int limit) {
-		FullTextSearchTarget<Person> target = Search.getFullTextSession( entityManager ).search( Person.class );
-
-		FullTextQuery<Person> query = target.query()
+		FullTextQuery<Person> query = Search.getFullTextSession( entityManager ).search( Person.class )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( borrowalsCountField ).desc() )

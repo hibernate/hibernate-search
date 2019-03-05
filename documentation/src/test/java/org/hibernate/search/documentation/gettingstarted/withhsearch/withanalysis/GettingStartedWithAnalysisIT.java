@@ -79,7 +79,7 @@ public class GettingStartedWithAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class ).query()
+			FullTextQuery<Book> query = fullTextSession.search( Book.class )
 					.asEntity()
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
@@ -100,7 +100,7 @@ public class GettingStartedWithAnalysisIT {
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
-				FullTextQuery<Book> query = fullTextSession.search( Book.class ).query()
+				FullTextQuery<Book> query = fullTextSession.search( Book.class )
 						.asEntity()
 						.predicate( factory -> factory.match()
 								.onFields( "title", "authors.name" )

@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.search.PojoReference;
 
 public interface FullTextSearchTarget<T> {
 
-	FullTextQueryResultDefinitionContext<T> query();
+	FullTextQueryResultDefinitionContext<T> search();
 
 	SearchPredicateFactoryContext predicate();
 

@@ -102,9 +102,9 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.search( Book.class ); // <2>
+			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class ); // <2>
 
-			FullTextQuery<Book> query = searchTarget.query() // <3>
+			FullTextQuery<Book> query = searchTarget.search() // <3>
 					.asEntity() // <4>
 					.predicate( searchTarget.predicate().match() // <5>
 							.onFields( "title", "authors.name" )
@@ -126,7 +126,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class ).query()
+			FullTextQuery<Book> query = fullTextSession.search( Book.class )
 					.asEntity()
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
@@ -147,7 +147,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager );
 
-			FullTextQuery<Book> query = fullTextSession.search( Book.class ).query()
+			FullTextQuery<Book> query = fullTextSession.search( Book.class )
 					.asEntity()
 					.predicate( factory -> factory.match()
 							.onFields( "title", "authors.name" )
