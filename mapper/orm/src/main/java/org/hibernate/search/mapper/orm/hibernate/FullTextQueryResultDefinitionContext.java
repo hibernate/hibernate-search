@@ -15,23 +15,15 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionTermina
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-/**
- * @author Yoann Rodiere
- */
-public interface FullTextQueryResultDefinitionContext<O>
-		extends org.hibernate.search.mapper.orm.jpa.FullTextQueryResultDefinitionContext<O> {
+public interface FullTextQueryResultDefinitionContext<O> {
 
-	@Override
 	SearchQueryResultContext<? extends FullTextQuery<O>> asEntity();
 
-	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, O>, ? extends SearchProjectionTerminalContext<T>> projectionContributor);
 
-	@Override
 	<T> SearchQueryResultContext<? extends FullTextQuery<T>> asProjection(SearchProjection<T> projection);
 
-	@Override
 	SearchQueryResultContext<? extends FullTextQuery<List<?>>> asProjections(SearchProjection<?>... projections);
 
 }

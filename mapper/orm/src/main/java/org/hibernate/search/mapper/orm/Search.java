@@ -12,7 +12,6 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.hibernate.FullTextSession;
 import org.hibernate.search.mapper.orm.impl.FullTextSessionImpl;
-import org.hibernate.search.mapper.orm.jpa.FullTextEntityManager;
 
 public final class Search {
 
@@ -24,7 +23,7 @@ public final class Search {
 		return createFullTextSession( session.unwrap( SessionImplementor.class ) );
 	}
 
-	public static FullTextEntityManager getFullTextEntityManager(EntityManager entityManager) {
+	public static FullTextSession getFullTextSession(EntityManager entityManager) {
 		return createFullTextSession( entityManager.unwrap( SessionImplementor.class ) );
 	}
 

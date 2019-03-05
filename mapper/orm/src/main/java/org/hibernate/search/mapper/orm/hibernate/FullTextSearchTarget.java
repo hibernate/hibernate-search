@@ -6,10 +6,19 @@
  */
 package org.hibernate.search.mapper.orm.hibernate;
 
-public interface FullTextSearchTarget<T>
-		extends org.hibernate.search.mapper.orm.jpa.FullTextSearchTarget<T> {
+import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
+import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
+import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
+import org.hibernate.search.mapper.pojo.search.PojoReference;
 
-	@Override
+public interface FullTextSearchTarget<T> {
+
 	FullTextQueryResultDefinitionContext<T> query();
+
+	SearchPredicateFactoryContext predicate();
+
+	SearchSortContainerContext sort();
+
+	SearchProjectionFactoryContext<PojoReference, T> projection();
 
 }
