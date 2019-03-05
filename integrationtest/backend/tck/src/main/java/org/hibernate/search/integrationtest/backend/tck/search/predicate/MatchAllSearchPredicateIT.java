@@ -63,7 +63,7 @@ public class MatchAllSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
@@ -76,7 +76,7 @@ public class MatchAllSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( c2 -> c2.match().onField( "string" ).matching( STRING_1 ) ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -85,7 +85,7 @@ public class MatchAllSearchPredicateIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 	}
@@ -100,7 +100,7 @@ public class MatchAllSearchPredicateIT {
 						.except( f.match().onField( "string" ).matching( STRING_1 ) )
 						.except( f.match().onField( "string" ).matching( STRING_2 ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -111,7 +111,7 @@ public class MatchAllSearchPredicateIT {
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -136,7 +136,7 @@ public class MatchAllSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 

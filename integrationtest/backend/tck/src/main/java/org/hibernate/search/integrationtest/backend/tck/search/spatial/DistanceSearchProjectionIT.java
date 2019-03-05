@@ -40,7 +40,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
-				.build();
+				.toQuery();
 		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
@@ -63,7 +63,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
-				.build();
+				.toQuery();
 		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 0.430d, Offset.offset( 0.010d ) );
@@ -88,7 +88,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
-				.build();
+				.toQuery();
 		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
@@ -126,7 +126,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						.byDistance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
 						.byDistance( "geoPoint", center )
 				)
-				.build();
+				.toQuery();
 		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
@@ -151,7 +151,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				)
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
-				.build();
+				.toQuery();
 		IndexSearchResult<List<?>> results = query.execute();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );

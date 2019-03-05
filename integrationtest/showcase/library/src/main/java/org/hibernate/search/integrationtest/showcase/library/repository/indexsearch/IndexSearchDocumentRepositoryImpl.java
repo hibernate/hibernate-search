@@ -38,7 +38,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.search( Book.class )
 				.asEntity()
 				.predicate( p -> p.matchAll() )
-				.build();
+				.toQuery();
 
 		query.setMaxResults( MAX_RESULT );
 		return query.getResultList();
@@ -54,7 +54,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						.asEntity()
 						// onRawField option allows to bypass the bridge in the DSL
 						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
-						.build();
+						.toQuery();
 
 		return query.getOptionalResult();
 	}
@@ -76,7 +76,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					);
 				} ) )
 				.sort( b -> b.byField( "title_sort" ) )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
@@ -138,7 +138,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				} ) )
 				// TODO facets (tag, medium, library in particular)
 				.sort( b -> b.byScore() )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
@@ -156,7 +156,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						.matching( terms )
 				)
 				.sort( b -> b.byField( "author" ).order( order ) )
-				.build();
+				.toQuery();
 
 		return query.getResultList();
 	}

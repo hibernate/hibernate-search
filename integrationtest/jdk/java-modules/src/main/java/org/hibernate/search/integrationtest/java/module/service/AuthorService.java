@@ -63,7 +63,7 @@ public class AuthorService implements AutoCloseable {
 			SearchQuery<Author> query = ftSession.search( Author.class )
 					.asEntity()
 					.predicate( p -> p.match().onField( "name" ).matching( term ) )
-					.build();
+					.toQuery();
 
 			return query.getResultList();
 		}

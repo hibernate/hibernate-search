@@ -108,7 +108,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -126,7 +126,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -143,7 +143,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onRawField( absoluteFieldPath ).above( fieldModel.predicateLowerBound ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -163,7 +163,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
@@ -173,7 +173,7 @@ public class RangeSearchPredicateIT {
 			query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit() )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -191,7 +191,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -209,7 +209,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -226,7 +226,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( fieldModel.predicateUpperBound ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -246,7 +246,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -256,7 +256,7 @@ public class RangeSearchPredicateIT {
 			query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ).excludeLimit() )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -275,7 +275,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -294,7 +294,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -312,7 +312,7 @@ public class RangeSearchPredicateIT {
 					.asReference()
 					.predicate( f -> f.range().onRawField( absoluteFieldPath )
 							.from( fieldModel.predicateLowerBound ).to( fieldModel.predicateUpperBound ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -334,7 +334,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -347,7 +347,7 @@ public class RangeSearchPredicateIT {
 							.from( value1ToMatch ).excludeLimit()
 							.to( value2ToMatch )
 					)
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -360,7 +360,7 @@ public class RangeSearchPredicateIT {
 							.from( value1ToMatch )
 							.to( value2ToMatch ).excludeLimit()
 					)
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -373,7 +373,7 @@ public class RangeSearchPredicateIT {
 							.from( value1ToMatch ).excludeLimit()
 							.to( value3ToMatch ).excludeLimit()
 					)
-					.build();
+					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
@@ -415,7 +415,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -431,7 +431,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -452,7 +452,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -468,7 +468,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -491,7 +491,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -509,7 +509,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -532,7 +532,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -550,7 +550,7 @@ public class RangeSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
@@ -568,7 +568,7 @@ public class RangeSearchPredicateIT {
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -579,7 +579,7 @@ public class RangeSearchPredicateIT {
 						.orField( indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -592,7 +592,7 @@ public class RangeSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -603,7 +603,7 @@ public class RangeSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.from( "d" ).to( "e" )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -614,7 +614,7 @@ public class RangeSearchPredicateIT {
 						.orFields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
 						.above( indexMapping.string3Field.document3Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -626,7 +626,7 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -636,7 +636,7 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.range().onFields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
 						.above( indexMapping.string2Field.document3Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
@@ -650,7 +650,7 @@ public class RangeSearchPredicateIT {
 						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.below( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
@@ -663,7 +663,7 @@ public class RangeSearchPredicateIT {
 						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
@@ -829,7 +829,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onField( absoluteFieldPath ).below( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 				b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -869,7 +869,7 @@ public class RangeSearchPredicateIT {
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
 					.predicate( f -> f.range().onRawField( absoluteFieldPath ).below( upperValueToMatch ) )
-					.build();
+					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 				b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -971,17 +971,17 @@ public class RangeSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 

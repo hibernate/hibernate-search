@@ -194,7 +194,7 @@ public class ToHibernateOrmIT {
 		return searchSession.search( IndexedEntity.class )
 				.asEntity()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 	}
 
 	@Entity

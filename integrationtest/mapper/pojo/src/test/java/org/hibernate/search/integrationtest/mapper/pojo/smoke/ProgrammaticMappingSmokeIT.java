@@ -422,7 +422,7 @@ public class ProgrammaticMappingSmokeIT {
 			)
 					.asReference()
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
 
@@ -459,7 +459,7 @@ public class ProgrammaticMappingSmokeIT {
 			)
 					.asProjection( f -> f.field( "myTextField", String.class ) )
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 			query.setFirstResult( 3L );
 			query.setMaxResults( 2L );
 
@@ -503,7 +503,7 @@ public class ProgrammaticMappingSmokeIT {
 							scope.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
-					.build();
+					.toQuery();
 
 			backendMock.expectSearchProjections(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),

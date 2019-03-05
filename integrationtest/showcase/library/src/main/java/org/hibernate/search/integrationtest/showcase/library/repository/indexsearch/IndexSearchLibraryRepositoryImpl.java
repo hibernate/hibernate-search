@@ -34,7 +34,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 					c.byField( "collectionSize" ).desc();
 					c.byField( "name_sort" );
 				} )
-				.build();
+				.toQuery();
 
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );

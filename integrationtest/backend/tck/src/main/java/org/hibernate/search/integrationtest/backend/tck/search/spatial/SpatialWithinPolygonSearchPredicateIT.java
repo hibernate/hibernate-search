@@ -61,7 +61,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -69,7 +69,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).polygon( POLYGON_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -102,7 +102,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).boostedTo( 42 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -114,7 +114,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -131,7 +131,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -143,7 +143,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -162,7 +162,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().boostedTo( 1 ).onField( "string" ).boostedTo( 7 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -176,7 +176,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().boostedTo( 20 ).onField( "string" ).boostedTo( 15 ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -193,7 +193,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -205,7 +205,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 						.should( f.match().onField( "string" ).matching( OURSON_QUI_BOIT_STRING ) )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -220,7 +220,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -228,7 +228,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orField( "geoPoint_1" ).polygon( POLYGON_2_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -240,7 +240,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -250,7 +250,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_1_1 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );
@@ -260,7 +260,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 				.predicate( f -> f.spatial().within().onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.polygon( POLYGON_2_2 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, IMOUTO_ID, CHEZ_MARGOTTE_ID );
@@ -270,7 +270,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -278,7 +278,7 @@ public class SpatialWithinPolygonSearchPredicateIT extends AbstractSpatialWithin
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.spatial().within().onFields( "geoPoint", "geoPoint_2" ).polygon( POLYGON_1_2 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID );

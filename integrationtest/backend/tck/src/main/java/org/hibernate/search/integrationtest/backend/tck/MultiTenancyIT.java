@@ -95,7 +95,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
@@ -106,7 +106,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
@@ -124,7 +124,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
@@ -135,7 +135,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.id().matching( DOCUMENT_ID_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
@@ -155,7 +155,7 @@ public class MultiTenancyIT {
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
@@ -170,7 +170,7 @@ public class MultiTenancyIT {
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_3 ) );
 	}
 
@@ -182,7 +182,7 @@ public class MultiTenancyIT {
 		IndexSearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
@@ -194,7 +194,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
@@ -214,7 +214,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
@@ -222,7 +222,7 @@ public class MultiTenancyIT {
 		query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
@@ -235,7 +235,7 @@ public class MultiTenancyIT {
 		IndexSearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( checkQuery )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
@@ -260,7 +260,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( UPDATED_STRING ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		query = scope.query( tenant2SessionContext )
@@ -275,7 +275,7 @@ public class MultiTenancyIT {
 								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		// The tenant 1 has not been updated.
@@ -288,7 +288,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.match().onField( "nestedObject.string" ).matching( UPDATED_STRING ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
@@ -303,7 +303,7 @@ public class MultiTenancyIT {
 								.onField( "nestedObject.string" ).matching( UPDATED_STRING )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
@@ -314,7 +314,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE_1 ) )
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant1SessionContext )
@@ -329,7 +329,7 @@ public class MultiTenancyIT {
 								.onField( "nestedObject.string" ).matching( STRING_VALUE_1 )
 						)
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 	}
 
@@ -370,7 +370,7 @@ public class MultiTenancyIT {
 		IndexSearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
@@ -460,7 +460,7 @@ public class MultiTenancyIT {
 		IndexSearchQuery<DocumentReference> query = scope.query( new StubSessionContext() )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 	}
@@ -564,7 +564,7 @@ public class MultiTenancyIT {
 		IndexSearchQuery<DocumentReference> query = scope.query( tenant1SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
@@ -576,7 +576,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_1 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_2 );
@@ -585,7 +585,7 @@ public class MultiTenancyIT {
 		query = scope.query( tenant2SessionContext )
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
@@ -597,7 +597,7 @@ public class MultiTenancyIT {
 						)
 				)
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( projectionQuery ).hasListHitsAnyOrder( b -> {
 				b.list( STRING_VALUE_1, INTEGER_VALUE_3 );
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );

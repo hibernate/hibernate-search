@@ -42,7 +42,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1_500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -53,7 +53,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
@@ -64,7 +64,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1_500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -75,7 +75,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI.getLatitude(), METRO_GARIBALDI.getLongitude(), 1.5, DistanceUnit.KILOMETERS )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -86,7 +86,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" )
 						.circle( METRO_GARIBALDI, 1.5, DistanceUnit.KILOMETERS )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -127,7 +127,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -145,7 +145,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -168,7 +168,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -186,7 +186,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -211,7 +211,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -231,7 +231,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -254,7 +254,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, CHEZ_MARGOTTE_ID );
@@ -272,7 +272,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, OURSON_QUI_BOIT_ID );
@@ -290,7 +290,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_GARIBALDI, 400 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
@@ -301,7 +301,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" ).orField( "geoPoint_1" )
 						.circle( METRO_HOTEL_DE_VILLE_1, 500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
@@ -314,7 +314,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE, 500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );
@@ -325,7 +325,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_1, 1_500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -336,7 +336,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onField( "geoPoint" ).orFields( "geoPoint_1" ).orFields( "geoPoint_2" )
 						.circle( METRO_GARIBALDI_2, 400 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
@@ -349,7 +349,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_GARIBALDI, 400 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID );
@@ -360,7 +360,7 @@ public class SpatialWithinCircleSearchPredicateIT extends AbstractSpatialWithinS
 						.onFields( "geoPoint", "geoPoint_2" )
 						.circle( METRO_HOTEL_DE_VILLE_2, 500 )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID );

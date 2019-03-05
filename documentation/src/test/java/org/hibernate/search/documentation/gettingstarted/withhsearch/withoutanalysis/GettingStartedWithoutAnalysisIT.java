@@ -111,7 +111,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
 					)
-					.build(); // <6>
+					.toQuery(); // <6>
 
 			List<Book> result = query.getResultList(); // <7>
 			// Not shown: commit the transaction and close the entity manager
@@ -132,7 +132,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.build(); // <5>
+					.toQuery(); // <5>
 
 			List<Book> result = query.getResultList(); // <6>
 			// Not shown: commit the transaction and close the entity manager
@@ -153,7 +153,7 @@ public class GettingStartedWithoutAnalysisIT {
 							.onFields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
-					.build();
+					.toQuery();
 
 			long resultSize = query.getResultSize(); // <1>
 			// Not shown: commit the transaction and close the entity manager

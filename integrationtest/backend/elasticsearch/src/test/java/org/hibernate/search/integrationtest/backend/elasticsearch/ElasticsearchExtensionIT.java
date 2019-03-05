@@ -109,7 +109,7 @@ public class ElasticsearchExtensionIT {
 						// Also test using the standard DSL on a field defined with the extension
 						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ) )
 				)
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
@@ -149,7 +149,7 @@ public class ElasticsearchExtensionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( booleanPredicate )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
 				.hasHitCount( 4 );
@@ -173,7 +173,7 @@ public class ElasticsearchExtensionIT {
 						.then().byField( "sort4" ).asc().onMissingValue().sortLast()
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
@@ -192,7 +192,7 @@ public class ElasticsearchExtensionIT {
 						.then().byField( "sort4" ).desc().onMissingValue().sortLast()
 						.then().byField( "sort5" ).asc().onMissingValue().sortFirst()
 				)
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
 				INDEX_NAME,
 				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
@@ -222,7 +222,7 @@ public class ElasticsearchExtensionIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Asc ).then().by( sort2Asc ).then().by( sort3Asc ).then().by( sort4Asc ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
@@ -244,7 +244,7 @@ public class ElasticsearchExtensionIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.by( sort1Desc ).then().by( sort2Desc ).then().by( sort3Desc ).then().by( sort4Desc ) )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
 	}
@@ -258,7 +258,7 @@ public class ElasticsearchExtensionIT {
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
-				.build();
+				.toQuery();
 
 		List<String> result = query.execute().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -291,7 +291,7 @@ public class ElasticsearchExtensionIT {
 						)
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
-				.build();
+				.toQuery();
 
 		List<String> result = query.execute().getHits().stream()
 				.map( list -> (String) list.get( 0 ) )
@@ -317,7 +317,7 @@ public class ElasticsearchExtensionIT {
 		IndexSearchQuery<String> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
-				.build();
+				.toQuery();
 
 		List<String> result = query.execute().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -443,7 +443,7 @@ public class ElasticsearchExtensionIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,
 				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID

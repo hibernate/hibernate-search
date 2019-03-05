@@ -81,7 +81,7 @@ public class BooleanSortAndRangePredicateIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.sort( sortContributor )
-				.build();
+				.toQuery();
 	}
 
 	private IndexSearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactoryContext, SearchPredicateTerminalContext> rangePredicate) {
@@ -89,7 +89,7 @@ public class BooleanSortAndRangePredicateIT {
 		return scope.query()
 				.asReference()
 				.predicate( rangePredicate )
-				.build();
+				.toQuery();
 	}
 
 	@Test
@@ -136,7 +136,7 @@ public class BooleanSortAndRangePredicateIT {
 				.asReference()
 				.predicate( f -> f.range().onField( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
 				.sort( c -> c.byField( FIELD_PATH ).onMissingValue().sortLast() )
-				.build();
+				.toQuery();
 
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE, Boolean.TRUE, Boolean.TRUE );
 	}
@@ -202,7 +202,7 @@ public class BooleanSortAndRangePredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}

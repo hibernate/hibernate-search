@@ -68,7 +68,7 @@ public class ElasticsearchIndexSearchQueryIT {
 		IndexSearchQuery<Object> query = scope.query()
 				.asProjection( f -> f.field( "string" ) )
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
@@ -92,7 +92,7 @@ public class ElasticsearchIndexSearchQueryIT {
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.routing( routingKey )
-				.build();
+				.toQuery();
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()

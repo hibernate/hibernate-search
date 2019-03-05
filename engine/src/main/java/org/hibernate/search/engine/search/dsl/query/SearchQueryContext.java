@@ -26,6 +26,6 @@ public interface SearchQueryContext<Q> {
 
 	SearchQueryContext<Q> sort(Consumer<? super SearchSortContainerContext> sortContributor);
 
-	Q build();
+	Q toQuery();
 
 }

@@ -60,7 +60,7 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 	}
 
 	@Override
-	public Q build() {
+	public Q toQuery() {
 		/*
 		 * HSEARCH-3207: we must never call a contribution twice.
 		 * Contributions may have side-effects, such as finishing the building of a boolean predicate by adding

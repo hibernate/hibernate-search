@@ -117,7 +117,7 @@ public class WildcardSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<String, IndexSearchQuery<DocumentReference>> createQuery = queryString -> scope.query().asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( queryString ) )
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -142,7 +142,7 @@ public class WildcardSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -156,7 +156,7 @@ public class WildcardSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( fieldModel.relativeFieldName ).matching( "" ) )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasNoHits();
@@ -212,7 +212,7 @@ public class WildcardSearchPredicateIT {
 						.matching( PATTERN_1 )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -225,7 +225,7 @@ public class WildcardSearchPredicateIT {
 						.matching( PATTERN_1 )
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
@@ -246,7 +246,7 @@ public class WildcardSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
@@ -262,7 +262,7 @@ public class WildcardSearchPredicateIT {
 						)
 				)
 				.sort( c -> c.byScore() )
-				.build();
+				.toQuery();
 
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -282,7 +282,7 @@ public class WildcardSearchPredicateIT {
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath1 )
 						.matching( pattern )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -298,7 +298,7 @@ public class WildcardSearchPredicateIT {
 						.orField( absoluteFieldPath2 )
 						.matching( pattern )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -315,7 +315,7 @@ public class WildcardSearchPredicateIT {
 						.orFields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( pattern )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -331,7 +331,7 @@ public class WildcardSearchPredicateIT {
 				.predicate( f -> f.wildcard().onFields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( pattern )
 				)
-				.build();
+				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
@@ -397,7 +397,7 @@ public class WildcardSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -414,7 +414,7 @@ public class WildcardSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.wildcard().onField( absoluteFieldPath ).matching( PATTERN_1 ) )
-				.build();
+				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
 			b.doc( INDEX_NAME, DOCUMENT_1 );
@@ -484,18 +484,18 @@ public class WildcardSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 		query = compatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
-				.build();
+				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
