@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
@@ -14,14 +14,14 @@ import org.hibernate.search.engine.search.loading.spi.ObjectLoader;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
 
 /**
- * A wrapper around {@link MappedIndexSearchTarget} providing some syntactic sugar,
+ * A wrapper around {@link MappedIndexSearchScope} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
 public class GenericStubMappingSearchTarget<R, O> {
 
-	private final MappedIndexSearchTarget<R, O> indexSearchTarget;
+	private final MappedIndexSearchScope<R, O> indexSearchTarget;
 
-	GenericStubMappingSearchTarget(MappedIndexSearchTarget<R, O> indexSearchTarget) {
+	GenericStubMappingSearchTarget(MappedIndexSearchScope<R, O> indexSearchTarget) {
 		this.indexSearchTarget = indexSearchTarget;
 	}
 

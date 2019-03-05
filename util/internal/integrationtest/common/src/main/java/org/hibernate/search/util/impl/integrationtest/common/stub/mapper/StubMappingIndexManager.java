@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubMappingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionContext;
@@ -54,8 +54,8 @@ public class StubMappingIndexManager {
 	 * @return A search target scoped to this index only.
 	 */
 	public StubMappingSearchTarget createSearchTarget() {
-		MappedIndexSearchTargetBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchTargetBuilder( new StubMappingContext(), Function.identity() );
+		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
+				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
 		return new StubMappingSearchTarget( builder.build() );
 	}
 
@@ -63,10 +63,10 @@ public class StubMappingIndexManager {
 	 * @return A search target scoped to this index and the given other indexes.
 	 */
 	public StubMappingSearchTarget createSearchTarget(StubMappingIndexManager... others) {
-		MappedIndexSearchTargetBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createSearchTargetBuilder( new StubMappingContext(), Function.identity() );
+		MappedIndexSearchScopeBuilder<DocumentReference, DocumentReference> builder =
+				indexManager.createSearchScopeBuilder( new StubMappingContext(), Function.identity() );
 		for ( StubMappingIndexManager other : others ) {
-			other.indexManager.addToSearchTarget( builder );
+			other.indexManager.addTo( builder );
 		}
 		return new StubMappingSearchTarget( builder.build() );
 	}
@@ -76,10 +76,10 @@ public class StubMappingIndexManager {
 	 */
 	public <R, O> GenericStubMappingSearchTarget<R, O> createSearchTarget(
 			Function<DocumentReference, R> documentReferenceTransformer, StubMappingIndexManager... others) {
-		MappedIndexSearchTargetBuilder<R, O> builder =
-				indexManager.createSearchTargetBuilder( new StubMappingContext(), documentReferenceTransformer );
+		MappedIndexSearchScopeBuilder<R, O> builder =
+				indexManager.createSearchScopeBuilder( new StubMappingContext(), documentReferenceTransformer );
 		for ( StubMappingIndexManager other : others ) {
-			other.indexManager.addToSearchTarget( builder );
+			other.indexManager.addTo( builder );
 		}
 		return new GenericStubMappingSearchTarget<>( builder.build() );
 	}

@@ -12,25 +12,25 @@ import java.util.Collections;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.dsl.query.FullTextQueryResultDefinitionContext;
 
 public interface FullTextSession {
 
 	default <T> FullTextQueryResultDefinitionContext<T> search(Class<T> type) {
-		return target( type ).search();
+		return scope( type ).search();
 	}
 
 	default <T> FullTextQueryResultDefinitionContext<T> search(Collection<? extends Class<? extends T>> types) {
-		return target( types ).search();
+		return scope( types ).search();
 	}
 
-	default <T> FullTextSearchTarget<T> target(Class<T> type) {
-		return target( Collections.singleton( type ) );
+	default <T> SearchScope<T> scope(Class<T> type) {
+		return scope( Collections.singleton( type ) );
 	}
 
-	<T> FullTextSearchTarget<T> target(Collection<? extends Class<? extends T>> types);
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	MassIndexer createIndexer(Class<?>... types);
 

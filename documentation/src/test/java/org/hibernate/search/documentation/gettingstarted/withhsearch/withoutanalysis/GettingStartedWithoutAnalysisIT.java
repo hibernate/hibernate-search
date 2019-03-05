@@ -16,7 +16,7 @@ import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -102,7 +102,7 @@ public class GettingStartedWithoutAnalysisIT {
 			// Not shown: get the entity manager and open a transaction
 			FullTextSession fullTextSession = Search.getFullTextSession( entityManager ); // <1>
 
-			FullTextSearchTarget<Book> searchTarget = fullTextSession.target( Book.class ); // <2>
+			SearchScope<Book> searchTarget = fullTextSession.scope( Book.class ); // <2>
 
 			FullTextQuery<Book> query = searchTarget.search() // <3>
 					.asEntity() // <4>

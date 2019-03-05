@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.search.DocumentReference;
@@ -135,12 +135,12 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement> implements 
 		);
 	}
 
-	<R, O> MappedIndexSearchTargetBuilder<R, O> createSearchTargetBuilder(MappingContextImplementor mappingContext,
+	<R, O> MappedIndexSearchScopeBuilder<R, O> createSearchScopeBuilder(MappingContextImplementor mappingContext,
 			Function<DocumentReference, R> documentReferenceTransformer) {
-		return indexManager.createSearchTargetBuilder( mappingContext, documentReferenceTransformer );
+		return indexManager.createSearchScopeBuilder( mappingContext, documentReferenceTransformer );
 	}
 
-	void addToSearchTarget(MappedIndexSearchTargetBuilder<?, ?> builder) {
-		indexManager.addToSearchTarget( builder );
+	void addTo(MappedIndexSearchScopeBuilder<?, ?> builder) {
+		indexManager.addTo( builder );
 	}
 }

@@ -19,7 +19,7 @@ public interface SearchQueryResultContext<Q> {
 
 	/**
 	 * Set the predicate for this query.
-	 * @param predicate A {@link SearchPredicate} object obtained from the search target.
+	 * @param predicate A {@link SearchPredicate} object obtained from the search scope.
 	 * @return A context allowing to define the query further.
 	 */
 	SearchQueryContext<Q> predicate(SearchPredicate predicate);

@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSortBuilderFactory;
 
-class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryElementCollector> {
+class StubIndexSearchTargetContext implements IndexSearchScope<StubQueryElementCollector> {
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
 	private final StubSearchQueryBuilderFactory queryFactory;
@@ -58,7 +58,7 @@ class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryEleme
 		return projectionFactory;
 	}
 
-	static class Builder implements IndexSearchTargetContextBuilder {
+	static class Builder implements IndexSearchScopeBuilder {
 
 		private final StubBackend backend;
 		// In a real mapper, this should be used for some features; keeping this here in case we need to stub such feature
@@ -83,7 +83,7 @@ class StubIndexSearchTargetContext implements SearchTargetContext<StubQueryEleme
 		}
 
 		@Override
-		public SearchTargetContext<?> build() {
+		public IndexSearchScope<?> build() {
 			return new StubIndexSearchTargetContext( this );
 		}
 	}

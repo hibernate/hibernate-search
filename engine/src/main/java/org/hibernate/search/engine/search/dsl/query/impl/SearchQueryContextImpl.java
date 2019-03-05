@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryContext;
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
-import org.hibernate.search.engine.search.dsl.spi.SearchTargetContext;
+import org.hibernate.search.engine.search.dsl.spi.IndexSearchScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 
@@ -26,7 +26,7 @@ public final class SearchQueryContextImpl<T, Q, C> implements SearchQueryContext
 
 	private final SearchQuerySortCollector<? super C, ?> searchSortCollector;
 
-	public SearchQueryContextImpl(SearchTargetContext<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
+	public SearchQueryContextImpl(IndexSearchScope<C> targetContext, SearchQueryBuilder<T, C> searchQueryBuilder,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchQueryPredicateCollector<? super C, ?> searchPredicateCollector) {
 		this.searchQueryBuilder = searchQueryBuilder;

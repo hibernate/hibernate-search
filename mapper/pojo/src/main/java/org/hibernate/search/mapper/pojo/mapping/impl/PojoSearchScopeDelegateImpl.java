@@ -13,12 +13,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTargetBuilder;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScopeBuilder;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.query.SearchQueryResultContext;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoSessionContextImplementor;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoMappingContextImplementor;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
@@ -29,14 +29,14 @@ import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactory
 import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
 import org.hibernate.search.util.common.AssertionFailure;
 
-class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, O> {
+class PojoSearchScopeDelegateImpl<E, O> implements PojoSearchScopeDelegate<E, O> {
 
 	private final PojoIndexedTypeManagerContainer typeManagers;
 	private final Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers;
 	private final AbstractPojoSessionContextImplementor sessionContext;
-	private MappedIndexSearchTarget<PojoReference, O> indexSearchTarget;
+	private MappedIndexSearchScope<PojoReference, O> delegate;
 
-	PojoSearchTargetDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
+	PojoSearchScopeDelegateImpl(PojoIndexedTypeManagerContainer typeManagers,
 			Set<PojoIndexedTypeManager<?, ? extends E, ?>> targetedTypeManagers,
 			AbstractPojoSessionContextImplementor sessionContext) {
 		this.typeManagers = typeManagers;
@@ -45,7 +45,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	}
 
 	@Override
-	public Set<Class<? extends E>> getTargetedIndexedTypes() {
+	public Set<Class<? extends E>> getIncludedIndexedTypes() {
 		return targetedTypeManagers.stream()
 				.map( PojoIndexedTypeManager::getIndexedJavaClass )
 				.collect( Collectors.toCollection( LinkedHashSet::new ) );
@@ -54,7 +54,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	@Override
 	public <T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(ObjectLoader<PojoReference, T> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory) {
-		return getIndexSearchTarget().queryAsLoadedObject(
+		return getDelegate().queryAsLoadedObject(
 				sessionContext, objectLoader, searchQueryWrapperFactory
 		);
 	}
@@ -62,7 +62,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	@Override
 	public <Q> SearchQueryResultContext<Q> queryAsReference(
 			Function<IndexSearchQuery<PojoReference>, Q> searchQueryWrapperFactory) {
-		return getIndexSearchTarget().queryAsReference(
+		return getDelegate().queryAsReference(
 				sessionContext, searchQueryWrapperFactory
 		);
 	}
@@ -71,7 +71,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	public <T, Q> SearchQueryResultContext<Q> queryAsProjection(ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection) {
-		return getIndexSearchTarget().queryAsProjection(
+		return getDelegate().queryAsProjection(
 				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projection
 		);
@@ -81,7 +81,7 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 	public <Q> SearchQueryResultContext<Q> queryAsProjections(ObjectLoader<PojoReference, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections) {
-		return getIndexSearchTarget().queryAsProjections(
+		return getDelegate().queryAsProjections(
 				sessionContext, objectLoader, searchQueryWrapperFactory,
 				projections
 		);
@@ -89,32 +89,32 @@ class PojoSearchTargetDelegateImpl<E, O> implements PojoSearchTargetDelegate<E, 
 
 	@Override
 	public SearchPredicateFactoryContext predicate() {
-		return getIndexSearchTarget().predicate();
+		return getDelegate().predicate();
 	}
 
 	@Override
 	public SearchSortContainerContext sort() {
-		return getIndexSearchTarget().sort();
+		return getDelegate().sort();
 	}
 
 	@Override
 	public SearchProjectionFactoryContext<PojoReference, O> projection() {
-		return getIndexSearchTarget().projection();
+		return getDelegate().projection();
 	}
 
-	private MappedIndexSearchTarget<PojoReference, O> getIndexSearchTarget() {
+	private MappedIndexSearchScope<PojoReference, O> getDelegate() {
 		AbstractPojoMappingContextImplementor mappingContext = sessionContext.getMappingContext();
-		if ( indexSearchTarget == null ) {
+		if ( delegate == null ) {
 			Iterator<PojoIndexedTypeManager<?, ? extends E, ?>> iterator = targetedTypeManagers.iterator();
-			MappedIndexSearchTargetBuilder<PojoReference, O> builder = iterator.next().createSearchTargetBuilder(
+			MappedIndexSearchScopeBuilder<PojoReference, O> builder = iterator.next().createSearchScopeBuilder(
 					mappingContext, this::toPojoReference
 			);
 			while ( iterator.hasNext() ) {
-				iterator.next().addToSearchTarget( builder );
+				iterator.next().addTo( builder );
 			}
-			indexSearchTarget = builder.build();
+			delegate = builder.build();
 		}
-		return indexSearchTarget;
+		return delegate;
 	}
 
 	private PojoReference toPojoReference(DocumentReference documentReference) {

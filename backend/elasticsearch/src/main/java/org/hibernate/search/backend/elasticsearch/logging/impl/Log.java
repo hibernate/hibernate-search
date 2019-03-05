@@ -18,8 +18,8 @@ import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManage
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
@@ -252,16 +252,16 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_3 = MessageConstants.BACKEND_ES_ID_RANGE_MIN + 500;
 
 	@Message(id = ID_OFFSET_3 + 2,
-			value = "A search query cannot target both an Elasticsearch index and other types of index."
-					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchTargetWithOtherType(IndexSearchTargetContextBuilder firstTarget,
-			ElasticsearchIndexManager otherTarget, @Param EventContext context);
+			value = "A search query cannot have a scope spanning both an Elasticsearch index and another type of index."
+					+ " Base scope was: '%1$s', Elasticsearch index was: '%2$s'")
+	SearchException cannotMixElasticsearchSearchScopeWithOtherType(IndexSearchScopeBuilder baseScope,
+			ElasticsearchIndexManager elasticsearchIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 3,
-			value = "A search query cannot target multiple Elasticsearch backends."
-					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixElasticsearchSearchTargetWithOtherBackend(IndexSearchTargetContextBuilder firstTarget,
-			ElasticsearchIndexManager otherTarget, @Param EventContext context);
+			value = "A search query cannot have a scope spanning multiple Elasticsearch backends."
+					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
+	SearchException cannotMixElasticsearchSearchScopeWithOtherBackend(IndexSearchScopeBuilder baseScope,
+			ElasticsearchIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 4,
 			value = "Unknown field '%1$s'.")
@@ -273,7 +273,7 @@ public interface Log extends BasicLogger {
 	SearchException elasticsearchExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET_3 + 8,
-			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search target."
+			value = "An Elasticsearch query cannot include search predicates built using a non-Elasticsearch search scope."
 					+ " Given predicate was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
@@ -286,7 +286,7 @@ public interface Log extends BasicLogger {
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 11,
-			value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search target."
+			value = "An Elasticsearch query cannot include search sorts built using a non-Elasticsearch search scope."
 					+ " Given sort was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchSortWithOtherSorts(SearchSort sort);
 
@@ -397,7 +397,7 @@ public interface Log extends BasicLogger {
 	SearchException analysisComponentParameterConflict(String name, JsonElement value1, JsonElement value2);
 
 	@Message(id = ID_OFFSET_3 + 38,
-			value = "An Elasticsearch query cannot include search projections built using a non-Elasticsearch search target."
+			value = "An Elasticsearch query cannot include search projections built using a non-Elasticsearch search scope."
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixElasticsearchSearchQueryWithOtherProjections(SearchProjection<?> projection);
 

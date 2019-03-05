@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
@@ -34,14 +34,14 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
 
 
-	private final ElasticsearchSearchTargetModel searchTargetModel;
+	private final ElasticsearchSearchScopeModel scopeModel;
 
 	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 
-	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchTargetModel searchTargetModel) {
-		this.searchTargetModel = searchTargetModel;
+	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchSearchScopeModel scopeModel) {
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	public FieldContext field(String absoluteFieldPath) {
 		ElasticsearchSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = searchTargetModel.getSchemaNodeComponent(
+			field = scopeModel.getSchemaNodeComponent(
 					absoluteFieldPath,
 					ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
 					DslConverter.DISABLED

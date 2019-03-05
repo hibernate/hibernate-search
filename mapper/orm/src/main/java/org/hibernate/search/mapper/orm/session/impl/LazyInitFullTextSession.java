@@ -14,7 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 
@@ -44,8 +44,8 @@ public class LazyInitFullTextSession implements FullTextSession {
 	}
 
 	@Override
-	public <T> FullTextSearchTarget<T> target(Collection<? extends Class<? extends T>> types) {
-		return getDelegate().target( types );
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+		return getDelegate().scope( types );
 	}
 
 	@Override

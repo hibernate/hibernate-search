@@ -18,36 +18,36 @@ import org.hibernate.search.mapper.javabean.search.dsl.query.JavaBeanQueryResult
 import org.hibernate.search.mapper.javabean.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.search.query.impl.JavaBeanSearchQuery;
 import org.hibernate.search.mapper.pojo.search.PojoReference;
-import org.hibernate.search.mapper.pojo.search.spi.PojoSearchTargetDelegate;
+import org.hibernate.search.mapper.pojo.search.spi.PojoSearchScopeDelegate;
 
 public class JavaBeanQueryResultDefinitionContextImpl implements JavaBeanQueryResultDefinitionContext {
-	private final PojoSearchTargetDelegate<?, PojoReference> delegate;
+	private final PojoSearchScopeDelegate<?, PojoReference> searchScopeDelegate;
 
-	public JavaBeanQueryResultDefinitionContextImpl(PojoSearchTargetDelegate<?, PojoReference> delegate) {
-		this.delegate = delegate;
+	public JavaBeanQueryResultDefinitionContextImpl(PojoSearchScopeDelegate<?, PojoReference> searchScopeDelegate) {
+		this.searchScopeDelegate = searchScopeDelegate;
 	}
 
 	@Override
 	public SearchQueryResultContext<SearchQuery<PojoReference>> asReference() {
-		return delegate.queryAsReference( JavaBeanSearchQuery::new );
+		return searchScopeDelegate.queryAsReference( JavaBeanSearchQuery::new );
 	}
 
 	@Override
 	public <T> SearchQueryResultContext<SearchQuery<T>> asProjection(
 			Function<? super SearchProjectionFactoryContext<PojoReference, ?>, ? extends SearchProjectionTerminalContext<T>> projectionContributor) {
-		return asProjection( projectionContributor.apply( delegate.projection() ).toProjection() );
+		return asProjection( projectionContributor.apply( searchScopeDelegate.projection() ).toProjection() );
 	}
 
 	@Override
 	public <T> SearchQueryResultContext<SearchQuery<T>> asProjection(SearchProjection<T> projection) {
-		return delegate.queryAsProjection(
+		return searchScopeDelegate.queryAsProjection(
 				ObjectLoader.identity(), JavaBeanSearchQuery::new, projection
 		);
 	}
 
 	@Override
 	public SearchQueryResultContext<SearchQuery<List<?>>> asProjections(SearchProjection<?>... projections) {
-		return delegate.queryAsProjections(
+		return searchScopeDelegate.queryAsProjections(
 				ObjectLoader.identity(), JavaBeanSearchQuery::new, projections
 		);
 	}

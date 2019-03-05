@@ -18,8 +18,8 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
+import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.backend.index.spi.IndexSearchTargetContextBuilder;
 import org.hibernate.search.engine.search.SearchPredicate;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.SearchSort;
@@ -179,7 +179,7 @@ public interface Log extends BasicLogger {
 	SearchException luceneExtensionOnUnknownType(Object context);
 
 	@Message(id = ID_OFFSET_2 + 10,
-			value = "A Lucene query cannot include search predicates built using a non-Lucene search target."
+			value = "A Lucene query cannot include search predicates built using a non-Lucene search scope."
 			+ " Given predicate was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherPredicates(SearchPredicate predicate);
 
@@ -192,7 +192,7 @@ public interface Log extends BasicLogger {
 	SearchException nonNestedFieldForNestedQuery(String absoluteFieldPath, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 14,
-			value = "A Lucene query cannot include search sorts built using a non-Lucene search target."
+			value = "A Lucene query cannot include search sorts built using a non-Lucene search scope."
 			+ " Given sort was: '%1$s'")
 	SearchException cannotMixLuceneSearchSortWithOtherSorts(SearchSort sort);
 
@@ -232,16 +232,16 @@ public interface Log extends BasicLogger {
 	SearchException unableToCreateIndexReader(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 24,
-			value = "A search query cannot target both a Lucene index and other types of index."
-					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixLuceneSearchTargetWithOtherType(IndexSearchTargetContextBuilder firstTarget,
-			LuceneIndexManager otherTarget, @Param EventContext context);
+			value = "A search query cannot have a scope spanning both an Lucene index and another type of index."
+					+ " Base scope was: '%1$s', Lucene index was: '%2$s'")
+	SearchException cannotMixLuceneSearchScopeWithOtherType(IndexSearchScopeBuilder baseScope,
+			LuceneIndexManager luceneIndex, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 25,
-			value = "A search query cannot target multiple Lucene backends."
-					+ " First target was: '%1$s', other target was: '%2$s'")
-	SearchException cannotMixLuceneSearchTargetWithOtherBackend(IndexSearchTargetContextBuilder firstTarget,
-			LuceneIndexManager otherTarget, @Param EventContext context);
+			value = "A search query cannot have a scope spanning multiple Lucene backends."
+					+ " Base scope was: '%1$s', index from another backend was: '%2$s'")
+	SearchException cannotMixLuceneSearchScopeWithOtherBackend(IndexSearchScopeBuilder baseScope,
+			LuceneIndexManager indexFromOtherBackend, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "An IOException happened while executing the query '%1$s'.")
@@ -356,7 +356,7 @@ public interface Log extends BasicLogger {
 	SearchException unknownNormalizer(String normalizerName, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 55,
-			value = "A Lucene query cannot include search projections built using a non-Lucene search target."
+			value = "A Lucene query cannot include search projections built using a non-Lucene search scope."
 			+ " Given projection was: '%1$s'")
 	SearchException cannotMixLuceneSearchQueryWithOtherProjections(SearchProjection<?> projection);
 

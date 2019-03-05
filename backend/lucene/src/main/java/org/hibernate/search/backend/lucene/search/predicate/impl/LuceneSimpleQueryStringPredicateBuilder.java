@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
@@ -23,14 +23,14 @@ import org.apache.lucene.search.Query;
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
 
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel scopeModel;
 
 	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldContext> fields = new LinkedHashMap<>();
 	private Occur defaultOperator = Occur.SHOULD;
 	private String simpleQueryString;
 
-	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchTargetModel searchTargetModel) {
-		this.searchTargetModel = searchTargetModel;
+	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchScopeModel scopeModel) {
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	public FieldContext field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = searchTargetModel.getSchemaNodeComponent(
+			field = scopeModel.getSchemaNodeComponent(
 					absoluteFieldPath,
 					LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
 					DslConverter.DISABLED

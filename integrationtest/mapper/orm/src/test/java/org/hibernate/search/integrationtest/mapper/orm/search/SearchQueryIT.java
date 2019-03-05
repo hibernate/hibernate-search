@@ -20,7 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.FullTextQuery;
-import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.SearchScope;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -135,7 +135,7 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			FullTextSearchTarget<Book> searchTarget = ftSession.target( Book.class );
+			SearchScope<Book> searchTarget = ftSession.scope( Book.class );
 
 			FullTextQuery<String> query = searchTarget.search()
 					.asProjection(
@@ -170,7 +170,7 @@ public class SearchQueryIT {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			FullTextSession ftSession = Search.getFullTextSession( session );
 
-			FullTextSearchTarget<Book> searchTarget = ftSession.target( Book.class );
+			SearchScope<Book> searchTarget = ftSession.scope( Book.class );
 
 			FullTextQuery<List<?>> query = searchTarget.search()
 					.asProjections(

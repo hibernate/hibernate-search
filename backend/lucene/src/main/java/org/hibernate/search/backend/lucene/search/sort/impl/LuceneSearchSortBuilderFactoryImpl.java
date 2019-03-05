@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
 import org.hibernate.search.engine.search.SearchSort;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
@@ -39,12 +39,12 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 			new SortBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel scopeModel;
 
 	public LuceneSearchSortBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneSearchTargetModel searchTargetModel) {
+			LuceneSearchScopeModel scopeModel) {
 		this.searchContext = searchContext;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -74,14 +74,14 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 
 	@Override
 	public FieldSortBuilder<LuceneSearchSortBuilder> field(String absoluteFieldPath, DslConverter dslConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
 				.createFieldSortBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceSortBuilder( absoluteFieldPath, location );
 	}

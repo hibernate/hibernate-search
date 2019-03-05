@@ -25,7 +25,7 @@ public class ObjectProjectionContextImpl<O> implements ObjectProjectionContext<O
 	 * The backend has no control over the type of loaded objects.
 	 * This cast is only safe because we make sure to only use SearchProjectionFactoryContext
 	 * with generic type arguments that are consistent with the type of object loaders.
-	 * See comments in MappedIndexSearchTarget.
+	 * See comments in MappedIndexSearchScope.
 	 */
 	public SearchProjection<O> toProjection() {
 		return objectProjectionBuilder.build();

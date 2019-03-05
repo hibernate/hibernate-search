@@ -27,7 +27,7 @@ import org.hibernate.search.engine.search.dsl.sort.SearchSortContainerContext;
  * when not using any hit transformer,
  * or the type of objects returned for {@link SearchProjectionFactoryContext#object() loaded object projections}.
  */
-public interface MappedIndexSearchTarget<R, O> {
+public interface MappedIndexSearchScope<R, O> {
 
 	<T, Q> SearchQueryResultContext<Q> queryAsLoadedObject(
 			SessionContextImplementor sessionContext,

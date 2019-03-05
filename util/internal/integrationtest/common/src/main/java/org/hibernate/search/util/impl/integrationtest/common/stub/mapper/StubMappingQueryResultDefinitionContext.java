@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchTarget;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexSearchScope;
 import org.hibernate.search.engine.search.SearchProjection;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
@@ -20,11 +20,11 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.StubSessionCon
 
 public final class StubMappingQueryResultDefinitionContext<R, O> {
 
-	private final MappedIndexSearchTarget<R, O> indexSearchTarget;
+	private final MappedIndexSearchScope<R, O> indexSearchTarget;
 	private final StubSessionContext sessionContext;
 	private final ObjectLoader<R, O> objectLoader;
 
-	StubMappingQueryResultDefinitionContext(MappedIndexSearchTarget<R, O> indexSearchTarget,
+	StubMappingQueryResultDefinitionContext(MappedIndexSearchScope<R, O> indexSearchTarget,
 			StubSessionContext sessionContext,
 			ObjectLoader<R, O> objectLoader) {
 		this.indexSearchTarget = indexSearchTarget;

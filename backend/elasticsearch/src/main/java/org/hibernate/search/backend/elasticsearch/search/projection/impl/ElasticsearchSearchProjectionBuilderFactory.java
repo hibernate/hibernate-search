@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchTargetModel;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.SearchProjection;
@@ -44,12 +44,12 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
-	private final ElasticsearchSearchTargetModel searchTargetModel;
+	private final ElasticsearchSearchScopeModel scopeModel;
 
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
-			ElasticsearchSearchTargetModel searchTargetModel) {
+			ElasticsearchSearchScopeModel scopeModel) {
 		this.searchProjectionBackendContext = searchProjectionBackendContext;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
 	}
@@ -81,7 +81,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
-		return searchTargetModel
+		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}

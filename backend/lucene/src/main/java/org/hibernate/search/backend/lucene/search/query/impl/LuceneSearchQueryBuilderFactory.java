@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchTargetModel;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneCompositeListProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
@@ -28,15 +28,15 @@ class LuceneSearchQueryBuilderFactory
 
 	private final SearchBackendContext searchBackendContext;
 
-	private final LuceneSearchTargetModel searchTargetModel;
+	private final LuceneSearchScopeModel scopeModel;
 
 	private final LuceneSearchProjectionBuilderFactory searchProjectionFactory;
 
 	LuceneSearchQueryBuilderFactory(SearchBackendContext searchBackendContext,
-			LuceneSearchTargetModel searchTargetModel,
+			LuceneSearchScopeModel scopeModel,
 			LuceneSearchProjectionBuilderFactory searchProjectionFactory) {
 		this.searchBackendContext = searchBackendContext;
-		this.searchTargetModel = searchTargetModel;
+		this.scopeModel = scopeModel;
 		this.searchProjectionFactory = searchProjectionFactory;
 	}
 
@@ -81,7 +81,7 @@ class LuceneSearchQueryBuilderFactory
 			SessionContextImplementor sessionContext, ProjectionHitMapper<?, ?> projectionHitMapper,
 			LuceneSearchProjection<?, T> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
-				searchTargetModel, sessionContext, projectionHitMapper, rootProjection
+				scopeModel, sessionContext, projectionHitMapper, rootProjection
 		);
 	}
 }

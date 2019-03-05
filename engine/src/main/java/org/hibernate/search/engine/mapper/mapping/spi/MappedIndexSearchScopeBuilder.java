@@ -9,8 +9,8 @@ package org.hibernate.search.engine.mapper.mapping.spi;
 /**
  * @author Yoann Rodiere
  */
-public interface MappedIndexSearchTargetBuilder<R, O> {
+public interface MappedIndexSearchScopeBuilder<R, O> {
 
-	MappedIndexSearchTarget<R, O> build();
+	MappedIndexSearchScope<R, O> build();
 
 }

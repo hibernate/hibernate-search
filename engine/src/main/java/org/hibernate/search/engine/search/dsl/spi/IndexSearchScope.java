@@ -12,11 +12,11 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilderFactory;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 /**
- * The target context during a search, aware of the targeted indexes and of the underlying technology (backend).
+ * The scope of a search, aware of the targeted indexes and of the underlying technology (backend).
  *
  * @param <C> The type of query element collector
  */
-public interface SearchTargetContext<C> {
+public interface IndexSearchScope<C> {
 
 	SearchPredicateBuilderFactory<? super C, ?> getSearchPredicateBuilderFactory();
 
