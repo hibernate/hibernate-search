@@ -10,8 +10,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.mapper.orm.search.impl.HibernateOrmSearchTargetImpl;
-import org.hibernate.search.mapper.orm.search.spi.HibernateOrmSearchTarget;
+import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
+import org.hibernate.search.mapper.orm.search.impl.FullTextSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
 import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
@@ -38,14 +38,14 @@ public class HibernateOrmSearchManagerImpl extends AbstractPojoSearchManager
 	}
 
 	@Override
-	public <T> HibernateOrmSearchTarget<T> search(Class<T> targetedType) {
+	public <T> FullTextSearchTarget<T> search(Class<T> targetedType) {
 		return search( Collections.singleton( targetedType ) );
 	}
 
 	@Override
-	public <T> HibernateOrmSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
+	public <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> targetedTypes) {
 		PojoSearchTargetDelegate<T, T> searchTargetDelegate = getDelegate().createPojoSearchTarget( targetedTypes );
-		return new HibernateOrmSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
+		return new FullTextSearchTargetImpl<>( searchTargetDelegate, sessionImplementor );
 	}
 
 	@Override

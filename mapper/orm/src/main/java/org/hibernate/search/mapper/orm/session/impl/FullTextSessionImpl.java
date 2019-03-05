@@ -15,7 +15,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
-import org.hibernate.search.mapper.orm.search.impl.FullTextSearchTargetImpl;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
@@ -42,12 +41,12 @@ public class FullTextSessionImpl implements FullTextSession {
 
 	@Override
 	public final <T> FullTextSearchTarget<T> search(Class<T> type) {
-		return new FullTextSearchTargetImpl<>( getSearchManager().search( type ) );
+		return getSearchManager().search( type );
 	}
 
 	@Override
 	public final <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types) {
-		return new FullTextSearchTargetImpl<>( getSearchManager().search( types ) );
+		return getSearchManager().search( types );
 	}
 
 	@Override
