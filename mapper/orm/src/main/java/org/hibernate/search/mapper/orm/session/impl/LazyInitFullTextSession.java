@@ -16,55 +16,54 @@ import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.FullTextSearchTarget;
 import org.hibernate.search.mapper.orm.session.FullTextSession;
-import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 
-public class FullTextSessionImpl implements FullTextSession {
+/**
+ * A lazily initializing {@link FullTextSession}.
+ * <p>
+ * This implementation allows to call {@link org.hibernate.search.mapper.orm.Search#getFullTextSession(Session)}
+ * before Hibernate Search is fully initialized, which can be useful in CDI/Spring environments.
+ */
+public class LazyInitFullTextSession implements FullTextSession {
 
-	private final SessionImplementor delegate;
+	private final SessionImplementor sessionImplementor;
+	private FullTextSessionImplementor delegate;
 
-	private HibernateOrmSearchManager searchManager = null;
-
-	public FullTextSessionImpl(SessionImplementor delegate) {
-		this.delegate = delegate;
+	public LazyInitFullTextSession(SessionImplementor sessionImplementor) {
+		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
 	public EntityManager toJpaEntityManager() {
-		return delegate;
+		return getDelegate().toJpaEntityManager();
 	}
 
 	@Override
 	public Session toHibernateOrmSession() {
-		return delegate;
+		return getDelegate().toHibernateOrmSession();
 	}
 
 	@Override
 	public final <T> FullTextSearchTarget<T> search(Class<T> type) {
-		return getSearchManager().search( type );
+		return getDelegate().search( type );
 	}
 
 	@Override
 	public final <T> FullTextSearchTarget<T> search(Collection<? extends Class<? extends T>> types) {
-		return getSearchManager().search( types );
+		return getDelegate().search( types );
 	}
 
 	@Override
 	public MassIndexer createIndexer(Class<?>... types) {
-		if ( types.length == 0 ) {
-			// by default reindex all entities
-			types = new Class<?>[] { Object.class };
-		}
-
-		return new MassIndexerImpl( delegate.getFactory(), delegate.getTenantIdentifier(), types );
+		return getDelegate().createIndexer( types );
 	}
 
-	private HibernateOrmSearchManager getSearchManager() {
-		if ( searchManager == null ) {
-			HibernateSearchContextService contextService = delegate.getSessionFactory().getServiceRegistry()
+	private FullTextSessionImplementor getDelegate() {
+		if ( delegate == null ) {
+			HibernateSearchContextService contextService = sessionImplementor.getSessionFactory().getServiceRegistry()
 					.getService( HibernateSearchContextService.class );
-			searchManager = contextService.getSearchManager( delegate );
+			delegate = contextService.getFullTextSession( sessionImplementor );
 		}
-		return searchManager;
+		return delegate;
 	}
 }

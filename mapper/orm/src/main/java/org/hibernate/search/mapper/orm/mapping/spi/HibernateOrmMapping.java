@@ -10,16 +10,16 @@ import java.util.Set;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.mapper.orm.session.FullTextSession;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManagerBuilder;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionBuilder;
 import org.hibernate.search.mapper.pojo.work.spi.PojoMappingWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
 
 public interface HibernateOrmMapping {
 
-	HibernateOrmSearchManager createSearchManager(EntityManager entityManager);
+	FullTextSessionImplementor createFullTextSession(EntityManager entityManager);
 
-	HibernateOrmSearchManagerBuilder createSearchManagerWithOptions(EntityManager entityManager);
+	FullTextSessionBuilder createFullTextSessionWithOptions(EntityManager entityManager);
 
 	/**
 	 * @param type A Java type.

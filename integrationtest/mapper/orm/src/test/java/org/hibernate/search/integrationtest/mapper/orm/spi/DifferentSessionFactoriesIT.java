@@ -14,7 +14,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
 import org.hibernate.search.mapper.orm.mapping.spi.HibernateOrmMapping;
-import org.hibernate.search.mapper.orm.session.spi.HibernateOrmSearchManager;
+import org.hibernate.search.mapper.orm.session.spi.FullTextSessionImplementor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests the creation of a {@link HibernateOrmSearchManager}, using a {@link HibernateOrmMapping} with an {@link EntityManager} owned by a different {@link SessionFactory}.
+ * Tests the creation of a {@link FullTextSessionImplementor}, using a {@link HibernateOrmMapping} with an {@link EntityManager} owned by a different {@link SessionFactory}.
  *
  * @author Fabio Massimo Ercoli
  */
@@ -54,7 +54,7 @@ public class DifferentSessionFactoriesIT {
 	@Test
 	public void tryToUseDifferentSessionFactories() {
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Mapping service cannot create a search manager using a different session factory." );
+		thrown.expectMessage( "Mapping service cannot create a FullTextSession using a different session factory." );
 
 		// service mapping is taken from the alternative session factory
 		HibernateOrmMapping serviceMapping = sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
@@ -62,7 +62,7 @@ public class DifferentSessionFactoriesIT {
 
 		// try to use an entityManager owned by the original session factory instead
 		OrmUtils.withinSession( sessionFactory, session -> {
-			serviceMapping.createSearchManager( session );
+			serviceMapping.createFullTextSession( session );
 		} );
 	}
 
