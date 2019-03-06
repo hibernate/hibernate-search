@@ -47,8 +47,8 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	private final MutableObjectLoadingOptions loadingOptions;
 
-	private Integer firstResult;
-	private Integer maxResults;
+	private Long firstResult;
+	private Long maxResults;
 
 	public HibernateOrmSearchQuery(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
 			MutableObjectLoadingOptions loadingOptions) {
@@ -142,29 +142,25 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public HibernateOrmSearchQuery<R> setMaxResults(int maxResults) {
-		if ( maxResults < 0 ) {
+	public HibernateOrmSearchQuery<R> setMaxResults(Long maxResults) {
+		if ( maxResults != null && maxResults < 0L ) {
 			throw new IllegalArgumentException(
-					"Negative ("
-							+ maxResults
-							+ ") parameter passed in to setMaxResults"
+					"Negative (" + maxResults + ") parameter passed in to setMaxResults"
 			);
 		}
-		delegate.setMaxResults( (long) maxResults );
+		delegate.setMaxResults( maxResults );
 		this.maxResults = maxResults;
 		return this;
 	}
 
 	@Override
-	public HibernateOrmSearchQuery<R> setFirstResult(int firstResult) {
-		if ( firstResult < 0 ) {
+	public HibernateOrmSearchQuery<R> setFirstResult(Long firstResult) {
+		if ( maxResults != null && firstResult < 0L ) {
 			throw new IllegalArgumentException(
-					"Negative ("
-							+ firstResult
-							+ ") parameter passed in to setFirstResult"
+					"Negative (" + firstResult + ") parameter passed in to setFirstResult"
 			);
 		}
-		delegate.setFirstResult( (long) firstResult );
+		delegate.setFirstResult( firstResult );
 		this.firstResult = firstResult;
 		return this;
 	}
@@ -210,15 +206,23 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
+	public HibernateOrmSearchQuery<R> setMaxResults(int maxResult) {
+		return setMaxResults( (long) maxResult );
+	}
+
+	@Override
 	public int getMaxResults() {
-		return maxResults == null || maxResults == -1
-				? Integer.MAX_VALUE
-				: maxResults;
+		return maxResults == null ? Integer.MAX_VALUE : maxResults.intValue();
+	}
+
+	@Override
+	public HibernateOrmSearchQuery<R> setFirstResult(int startPosition) {
+		return setFirstResult( (long) startPosition );
 	}
 
 	@Override
 	public int getFirstResult() {
-		return firstResult == null ? 0 : firstResult;
+		return firstResult == null ? 0 : firstResult.intValue();
 	}
 
 	@Override

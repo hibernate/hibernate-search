@@ -60,7 +60,7 @@ public interface SearchQuery<T> {
 
 	/**
 	 * Execute the query and retrieve the total hit count,
-	 * ignoring pagination settings ({@link #setMaxResults(int)} and {@link #setFirstResult(int)}).
+	 * ignoring pagination settings ({@link #setMaxResults(Long)} and {@link #setFirstResult(Long)}).
 	 *
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
@@ -72,9 +72,17 @@ public interface SearchQuery<T> {
 	 * <p>
 	 * The default is no limit.
 	 *
+	 * @param maxResults The maximum number of results to return. Must be positive or zero; {@code null} resets to the default value.
+	 * @return {@code this} for method chaining.
+	 */
+	SearchQuery<T> setMaxResults(Long maxResults);
+
+	/**
+	 * @deprecated Pass a {@code long} value and use {@link #setMaxResults(Long)} instead.
 	 * @param maxResults The maximum number of results to return. Must be positive or zero.
 	 * @return {@code this} for method chaining.
 	 */
+	@Deprecated
 	SearchQuery<T> setMaxResults(int maxResults);
 
 	/**
@@ -82,9 +90,17 @@ public interface SearchQuery<T> {
 	 * <p>
 	 * The default offset is {@code 0}.
 	 *
+	 * @param firstResult The offset of the first result. Must be positive or zero; {@code null} resets to the default value.
+	 * @return {@code this} for method chaining.
+	 */
+	SearchQuery<T> setFirstResult(Long firstResult);
+
+	/**
+	 * @deprecated Pass a {@code long} value and use {@link #setFirstResult(Long)} instead.
 	 * @param firstResult The offset of the first result. Must be positive or zero.
 	 * @return {@code this} for method chaining.
 	 */
+	@Deprecated
 	SearchQuery<T> setFirstResult(int firstResult);
 
 	/**

@@ -113,6 +113,32 @@ public class SearchQueryIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
+			query.setFirstResult( 2L );
+			query.setMaxResults( 3L );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> b.firstResultIndex( 2L )
+							.maxResultsCount( 3L ),
+					StubSearchWorkBehavior.of(
+							0L
+					)
+			);
+
+			query.getResultList();
+		} );
+	}
+
+	@Test
+	public void offsetAndLimit_integer() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
 			query.setFirstResult( 2 );
 			query.setMaxResults( 3 );
 
@@ -126,8 +152,6 @@ public class SearchQueryIT {
 			);
 
 			query.getResultList();
-
-			// TODO also test getResultSize
 		} );
 	}
 
