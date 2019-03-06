@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.document.impl;
 
-import org.apache.lucene.index.IndexableField;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
+
+import org.apache.lucene.index.IndexableField;
 
 /**
  * @author Guillaume Smet
@@ -16,11 +16,5 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 public interface LuceneDocumentBuilder extends DocumentElement {
 
 	void addField(IndexableField field);
-
-	void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder);
-
-	void addFlattenedObjectDocumentBuilder(LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder);
-
-	void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode);
 
 }

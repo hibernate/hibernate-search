@@ -35,11 +35,15 @@ public final class IndexSchemaObjectFieldDefinitionHelper {
 	 * @return A (potentially un-{@link #initialize(IndexObjectFieldAccessor) initialized}) accessor
 	 */
 	public IndexObjectFieldAccessor createAccessor() {
+		onCreateReference();
+		return rawAccessor;
+	}
+
+	public void onCreateReference() {
 		if ( accessorCreated ) {
 			throw log.cannotCreateAccessorMultipleTimes( schemaContext.getEventContext() );
 		}
 		accessorCreated = true;
-		return rawAccessor;
 	}
 
 	/**
@@ -51,9 +55,13 @@ public final class IndexSchemaObjectFieldDefinitionHelper {
 	 * @param delegate The delegate to use when writing to the accessor returned by {@link #createAccessor()}.
 	 */
 	public void initialize(IndexObjectFieldAccessor delegate) {
+		checkReferenceCreated();
+		rawAccessor.initialize( delegate );
+	}
+
+	public void checkReferenceCreated() {
 		if ( !accessorCreated ) {
 			throw log.incompleteFieldDefinition( schemaContext.getEventContext() );
 		}
-		rawAccessor.initialize( delegate );
 	}
 }

@@ -11,12 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.spi.NoOpDocumentElement;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -40,24 +42,45 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 
 	@Override
 	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+		LuceneIndexFieldReference<F> luceneFieldReference = (LuceneIndexFieldReference<F>) fieldReference;
+		if ( !luceneFieldReference.isEnabled() ) {
+			return;
+		}
+
+		LuceneIndexSchemaFieldNode<F> fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		checkTreeConsistency( fieldSchemaNode.getParent() );
+
+		fieldSchemaNode.getCodec().encode( this, fieldSchemaNode.getAbsoluteFieldPath(), value );
 	}
 
 	@Override
 	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+		LuceneIndexObjectFieldReference luceneFieldReference = (LuceneIndexObjectFieldReference) fieldReference;
+		if ( !luceneFieldReference.isEnabled() ) {
+			return NoOpDocumentElement.get();
+		}
+
+		LuceneIndexSchemaObjectNode fieldSchemaNode = luceneFieldReference.getSchemaNode();
+		checkTreeConsistency( fieldSchemaNode.getParent() );
+
+		switch ( luceneFieldReference.getStorage() ) {
+			case NESTED:
+				LuceneNestedObjectDocumentBuilder nestedDocumentBuilder = new LuceneNestedObjectDocumentBuilder( fieldSchemaNode );
+				addNestedObjectDocumentBuilder( nestedDocumentBuilder );
+				return nestedDocumentBuilder;
+			default:
+				LuceneFlattenedObjectDocumentBuilder flattenedDocumentBuilder = new LuceneFlattenedObjectDocumentBuilder( fieldSchemaNode );
+				addFlattenedObjectDocumentBuilder( flattenedDocumentBuilder );
+				return flattenedDocumentBuilder;
+		}
 	}
 
 	@Override
 	public void addNullObject(IndexObjectFieldReference fieldReference) {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+		// we ignore the null objects
 	}
 
-	@Override
-	public void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
+	private void addNestedObjectDocumentBuilder(LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder) {
 		if ( nestedObjectDocumentBuilders == null ) {
 			nestedObjectDocumentBuilders = new ArrayList<>();
 		}
@@ -65,8 +88,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 		nestedObjectDocumentBuilders.add( nestedObjectDocumentBuilder );
 	}
 
-	@Override
-	public void addFlattenedObjectDocumentBuilder(
+	private void addFlattenedObjectDocumentBuilder(
 			LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder) {
 		if ( flattenedObjectDocumentBuilders == null ) {
 			flattenedObjectDocumentBuilders = new ArrayList<>();
@@ -75,8 +97,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 		flattenedObjectDocumentBuilders.add( flattenedObjectDocumentBuilder );
 	}
 
-	@Override
-	public void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode) {
+	private void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
 			throw log.invalidParentDocumentObjectState( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}

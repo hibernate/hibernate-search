@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.types.impl;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexFieldAccessor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
@@ -14,7 +13,6 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -45,7 +43,7 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
-	public IndexFieldAccessor<F> addField(LuceneIndexSchemaNodeCollector collector,
+	public LuceneIndexSchemaFieldNode<F> addField(LuceneIndexSchemaNodeCollector collector,
 			LuceneIndexSchemaObjectNode parentNode, String relativeFieldName) {
 		LuceneIndexSchemaFieldNode<F> schemaNode = new LuceneIndexSchemaFieldNode<>(
 				parentNode,
@@ -62,6 +60,6 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 			collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
 		}
 
-		return new LuceneIndexFieldAccessor<>( schemaNode );
+		return schemaNode;
 	}
 }
