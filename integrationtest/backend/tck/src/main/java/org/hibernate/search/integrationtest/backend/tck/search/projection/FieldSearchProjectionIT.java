@@ -191,6 +191,27 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
+	public void error_invalidProjectionType_rawField() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			Class<?> rightType = fieldModel.type;
+			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
+
+			SubTest.expectException(
+					() -> searchTarget.projection().rawField( fieldPath, wrongType ).toProjection()
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid type" )
+					.hasMessageContaining( "for projection on field" )
+					.hasMessageContaining( "'" + fieldPath + "'" );
+		}
+	}
+
+	@Test
 	public void error_unknownField() {
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
@@ -262,6 +283,52 @@ public class FieldSearchProjectionIT {
 				new ValueWrapper<>( fieldModel.document3Value.indexedValue ),
 				new ValueWrapper<>( null )
 			);
+		}
+	}
+
+	@Test
+	public void withProjectionConverters_rawValues() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
+
+				assertThat(
+						searchTarget.query()
+								.asProjection( f -> f.rawField( fieldPath, model.type ) )
+								.predicate( f -> f.matchAll() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
+			} );
+		}
+	}
+
+	@Test
+	public void withProjectionConverters_rawValues_withoutType() {
+		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
+
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
+			SubTest.expectSuccess( fieldModel, model -> {
+				String fieldPath = model.relativeFieldName;
+
+				assertThat(
+						searchTarget.query()
+								.asProjection( f -> f.rawField( fieldPath ) )
+								.predicate( f -> f.matchAll() )
+								.build()
+				).hasHitsAnyOrder(
+						model.document1Value.indexedValue,
+						model.document2Value.indexedValue,
+						model.document3Value.indexedValue,
+						null // Empty document
+				);
+			} );
 		}
 	}
 
