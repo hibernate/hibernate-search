@@ -439,7 +439,7 @@ public class ProgrammaticMappingSmokeIT {
 			);
 
 
-			SearchResult<PojoReference> result = query.execute();
+			SearchResult<PojoReference> result = query.getResult();
 			assertThat( result.getHits() )
 					.containsExactly(
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
@@ -475,7 +475,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			SearchResult<String> result = query.execute();
+			SearchResult<String> result = query.getResult();
 			assertThat( result.getHits() )
 					.containsExactly(
 							"text1",
@@ -527,7 +527,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			SearchResult<List<?>> result = query.execute();
+			SearchResult<List<?>> result = query.getResult();
 			assertThat( result.getHits() )
 					.containsExactly(
 							Arrays.asList(

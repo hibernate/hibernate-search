@@ -17,7 +17,7 @@ public interface SearchQuery<T> {
 	 * @return The results.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	SearchResult<T> execute();
+	SearchResult<T> getResult();
 
 	/**
 	 * Execute the query and retrieve the total hit count,
@@ -26,7 +26,7 @@ public interface SearchQuery<T> {
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	long executeCount();
+	long getResultSize();
 
 	/**
 	 * Set the maximum number of results returned by this query.
@@ -34,8 +34,9 @@ public interface SearchQuery<T> {
 	 * The default is no limit.
 	 *
 	 * @param maxResults The maximum number of results to return. Must be positive or zero; {@code null} resets to the default.
+	 * @return {@code this} for method chaining.
 	 */
-	void setMaxResults(Long maxResults);
+	SearchQuery<T> setMaxResults(Long maxResults);
 
 	/**
 	 * Set the offset of the first result returned by this query.
@@ -43,8 +44,9 @@ public interface SearchQuery<T> {
 	 * The default offset is {@code 0}.
 	 *
 	 * @param firstResultIndex The offset of the first result. Must be positive or zero; {@code null} resets to the default.
+	 * @return {@code this} for method chaining.
 	 */
-	void setFirstResult(Long firstResultIndex);
+	SearchQuery<T> setFirstResult(Long firstResultIndex);
 
 	/**
 	 * @return A textual representation of the query.

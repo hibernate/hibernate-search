@@ -19,23 +19,25 @@ public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
-	public SearchResult<T> execute() {
+	public SearchResult<T> getResult() {
 		return new JavaBeanSearchResult( delegate.execute() );
 	}
 
 	@Override
-	public long executeCount() {
+	public long getResultSize() {
 		return delegate.executeCount();
 	}
 
 	@Override
-	public void setFirstResult(Long firstResultIndex) {
+	public JavaBeanSearchQuery<T> setFirstResult(Long firstResultIndex) {
 		delegate.setFirstResult( firstResultIndex );
+		return this;
 	}
 
 	@Override
-	public void setMaxResults(Long maxResultsCount) {
+	public JavaBeanSearchQuery<T> setMaxResults(Long maxResultsCount) {
 		delegate.setMaxResults( maxResultsCount );
+		return this;
 	}
 
 	@Override

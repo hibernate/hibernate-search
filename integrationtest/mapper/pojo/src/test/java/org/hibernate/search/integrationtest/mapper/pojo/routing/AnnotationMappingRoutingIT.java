@@ -122,7 +122,7 @@ public class AnnotationMappingRoutingIT {
 					StubSearchWorkBehavior.empty()
 			);
 
-			query.execute();
+			query.getResult();
 			backendMock.verifyExpectationsMet();
 		}
 	}
