@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaObjectFieldDefinitionHelper;
@@ -54,6 +55,12 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	@Override
 	public IndexObjectFieldAccessor createAccessor() {
 		return helper.createAccessor();
+	}
+
+	@Override
+	public IndexObjectFieldReference getReference() {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

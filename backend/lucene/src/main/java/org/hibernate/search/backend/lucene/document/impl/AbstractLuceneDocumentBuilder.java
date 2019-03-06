@@ -14,6 +14,9 @@ import java.util.Objects;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -33,6 +36,24 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 
 	protected AbstractLuceneDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
 		this.schemaNode = schemaNode;
+	}
+
+	@Override
+	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addNullObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.A
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -49,6 +50,12 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
 		return helper.createAccessor();
+	}
+
+	@Override
+	public IndexFieldReference<F> toReference() {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

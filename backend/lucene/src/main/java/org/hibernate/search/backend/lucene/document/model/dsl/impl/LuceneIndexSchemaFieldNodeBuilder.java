@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
@@ -47,6 +48,12 @@ class LuceneIndexSchemaFieldNodeBuilder<F>
 	@Override
 	public IndexFieldAccessor<F> createAccessor() {
 		return helper.createAccessor();
+	}
+
+	@Override
+	public IndexFieldReference<F> toReference() {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

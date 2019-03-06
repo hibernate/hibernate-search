@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubExcludedIndexFieldAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIncludedIndexFieldAccessor;
@@ -39,5 +40,11 @@ class StubIndexSchemaFieldNodeBuilder<F> implements IndexSchemaFieldTerminalCont
 			}
 		}
 		return accessor;
+	}
+
+	@Override
+	public IndexFieldReference<F> toReference() {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 }

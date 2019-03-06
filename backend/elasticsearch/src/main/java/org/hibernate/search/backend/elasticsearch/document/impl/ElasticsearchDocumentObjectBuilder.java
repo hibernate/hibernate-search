@@ -14,6 +14,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -35,6 +37,24 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 	ElasticsearchDocumentObjectBuilder(ElasticsearchIndexSchemaObjectNode schemaNode, JsonObject content) {
 		this.schemaNode = schemaNode;
 		this.content = content;
+	}
+
+	@Override
+	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addNullObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	public <T> void add(JsonAccessor<T> relativeAccessor, T value) {
