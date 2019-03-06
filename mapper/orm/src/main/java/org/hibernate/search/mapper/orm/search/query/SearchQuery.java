@@ -15,9 +15,19 @@ import org.hibernate.query.Query;
 public interface SearchQuery<T> {
 
 	/**
-	 * Execute the query and retrieve the results as a {@link List}
+	 * Execute the query and retrieve the results as a {@link SearchResult}.
 	 *
-	 * @return The results as a {@link List} containing one element for each matched entity.
+	 * @return The results.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database.
+	 */
+	SearchResult<T> getResult();
+
+	/**
+	 * Execute the query and retrieve the results as a {@link List}.
+	 *
+	 * @return The results.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database.
 	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database.
@@ -49,10 +59,10 @@ public interface SearchQuery<T> {
 	Optional<T> getOptionalResult();
 
 	/**
-	 * Execute the query and retrieve the total result size,
+	 * Execute the query and retrieve the total hit count,
 	 * ignoring pagination settings ({@link #setMaxResults(int)} and {@link #setFirstResult(int)}).
 	 *
-	 * @return The total number of results, ignoring pagination settings.
+	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
 	long getResultSize();

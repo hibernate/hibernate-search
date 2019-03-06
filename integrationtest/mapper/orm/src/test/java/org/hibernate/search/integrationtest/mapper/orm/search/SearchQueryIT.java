@@ -21,6 +21,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
+import org.hibernate.search.mapper.orm.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -127,6 +128,37 @@ public class SearchQueryIT {
 			query.getResultList();
 
 			// TODO also test getResultSize
+		} );
+	}
+
+	@Test
+	public void getResult() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							3L,
+							reference( Book.INDEX, "1" ),
+							reference( Book.INDEX, "2" ),
+							reference( Book.INDEX, "3" )
+					)
+			);
+
+			SearchResult<Book> result = query.getResult();
+			Assertions.assertThat( result.getHits() ).containsExactly(
+					session.load( Book.class, 1 ),
+					session.load( Book.class, 2 ),
+					session.load( Book.class, 3 )
+			);
+			Assertions.assertThat( result.getHitCount() ).isEqualTo( 3L );
 		} );
 	}
 

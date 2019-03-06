@@ -17,6 +17,7 @@ import javax.persistence.Persistence;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.SearchScope;
+import org.hibernate.search.mapper.orm.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -113,11 +114,15 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery(); // <6>
 
-			List<Book> result = query.getResultList(); // <7>
+			SearchResult<Book> result = query.getResult(); // <7>
+			long totalHitCount = result.getHitCount(); // <8>
+			List<Book> hits = result.getHits(); // <9>
+
+			List<Book> hits2 = query.getResultList(); // <10>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
-			assertThat( result ).extracting( "id" )
+			assertThat( result.getHits() ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
@@ -134,11 +139,15 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery(); // <5>
 
-			List<Book> result = query.getResultList(); // <6>
+			SearchResult<Book> result = query.getResult(); // <6>
+			long totalHitCount = result.getHitCount(); // <7>
+			List<Book> hits = result.getHits(); // <8>
+
+			List<Book> hits2 = query.getResultList(); // <9>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 
-			assertThat( result ).extracting( "id" )
+			assertThat( result.getHits() ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
