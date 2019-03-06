@@ -50,8 +50,6 @@ public interface MappedIndexSearchScope<R, O> {
 			Function<IndexSearchQuery<T>, Q> searchQueryWrapperFactory,
 			SearchProjection<T> projection);
 
-	SearchPredicateFactoryContext predicate();
-
 	/*
 	 * IMPLEMENTATION NOTE: we *must* only accept an object loader with the same R/O type parameters as this class,
 	 * otherwise some casts in ObjectProjectionContextImpl and ReferenceProjectionContextImpl
@@ -63,6 +61,8 @@ public interface MappedIndexSearchScope<R, O> {
 			ObjectLoader<R, O> objectLoader,
 			Function<IndexSearchQuery<List<?>>, Q> searchQueryWrapperFactory,
 			SearchProjection<?>... projections);
+
+	SearchPredicateFactoryContext predicate();
 
 	SearchSortContainerContext sort();
 
