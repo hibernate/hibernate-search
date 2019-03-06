@@ -12,7 +12,9 @@ package org.hibernate.search.engine.backend.document;
  * allowing to add new values to this field for a given document.
  *
  * @param <F> The indexed field value type.
+ * @deprecated FIXME Remove this type
  */
+@Deprecated
 public interface IndexFieldAccessor<F> {
 
 	/**

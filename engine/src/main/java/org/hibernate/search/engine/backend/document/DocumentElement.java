@@ -16,4 +16,33 @@ package org.hibernate.search.engine.backend.document;
  */
 public interface DocumentElement {
 
+	/**
+	 * Add a new value to the referenced field in this document element.
+	 * <p>
+	 * This method can be called multiple times for the same field,
+	 * which will result in multiple values being added to the same field.
+	 *
+	 * @param fieldReference The field to add a value to.
+	 * @param value The value to add to the field.
+	 */
+	<F> void addValue(IndexFieldReference<F> fieldReference, F value);
+
+	/**
+	 * Add a new object to the referenced field in this document element.
+	 *
+	 * @param fieldReference The object field to add an object to.
+	 * @return The new object, that can be populated with its own fields.
+	 */
+	DocumentElement addObject(IndexObjectFieldReference fieldReference);
+
+	/**
+	 * Add a {@code null} object to the referenced field in this document element.
+	 * <p>
+	 * The {@code null} object may have a representation in the backend (such as a JSON {@code null}),
+	 * or it may be ignored completely, depending on the backend implementation.
+	 *
+	 * @param fieldReference The object field to add a {@code null} object to.
+	 */
+	void addNullObject(IndexObjectFieldReference fieldReference);
+
 }

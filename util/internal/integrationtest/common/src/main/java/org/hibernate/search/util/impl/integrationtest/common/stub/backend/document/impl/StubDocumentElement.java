@@ -7,6 +7,8 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 
 public class StubDocumentElement implements DocumentElement {
@@ -15,6 +17,24 @@ public class StubDocumentElement implements DocumentElement {
 
 	public StubDocumentElement(StubDocumentNode.Builder builder) {
 		this.builder = builder;
+	}
+
+	@Override
+	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addNullObject(IndexObjectFieldReference fieldReference) {
+		// FIXME Implement this
+		throw new UnsupportedOperationException();
 	}
 
 	public void putValue(String relativeFieldName, Object value) {

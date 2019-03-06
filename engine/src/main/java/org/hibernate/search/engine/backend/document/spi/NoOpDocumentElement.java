@@ -7,6 +7,8 @@
 package org.hibernate.search.engine.backend.document.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 class NoOpDocumentElement implements DocumentElement {
 
@@ -15,4 +17,19 @@ class NoOpDocumentElement implements DocumentElement {
 	private NoOpDocumentElement() {
 	}
 
+	@Override
+	public <F> void addValue(IndexFieldReference<F> fieldReference, F value) {
+		// No-op
+	}
+
+	@Override
+	public DocumentElement addObject(IndexObjectFieldReference fieldReference) {
+		// No-op; just return a no-op child
+		return INSTANCE;
+	}
+
+	@Override
+	public void addNullObject(IndexObjectFieldReference fieldReference) {
+		// No-op
+	}
 }

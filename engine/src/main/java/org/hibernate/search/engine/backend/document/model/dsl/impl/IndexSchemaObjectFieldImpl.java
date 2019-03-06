@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.document.model.dsl.impl;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -25,4 +26,8 @@ class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjec
 		return objectNodeBuilder.createAccessor();
 	}
 
+	@Override
+	public IndexObjectFieldReference toReference() {
+		return objectNodeBuilder.getReference();
+	}
 }

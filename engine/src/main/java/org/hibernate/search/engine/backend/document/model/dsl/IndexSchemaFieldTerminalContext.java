@@ -7,10 +7,16 @@
 package org.hibernate.search.engine.backend.document.model.dsl;
 
 /**
- * @param <A> The accessor type.
+ * @param <R> The reference type.
  */
-public interface IndexSchemaFieldTerminalContext<A> {
+public interface IndexSchemaFieldTerminalContext<R> {
 
-	A createAccessor();
+	// FIXME Remove this method
+	@Deprecated
+	default R createAccessor() {
+		return toReference();
+	}
+
+	R toReference();
 
 }
