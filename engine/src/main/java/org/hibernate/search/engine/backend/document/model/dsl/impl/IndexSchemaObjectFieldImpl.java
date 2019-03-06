@@ -28,6 +28,6 @@ class IndexSchemaObjectFieldImpl extends IndexSchemaElementImpl<IndexSchemaObjec
 
 	@Override
 	public IndexObjectFieldReference toReference() {
-		return objectNodeBuilder.getReference();
+		return objectNodeBuilder.toReference();
 	}
 }

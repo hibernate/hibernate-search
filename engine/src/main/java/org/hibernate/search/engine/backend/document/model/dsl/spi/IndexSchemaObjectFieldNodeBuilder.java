@@ -13,9 +13,9 @@ public interface IndexSchemaObjectFieldNodeBuilder extends IndexSchemaObjectNode
 
 	// FIXME remove this method
 	default IndexObjectFieldAccessor createAccessor() {
-		return getReference();
+		return toReference();
 	}
 
-	IndexObjectFieldReference getReference();
+	IndexObjectFieldReference toReference();
 
 }

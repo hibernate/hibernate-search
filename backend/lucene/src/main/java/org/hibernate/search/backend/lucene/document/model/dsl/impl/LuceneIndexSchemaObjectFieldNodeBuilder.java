@@ -6,34 +6,36 @@
  */
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaObjectFieldDefinitionHelper;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldAccessor;
+import org.hibernate.search.backend.lucene.document.impl.LuceneIndexObjectFieldReference;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeContributor;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
 class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
 		implements IndexSchemaObjectFieldNodeBuilder, LuceneIndexSchemaNodeContributor {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractLuceneIndexSchemaObjectNodeBuilder parent;
 	private final String absoluteFieldPath;
 	private final ObjectFieldStorage storage;
 
-	private final IndexSchemaObjectFieldDefinitionHelper helper;
+	private LuceneIndexObjectFieldReference reference;
 
 	LuceneIndexSchemaObjectFieldNodeBuilder(AbstractLuceneIndexSchemaObjectNodeBuilder parent,
 			String relativeFieldName, ObjectFieldStorage storage) {
 		this.parent = parent;
 		this.absoluteFieldPath = LuceneFields.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.storage = storage;
-		this.helper = new IndexSchemaObjectFieldDefinitionHelper( this );
 	}
 
 	@Override
@@ -43,22 +45,24 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 	}
 
 	@Override
-	public IndexObjectFieldAccessor createAccessor() {
-		return helper.createAccessor();
-	}
-
-	@Override
-	public IndexObjectFieldReference getReference() {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+	public IndexObjectFieldReference toReference() {
+		if ( reference != null ) {
+			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
+		}
+		this.reference = new LuceneIndexObjectFieldReference( storage );
+		return reference;
 	}
 
 	@Override
 	public void contribute(LuceneIndexSchemaNodeCollector collector, LuceneIndexSchemaObjectNode parentNode) {
+		if ( reference == null ) {
+			throw log.incompleteFieldDefinition( getEventContext() );
+		}
+
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode( parentNode, absoluteFieldPath, storage );
 		collector.collectObjectNode( absoluteFieldPath, node );
 
-		helper.initialize( new LuceneIndexObjectFieldAccessor( node, storage ) );
+		reference.enable( node );
 
 		contributeChildren( node, collector );
 	}

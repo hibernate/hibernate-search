@@ -10,9 +10,13 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
-class NoOpDocumentElement implements DocumentElement {
+public class NoOpDocumentElement implements DocumentElement {
 
 	static final NoOpDocumentElement INSTANCE = new NoOpDocumentElement();
+
+	public static NoOpDocumentElement get() {
+		return INSTANCE;
+	}
 
 	private NoOpDocumentElement() {
 	}

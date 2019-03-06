@@ -58,7 +58,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 	}
 
 	@Override
-	public IndexObjectFieldReference getReference() {
+	public IndexObjectFieldReference toReference() {
 		// FIXME Implement this
 		throw new UnsupportedOperationException();
 	}

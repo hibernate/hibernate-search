@@ -51,13 +51,9 @@ public final class IndexSchemaFieldDefinitionHelper<F> {
 	 * @param delegate The delegate to use when writing to the accessor returned by {@link #createAccessor()}.
 	 */
 	public void initialize(IndexFieldAccessor<F> delegate) {
-		checkAccessorCreated();
-		deferredInitializationAccessor.initialize( delegate );
-	}
-
-	private void checkAccessorCreated() {
 		if ( !accessorCreated ) {
 			throw log.incompleteFieldDefinition( schemaContext.getEventContext() );
 		}
+		deferredInitializationAccessor.initialize( delegate );
 	}
 }

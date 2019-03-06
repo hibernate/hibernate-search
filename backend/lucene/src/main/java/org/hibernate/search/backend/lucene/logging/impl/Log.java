@@ -418,4 +418,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 70,
 			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 71,
+			value = "Incomplete field definition."
+					+ " You must call createAccessor() to complete the field definition.")
+	SearchException incompleteFieldDefinition(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 72,
+			value = "Multiple calls to createAccessor() for the same field definition."
+					+ " You must call createAccessor() exactly once.")
+	SearchException cannotCreateReferenceMultipleTimes(@Param EventContext context);
 }
