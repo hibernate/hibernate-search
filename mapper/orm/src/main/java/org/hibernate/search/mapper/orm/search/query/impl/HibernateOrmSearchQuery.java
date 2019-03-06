@@ -33,9 +33,11 @@ import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
+import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchResult;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
@@ -85,10 +87,10 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public List<R> getResultList() {
+	public SearchResult<R> getResult() {
 		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
 		try {
-			return doGetResultList();
+			return doExecute();
 		}
 		catch (QueryExecutionRequestException he) {
 			throw new IllegalStateException( he );
@@ -101,11 +103,16 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 		}
 	}
 
-	private List<R> doGetResultList() {
+	private SearchResult<R> doExecute() {
 		// TODO handle timeouts
-		final List<R> results = delegate.execute().getHits();
+		final IndexSearchResult<R> results = delegate.execute();
 		// TODO apply the result transformer?
-		return results;
+		return new HibernateOrmSearchResult<>( results );
+	}
+
+	@Override
+	public List<R> getResultList() {
+		return getResult().getHits();
 	}
 
 	@Override
@@ -122,6 +129,11 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 		catch (HibernateException he) {
 			throw getExceptionConverter().convert( he );
 		}
+	}
+
+	@Override
+	public R getSingleResult() {
+		return super.getSingleResult();
 	}
 
 	@Override
@@ -170,7 +182,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	@Override
 	public List<R> list() {
-		return getResultList();
+		return getResult().getHits();
 	}
 
 	/**

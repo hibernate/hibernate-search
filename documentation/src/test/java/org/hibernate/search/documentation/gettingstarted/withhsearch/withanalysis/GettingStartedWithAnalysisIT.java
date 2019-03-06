@@ -8,13 +8,13 @@ package org.hibernate.search.documentation.gettingstarted.withhsearch.withanalys
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 
@@ -87,11 +87,11 @@ public class GettingStartedWithAnalysisIT {
 					)
 					.toQuery();
 
-			List<Book> result = query.getResultList();
+			SearchResult<Book> result = query.getResult();
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
 
-			assertThat( result ).extracting( "id" )
+			assertThat( result.getHits() ).extracting( "id" )
 					.containsExactlyInAnyOrder( bookIdHolder.get() );
 		} );
 
@@ -107,8 +107,8 @@ public class GettingStartedWithAnalysisIT {
 								.matching( term )
 						)
 						.toQuery();
-				List<Book> result = query.getResultList();
-				assertThat( result ).as( "Result of searching for '" + term + "'" )
+				SearchResult<Book> result = query.getResult();
+				assertThat( result.getHits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
 						.containsExactlyInAnyOrder( bookIdHolder.get() );
 			}
