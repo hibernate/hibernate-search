@@ -56,6 +56,11 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
+	public String toString() {
+		return "HibernateOrmSearchQuery(" + getQueryString() + ")";
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> type) {
 		if ( type.equals( SearchQuery.class ) ) {
@@ -81,12 +86,91 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	@Override
 	public List<R> getResultList() {
-		return list();
+		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
+		try {
+			return doGetResultList();
+		}
+		catch (QueryExecutionRequestException he) {
+			throw new IllegalStateException( he );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
+	}
+
+	private List<R> doGetResultList() {
+		// TODO handle timeouts
+		final List<R> results = delegate.execute().getHits();
+		// TODO apply the result transformer?
+		return results;
+	}
+
+	@Override
+	public long getResultSize() {
+		try {
+			return delegate.executeCount();
+		}
+		catch (QueryExecutionRequestException e) {
+			throw new IllegalStateException( e );
+		}
+		catch (TypeMismatchException e) {
+			throw new IllegalArgumentException( e );
+		}
+		catch (HibernateException he) {
+			throw getExceptionConverter().convert( he );
+		}
 	}
 
 	@Override
 	public Optional<R> getOptionalResult() {
 		return Optional.ofNullable( uniqueResult() );
+	}
+
+	@Override
+	public HibernateOrmSearchQuery<R> setMaxResults(int maxResults) {
+		if ( maxResults < 0 ) {
+			throw new IllegalArgumentException(
+					"Negative ("
+							+ maxResults
+							+ ") parameter passed in to setMaxResults"
+			);
+		}
+		delegate.setMaxResults( (long) maxResults );
+		this.maxResults = maxResults;
+		return this;
+	}
+
+	@Override
+	public HibernateOrmSearchQuery<R> setFirstResult(int firstResult) {
+		if ( firstResult < 0 ) {
+			throw new IllegalArgumentException(
+					"Negative ("
+							+ firstResult
+							+ ") parameter passed in to setFirstResult"
+			);
+		}
+		delegate.setFirstResult( (long) firstResult );
+		this.firstResult = firstResult;
+		return this;
+	}
+
+	@Override
+	public HibernateOrmSearchQuery<R> setFetchSize(int fetchSize) {
+		super.setFetchSize( fetchSize );
+		loadingOptions.setFetchSize( fetchSize );
+		return this;
+	}
+
+	//-------------------------------------------------------------
+	// Implementation of ORM/JPA query interfaces
+	//-------------------------------------------------------------
+
+	@Override
+	public List<R> list() {
+		return getResultList();
 	}
 
 	/**
@@ -114,78 +198,10 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public List<R> list() {
-		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
-		try {
-			return doHibernateSearchList();
-		}
-		catch (QueryExecutionRequestException he) {
-			throw new IllegalStateException( he );
-		}
-		catch (TypeMismatchException e) {
-			throw new IllegalArgumentException( e );
-		}
-		catch (HibernateException he) {
-			throw getExceptionConverter().convert( he );
-		}
-	}
-
-	protected List<R> doHibernateSearchList() {
-		// TODO handle timeouts
-		final List<R> results = delegate.execute().getHits();
-		// TODO apply the result transformer?
-		return results;
-	}
-
-	@Override
-	public long getResultSize() {
-		try {
-			return delegate.executeCount();
-		}
-		catch (QueryExecutionRequestException e) {
-			throw new IllegalStateException( e );
-		}
-		catch (TypeMismatchException e) {
-			throw new IllegalArgumentException( e );
-		}
-		catch (HibernateException he) {
-			throw getExceptionConverter().convert( he );
-		}
-	}
-
-	@Override
-	public HibernateOrmSearchQuery<R> setMaxResults(int maxResults) {
-		if ( maxResults < 0 ) {
-			throw new IllegalArgumentException(
-					"Negative ("
-							+ maxResults
-							+ ") parameter passed in to setMaxResults"
-			);
-		}
-		delegate.setMaxResults( (long) maxResults );
-		this.maxResults = maxResults;
-		return this;
-	}
-
-	@Override
 	public int getMaxResults() {
 		return maxResults == null || maxResults == -1
 				? Integer.MAX_VALUE
 				: maxResults;
-	}
-
-	@Override
-	public HibernateOrmSearchQuery<R> setFirstResult(int firstResult) {
-		if ( firstResult < 0 ) {
-			throw new IllegalArgumentException(
-					"Negative ("
-							+ firstResult
-							+ ") parameter passed in to setFirstResult"
-			);
-		}
-		delegate.setFirstResult( (long) firstResult );
-		this.firstResult = firstResult;
-		return this;
 	}
 
 	@Override
@@ -310,13 +326,6 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public HibernateOrmSearchQuery<R> setFetchSize(int fetchSize) {
-		super.setFetchSize( fetchSize );
-		loadingOptions.setFetchSize( fetchSize );
-		return this;
-	}
-
-	@Override
 	public HibernateOrmSearchQuery<R> setLockOptions(LockOptions lockOptions) {
 		throw new UnsupportedOperationException( "Lock options are not implemented in Hibernate Search queries" );
 	}
@@ -400,10 +409,5 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	@Override
 	public HibernateOrmSearchQuery<R> setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
-	}
-
-	@Override
-	public String toString() {
-		return "HibernateOrmSearchQuery(" + getQueryString() + ")";
 	}
 }
