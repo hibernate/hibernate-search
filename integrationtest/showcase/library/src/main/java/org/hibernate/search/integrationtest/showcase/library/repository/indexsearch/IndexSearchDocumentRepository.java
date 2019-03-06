@@ -22,12 +22,12 @@ public interface IndexSearchDocumentRepository {
 
 	Optional<Book> getByIsbn(String isbnAsString);
 
-	List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit);
+	List<Book> searchByMedium(String terms, BookMedium medium, long offset, long limit);
 
 	List<Document<?>> searchAroundMe(String terms, String tags,
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryServiceOption> libraryServices,
-			int offset, int limit);
+			long offset, long limit);
 
 	List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order);
 }

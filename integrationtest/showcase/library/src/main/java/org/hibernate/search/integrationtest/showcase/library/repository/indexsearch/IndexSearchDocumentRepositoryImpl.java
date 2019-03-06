@@ -27,7 +27,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static final Class<Document<?>> DOCUMENT_CLASS = (Class<Document<?>>) (Class) Document.class;
 
-	private static final int MAX_RESULT = 10000;
+	private static final long MAX_RESULT = 10000L;
 
 	@Autowired
 	private EntityManager entityManager;
@@ -60,7 +60,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	}
 
 	@Override
-	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
+	public List<Book> searchByMedium(String terms, BookMedium medium, long offset, long limit) {
 		SearchQuery<Book> query = Search.getSearchSession( entityManager ).search( Book.class )
 				.asEntity()
 				.predicate( f -> f.bool( b -> {
@@ -88,7 +88,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public List<Document<?>> searchAroundMe(String terms, String tags,
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryServiceOption> libraryServices,
-			int offset, int limit) {
+			long offset, long limit) {
 		SearchQuery<Document<?>> query = Search.getSearchSession( entityManager ).search( DOCUMENT_CLASS )
 				.asEntity()
 				.predicate( f -> f.bool( b -> {

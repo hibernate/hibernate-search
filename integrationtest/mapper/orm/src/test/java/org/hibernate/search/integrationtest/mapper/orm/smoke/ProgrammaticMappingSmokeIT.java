@@ -302,8 +302,8 @@ public class ProgrammaticMappingSmokeIT {
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.toQuery();
-			query.setFirstResult( 3 );
-			query.setMaxResults( 2 );
+			query.setFirstResult( 3L );
+			query.setMaxResults( 2L );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
