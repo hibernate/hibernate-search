@@ -6,31 +6,40 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import java.lang.invoke.MethodHandles;
+
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldReference;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
-import org.hibernate.search.engine.backend.document.spi.IndexSchemaFieldDefinitionHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
+
+import com.google.gson.JsonElement;
 
 class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		implements IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>>,
 		ElasticsearchIndexSchemaNodeContributor,
 		IndexSchemaBuildContext {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final AbstractElasticsearchIndexSchemaObjectNodeBuilder parent;
 	private final String relativeFieldName;
 	private final String absoluteFieldPath;
 	private final ElasticsearchIndexFieldType<F> type;
 
-	private final IndexSchemaFieldDefinitionHelper<F> helper;
+	private ElasticsearchIndexFieldReference<F> reference;
 
 	ElasticsearchIndexSchemaFieldNodeBuilder(AbstractElasticsearchIndexSchemaObjectNodeBuilder parent,
 			String relativeFieldName, ElasticsearchIndexFieldType<F> type) {
@@ -38,7 +47,6 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = ElasticsearchFields.compose( parent.getAbsolutePath(), relativeFieldName );
 		this.type = type;
-		this.helper = new IndexSchemaFieldDefinitionHelper<>( this );
 	}
 
 	@Override
@@ -48,22 +56,25 @@ class ElasticsearchIndexSchemaFieldNodeBuilder<F>
 	}
 
 	@Override
-	public IndexFieldAccessor<F> createAccessor() {
-		return helper.createAccessor();
-	}
-
-	@Override
 	public IndexFieldReference<F> toReference() {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+		if ( reference != null ) {
+			throw log.cannotCreateReferenceMultipleTimes( getEventContext() );
+		}
+		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
+		this.reference = new ElasticsearchIndexFieldReference<>( jsonAccessor );
+		return reference;
 	}
 
 	@Override
 	public void contribute(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode,
 			AbstractTypeMapping parentMapping) {
-		IndexFieldAccessor<F> accessor = type.addField( collector, parentNode, parentMapping, relativeFieldName );
-		helper.initialize( accessor );
+		if ( reference == null ) {
+			throw log.incompleteFieldDefinition( getEventContext() );
+		}
+
+		ElasticsearchIndexSchemaFieldNode<F> fieldNode = type.addField( collector, parentNode, parentMapping, relativeFieldName );
+		reference.enable( fieldNode );
 	}
 
 }

@@ -6,21 +6,16 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchIndexFieldAccessor;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
-
-import com.google.gson.JsonElement;
 
 public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 	private final ElasticsearchFieldCodec<F> codec;
@@ -41,7 +36,7 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 		this.mapping = mapping;
 	}
 
-	public IndexFieldAccessor<F> addField(ElasticsearchIndexSchemaNodeCollector collector,
+	public ElasticsearchIndexSchemaFieldNode<F> addField(ElasticsearchIndexSchemaNodeCollector collector,
 			ElasticsearchIndexSchemaObjectNode parentNode, AbstractTypeMapping parentMapping,
 			String relativeFieldName) {
 		ElasticsearchIndexSchemaFieldNode<F> schemaNode = new ElasticsearchIndexSchemaFieldNode<>(
@@ -57,7 +52,6 @@ public class ElasticsearchIndexFieldType<F> implements IndexFieldType<F> {
 
 		parentMapping.addProperty( relativeFieldName, mapping );
 
-		JsonAccessor<JsonElement> jsonAccessor = JsonAccessor.root().property( relativeFieldName );
-		return new ElasticsearchIndexFieldAccessor<>( jsonAccessor, schemaNode );
+		return schemaNode;
 	}
 }
