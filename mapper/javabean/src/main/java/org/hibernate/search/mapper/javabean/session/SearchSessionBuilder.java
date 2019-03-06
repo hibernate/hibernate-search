@@ -9,10 +9,16 @@ package org.hibernate.search.mapper.javabean.session;
 
 public interface SearchSessionBuilder {
 
-	// TODO other options (default query timeout, default query hints, ...)
-
+	/**
+	 * @param tenantId The tenant ID to use when performing index-related operatiosn (indexing, searching, ...)
+	 * in the resulting session.
+	 * @return {@code this} for method chaining.
+	 */
 	SearchSessionBuilder tenantId(String tenantId);
 
+	/**
+	 * @return The resulting session.
+	 */
 	SearchSession build();
 
 }
