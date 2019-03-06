@@ -6,16 +6,18 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
-public class StubIncludedIndexFieldAccessor<F> implements IndexFieldAccessor<F> {
+public class StubIndexObjectFieldReference implements IndexObjectFieldReference {
+
 	private final String absolutePath;
 	private final String relativeFieldName;
+	private final boolean enabled;
 
-	public StubIncludedIndexFieldAccessor(String absolutePath, String relativeFieldName) {
+	public StubIndexObjectFieldReference(String absolutePath, String relativeFieldName, boolean enabled) {
 		this.absolutePath = absolutePath;
 		this.relativeFieldName = relativeFieldName;
+		this.enabled = enabled;
 	}
 
 	@Override
@@ -23,9 +25,15 @@ public class StubIncludedIndexFieldAccessor<F> implements IndexFieldAccessor<F> 
 		return getClass().getSimpleName() + "[" + absolutePath + "]";
 	}
 
-	@Override
-	public void write(DocumentElement target, F value) {
-		StubDocumentElement stubTarget = (StubDocumentElement) target;
-		stubTarget.putValue( relativeFieldName, value );
+	boolean isEnabled() {
+		return enabled;
+	}
+
+	String getAbsolutePath() {
+		return absolutePath;
+	}
+
+	String getRelativeFieldName() {
+		return relativeFieldName;
 	}
 }

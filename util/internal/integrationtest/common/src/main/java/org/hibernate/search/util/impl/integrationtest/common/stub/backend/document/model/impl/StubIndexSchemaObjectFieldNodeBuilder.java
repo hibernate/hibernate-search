@@ -6,13 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubExcludedIndexObjectFieldAccessor;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIncludedIndexObjectFieldAccessor;
+import org.hibernate.search.util.common.reporting.EventContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubIndexObjectFieldReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 
 class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjectNodeBuilder
@@ -20,7 +18,7 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 
 	private final AbstractStubIndexSchemaObjectNodeBuilder parent;
 	private final boolean included;
-	private IndexObjectFieldAccessor accessor;
+	private IndexObjectFieldReference reference;
 
 	StubIndexSchemaObjectFieldNodeBuilder(AbstractStubIndexSchemaObjectNodeBuilder parent,
 			StubIndexSchemaNode.Builder builder, boolean included) {
@@ -36,26 +34,13 @@ class StubIndexSchemaObjectFieldNodeBuilder extends AbstractStubIndexSchemaObjec
 	}
 
 	@Override
-	public IndexObjectFieldAccessor createAccessor() {
-		if ( accessor == null ) {
-			if ( included ) {
-				accessor = new StubIncludedIndexObjectFieldAccessor(
-						builder.getAbsolutePath(), builder.getRelativeName()
-				);
-			}
-			else {
-				accessor = new StubExcludedIndexObjectFieldAccessor(
-						builder.getAbsolutePath(), builder.getRelativeName()
-				);
-			}
-		}
-		return accessor;
-	}
-
-	@Override
 	public IndexObjectFieldReference toReference() {
-		// FIXME Implement this
-		throw new UnsupportedOperationException();
+		if ( reference == null ) {
+			reference = new StubIndexObjectFieldReference(
+					builder.getAbsolutePath(), builder.getRelativeName(), included
+			);
+		}
+		return reference;
 	}
 
 	@Override
