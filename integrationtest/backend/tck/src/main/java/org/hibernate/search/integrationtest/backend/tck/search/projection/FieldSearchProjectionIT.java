@@ -180,14 +180,23 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_invalidProjectionType() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid type" );
-		thrown.expectMessage( "for projection on field" );
-		thrown.expectMessage( indexMapping.string1Field.relativeFieldName );
-
 		StubMappingSearchTarget searchTarget = indexManager.createSearchTarget();
 
-		searchTarget.projection().field( indexMapping.string1Field.relativeFieldName, Integer.class ).toProjection();
+		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			String fieldPath = fieldModel.relativeFieldName;
+
+			Class<?> rightType = fieldModel.type;
+			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
+
+			SubTest.expectException(
+					() -> searchTarget.projection().field( fieldPath, wrongType ).toProjection()
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid type" )
+					.hasMessageContaining( "for projection on field" )
+					.hasMessageContaining( "'" + fieldPath + "'" );
+		}
 	}
 
 	@Test
