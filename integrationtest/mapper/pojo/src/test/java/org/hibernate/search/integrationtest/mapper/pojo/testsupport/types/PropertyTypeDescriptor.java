@@ -57,7 +57,8 @@ public abstract class PropertyTypeDescriptor<V> {
 					new DurationPropertyTypeDescriptor(),
 					new PeriodPropertyTypeDescriptor(),
 					new JavaNetURIPropertyTypeDescriptor(),
-					new JavaNetURLPropertyTypeDescriptor()
+					new JavaNetURLPropertyTypeDescriptor(),
+					new JavaSqlDatePropertyTypeDescriptor()
 			) );
 		}
 		return all;

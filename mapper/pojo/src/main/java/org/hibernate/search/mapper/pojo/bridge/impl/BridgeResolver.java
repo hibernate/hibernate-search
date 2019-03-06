@@ -45,6 +45,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultEnumValueBrid
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultLongIdentifierBridge;
@@ -119,6 +120,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( Duration.class, ignored -> BeanHolder.of( new DefaultDurationValueBridge() ) );
 		addValueBridgeForExactRawType( URI.class, ignored -> BeanHolder.of( new DefaultJavaNetURIValueBridge() ) );
 		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
+		addValueBridgeForExactRawType( java.sql.Date.class, ignored -> BeanHolder.of( new DefaultJavaSqlDateValueBridge() ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
