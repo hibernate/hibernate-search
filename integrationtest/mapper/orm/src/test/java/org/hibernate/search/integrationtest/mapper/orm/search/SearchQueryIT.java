@@ -6,14 +6,17 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.search;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.NoResultException;
 import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
@@ -31,6 +34,8 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -98,8 +103,6 @@ public class SearchQueryIT {
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
 			);
-
-			// TODO also test getResultSize
 		} );
 	}
 
@@ -187,6 +190,125 @@ public class SearchQueryIT {
 	}
 
 	@Test
+	public void getResultSize() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectCount( Arrays.asList( Book.INDEX ), 6L );
+			Assertions.assertThat( query.getResultSize() ).isEqualTo( 6L );
+		} );
+	}
+
+	@Test
+	public void getSingleResult() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							1L,
+							reference( Book.INDEX, "1" )
+					)
+			);
+			Book result = query.getSingleResult();
+			backendMock.verifyExpectationsMet();
+			assertThat( result )
+					.isEqualTo( session.load( Book.class, 1 ) );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty()
+			);
+			SubTest.expectException( () -> {
+				query.getSingleResult();
+			} )
+					.assertThrown()
+					.isInstanceOf( NoResultException.class );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.INDEX, "1" ),
+							reference( Book.INDEX, "2" )
+					)
+			);
+			SubTest.expectException( () -> {
+				query.getSingleResult();
+			} )
+					.assertThrown()
+					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
+					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
+			backendMock.verifyExpectationsMet();
+		} );
+	}
+
+	@Test
+	public void getOptionalResult() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							1L,
+							reference( Book.INDEX, "1" )
+					)
+			);
+			Optional<Book> result = query.getOptionalResult();
+			backendMock.verifyExpectationsMet();
+			assertThat( result ).contains( session.load( Book.class, 1 ) );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty()
+			);
+			result = query.getOptionalResult();
+			backendMock.verifyExpectationsMet();
+			assertThat( result ).isEmpty();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.INDEX, "1" ),
+							reference( Book.INDEX, "2" )
+					)
+			);
+			SubTest.expectException( () -> {
+				query.getOptionalResult();
+			} )
+					.assertThrown()
+					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
+					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
+			backendMock.verifyExpectationsMet();
+		} );
+	}
+
+	@Test
 	public void asProjection_searchProjectionObject_single() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
@@ -216,8 +338,6 @@ public class SearchQueryIT {
 					TITLE_CIDER_HOUSE,
 					TITLE_AVENUE_OF_MYSTERIES
 			);
-
-			// TODO also test getResultSize
 		} );
 	}
 
@@ -284,8 +404,6 @@ public class SearchQueryIT {
 							AUTHOR_AVENUE_OF_MYSTERIES
 					)
 			);
-
-			// TODO also test getResultSize
 		} );
 	}
 
@@ -334,8 +452,6 @@ public class SearchQueryIT {
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
 			);
-
-			// TODO also test getResultSize
 		} );
 	}
 
@@ -384,8 +500,6 @@ public class SearchQueryIT {
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
 			);
-
-			// TODO also test getResultSize
 		} );
 	}
 
