@@ -17,9 +17,8 @@ public class FieldProjectionContextImpl<T> implements FieldProjectionContext<T> 
 
 	private final FieldProjectionBuilder<T> fieldProjectionBuilder;
 
-	FieldProjectionContextImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz) {
-		// TODO handle ProjectionConverter option here
-		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz, ProjectionConverter.ENABLED );
+	FieldProjectionContextImpl(SearchProjectionBuilderFactory factory, String absoluteFieldPath, Class<T> clazz, ProjectionConverter dslConverter) {
+		this.fieldProjectionBuilder = factory.field( absoluteFieldPath, clazz, dslConverter );
 	}
 
 	@Override

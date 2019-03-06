@@ -55,7 +55,7 @@ public interface SearchProjectionFactoryContext<R, O> {
 	ObjectProjectionContext<O> object();
 
 	/**
-	 * Project to a field of the indexed document.
+	 * Project to the value of a field in the indexed document.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param type The resulting type of the projection.
@@ -65,12 +65,36 @@ public interface SearchProjectionFactoryContext<R, O> {
 	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type);
 
 	/**
-	 * Project to a field of the indexed document without specifying a type.
+	 * Project to the value of a field in the indexed document, without specifying a type.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @return A context allowing to define the projection more precisely.
 	 */
 	FieldProjectionContext<Object> field(String absoluteFieldPath);
+
+	/**
+	 * Project to the raw value of a field in the indexed document.
+	 * <p>
+	 * Using this method instead of {@link #field(String, Class)} will disable some of the conversion applied to the field value,
+	 * allowing to retrieve values directly from the backend.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param type The resulting type of the projection.
+	 * @param <T> The resulting type of the projection.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> type);
+
+	/**
+	 * Project to the raw value of a field in the indexed document, without specifying a type.
+	 * <p>
+	 * Using this method instead of {@link #field(String, Class)} will disable some of the conversion applied to the field value,
+	 * allowing to retrieve values directly from the backend.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	FieldProjectionContext<Object> rawField(String absoluteFieldPath);
 
 	/**
 	 * Project on the score of the hit.
