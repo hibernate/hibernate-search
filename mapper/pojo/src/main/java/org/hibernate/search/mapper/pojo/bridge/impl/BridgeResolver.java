@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URL;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
@@ -47,6 +48,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdenti
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURIValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaNetURLValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlDateValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimeValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaSqlTimestampValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilCalendarValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultJavaUtilDateValueBridge;
@@ -124,6 +126,7 @@ public final class BridgeResolver {
 		addValueBridgeForExactRawType( URL.class, ignored -> BeanHolder.of( new DefaultJavaNetURLValueBridge() ) );
 		addValueBridgeForExactRawType( java.sql.Date.class, ignored -> BeanHolder.of( new DefaultJavaSqlDateValueBridge() ) );
 		addValueBridgeForExactRawType( Timestamp.class, ignored -> BeanHolder.of( new DefaultJavaSqlTimestampValueBridge() ) );
+		addValueBridgeForExactRawType( Time.class, ignored -> BeanHolder.of( new DefaultJavaSqlTimeValueBridge() ) );
 	}
 
 	public BridgeBuilder<? extends IdentifierBridge<?>> resolveIdentifierBridgeForType(PojoGenericTypeModel<?> sourceType) {
