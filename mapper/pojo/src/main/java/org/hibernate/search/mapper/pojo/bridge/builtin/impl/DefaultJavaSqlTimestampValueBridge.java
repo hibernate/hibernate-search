@@ -41,10 +41,7 @@ public final class DefaultJavaSqlTimestampValueBridge implements ValueBridge<Tim
 
 	@Override
 	public boolean isCompatibleWith(ValueBridge<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		return true;
+		return getClass().equals( other.getClass() );
 	}
 
 	private static class PojoDefaultSqlDateFromDocumentFieldValueConverter
