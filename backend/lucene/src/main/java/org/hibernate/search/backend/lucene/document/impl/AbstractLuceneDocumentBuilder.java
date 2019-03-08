@@ -99,7 +99,7 @@ public abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBui
 
 	private void checkTreeConsistency(LuceneIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
-			throw log.invalidParentDocumentObjectState( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
+			throw log.invalidFieldForDocumentElement( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}
 	}
 

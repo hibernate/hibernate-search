@@ -13,8 +13,8 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -54,7 +54,7 @@ public class ObjectFieldStorageIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -62,7 +62,7 @@ public class ObjectFieldStorageIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -71,46 +71,46 @@ public class ObjectFieldStorageIT {
 	}
 
 	@Test
-	public void index_error_invalidDocumentElement_root() {
+	public void index_error_invalidFieldForDocumentElement_root() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid parent object for this field accessor" );
-		thrown.expectMessage( "expected path 'null', got 'flattenedObject'." );
+		thrown.expectMessage( "Invalid field reference for this document element" );
+		thrown.expectMessage( "this document element has path 'null', but the referenced field has a parent with path 'flattenedObject'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.string.write( flattenedObject, "willNotWork" );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.string.write( flattenedObject, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
 	}
 
 	@Test
-	public void index_error_invalidDocumentElement_flattened() {
+	public void index_error_invalidFieldForDocumentElement_flattened() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid parent object for this field accessor" );
-		thrown.expectMessage( "expected path 'flattenedObject', got 'null'." );
+		thrown.expectMessage( "Invalid field reference for this document element" );
+		thrown.expectMessage( "this document element has path 'flattenedObject', but the referenced field has a parent with path 'null'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			indexAccessors.flattenedObject.string.write( document, "willNotWork" );
+			indexMapping.flattenedObject.string.write( document, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
 	}
 
 	@Test
-	public void index_error_invalidDocumentElement_nested() {
+	public void index_error_invalidFieldForDocumentElement_nested() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid parent object for this field accessor" );
-		thrown.expectMessage( "expected path 'nestedObject', got 'null'." );
+		thrown.expectMessage( "Invalid field reference for this document element" );
+		thrown.expectMessage( "this document element has path 'nestedObject', but the referenced field has a parent with path 'null'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			indexAccessors.nestedObject.string.write( document, "willNotWork" );
+			indexMapping.nestedObject.string.write( document, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
@@ -226,33 +226,33 @@ public class ObjectFieldStorageIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
-			ObjectAccessors accessors;
+			ObjectMapping objectMapping;
 			DocumentElement object;
 
 			// ----------------
 			// Flattened object
 			// Leave it empty.
-			accessors = indexAccessors.flattenedObject;
-			accessors.self.addMissing( document );
+			objectMapping = indexMapping.flattenedObject;
+			objectMapping.self.addMissing( document );
 
 			// -------------
 			// Nested object
 			// Content specially crafted to match in nested queries.
-			accessors = indexAccessors.nestedObject;
+			objectMapping = indexMapping.nestedObject;
 
-			object = accessors.self.add( document );
-			accessors.integer.write( object, NON_MATCHING_INTEGER );
+			object = objectMapping.self.add( document );
+			objectMapping.integer.write( object, NON_MATCHING_INTEGER );
 
 			// This object will trigger the match; others should not
-			object = accessors.self.add( document );
-			accessors.string.write( object, MATCHING_STRING );
-			accessors.string.write( object, NON_MATCHING_STRING );
-			accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
-			accessors.integer.write( object, MATCHING_INTEGER );
-			accessors.localDate.write( object, MATCHING_LOCAL_DATE );
+			object = objectMapping.self.add( document );
+			objectMapping.string.write( object, MATCHING_STRING );
+			objectMapping.string.write( object, NON_MATCHING_STRING );
+			objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
+			objectMapping.integer.write( object, MATCHING_INTEGER );
+			objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
 
-			object = accessors.self.add( document );
-			accessors.localDate.write( object, NON_MATCHING_LOCAL_DATE );
+			object = objectMapping.self.add( document );
+			objectMapping.localDate.write( object, NON_MATCHING_LOCAL_DATE );
 		} );
 
 		workPlan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
@@ -265,25 +265,25 @@ public class ObjectFieldStorageIT {
 			 * but this content is spread over several objects, meaning it will only match
 			 * if flattened storage is used.
 			 */
-			for ( ObjectAccessors accessors :
-					Arrays.asList( indexAccessors.flattenedObject, indexAccessors.nestedObject ) ) {
-				DocumentElement object = accessors.self.add( document );
-				accessors.integer.write( object, NON_MATCHING_INTEGER );
+			for ( ObjectMapping objectMapping :
+					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
+				DocumentElement object = objectMapping.self.add( document );
+				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
 
-				object = accessors.self.add( document );
-				accessors.string.write( object, NON_MATCHING_STRING );
-				accessors.integer.write( object, MATCHING_INTEGER );
-				accessors.integer.write( object, NON_MATCHING_INTEGER );
+				object = objectMapping.self.add( document );
+				objectMapping.string.write( object, NON_MATCHING_STRING );
+				objectMapping.integer.write( object, MATCHING_INTEGER );
+				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
 
-				object = accessors.self.add( document );
-				accessors.string.write( object, MATCHING_STRING );
+				object = objectMapping.self.add( document );
+				objectMapping.string.write( object, MATCHING_STRING );
 
-				object = accessors.self.add( document );
-				accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
+				object = objectMapping.self.add( document );
+				objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
 
-				object = accessors.self.add( document );
-				accessors.localDate.write( object, MATCHING_LOCAL_DATE );
-				accessors.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
+				object = objectMapping.self.add( document );
+				objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
+				objectMapping.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
 			}
 		} );
 
@@ -293,24 +293,24 @@ public class ObjectFieldStorageIT {
 			 * For first-level nesting tests, it's because of the integer field.
 			 * For second-level nesting tests, it's because there is no nested object matching condition 1.
 			 */
-			for ( ObjectAccessors accessors :
-					Arrays.asList( indexAccessors.flattenedObject, indexAccessors.nestedObject ) ) {
-				DocumentElement object = accessors.self.add( document );
-				accessors.integer.write( object, NON_MATCHING_INTEGER );
+			for ( ObjectMapping objectMapping :
+					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
+				DocumentElement object = objectMapping.self.add( document );
+				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
 
-				object = accessors.self.add( document );
-				accessors.string.write( object, NON_MATCHING_STRING );
-				accessors.integer.write( object, NON_MATCHING_INTEGER );
+				object = objectMapping.self.add( document );
+				objectMapping.string.write( object, NON_MATCHING_STRING );
+				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
 
-				object = accessors.self.add( document );
-				accessors.string.write( object, MATCHING_STRING );
+				object = objectMapping.self.add( document );
+				objectMapping.string.write( object, MATCHING_STRING );
 
-				object = accessors.self.add( document );
-				accessors.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
+				object = objectMapping.self.add( document );
+				objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
 
-				object = accessors.self.add( document );
-				accessors.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
-				accessors.localDate.write( object, MATCHING_LOCAL_DATE );
+				object = objectMapping.self.add( document );
+				objectMapping.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
+				objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
 			}
 		} );
 
@@ -331,37 +331,37 @@ public class ObjectFieldStorageIT {
 				);
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final ObjectAccessors flattenedObject;
-		final ObjectAccessors nestedObject;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
+		final ObjectMapping flattenedObject;
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString() ).createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString() ).toReference();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
-			flattenedObject = new ObjectAccessors( flattenedObjectField );
+			flattenedObject = new ObjectMapping( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> string_analyzed;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<LocalDate> localDate;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> string_analyzed;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<LocalDate> localDate;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
-			string = objectField.field( "string", f -> f.asString() ).createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
+			string = objectField.field( "string", f -> f.asString() ).toReference();
 			string_analyzed = objectField.field(
 					"string_analyzed",
 					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 			)
-					.createAccessor();
-			integer = objectField.field( "integer", f -> f.asInteger() ).createAccessor();
-			localDate = objectField.field( "localDate", f -> f.asLocalDate() ).createAccessor();
+					.toReference();
+			integer = objectField.field( "integer", f -> f.asInteger() ).toReference();
+			localDate = objectField.field( "localDate", f -> f.asLocalDate() ).toReference();
 		}
 	}
 }
