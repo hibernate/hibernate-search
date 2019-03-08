@@ -178,19 +178,19 @@ public class BooleanSortAndRangePredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.bool.write( document, true );
+			document.addValue( indexMapping.bool, true );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.bool.write( document, Boolean.FALSE );
+			document.addValue( indexMapping.bool, Boolean.FALSE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.bool.write( document, Boolean.TRUE );
+			document.addValue( indexMapping.bool, Boolean.TRUE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			indexMapping.bool.write( document, null );
+			document.addValue( indexMapping.bool, null );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			indexMapping.bool.write( document, false );
+			document.addValue( indexMapping.bool, false );
 		} );
 
 		workPlan.execute().join();

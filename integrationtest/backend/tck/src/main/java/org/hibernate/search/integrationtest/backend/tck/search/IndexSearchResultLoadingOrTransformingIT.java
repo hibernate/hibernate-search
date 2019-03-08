@@ -375,21 +375,21 @@ public class IndexSearchResultLoadingOrTransformingIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( MAIN_ID ), document -> {
-			indexMapping.string.write( document, STRING_VALUE );
-			indexMapping.string_analyzed.write( document, STRING_ANALYZED_VALUE );
-			indexMapping.integer.write( document, INTEGER_VALUE );
-			indexMapping.localDate.write( document, LOCAL_DATE_VALUE );
-			indexMapping.geoPoint.write( document, GEO_POINT_VALUE );
+			document.addValue( indexMapping.string, STRING_VALUE );
+			document.addValue( indexMapping.string_analyzed, STRING_ANALYZED_VALUE );
+			document.addValue( indexMapping.integer, INTEGER_VALUE );
+			document.addValue( indexMapping.localDate, LOCAL_DATE_VALUE );
+			document.addValue( indexMapping.geoPoint, GEO_POINT_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, FLATTENED_OBJECT_STRING_VALUE );
-			indexMapping.flattenedObject.integer.write( flattenedObject, FLATTENED_OBJECT_INTEGER_VALUE );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, FLATTENED_OBJECT_STRING_VALUE );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, FLATTENED_OBJECT_INTEGER_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, NESTED_OBJECT_STRING_VALUE );
-			indexMapping.nestedObject.integer.write( nestedObject, NESTED_OBJECT_INTEGER_VALUE );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, NESTED_OBJECT_STRING_VALUE );
+			nestedObject.addValue( indexMapping.nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
 		} );
 
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );

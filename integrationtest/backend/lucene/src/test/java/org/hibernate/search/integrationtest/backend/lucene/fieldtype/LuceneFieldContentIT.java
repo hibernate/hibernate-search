@@ -93,18 +93,18 @@ public class LuceneFieldContentIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		workPlan.add( referenceProvider( "ID:1" ), document -> {
-			indexMapping.string.write( document, "keyword" );
-			indexMapping.text.write( document, TEXT_1 );
-			indexMapping.integer.write( document, 739 );
-			indexMapping.longNumber.write( document, 739L );
-			indexMapping.bool.write( document, true );
+			document.addValue( indexMapping.string, "keyword" );
+			document.addValue( indexMapping.text, TEXT_1 );
+			document.addValue( indexMapping.integer, 739 );
+			document.addValue( indexMapping.longNumber, 739L );
+			document.addValue( indexMapping.bool, true );
 		} );
 		workPlan.add( referenceProvider( "ID:2" ), document -> {
-			indexMapping.string.write( document, "anotherKeyword" );
-			indexMapping.text.write( document, TEXT_2 );
-			indexMapping.integer.write( document, 123 );
-			indexMapping.longNumber.write( document, 123L );
-			indexMapping.bool.write( document, false );
+			document.addValue( indexMapping.string, "anotherKeyword" );
+			document.addValue( indexMapping.text, TEXT_2 );
+			document.addValue( indexMapping.integer, 123 );
+			document.addValue( indexMapping.longNumber, 123L );
+			document.addValue( indexMapping.bool, false );
 		} );
 
 		workPlan.execute().join();

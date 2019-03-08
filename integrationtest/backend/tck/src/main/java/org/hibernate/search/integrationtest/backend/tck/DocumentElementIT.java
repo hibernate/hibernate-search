@@ -92,7 +92,7 @@ public class DocumentElementIT {
 			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			setNullValues( indexMapping.flattenedObject, flattenedObject );
 			DocumentElement flattenedObjectSecondLevelObject =
-					flattenedObject.addObject( indexMapping.flattenedObject.flattenedObject.self  );
+					flattenedObject.addObject( indexMapping.flattenedObject.flattenedObject.self );
 			setNonNullValues( indexMapping.flattenedObject.flattenedObject, flattenedObjectSecondLevelObject );
 			flattenedObjectSecondLevelObject = flattenedObject.addObject( indexMapping.flattenedObject.nestedObject.self );
 			setNullValues( indexMapping.flattenedObject.nestedObject, flattenedObjectSecondLevelObject );

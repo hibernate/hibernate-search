@@ -570,12 +570,12 @@ public class FieldSearchSortIT {
 			indexMapping.identicalForLastTwo.document2Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
 			indexMapping.flattenedObject.unsupportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 		} );
@@ -588,12 +588,12 @@ public class FieldSearchSortIT {
 			indexMapping.identicalForLastTwo.document1Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
 			indexMapping.flattenedObject.unsupportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 		} );
@@ -606,12 +606,12 @@ public class FieldSearchSortIT {
 			indexMapping.identicalForLastTwo.document3Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
 			indexMapping.flattenedObject.unsupportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 			indexMapping.nestedObject.unsupportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
@@ -794,7 +794,7 @@ public class FieldSearchSortIT {
 		}
 
 		public void write(DocumentElement target) {
-			reference.write( target, indexedValue );
+			target.addValue( reference, indexedValue );
 		}
 	}
 

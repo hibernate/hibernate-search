@@ -304,16 +304,16 @@ public class SearchMultiIndexIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
-			indexMapping_1_1.string.write( document, STRING_1 );
-			indexMapping_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_1 );
-			indexMapping_1_1.differentTypesField.write( document, DIFFERENT_TYPES_FIELD_1_1_1 );
-			indexMapping_1_1.sortField.write( document, SORT_FIELD_1_1_1 );
+			document.addValue( indexMapping_1_1.string, STRING_1 );
+			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_1 );
+			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
+			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
-			indexMapping_1_1.string.write( document, STRING_2 );
-			indexMapping_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_2 );
-			indexMapping_1_1.differentTypesField.write( document, DIFFERENT_TYPES_FIELD_1_1_2 );
-			indexMapping_1_1.sortField.write( document, SORT_FIELD_1_1_2 );
+			document.addValue( indexMapping_1_1.string, STRING_2 );
+			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_2 );
+			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
+			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_2 );
 		} );
 
 		workPlan.execute().join();
@@ -330,9 +330,9 @@ public class SearchMultiIndexIT {
 		workPlan = indexManager_1_2.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
-			indexMapping_1_2.string.write( document, STRING_1 );
-			indexMapping_1_2.differentTypesField.write( document, DIFFERENT_TYPES_FIELD_1_2_1 );
-			indexMapping_1_2.sortField.write( document, SORT_FIELD_1_2_1 );
+			document.addValue( indexMapping_1_2.string, STRING_1 );
+			document.addValue( indexMapping_1_2.differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
+			document.addValue( indexMapping_1_2.sortField, SORT_FIELD_1_2_1 );
 		} );
 
 		workPlan.execute().join();
@@ -349,10 +349,10 @@ public class SearchMultiIndexIT {
 		workPlan = indexManager_2_1.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
-			indexMapping_2_1.string.write( document, STRING_1 );
+			document.addValue( indexMapping_2_1.string, STRING_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2_1_2 ), document -> {
-			indexMapping_2_1.string.write( document, STRING_2 );
+			document.addValue( indexMapping_2_1.string, STRING_2 );
 		} );
 
 		workPlan.execute().join();

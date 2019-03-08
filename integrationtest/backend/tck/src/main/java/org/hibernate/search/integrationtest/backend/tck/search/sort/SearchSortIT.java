@@ -409,55 +409,55 @@ public class SearchSortIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		// Important: do not index the documents in the expected order after sorts
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexMapping.string.write( document, "george" );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
+			document.addValue( indexMapping.string, "george" );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7705687,4.835233 ) );
 
-			indexMapping.string_analyzed_forScore.write( document, "Hooray Hooray" );
-			indexMapping.unsortable.write( document, "george" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "george" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 2 );
+			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray" );
+			document.addValue( indexMapping.unsortable, "george" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "george" );
-			indexMapping.nestedObject.integer.write( nestedObject, 2 );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "george" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 2 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "george" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 2 );
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexMapping.string.write( document, "aaron" );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
+			document.addValue( indexMapping.string, "aaron" );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7541719, 4.8386221 ) );
 
-			indexMapping.string_analyzed_forScore.write( document, "Hooray Hooray Hooray" );
-			indexMapping.unsortable.write( document, "aaron" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "aaron" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 1 );
+			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray Hooray" );
+			document.addValue( indexMapping.unsortable, "aaron" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "aaron" );
-			indexMapping.nestedObject.integer.write( nestedObject, 1 );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "aaron" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 1 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "aaron" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 1 );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexMapping.string.write( document, "zach" );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
+			document.addValue( indexMapping.string, "zach" );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7530374, 4.8510299 ) );
 
-			indexMapping.string_analyzed_forScore.write( document, "Hooray" );
-			indexMapping.unsortable.write( document, "zach" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "zach" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 3 );
+			document.addValue( indexMapping.string_analyzed_forScore, "Hooray" );
+			document.addValue( indexMapping.unsortable, "zach" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "zach" );
-			indexMapping.nestedObject.integer.write( nestedObject, 3 );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "zach" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 3 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "zach" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 3 );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 

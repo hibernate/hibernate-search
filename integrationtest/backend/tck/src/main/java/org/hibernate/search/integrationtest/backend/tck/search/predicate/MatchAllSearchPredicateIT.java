@@ -120,13 +120,13 @@ public class MatchAllSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.string.write( document, STRING_1 );
+			document.addValue( indexMapping.string, STRING_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.string.write( document, STRING_2 );
+			document.addValue( indexMapping.string, STRING_2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.string.write( document, STRING_3 );
+			document.addValue( indexMapping.string, STRING_3 );
 		} );
 
 		workPlan.execute().join();

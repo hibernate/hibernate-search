@@ -301,7 +301,7 @@ public class AnalysisCustomIT {
 		}
 
 		public void write(DocumentElement target, String value) {
-			reference.write( target, value );
+			target.addValue( reference, value );
 		}
 	}
 }

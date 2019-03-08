@@ -240,12 +240,12 @@ public class MultiTenancyIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexMapping.string.write( document, UPDATED_STRING );
-			indexMapping.integer.write( document, INTEGER_VALUE_4 );
+			document.addValue( indexMapping.string, UPDATED_STRING );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -392,12 +392,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_3 );
-			indexMapping.integer.write( document, INTEGER_VALUE_5 );
+			document.addValue( indexMapping.string, STRING_VALUE_3 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_3 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
 		} );
 
 		workPlan.execute().join();
@@ -420,12 +420,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexMapping.string.write( document, UPDATED_STRING );
-			indexMapping.integer.write( document, INTEGER_VALUE_4 );
+			document.addValue( indexMapping.string, UPDATED_STRING );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -474,12 +474,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_3 );
-			indexMapping.integer.write( document, INTEGER_VALUE_5 );
+			document.addValue( indexMapping.string, STRING_VALUE_3 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_3 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
 		} );
 
 		workPlan.execute().join();
@@ -494,12 +494,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexMapping.string.write( document, UPDATED_STRING );
-			indexMapping.integer.write( document, INTEGER_VALUE_4 );
+			document.addValue( indexMapping.string, UPDATED_STRING );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -519,42 +519,42 @@ public class MultiTenancyIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_1 );
-			indexMapping.integer.write( document, INTEGER_VALUE_1 );
+			document.addValue( indexMapping.string, STRING_VALUE_1 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_1 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_1 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_1 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_1 );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_2 );
-			indexMapping.integer.write( document, INTEGER_VALUE_2 );
+			document.addValue( indexMapping.string, STRING_VALUE_2 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_2 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_2 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_2 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_2 );
 		} );
 
 		workPlan.execute().join();
 
 		workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_1 );
-			indexMapping.integer.write( document, INTEGER_VALUE_3 );
+			document.addValue( indexMapping.string, STRING_VALUE_1 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_3 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_3 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_1 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_3 );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexMapping.string.write( document, STRING_VALUE_2 );
-			indexMapping.integer.write( document, INTEGER_VALUE_4 );
+			document.addValue( indexMapping.string, STRING_VALUE_2 );
+			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
-			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_2 );
+			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();

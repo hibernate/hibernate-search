@@ -238,105 +238,105 @@ public class NestedSearchPredicateIT {
 			level1 = indexMapping.nestedObject;
 			level2 = level1.nestedObject;
 
-			object = level1.self.add( document );
-			level2.self.addMissing( object );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addNullObject( level2.self );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
 			// This object will trigger the match; others should not
-			object = level1.self.add( document );
-			level1.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			level2.self.addMissing( object );
-			secondLevelObject = level2.self.add( object ); // This matches nested condition 1
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = level2.self.add( object ); // This matches nested condition 2
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, NON_MATCHING_STRING );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object.addNullObject( level2.self );
+			secondLevelObject = object.addObject( level2.self ); // This matches nested condition 1
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = object.addObject( level2.self ); // This matches nested condition 2
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
-			object = level1.self.add( document );
-			level2.self.addMissing( object );
+			object = document.addObject( level1.self );
+			object.addNullObject( level2.self );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			ObjectMapping level1 = indexMapping.nestedObject;
-			DocumentElement object = level1.self.add( document );
+			DocumentElement object = document.addObject( level1.self );
 			SecondLevelObjectMapping level2 = level1.nestedObject;
-			DocumentElement secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			DocumentElement secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
-			object = level1.self.add( document );
-			level1.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = level2.self.add( object ); // This matches nested condition 1
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, NON_MATCHING_STRING );
+			secondLevelObject = object.addObject( level2.self ); // This matches nested condition 1
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
-			object = level1.self.add( document );
-			level1.string.write( object, MATCHING_STRING );
-			level2.self.addMissing( object );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, MATCHING_STRING );
+			object.addNullObject( level2.self );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = level1.self.add( document );
-			level1.string.write( object, MATCHING_STRING );
-			secondLevelObject = level2.self.add( object ); // This matches nested condition 2
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, MATCHING_STRING );
+			secondLevelObject = object.addObject( level2.self ); // This matches nested condition 2
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = level1.self.add( document );
+			object = document.addObject( level1.self );
 		} );
 
 		workPlan.add( referenceProvider( "neverMatching" ), document -> {
 			ObjectMapping level1 = indexMapping.nestedObject;
 			SecondLevelObjectMapping level2 = level1.nestedObject;
 
-			DocumentElement object = level1.self.add( document );
-			DocumentElement secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			DocumentElement object = document.addObject( level1.self );
+			DocumentElement secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
-			object = level1.self.add( document );
-			level1.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			level2.self.addMissing( object );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, NON_MATCHING_STRING );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object.addNullObject( level2.self );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = level1.self.add( document );
-			level1.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = document.addObject( level1.self );
+			object.addValue( level1.string, NON_MATCHING_STRING );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = level1.self.add( document );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = document.addObject( level1.self );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			secondLevelObject.addValue( level2.field2, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = level1.self.add( document );
-			secondLevelObject = level2.self.add( object );
-			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = document.addObject( level1.self );
+			secondLevelObject = object.addObject( level2.self );
+			secondLevelObject.addValue( level2.field1, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 		} );
 
 		workPlan.add( referenceProvider( "empty" ), document -> { } );

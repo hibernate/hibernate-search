@@ -597,25 +597,25 @@ public class PhraseSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringFieldWithDslConverter.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_1_MATCH );
-			indexMapping.analyzedStringField2.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
+			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_2_MATCH );
-			indexMapping.analyzedStringField2.reference.write( document, PHRASE_3_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringField3.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
+			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_3_MATCH );
-			indexMapping.analyzedStringField3.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
+			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			indexMapping.analyzedStringField1.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringField2.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> {
 		} );
@@ -623,13 +623,13 @@ public class PhraseSearchPredicateIT {
 
 		workPlan = compatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( compatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.execute().join();
 
 		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( rawFieldCompatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.execute().join();
 

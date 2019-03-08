@@ -79,8 +79,8 @@ public class ObjectFieldStorageIT {
 		thrown.expectMessage( "this document element has path 'null', but the referenced field has a parent with path 'flattenedObject'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.string.write( flattenedObject, "willNotWork" );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.string, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
@@ -95,7 +95,7 @@ public class ObjectFieldStorageIT {
 		thrown.expectMessage( "this document element has path 'flattenedObject', but the referenced field has a parent with path 'null'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			indexMapping.flattenedObject.string.write( document, "willNotWork" );
+			document.addValue( indexMapping.flattenedObject.string, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
@@ -110,7 +110,7 @@ public class ObjectFieldStorageIT {
 		thrown.expectMessage( "this document element has path 'nestedObject', but the referenced field has a parent with path 'null'." );
 
 		workPlan.add( referenceProvider( "willNotWork" ), document -> {
-			indexMapping.nestedObject.string.write( document, "willNotWork" );
+			document.addValue( indexMapping.nestedObject.string, "willNotWork" );
 		} );
 
 		workPlan.execute().join();
@@ -233,26 +233,26 @@ public class ObjectFieldStorageIT {
 			// Flattened object
 			// Leave it empty.
 			objectMapping = indexMapping.flattenedObject;
-			objectMapping.self.addMissing( document );
+			document.addNullObject( objectMapping.self );
 
 			// -------------
 			// Nested object
 			// Content specially crafted to match in nested queries.
 			objectMapping = indexMapping.nestedObject;
 
-			object = objectMapping.self.add( document );
-			objectMapping.integer.write( object, NON_MATCHING_INTEGER );
+			object = document.addObject( objectMapping.self );
+			object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
 			// This object will trigger the match; others should not
-			object = objectMapping.self.add( document );
-			objectMapping.string.write( object, MATCHING_STRING );
-			objectMapping.string.write( object, NON_MATCHING_STRING );
-			objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
-			objectMapping.integer.write( object, MATCHING_INTEGER );
-			objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
+			object = document.addObject( objectMapping.self );
+			object.addValue( objectMapping.string, MATCHING_STRING );
+			object.addValue( objectMapping.string, NON_MATCHING_STRING );
+			object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
+			object.addValue( objectMapping.integer, MATCHING_INTEGER );
+			object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
 
-			object = objectMapping.self.add( document );
-			objectMapping.localDate.write( object, NON_MATCHING_LOCAL_DATE );
+			object = document.addObject( objectMapping.self );
+			object.addValue( objectMapping.localDate, NON_MATCHING_LOCAL_DATE );
 		} );
 
 		workPlan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
@@ -267,23 +267,23 @@ public class ObjectFieldStorageIT {
 			 */
 			for ( ObjectMapping objectMapping :
 					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
-				DocumentElement object = objectMapping.self.add( document );
-				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
+				DocumentElement object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string.write( object, NON_MATCHING_STRING );
-				objectMapping.integer.write( object, MATCHING_INTEGER );
-				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string, NON_MATCHING_STRING );
+				object.addValue( objectMapping.integer, MATCHING_INTEGER );
+				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string.write( object, MATCHING_STRING );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string, MATCHING_STRING );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
 
-				object = objectMapping.self.add( document );
-				objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
-				objectMapping.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
+				object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
 			}
 		} );
 
@@ -295,22 +295,22 @@ public class ObjectFieldStorageIT {
 			 */
 			for ( ObjectMapping objectMapping :
 					Arrays.asList( indexMapping.flattenedObject, indexMapping.nestedObject ) ) {
-				DocumentElement object = objectMapping.self.add( document );
-				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
+				DocumentElement object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string.write( object, NON_MATCHING_STRING );
-				objectMapping.integer.write( object, NON_MATCHING_INTEGER );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string, NON_MATCHING_STRING );
+				object.addValue( objectMapping.integer, NON_MATCHING_INTEGER );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string.write( object, MATCHING_STRING );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string, MATCHING_STRING );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string_analyzed.write( object, MATCHING_STRING_ANALYZED );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string_analyzed, MATCHING_STRING_ANALYZED );
 
-				object = objectMapping.self.add( document );
-				objectMapping.string_analyzed.write( object, NON_MATCHING_STRING_ANALYZED );
-				objectMapping.localDate.write( object, MATCHING_LOCAL_DATE );
+				object = document.addObject( objectMapping.self );
+				object.addValue( objectMapping.string_analyzed, NON_MATCHING_STRING_ANALYZED );
+				object.addValue( objectMapping.localDate, MATCHING_LOCAL_DATE );
 			}
 		} );
 

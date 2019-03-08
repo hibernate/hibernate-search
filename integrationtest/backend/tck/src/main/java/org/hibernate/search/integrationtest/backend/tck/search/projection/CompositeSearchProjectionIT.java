@@ -380,7 +380,7 @@ public class CompositeSearchProjectionIT {
 		}
 
 		public void write(DocumentElement target) {
-			reference.write( target, indexedValue );
+			target.addValue( reference, indexedValue );
 		}
 	}
 
