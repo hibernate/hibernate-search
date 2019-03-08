@@ -14,19 +14,16 @@ package org.hibernate.search.engine.backend.document;
  * @see DocumentElement#addObject(IndexObjectFieldReference)
  * @see DocumentElement#addNullObject(IndexObjectFieldReference)
  */
-// FIXME remove inheritance from IndexObjectFieldAccessor
-public interface IndexObjectFieldReference extends IndexObjectFieldAccessor {
+public interface IndexObjectFieldReference {
 
 	// FIXME Remove this method and usages of this method
 	@Deprecated
-	@Override
 	default DocumentElement add(DocumentElement target) {
 		return target.addObject( this );
 	}
 
 	// FIXME Remove this method and usages of this method
 	@Deprecated
-	@Override
 	default void addMissing(DocumentElement target) {
 		target.addNullObject( this );
 	}

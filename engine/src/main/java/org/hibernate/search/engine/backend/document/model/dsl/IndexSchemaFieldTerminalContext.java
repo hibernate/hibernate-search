@@ -11,12 +11,6 @@ package org.hibernate.search.engine.backend.document.model.dsl;
  */
 public interface IndexSchemaFieldTerminalContext<R> {
 
-	// FIXME Remove this method
-	@Deprecated
-	default R createAccessor() {
-		return toReference();
-	}
-
 	R toReference();
 
 }

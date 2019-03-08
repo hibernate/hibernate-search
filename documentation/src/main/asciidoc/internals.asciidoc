@@ -136,13 +136,13 @@ and so are the upper levels of each mapper implementation.
 But at the lower levels, indexing in a mapper comes down to using the backend SPIs.
 
 When indexing, the mapper must build a document that will be passed to the backend.
-This is done using index field accessors.
-During bootstrap, whenever the mapper declared a field, the backend returned an accessor
-(see `IndexSchemaFieldTerminalContext#createAccessor`).
+This is done using document elements and index field references.
+During bootstrap, whenever the mapper declared a field, the backend returned a reference
+(see `IndexSchemaFieldTerminalContext#getReference`).
 In order to build a document, the mapper extracts data from an object to index,
-but it then needs to store the extracted data at the appropriate place in the document.
-The accessor is responsible for exactly this: given a document,
-it sets the value of the field it represents to some mapper-provided value.
+retrieves a document element from the backend,
+and pass the field reference along with the value to the document element,
+so that the value is added to the field.
 
 The other part of indexing (or altering the index in any way) is to give an order to the index manager:
 "add this document", "delete this document", ...
