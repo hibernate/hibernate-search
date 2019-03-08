@@ -35,13 +35,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test the behavior of implementations of index field references.
- * <p>
- * This does not check the effects of the model definition on the actual index schema,
- * since this would require backend-specific code to inspect that schema.
- * However, in search and projection tests, we check that defined fields behave correctly at runtime.
+ * Test the behavior of implementations of implementations of {@link DocumentElement}.
  */
-public class IndexFieldReferenceIT {
+public class DocumentElementIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -63,100 +59,100 @@ public class IndexFieldReferenceIT {
 	}
 
 	/**
-	 * Test that field references do not throw any exception when calling write() with a non-null value.
+	 * Test that DocumentElement.add does not throw any exception when passing a non-null value.
 	 */
 	@Test
-	public void field_write_nonNull() {
+	public void add_nonNull() {
 		executeAdd( "1", document -> {
 			setNonNullValues( indexMapping, document );
 		} );
 	}
 
 	/**
-	 * Test that field references do not throw any exception when calling write() with a null value.
+	 * Test that DocumentElement.add does not throw any exception when passing a null value.
 	 */
 	@Test
-	public void field_write_null() {
+	public void add_null() {
 		executeAdd( "1", document -> {
 			setNullValues( indexMapping, document );
 		} );
 	}
 
 	/**
-	 * Test that object field references do not throw any exception when calling add()
-	 * or when using field references on added objects.
+	 * Test that DocumentElement.addObject does not throw any exception,
+	 * add that DocumentElement.add does not throw an exception for returned objects.
 	 */
 	@Test
-	public void objectField_add() {
+	public void addObject() {
 		executeAdd( "1", document -> {
 			setNullValues( indexMapping, document );
 
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			setNonNullValues( indexMapping.flattenedObject, flattenedObject );
-			flattenedObject = indexMapping.flattenedObject.self.add( document );
+			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			setNullValues( indexMapping.flattenedObject, flattenedObject );
 			DocumentElement flattenedObjectSecondLevelObject =
-					indexMapping.flattenedObject.flattenedObject.self.add( flattenedObject );
+					flattenedObject.addObject( indexMapping.flattenedObject.flattenedObject.self  );
 			setNonNullValues( indexMapping.flattenedObject.flattenedObject, flattenedObjectSecondLevelObject );
-			flattenedObjectSecondLevelObject = indexMapping.flattenedObject.nestedObject.self.add( flattenedObject );
+			flattenedObjectSecondLevelObject = flattenedObject.addObject( indexMapping.flattenedObject.nestedObject.self );
 			setNullValues( indexMapping.flattenedObject.nestedObject, flattenedObjectSecondLevelObject );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			setNonNullValues( indexMapping.nestedObject, nestedObject );
-			nestedObject = indexMapping.nestedObject.self.add( document );
+			nestedObject = document.addObject( indexMapping.nestedObject.self );
 			setNullValues( indexMapping.nestedObject, nestedObject );
 			DocumentElement nestedObjectSecondLevelObject =
-					indexMapping.nestedObject.flattenedObject.self.add( nestedObject );
+					nestedObject.addObject( indexMapping.nestedObject.flattenedObject.self );
 			setNonNullValues( indexMapping.nestedObject.flattenedObject, nestedObjectSecondLevelObject );
-			nestedObjectSecondLevelObject = indexMapping.nestedObject.nestedObject.self.add( nestedObject );
+			nestedObjectSecondLevelObject = nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
 			setNullValues( indexMapping.nestedObject.nestedObject, nestedObjectSecondLevelObject );
 		} );
 	}
 
 	/**
-	 * Test that object field references do not throw any exception when calling addMissing().
+	 * Test that DocumentElement.addNullObject does not throw any exception.
 	 */
 	@Test
-	public void objectField_addMissing() {
+	public void addNullObject() {
 		executeAdd( "1", document -> {
 			setNullValues( indexMapping, document );
 
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.self.addMissing( document );
-			indexMapping.flattenedObject.flattenedObject.self.add( flattenedObject );
-			indexMapping.flattenedObject.flattenedObject.self.addMissing( flattenedObject );
-			indexMapping.flattenedObject.nestedObject.self.add( flattenedObject );
-			indexMapping.flattenedObject.nestedObject.self.addMissing( flattenedObject );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			document.addNullObject( indexMapping.flattenedObject.self );
+			flattenedObject.addObject( indexMapping.flattenedObject.flattenedObject.self );
+			flattenedObject.addNullObject( indexMapping.flattenedObject.flattenedObject.self );
+			flattenedObject.addObject( indexMapping.flattenedObject.nestedObject.self );
+			flattenedObject.addNullObject( indexMapping.flattenedObject.nestedObject.self );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.self.addMissing( document );
-			indexMapping.nestedObject.flattenedObject.self.add( nestedObject );
-			indexMapping.nestedObject.flattenedObject.self.addMissing( nestedObject );
-			indexMapping.nestedObject.nestedObject.self.add( nestedObject );
-			indexMapping.nestedObject.nestedObject.self.addMissing( nestedObject );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			document.addNullObject( indexMapping.nestedObject.self );
+			nestedObject.addObject( indexMapping.nestedObject.flattenedObject.self );
+			nestedObject.addNullObject( indexMapping.nestedObject.flattenedObject.self );
+			nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
+			nestedObject.addNullObject( indexMapping.nestedObject.nestedObject.self );
 		} );
 	}
 
 	/**
-	 * Test that references to excluded fields can be called without any exception being thrown.
+	 * Test that DocumentElement.add does not throw any exception when passing a reference to an excluded field.
 	 */
 	@Test
-	public void excludedFields_write() {
+	public void add_excludedFields() {
 		executeAdd( "1", document -> {
-			DocumentElement excludingObject = indexMapping.excludingObject.self.add( document );
+			DocumentElement excludingObject = document.addObject( indexMapping.excludingObject.self );
 			setNonNullValues( indexMapping.excludingObject, excludingObject );
-			excludingObject = indexMapping.excludingObject.self.add( document );
+			excludingObject = document.addObject( indexMapping.excludingObject.self );
 			setNullValues( indexMapping.excludingObject, excludingObject );
 
 			DocumentElement flattenedSecondLevelObject =
-					indexMapping.excludingObject.flattenedObject.self.add( excludingObject );
+					excludingObject.addObject( indexMapping.excludingObject.flattenedObject.self );
 			setNonNullValues( indexMapping.excludingObject.flattenedObject, flattenedSecondLevelObject );
-			flattenedSecondLevelObject = indexMapping.excludingObject.flattenedObject.self.add( excludingObject );
+			flattenedSecondLevelObject = excludingObject.addObject( indexMapping.excludingObject.flattenedObject.self );
 			setNullValues( indexMapping.excludingObject.flattenedObject, flattenedSecondLevelObject );
 
-			DocumentElement nestedSecondLevelObject = indexMapping.excludingObject.nestedObject.self.add( excludingObject );
+			DocumentElement nestedSecondLevelObject = excludingObject.addObject( indexMapping.excludingObject.nestedObject.self );
 			setNullValues( indexMapping.excludingObject.nestedObject, nestedSecondLevelObject );
-			nestedSecondLevelObject = indexMapping.excludingObject.nestedObject.self.add( excludingObject );
+			nestedSecondLevelObject = excludingObject.addObject( indexMapping.excludingObject.nestedObject.self );
 			setNullValues( indexMapping.excludingObject.nestedObject, nestedSecondLevelObject );
 		} );
 	}
@@ -168,7 +164,7 @@ public class IndexFieldReferenceIT {
 					"Parent mismatch with reference " + reference,
 					() ->
 							executeAdd( "1", document -> {
-								reference.write( document, null );
+								document.addValue( reference, null );
 							} )
 			)
 					.assertThrown()
@@ -186,7 +182,7 @@ public class IndexFieldReferenceIT {
 					"Parent mismatch with reference " + reference,
 					() ->
 							executeAdd( "1", document -> {
-								reference.write( document, null );
+								document.addValue( reference, null );
 							} )
 			)
 					.assertThrown()
@@ -204,8 +200,8 @@ public class IndexFieldReferenceIT {
 					"Parent mismatch with reference " + reference,
 					() ->
 							executeAdd( "1", document -> {
-								DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-								reference.write( flattenedObject, null );
+								DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+								flattenedObject.addValue( reference, null );
 							} )
 			)
 					.assertThrown()
@@ -217,19 +213,19 @@ public class IndexFieldReferenceIT {
 	}
 
 	private void setNonNullValues(AllTypesMapping mapping, DocumentElement document) {
-		mapping.string.write( document, "text 1" );
-		mapping.string_analyzed.write( document, "text 1" );
-		mapping.integer.write( document, 1 );
-		mapping.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
-		mapping.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
+		document.addValue( mapping.string, "text 1" );
+		document.addValue( mapping.string_analyzed, "text 1" );
+		document.addValue( mapping.integer, 1 );
+		document.addValue( mapping.localDate, LocalDate.of( 2018, 1, 1 ) );
+		document.addValue( mapping.geoPoint, GeoPoint.of( 0, 1 ) );
 	}
 
 	private void setNullValues(AllTypesMapping mapping, DocumentElement document) {
-		mapping.string.write( document, null );
-		mapping.string_analyzed.write( document, null );
-		mapping.integer.write( document, null );
-		mapping.localDate.write( document, null );
-		mapping.geoPoint.write( document, null );
+		document.addValue( mapping.string, null );
+		document.addValue( mapping.string_analyzed, null );
+		document.addValue( mapping.integer, null );
+		document.addValue( mapping.localDate, null );
+		document.addValue( mapping.geoPoint, null );
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
