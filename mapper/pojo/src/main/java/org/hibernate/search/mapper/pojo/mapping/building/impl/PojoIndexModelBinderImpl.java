@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -311,10 +311,10 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute( fieldTypeContext );
 
-		IndexFieldAccessor<? super F> indexFieldAccessor = schemaElement.field( relativeFieldName, fieldTypeContext )
-				.createAccessor();
+		IndexFieldReference<? super F> indexFieldReference = schemaElement.field( relativeFieldName, fieldTypeContext )
+				.toReference();
 
-		return new BoundValueBridge<>( castedBridgeHolder, indexFieldAccessor );
+		return new BoundValueBridge<>( castedBridgeHolder, indexFieldReference );
 	}
 
 	private class PojoIndexSchemaContributionListener implements IndexSchemaContributionListener {

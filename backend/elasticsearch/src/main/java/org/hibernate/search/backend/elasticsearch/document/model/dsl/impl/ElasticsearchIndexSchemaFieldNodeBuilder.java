@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -29,7 +28,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import com.google.gson.JsonElement;
 
 class ElasticsearchIndexSchemaFieldNodeBuilder<F>
-		implements IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>>,
+		implements IndexSchemaFieldTerminalContext<IndexFieldReference<F>>,
 		ElasticsearchIndexSchemaNodeContributor,
 		IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );

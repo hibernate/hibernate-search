@@ -11,7 +11,7 @@ import com.google.gson.JsonElement;
 /**
  * Defines how a given value will be encoded as JSON and decoded from JSON.
  * <p>
- * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
+ * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldReference} when indexing,
  * and returns decoded values to the {@link org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection}
  * when projecting in a search query.
  */

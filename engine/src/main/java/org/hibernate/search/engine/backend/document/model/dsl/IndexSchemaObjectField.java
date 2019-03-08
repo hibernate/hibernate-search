@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
 public interface IndexSchemaObjectField
-		extends IndexSchemaElement, IndexSchemaFieldTerminalContext<IndexObjectFieldAccessor> {
+		extends IndexSchemaElement, IndexSchemaFieldTerminalContext<IndexObjectFieldReference> {
 
 }

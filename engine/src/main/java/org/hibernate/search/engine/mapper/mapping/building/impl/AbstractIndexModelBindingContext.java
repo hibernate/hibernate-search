@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
@@ -84,7 +84,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
 		private final ObjectFieldStorage storage;
-		private final List<IndexObjectFieldAccessor> parentObjectAccessors = new ArrayList<>();
+		private final List<IndexObjectFieldReference> parentIndexObjectReferences = new ArrayList<>();
 
 		private NestedContextBuilderImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 				IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage) {
@@ -97,7 +97,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
 					currentNodeBuilder.addObjectField( objectName, storage );
-			parentObjectAccessors.add( nextNodeBuilder.createAccessor() );
+			parentIndexObjectReferences.add( nextNodeBuilder.toReference() );
 			currentNodeBuilder = nextNodeBuilder;
 		}
 
@@ -105,7 +105,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		public IndexModelBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
 			return new NonRootIndexModelBindingContext(
 					indexSchemaRootNodeBuilder,
-					currentNodeBuilder, parentObjectAccessors, nestingContext
+					currentNodeBuilder, parentIndexObjectReferences, nestingContext
 			);
 		}
 	}

@@ -9,7 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -17,19 +17,19 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 class NonRootIndexModelBindingContext
 		extends AbstractIndexModelBindingContext<IndexSchemaObjectNodeBuilder> {
-	private final Collection<IndexObjectFieldAccessor> parentObjectAccessors;
+	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
 	NonRootIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
-			Collection<IndexObjectFieldAccessor> parentObjectAccessors,
+			Collection<IndexObjectFieldReference> parentIndexObjectReferences,
 			ConfiguredIndexSchemaNestingContext nestingContext) {
 		super( indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, nestingContext );
-		this.parentObjectAccessors = Collections.unmodifiableCollection( parentObjectAccessors );
+		this.parentIndexObjectReferences = Collections.unmodifiableCollection( parentIndexObjectReferences );
 	}
 
 	@Override
-	public Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors() {
-		return parentObjectAccessors;
+	public Collection<IndexObjectFieldReference> getParentIndexObjectReferences() {
+		return parentIndexObjectReferences;
 	}
 
 	@Override

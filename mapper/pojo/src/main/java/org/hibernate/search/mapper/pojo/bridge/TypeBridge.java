@@ -48,7 +48,7 @@ public interface TypeBridge extends AutoCloseable {
 	 * using the given {@link PojoElement} as input and transforming it as necessary.
 	 * <p>
 	 * Writing to the {@link DocumentElement} should be done using
-	 * {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor}s retrieved when the
+	 * {@link org.hibernate.search.engine.backend.document.IndexFieldReference}s retrieved when the
 	 * {@link #bind(TypeBridgeBindingContext)} method was called.
 	 * <p>
 	 * Reading from the {@link PojoElement} should be done using

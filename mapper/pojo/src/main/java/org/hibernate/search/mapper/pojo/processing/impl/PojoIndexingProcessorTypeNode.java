@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.impl;
 import java.util.Collection;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.model.PojoElement;
@@ -26,14 +26,14 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  */
 public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 
-	private final Iterable<IndexObjectFieldAccessor> parentObjectAccessors;
+	private final Iterable<IndexObjectFieldReference> parentIndexObjectReferences;
 	private final Collection<BeanHolder<? extends TypeBridge>> bridgeHolders;
 	private final Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes;
 
-	public PojoIndexingProcessorTypeNode(Iterable<IndexObjectFieldAccessor> parentObjectAccessors,
+	public PojoIndexingProcessorTypeNode(Iterable<IndexObjectFieldReference> parentIndexObjectReferences,
 			Collection<BeanHolder<? extends TypeBridge>> bridgeHolders,
 			Collection<PojoIndexingProcessorPropertyNode<? super T, ?>> propertyNodes) {
-		this.parentObjectAccessors = parentObjectAccessors;
+		this.parentIndexObjectReferences = parentIndexObjectReferences;
 		this.bridgeHolders = bridgeHolders;
 		this.propertyNodes = propertyNodes;
 	}
@@ -50,7 +50,7 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
 		builder.attribute( "class", getClass().getSimpleName() );
-		builder.attribute( "objectAccessors", parentObjectAccessors );
+		builder.attribute( "parentIndexObjectReferences", parentIndexObjectReferences );
 		builder.startList( "bridges" );
 		for ( BeanHolder<? extends TypeBridge> bridgeHolder : bridgeHolders ) {
 			builder.value( bridgeHolder.get() );
@@ -69,8 +69,8 @@ public class PojoIndexingProcessorTypeNode<T> extends PojoIndexingProcessor<T> {
 			return;
 		}
 		DocumentElement parentObject = target;
-		for ( IndexObjectFieldAccessor objectAccessor : parentObjectAccessors ) {
-			parentObject = objectAccessor.add( parentObject );
+		for ( IndexObjectFieldReference objectFieldReference : parentIndexObjectReferences ) {
+			parentObject = parentObject.addObject( objectFieldReference );
 		}
 		if ( !bridgeHolders.isEmpty() ) {
 			PojoElement bridgedElement = new PojoElementImpl( source );

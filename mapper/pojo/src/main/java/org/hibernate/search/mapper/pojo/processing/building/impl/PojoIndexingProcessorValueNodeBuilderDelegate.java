@@ -155,7 +155,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 	private static <V, F> PojoIndexingProcessor<V> createValueBridgeNode(BoundValueBridge<V, F> boundBridge) {
 		return new PojoIndexingProcessorValueBridgeNode<>(
-				boundBridge.getBridgeHolder(), boundBridge.getIndexFieldAccessor()
+				boundBridge.getBridgeHolder(), boundBridge.getIndexFieldReference()
 		);
 	}
 }

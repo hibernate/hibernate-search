@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 /**
  * Defines how a given value will be encoded in the Lucene document and how it will be decoded.
  * <p>
- * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldAccessor} when indexing,
+ * Encodes values received from an {@link org.hibernate.search.engine.backend.document.IndexFieldReference} when indexing,
  * and returns decoded values to the hit extractor when projecting in a search query.
  *
  * @param <F> The field type as declared on

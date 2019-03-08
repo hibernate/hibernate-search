@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -25,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 class LuceneIndexSchemaFieldNodeBuilder<F>
-		implements IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>>,
+		implements IndexSchemaFieldTerminalContext<IndexFieldReference<F>>,
 		LuceneIndexSchemaNodeContributor, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

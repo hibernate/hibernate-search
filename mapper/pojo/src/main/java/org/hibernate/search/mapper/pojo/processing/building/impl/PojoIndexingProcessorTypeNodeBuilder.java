@@ -13,7 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -115,7 +115,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	private Optional<PojoIndexingProcessor<T>> doBuild(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
-		Collection<IndexObjectFieldAccessor> parentIndexObjectAccessors = bindingContext.getParentIndexObjectAccessors();
+		Collection<IndexObjectFieldReference> parentIndexObjectReferences = bindingContext.getParentIndexObjectReferences();
 
 		if ( boundRoutingKeyBridge != null ) {
 			boundRoutingKeyBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
@@ -137,7 +137,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 					.map( Optional::get )
 					.forEach( immutablePropertyNodes::add );
 
-			if ( parentIndexObjectAccessors.isEmpty() && immutableBridgeHolders.isEmpty() && immutablePropertyNodes
+			if ( parentIndexObjectReferences.isEmpty() && immutableBridgeHolders.isEmpty() && immutablePropertyNodes
 					.isEmpty() ) {
 				/*
 				 * If this node doesn't create any object in the document, and it doesn't have any bridge,
@@ -147,7 +147,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 			}
 			else {
 				return Optional.of( new PojoIndexingProcessorTypeNode<>(
-						parentIndexObjectAccessors, immutableBridgeHolders, immutablePropertyNodes
+						parentIndexObjectReferences, immutableBridgeHolders, immutablePropertyNodes
 				) );
 			}
 		}

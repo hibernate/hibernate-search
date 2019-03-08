@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collector;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -84,7 +84,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private final Projectable projectable;
 	private final String markerSet;
 
-	private IndexFieldAccessor<GeoPoint> fieldAccessor;
+	private IndexFieldReference<GeoPoint> indexFieldReference;
 	private Function<PojoElement, GeoPoint> coordinatesExtractor;
 
 	/**
@@ -121,11 +121,11 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 	private void bind(String defaultedFieldName, IndexFieldTypeFactoryContext typeFactoryContext,
 			IndexSchemaElement indexSchemaElement,
 			PojoModelCompositeElement bridgedPojoModelElement) {
-		fieldAccessor = indexSchemaElement.field(
+		indexFieldReference = indexSchemaElement.field(
 				defaultedFieldName,
 				typeFactoryContext.asGeoPoint().projectable( projectable ).toIndexFieldType()
 		)
-				.createAccessor();
+				.toReference();
 
 		if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
 			PojoModelElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
@@ -176,7 +176,7 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 
 	private void doWrite(DocumentElement target, PojoElement source) {
 		GeoPoint coordinates = coordinatesExtractor.apply( source );
-		fieldAccessor.write( target, coordinates );
+		target.addValue( indexFieldReference, coordinates );
 	}
 
 	@Override
