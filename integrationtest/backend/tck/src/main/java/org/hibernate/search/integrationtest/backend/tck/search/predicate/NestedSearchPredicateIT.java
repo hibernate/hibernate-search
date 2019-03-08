@@ -10,8 +10,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -52,7 +52,7 @@ public class NestedSearchPredicateIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -60,7 +60,7 @@ public class NestedSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -230,113 +230,113 @@ public class NestedSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			ObjectAccessors accessors;
-			SecondLevelObjectAccessors secondLevelAccessors;
+			ObjectMapping level1;
+			SecondLevelObjectMapping level2;
 			DocumentElement object;
 			DocumentElement secondLevelObject;
 
-			accessors = indexAccessors.nestedObject;
-			secondLevelAccessors = accessors.nestedObject;
+			level1 = indexMapping.nestedObject;
+			level2 = level1.nestedObject;
 
-			object = accessors.self.add( document );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = level1.self.add( document );
+			level2.self.addMissing( object );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
 			// This object will trigger the match; others should not
-			object = accessors.self.add( document );
-			accessors.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 1
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 2
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, NON_MATCHING_STRING );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			level2.self.addMissing( object );
+			secondLevelObject = level2.self.add( object ); // This matches nested condition 1
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = level2.self.add( object ); // This matches nested condition 2
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
-			object = accessors.self.add( document );
-			secondLevelAccessors.self.addMissing( object );
+			object = level1.self.add( document );
+			level2.self.addMissing( object );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			ObjectAccessors accessors = indexAccessors.nestedObject;
-			DocumentElement object = accessors.self.add( document );
-			SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
-			DocumentElement secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			ObjectMapping level1 = indexMapping.nestedObject;
+			DocumentElement object = level1.self.add( document );
+			SecondLevelObjectMapping level2 = level1.nestedObject;
+			DocumentElement secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
-			object = accessors.self.add( document );
-			accessors.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 1
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, NON_MATCHING_STRING );
+			secondLevelObject = level2.self.add( object ); // This matches nested condition 1
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 
-			object = accessors.self.add( document );
-			accessors.string.write( object, MATCHING_STRING );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, MATCHING_STRING );
+			level2.self.addMissing( object );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = accessors.self.add( document );
-			accessors.string.write( object, MATCHING_STRING );
-			secondLevelObject = secondLevelAccessors.self.add( object ); // This matches nested condition 2
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, MATCHING_STRING );
+			secondLevelObject = level2.self.add( object ); // This matches nested condition 2
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = accessors.self.add( document );
+			object = level1.self.add( document );
 		} );
 
 		workPlan.add( referenceProvider( "neverMatching" ), document -> {
-			ObjectAccessors accessors = indexAccessors.nestedObject;
-			SecondLevelObjectAccessors secondLevelAccessors = accessors.nestedObject;
+			ObjectMapping level1 = indexMapping.nestedObject;
+			SecondLevelObjectMapping level2 = level1.nestedObject;
 
-			DocumentElement object = accessors.self.add( document );
-			DocumentElement secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			DocumentElement object = level1.self.add( document );
+			DocumentElement secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
 
-			object = accessors.self.add( document );
-			accessors.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelAccessors.self.addMissing( object );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, NON_MATCHING_STRING );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			level2.self.addMissing( object );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = accessors.self.add( document );
-			accessors.string.write( object, NON_MATCHING_STRING );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = level1.self.add( document );
+			level1.string.write( object, NON_MATCHING_STRING );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = accessors.self.add( document );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
+			object = level1.self.add( document );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD1 );
+			level2.field2.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION2_FIELD2 );
 
-			object = accessors.self.add( document );
-			secondLevelObject = secondLevelAccessors.self.add( object );
-			secondLevelAccessors.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
-			secondLevelAccessors.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
+			object = level1.self.add( document );
+			secondLevelObject = level2.self.add( object );
+			level2.field1.write( secondLevelObject, MATCHING_SECOND_LEVEL_CONDITION1_FIELD1 );
+			level2.field2.write( secondLevelObject, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 		} );
 
 		workPlan.add( referenceProvider( "empty" ), document -> { } );
@@ -356,40 +356,40 @@ public class NestedSearchPredicateIT {
 				);
 	}
 
-	private static class IndexAccessors {
-		final ObjectAccessors nestedObject;
+	private static class IndexMapping {
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<String> string;
-		final SecondLevelObjectAccessors nestedObject;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+		final SecondLevelObjectMapping nestedObject;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
-			string = objectField.field( "string", f -> f.asString() ).createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
+			string = objectField.field( "string", f -> f.asString() ).toReference();
 			IndexSchemaObjectField nestedObjectField = objectField.objectField(
 					"nestedObject",
 					ObjectFieldStorage.NESTED
 			);
-			nestedObject = new SecondLevelObjectAccessors( nestedObjectField );
+			nestedObject = new SecondLevelObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class SecondLevelObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<String> field1;
-		final IndexFieldAccessor<String> field2;
+	private static class SecondLevelObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> field1;
+		final IndexFieldReference<String> field2;
 
-		SecondLevelObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
-			field1 = objectField.field( "field1", f -> f.asString() ).createAccessor();
-			field2 = objectField.field( "field2", f -> f.asString() ).createAccessor();
+		SecondLevelObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
+			field1 = objectField.field( "field1", f -> f.asString() ).toReference();
+			field2 = objectField.field( "field2", f -> f.asString() ).toReference();
 		}
 	}
 }

@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.showcase.library.bridge;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -35,10 +35,10 @@ import org.hibernate.search.integrationtest.showcase.library.model.Borrowal;
 public class AccountBorrowalSummaryBridge implements TypeBridge {
 
 	private PojoModelElementAccessor<Account> accountAccessor;
-	private IndexObjectFieldAccessor borrowalsObjectFieldAccessor;
-	private IndexFieldAccessor<Integer> shortTermBorrowalCountAccessor;
-	private IndexFieldAccessor<Integer> longTermBorrowalCountAccessor;
-	private IndexFieldAccessor<Integer> totalBorrowalCountAccessor;
+	private IndexObjectFieldReference borrowalsObjectFieldReference;
+	private IndexFieldReference<Integer> shortTermBorrowalCountReference;
+	private IndexFieldReference<Integer> longTermBorrowalCountReference;
+	private IndexFieldReference<Integer> totalBorrowalCountReference;
 
 	@Override
 	public void bind(TypeBridgeBindingContext context) {
@@ -46,19 +46,19 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 		accountAccessor = context.getBridgedElement().createAccessor( Account.class );
 
 		IndexSchemaObjectField borrowalsObjectField = context.getIndexSchemaElement().objectField( "borrowals" );
-		borrowalsObjectFieldAccessor = borrowalsObjectField.createAccessor();
-		shortTermBorrowalCountAccessor = borrowalsObjectField.field(
+		borrowalsObjectFieldReference = borrowalsObjectField.toReference();
+		shortTermBorrowalCountReference = borrowalsObjectField.field(
 				"shortTermCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
-				.createAccessor();
-		longTermBorrowalCountAccessor = borrowalsObjectField.field(
+				.toReference();
+		longTermBorrowalCountReference = borrowalsObjectField.field(
 				"longTermCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
-				.createAccessor();
-		totalBorrowalCountAccessor = borrowalsObjectField.field(
+				.toReference();
+		totalBorrowalCountReference = borrowalsObjectField.field(
 				"totalCount", f -> f.asInteger().sortable( Sortable.YES )
 		)
-				.createAccessor();
+				.toReference();
 	}
 
 	@Override
@@ -84,10 +84,10 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 			}
 		}
 
-		DocumentElement borrowalsObject = borrowalsObjectFieldAccessor.add( target );
-		shortTermBorrowalCountAccessor.write( borrowalsObject, shortTermBorrowalCount );
-		longTermBorrowalCountAccessor.write( borrowalsObject, longTermBorrowalCount );
-		totalBorrowalCountAccessor.write( borrowalsObject, borrowals.size() );
+		DocumentElement borrowalsObject = borrowalsObjectFieldReference.add( target );
+		shortTermBorrowalCountReference.write( borrowalsObject, shortTermBorrowalCount );
+		longTermBorrowalCountReference.write( borrowalsObject, longTermBorrowalCount );
+		totalBorrowalCountReference.write( borrowalsObject, borrowals.size() );
 	}
 
 }

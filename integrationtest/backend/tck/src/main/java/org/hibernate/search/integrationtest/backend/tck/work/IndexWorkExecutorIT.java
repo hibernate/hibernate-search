@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkExecutor;
@@ -52,7 +52,7 @@ public class IndexWorkExecutorIT {
 	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
 	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Test
@@ -60,7 +60,7 @@ public class IndexWorkExecutorIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -86,7 +86,7 @@ public class IndexWorkExecutorIT {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
@@ -121,7 +121,7 @@ public class IndexWorkExecutorIT {
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
 			tasks[i] = documentWorkExecutor.add( referenceProvider( id ), document -> {
-				indexAccessors.title.write( document, "The Lord of the Rings cap. " + id );
+				indexMapping.title.write( document, "The Lord of the Rings cap. " + id );
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
@@ -136,12 +136,12 @@ public class IndexWorkExecutorIT {
 		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> title;
+	private static class IndexMapping {
+		final IndexFieldReference<String> title;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			title = root.field( "title", f -> f.asString() )
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

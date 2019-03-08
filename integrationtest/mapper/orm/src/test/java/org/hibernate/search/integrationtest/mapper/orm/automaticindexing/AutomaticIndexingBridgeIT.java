@@ -22,8 +22,8 @@ import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -719,40 +719,40 @@ public class AutomaticIndexingBridgeIT {
 	public static class ContainingEntityTypeBridge implements TypeBridge {
 
 		private PojoModelElementAccessor<String> directFieldSourceAccessor;
-		private PojoModelElementAccessor<String> includedInTypeBridgeSourceAccessor;
-		private IndexObjectFieldAccessor typeBridgeObjectFieldAccessor;
-		private IndexFieldAccessor<String> directFieldTargetAccessor;
-		private IndexObjectFieldAccessor childObjectFieldAccessor;
-		private IndexFieldAccessor<String> includedInTypeBridgeTargetAccessor;
+		private PojoModelElementAccessor<String> includedInTypeBridgeFieldSourceAccessor;
+		private IndexObjectFieldReference typeBridgeObjectFieldReference;
+		private IndexFieldReference<String> directFieldReference;
+		private IndexObjectFieldReference childObjectFieldReference;
+		private IndexFieldReference<String> includedInTypeBridgeFieldReference;
 
 		@Override
 		public void bind(TypeBridgeBindingContext context) {
 			PojoModelType bridgedElement = context.getBridgedElement();
 			directFieldSourceAccessor = bridgedElement.property( "directField" )
 					.createAccessor( String.class );
-			includedInTypeBridgeSourceAccessor = bridgedElement.property( "child" )
+			includedInTypeBridgeFieldSourceAccessor = bridgedElement.property( "child" )
 					.property( "containedSingle" )
 					.property( "includedInTypeBridge" )
 					.createAccessor( String.class );
 			IndexSchemaObjectField typeBridgeObjectField = context.getIndexSchemaElement().objectField( "typeBridge" );
-			typeBridgeObjectFieldAccessor = typeBridgeObjectField.createAccessor();
-			directFieldTargetAccessor = typeBridgeObjectField.field( "directField", f -> f.asString() )
-					.createAccessor();
+			typeBridgeObjectFieldReference = typeBridgeObjectField.toReference();
+			directFieldReference = typeBridgeObjectField.field( "directField", f -> f.asString() )
+					.toReference();
 			IndexSchemaObjectField childObjectField = typeBridgeObjectField.objectField( "child" );
-			childObjectFieldAccessor = childObjectField.createAccessor();
-			includedInTypeBridgeTargetAccessor = childObjectField.field(
+			childObjectFieldReference = childObjectField.toReference();
+			includedInTypeBridgeFieldReference = childObjectField.field(
 					"includedInTypeBridge", f -> f.asString()
 			)
-					.createAccessor();
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement typeBridgeObjectField = typeBridgeObjectFieldAccessor.add( target );
-			directFieldTargetAccessor.write( typeBridgeObjectField, directFieldSourceAccessor.read( source ) );
-			DocumentElement childObjectField = childObjectFieldAccessor.add( typeBridgeObjectField );
-			includedInTypeBridgeTargetAccessor.write(
-					childObjectField, includedInTypeBridgeSourceAccessor.read( source )
+			DocumentElement typeBridgeObjectField = typeBridgeObjectFieldReference.add( target );
+			directFieldReference.write( typeBridgeObjectField, directFieldSourceAccessor.read( source ) );
+			DocumentElement childObjectField = childObjectFieldReference.add( typeBridgeObjectField );
+			includedInTypeBridgeFieldReference.write(
+					childObjectField, includedInTypeBridgeFieldSourceAccessor.read( source )
 			);
 		}
 	}
@@ -767,8 +767,8 @@ public class AutomaticIndexingBridgeIT {
 	public static class ContainingEntityPropertyBridge implements PropertyBridge {
 
 		private PojoModelElementAccessor<String> includedInPropertyBridgeSourceAccessor;
-		private IndexObjectFieldAccessor propertyBridgeObjectFieldAccessor;
-		private IndexFieldAccessor<String> includedInPropertyBridgeTargetAccessor;
+		private IndexObjectFieldReference propertyBridgeObjectFieldReference;
+		private IndexFieldReference<String> includedInPropertyBridgeFieldReference;
 
 		@Override
 		public void bind(PropertyBridgeBindingContext context) {
@@ -776,17 +776,17 @@ public class AutomaticIndexingBridgeIT {
 					.property( "includedInPropertyBridge" )
 					.createAccessor( String.class );
 			IndexSchemaObjectField propertyBridgeObjectField = context.getIndexSchemaElement().objectField( "propertyBridge" );
-			propertyBridgeObjectFieldAccessor = propertyBridgeObjectField.createAccessor();
-			includedInPropertyBridgeTargetAccessor = propertyBridgeObjectField.field(
+			propertyBridgeObjectFieldReference = propertyBridgeObjectField.toReference();
+			includedInPropertyBridgeFieldReference = propertyBridgeObjectField.field(
 					"includedInPropertyBridge", f -> f.asString()
 			)
-					.createAccessor();
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-			DocumentElement propertyBridgeObjectField = propertyBridgeObjectFieldAccessor.add( target );
-			includedInPropertyBridgeTargetAccessor.write(
+			DocumentElement propertyBridgeObjectField = propertyBridgeObjectFieldReference.add( target );
+			includedInPropertyBridgeFieldReference.write(
 					propertyBridgeObjectField, includedInPropertyBridgeSourceAccessor.read( source )
 			);
 		}

@@ -16,8 +16,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -658,13 +658,13 @@ public class FieldSearchProjectionIT {
 
 	private static class ObjectMapping {
 		final String relativeFieldName;
-		final IndexObjectFieldAccessor self;
+		final IndexObjectFieldReference self;
 		final List<FieldModel<?>> supportedFieldModels = new ArrayList<>();
 
 		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
-			self = objectField.createAccessor();
+			self = objectField.toReference();
 			mapByTypeFields(
 					objectField, "byType_", ignored -> { },
 					(typeDescriptor, expectations, model) -> {
@@ -723,16 +723,16 @@ public class FieldSearchProjectionIT {
 	}
 
 	private static class ValueModel<F> {
-		private final IndexFieldAccessor<F> accessor;
+		private final IndexFieldReference<F> reference;
 		final F indexedValue;
 
-		private ValueModel(IndexFieldAccessor<F> accessor, F indexedValue) {
-			this.accessor = accessor;
+		private ValueModel(IndexFieldReference<F> reference, F indexedValue) {
+			this.reference = reference;
 			this.indexedValue = indexedValue;
 		}
 
 		public void write(DocumentElement target) {
-			accessor.write( target, indexedValue );
+			reference.write( target, indexedValue );
 		}
 	}
 
@@ -761,8 +761,8 @@ public class FieldSearchProjectionIT {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
-					(accessor, name) -> new FieldModel<>(
-							accessor, name, type, document1Value, document2Value, document3Value
+					(reference, name) -> new FieldModel<>(
+							reference, name, type, document1Value, document2Value, document3Value
 					)
 			);
 		}
@@ -774,13 +774,13 @@ public class FieldSearchProjectionIT {
 		final ValueModel<F> document2Value;
 		final ValueModel<F> document3Value;
 
-		private FieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName, Class<F> type,
+		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName, Class<F> type,
 				F document1Value, F document2Value, F document3Value) {
 			this.relativeFieldName = relativeFieldName;
 			this.type = type;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
-			this.document3Value = new ValueModel<>( accessor, document3Value );
+			this.document1Value = new ValueModel<>( reference, document1Value );
+			this.document2Value = new ValueModel<>( reference, document2Value );
+			this.document3Value = new ValueModel<>( reference, document3Value );
 		}
 	}
 
@@ -790,7 +790,7 @@ public class FieldSearchProjectionIT {
 			return StandardFieldMapper.of(
 					configuration,
 					c -> c.projectable( Projectable.YES ),
-					(accessor, name) -> new IncompatibleFieldModel( name )
+					(reference, name) -> new IncompatibleFieldModel( name )
 			);
 		}
 

@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.PropertyBridgeMapping;
@@ -209,22 +209,22 @@ public class ContainedInThroughNonContainingIndexedType {
 	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge {
 
 		private PojoModelElementAccessor<Integer> sourceFieldAccessor;
-		private IndexFieldAccessor<Integer> indexFieldAccessor;
+		private IndexFieldReference<Integer> indexFieldReference;
 
 		@Override
 		public void bind(PropertyBridgeBindingContext context) {
 			sourceFieldAccessor = context.getBridgedElement().property( "indexedInContaining" )
 					.createAccessor( Integer.class );
-			indexFieldAccessor = context.getIndexSchemaElement().field(
+			indexFieldReference = context.getIndexSchemaElement().field(
 					"indexedInContaining", f -> f.asInteger()
 			)
-					.createAccessor();
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			Integer value = sourceFieldAccessor.read( source );
-			indexFieldAccessor.write( target, value );
+			indexFieldReference.write( target, value );
 		}
 	}
 }

@@ -22,8 +22,8 @@ import javax.persistence.OrderBy;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
@@ -286,25 +286,25 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	public static class FirstTypeBridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> valueSourceAccessor;
-		private IndexObjectFieldAccessor objectFieldAccessor;
-		private IndexFieldAccessor<String> valueTargetAccessor;
+		private PojoModelElementAccessor<String> valueSourcePropertyAccessor;
+		private IndexObjectFieldReference firstBridgeObjectFieldReference;
+		private IndexFieldReference<String> valueFieldReference;
 
 		@Override
 		public void bind(TypeBridgeBindingContext context) {
-			valueSourceAccessor = context.getBridgedElement().property( "firstContained" )
+			valueSourcePropertyAccessor = context.getBridgedElement().property( "firstContained" )
 					.property( "includedInFirstBridge" )
 					.createAccessor( String.class );
 			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "firstBridge" );
-			objectFieldAccessor = objectField.createAccessor();
-			valueTargetAccessor = objectField.field( "value", f -> f.asString() )
-					.createAccessor();
+			firstBridgeObjectFieldReference = objectField.toReference();
+			valueFieldReference = objectField.field( "value", f -> f.asString() )
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement objectField = objectFieldAccessor.add( target );
-			valueTargetAccessor.write( objectField, valueSourceAccessor.read( source ) );
+			DocumentElement objectField = firstBridgeObjectFieldReference.add( target );
+			valueFieldReference.write( objectField, valueSourcePropertyAccessor.read( source ) );
 		}
 	}
 
@@ -316,25 +316,25 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	public static class SecondTypeBridge implements TypeBridge {
 
-		private PojoModelElementAccessor<String> valueSourceAccessor;
-		private IndexObjectFieldAccessor objectFieldAccessor;
-		private IndexFieldAccessor<String> valueTargetAccessor;
+		private PojoModelElementAccessor<String> valueSourcePropertyAccessor;
+		private IndexObjectFieldReference secondBridgeObjectFieldReference;
+		private IndexFieldReference<String> valueFieldReference;
 
 		@Override
 		public void bind(TypeBridgeBindingContext context) {
-			valueSourceAccessor = context.getBridgedElement().property( "secondContained" )
+			valueSourcePropertyAccessor = context.getBridgedElement().property( "secondContained" )
 					.property( "includedInSecondBridge" )
 					.createAccessor( String.class );
 			IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( "secondBridge" );
-			objectFieldAccessor = objectField.createAccessor();
-			valueTargetAccessor = objectField.field( "value", f -> f.asString() )
-					.createAccessor();
+			secondBridgeObjectFieldReference = objectField.toReference();
+			valueFieldReference = objectField.field( "value", f -> f.asString() )
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement objectField = objectFieldAccessor.add( target );
-			valueTargetAccessor.write( objectField, valueSourceAccessor.read( source ) );
+			DocumentElement objectField = secondBridgeObjectFieldReference.add( target );
+			valueFieldReference.write( objectField, valueSourcePropertyAccessor.read( source ) );
 		}
 	}
 }

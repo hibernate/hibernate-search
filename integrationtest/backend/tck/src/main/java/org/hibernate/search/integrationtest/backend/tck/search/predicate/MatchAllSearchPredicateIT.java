@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -40,7 +40,7 @@ public class MatchAllSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -48,7 +48,7 @@ public class MatchAllSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -120,13 +120,13 @@ public class MatchAllSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexAccessors.string.write( document, STRING_1 );
+			indexMapping.string.write( document, STRING_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexAccessors.string.write( document, STRING_2 );
+			indexMapping.string.write( document, STRING_2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexAccessors.string.write( document, STRING_3 );
+			indexMapping.string.write( document, STRING_3 );
 		} );
 
 		workPlan.execute().join();
@@ -140,11 +140,11 @@ public class MatchAllSearchPredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
 
-		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString() ).createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString() ).toReference();
 		}
 	}
 }

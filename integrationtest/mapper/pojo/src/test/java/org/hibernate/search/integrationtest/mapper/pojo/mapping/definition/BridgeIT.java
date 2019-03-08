@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.JavaBeanMapping;
@@ -84,24 +84,24 @@ public class BridgeIT {
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.bridge( (BridgeBuilder<TypeBridge>) buildContext -> BeanHolder.of( new TypeBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
-							private IndexFieldAccessor<String> indexFieldAccessor;
+							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
 							public void bind(TypeBridgeBindingContext context) {
 								pojoPropertyAccessor = context.getBridgedElement()
 										.property( "stringProperty" )
 										.createAccessor( String.class );
-								indexFieldAccessor = context.getIndexSchemaElement().field(
+								indexFieldReference = context.getIndexSchemaElement().field(
 										"someField",
 										f -> f.asString().analyzer( "myAnalyzer" )
 								)
-										.createAccessor();
+										.toReference();
 							}
 
 							@Override
 							public void write(DocumentElement target, PojoElement source,
 									TypeBridgeWriteContext context) {
-								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
+								indexFieldReference.write( target, pojoPropertyAccessor.read( source ) );
 							}
 						} ) )
 		)
@@ -150,23 +150,23 @@ public class BridgeIT {
 				b -> b.programmaticMapping().type( IndexedEntity.class )
 						.property( "stringProperty" ).bridge( (BridgeBuilder<PropertyBridge>) buildContext -> BeanHolder.of( new PropertyBridge() {
 							private PojoModelElementAccessor<String> pojoPropertyAccessor;
-							private IndexFieldAccessor<String> indexFieldAccessor;
+							private IndexFieldReference<String> indexFieldReference;
 
 							@Override
 							public void bind(PropertyBridgeBindingContext context) {
 								pojoPropertyAccessor = context.getBridgedElement()
 										.createAccessor( String.class );
-								indexFieldAccessor = context.getIndexSchemaElement().field(
+								indexFieldReference = context.getIndexSchemaElement().field(
 										"someField",
 										f -> f.asString().analyzer( "myAnalyzer" )
 								)
-										.createAccessor();
+										.toReference();
 							}
 
 							@Override
 							public void write(DocumentElement target, PojoElement source,
 									PropertyBridgeWriteContext context) {
-								indexFieldAccessor.write( target, pojoPropertyAccessor.read( source ) );
+								indexFieldReference.write( target, pojoPropertyAccessor.read( source ) );
 							}
 						} ) )
 		)

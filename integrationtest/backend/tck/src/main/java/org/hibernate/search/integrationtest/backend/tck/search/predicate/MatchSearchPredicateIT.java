@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -1222,16 +1222,16 @@ public class MatchSearchPredicateIT {
 	}
 
 	private static class ValueModel<F> {
-		private final IndexFieldAccessor<F> accessor;
+		private final IndexFieldReference<F> reference;
 		final F indexedValue;
 
-		private ValueModel(IndexFieldAccessor<F> accessor, F indexedValue) {
-			this.accessor = accessor;
+		private ValueModel(IndexFieldReference<F> reference, F indexedValue) {
+			this.reference = reference;
 			this.indexedValue = indexedValue;
 		}
 
 		public void write(DocumentElement target) {
-			accessor.write( target, indexedValue );
+			reference.write( target, indexedValue );
 		}
 	}
 
@@ -1246,7 +1246,7 @@ public class MatchSearchPredicateIT {
 				String document1Value, String document2Value, String document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+					(reference, name) -> new MainFieldModel( reference, name, document1Value, document2Value, document3Value )
 			);
 		}
 
@@ -1255,12 +1255,12 @@ public class MatchSearchPredicateIT {
 		final ValueModel<String> document2Value;
 		final ValueModel<String> document3Value;
 
-		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName,
+		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName,
 				String document1Value, String document2Value, String document3Value) {
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document3Value = new ValueModel<>( accessor, document3Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
+			this.document1Value = new ValueModel<>( reference, document1Value );
+			this.document3Value = new ValueModel<>( reference, document3Value );
+			this.document2Value = new ValueModel<>( reference, document2Value );
 		}
 	}
 
@@ -1270,7 +1270,7 @@ public class MatchSearchPredicateIT {
 			MatchPredicateExpectations<F> expectations = typeDescriptor.getMatchPredicateExpectations().get();
 			return StandardFieldMapper.of(
 					typeDescriptor::configure,
-					(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
+					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations )
 			);
 		}
 
@@ -1280,11 +1280,11 @@ public class MatchSearchPredicateIT {
 
 		final F predicateParameterValue;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+		private ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName,
 				MatchPredicateExpectations<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
-			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
+			this.document1Value = new ValueModel<>( reference, expectations.getDocument1Value() );
+			this.document2Value = new ValueModel<>( reference, expectations.getDocument2Value() );
 			this.predicateParameterValue = expectations.getMatchingDocument1Value();
 		}
 	}
@@ -1292,7 +1292,7 @@ public class MatchSearchPredicateIT {
 	private static class IncompatibleFieldModel {
 		static <F> StandardFieldMapper<?, IncompatibleFieldModel> mapper(
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
-			return StandardFieldMapper.of( configuration, (accessor, name) -> new IncompatibleFieldModel( name ) );
+			return StandardFieldMapper.of( configuration, (reference, name) -> new IncompatibleFieldModel( name ) );
 		}
 
 		final String relativeFieldName;

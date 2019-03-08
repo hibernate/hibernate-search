@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.backend.tck;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -40,7 +40,7 @@ public class SmokeIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -48,7 +48,7 @@ public class SmokeIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -279,59 +279,59 @@ public class SmokeIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( "1" ), document -> {
-			indexAccessors.string.write( document, "text 1" );
-			indexAccessors.string_analyzed.write( document, "text 1" );
-			indexAccessors.integer.write( document, 1 );
-			indexAccessors.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
+			indexMapping.string.write( document, "text 1" );
+			indexMapping.string_analyzed.write( document, "text 1" );
+			indexMapping.integer.write( document, 1 );
+			indexMapping.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
 
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "text 1_1" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 101 );
-			flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "text 1_2" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 102 );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "text 1_1" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 101 );
+			flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "text 1_2" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 102 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "text 1_1" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 101 );
-			nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "text 1_2" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 102 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "text 1_1" );
+			indexMapping.nestedObject.integer.write( nestedObject, 101 );
+			nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "text 1_2" );
+			indexMapping.nestedObject.integer.write( nestedObject, 102 );
 		} );
 
 		workPlan.add( referenceProvider( "2" ), document -> {
-			indexAccessors.string.write( document, "text 2" );
-			indexAccessors.string_analyzed.write( document, "text 2" );
-			indexAccessors.integer.write( document, 2 );
-			indexAccessors.localDate.write( document, LocalDate.of( 2018, 1, 2 ) );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 0, 2 ) );
+			indexMapping.string.write( document, "text 2" );
+			indexMapping.string_analyzed.write( document, "text 2" );
+			indexMapping.integer.write( document, 2 );
+			indexMapping.localDate.write( document, LocalDate.of( 2018, 1, 2 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 0, 2 ) );
 
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "text 2_1" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 201 );
-			flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "text 2_2" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 202 );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "text 2_1" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 201 );
+			flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "text 2_2" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 202 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "text 2_1" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 201 );
-			nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "text 2_2" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 202 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "text 2_1" );
+			indexMapping.nestedObject.integer.write( nestedObject, 201 );
+			nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "text 2_2" );
+			indexMapping.nestedObject.integer.write( nestedObject, 202 );
 		} );
 
 		workPlan.add( referenceProvider( "3" ), document -> {
-			indexAccessors.string.write( document, "text 3" );
-			indexAccessors.string_analyzed.write( document, "text 3" );
-			indexAccessors.integer.write( document, 3 );
+			indexMapping.string.write( document, "text 3" );
+			indexMapping.string_analyzed.write( document, "text 3" );
+			indexMapping.integer.write( document, 3 );
 		} );
 
 		workPlan.add( referenceProvider( "neverMatching" ), document -> {
-			indexAccessors.string.write( document, "never matching" );
-			indexAccessors.string_analyzed.write( document, "never matching" );
-			indexAccessors.integer.write( document, 9484 );
+			indexMapping.string.write( document, "never matching" );
+			indexMapping.string_analyzed.write( document, "never matching" );
+			indexMapping.integer.write( document, 9484 );
 		} );
 
 		workPlan.add( referenceProvider( "empty" ), document -> { } );
@@ -348,41 +348,41 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> string_analyzed;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<LocalDate> localDate;
-		final IndexFieldAccessor<GeoPoint> geoPoint;
-		final ObjectAccessors flattenedObject;
-		final ObjectAccessors nestedObject;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> string_analyzed;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<LocalDate> localDate;
+		final IndexFieldReference<GeoPoint> geoPoint;
+		final ObjectMapping flattenedObject;
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString() ).createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString() ).toReference();
 			string_analyzed = root.field(
 					"string_analyzed",
 					f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 			)
-					.createAccessor();
-			integer = root.field( "integer", f -> f.asInteger() ).createAccessor();
-			localDate = root.field( "localDate", f -> f.asLocalDate() ).createAccessor();
-			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint() ).createAccessor();
+					.toReference();
+			integer = root.field( "integer", f -> f.asInteger() ).toReference();
+			localDate = root.field( "localDate", f -> f.asLocalDate() ).toReference();
+			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint() ).toReference();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
-			flattenedObject = new ObjectAccessors( flattenedObjectField );
+			flattenedObject = new ObjectMapping( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<Integer> integer;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<Integer> integer;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
-			string = objectField.field( "string", f -> f.asString() ).createAccessor();
-			integer = objectField.field( "integer", f -> f.asInteger() ).createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
+			string = objectField.field( "string", f -> f.asString() ).toReference();
+			integer = objectField.field( "integer", f -> f.asInteger() ).toReference();
 		}
 	}
 }
