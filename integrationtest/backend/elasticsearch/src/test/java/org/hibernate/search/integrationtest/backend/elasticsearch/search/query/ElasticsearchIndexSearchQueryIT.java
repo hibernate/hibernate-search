@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
@@ -55,7 +55,7 @@ public class ElasticsearchIndexSearchQueryIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						ctx -> new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -108,21 +108,21 @@ public class ElasticsearchIndexSearchQueryIT {
 	}
 
 	@SuppressWarnings("unused")
-	private static class IndexAccessors {
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<String> string;
+	private static class IndexMapping {
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<String> string;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 

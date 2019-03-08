@@ -114,7 +114,7 @@ public class ElasticsearchSchemaMigrationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -123,7 +123,7 @@ public class ElasticsearchSchemaMigrationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -135,17 +135,17 @@ public class ElasticsearchSchemaMigrationIT {
 									"defaultAnalyzer",
 									f -> f.asString().analyzer( "default" )
 							)
-									.createAccessor();
+									.toReference();
 							root.field(
 									"nonDefaultAnalyzer",
 									f -> f.asString().analyzer( "customAnalyzer" )
 							)
-									.createAccessor();
+									.toReference();
 							root.field(
 									"normalizer",
 									f -> f.asString().normalizer( "customNormalizer" )
 							)
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -215,7 +215,7 @@ public class ElasticsearchSchemaMigrationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -261,7 +261,7 @@ public class ElasticsearchSchemaMigrationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -306,7 +306,7 @@ public class ElasticsearchSchemaMigrationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -354,7 +354,7 @@ public class ElasticsearchSchemaMigrationIT {
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -399,7 +399,7 @@ public class ElasticsearchSchemaMigrationIT {
 											"analyzer",
 											f -> f.asString().analyzer( "customAnalyzer" )
 									)
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -444,7 +444,7 @@ public class ElasticsearchSchemaMigrationIT {
 											"normalizer",
 											f -> f.asString().normalizer( "customNormalizer" )
 									)
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)

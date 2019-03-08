@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -45,7 +45,7 @@ public class LuceneSearchSortIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -53,7 +53,7 @@ public class LuceneSearchSortIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -81,13 +81,13 @@ public class LuceneSearchSortIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
 		} );
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -102,15 +102,15 @@ public class LuceneSearchSortIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<GeoPoint> geoPoint;
+	private static class IndexMapping {
+		final IndexFieldReference<GeoPoint> geoPoint;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.asGeoPoint().sortable( Sortable.YES )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

@@ -390,10 +390,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
-			indexAccessors.geoPoint.write( document, ADDITIONAL_POINT_1_GEO_POINT );
+			indexMapping.geoPoint.write( document, ADDITIONAL_POINT_1_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
-			indexAccessors.geoPoint.write( document, ADDITIONAL_POINT_2_GEO_POINT );
+			indexMapping.geoPoint.write( document, ADDITIONAL_POINT_2_GEO_POINT );
 		} );
 
 		workPlan.execute().join();

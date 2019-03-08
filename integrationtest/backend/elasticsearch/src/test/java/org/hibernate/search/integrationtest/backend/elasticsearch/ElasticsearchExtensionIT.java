@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingSearchScope;
@@ -64,7 +64,7 @@ public class ElasticsearchExtensionIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -72,7 +72,7 @@ public class ElasticsearchExtensionIT {
 		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -390,49 +390,49 @@ public class ElasticsearchExtensionIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexAccessors.integer.write( document, "2" );
+			indexMapping.integer.write( document, "2" );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "a" );
-			indexAccessors.sort3.write( document, "z" );
-			indexAccessors.sort4.write( document, "z" );
-			indexAccessors.sort5.write( document, "a" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "a" );
+			indexMapping.sort3.write( document, "z" );
+			indexMapping.sort4.write( document, "z" );
+			indexMapping.sort5.write( document, "a" );
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexAccessors.string.write( document, "'text 1'" );
+			indexMapping.string.write( document, "'text 1'" );
 
-			indexAccessors.sort1.write( document, "a" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "z" );
-			indexAccessors.sort4.write( document, "z" );
-			indexAccessors.sort5.write( document, "a" );
+			indexMapping.sort1.write( document, "a" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "z" );
+			indexMapping.sort4.write( document, "z" );
+			indexMapping.sort5.write( document, "a" );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.geoPoint.write( document, "{'lat': 40.12, 'lon': -71.34}" );
+			indexMapping.geoPoint.write( document, "{'lat': 40.12, 'lon': -71.34}" );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "a" );
-			indexAccessors.sort4.write( document, "z" );
-			indexAccessors.sort5.write( document, "a" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "a" );
+			indexMapping.sort4.write( document, "z" );
+			indexMapping.sort5.write( document, "a" );
 		} );
 		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
-			indexAccessors.yearDays.write( document, "'2018:012'" );
+			indexMapping.yearDays.write( document, "'2018:012'" );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "z" );
-			indexAccessors.sort4.write( document, "a" );
-			indexAccessors.sort5.write( document, "a" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "z" );
+			indexMapping.sort4.write( document, "a" );
+			indexMapping.sort5.write( document, "a" );
 		} );
 		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			indexAccessors.string.write( document, "'text 2'" );
-			indexAccessors.integer.write( document, "1" );
-			indexAccessors.geoPoint.write( document, "{'lat': 45.12, 'lon': -75.34}" );
-			indexAccessors.yearDays.write( document, "'2018:025'" );
+			indexMapping.string.write( document, "'text 2'" );
+			indexMapping.integer.write( document, "1" );
+			indexMapping.geoPoint.write( document, "{'lat': 45.12, 'lon': -75.34}" );
+			indexMapping.yearDays.write( document, "'2018:025'" );
 
-			indexAccessors.sort5.write( document, "z" );
+			indexMapping.sort5.write( document, "z" );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -450,74 +450,74 @@ public class ElasticsearchExtensionIT {
 		);
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> integer;
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> geoPoint;
-		final IndexFieldAccessor<String> yearDays;
+	private static class IndexMapping {
+		final IndexFieldReference<String> integer;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> geoPoint;
+		final IndexFieldReference<String> yearDays;
 
-		final IndexFieldAccessor<String> sort1;
-		final IndexFieldAccessor<String> sort2;
-		final IndexFieldAccessor<String> sort3;
-		final IndexFieldAccessor<String> sort4;
-		final IndexFieldAccessor<String> sort5;
+		final IndexFieldReference<String> sort1;
+		final IndexFieldReference<String> sort2;
+		final IndexFieldReference<String> sort3;
+		final IndexFieldReference<String> sort4;
+		final IndexFieldReference<String> sort5;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'integer'}" )
 			)
-					.createAccessor();
+					.toReference();
 			string = root.field(
 					"string",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword'}" )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'geo_point'}" )
 			)
-					.createAccessor();
+					.toReference();
 			yearDays = root.field(
 					"yearDays",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'date', 'format': 'yyyy:DDD'}" )
 			)
-					.createAccessor();
+					.toReference();
 
 			sort1 = root.field(
 					"sort1",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 			)
-					.createAccessor();
+					.toReference();
 			sort2 = root.field(
 					"sort2",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 			)
-					.createAccessor();
+					.toReference();
 			sort3 = root.field(
 					"sort3",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 			)
-					.createAccessor();
+					.toReference();
 			sort4 = root.field(
 					"sort4",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 			)
-					.createAccessor();
+					.toReference();
 			sort5 = root.field(
 					"sort5",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asJsonString( "{'type': 'keyword', 'doc_values': true}" )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 

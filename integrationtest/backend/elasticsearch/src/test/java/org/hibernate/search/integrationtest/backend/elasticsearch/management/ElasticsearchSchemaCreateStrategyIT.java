@@ -81,7 +81,7 @@ public class ElasticsearchSchemaCreateStrategyIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "field", f -> f.asString() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)

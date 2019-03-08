@@ -34,7 +34,7 @@ import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -77,7 +77,7 @@ public class LuceneExtensionIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
-	private IndexAccessors indexAccessors;
+	private IndxMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -85,7 +85,7 @@ public class LuceneExtensionIT {
 		this.integration = setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndxMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -450,7 +450,7 @@ public class LuceneExtensionIT {
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
 				() -> workPlan.add( referenceProvider( FIRST_ID ), document -> {
-					indexAccessors.nativeField_invalidFieldPath.write( document, 45 );
+					indexMapping.nativeField_invalidFieldPath.write( document, 45 );
 				} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -496,55 +496,55 @@ public class LuceneExtensionIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexAccessors.string.write( document, "text 1" );
+			indexMapping.string.write( document, "text 1" );
 
-			indexAccessors.nativeField.write( document, 37 );
-			indexAccessors.nativeField_unsupportedProjection.write( document, 37 );
+			indexMapping.nativeField.write( document, 37 );
+			indexMapping.nativeField_unsupportedProjection.write( document, 37 );
 
-			indexAccessors.sort1.write( document, "a" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "z" );
+			indexMapping.sort1.write( document, "a" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "z" );
 		} );
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexAccessors.integer.write( document, 2 );
+			indexMapping.integer.write( document, 2 );
 
-			indexAccessors.nativeField.write( document, 78 );
-			indexAccessors.nativeField_unsupportedProjection.write( document, 78 );
+			indexMapping.nativeField.write( document, 78 );
+			indexMapping.nativeField_unsupportedProjection.write( document, 78 );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "a" );
-			indexAccessors.sort3.write( document, "z" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "a" );
+			indexMapping.sort3.write( document, "z" );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 40.12, -71.34 ) );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 40.12, -71.34 ) );
 
-			indexAccessors.nativeField.write( document, 13 );
-			indexAccessors.nativeField_unsupportedProjection.write( document, 13 );
+			indexMapping.nativeField.write( document, 13 );
+			indexMapping.nativeField_unsupportedProjection.write( document, 13 );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "a" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "a" );
 		} );
 		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
-			indexAccessors.nativeField.write( document, 89 );
-			indexAccessors.nativeField_unsupportedProjection.write( document, 89 );
+			indexMapping.nativeField.write( document, 89 );
+			indexMapping.nativeField_unsupportedProjection.write( document, 89 );
 
-			indexAccessors.sort1.write( document, "z" );
-			indexAccessors.sort2.write( document, "z" );
-			indexAccessors.sort3.write( document, "z" );
+			indexMapping.sort1.write( document, "z" );
+			indexMapping.sort2.write( document, "z" );
+			indexMapping.sort3.write( document, "z" );
 		} );
 		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			indexAccessors.string.write( document, "text 2" );
-			indexAccessors.integer.write( document, 1 );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.12, -75.34 ) );
+			indexMapping.string.write( document, "text 2" );
+			indexMapping.integer.write( document, 1 );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.12, -75.34 ) );
 
-			indexAccessors.nativeField.write( document, 53 );
-			indexAccessors.nativeField_unsupportedProjection.write( document, 53 );
+			indexMapping.nativeField.write( document, 53 );
+			indexMapping.nativeField_unsupportedProjection.write( document, 53 );
 
-			indexAccessors.sort1.write( document, "zz" );
-			indexAccessors.sort2.write( document, "zz" );
-			indexAccessors.sort3.write( document, "zz" );
+			indexMapping.sort1.write( document, "zz" );
+			indexMapping.sort2.write( document, "zz" );
+			indexMapping.sort3.write( document, "zz" );
 		} );
 
 		workPlan.execute().join();
@@ -561,59 +561,59 @@ public class LuceneExtensionIT {
 		);
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<GeoPoint> geoPoint;
-		final IndexFieldAccessor<Integer> nativeField;
-		final IndexFieldAccessor<Integer> nativeField_unsupportedProjection;
-		final IndexFieldAccessor<Integer> nativeField_invalidFieldPath;
+	private static class IndxMapping {
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<GeoPoint> geoPoint;
+		final IndexFieldReference<Integer> nativeField;
+		final IndexFieldReference<Integer> nativeField_unsupportedProjection;
+		final IndexFieldReference<Integer> nativeField_invalidFieldPath;
 
-		final IndexFieldAccessor<String> sort1;
-		final IndexFieldAccessor<String> sort2;
-		final IndexFieldAccessor<String> sort3;
+		final IndexFieldReference<String> sort1;
+		final IndexFieldReference<String> sort2;
+		final IndexFieldReference<String> sort3;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndxMapping(IndexSchemaElement root) {
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.asGeoPoint().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			nativeField = root.field(
 					"nativeField",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
 			)
-					.createAccessor();
+					.toReference();
 			nativeField_unsupportedProjection = root.field(
 					"nativeField_unsupportedProjection",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeField )
 			)
-					.createAccessor();
+					.toReference();
 			nativeField_invalidFieldPath = root.field(
 					"nativeField_invalidFieldPath",
 					f -> f.extension( LuceneExtension.get() )
 							.asLuceneField( Integer.class, LuceneExtensionIT::contributeNativeFieldInvalidFieldPath )
 			)
-					.createAccessor();
+					.toReference();
 
 			sort1 = root.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 		}
 	}
 

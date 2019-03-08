@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.mapper.orm.smoke.bridge;
 import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -54,9 +54,9 @@ public final class CustomPropertyBridge implements PropertyBridge {
 
 	private PojoModelElementAccessor<String> textPropertyAccessor;
 	private PojoModelElementAccessor<LocalDate> localDatePropertyAccessor;
-	private IndexObjectFieldAccessor objectFieldAccessor;
-	private IndexFieldAccessor<String> textFieldAccessor;
-	private IndexFieldAccessor<LocalDate> localDateFieldAccessor;
+	private IndexObjectFieldReference objectFieldReference;
+	private IndexFieldReference<String> textFieldReference;
+	private IndexFieldReference<LocalDate> localDateFieldReference;
 
 	private CustomPropertyBridge(String objectName) {
 		this.objectName = objectName;
@@ -69,11 +69,11 @@ public final class CustomPropertyBridge implements PropertyBridge {
 		localDatePropertyAccessor = bridgedElement.property( LOCAL_DATE_PROPERTY_NAME ).createAccessor( LocalDate.class );
 
 		IndexSchemaObjectField objectField = context.getIndexSchemaElement().objectField( objectName );
-		objectFieldAccessor = objectField.createAccessor();
-		textFieldAccessor = objectField.field( TEXT_FIELD_NAME, f -> f.asString() )
-				.createAccessor();
-		localDateFieldAccessor = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate() )
-				.createAccessor();
+		objectFieldReference = objectField.toReference();
+		textFieldReference = objectField.field( TEXT_FIELD_NAME, f -> f.asString() )
+				.toReference();
+		localDateFieldReference = objectField.field( LOCAL_DATE_FIELD_NAME, f -> f.asLocalDate() )
+				.toReference();
 	}
 
 	@Override
@@ -81,9 +81,9 @@ public final class CustomPropertyBridge implements PropertyBridge {
 		String textSourceValue = textPropertyAccessor.read( source );
 		LocalDate localDateSourceValue = localDatePropertyAccessor.read( source );
 		if ( textSourceValue != null || localDateSourceValue != null ) {
-			DocumentElement object = objectFieldAccessor.add( target );
-			textFieldAccessor.write( object, textSourceValue );
-			localDateFieldAccessor.write( object, localDateSourceValue );
+			DocumentElement object = objectFieldReference.add( target );
+			textFieldReference.write( object, textSourceValue );
+			localDateFieldReference.write( object, localDateSourceValue );
 		}
 	}
 

@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -46,7 +46,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	protected IndexAccessors indexAccessors;
+	protected IndexMapping indexMapping;
 	protected StubMappingIndexManager indexManager;
 
 	@Before
@@ -54,7 +54,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -65,31 +65,31 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	protected void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			indexAccessors.string.write( document, OURSON_QUI_BOIT_STRING );
-			indexAccessors.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
+			indexMapping.string.write( document, OURSON_QUI_BOIT_STRING );
+			indexMapping.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
+			indexMapping.geoPoint_1.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
+			indexMapping.geoPoint_2.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
-			indexAccessors.geoPoint_with_longName.write( document, OURSON_QUI_BOIT_GEO_POINT );
+			indexMapping.geoPoint_with_longName.write( document, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
-			indexAccessors.string.write( document, IMOUTO_STRING );
-			indexAccessors.geoPoint.write( document, IMOUTO_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
+			indexMapping.string.write( document, IMOUTO_STRING );
+			indexMapping.geoPoint.write( document, IMOUTO_GEO_POINT );
+			indexMapping.geoPoint_1.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
 					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
+			indexMapping.geoPoint_2.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
-			indexAccessors.geoPoint_with_longName.write( document, IMOUTO_GEO_POINT );
+			indexMapping.geoPoint_with_longName.write( document, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			indexAccessors.string.write( document, CHEZ_MARGOTTE_STRING );
-			indexAccessors.geoPoint.write( document, CHEZ_MARGOTTE_GEO_POINT );
-			indexAccessors.geoPoint_1.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
+			indexMapping.string.write( document, CHEZ_MARGOTTE_STRING );
+			indexMapping.geoPoint.write( document, CHEZ_MARGOTTE_GEO_POINT );
+			indexMapping.geoPoint_1.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-			indexAccessors.geoPoint_2.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
+			indexMapping.geoPoint_2.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
-			indexAccessors.geoPoint_with_longName.write( document, CHEZ_MARGOTTE_GEO_POINT );
+			indexMapping.geoPoint_with_longName.write( document, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -104,48 +104,48 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID, EMPTY_ID );
 	}
 
-	protected static class IndexAccessors {
-		final IndexFieldAccessor<GeoPoint> geoPoint;
-		final IndexFieldAccessor<GeoPoint> geoPoint_1;
-		final IndexFieldAccessor<GeoPoint> geoPoint_2;
-		final IndexFieldAccessor<GeoPoint> geoPoint_with_longName;
-		final IndexFieldAccessor<GeoPoint> nonProjectableGeoPoint;
-		final IndexFieldAccessor<GeoPoint> unsortableGeoPoint;
-		final IndexFieldAccessor<String> string;
+	protected static class IndexMapping {
+		final IndexFieldReference<GeoPoint> geoPoint;
+		final IndexFieldReference<GeoPoint> geoPoint_1;
+		final IndexFieldReference<GeoPoint> geoPoint_2;
+		final IndexFieldReference<GeoPoint> geoPoint_with_longName;
+		final IndexFieldReference<GeoPoint> nonProjectableGeoPoint;
+		final IndexFieldReference<GeoPoint> unsortableGeoPoint;
+		final IndexFieldReference<String> string;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			geoPoint = root.field(
 					"geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint_1 = root.field(
 					"geoPoint_1", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint_2 = root.field(
 					"geoPoint_2", f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint_with_longName = root.field(
 					"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
 					f -> f.asGeoPoint().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			nonProjectableGeoPoint = root.field(
 					"nonProjectableGeoPoint",
 					f -> f.asGeoPoint().projectable( Projectable.NO )
 			)
-					.createAccessor();
+					.toReference();
 			unsortableGeoPoint = root.field(
 					"unsortableGeoPoint",
 					f -> f.asGeoPoint().sortable( Sortable.NO )
 			)
-					.createAccessor();
+					.toReference();
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

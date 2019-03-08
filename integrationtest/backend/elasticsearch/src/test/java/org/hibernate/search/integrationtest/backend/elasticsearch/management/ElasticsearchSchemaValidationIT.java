@@ -131,7 +131,7 @@ public class ElasticsearchSchemaValidationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -140,7 +140,7 @@ public class ElasticsearchSchemaValidationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBoolean() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -152,7 +152,7 @@ public class ElasticsearchSchemaValidationIT {
 									"myField",
 									f -> f.asString().analyzer( "default" )
 							)
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> { }
 				)
@@ -351,7 +351,7 @@ public class ElasticsearchSchemaValidationIT {
 											"myField",
 											f -> f.asString().analyzer( "default" )
 									)
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -393,7 +393,7 @@ public class ElasticsearchSchemaValidationIT {
 											f -> f.asString().analyzer( "default" )
 											// TODO disable norms once the APIs allow it; see HSEARCH-3048
 									)
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -429,7 +429,7 @@ public class ElasticsearchSchemaValidationIT {
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> {
 								}
@@ -471,7 +471,7 @@ public class ElasticsearchSchemaValidationIT {
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() )
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> {
 								}
@@ -548,9 +548,9 @@ public class ElasticsearchSchemaValidationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLong() )
-									.createAccessor();
+									.toReference();
 							root.field( "myTextField", f -> f.asString().analyzer( "default" ) )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> {
 						}
@@ -592,8 +592,8 @@ public class ElasticsearchSchemaValidationIT {
 									IndexSchemaObjectField objectField =
 											root.objectField( "myObjectField" );
 									objectField.field( "myField", f -> f.asLocalDate() )
-											.createAccessor();
-									objectField.createAccessor();
+											.toReference();
+									objectField.toReference();
 								},
 								indexManager -> {
 								}
@@ -670,7 +670,7 @@ public class ElasticsearchSchemaValidationIT {
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -679,7 +679,7 @@ public class ElasticsearchSchemaValidationIT {
 								ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString() )
-											.createAccessor();
+											.toReference();
 								},
 								indexManager -> { }
 						)
@@ -835,7 +835,7 @@ public class ElasticsearchSchemaValidationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> {
 						}
@@ -850,7 +850,7 @@ public class ElasticsearchSchemaValidationIT {
 						ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() )
-									.createAccessor();
+									.toReference();
 						},
 						indexManager -> {
 						}

@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
@@ -59,7 +59,7 @@ public class BooleanSortAndRangePredicateIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -67,7 +67,7 @@ public class BooleanSortAndRangePredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -178,19 +178,19 @@ public class BooleanSortAndRangePredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexAccessors.bool.write( document, true );
+			indexMapping.bool.write( document, true );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexAccessors.bool.write( document, Boolean.FALSE );
+			indexMapping.bool.write( document, Boolean.FALSE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexAccessors.bool.write( document, Boolean.TRUE );
+			indexMapping.bool.write( document, Boolean.TRUE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			indexAccessors.bool.write( document, null );
+			indexMapping.bool.write( document, null );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			indexAccessors.bool.write( document, false );
+			indexMapping.bool.write( document, false );
 		} );
 
 		workPlan.execute().join();
@@ -207,12 +207,12 @@ public class BooleanSortAndRangePredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<Boolean> bool;
+	private static class IndexMapping {
+		final IndexFieldReference<Boolean> bool;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			bool = root.field( FIELD_PATH, f -> f.asBoolean().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

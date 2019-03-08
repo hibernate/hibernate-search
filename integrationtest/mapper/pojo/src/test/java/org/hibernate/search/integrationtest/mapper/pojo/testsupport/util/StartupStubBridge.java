@@ -88,7 +88,7 @@ public class StartupStubBridge
 				"startupStubBridgeFieldFromPropertyBridge",
 				f -> f.asString()
 		)
-				.createAccessor();
+				.toReference();
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class StartupStubBridge
 				"startupStubBridgeFieldFromTypeBridge",
 				f -> f.asString()
 		)
-				.createAccessor();
+				.toReference();
 	}
 
 	@Override

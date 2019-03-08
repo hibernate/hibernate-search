@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -237,12 +237,12 @@ public class AnalysisCustomIT {
 				.withIndex(
 						INDEX_NAME,
 						ctx -> {
-							IndexFieldAccessor<String> accessor = ctx.getSchemaElement().field(
+							IndexFieldReference<String> reference = ctx.getSchemaElement().field(
 									fieldName,
 									f -> typeContributor.apply( f.asString() )
 							)
-									.createAccessor();
-							MainFieldModel fieldModel = new MainFieldModel( accessor, fieldName );
+									.toReference();
+							MainFieldModel fieldModel = new MainFieldModel( reference, fieldName );
 							this.indexMapping = new IndexMapping( fieldModel );
 						},
 						indexManager -> this.indexManager = indexManager
@@ -292,16 +292,16 @@ public class AnalysisCustomIT {
 	}
 
 	private static class MainFieldModel {
-		private final IndexFieldAccessor<String> accessor;
+		private final IndexFieldReference<String> reference;
 		final String relativeFieldName;
 
-		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName) {
-			this.accessor = accessor;
+		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName) {
+			this.reference = reference;
 			this.relativeFieldName = relativeFieldName;
 		}
 
 		public void write(DocumentElement target, String value) {
-			accessor.write( target, value );
+			reference.write( target, value );
 		}
 	}
 }

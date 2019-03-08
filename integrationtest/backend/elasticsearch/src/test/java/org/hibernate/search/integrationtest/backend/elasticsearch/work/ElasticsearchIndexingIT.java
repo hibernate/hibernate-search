@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
@@ -46,7 +46,7 @@ public class ElasticsearchIndexingIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -57,7 +57,7 @@ public class ElasticsearchIndexingIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -69,7 +69,7 @@ public class ElasticsearchIndexingIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		workPlan.add( referenceProvider( "1", routingKey ), document -> {
-			indexAccessors.string.write( document, "text1" );
+			indexMapping.string.write( document, "text1" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
@@ -85,7 +85,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 
 		workPlan.update( referenceProvider( "1", routingKey ), document -> {
-			indexAccessors.string.write( document, "text2" );
+			indexMapping.string.write( document, "text2" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
@@ -114,12 +114,12 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() )
-					.createAccessor();
+					.toReference();
 		}
 	}
 

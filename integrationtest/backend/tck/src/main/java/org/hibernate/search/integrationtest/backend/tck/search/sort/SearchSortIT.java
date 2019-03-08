@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -69,7 +69,7 @@ public class SearchSortIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -77,7 +77,7 @@ public class SearchSortIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -409,55 +409,55 @@ public class SearchSortIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		// Important: do not index the documents in the expected order after sorts
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexAccessors.string.write( document, "george" );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
+			indexMapping.string.write( document, "george" );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
 
-			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray" );
-			indexAccessors.unsortable.write( document, "george" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "george" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 2 );
+			indexMapping.string_analyzed_forScore.write( document, "Hooray Hooray" );
+			indexMapping.unsortable.write( document, "george" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "george" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 2 );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "george" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 2 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "george" );
+			indexMapping.nestedObject.integer.write( nestedObject, 2 );
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexAccessors.string.write( document, "aaron" );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
+			indexMapping.string.write( document, "aaron" );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
 
-			indexAccessors.string_analyzed_forScore.write( document, "Hooray Hooray Hooray" );
-			indexAccessors.unsortable.write( document, "aaron" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "aaron" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 1 );
+			indexMapping.string_analyzed_forScore.write( document, "Hooray Hooray Hooray" );
+			indexMapping.unsortable.write( document, "aaron" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "aaron" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 1 );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "aaron" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 1 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "aaron" );
+			indexMapping.nestedObject.integer.write( nestedObject, 1 );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexAccessors.string.write( document, "zach" );
-			indexAccessors.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
+			indexMapping.string.write( document, "zach" );
+			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
 
-			indexAccessors.string_analyzed_forScore.write( document, "Hooray" );
-			indexAccessors.unsortable.write( document, "zach" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, "zach" );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, 3 );
+			indexMapping.string_analyzed_forScore.write( document, "Hooray" );
+			indexMapping.unsortable.write( document, "zach" );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, "zach" );
-			indexAccessors.nestedObject.integer.write( nestedObject, 3 );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, "zach" );
+			indexMapping.flattenedObject.integer.write( flattenedObject, 3 );
+
+			// Note: this object must be single-valued for these tests
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, "zach" );
+			indexMapping.nestedObject.integer.write( nestedObject, 3 );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -472,49 +472,49 @@ public class SearchSortIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<GeoPoint> geoPoint;
-		final IndexFieldAccessor<String> string_analyzed_forScore;
-		final IndexFieldAccessor<String> unsortable;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<GeoPoint> geoPoint;
+		final IndexFieldReference<String> string_analyzed_forScore;
+		final IndexFieldReference<String> unsortable;
 
-		final ObjectAccessors flattenedObject;
-		final ObjectAccessors nestedObject;
+		final ObjectMapping flattenedObject;
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 			string_analyzed_forScore = root.field(
 					"string_analyzed_forScore" ,
 					f -> f.asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 			)
-					.createAccessor();
+					.toReference();
 			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ) )
-					.createAccessor();
+					.toReference();
 
 			IndexSchemaObjectField flattenedObjectField =
 					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
-			flattenedObject = new ObjectAccessors( flattenedObjectField );
+			flattenedObject = new ObjectMapping( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<String> string;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<String> string;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
 			string = objectField.field( "string", f -> f.asString().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 			integer = objectField.field( "integer", f -> f.asInteger().sortable( Sortable.YES ) )
-					.createAccessor();
+					.toReference();
 		}
 	}
 

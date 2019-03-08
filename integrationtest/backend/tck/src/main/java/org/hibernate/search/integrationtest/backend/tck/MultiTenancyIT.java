@@ -12,8 +12,8 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -66,7 +66,7 @@ public class MultiTenancyIT {
 	private final StubSessionContext tenant1SessionContext = new StubSessionContext( TENANT_1 );
 	private final StubSessionContext tenant2SessionContext = new StubSessionContext( TENANT_2 );
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -74,7 +74,7 @@ public class MultiTenancyIT {
 		setupHelper.withConfiguration( CONFIGURATION_ID )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
@@ -240,12 +240,12 @@ public class MultiTenancyIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexAccessors.string.write( document, UPDATED_STRING );
-			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
+			indexMapping.string.write( document, UPDATED_STRING );
+			indexMapping.integer.write( document, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -343,7 +343,7 @@ public class MultiTenancyIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
@@ -361,7 +361,7 @@ public class MultiTenancyIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_query_while_disabled_throws_exception",
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -384,7 +384,7 @@ public class MultiTenancyIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_add_while_disabled_throws_exception",
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -392,12 +392,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_3 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_5 );
+			indexMapping.string.write( document, STRING_VALUE_3 );
+			indexMapping.integer.write( document, INTEGER_VALUE_5 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
 		} );
 
 		workPlan.execute().join();
@@ -412,7 +412,7 @@ public class MultiTenancyIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_update_while_disabled_throws_exception",
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -420,12 +420,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexAccessors.string.write( document, UPDATED_STRING );
-			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
+			indexMapping.string.write( document, UPDATED_STRING );
+			indexMapping.integer.write( document, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -440,7 +440,7 @@ public class MultiTenancyIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						"IndexName-using_multi_tenancy_for_delete_while_disabled_throws_exception",
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -474,12 +474,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_3 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_5 );
+			indexMapping.string.write( document, STRING_VALUE_3 );
+			indexMapping.integer.write( document, INTEGER_VALUE_5 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_3 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_5 );
 		} );
 
 		workPlan.execute().join();
@@ -494,12 +494,12 @@ public class MultiTenancyIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubSessionContext() );
 
 		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexAccessors.string.write( document, UPDATED_STRING );
-			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
+			indexMapping.string.write( document, UPDATED_STRING );
+			indexMapping.integer.write( document, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, UPDATED_STRING );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, UPDATED_STRING );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -519,42 +519,42 @@ public class MultiTenancyIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
 		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_1 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_1 );
+			indexMapping.string.write( document, STRING_VALUE_1 );
+			indexMapping.integer.write( document, INTEGER_VALUE_1 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_1 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_1 );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_2 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_2 );
+			indexMapping.string.write( document, STRING_VALUE_2 );
+			indexMapping.integer.write( document, INTEGER_VALUE_2 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_2 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_2 );
 		} );
 
 		workPlan.execute().join();
 
 		workPlan = indexManager.createWorkPlan( tenant2SessionContext );
 		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_1 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_3 );
+			indexMapping.string.write( document, STRING_VALUE_1 );
+			indexMapping.integer.write( document, INTEGER_VALUE_3 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_3 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_1 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_3 );
 		} );
 
 		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE_2 );
-			indexAccessors.integer.write( document, INTEGER_VALUE_4 );
+			indexMapping.string.write( document, STRING_VALUE_2 );
+			indexMapping.integer.write( document, INTEGER_VALUE_4 );
 
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
-			indexAccessors.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, STRING_VALUE_2 );
+			indexMapping.nestedObject.integer.write( nestedObject, INTEGER_VALUE_4 );
 		} );
 
 		workPlan.execute().join();
@@ -604,33 +604,33 @@ public class MultiTenancyIT {
 		} );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<Integer> integer;
-		final ObjectAccessors nestedObject;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<Integer> integer;
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) )
-					.createAccessor();
+					.toReference();
 			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
-					.createAccessor();
+					.toReference();
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<String> string;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<String> string;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
 			string = objectField.field( "string", f -> f.asString().projectable( Projectable.YES ) )
-					.createAccessor();
+					.toReference();
 			integer = objectField.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) )
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

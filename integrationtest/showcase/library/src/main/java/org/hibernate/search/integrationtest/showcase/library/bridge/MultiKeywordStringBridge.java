@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.showcase.library.bridge;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
@@ -56,7 +56,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	private final Pattern separatorPattern;
 
 	private PojoModelElementAccessor<String> sourceAccessor;
-	private IndexFieldAccessor<String> valueFieldAccessor;
+	private IndexFieldReference<String> valueFieldReference;
 
 	private MultiKeywordStringBridge(Builder builder) {
 		this.fieldName = builder.fieldName;
@@ -66,10 +66,10 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 	@Override
 	public void bind(PropertyBridgeBindingContext context) {
 		sourceAccessor = context.getBridgedElement().createAccessor( String.class );
-		valueFieldAccessor = context.getIndexSchemaElement().field(
+		valueFieldReference = context.getIndexSchemaElement().field(
 				fieldName, f -> f.asString()
 		)
-				.createAccessor();
+				.toReference();
 	}
 
 	@Override
@@ -78,7 +78,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		if ( sourceValue != null ) {
 			String[] items = separatorPattern.split( sourceValue );
 			for ( String item : items ) {
-				valueFieldAccessor.write( target, item );
+				valueFieldReference.write( target, item );
 			}
 		}
 	}

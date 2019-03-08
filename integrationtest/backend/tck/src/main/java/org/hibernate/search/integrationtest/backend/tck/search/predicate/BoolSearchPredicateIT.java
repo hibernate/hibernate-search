@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -64,7 +64,7 @@ public class BoolSearchPredicateIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -72,7 +72,7 @@ public class BoolSearchPredicateIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -989,25 +989,25 @@ public class BoolSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexAccessors.field1.write( document, FIELD1_VALUE1 );
-			indexAccessors.field2.write( document, FIELD2_VALUE1 );
-			indexAccessors.field3.write( document, FIELD3_VALUE1 );
-			indexAccessors.field4.write( document, FIELD4_VALUE1AND2 );
-			indexAccessors.field5.write( document, FIELD5_VALUE1AND2 );
+			indexMapping.field1.write( document, FIELD1_VALUE1 );
+			indexMapping.field2.write( document, FIELD2_VALUE1 );
+			indexMapping.field3.write( document, FIELD3_VALUE1 );
+			indexMapping.field4.write( document, FIELD4_VALUE1AND2 );
+			indexMapping.field5.write( document, FIELD5_VALUE1AND2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexAccessors.field1.write( document, FIELD1_VALUE2 );
-			indexAccessors.field2.write( document, FIELD2_VALUE2 );
-			indexAccessors.field3.write( document, FIELD3_VALUE2 );
-			indexAccessors.field4.write( document, FIELD4_VALUE1AND2 );
-			indexAccessors.field5.write( document, FIELD5_VALUE1AND2 );
+			indexMapping.field1.write( document, FIELD1_VALUE2 );
+			indexMapping.field2.write( document, FIELD2_VALUE2 );
+			indexMapping.field3.write( document, FIELD3_VALUE2 );
+			indexMapping.field4.write( document, FIELD4_VALUE1AND2 );
+			indexMapping.field5.write( document, FIELD5_VALUE1AND2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexAccessors.field1.write( document, FIELD1_VALUE3 );
-			indexAccessors.field2.write( document, FIELD2_VALUE3 );
-			indexAccessors.field3.write( document, FIELD3_VALUE3 );
-			indexAccessors.field4.write( document, FIELD4_VALUE3 );
-			indexAccessors.field5.write( document, FIELD5_VALUE3 );
+			indexMapping.field1.write( document, FIELD1_VALUE3 );
+			indexMapping.field2.write( document, FIELD2_VALUE3 );
+			indexMapping.field3.write( document, FIELD3_VALUE3 );
+			indexMapping.field4.write( document, FIELD4_VALUE3 );
+			indexMapping.field5.write( document, FIELD5_VALUE3 );
 		} );
 
 		workPlan.execute().join();
@@ -1021,19 +1021,19 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> field1;
-		final IndexFieldAccessor<Integer> field2;
-		final IndexFieldAccessor<Integer> field3;
-		final IndexFieldAccessor<Integer> field4;
-		final IndexFieldAccessor<Integer> field5;
+	private static class IndexMapping {
+		final IndexFieldReference<String> field1;
+		final IndexFieldReference<Integer> field2;
+		final IndexFieldReference<Integer> field3;
+		final IndexFieldReference<Integer> field4;
+		final IndexFieldReference<Integer> field5;
 
-		IndexAccessors(IndexSchemaElement root) {
-			field1 = root.field( "field1", f -> f.asString() ).createAccessor();
-			field2 = root.field( "field2", f -> f.asInteger() ).createAccessor();
-			field3 = root.field( "field3", f -> f.asInteger() ).createAccessor();
-			field4 = root.field( "field4", f -> f.asInteger() ).createAccessor();
-			field5 = root.field( "field5", f -> f.asInteger() ).createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			field1 = root.field( "field1", f -> f.asString() ).toReference();
+			field2 = root.field( "field2", f -> f.asInteger() ).toReference();
+			field3 = root.field( "field3", f -> f.asInteger() ).toReference();
+			field4 = root.field( "field4", f -> f.asInteger() ).toReference();
+			field5 = root.field( "field5", f -> f.asInteger() ).toReference();
 		}
 	}
 }

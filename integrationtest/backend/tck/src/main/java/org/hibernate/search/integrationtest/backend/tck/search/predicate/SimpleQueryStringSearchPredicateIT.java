@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -619,25 +619,25 @@ public class SimpleQueryStringSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_1_AND_TERM_2 );
-			indexMapping.analyzedStringFieldWithDslConverter.accessor.write( document, TEXT_TERM_1_AND_TERM_2 );
-			indexMapping.analyzedStringField2.accessor.write( document, TEXT_TERM_1_AND_TERM_3 );
-			indexMapping.analyzedStringField3.accessor.write( document, TERM_4 );
+			indexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_1_AND_TERM_2 );
+			indexMapping.analyzedStringFieldWithDslConverter.reference.write( document, TEXT_TERM_1_AND_TERM_2 );
+			indexMapping.analyzedStringField2.reference.write( document, TEXT_TERM_1_AND_TERM_3 );
+			indexMapping.analyzedStringField3.reference.write( document, TERM_4 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_1_AND_TERM_3 );
+			indexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_1_AND_TERM_3 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_2_IN_PHRASE );
+			indexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_2_IN_PHRASE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
-			indexMapping.analyzedStringField2.accessor.write( document, TEXT_TERM_2_IN_PHRASE );
+			indexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
+			indexMapping.analyzedStringField2.reference.write( document, TEXT_TERM_2_IN_PHRASE );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_1_EDIT_DISTANCE_1 );
-			indexMapping.analyzedStringField3.accessor.write( document, TEXT_TERM_2_IN_PHRASE );
-			indexMapping.analyzedStringField3.accessor.write( document, TEXT_TERM_1_AND_TERM_3 );
+			indexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_1_EDIT_DISTANCE_1 );
+			indexMapping.analyzedStringField3.reference.write( document, TEXT_TERM_2_IN_PHRASE );
+			indexMapping.analyzedStringField3.reference.write( document, TEXT_TERM_1_AND_TERM_3 );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> {
 		} );
@@ -645,13 +645,13 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		workPlan = compatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_1_AND_TERM_2 );
+			compatibleIndexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_1_AND_TERM_2 );
 		} );
 		workPlan.execute().join();
 
 		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.analyzedStringField1.accessor.write( document, TEXT_TERM_1_AND_TERM_2 );
+			rawFieldCompatibleIndexMapping.analyzedStringField1.reference.write( document, TEXT_TERM_1_AND_TERM_2 );
 		} );
 		workPlan.execute().join();
 
@@ -770,15 +770,15 @@ public class SimpleQueryStringSearchPredicateIT {
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new MainFieldModel( accessor, name )
+					(reference, name) -> new MainFieldModel( reference, name )
 			);
 		}
 
-		final IndexFieldAccessor<String> accessor;
+		final IndexFieldReference<String> reference;
 		final String relativeFieldName;
 
-		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName) {
-			this.accessor = accessor;
+		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName) {
+			this.reference = reference;
 			this.relativeFieldName = relativeFieldName;
 		}
 	}
@@ -787,7 +787,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		static <F> StandardFieldMapper<F, ByTypeFieldModel> mapper(FieldTypeDescriptor<F> typeDescriptor) {
 			return StandardFieldMapper.of(
 					typeDescriptor::configure,
-					(accessor, name) -> new ByTypeFieldModel( name )
+					(reference, name) -> new ByTypeFieldModel( name )
 			);
 		}
 

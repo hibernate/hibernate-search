@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -40,7 +40,7 @@ public class LuceneFieldContentIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -48,7 +48,7 @@ public class LuceneFieldContentIT {
 		setupHelper.withDefaultConfiguration( "myLuceneBackend" )
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -93,41 +93,41 @@ public class LuceneFieldContentIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		workPlan.add( referenceProvider( "ID:1" ), document -> {
-			indexAccessors.string.write( document, "keyword" );
-			indexAccessors.text.write( document, TEXT_1 );
-			indexAccessors.integer.write( document, 739 );
-			indexAccessors.longNumber.write( document, 739L );
-			indexAccessors.bool.write( document, true );
+			indexMapping.string.write( document, "keyword" );
+			indexMapping.text.write( document, TEXT_1 );
+			indexMapping.integer.write( document, 739 );
+			indexMapping.longNumber.write( document, 739L );
+			indexMapping.bool.write( document, true );
 		} );
 		workPlan.add( referenceProvider( "ID:2" ), document -> {
-			indexAccessors.string.write( document, "anotherKeyword" );
-			indexAccessors.text.write( document, TEXT_2 );
-			indexAccessors.integer.write( document, 123 );
-			indexAccessors.longNumber.write( document, 123L );
-			indexAccessors.bool.write( document, false );
+			indexMapping.string.write( document, "anotherKeyword" );
+			indexMapping.text.write( document, TEXT_2 );
+			indexMapping.integer.write( document, 123 );
+			indexMapping.longNumber.write( document, 123L );
+			indexMapping.bool.write( document, false );
 		} );
 
 		workPlan.execute().join();
 	}
 
-	private static class IndexAccessors {
+	private static class IndexMapping {
 
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> text;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<Long> longNumber;
-		final IndexFieldAccessor<Boolean> bool;
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> text;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<Long> longNumber;
+		final IndexFieldReference<Boolean> bool;
 
-		IndexAccessors(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).createAccessor();
-			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).projectable( Projectable.YES ) ).createAccessor();
-			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) ).createAccessor();
-			longNumber = root.field( "longNumber", f -> f.asLong().projectable( Projectable.YES ) ).createAccessor();
+		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
+			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name ).projectable( Projectable.YES ) ).toReference();
+			integer = root.field( "integer", f -> f.asInteger().projectable( Projectable.YES ) ).toReference();
+			longNumber = root.field( "longNumber", f -> f.asLong().projectable( Projectable.YES ) ).toReference();
 
 			// the external form is the Boolean,
 			// BUT we treat it as **Integer** for comparison operation (range, sort)
 			// and we store it as **Integer** as well.
-			bool = root.field( "bool", f -> f.asBoolean().projectable( Projectable.YES ) ).createAccessor();
+			bool = root.field( "bool", f -> f.asBoolean().projectable( Projectable.YES ) ).toReference();
 		}
 	}
 }

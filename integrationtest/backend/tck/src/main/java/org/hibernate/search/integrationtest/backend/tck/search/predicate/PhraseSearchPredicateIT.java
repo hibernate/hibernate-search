@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
@@ -597,25 +597,25 @@ public class PhraseSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringFieldWithDslConverter.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringFieldWithDslConverter.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_SLOP_1_MATCH );
-			indexMapping.analyzedStringField2.accessor.write( document, PHRASE_2_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_1_MATCH );
+			indexMapping.analyzedStringField2.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_SLOP_2_MATCH );
-			indexMapping.analyzedStringField2.accessor.write( document, PHRASE_3_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringField3.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_2_MATCH );
+			indexMapping.analyzedStringField2.reference.write( document, PHRASE_3_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField3.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_SLOP_3_MATCH );
-			indexMapping.analyzedStringField3.accessor.write( document, PHRASE_2_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_SLOP_3_MATCH );
+			indexMapping.analyzedStringField3.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			indexMapping.analyzedStringField1.accessor.write( document, PHRASE_2_TEXT_EXACT_MATCH );
-			indexMapping.analyzedStringField2.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField1.reference.write( document, PHRASE_2_TEXT_EXACT_MATCH );
+			indexMapping.analyzedStringField2.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> {
 		} );
@@ -623,13 +623,13 @@ public class PhraseSearchPredicateIT {
 
 		workPlan = compatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			compatibleIndexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			compatibleIndexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.execute().join();
 
 		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
 		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			rawFieldCompatibleIndexMapping.analyzedStringField1.accessor.write( document, PHRASE_1_TEXT_EXACT_MATCH );
+			rawFieldCompatibleIndexMapping.analyzedStringField1.reference.write( document, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		workPlan.execute().join();
 
@@ -748,15 +748,15 @@ public class PhraseSearchPredicateIT {
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, String>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new MainFieldModel( accessor, name )
+					(reference, name) -> new MainFieldModel( reference, name )
 			);
 		}
 
-		final IndexFieldAccessor<String> accessor;
+		final IndexFieldReference<String> reference;
 		final String relativeFieldName;
 
-		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName) {
-			this.accessor = accessor;
+		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName) {
+			this.reference = reference;
 			this.relativeFieldName = relativeFieldName;
 		}
 	}
@@ -765,7 +765,7 @@ public class PhraseSearchPredicateIT {
 		static <F> StandardFieldMapper<F, ByTypeFieldModel> mapper(FieldTypeDescriptor<F> typeDescriptor) {
 			return StandardFieldMapper.of(
 					typeDescriptor::configure,
-					(accessor, name) -> new ByTypeFieldModel( name )
+					(reference, name) -> new ByTypeFieldModel( name )
 			);
 		}
 

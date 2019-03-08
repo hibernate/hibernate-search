@@ -20,8 +20,8 @@ import java.util.function.Function;
 import org.easymock.EasyMock;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -65,7 +65,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private IndexAccessors indexAccessors;
+	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
 	@Before
@@ -73,7 +73,7 @@ public class IndexSearchResultLoadingOrTransformingIT {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,
-						ctx -> this.indexAccessors = new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
@@ -375,21 +375,21 @@ public class IndexSearchResultLoadingOrTransformingIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( MAIN_ID ), document -> {
-			indexAccessors.string.write( document, STRING_VALUE );
-			indexAccessors.string_analyzed.write( document, STRING_ANALYZED_VALUE );
-			indexAccessors.integer.write( document, INTEGER_VALUE );
-			indexAccessors.localDate.write( document, LOCAL_DATE_VALUE );
-			indexAccessors.geoPoint.write( document, GEO_POINT_VALUE );
+			indexMapping.string.write( document, STRING_VALUE );
+			indexMapping.string_analyzed.write( document, STRING_ANALYZED_VALUE );
+			indexMapping.integer.write( document, INTEGER_VALUE );
+			indexMapping.localDate.write( document, LOCAL_DATE_VALUE );
+			indexMapping.geoPoint.write( document, GEO_POINT_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexAccessors.flattenedObject.self.add( document );
-			indexAccessors.flattenedObject.string.write( flattenedObject, FLATTENED_OBJECT_STRING_VALUE );
-			indexAccessors.flattenedObject.integer.write( flattenedObject, FLATTENED_OBJECT_INTEGER_VALUE );
+			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			indexMapping.flattenedObject.string.write( flattenedObject, FLATTENED_OBJECT_STRING_VALUE );
+			indexMapping.flattenedObject.integer.write( flattenedObject, FLATTENED_OBJECT_INTEGER_VALUE );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexAccessors.nestedObject.self.add( document );
-			indexAccessors.nestedObject.string.write( nestedObject, NESTED_OBJECT_STRING_VALUE );
-			indexAccessors.nestedObject.integer.write( nestedObject, NESTED_OBJECT_INTEGER_VALUE );
+			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			indexMapping.nestedObject.string.write( nestedObject, NESTED_OBJECT_STRING_VALUE );
+			indexMapping.nestedObject.integer.write( nestedObject, NESTED_OBJECT_INTEGER_VALUE );
 		} );
 
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
@@ -406,69 +406,69 @@ public class IndexSearchResultLoadingOrTransformingIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
 	}
 
-	private static class IndexAccessors {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> string_analyzed;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<LocalDate> localDate;
-		final IndexFieldAccessor<GeoPoint> geoPoint;
-		final ObjectAccessors flattenedObject;
-		final ObjectAccessors nestedObject;
+	private static class IndexMapping {
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> string_analyzed;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<LocalDate> localDate;
+		final IndexFieldReference<GeoPoint> geoPoint;
+		final ObjectMapping flattenedObject;
+		final ObjectMapping nestedObject;
 
-		IndexAccessors(IndexSchemaElement root) {
+		IndexMapping(IndexSchemaElement root) {
 			string = root.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			string_analyzed = root.field(
 					"string_analyzed",
 					f -> f.asString()
 							.projectable( Projectable.YES )
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 			)
-					.createAccessor();
+					.toReference();
 			integer = root.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			localDate = root.field(
 					"localDate",
 					f -> f.asLocalDate().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			geoPoint = root.field(
 					"geoPoint",
 					f -> f.asGeoPoint().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			IndexSchemaObjectField flattenedObjectField =
 					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
-			flattenedObject = new ObjectAccessors( flattenedObjectField );
+			flattenedObject = new ObjectMapping( flattenedObjectField );
 			IndexSchemaObjectField nestedObjectField =
 					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectAccessors( nestedObjectField );
+			nestedObject = new ObjectMapping( nestedObjectField );
 		}
 	}
 
-	private static class ObjectAccessors {
-		final IndexObjectFieldAccessor self;
-		final IndexFieldAccessor<Integer> integer;
-		final IndexFieldAccessor<String> string;
+	private static class ObjectMapping {
+		final IndexObjectFieldReference self;
+		final IndexFieldReference<Integer> integer;
+		final IndexFieldReference<String> string;
 
-		ObjectAccessors(IndexSchemaObjectField objectField) {
-			self = objectField.createAccessor();
+		ObjectMapping(IndexSchemaObjectField objectField) {
+			self = objectField.toReference();
 			string = objectField.field(
 					"string",
 					f -> f.asString().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 			integer = objectField.field(
 					"integer",
 					f -> f.asInteger().projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.MarkerMapping;
@@ -250,7 +250,7 @@ public class AnnotationMappingDiscoveryIT {
 	}
 
 	public static final class CustomMarkerConsumingPropertyBridge implements PropertyBridge {
-		private List<IndexObjectFieldAccessor> objectFieldAccessors = new ArrayList<>();
+		private List<IndexObjectFieldReference> objectFieldReferences = new ArrayList<>();
 
 		@Override
 		public void bind(PropertyBridgeBindingContext context) {
@@ -258,16 +258,16 @@ public class AnnotationMappingDiscoveryIT {
 					.filter( property -> property.markers( CustomMarker.class ).findAny().isPresent() )
 					.collect( Collectors.toList() );
 			for ( PojoModelProperty property : markedProperties ) {
-				objectFieldAccessors.add(
-						context.getIndexSchemaElement().objectField( property.getName() ).createAccessor()
+				objectFieldReferences.add(
+						context.getIndexSchemaElement().objectField( property.getName() ).toReference()
 				);
 			}
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-			for ( IndexObjectFieldAccessor objectFieldAccessor : objectFieldAccessors ) {
-				objectFieldAccessor.add( target );
+			for ( IndexObjectFieldReference reference : objectFieldReferences ) {
+				reference.add( target );
 			}
 		}
 	}

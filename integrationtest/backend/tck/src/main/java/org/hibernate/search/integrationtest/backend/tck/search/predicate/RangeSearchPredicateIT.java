@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
@@ -1103,16 +1103,16 @@ public class RangeSearchPredicateIT {
 	}
 
 	private static class ValueModel<F> {
-		private final IndexFieldAccessor<F> accessor;
+		private final IndexFieldReference<F> reference;
 		final F indexedValue;
 
-		private ValueModel(IndexFieldAccessor<F> accessor, F indexedValue) {
-			this.accessor = accessor;
+		private ValueModel(IndexFieldReference<F> reference, F indexedValue) {
+			this.reference = reference;
 			this.indexedValue = indexedValue;
 		}
 
 		public void write(DocumentElement target) {
-			accessor.write( target, indexedValue );
+			reference.write( target, indexedValue );
 		}
 	}
 
@@ -1121,7 +1121,7 @@ public class RangeSearchPredicateIT {
 				String document1Value, String document2Value, String document3Value) {
 			return StandardFieldMapper.of(
 					f -> f.asString(),
-					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+					(reference, name) -> new MainFieldModel( reference, name, document1Value, document2Value, document3Value )
 			);
 		}
 
@@ -1130,7 +1130,7 @@ public class RangeSearchPredicateIT {
 				String document1Value, String document2Value, String document3Value) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new MainFieldModel( accessor, name, document1Value, document2Value, document3Value )
+					(reference, name) -> new MainFieldModel( reference, name, document1Value, document2Value, document3Value )
 			);
 		}
 
@@ -1139,12 +1139,12 @@ public class RangeSearchPredicateIT {
 		final ValueModel<String> document2Value;
 		final ValueModel<String> document3Value;
 
-		private MainFieldModel(IndexFieldAccessor<String> accessor, String relativeFieldName,
+		private MainFieldModel(IndexFieldReference<String> reference, String relativeFieldName,
 				String document1Value, String document2Value, String document3Value) {
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, document1Value );
-			this.document2Value = new ValueModel<>( accessor, document2Value );
-			this.document3Value = new ValueModel<>( accessor, document3Value );
+			this.document1Value = new ValueModel<>( reference, document1Value );
+			this.document2Value = new ValueModel<>( reference, document2Value );
+			this.document3Value = new ValueModel<>( reference, document3Value );
 		}
 	}
 
@@ -1154,7 +1154,7 @@ public class RangeSearchPredicateIT {
 			RangePredicateExpectations<F> expectations = typeDescriptor.getRangePredicateExpectations().get();
 			return StandardFieldMapper.of(
 					typeDescriptor::configure,
-					(accessor, name) -> new ByTypeFieldModel<>( accessor, name, expectations )
+					(reference, name) -> new ByTypeFieldModel<>( reference, name, expectations )
 			);
 		}
 
@@ -1166,12 +1166,12 @@ public class RangeSearchPredicateIT {
 		final F predicateLowerBound;
 		final F predicateUpperBound;
 
-		private ByTypeFieldModel(IndexFieldAccessor<F> accessor, String relativeFieldName,
+		private ByTypeFieldModel(IndexFieldReference<F> reference, String relativeFieldName,
 				RangePredicateExpectations<F> expectations) {
 			this.relativeFieldName = relativeFieldName;
-			this.document1Value = new ValueModel<>( accessor, expectations.getDocument1Value() );
-			this.document2Value = new ValueModel<>( accessor, expectations.getDocument2Value() );
-			this.document3Value = new ValueModel<>( accessor, expectations.getDocument3Value() );
+			this.document1Value = new ValueModel<>( reference, expectations.getDocument1Value() );
+			this.document2Value = new ValueModel<>( reference, expectations.getDocument2Value() );
+			this.document3Value = new ValueModel<>( reference, expectations.getDocument3Value() );
 			this.predicateLowerBound = expectations.getBetweenDocument1And2Value();
 			this.predicateUpperBound = expectations.getBetweenDocument2And3Value();
 		}
@@ -1182,7 +1182,7 @@ public class RangeSearchPredicateIT {
 				Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, F>> configuration) {
 			return StandardFieldMapper.of(
 					configuration,
-					(accessor, name) -> new IncompatibleFieldModel( name )
+					(reference, name) -> new IncompatibleFieldModel( name )
 			);
 		}
 

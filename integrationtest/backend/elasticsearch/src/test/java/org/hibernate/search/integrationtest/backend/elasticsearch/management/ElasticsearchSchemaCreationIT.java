@@ -69,7 +69,7 @@ public class ElasticsearchSchemaCreationIT {
 					"myField",
 					f -> f.asLocalDate()
 			)
-					.createAccessor();
+					.toReference();
 		} );
 
 		assertJsonEquals(
@@ -97,7 +97,7 @@ public class ElasticsearchSchemaCreationIT {
 					"myField",
 					f -> f.asBoolean()
 			)
-					.createAccessor();
+					.toReference();
 		} );
 
 		assertJsonEquals(
@@ -124,7 +124,7 @@ public class ElasticsearchSchemaCreationIT {
 					"myField",
 					f -> f.asString()
 			)
-					.createAccessor();
+					.toReference();
 		} );
 
 		assertJsonEquals(
@@ -151,7 +151,7 @@ public class ElasticsearchSchemaCreationIT {
 					"myField",
 					f -> f.asString().analyzer( "standard" )
 			)
-					.createAccessor();
+					.toReference();
 		} );
 
 		assertJsonEquals(
@@ -181,7 +181,7 @@ public class ElasticsearchSchemaCreationIT {
 					f -> f.asString().analyzer( "standard" )
 							// TODO disable norms once the APIs allow it; see HSEARCH-3048
 			)
-					.createAccessor();
+					.toReference();
 		} );
 
 		assertJsonEquals(

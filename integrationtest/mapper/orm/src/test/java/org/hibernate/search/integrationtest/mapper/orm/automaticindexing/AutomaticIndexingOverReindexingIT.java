@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBridgeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.declaration.TypeBridgeMapping;
@@ -310,7 +310,7 @@ public class AutomaticIndexingOverReindexingIT {
 	public static class Level3Property1Bridge implements TypeBridge {
 
 		private PojoModelElementAccessor<String> level3Property1SourceAccessor;
-		private IndexFieldAccessor<String> typeBridgeFieldAccessor;
+		private IndexFieldReference<String> property1FromBridgeFieldReference;
 
 		@Override
 		public void bind(TypeBridgeBindingContext context) {
@@ -318,15 +318,15 @@ public class AutomaticIndexingOverReindexingIT {
 					.property( "level3" )
 					.property( "property1" )
 					.createAccessor( String.class );
-			typeBridgeFieldAccessor = context.getIndexSchemaElement().field(
+			property1FromBridgeFieldReference = context.getIndexSchemaElement().field(
 					"property1FromBridge", f -> f.asString()
 			)
-					.createAccessor();
+					.toReference();
 		}
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			typeBridgeFieldAccessor.write(
+			property1FromBridgeFieldReference.write(
 					target,
 					level3Property1SourceAccessor.read( source )
 			);

@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -57,12 +57,12 @@ public class LuceneSearchMultiIndexIT {
 
 	// Backend 1 / Index 1
 
-	private IndexAccessors_1_1 indexAccessors_1_1;
+	private IndexMapping_1_1 indexMapping_1_1;
 	private StubMappingIndexManager indexManager_1_1;
 
 	// Backend 1 / Index 2
 
-	private IndexAccessors_1_2 indexAccessors_1_2;
+	private IndexMapping_1_2 indexMapping_1_2;
 	private StubMappingIndexManager indexManager_1_2;
 
 	@Before
@@ -70,12 +70,12 @@ public class LuceneSearchMultiIndexIT {
 		setupHelper.withDefaultConfiguration( BACKEND_1 )
 				.withIndex(
 						INDEX_NAME_1_1,
-						ctx -> this.indexAccessors_1_1 = new IndexAccessors_1_1( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
 						indexMapping -> this.indexManager_1_1 = indexMapping
 				)
 				.withIndex(
 						INDEX_NAME_1_2,
-						ctx -> this.indexAccessors_1_2 = new IndexAccessors_1_2( ctx.getSchemaElement() ),
+						ctx -> this.indexMapping_1_2 = new IndexMapping_1_2( ctx.getSchemaElement() ),
 						indexMapping -> this.indexManager_1_2 = indexMapping
 				)
 				.setup();
@@ -116,12 +116,12 @@ public class LuceneSearchMultiIndexIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
-			indexAccessors_1_1.string.write( document, STRING_1 );
-			indexAccessors_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_1 );
+			indexMapping_1_1.string.write( document, STRING_1 );
+			indexMapping_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_1 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
-			indexAccessors_1_1.string.write( document, STRING_2 );
-			indexAccessors_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_2 );
+			indexMapping_1_1.string.write( document, STRING_2 );
+			indexMapping_1_1.additionalField.write( document, ADDITIONAL_FIELD_1_1_2 );
 		} );
 
 		workPlan.execute().join();
@@ -138,7 +138,7 @@ public class LuceneSearchMultiIndexIT {
 		workPlan = indexManager_1_2.createWorkPlan();
 
 		workPlan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
-			indexAccessors_1_2.string.write( document, STRING_1 );
+			indexMapping_1_2.string.write( document, STRING_1 );
 		} );
 
 		workPlan.execute().join();
@@ -151,26 +151,26 @@ public class LuceneSearchMultiIndexIT {
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}
 
-	private static class IndexAccessors_1_1 {
-		final IndexFieldAccessor<String> string;
-		final IndexFieldAccessor<String> additionalField;
+	private static class IndexMapping_1_1 {
+		final IndexFieldReference<String> string;
+		final IndexFieldReference<String> additionalField;
 
-		IndexAccessors_1_1(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString() ).createAccessor();
+		IndexMapping_1_1(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString() ).toReference();
 			additionalField = root.field(
 					"additionalField",
 					f -> f.asString().sortable( Sortable.YES ).projectable( Projectable.YES )
 			)
-					.createAccessor();
+					.toReference();
 		}
 	}
 
-	private static class IndexAccessors_1_2 {
-		final IndexFieldAccessor<String> string;
+	private static class IndexMapping_1_2 {
+		final IndexFieldReference<String> string;
 
-		IndexAccessors_1_2(IndexSchemaElement root) {
+		IndexMapping_1_2(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() )
-					.createAccessor();
+					.toReference();
 		}
 	}
 }

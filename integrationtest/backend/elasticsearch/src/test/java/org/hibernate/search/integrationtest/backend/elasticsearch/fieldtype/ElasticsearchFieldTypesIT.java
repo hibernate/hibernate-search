@@ -61,7 +61,7 @@ public class ElasticsearchFieldTypesIT {
 				)
 				.withIndex(
 						INDEX_NAME,
-						ctx -> new IndexAccessors( ctx.getSchemaElement() ),
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> {
 						}
 				)
@@ -101,21 +101,21 @@ public class ElasticsearchFieldTypesIT {
 		return field;
 	}
 
-	private static class IndexAccessors {
-		IndexAccessors(IndexSchemaElement root) {
+	private static class IndexMapping {
+		IndexMapping(IndexSchemaElement root) {
 			// string type + not analyzed => keyword
-			root.field( "keyword", f -> f.asString() ).createAccessor();
+			root.field( "keyword", f -> f.asString() ).toReference();
 
 			// string type + analyzed => text
-			root.field( "text", f -> f.asString().analyzer( "standard" ) ).createAccessor();
+			root.field( "text", f -> f.asString().analyzer( "standard" ) ).toReference();
 
-			root.field( "integer", f -> f.asInteger() ).createAccessor();
-			root.field( "long", f -> f.asLong() ).createAccessor();
-			root.field( "boolean", f -> f.asBoolean() ).createAccessor();
-			root.field( "byte", f -> f.asByte() ).createAccessor();
-			root.field( "short", f -> f.asShort() ).createAccessor();
-			root.field( "float", f -> f.asFloat() ).createAccessor();
-			root.field( "double", f -> f.asDouble() ).createAccessor();
+			root.field( "integer", f -> f.asInteger() ).toReference();
+			root.field( "long", f -> f.asLong() ).toReference();
+			root.field( "boolean", f -> f.asBoolean() ).toReference();
+			root.field( "byte", f -> f.asByte() ).toReference();
+			root.field( "short", f -> f.asShort() ).toReference();
+			root.field( "float", f -> f.asFloat() ).toReference();
+			root.field( "double", f -> f.asDouble() ).toReference();
 		}
 	}
 }
