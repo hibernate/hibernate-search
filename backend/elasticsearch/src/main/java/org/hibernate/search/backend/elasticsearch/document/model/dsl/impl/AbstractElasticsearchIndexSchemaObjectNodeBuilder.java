@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldTerminalContext;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -40,7 +40,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	@Override
-	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> addField(
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> addField(
 			String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
@@ -51,7 +51,7 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	@Override
-	public <F> IndexSchemaFieldTerminalContext<IndexFieldAccessor<F>> createExcludedField(
+	public <F> IndexSchemaFieldTerminalContext<IndexFieldReference<F>> createExcludedField(
 			String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		return new ElasticsearchIndexSchemaFieldNodeBuilder<>(

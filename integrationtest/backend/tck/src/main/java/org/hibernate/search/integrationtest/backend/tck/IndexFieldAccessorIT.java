@@ -294,7 +294,7 @@ public class IndexFieldAccessorIT {
 			).get();
 			excludingObject = new FirstLevelObjectAccessors(
 					excludingEmbeddedContext.getSchemaElement(),
-					excludingEmbeddedContext.getParentIndexObjectAccessors().iterator().next()
+					excludingEmbeddedContext.getParentIndexObjectReferences().iterator().next()
 			);
 		}
 	}

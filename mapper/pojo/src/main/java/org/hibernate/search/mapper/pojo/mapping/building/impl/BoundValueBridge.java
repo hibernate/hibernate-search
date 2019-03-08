@@ -6,25 +6,25 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.IndexFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 
 public final class BoundValueBridge<V, F> {
 	private final BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder;
-	private final IndexFieldAccessor<? super F> indexFieldAccessor;
+	private final IndexFieldReference<? super F> indexFieldReference;
 
 	BoundValueBridge(BeanHolder<? extends ValueBridge<? super V, F>> bridgeHolder,
-			IndexFieldAccessor<? super F> indexFieldAccessor) {
+			IndexFieldReference<? super F> indexFieldReference) {
 		this.bridgeHolder = bridgeHolder;
-		this.indexFieldAccessor = indexFieldAccessor;
+		this.indexFieldReference = indexFieldReference;
 	}
 
 	public BeanHolder<? extends ValueBridge<? super V, F>> getBridgeHolder() {
 		return bridgeHolder;
 	}
 
-	public IndexFieldAccessor<? super F> getIndexFieldAccessor() {
-		return indexFieldAccessor;
+	public IndexFieldReference<? super F> getIndexFieldReference() {
+		return indexFieldReference;
 	}
 }

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
@@ -21,7 +21,7 @@ public interface IndexModelBindingContext {
 
 	IndexFieldTypeFactoryContext getTypeFactory();
 
-	Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors();
+	Collection<IndexObjectFieldReference> getParentIndexObjectReferences();
 
 	IndexSchemaElement getSchemaElement();
 

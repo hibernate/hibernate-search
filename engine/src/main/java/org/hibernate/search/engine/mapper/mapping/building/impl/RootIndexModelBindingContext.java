@@ -9,7 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldAccessor;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 
@@ -20,7 +20,7 @@ public class RootIndexModelBindingContext extends AbstractIndexModelBindingConte
 	}
 
 	@Override
-	public Collection<IndexObjectFieldAccessor> getParentIndexObjectAccessors() {
+	public Collection<IndexObjectFieldReference> getParentIndexObjectReferences() {
 		return Collections.emptyList();
 	}
 
