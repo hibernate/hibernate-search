@@ -15,11 +15,7 @@ package org.hibernate.search.engine.backend.document;
  *
  * @see DocumentElement#addValue(IndexFieldReference, Object)
  */
+@SuppressWarnings("unused") // The type parameter is used in methods accepting this interface as a parameter.
 public interface IndexFieldReference<F> {
 
-	// FIXME Remove this method and usages of this method
-	@Deprecated
-	default void write(DocumentElement target, F value) {
-		target.addValue( this, value );
-	}
 }
