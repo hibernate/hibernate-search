@@ -34,13 +34,13 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
-	public EntityManager toJpaEntityManager() {
-		return getDelegate().toJpaEntityManager();
+	public EntityManager toEntityManager() {
+		return getDelegate().toEntityManager();
 	}
 
 	@Override
-	public Session toHibernateOrmSession() {
-		return getDelegate().toHibernateOrmSession();
+	public Session toOrmSession() {
+		return getDelegate().toOrmSession();
 	}
 
 	@Override

@@ -136,6 +136,6 @@ public interface SearchQuery<T> {
 	 *
 	 * @return A representation of this query as a Hibernate ORM query.
 	 */
-	Query<T> toHibernateOrmQuery();
+	Query<T> toOrmQuery();
 
 }

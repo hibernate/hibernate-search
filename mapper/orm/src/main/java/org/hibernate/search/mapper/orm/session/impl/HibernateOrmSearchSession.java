@@ -46,12 +46,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public EntityManager toJpaEntityManager() {
+	public EntityManager toEntityManager() {
 		return sessionImplementor;
 	}
 
 	@Override
-	public Session toHibernateOrmSession() {
+	public Session toOrmSession() {
 		return sessionImplementor;
 	}
 

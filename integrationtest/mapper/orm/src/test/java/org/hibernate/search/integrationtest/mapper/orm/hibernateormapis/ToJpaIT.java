@@ -82,7 +82,7 @@ public class ToJpaIT {
 	public void toJpaEntityManager() {
 		OrmUtils.withinEntityManager( sessionFactory, entityManager -> {
 			SearchSession searchSession = Search.getSearchSession( entityManager );
-			assertThat( searchSession.toJpaEntityManager() ).isSameAs( entityManager );
+			assertThat( searchSession.toEntityManager() ).isSameAs( entityManager );
 		} );
 	}
 
