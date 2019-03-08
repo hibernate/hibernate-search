@@ -82,7 +82,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public Query<R> toHibernateOrmQuery() {
+	public Query<R> toOrmQuery() {
 		return this;
 	}
 

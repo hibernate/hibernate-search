@@ -79,7 +79,7 @@ public class ToHibernateOrmIT {
 	public void toHibernateOrmSession() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			assertThat( searchSession.toHibernateOrmSession() ).isSameAs( session );
+			assertThat( searchSession.toOrmSession() ).isSameAs( session );
 		} );
 	}
 
@@ -87,7 +87,7 @@ public class ToHibernateOrmIT {
 	public void toHibernateOrmQuery() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
 			assertThat( query ).isNotNull();
 		} );
 	}
@@ -96,7 +96,7 @@ public class ToHibernateOrmIT {
 	public void list() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -121,7 +121,7 @@ public class ToHibernateOrmIT {
 	public void uniqueResult() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -167,7 +167,7 @@ public class ToHibernateOrmIT {
 	public void pagination() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
-			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toHibernateOrmQuery();
+			Query<IndexedEntity> query = createSimpleQuery( searchSession ).toOrmQuery();
 
 			assertThat( query.getFirstResult() ).isEqualTo( 0 );
 			assertThat( query.getMaxResults() ).isEqualTo( Integer.MAX_VALUE );

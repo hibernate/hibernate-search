@@ -83,11 +83,11 @@ public interface SearchSession {
 	/**
 	 * @return The underlying {@link EntityManager} used by this {@link SearchSession}.
 	 */
-	EntityManager toJpaEntityManager();
+	EntityManager toEntityManager();
 
 	/**
 	 * @return The underlying {@link Session} used by this {@link SearchSession}.
 	 */
-	Session toHibernateOrmSession();
+	Session toOrmSession();
 
 }
