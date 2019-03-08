@@ -292,9 +292,12 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.Year|-
 |java.time.YearMonth|-
 |java.time.MonthDay|-
+|java.util.UUID|`toString()` as a `java.lang.String`
 |java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>>
 |java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
-|java.util.UUID|`toString()` as a `java.lang.String`
+|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
+|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
+|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>
 |====
 
 [[mapper-orm-bridge-typeandpropertybridge]]
@@ -338,9 +341,10 @@ along with the value of the document identifier, i.e. the value passed to the un
 include::todo-placeholder.asciidoc[]
 
 [[mapper-orm-legacy-date-time-apis]]
-=== Support for legacy date/time APIs
+=== Support for legacy java.util date/time APIs
 
-Using legacy date/time types such as `java.util.Calendar` or `java.util.Date` is not recommended,
+Using legacy date/time types such as `java.util.Calendar`, `java.util.Date`, `java.sql.Timestamp`, `java.sql.Date`, `java.sql.Time`
+is not recommended,
 due to their numerous quirks and shortcomings.
 The https://docs.oracle.com/javase/8/docs/api/java/time/package-summary.html[`java.time`] package introduced
 in Java 8 should generally be preferred.
