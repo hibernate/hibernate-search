@@ -16,15 +16,4 @@ package org.hibernate.search.engine.backend.document;
  */
 public interface IndexObjectFieldReference {
 
-	// FIXME Remove this method and usages of this method
-	@Deprecated
-	default DocumentElement add(DocumentElement target) {
-		return target.addObject( this );
-	}
-
-	// FIXME Remove this method and usages of this method
-	@Deprecated
-	default void addMissing(DocumentElement target) {
-		target.addNullObject( this );
-	}
 }
