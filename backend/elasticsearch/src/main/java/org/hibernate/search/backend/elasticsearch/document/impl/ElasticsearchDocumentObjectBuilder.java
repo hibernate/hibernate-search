@@ -84,7 +84,7 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 
 	private void checkTreeConsistency(ElasticsearchIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
-			throw log.invalidParentDocumentObjectState( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
+			throw log.invalidFieldForDocumentElement( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}
 	}
 

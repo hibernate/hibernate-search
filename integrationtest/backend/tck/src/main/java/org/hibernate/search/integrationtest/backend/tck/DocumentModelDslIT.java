@@ -376,7 +376,7 @@ public class DocumentModelDslIT {
 									.sortable( Sortable.YES )
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 					)
-							.createAccessor();
+							.toReference();
 				} )
 		)
 				.assertThrown()
@@ -401,7 +401,7 @@ public class DocumentModelDslIT {
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD.name )
 									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
 					)
-							.createAccessor();
+							.toReference();
 				} )
 		)
 				.assertThrown()
@@ -415,10 +415,10 @@ public class DocumentModelDslIT {
 	}
 
 	@Test
-	public void missingCreateAccessorCall() {
+	public void missingGetReferenceCall() {
 		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
-					"Missing createAccessor() call after " + typedContextFunction,
+					"Missing toReference() call after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
 						root.field( "myField", typedContextFunction::apply );
@@ -433,7 +433,7 @@ public class DocumentModelDslIT {
 					) );
 		}
 		SubTest.expectException(
-				"Missing createAccessor() call after objectField()",
+				"Missing toReference() call after objectField()",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "myField" );
@@ -449,40 +449,40 @@ public class DocumentModelDslIT {
 	}
 
 	@Test
-	public void multipleCreateAccessorCall() {
+	public void multipleGetReferenceCall() {
 		for ( Function<IndexFieldTypeFactoryContext, StandardIndexFieldTypeContext<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(
-					"Multiple createAccessor() calls after " + typedContextFunction,
+					"Multiple toReference() calls after " + typedContextFunction,
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
 						IndexSchemaFieldTerminalContext<?> context = root.field(
 								"myField",
 								typedContextFunction::apply
 						);
-						context.createAccessor();
-						context.createAccessor();
+						context.toReference();
+						context.toReference();
 					} )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Multiple calls to createAccessor() for the same field definition" )
+					.hasMessageContaining( "Multiple calls to toReference() for the same field definition" )
 					.satisfies( FailureReportUtils.hasContext(
 							EventContexts.fromIndexName( INDEX_NAME ),
 							EventContexts.fromIndexFieldAbsolutePath( "myField" )
 					) );
 		}
 		SubTest.expectException(
-				"Multiple createAccessor() calls after objectField()",
+				"Multiple toReference() calls after objectField()",
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField context = root.objectField( "myField" );
-					context.createAccessor();
-					context.createAccessor();
+					context.toReference();
+					context.toReference();
 				} )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Multiple calls to createAccessor() for the same field definition" )
+				.hasMessageContaining( "Multiple calls to toReference() for the same field definition" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexName( INDEX_NAME ),
 						EventContexts.fromIndexFieldAbsolutePath( "myField" )

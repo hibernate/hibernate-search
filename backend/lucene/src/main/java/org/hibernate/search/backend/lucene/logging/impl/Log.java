@@ -288,8 +288,8 @@ public interface Log extends BasicLogger {
 	SearchException matchPredicatesNotSupportedByGeoPoint(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 39,
-			value = "Invalid parent object for this field accessor; expected path '%1$s', got '%2$s'.")
-	SearchException invalidParentDocumentObjectState(String expectedPath, String actualPath);
+			value = "Invalid field reference for this document element: this document element has path '%1$s', but the referenced field has a parent with path '%2$s'.")
+	SearchException invalidFieldForDocumentElement(String expectedPath, String actualPath);
 
 	@Message(id = ID_OFFSET_2 + 40,
 			value = "Spatial predicates are not supported by this field's type.")
@@ -421,11 +421,11 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 71,
 			value = "Incomplete field definition."
-					+ " You must call createAccessor() to complete the field definition.")
+					+ " You must call toReference() to complete the field definition.")
 	SearchException incompleteFieldDefinition(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 72,
-			value = "Multiple calls to createAccessor() for the same field definition."
-					+ " You must call createAccessor() exactly once.")
+			value = "Multiple calls to toReference() for the same field definition."
+					+ " You must call toReference() exactly once.")
 	SearchException cannotCreateReferenceMultipleTimes(@Param EventContext context);
 }
