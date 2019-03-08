@@ -390,49 +390,49 @@ public class ElasticsearchExtensionIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexMapping.integer.write( document, "2" );
+			document.addValue( indexMapping.integer, "2" );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "a" );
-			indexMapping.sort3.write( document, "z" );
-			indexMapping.sort4.write( document, "z" );
-			indexMapping.sort5.write( document, "a" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "a" );
+			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( indexMapping.sort4, "z" );
+			document.addValue( indexMapping.sort5, "a" );
 		} );
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexMapping.string.write( document, "'text 1'" );
+			document.addValue( indexMapping.string, "'text 1'" );
 
-			indexMapping.sort1.write( document, "a" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "z" );
-			indexMapping.sort4.write( document, "z" );
-			indexMapping.sort5.write( document, "a" );
+			document.addValue( indexMapping.sort1, "a" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( indexMapping.sort4, "z" );
+			document.addValue( indexMapping.sort5, "a" );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexMapping.geoPoint.write( document, "{'lat': 40.12, 'lon': -71.34}" );
+			document.addValue( indexMapping.geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "a" );
-			indexMapping.sort4.write( document, "z" );
-			indexMapping.sort5.write( document, "a" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "a" );
+			document.addValue( indexMapping.sort4, "z" );
+			document.addValue( indexMapping.sort5, "a" );
 		} );
 		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
-			indexMapping.yearDays.write( document, "'2018:012'" );
+			document.addValue( indexMapping.yearDays, "'2018:012'" );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "z" );
-			indexMapping.sort4.write( document, "a" );
-			indexMapping.sort5.write( document, "a" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "z" );
+			document.addValue( indexMapping.sort4, "a" );
+			document.addValue( indexMapping.sort5, "a" );
 		} );
 		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			indexMapping.string.write( document, "'text 2'" );
-			indexMapping.integer.write( document, "1" );
-			indexMapping.geoPoint.write( document, "{'lat': 45.12, 'lon': -75.34}" );
-			indexMapping.yearDays.write( document, "'2018:025'" );
+			document.addValue( indexMapping.string, "'text 2'" );
+			document.addValue( indexMapping.integer, "1" );
+			document.addValue( indexMapping.geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
+			document.addValue( indexMapping.yearDays, "'2018:025'" );
 
-			indexMapping.sort5.write( document, "z" );
+			document.addValue( indexMapping.sort5, "z" );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 

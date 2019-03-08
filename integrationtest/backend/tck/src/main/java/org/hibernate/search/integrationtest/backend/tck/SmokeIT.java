@@ -279,59 +279,59 @@ public class SmokeIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( "1" ), document -> {
-			indexMapping.string.write( document, "text 1" );
-			indexMapping.string_analyzed.write( document, "text 1" );
-			indexMapping.integer.write( document, 1 );
-			indexMapping.localDate.write( document, LocalDate.of( 2018, 1, 1 ) );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 0, 1 ) );
+			document.addValue( indexMapping.string, "text 1" );
+			document.addValue( indexMapping.string_analyzed, "text 1" );
+			document.addValue( indexMapping.integer, 1 );
+			document.addValue( indexMapping.localDate, LocalDate.of( 2018, 1, 1 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 0, 1 ) );
 
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "text 1_1" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 101 );
-			flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "text 1_2" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 102 );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 1_1" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 101 );
+			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 1_2" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 102 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "text 1_1" );
-			indexMapping.nestedObject.integer.write( nestedObject, 101 );
-			nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "text 1_2" );
-			indexMapping.nestedObject.integer.write( nestedObject, 102 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "text 1_1" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 101 );
+			nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "text 1_2" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 102 );
 		} );
 
 		workPlan.add( referenceProvider( "2" ), document -> {
-			indexMapping.string.write( document, "text 2" );
-			indexMapping.string_analyzed.write( document, "text 2" );
-			indexMapping.integer.write( document, 2 );
-			indexMapping.localDate.write( document, LocalDate.of( 2018, 1, 2 ) );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 0, 2 ) );
+			document.addValue( indexMapping.string, "text 2" );
+			document.addValue( indexMapping.string_analyzed, "text 2" );
+			document.addValue( indexMapping.integer, 2 );
+			document.addValue( indexMapping.localDate, LocalDate.of( 2018, 1, 2 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 0, 2 ) );
 
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "text 2_1" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 201 );
-			flattenedObject = indexMapping.flattenedObject.self.add( document );
-			indexMapping.flattenedObject.string.write( flattenedObject, "text 2_2" );
-			indexMapping.flattenedObject.integer.write( flattenedObject, 202 );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 2_1" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 201 );
+			flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+			flattenedObject.addValue( indexMapping.flattenedObject.string, "text 2_2" );
+			flattenedObject.addValue( indexMapping.flattenedObject.integer, 202 );
 
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "text 2_1" );
-			indexMapping.nestedObject.integer.write( nestedObject, 201 );
-			nestedObject = indexMapping.nestedObject.self.add( document );
-			indexMapping.nestedObject.string.write( nestedObject, "text 2_2" );
-			indexMapping.nestedObject.integer.write( nestedObject, 202 );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "text 2_1" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 201 );
+			nestedObject = document.addObject( indexMapping.nestedObject.self );
+			nestedObject.addValue( indexMapping.nestedObject.string, "text 2_2" );
+			nestedObject.addValue( indexMapping.nestedObject.integer, 202 );
 		} );
 
 		workPlan.add( referenceProvider( "3" ), document -> {
-			indexMapping.string.write( document, "text 3" );
-			indexMapping.string_analyzed.write( document, "text 3" );
-			indexMapping.integer.write( document, 3 );
+			document.addValue( indexMapping.string, "text 3" );
+			document.addValue( indexMapping.string_analyzed, "text 3" );
+			document.addValue( indexMapping.integer, 3 );
 		} );
 
 		workPlan.add( referenceProvider( "neverMatching" ), document -> {
-			indexMapping.string.write( document, "never matching" );
-			indexMapping.string_analyzed.write( document, "never matching" );
-			indexMapping.integer.write( document, 9484 );
+			document.addValue( indexMapping.string, "never matching" );
+			document.addValue( indexMapping.string_analyzed, "never matching" );
+			document.addValue( indexMapping.integer, 9484 );
 		} );
 
 		workPlan.add( referenceProvider( "empty" ), document -> { } );

@@ -542,11 +542,11 @@ public class FieldSearchProjectionIT {
 			indexMapping.string1Field.document1Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document1Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
@@ -556,11 +556,11 @@ public class FieldSearchProjectionIT {
 			indexMapping.string1Field.document2Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document2Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
@@ -570,11 +570,11 @@ public class FieldSearchProjectionIT {
 			indexMapping.string1Field.document3Value.write( document );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = indexMapping.flattenedObject.self.add( document );
+			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			indexMapping.flattenedObject.supportedFieldModels.forEach( f -> f.document3Value.write( flattenedObject ) );
 
 			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = indexMapping.nestedObject.self.add( document );
+			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY ), document -> { } );
@@ -732,7 +732,7 @@ public class FieldSearchProjectionIT {
 		}
 
 		public void write(DocumentElement target) {
-			reference.write( target, indexedValue );
+			target.addValue( reference, indexedValue );
 		}
 	}
 

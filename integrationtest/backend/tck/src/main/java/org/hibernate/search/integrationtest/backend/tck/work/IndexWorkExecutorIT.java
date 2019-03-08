@@ -121,7 +121,7 @@ public class IndexWorkExecutorIT {
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
 			tasks[i] = documentWorkExecutor.add( referenceProvider( id ), document -> {
-				indexMapping.title.write( document, "The Lord of the Rings cap. " + id );
+				document.addValue( indexMapping.title, "The Lord of the Rings cap. " + id );
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();

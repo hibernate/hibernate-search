@@ -303,8 +303,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement objectField = firstBridgeObjectFieldReference.add( target );
-			valueFieldReference.write( objectField, valueSourcePropertyAccessor.read( source ) );
+			DocumentElement objectField = target.addObject( firstBridgeObjectFieldReference );
+			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( source ) );
 		}
 	}
 
@@ -333,8 +333,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement objectField = secondBridgeObjectFieldReference.add( target );
-			valueFieldReference.write( objectField, valueSourcePropertyAccessor.read( source ) );
+			DocumentElement objectField = target.addObject( secondBridgeObjectFieldReference );
+			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( source ) );
 		}
 	}
 }

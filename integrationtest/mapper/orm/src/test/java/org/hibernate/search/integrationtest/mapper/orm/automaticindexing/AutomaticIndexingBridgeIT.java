@@ -748,11 +748,11 @@ public class AutomaticIndexingBridgeIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			DocumentElement typeBridgeObjectField = typeBridgeObjectFieldReference.add( target );
-			directFieldReference.write( typeBridgeObjectField, directFieldSourceAccessor.read( source ) );
-			DocumentElement childObjectField = childObjectFieldReference.add( typeBridgeObjectField );
-			includedInTypeBridgeFieldReference.write(
-					childObjectField, includedInTypeBridgeFieldSourceAccessor.read( source )
+			DocumentElement typeBridgeObjectField = target.addObject( typeBridgeObjectFieldReference );
+			typeBridgeObjectField.addValue( directFieldReference, directFieldSourceAccessor.read( source ) );
+			DocumentElement childObjectField = typeBridgeObjectField.addObject( childObjectFieldReference );
+			childObjectField.addValue(
+					includedInTypeBridgeFieldReference, includedInTypeBridgeFieldSourceAccessor.read( source )
 			);
 		}
 	}
@@ -785,9 +785,9 @@ public class AutomaticIndexingBridgeIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
-			DocumentElement propertyBridgeObjectField = propertyBridgeObjectFieldReference.add( target );
-			includedInPropertyBridgeFieldReference.write(
-					propertyBridgeObjectField, includedInPropertyBridgeSourceAccessor.read( source )
+			DocumentElement propertyBridgeObjectField = target.addObject( propertyBridgeObjectFieldReference );
+			propertyBridgeObjectField.addValue(
+					includedInPropertyBridgeFieldReference, includedInPropertyBridgeSourceAccessor.read( source )
 			);
 		}
 	}

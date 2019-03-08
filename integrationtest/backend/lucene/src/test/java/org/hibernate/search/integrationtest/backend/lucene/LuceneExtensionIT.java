@@ -450,7 +450,7 @@ public class LuceneExtensionIT {
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
 				() -> workPlan.add( referenceProvider( FIRST_ID ), document -> {
-					indexMapping.nativeField_invalidFieldPath.write( document, 45 );
+					document.addValue( indexMapping.nativeField_invalidFieldPath, 45 );
 				} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -496,55 +496,55 @@ public class LuceneExtensionIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexMapping.string.write( document, "text 1" );
+			document.addValue( indexMapping.string, "text 1" );
 
-			indexMapping.nativeField.write( document, 37 );
-			indexMapping.nativeField_unsupportedProjection.write( document, 37 );
+			document.addValue( indexMapping.nativeField, 37 );
+			document.addValue( indexMapping.nativeField_unsupportedProjection, 37 );
 
-			indexMapping.sort1.write( document, "a" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "z" );
+			document.addValue( indexMapping.sort1, "a" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "z" );
 		} );
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexMapping.integer.write( document, 2 );
+			document.addValue( indexMapping.integer, 2 );
 
-			indexMapping.nativeField.write( document, 78 );
-			indexMapping.nativeField_unsupportedProjection.write( document, 78 );
+			document.addValue( indexMapping.nativeField, 78 );
+			document.addValue( indexMapping.nativeField_unsupportedProjection, 78 );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "a" );
-			indexMapping.sort3.write( document, "z" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "a" );
+			document.addValue( indexMapping.sort3, "z" );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexMapping.geoPoint.write( document, GeoPoint.of( 40.12, -71.34 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
 
-			indexMapping.nativeField.write( document, 13 );
-			indexMapping.nativeField_unsupportedProjection.write( document, 13 );
+			document.addValue( indexMapping.nativeField, 13 );
+			document.addValue( indexMapping.nativeField_unsupportedProjection, 13 );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "a" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "a" );
 		} );
 		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
-			indexMapping.nativeField.write( document, 89 );
-			indexMapping.nativeField_unsupportedProjection.write( document, 89 );
+			document.addValue( indexMapping.nativeField, 89 );
+			document.addValue( indexMapping.nativeField_unsupportedProjection, 89 );
 
-			indexMapping.sort1.write( document, "z" );
-			indexMapping.sort2.write( document, "z" );
-			indexMapping.sort3.write( document, "z" );
+			document.addValue( indexMapping.sort1, "z" );
+			document.addValue( indexMapping.sort2, "z" );
+			document.addValue( indexMapping.sort3, "z" );
 		} );
 		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			indexMapping.string.write( document, "text 2" );
-			indexMapping.integer.write( document, 1 );
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.12, -75.34 ) );
+			document.addValue( indexMapping.string, "text 2" );
+			document.addValue( indexMapping.integer, 1 );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.12, -75.34 ) );
 
-			indexMapping.nativeField.write( document, 53 );
-			indexMapping.nativeField_unsupportedProjection.write( document, 53 );
+			document.addValue( indexMapping.nativeField, 53 );
+			document.addValue( indexMapping.nativeField_unsupportedProjection, 53 );
 
-			indexMapping.sort1.write( document, "zz" );
-			indexMapping.sort2.write( document, "zz" );
-			indexMapping.sort3.write( document, "zz" );
+			document.addValue( indexMapping.sort1, "zz" );
+			document.addValue( indexMapping.sort2, "zz" );
+			document.addValue( indexMapping.sort3, "zz" );
 		} );
 
 		workPlan.execute().join();

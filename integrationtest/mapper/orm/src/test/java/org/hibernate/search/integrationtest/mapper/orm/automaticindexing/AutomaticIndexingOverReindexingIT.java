@@ -326,8 +326,8 @@ public class AutomaticIndexingOverReindexingIT {
 
 		@Override
 		public void write(DocumentElement target, PojoElement source, TypeBridgeWriteContext context) {
-			property1FromBridgeFieldReference.write(
-					target,
+			target.addValue(
+					property1FromBridgeFieldReference,
 					level3Property1SourceAccessor.read( source )
 			);
 		}

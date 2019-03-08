@@ -65,31 +65,31 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	protected void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
-			indexMapping.string.write( document, OURSON_QUI_BOIT_STRING );
-			indexMapping.geoPoint.write( document, OURSON_QUI_BOIT_GEO_POINT );
-			indexMapping.geoPoint_1.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
+			document.addValue( indexMapping.string, OURSON_QUI_BOIT_STRING );
+			document.addValue( indexMapping.geoPoint, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 1 ) );
-			indexMapping.geoPoint_2.write( document, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
+			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 2,
 					OURSON_QUI_BOIT_GEO_POINT.getLongitude() - 2 ) );
-			indexMapping.geoPoint_with_longName.write( document, OURSON_QUI_BOIT_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
-			indexMapping.string.write( document, IMOUTO_STRING );
-			indexMapping.geoPoint.write( document, IMOUTO_GEO_POINT );
-			indexMapping.geoPoint_1.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
+			document.addValue( indexMapping.string, IMOUTO_STRING );
+			document.addValue( indexMapping.geoPoint, IMOUTO_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
 					IMOUTO_GEO_POINT.getLongitude() - 1 ) );
-			indexMapping.geoPoint_2.write( document, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
+			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 2,
 					IMOUTO_GEO_POINT.getLongitude() - 2 ) );
-			indexMapping.geoPoint_with_longName.write( document, IMOUTO_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_with_longName, IMOUTO_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
-			indexMapping.string.write( document, CHEZ_MARGOTTE_STRING );
-			indexMapping.geoPoint.write( document, CHEZ_MARGOTTE_GEO_POINT );
-			indexMapping.geoPoint_1.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
+			document.addValue( indexMapping.string, CHEZ_MARGOTTE_STRING );
+			document.addValue( indexMapping.geoPoint, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 1 ) );
-			indexMapping.geoPoint_2.write( document, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
+			document.addValue( indexMapping.geoPoint_2, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 2,
 					CHEZ_MARGOTTE_GEO_POINT.getLongitude() - 2 ) );
-			indexMapping.geoPoint_with_longName.write( document, CHEZ_MARGOTTE_GEO_POINT );
+			document.addValue( indexMapping.geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 

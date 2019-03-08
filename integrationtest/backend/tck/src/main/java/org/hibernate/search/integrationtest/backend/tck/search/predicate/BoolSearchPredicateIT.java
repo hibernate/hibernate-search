@@ -989,25 +989,25 @@ public class BoolSearchPredicateIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			indexMapping.field1.write( document, FIELD1_VALUE1 );
-			indexMapping.field2.write( document, FIELD2_VALUE1 );
-			indexMapping.field3.write( document, FIELD3_VALUE1 );
-			indexMapping.field4.write( document, FIELD4_VALUE1AND2 );
-			indexMapping.field5.write( document, FIELD5_VALUE1AND2 );
+			document.addValue( indexMapping.field1, FIELD1_VALUE1 );
+			document.addValue( indexMapping.field2, FIELD2_VALUE1 );
+			document.addValue( indexMapping.field3, FIELD3_VALUE1 );
+			document.addValue( indexMapping.field4, FIELD4_VALUE1AND2 );
+			document.addValue( indexMapping.field5, FIELD5_VALUE1AND2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			indexMapping.field1.write( document, FIELD1_VALUE2 );
-			indexMapping.field2.write( document, FIELD2_VALUE2 );
-			indexMapping.field3.write( document, FIELD3_VALUE2 );
-			indexMapping.field4.write( document, FIELD4_VALUE1AND2 );
-			indexMapping.field5.write( document, FIELD5_VALUE1AND2 );
+			document.addValue( indexMapping.field1, FIELD1_VALUE2 );
+			document.addValue( indexMapping.field2, FIELD2_VALUE2 );
+			document.addValue( indexMapping.field3, FIELD3_VALUE2 );
+			document.addValue( indexMapping.field4, FIELD4_VALUE1AND2 );
+			document.addValue( indexMapping.field5, FIELD5_VALUE1AND2 );
 		} );
 		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			indexMapping.field1.write( document, FIELD1_VALUE3 );
-			indexMapping.field2.write( document, FIELD2_VALUE3 );
-			indexMapping.field3.write( document, FIELD3_VALUE3 );
-			indexMapping.field4.write( document, FIELD4_VALUE3 );
-			indexMapping.field5.write( document, FIELD5_VALUE3 );
+			document.addValue( indexMapping.field1, FIELD1_VALUE3 );
+			document.addValue( indexMapping.field2, FIELD2_VALUE3 );
+			document.addValue( indexMapping.field3, FIELD3_VALUE3 );
+			document.addValue( indexMapping.field4, FIELD4_VALUE3 );
+			document.addValue( indexMapping.field5, FIELD5_VALUE3 );
 		} );
 
 		workPlan.execute().join();

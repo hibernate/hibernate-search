@@ -84,10 +84,10 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 			}
 		}
 
-		DocumentElement borrowalsObject = borrowalsObjectFieldReference.add( target );
-		shortTermBorrowalCountReference.write( borrowalsObject, shortTermBorrowalCount );
-		longTermBorrowalCountReference.write( borrowalsObject, longTermBorrowalCount );
-		totalBorrowalCountReference.write( borrowalsObject, borrowals.size() );
+		DocumentElement borrowalsObject = target.addObject( borrowalsObjectFieldReference );
+		borrowalsObject.addValue( shortTermBorrowalCountReference, shortTermBorrowalCount );
+		borrowalsObject.addValue( longTermBorrowalCountReference, longTermBorrowalCount );
+		borrowalsObject.addValue( totalBorrowalCountReference, borrowals.size() );
 	}
 
 }

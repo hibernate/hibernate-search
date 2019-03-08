@@ -81,13 +81,13 @@ public class LuceneSearchSortIT {
 	private void initData() {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 		workPlan.add( referenceProvider( FIRST_ID ), document -> {
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7705687,4.835233 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7705687,4.835233 ) );
 		} );
 		workPlan.add( referenceProvider( SECOND_ID ), document -> {
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7541719, 4.8386221 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7541719, 4.8386221 ) );
 		} );
 		workPlan.add( referenceProvider( THIRD_ID ), document -> {
-			indexMapping.geoPoint.write( document, GeoPoint.of( 45.7530374, 4.8510299 ) );
+			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7530374, 4.8510299 ) );
 		} );
 		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
 

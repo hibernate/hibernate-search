@@ -69,7 +69,7 @@ public class ElasticsearchIndexingIT {
 		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
 
 		workPlan.add( referenceProvider( "1", routingKey ), document -> {
-			indexMapping.string.write( document, "text1" );
+			document.addValue( indexMapping.string, "text1" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
@@ -85,7 +85,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.verifyExpectationsMet();
 
 		workPlan.update( referenceProvider( "1", routingKey ), document -> {
-			indexMapping.string.write( document, "text2" );
+			document.addValue( indexMapping.string, "text2" );
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()

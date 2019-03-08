@@ -78,7 +78,7 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		if ( sourceValue != null ) {
 			String[] items = separatorPattern.split( sourceValue );
 			for ( String item : items ) {
-				valueFieldReference.write( target, item );
+				target.addValue( valueFieldReference, item );
 			}
 		}
 	}

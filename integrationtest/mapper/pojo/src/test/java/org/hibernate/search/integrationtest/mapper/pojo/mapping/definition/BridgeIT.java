@@ -101,7 +101,7 @@ public class BridgeIT {
 							@Override
 							public void write(DocumentElement target, PojoElement source,
 									TypeBridgeWriteContext context) {
-								indexFieldReference.write( target, pojoPropertyAccessor.read( source ) );
+								target.addValue( indexFieldReference, pojoPropertyAccessor.read( source ) );
 							}
 						} ) )
 		)
@@ -166,7 +166,7 @@ public class BridgeIT {
 							@Override
 							public void write(DocumentElement target, PojoElement source,
 									PropertyBridgeWriteContext context) {
-								indexFieldReference.write( target, pojoPropertyAccessor.read( source ) );
+								target.addValue( indexFieldReference, pojoPropertyAccessor.read( source ) );
 							}
 						} ) )
 		)

@@ -224,7 +224,7 @@ public class ContainedInThroughNonContainingIndexedType {
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			Integer value = sourceFieldAccessor.read( source );
-			indexFieldReference.write( target, value );
+			target.addValue( indexFieldReference, value );
 		}
 	}
 }

@@ -267,7 +267,7 @@ public class AnnotationMappingDiscoveryIT {
 		@Override
 		public void write(DocumentElement target, PojoElement source, PropertyBridgeWriteContext context) {
 			for ( IndexObjectFieldReference reference : objectFieldReferences ) {
-				reference.add( target );
+				target.addObject( reference );
 			}
 		}
 	}

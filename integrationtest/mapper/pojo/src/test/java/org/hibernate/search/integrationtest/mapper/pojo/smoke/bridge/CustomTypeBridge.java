@@ -79,9 +79,9 @@ public final class CustomTypeBridge implements TypeBridge {
 		String textSourceValue = textPropertyAccessor.read( source );
 		LocalDate localDateSourceValue = localDatePropertyAccessor.read( source );
 		if ( textSourceValue != null || localDateSourceValue != null ) {
-			DocumentElement object = objectFieldReference.add( target );
-			textFieldReference.write( object, textSourceValue );
-			localDateFieldReference.write( object, localDateSourceValue );
+			DocumentElement object = target.addObject( objectFieldReference );
+			object.addValue( textFieldReference, textSourceValue );
+			object.addValue( localDateFieldReference, localDateSourceValue );
 		}
 	}
 
