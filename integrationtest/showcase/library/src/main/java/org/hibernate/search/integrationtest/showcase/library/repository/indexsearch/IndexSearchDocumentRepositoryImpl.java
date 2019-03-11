@@ -40,8 +40,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.predicate( p -> p.matchAll() )
 				.toQuery();
 
-		query.setMaxResults( MAX_RESULT );
-		return query.fetchHits();
+		return query.fetchHits( MAX_RESULT, 0L );
 	}
 
 	@Override
@@ -78,10 +77,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.sort( b -> b.byField( "title_sort" ) )
 				.toQuery();
 
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.fetchHits();
+		return query.fetchHits( limit, offset );
 	}
 
 	@Override
@@ -140,10 +136,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.sort( b -> b.byScore() )
 				.toQuery();
 
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.fetchHits();
+		return query.fetchHits( limit, offset );
 	}
 
 	@Override

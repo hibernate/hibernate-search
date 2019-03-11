@@ -302,8 +302,6 @@ public class ProgrammaticMappingSmokeIT {
 					.asEntity()
 					.predicate( f -> f.matchAll() )
 					.toQuery();
-			query.setFirstResult( 3L );
-			query.setMaxResults( 2L );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
@@ -317,7 +315,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			List<ParentIndexedEntity> result = query.fetchHits();
+			List<ParentIndexedEntity> result = query.fetchHits( 2L, 3L );
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( result )
 					.containsExactly(

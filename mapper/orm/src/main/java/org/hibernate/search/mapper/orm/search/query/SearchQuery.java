@@ -22,7 +22,61 @@ public interface SearchQuery<T> {
 	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
 	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
 	 */
-	SearchResult<T> fetch();
+	default SearchResult<T> fetch() {
+		return fetch( (Long) null, null );
+	}
+
+	/**
+	 * Execute the query and return the {@link SearchResult}.
+	 *
+	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
+	 * @return The {@link SearchResult}.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default SearchResult<T> fetch(Long limit) {
+		return fetch( limit, null );
+	}
+
+	/**
+	 * Execute the query and return the {@link SearchResult}.
+	 *
+	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
+	 * @return The {@link SearchResult}.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default SearchResult<T> fetch(Integer limit) {
+		return fetch( limit == null ? null : limit.longValue(), null );
+	}
+
+	/**
+	 * Execute the query and return the {@link SearchResult}.
+	 *
+	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
+	 * @param offset The number of hits to skip before adding the hits to the {@link SearchResult}. {@code null} means no offset.
+	 * @return The {@link SearchResult}.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	SearchResult<T> fetch(Long limit, Long offset);
+
+	/**
+	 * Execute the query and return the {@link SearchResult}.
+	 *
+	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
+	 * @param offset The number of hits to skip before adding the hits to the {@link SearchResult}. {@code null} means no offset.
+	 * @return The {@link SearchResult}.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default SearchResult<T> fetch(Integer limit, Integer offset) {
+		return fetch( limit == null ? null : (long) limit, offset == null ? null : (long) offset );
+	}
 
 	/**
 	 * Execute the query and return the hits as a {@link List}.
@@ -32,7 +86,61 @@ public interface SearchQuery<T> {
 	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
 	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
 	 */
-	List<T> fetchHits();
+	default List<T> fetchHits() {
+		return fetchHits( (Long) null, null );
+	}
+
+	/**
+	 * Execute the query and return the hits as a {@link List}.
+	 *
+	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
+	 * @return The query hits.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default List<T> fetchHits(Long limit) {
+		return fetchHits( limit, null );
+	}
+
+	/**
+	 * Execute the query and return the hits as a {@link List}.
+	 *
+	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
+	 * @return The query hits.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default List<T> fetchHits(Integer limit) {
+		return fetchHits( limit == null ? null : limit.longValue(), null );
+	}
+
+	/**
+	 * Execute the query and return the hits as a {@link List}.
+	 *
+	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
+	 * @param offset The number of hits to skip. {@code null} means no offset. {@code null} means no offset.
+	 * @return The query hits.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	List<T> fetchHits(Long limit, Long offset);
+
+	/**
+	 * Execute the query and return the hits as a {@link List}.
+	 *
+	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
+	 * @param offset The number of hits to skip. {@code null} means no offset. {@code null} means no offset.
+	 * @return The query hits.
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
+	 */
+	default List<T> fetchHits(Integer limit, Integer offset) {
+		return fetchHits( limit == null ? null : (long) limit, offset == null ? null : (long) offset );
+	}
 
 	/**
 	 * Execute the query and return the hits as a single, optional element.
@@ -47,49 +155,12 @@ public interface SearchQuery<T> {
 	Optional<T> fetchSingleHit();
 
 	/**
-	 * Execute the query and retrieve the total hit count,
-	 * ignoring pagination settings ({@link #setMaxResults(Long)} and {@link #setFirstResult(Long)}).
+	 * Execute the query and return the total hit count.
 	 *
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
 	long fetchTotalHitCount();
-
-	/**
-	 * Set the maximum number of hits returned by this query.
-	 * <p>
-	 * The default is no limit.
-	 *
-	 * @param maxResults The maximum number of hits to return. Must be positive or zero; {@code null} resets to the default value.
-	 * @return {@code this} for method chaining.
-	 */
-	SearchQuery<T> setMaxResults(Long maxResults);
-
-	/**
-	 * @deprecated Pass a {@code long} value and use {@link #setMaxResults(Long)} instead.
-	 * @param maxResults The maximum number of hits to return. Must be positive or zero.
-	 * @return {@code this} for method chaining.
-	 */
-	@Deprecated
-	SearchQuery<T> setMaxResults(int maxResults);
-
-	/**
-	 * Set the offset of the first hit returned by this query.
-	 * <p>
-	 * The default offset is {@code 0}.
-	 *
-	 * @param firstResult The offset of the first hit. Must be positive or zero; {@code null} resets to the default value.
-	 * @return {@code this} for method chaining.
-	 */
-	SearchQuery<T> setFirstResult(Long firstResult);
-
-	/**
-	 * @deprecated Pass a {@code long} value and use {@link #setFirstResult(Long)} instead.
-	 * @param firstResult The offset of the first hit. Must be positive or zero.
-	 * @return {@code this} for method chaining.
-	 */
-	@Deprecated
-	SearchQuery<T> setFirstResult(int firstResult);
 
 	/**
 	 * Set the JDBC fetch size for this query.

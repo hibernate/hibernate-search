@@ -106,7 +106,7 @@ public class SearchQueryIT {
 	}
 
 	@Test
-	public void offsetAndLimit() {
+	public void fetch_offsetAndLimit() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
 
@@ -115,24 +115,51 @@ public class SearchQueryIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
-			query.setFirstResult( 2L );
-			query.setMaxResults( 3L );
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetch();
+			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
 					b -> b.offset( 2L )
 							.limit( 3L ),
-					StubSearchWorkBehavior.of(
-							0L
-					)
+					StubSearchWorkBehavior.empty() // Irrelevant
 			);
+			query.fetch( 3L, 2L );
+			backendMock.verifyExpectationsMet();
 
-			query.fetchHits();
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetch( (Long) null, null );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> b.limit( 4L ),
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetch( 4L );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetch( (Long) null );
+			backendMock.verifyExpectationsMet();
 		} );
 	}
 
 	@Test
-	public void offsetAndLimit_integer() {
+	public void fetchHits_offsetAndLimit() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
 
@@ -141,19 +168,91 @@ public class SearchQueryIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
-			query.setFirstResult( 2 );
-			query.setMaxResults( 3 );
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits();
+			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
 					b -> b.offset( 2L )
 							.limit( 3L ),
-					StubSearchWorkBehavior.of(
-							0L
-					)
+					StubSearchWorkBehavior.empty() // Irrelevant
 			);
+			query.fetchHits( 3L, 2L );
+			backendMock.verifyExpectationsMet();
 
-			query.fetchHits();
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( (Long) null, null );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> b.limit( 4L ),
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( 4L );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( (Long) null );
+			backendMock.verifyExpectationsMet();
+		} );
+	}
+
+	@Test
+	public void fetchHits_offsetAndLimit_integer() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.getSearchSession( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.asEntity()
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> b.offset( 2L )
+							.limit( 3L ),
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( 3, 2 );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( (Integer) null, null );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> b.limit( 4L ),
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( 4 );
+			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.empty() // Irrelevant
+			);
+			query.fetchHits( (Integer) null );
+			backendMock.verifyExpectationsMet();
 		} );
 	}
 

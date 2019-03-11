@@ -47,8 +47,8 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	private final MutableObjectLoadingOptions loadingOptions;
 
-	private Long firstResult;
-	private Long maxResults;
+	private Integer firstResult;
+	private Integer maxResults;
 
 	public HibernateOrmSearchQuery(IndexSearchQuery<R> delegate, SessionImplementor sessionImplementor,
 			MutableObjectLoadingOptions loadingOptions) {
@@ -87,10 +87,10 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public SearchResult<R> fetch() {
+	public SearchResult<R> fetch(Long limit, Long offset) {
 		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
 		try {
-			return doFetch();
+			return doFetch( limit, offset );
 		}
 		catch (QueryExecutionRequestException he) {
 			throw new IllegalStateException( he );
@@ -103,16 +103,16 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 		}
 	}
 
-	private SearchResult<R> doFetch() {
+	private SearchResult<R> doFetch(Long limit, Long offset) {
 		// TODO handle timeouts
-		final IndexSearchResult<R> results = delegate.fetch( maxResults, firstResult );
+		final IndexSearchResult<R> results = delegate.fetch( limit, offset );
 		// TODO apply the result transformer?
 		return new HibernateOrmSearchResult<>( results );
 	}
 
 	@Override
-	public List<R> fetchHits() {
-		return fetch().getHits();
+	public List<R> fetchHits(Long limit, Long offset) {
+		return fetch( limit, offset ).getHits();
 	}
 
 	@Override
@@ -137,28 +137,6 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public HibernateOrmSearchQuery<R> setMaxResults(Long maxResults) {
-		if ( maxResults != null && maxResults < 0L ) {
-			throw new IllegalArgumentException(
-					"Negative (" + maxResults + ") parameter passed in to setMaxResults"
-			);
-		}
-		this.maxResults = maxResults;
-		return this;
-	}
-
-	@Override
-	public HibernateOrmSearchQuery<R> setFirstResult(Long firstResult) {
-		if ( maxResults != null && firstResult < 0L ) {
-			throw new IllegalArgumentException(
-					"Negative (" + firstResult + ") parameter passed in to setFirstResult"
-			);
-		}
-		this.firstResult = firstResult;
-		return this;
-	}
-
-	@Override
 	public HibernateOrmSearchQuery<R> setFetchSize(int fetchSize) {
 		super.setFetchSize( fetchSize );
 		loadingOptions.setFetchSize( fetchSize );
@@ -169,9 +147,13 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	// Implementation of ORM/JPA query interfaces
 	//-------------------------------------------------------------
 
+	private SearchResult<R> fetchWithLimitAndOffsetFromSetters() {
+		return fetch( maxResults, firstResult );
+	}
+
 	@Override
 	public List<R> list() {
-		return fetch().getHits();
+		return fetchWithLimitAndOffsetFromSetters().getHits();
 	}
 
 	/**
@@ -199,23 +181,35 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public HibernateOrmSearchQuery<R> setMaxResults(int maxResult) {
-		return setMaxResults( (long) maxResult );
+	public HibernateOrmSearchQuery<R> setMaxResults(int maxResults) {
+		if ( maxResults < 0L ) {
+			throw new IllegalArgumentException(
+					"Negative (" + maxResults + ") parameter passed in to setMaxResults"
+			);
+		}
+		this.maxResults = maxResults;
+		return this;
+	}
+
+	@Override
+	public HibernateOrmSearchQuery<R> setFirstResult(int firstResult) {
+		if ( firstResult < 0 ) {
+			throw new IllegalArgumentException(
+					"Negative (" + firstResult + ") parameter passed in to setFirstResult"
+			);
+		}
+		this.firstResult = firstResult;
+		return this;
 	}
 
 	@Override
 	public int getMaxResults() {
-		return maxResults == null ? Integer.MAX_VALUE : maxResults.intValue();
-	}
-
-	@Override
-	public HibernateOrmSearchQuery<R> setFirstResult(int startPosition) {
-		return setFirstResult( (long) startPosition );
+		return maxResults == null ? Integer.MAX_VALUE : maxResults;
 	}
 
 	@Override
 	public int getFirstResult() {
-		return firstResult == null ? 0 : firstResult.intValue();
+		return firstResult == null ? 0 : firstResult;
 	}
 
 	@Override

@@ -367,8 +367,6 @@ public class AnnotationMappingSmokeIT {
 					.asReference()
 					.predicate( f -> f.matchAll() )
 					.toQuery();
-			query.setFirstResult( 3L );
-			query.setMaxResults( 2L );
 
 			backendMock.expectSearchReferences(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
@@ -382,7 +380,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			SearchResult<PojoReference> result = query.fetch();
+			SearchResult<PojoReference> result = query.fetch( 2, 3 );
 			assertThat( result.getHits() )
 					.containsExactly(
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
@@ -404,8 +402,6 @@ public class AnnotationMappingSmokeIT {
 					.asProjection( f -> f.field( "myTextField", String.class ) )
 					.predicate( f -> f.matchAll() )
 					.toQuery();
-			query.setFirstResult( 3L );
-			query.setMaxResults( 2L );
 
 			backendMock.expectSearchProjection(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
@@ -419,7 +415,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			SearchResult<String> result = query.fetch();
+			SearchResult<String> result = query.fetch( 2, 3 );
 			assertThat( result.getHits() )
 					.containsExactly(
 							"text1",

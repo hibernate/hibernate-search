@@ -51,10 +51,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 				} )
 				.toQuery();
 
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.fetchHits();
+		return query.fetchHits( limit, offset );
 	}
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, long offset, long limit) {
@@ -64,10 +61,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 				.sort( c -> c.byField( borrowalsCountField ).desc() )
 				.toQuery();
 
-		query.setFirstResult( offset );
-		query.setMaxResults( limit );
-
-		return query.fetchHits();
+		return query.fetchHits( limit, offset );
 	}
 
 }
