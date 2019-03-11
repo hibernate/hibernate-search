@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.search.query.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -34,14 +35,18 @@ import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.spi.IndexSearchResult;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableObjectLoadingOptions;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.mapper.orm.search.query.SearchResult;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
 public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> implements SearchQuery<R> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexSearchQuery<R> delegate;
 
@@ -133,7 +138,19 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	@Override
 	public Optional<R> fetchSingleHit() {
-		return Optional.ofNullable( uniqueResult() );
+		// We don't need to fetch more than two elements to detect a problem
+		SearchResult<R> result = fetch( 2L );
+		List<R> hits = result.getHits();
+		int fetchedHitCount = result.getHits().size();
+		if ( fetchedHitCount == 0 ) {
+			return Optional.empty();
+		}
+		else if ( fetchedHitCount > 1 ) {
+			throw log.nonSingleHit( result.getTotalHitCount() );
+		}
+		else {
+			return Optional.of( hits.get( 0 ) );
+		}
 	}
 
 	@Override
