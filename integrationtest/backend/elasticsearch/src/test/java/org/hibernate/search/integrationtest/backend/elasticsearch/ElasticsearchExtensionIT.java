@@ -260,7 +260,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.execute().getHits();
+		List<String> result = query.fetch().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		JSONAssert.assertEquals(
 				"{"
@@ -293,7 +293,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.execute().getHits().stream()
+		List<String> result = query.fetch().getHits().stream()
 				.map( list -> (String) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -319,7 +319,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<String> result = query.execute().getHits();
+		List<String> result = query.fetch().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.asString()

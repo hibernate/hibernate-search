@@ -41,7 +41,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		IndexSearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.fetch();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -64,7 +64,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		IndexSearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.fetch();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 0.430d, Offset.offset( 0.010d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1.300d, Offset.offset( 0.010d ) );
@@ -89,7 +89,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		IndexSearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.fetch();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -127,7 +127,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						.byDistance( "geoPoint", center )
 				)
 				.toQuery();
-		IndexSearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.fetch();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );
@@ -152,7 +152,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).onMissingValue().sortLast().asc() )
 				.toQuery();
-		IndexSearchResult<List<?>> results = query.execute();
+		IndexSearchResult<List<?>> results = query.fetch();
 
 		checkResult( results.getHits().get( 0 ), "Chez Margotte", 1, 430d, Offset.offset( 10d ) );
 		checkResult( results.getHits().get( 1 ), "Imouto", 1, 1300d, Offset.offset( 10d ) );

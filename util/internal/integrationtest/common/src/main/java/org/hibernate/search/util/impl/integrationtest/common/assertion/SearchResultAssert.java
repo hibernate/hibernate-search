@@ -26,7 +26,7 @@ import org.assertj.core.internal.Failures;
 public class SearchResultAssert<T> {
 
 	public static <T> SearchResultAssert<T> assertThat(IndexSearchQuery<? extends T> searchQuery) {
-		return SearchResultAssert.<T>assertThat( searchQuery.execute() ).fromQuery( searchQuery );
+		return SearchResultAssert.<T>assertThat( searchQuery.fetch() ).fromQuery( searchQuery );
 	}
 
 	public static <T> SearchResultAssert<T> assertThat(IndexSearchResult<? extends T> actual) {

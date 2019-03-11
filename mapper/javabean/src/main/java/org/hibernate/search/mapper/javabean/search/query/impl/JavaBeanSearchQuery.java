@@ -20,12 +20,12 @@ public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
 
 	@Override
 	public SearchResult<T> fetch() {
-		return new JavaBeanSearchResult( delegate.execute() );
+		return new JavaBeanSearchResult( delegate.fetch() );
 	}
 
 	@Override
 	public long fetchHitCount() {
-		return delegate.executeCount();
+		return delegate.fetchHitCount();
 	}
 
 	@Override

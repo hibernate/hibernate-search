@@ -51,14 +51,14 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public IndexSearchResult<T> execute() {
+	public IndexSearchResult<T> fetch() {
 		return backend.getBehavior().executeSearchWork(
 				indexNames, workBuilder.build(), convertContext, projectionHitMapper, rootProjection
 		);
 	}
 
 	@Override
-	public long executeCount() {
+	public long fetchHitCount() {
 		return backend.getBehavior().executeCountWork( indexNames );
 	}
 }

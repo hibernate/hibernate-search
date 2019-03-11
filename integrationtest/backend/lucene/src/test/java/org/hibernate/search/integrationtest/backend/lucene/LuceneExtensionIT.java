@@ -350,7 +350,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		List<Document> result = query.execute().getHits();
+		List<Document> result = query.fetch().getHits();
 		Assertions.assertThat( result )
 				.hasSize( 5 )
 				.satisfies( containsDocument(
@@ -413,7 +413,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<Document> result = query.execute().getHits().stream()
+		List<Document> result = query.fetch().getHits().stream()
 				.map( list -> (Document) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result )
@@ -436,7 +436,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<Explanation> result = query.execute().getHits();
+		List<Explanation> result = query.fetch().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) ).isInstanceOf( Explanation.class );
 		Assertions.assertThat( result.get( 0 ).toString() )

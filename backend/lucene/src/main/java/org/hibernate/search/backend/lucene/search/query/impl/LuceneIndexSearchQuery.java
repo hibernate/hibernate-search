@@ -76,7 +76,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public IndexSearchResult<T> execute() {
+	public IndexSearchResult<T> fetch() {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
@@ -98,7 +98,7 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public long executeCount() {
+	public long fetchHitCount() {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
