@@ -15,48 +15,36 @@ import org.hibernate.query.Query;
 public interface SearchQuery<T> {
 
 	/**
-	 * Execute the query and retrieve the results as a {@link SearchResult}.
+	 * Execute the query and return the {@link SearchResult}.
 	 *
-	 * @return The results.
+	 * @return The {@link SearchResult}.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
-	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database.
-	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
 	 */
-	SearchResult<T> getResult();
+	SearchResult<T> fetch();
 
 	/**
-	 * Execute the query and retrieve the results as a {@link List}.
+	 * Execute the query and return the hits as a {@link List}.
 	 *
-	 * @return The results.
+	 * @return The query hits.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
-	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database.
-	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
 	 */
-	List<T> getResultList();
+	List<T> fetchHits();
 
 	/**
-	 * Execute the query and retrieve the results as a single element.
+	 * Execute the query and return the hits as a single, optional element.
 	 *
-	 * @return The result.
+	 * @return The single, optional query hit.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
-	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database,
-	 * or the number of results is not exactly one.
-	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database,
-	 * or the number of results is not exactly one.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database,
+	 * or the number of hits is more than one.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database,
+	 * or the number of hits is more than one.
 	 */
-	T getSingleResult();
-
-	/**
-	 * Execute the query and retrieve the results as a single, optional element.
-	 *
-	 * @return The result.
-	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
-	 * @throws org.hibernate.HibernateException If something goes wrong while fetching results from the database,
-	 * or the number of results is more than one.
-	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching results from the database,
-	 * or the number of results is more than one.
-	 */
-	Optional<T> getOptionalResult();
+	Optional<T> fetchSingleHit();
 
 	/**
 	 * Execute the query and retrieve the total hit count,
@@ -65,39 +53,39 @@ public interface SearchQuery<T> {
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	long getResultSize();
+	long fetchHitCount();
 
 	/**
-	 * Set the maximum number of results returned by this query.
+	 * Set the maximum number of hits returned by this query.
 	 * <p>
 	 * The default is no limit.
 	 *
-	 * @param maxResults The maximum number of results to return. Must be positive or zero; {@code null} resets to the default value.
+	 * @param maxResults The maximum number of hits to return. Must be positive or zero; {@code null} resets to the default value.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchQuery<T> setMaxResults(Long maxResults);
 
 	/**
 	 * @deprecated Pass a {@code long} value and use {@link #setMaxResults(Long)} instead.
-	 * @param maxResults The maximum number of results to return. Must be positive or zero.
+	 * @param maxResults The maximum number of hits to return. Must be positive or zero.
 	 * @return {@code this} for method chaining.
 	 */
 	@Deprecated
 	SearchQuery<T> setMaxResults(int maxResults);
 
 	/**
-	 * Set the offset of the first result returned by this query.
+	 * Set the offset of the first hit returned by this query.
 	 * <p>
 	 * The default offset is {@code 0}.
 	 *
-	 * @param firstResult The offset of the first result. Must be positive or zero; {@code null} resets to the default value.
+	 * @param firstResult The offset of the first hit. Must be positive or zero; {@code null} resets to the default value.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchQuery<T> setFirstResult(Long firstResult);
 
 	/**
 	 * @deprecated Pass a {@code long} value and use {@link #setFirstResult(Long)} instead.
-	 * @param firstResult The offset of the first result. Must be positive or zero.
+	 * @param firstResult The offset of the first hit. Must be positive or zero.
 	 * @return {@code this} for method chaining.
 	 */
 	@Deprecated

@@ -87,7 +87,7 @@ public class GettingStartedWithAnalysisIT {
 					)
 					.toQuery();
 
-			SearchResult<Book> result = query.getResult();
+			SearchResult<Book> result = query.fetch();
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching[]
 
@@ -107,7 +107,7 @@ public class GettingStartedWithAnalysisIT {
 								.matching( term )
 						)
 						.toQuery();
-				SearchResult<Book> result = query.getResult();
+				SearchResult<Book> result = query.fetch();
 				assertThat( result.getHits() ).as( "Result of searching for '" + term + "'" )
 						.extracting( "id" )
 						.containsExactlyInAnyOrder( bookIdHolder.get() );

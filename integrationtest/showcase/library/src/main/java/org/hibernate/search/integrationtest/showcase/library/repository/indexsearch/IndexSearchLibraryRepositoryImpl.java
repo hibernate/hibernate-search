@@ -39,6 +39,6 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
 
-		return query.getResultList();
+		return query.fetchHits();
 	}
 }

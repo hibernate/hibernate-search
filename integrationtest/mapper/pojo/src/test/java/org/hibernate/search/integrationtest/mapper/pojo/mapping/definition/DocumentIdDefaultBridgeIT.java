@@ -140,7 +140,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 						.predicate( f -> f.matchAll() )
 						.toQuery();
 
-				assertThat( query.getResult().getHits() )
+				assertThat( query.fetch().getHits() )
 						.containsExactly( new PojoReferenceImpl(
 								expectations.getTypeWithIdentifierBridge1(),
 								entityIdentifierValue

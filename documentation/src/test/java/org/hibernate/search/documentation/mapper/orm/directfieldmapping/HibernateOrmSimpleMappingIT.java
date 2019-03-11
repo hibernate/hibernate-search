@@ -112,7 +112,7 @@ public class HibernateOrmSimpleMappingIT {
 					)
 					.toQuery();
 
-			List<Book> result = query.getResultList();
+			List<Book> result = query.fetchHits();
 			// end::sort-simple-objects[]
 
 			assertThat( result )
@@ -132,7 +132,7 @@ public class HibernateOrmSimpleMappingIT {
 					)
 					.toQuery();
 
-			List<Book> result = query.getResultList(); // <3>
+			List<Book> result = query.fetchHits(); // <3>
 			// end::sort-simple-lambdas[]
 
 			assertThat( result )
@@ -154,7 +154,7 @@ public class HibernateOrmSimpleMappingIT {
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.toQuery();
 
-			List<String> result = query.getResultList();
+			List<String> result = query.fetchHits();
 			// end::projection-simple-objects[]
 
 			assertThat( result )
@@ -170,7 +170,7 @@ public class HibernateOrmSimpleMappingIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
-			List<String> result = query.getResultList(); // <3>
+			List<String> result = query.fetchHits(); // <3>
 			// end::projection-simple-lambdas[]
 
 			assertThat( result )
@@ -193,7 +193,7 @@ public class HibernateOrmSimpleMappingIT {
 					.predicate( f -> f.matchAll() )
 					.toQuery();
 
-			List<MyEntityAndScoreBean<Book>> result = query.getResultList();
+			List<MyEntityAndScoreBean<Book>> result = query.fetchHits();
 			// end::projection-advanced[]
 
 			assertThat( result )

@@ -114,11 +114,11 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery(); // <6>
 
-			SearchResult<Book> result = query.getResult(); // <7>
+			SearchResult<Book> result = query.fetch(); // <7>
 			long totalHitCount = result.getHitCount(); // <8>
 			List<Book> hits = result.getHits(); // <9>
 
-			List<Book> hits2 = query.getResultList(); // <10>
+			List<Book> hits2 = query.fetchHits(); // <10>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-objects[]
 
@@ -139,11 +139,11 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery(); // <5>
 
-			SearchResult<Book> result = query.getResult(); // <6>
+			SearchResult<Book> result = query.fetch(); // <6>
 			long totalHitCount = result.getHitCount(); // <7>
 			List<Book> hits = result.getHits(); // <8>
 
-			List<Book> hits2 = query.getResultList(); // <9>
+			List<Book> hits2 = query.fetchHits(); // <9>
 			// Not shown: commit the transaction and close the entity manager
 			// end::searching-lambdas[]
 
@@ -164,7 +164,7 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery();
 
-			long resultSize = query.getResultSize(); // <1>
+			long resultSize = query.fetchHitCount(); // <1>
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
 

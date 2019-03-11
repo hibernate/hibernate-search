@@ -87,10 +87,10 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public SearchResult<R> getResult() {
+	public SearchResult<R> fetch() {
 		// Reproduce the behavior of AbstractProducedQuery.list() regarding exceptions
 		try {
-			return doExecute();
+			return doFetch();
 		}
 		catch (QueryExecutionRequestException he) {
 			throw new IllegalStateException( he );
@@ -103,7 +103,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 		}
 	}
 
-	private SearchResult<R> doExecute() {
+	private SearchResult<R> doFetch() {
 		// TODO handle timeouts
 		final IndexSearchResult<R> results = delegate.execute();
 		// TODO apply the result transformer?
@@ -111,12 +111,12 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public List<R> getResultList() {
-		return getResult().getHits();
+	public List<R> fetchHits() {
+		return fetch().getHits();
 	}
 
 	@Override
-	public long getResultSize() {
+	public long fetchHitCount() {
 		try {
 			return delegate.executeCount();
 		}
@@ -132,12 +132,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public R getSingleResult() {
-		return super.getSingleResult();
-	}
-
-	@Override
-	public Optional<R> getOptionalResult() {
+	public Optional<R> fetchSingleHit() {
 		return Optional.ofNullable( uniqueResult() );
 	}
 
@@ -178,7 +173,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	@Override
 	public List<R> list() {
-		return getResult().getHits();
+		return fetch().getHits();
 	}
 
 	/**
