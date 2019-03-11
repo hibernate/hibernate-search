@@ -14,33 +14,18 @@ public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
 
 	private final IndexSearchQuery<T> delegate;
 
-	private Long firstResultIndex;
-	private Long maxResultsCount;
-
 	public JavaBeanSearchQuery(IndexSearchQuery<T> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchResult<T> fetch() {
-		return new JavaBeanSearchResult( delegate.fetch( maxResultsCount, firstResultIndex ) );
+	public SearchResult<T> fetch(Long limit, Long offset) {
+		return new JavaBeanSearchResult<>( delegate.fetch( limit, offset ) );
 	}
 
 	@Override
 	public long fetchTotalHitCount() {
 		return delegate.fetchTotalHitCount();
-	}
-
-	@Override
-	public JavaBeanSearchQuery<T> setFirstResult(Long firstResultIndex) {
-		this.firstResultIndex = firstResultIndex;
-		return this;
-	}
-
-	@Override
-	public JavaBeanSearchQuery<T> setMaxResults(Long maxResultsCount) {
-		this.maxResultsCount = maxResultsCount;
-		return this;
 	}
 
 	@Override
