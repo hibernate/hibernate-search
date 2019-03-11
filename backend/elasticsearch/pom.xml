@@ -101,6 +101,9 @@
     <profiles>
         <profile>
             <id>module-descriptors</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
