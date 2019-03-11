@@ -382,7 +382,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			SearchResult<PojoReference> result = query.getResult();
+			SearchResult<PojoReference> result = query.fetch();
 			assertThat( result.getHits() )
 					.containsExactly(
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
@@ -419,7 +419,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			SearchResult<String> result = query.getResult();
+			SearchResult<String> result = query.fetch();
 			assertThat( result.getHits() )
 					.containsExactly(
 							"text1",
@@ -471,7 +471,7 @@ public class AnnotationMappingSmokeIT {
 					)
 			);
 
-			SearchResult<List<?>> result = query.getResult();
+			SearchResult<List<?>> result = query.fetch();
 			assertThat( result.getHits() )
 					.containsExactly(
 							Arrays.asList(

@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.NoResultException;
 import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
@@ -98,7 +97,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			Assertions.assertThat( query.getResultList() ).containsExactly(
+			Assertions.assertThat( query.fetchHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
@@ -128,7 +127,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			query.getResultList();
+			query.fetchHits();
 		} );
 	}
 
@@ -154,12 +153,12 @@ public class SearchQueryIT {
 					)
 			);
 
-			query.getResultList();
+			query.fetchHits();
 		} );
 	}
 
 	@Test
-	public void getResult() {
+	public void fetch() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
 
@@ -179,7 +178,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			SearchResult<Book> result = query.getResult();
+			SearchResult<Book> result = query.fetch();
 			Assertions.assertThat( result.getHits() ).containsExactly(
 					session.load( Book.class, 1 ),
 					session.load( Book.class, 2 ),
@@ -190,7 +189,7 @@ public class SearchQueryIT {
 	}
 
 	@Test
-	public void getResultSize() {
+	public void fetchCount() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
 
@@ -200,12 +199,12 @@ public class SearchQueryIT {
 					.toQuery();
 
 			backendMock.expectCount( Arrays.asList( Book.INDEX ), 6L );
-			Assertions.assertThat( query.getResultSize() ).isEqualTo( 6L );
+			Assertions.assertThat( query.fetchHitCount() ).isEqualTo( 6L );
 		} );
 	}
 
 	@Test
-	public void getSingleResult() {
+	public void fetchSingleHit() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.getSearchSession( session );
 
@@ -222,61 +221,7 @@ public class SearchQueryIT {
 							reference( Book.INDEX, "1" )
 					)
 			);
-			Book result = query.getSingleResult();
-			backendMock.verifyExpectationsMet();
-			assertThat( result )
-					.isEqualTo( session.load( Book.class, 1 ) );
-
-			backendMock.expectSearchObjects(
-					Arrays.asList( Book.INDEX ),
-					b -> { },
-					StubSearchWorkBehavior.empty()
-			);
-			SubTest.expectException( () -> {
-				query.getSingleResult();
-			} )
-					.assertThrown()
-					.isInstanceOf( NoResultException.class );
-			backendMock.verifyExpectationsMet();
-
-			backendMock.expectSearchObjects(
-					Arrays.asList( Book.INDEX ),
-					b -> { },
-					StubSearchWorkBehavior.of(
-							2L,
-							reference( Book.INDEX, "1" ),
-							reference( Book.INDEX, "2" )
-					)
-			);
-			SubTest.expectException( () -> {
-				query.getSingleResult();
-			} )
-					.assertThrown()
-					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
-					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
-			backendMock.verifyExpectationsMet();
-		} );
-	}
-
-	@Test
-	public void getOptionalResult() {
-		OrmUtils.withinSession( sessionFactory, session -> {
-			SearchSession searchSession = Search.getSearchSession( session );
-
-			SearchQuery<Book> query = searchSession.search( Book.class )
-					.asEntity()
-					.predicate( f -> f.matchAll() )
-					.toQuery();
-
-			backendMock.expectSearchObjects(
-					Arrays.asList( Book.INDEX ),
-					b -> { },
-					StubSearchWorkBehavior.of(
-							1L,
-							reference( Book.INDEX, "1" )
-					)
-			);
-			Optional<Book> result = query.getOptionalResult();
+			Optional<Book> result = query.fetchSingleHit();
 			backendMock.verifyExpectationsMet();
 			assertThat( result ).contains( session.load( Book.class, 1 ) );
 
@@ -285,7 +230,7 @@ public class SearchQueryIT {
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
-			result = query.getOptionalResult();
+			result = query.fetchSingleHit();
 			backendMock.verifyExpectationsMet();
 			assertThat( result ).isEmpty();
 
@@ -299,7 +244,7 @@ public class SearchQueryIT {
 					)
 			);
 			SubTest.expectException( () -> {
-				query.getOptionalResult();
+				query.fetchSingleHit();
 			} )
 					.assertThrown()
 					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
@@ -333,7 +278,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			Assertions.assertThat( query.getResultList() ).containsExactly(
+			Assertions.assertThat( query.fetchHits() ).containsExactly(
 					TITLE_4_3_2_1,
 					TITLE_CIDER_HOUSE,
 					TITLE_AVENUE_OF_MYSTERIES
@@ -384,7 +329,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			Assertions.assertThat( query.getResultList() ).containsExactly(
+			Assertions.assertThat( query.fetchHits() ).containsExactly(
 					Arrays.asList(
 							TITLE_4_3_2_1,
 							new PojoReferenceImpl( Book.class, 1 ),
@@ -447,7 +392,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			Assertions.assertThat( query.getResultList() ).containsExactlyInAnyOrder(
+			Assertions.assertThat( query.fetchHits() ).containsExactlyInAnyOrder(
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.get( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
@@ -495,7 +440,7 @@ public class SearchQueryIT {
 					)
 			);
 
-			Assertions.assertThat( query.getResultList() ).containsExactlyInAnyOrder(
+			Assertions.assertThat( query.fetchHits() ).containsExactlyInAnyOrder(
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )

@@ -12,38 +12,38 @@ package org.hibernate.search.mapper.javabean.search.query;
 public interface SearchQuery<T> {
 
 	/**
-	 * Execute the query and retrieve the results as a {@link SearchResult}.
+	 * Execute the query and return the {@link SearchResult}.
 	 *
-	 * @return The results.
+	 * @return The {@link SearchResult}.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	SearchResult<T> getResult();
+	SearchResult<T> fetch();
 
 	/**
-	 * Execute the query and retrieve the total hit count,
+	 * Execute the query and return the total hit count,
 	 * ignoring pagination settings ({@link #setMaxResults(Long)} and {@link #setFirstResult(Long)}).
 	 *
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	long getResultSize();
+	long fetchHitCount();
 
 	/**
-	 * Set the maximum number of results returned by this query.
+	 * Set the maximum number of hits returned by this query.
 	 * <p>
 	 * The default is no limit.
 	 *
-	 * @param maxResults The maximum number of results to return. Must be positive or zero; {@code null} resets to the default.
+	 * @param maxResults The maximum number of hits to return. Must be positive or zero; {@code null} resets to the default.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchQuery<T> setMaxResults(Long maxResults);
 
 	/**
-	 * Set the offset of the first result returned by this query.
+	 * Set the offset of the first hit returned by this query.
 	 * <p>
 	 * The default offset is {@code 0}.
 	 *
-	 * @param firstResultIndex The offset of the first result. Must be positive or zero; {@code null} resets to the default.
+	 * @param firstResultIndex The offset of the first hit. Must be positive or zero; {@code null} resets to the default.
 	 * @return {@code this} for method chaining.
 	 */
 	SearchQuery<T> setFirstResult(Long firstResultIndex);

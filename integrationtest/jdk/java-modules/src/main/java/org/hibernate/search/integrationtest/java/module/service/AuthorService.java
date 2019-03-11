@@ -65,7 +65,7 @@ public class AuthorService implements AutoCloseable {
 					.predicate( p -> p.match().onField( "name" ).matching( term ) )
 					.toQuery();
 
-			return query.getResultList();
+			return query.fetchHits();
 		}
 	}
 

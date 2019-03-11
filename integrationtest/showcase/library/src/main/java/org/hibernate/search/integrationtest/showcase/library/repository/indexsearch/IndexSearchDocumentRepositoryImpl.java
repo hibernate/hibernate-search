@@ -41,7 +41,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.toQuery();
 
 		query.setMaxResults( MAX_RESULT );
-		return query.getResultList();
+		return query.fetchHits();
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
 						.toQuery();
 
-		return query.getOptionalResult();
+		return query.fetchSingleHit();
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
 
-		return query.getResultList();
+		return query.fetchHits();
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		query.setFirstResult( offset );
 		query.setMaxResults( limit );
 
-		return query.getResultList();
+		return query.fetchHits();
 	}
 
 	@Override
@@ -158,6 +158,6 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				.sort( b -> b.byField( "author" ).order( order ) )
 				.toQuery();
 
-		return query.getResultList();
+		return query.fetchHits();
 	}
 }

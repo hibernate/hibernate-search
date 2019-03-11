@@ -317,7 +317,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			List<ParentIndexedEntity> result = query.getResultList();
+			List<ParentIndexedEntity> result = query.fetchHits();
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( result )
 					.containsExactly(
@@ -327,7 +327,7 @@ public class ProgrammaticMappingSmokeIT {
 
 			backendMock.expectCount( Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 6L );
 
-			long resultSize = query.getResultSize();
+			long resultSize = query.fetchHitCount();
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( resultSize ).isEqualTo( 6L );
 		} );
