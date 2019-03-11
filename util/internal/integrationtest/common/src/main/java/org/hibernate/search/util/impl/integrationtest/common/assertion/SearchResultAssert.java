@@ -52,8 +52,8 @@ public class SearchResultAssert<T> {
 		return this;
 	}
 
-	public SearchResultAssert<T> hasHitCount(long expected) {
-		Assertions.assertThat( actual.getHitCount() )
+	public SearchResultAssert<T> hasTotalHitCount(long expected) {
+		Assertions.assertThat( actual.getTotalHitCount() )
 				.as( "Total hit count of " + queryDescription )
 				.isEqualTo( expected );
 		return this;

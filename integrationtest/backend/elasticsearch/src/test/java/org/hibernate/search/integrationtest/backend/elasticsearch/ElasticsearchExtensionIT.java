@@ -112,7 +112,7 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
-				.hasHitCount( 4 );
+				.hasTotalHitCount( 4 );
 	}
 
 	@Test
@@ -152,7 +152,7 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
-				.hasHitCount( 4 );
+				.hasTotalHitCount( 4 );
 	}
 
 	@Test

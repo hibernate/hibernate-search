@@ -95,7 +95,7 @@ public class SearchProjectionIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		assertThat( query ).hasHitCount( 4 );
+		assertThat( query ).hasTotalHitCount( 4 );
 	}
 
 	@Test
@@ -225,7 +225,7 @@ public class SearchProjectionIT {
 				.toQuery();
 
 		IndexSearchResult<Float> result = query.fetch();
-		assertThat( result ).hasHitCount( 2 );
+		assertThat( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );
 		Float score2 = result.getHits().get( 1 );

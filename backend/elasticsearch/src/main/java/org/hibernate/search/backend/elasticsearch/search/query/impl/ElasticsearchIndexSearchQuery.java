@@ -93,7 +93,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public long fetchHitCount() {
+	public long fetchTotalHitCount() {
 		JsonObject filteredPayload = new JsonObject();
 		Optional<JsonObject> querySubTree = JsonAccessor.root().property( "query" ).asObject().get( payload );
 		if ( querySubTree.isPresent() ) {

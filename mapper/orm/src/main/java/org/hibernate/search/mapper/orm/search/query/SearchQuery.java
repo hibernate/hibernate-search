@@ -53,7 +53,7 @@ public interface SearchQuery<T> {
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
 	 */
-	long fetchHitCount();
+	long fetchTotalHitCount();
 
 	/**
 	 * Set the maximum number of hits returned by this query.

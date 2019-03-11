@@ -329,7 +329,7 @@ public class AnnotationMappingSmokeIT {
 
 			backendMock.expectCount( Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 6L );
 
-			long resultSize = query.fetchHitCount();
+			long resultSize = query.fetchTotalHitCount();
 			backendMock.verifyExpectationsMet();
 			Assertions.assertThat( resultSize ).isEqualTo( 6L );
 		} );

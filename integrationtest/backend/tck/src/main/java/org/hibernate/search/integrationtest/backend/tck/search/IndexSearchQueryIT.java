@@ -73,7 +73,7 @@ public class IndexSearchQueryIT {
 		query.setFirstResult( 1L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
@@ -85,7 +85,7 @@ public class IndexSearchQueryIT {
 		query.setMaxResults( 1L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query = scope.query()
@@ -96,7 +96,7 @@ public class IndexSearchQueryIT {
 		query.setMaxResults( 2L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = scope.query()
@@ -108,7 +108,7 @@ public class IndexSearchQueryIT {
 		query.setMaxResults( null );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
@@ -124,21 +124,21 @@ public class IndexSearchQueryIT {
 		query.setFirstResult( 1L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query.setFirstResult( 1L );
 		query.setMaxResults( 1L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
 		query.setFirstResult( null );
 		query.setMaxResults( 2L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = scope.query()
@@ -150,7 +150,7 @@ public class IndexSearchQueryIT {
 		query.setMaxResults( null );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
@@ -167,7 +167,7 @@ public class IndexSearchQueryIT {
 		query.setMaxResults( 0L );
 
 		assertThat( query )
-				.hasHitCount( 3 )
+				.hasTotalHitCount( 3 )
 				.hasNoHits();
 	}
 

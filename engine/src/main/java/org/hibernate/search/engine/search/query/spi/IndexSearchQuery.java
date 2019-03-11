@@ -13,7 +13,7 @@ public interface IndexSearchQuery<T> {
 
 	IndexSearchResult<T> fetch();
 
-	long fetchHitCount();
+	long fetchTotalHitCount();
 
 	void setFirstResult(Long firstResultIndex);
 

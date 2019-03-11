@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface IndexSearchResult<T> {
 
-	long getHitCount();
+	long getTotalHitCount();
 
 	List<T> getHits();
 

@@ -184,7 +184,7 @@ public class SearchQueryIT {
 					session.load( Book.class, 2 ),
 					session.load( Book.class, 3 )
 			);
-			Assertions.assertThat( result.getHitCount() ).isEqualTo( 3L );
+			Assertions.assertThat( result.getTotalHitCount() ).isEqualTo( 3L );
 		} );
 	}
 
@@ -199,7 +199,7 @@ public class SearchQueryIT {
 					.toQuery();
 
 			backendMock.expectCount( Arrays.asList( Book.INDEX ), 6L );
-			Assertions.assertThat( query.fetchHitCount() ).isEqualTo( 6L );
+			Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( 6L );
 		} );
 	}
 

@@ -133,7 +133,7 @@ public class IndexWorkExecutorIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		Assertions.assertThat( query.fetchHitCount() ).isEqualTo( bookNumber );
+		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );
 	}
 
 	private static class IndexAccessors {

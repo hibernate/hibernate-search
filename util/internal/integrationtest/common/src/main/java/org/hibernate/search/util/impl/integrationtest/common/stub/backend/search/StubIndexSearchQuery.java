@@ -58,7 +58,7 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public long fetchHitCount() {
+	public long fetchTotalHitCount() {
 		return backend.getBehavior().executeCountWork( indexNames );
 	}
 }

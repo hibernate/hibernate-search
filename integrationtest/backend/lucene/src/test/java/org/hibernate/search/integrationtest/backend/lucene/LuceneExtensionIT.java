@@ -113,7 +113,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
-				.hasHitCount( 3 );
+				.hasTotalHitCount( 3 );
 	}
 
 	@Test
@@ -138,7 +138,7 @@ public class LuceneExtensionIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
-				.hasHitCount( 3 );
+				.hasTotalHitCount( 3 );
 	}
 
 	@Test

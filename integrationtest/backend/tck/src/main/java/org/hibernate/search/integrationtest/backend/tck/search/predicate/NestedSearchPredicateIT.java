@@ -107,7 +107,7 @@ public class NestedSearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class NestedSearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class NestedSearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -224,7 +224,7 @@ public class NestedSearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	private void initData() {

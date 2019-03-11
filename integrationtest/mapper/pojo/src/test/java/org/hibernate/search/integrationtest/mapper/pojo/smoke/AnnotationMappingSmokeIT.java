@@ -388,7 +388,7 @@ public class AnnotationMappingSmokeIT {
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
 							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 6L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 6L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -425,7 +425,7 @@ public class AnnotationMappingSmokeIT {
 							"text1",
 							null
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 2L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -489,7 +489,7 @@ public class AnnotationMappingSmokeIT {
 									null
 							)
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 2L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}

@@ -116,9 +116,9 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	}
 
 	@Override
-	public long fetchHitCount() {
+	public long fetchTotalHitCount() {
 		try {
-			return delegate.fetchHitCount();
+			return delegate.fetchTotalHitCount();
 		}
 		catch (QueryExecutionRequestException e) {
 			throw new IllegalStateException( e );

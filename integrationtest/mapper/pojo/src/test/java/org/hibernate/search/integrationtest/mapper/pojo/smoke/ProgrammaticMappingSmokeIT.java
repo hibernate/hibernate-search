@@ -445,7 +445,7 @@ public class ProgrammaticMappingSmokeIT {
 							new PojoReferenceImpl( IndexedEntity.class, 0 ),
 							new PojoReferenceImpl( YetAnotherIndexedEntity.class, 1 )
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 6L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 6L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -481,7 +481,7 @@ public class ProgrammaticMappingSmokeIT {
 							"text1",
 							null
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 2L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}
@@ -545,7 +545,7 @@ public class ProgrammaticMappingSmokeIT {
 									null
 							)
 					);
-			assertThat( result.getHitCount() ).isEqualTo( 2L );
+			assertThat( result.getTotalHitCount() ).isEqualTo( 2L );
 
 			backendMock.verifyExpectationsMet();
 		}

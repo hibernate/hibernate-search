@@ -18,7 +18,7 @@ public final class SimpleIndexSearchResult<T> implements IndexSearchResult<T> {
 	}
 
 	@Override
-	public long getHitCount() {
+	public long getTotalHitCount() {
 		return hitCount;
 	}
 
