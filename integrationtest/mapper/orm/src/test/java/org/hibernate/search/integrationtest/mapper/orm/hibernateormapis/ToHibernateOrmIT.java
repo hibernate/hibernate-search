@@ -160,6 +160,20 @@ public class ToHibernateOrmIT {
 					.assertThrown()
 					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( IndexedEntity.INDEX, "1" ),
+							reference( IndexedEntity.INDEX, "1" )
+					)
+			);
+			result = query.uniqueResult();
+			backendMock.verifyExpectationsMet();
+			assertThat( result )
+					.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 		} );
 	}
 

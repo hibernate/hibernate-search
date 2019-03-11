@@ -177,4 +177,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 13, value = "Interrupted on batch Indexing; index will be left in unknown state!")
 	SearchException interruptedBatchIndexingException(@Cause Exception cause);
 
+	@Message(id = ID_OFFSET_2 + 14, value = "Multiple hits when a single hit was expected: got %1$s hits.")
+	SearchException nonSingleHit(long totalHitCount);
 }

@@ -167,6 +167,20 @@ public class ToJpaIT {
 					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
 					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( IndexedEntity.INDEX, "1" ),
+							reference( IndexedEntity.INDEX, "1" )
+					)
+			);
+			result = query.getSingleResult();
+			backendMock.verifyExpectationsMet();
+			assertThat( result )
+					.isEqualTo( entityManager.getReference( IndexedEntity.class, 1 ) );
 		} );
 	}
 

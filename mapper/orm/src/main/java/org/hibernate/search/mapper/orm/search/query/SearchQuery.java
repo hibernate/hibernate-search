@@ -146,11 +146,10 @@ public interface SearchQuery<T> {
 	 * Execute the query and return the hits as a single, optional element.
 	 *
 	 * @return The single, optional query hit.
-	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query.
-	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database,
+	 * @throws org.hibernate.search.util.common.SearchException If something goes wrong while executing the query,
 	 * or the number of hits is more than one.
-	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database,
-	 * or the number of hits is more than one.
+	 * @throws org.hibernate.HibernateException If something goes wrong while fetching entities from the database.
+	 * @throws javax.persistence.PersistenceException If something goes wrong while fetching entities from the database.
 	 */
 	Optional<T> fetchSingleHit();
 

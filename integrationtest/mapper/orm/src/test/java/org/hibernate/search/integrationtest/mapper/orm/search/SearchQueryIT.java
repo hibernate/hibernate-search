@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoReferenceImpl;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -314,7 +315,7 @@ public class SearchQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
-					b -> { },
+					b -> b.limit( 2L ), // Ensure we do not fetch more than is strictly necessary
 					StubSearchWorkBehavior.of(
 							1L,
 							reference( Book.INDEX, "1" )
@@ -326,7 +327,7 @@ public class SearchQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
-					b -> { },
+					b -> b.limit( 2L ), // Ensure we do not fetch more than is strictly necessary
 					StubSearchWorkBehavior.empty()
 			);
 			result = query.fetchSingleHit();
@@ -335,7 +336,7 @@ public class SearchQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
-					b -> { },
+					b -> b.limit( 2L ), // Ensure we do not fetch more than is strictly necessary
 					StubSearchWorkBehavior.of(
 							2L,
 							reference( Book.INDEX, "1" ),
@@ -346,8 +347,7 @@ public class SearchQueryIT {
 				query.fetchSingleHit();
 			} )
 					.assertThrown()
-					// HHH-13300: query.getSingleResult() throws org.hibernate.NonUniqueResultException instead of javax.persistence.NonUniqueResultException
-					.isInstanceOf( org.hibernate.NonUniqueResultException.class );
+					.isInstanceOf( SearchException.class );
 			backendMock.verifyExpectationsMet();
 		} );
 	}
