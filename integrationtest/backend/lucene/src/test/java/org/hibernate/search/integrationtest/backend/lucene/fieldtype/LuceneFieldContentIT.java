@@ -66,7 +66,7 @@ public class LuceneFieldContentIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		List<Document> result = query.execute().getHits();
+		List<Document> result = query.fetch().getHits();
 		Assertions.assertThat( result )
 				.hasSize( 2 )
 				.satisfies( containsDocument(

@@ -11,9 +11,9 @@ package org.hibernate.search.engine.search.query.spi;
  */
 public interface IndexSearchQuery<T> {
 
-	IndexSearchResult<T> execute();
+	IndexSearchResult<T> fetch();
 
-	long executeCount();
+	long fetchHitCount();
 
 	void setFirstResult(Long firstResultIndex);
 

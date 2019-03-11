@@ -102,7 +102,7 @@ public class SearchSortIT {
 		 */
 
 		IndexSearchQuery<DocumentReference> query = simpleQuery( b -> b.byIndexOrder() );
-		IndexSearchResult<DocumentReference> firstCallResult = query.execute();
+		IndexSearchResult<DocumentReference> firstCallResult = query.fetch();
 		assertThat( firstCallResult ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 		List<DocumentReference> firstCallHits = firstCallResult.getHits();

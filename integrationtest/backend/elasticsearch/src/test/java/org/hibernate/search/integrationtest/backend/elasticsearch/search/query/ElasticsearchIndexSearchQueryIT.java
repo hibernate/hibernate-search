@@ -79,7 +79,7 @@ public class ElasticsearchIndexSearchQueryIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		query.execute();
+		query.fetch();
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class ElasticsearchIndexSearchQueryIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		query.execute();
+		query.fetch();
 	}
 
 	@SuppressWarnings("unused")

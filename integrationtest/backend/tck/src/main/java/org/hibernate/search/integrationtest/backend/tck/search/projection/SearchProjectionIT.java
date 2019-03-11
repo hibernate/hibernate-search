@@ -224,7 +224,7 @@ public class SearchProjectionIT {
 				.sort( c -> c.byScore().desc() )
 				.toQuery();
 
-		IndexSearchResult<Float> result = query.execute();
+		IndexSearchResult<Float> result = query.fetch();
 		assertThat( result ).hasHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );

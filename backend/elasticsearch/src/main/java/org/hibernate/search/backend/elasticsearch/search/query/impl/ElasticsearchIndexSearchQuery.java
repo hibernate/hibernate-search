@@ -74,7 +74,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public IndexSearchResult<T> execute() {
+	public IndexSearchResult<T> fetch() {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
@@ -93,7 +93,7 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public long executeCount() {
+	public long fetchHitCount() {
 		JsonObject filteredPayload = new JsonObject();
 		Optional<JsonObject> querySubTree = JsonAccessor.root().property( "query" ).asObject().get( payload );
 		if ( querySubTree.isPresent() ) {

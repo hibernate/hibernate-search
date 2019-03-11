@@ -105,7 +105,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	private SearchResult<R> doFetch() {
 		// TODO handle timeouts
-		final IndexSearchResult<R> results = delegate.execute();
+		final IndexSearchResult<R> results = delegate.fetch();
 		// TODO apply the result transformer?
 		return new HibernateOrmSearchResult<>( results );
 	}
@@ -118,7 +118,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 	@Override
 	public long fetchHitCount() {
 		try {
-			return delegate.executeCount();
+			return delegate.fetchHitCount();
 		}
 		catch (QueryExecutionRequestException e) {
 			throw new IllegalStateException( e );
