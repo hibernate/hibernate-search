@@ -131,7 +131,7 @@ public class ObjectFieldStorageIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -146,7 +146,7 @@ public class ObjectFieldStorageIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -169,7 +169,7 @@ public class ObjectFieldStorageIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NON_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -190,7 +190,7 @@ public class ObjectFieldStorageIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, EXPECTED_NESTED_MATCH_ID )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test

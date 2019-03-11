@@ -75,7 +75,7 @@ public class IndexDocumentWorkExecutorIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		Assertions.assertThat( query.fetchHitCount() ).isEqualTo( NUMBER_OF_BOOKS );
+		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 
 	private static class IndexAccessors {

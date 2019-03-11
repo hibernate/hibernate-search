@@ -16,7 +16,7 @@ public interface SearchResult<T> {
 	/**
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 */
-	long getHitCount();
+	long getTotalHitCount();
 
 	/**
 	 * @return The hits as a {@link List} containing one element for each matched entity.

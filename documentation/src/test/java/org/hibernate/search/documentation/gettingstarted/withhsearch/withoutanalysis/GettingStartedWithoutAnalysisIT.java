@@ -115,7 +115,7 @@ public class GettingStartedWithoutAnalysisIT {
 					.toQuery(); // <6>
 
 			SearchResult<Book> result = query.fetch(); // <7>
-			long totalHitCount = result.getHitCount(); // <8>
+			long totalHitCount = result.getTotalHitCount(); // <8>
 			List<Book> hits = result.getHits(); // <9>
 
 			List<Book> hits2 = query.fetchHits(); // <10>
@@ -140,7 +140,7 @@ public class GettingStartedWithoutAnalysisIT {
 					.toQuery(); // <5>
 
 			SearchResult<Book> result = query.fetch(); // <6>
-			long totalHitCount = result.getHitCount(); // <7>
+			long totalHitCount = result.getTotalHitCount(); // <7>
 			List<Book> hits = result.getHits(); // <8>
 
 			List<Book> hits2 = query.fetchHits(); // <9>
@@ -164,7 +164,7 @@ public class GettingStartedWithoutAnalysisIT {
 					)
 					.toQuery();
 
-			long resultSize = query.fetchHitCount(); // <1>
+			long resultSize = query.fetchTotalHitCount(); // <1>
 			// Not shown: commit the transaction and close the entity manager
 			// end::counting[]
 

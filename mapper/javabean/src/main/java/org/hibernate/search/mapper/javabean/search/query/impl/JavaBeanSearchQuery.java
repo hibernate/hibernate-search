@@ -24,8 +24,8 @@ public class JavaBeanSearchQuery<T> implements SearchQuery<T> {
 	}
 
 	@Override
-	public long fetchHitCount() {
-		return delegate.fetchHitCount();
+	public long fetchTotalHitCount() {
+		return delegate.fetchTotalHitCount();
 	}
 
 	@Override

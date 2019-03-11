@@ -329,14 +329,14 @@ public class IndexSearchResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		assertEquals( 2L, query.fetchHitCount() );
+		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
-		assertEquals( 1L, query.fetchHitCount() );
+		assertEquals( 1L, query.fetchTotalHitCount() );
 
 		// Using setFirstResult/setMaxResult should not affect the count
 		query = scope.query()
@@ -345,11 +345,11 @@ public class IndexSearchResultLoadingOrTransformingIT {
 				.toQuery();
 
 		query.setFirstResult( 1L );
-		assertEquals( 2L, query.fetchHitCount() );
+		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query.setFirstResult( 0L );
 		query.setMaxResults( 1L );
-		assertEquals( 2L, query.fetchHitCount() );
+		assertEquals( 2L, query.fetchTotalHitCount() );
 	}
 
 	@Test
@@ -361,14 +361,14 @@ public class IndexSearchResultLoadingOrTransformingIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		assertEquals( 2L, query.fetchHitCount() );
+		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.match().onField( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
-		assertEquals( 1L, query.fetchHitCount() );
+		assertEquals( 1L, query.fetchTotalHitCount() );
 	}
 
 	private void initData() {

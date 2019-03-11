@@ -20,8 +20,8 @@ class HibernateOrmSearchResult<T> implements SearchResult<T> {
 	}
 
 	@Override
-	public long getHitCount() {
-		return delegate.getHitCount();
+	public long getTotalHitCount() {
+		return delegate.getTotalHitCount();
 	}
 
 	@Override

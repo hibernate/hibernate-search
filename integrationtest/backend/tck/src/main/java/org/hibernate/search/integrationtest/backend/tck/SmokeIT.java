@@ -66,7 +66,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -74,7 +74,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
-				.hasHitCount( 3 );
+				.hasTotalHitCount( 3 );
 
 		query = scope.query()
 				.asReference()
@@ -82,7 +82,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -90,7 +90,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -98,7 +98,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.asReference()
@@ -119,7 +119,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.asReference()
@@ -127,7 +127,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.asReference()
@@ -138,7 +138,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -146,7 +146,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -162,7 +162,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 
 		query = scope.query()
 				.asReference()
@@ -173,7 +173,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		query = scope.query()
 				.asReference()
@@ -184,7 +184,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "3" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 	}
 
 	@Test
@@ -201,7 +201,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		// With nested storage, we expect direct queries to never match
 		query = scope.query()
@@ -210,7 +210,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasNoHits()
-				.hasHitCount( 0 );
+				.hasTotalHitCount( 0 );
 
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = scope.query()
@@ -224,7 +224,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasNoHits()
-				.hasHitCount( 0 );
+				.hasTotalHitCount( 0 );
 
 		// ... but predicates should still be able to match on the same object
 		query = scope.query()
@@ -238,7 +238,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 	}
 
 	@Test
@@ -252,7 +252,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
-				.hasHitCount( 1 );
+				.hasTotalHitCount( 1 );
 
 		predicate = scope.predicate().range().onField( "integer" ).from( 1 ).to( 2 ).toPredicate();
 		query = scope.query()
@@ -261,7 +261,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 
 		predicate = scope.predicate().bool()
 				.should( f -> f.match().onField( "integer" ).matching( 1 ) )
@@ -273,7 +273,7 @@ public class SmokeIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
-				.hasHitCount( 2 );
+				.hasTotalHitCount( 2 );
 	}
 
 	private void initData() {
