@@ -79,9 +79,9 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		}
 
 		@Override
-		public Builder<T> paging(Long firstResult, Long size) {
-			this.from = firstResult;
-			this.size = size;
+		public Builder<T> paging(Long limit, Long offset) {
+			this.from = offset;
+			this.size = limit;
 			return this;
 		}
 

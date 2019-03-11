@@ -36,22 +36,13 @@ final class StubIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public void setFirstResult(Long firstResultIndex) {
-		workBuilder.firstResultIndex( firstResultIndex );
-	}
-
-	@Override
-	public void setMaxResults(Long maxResultsCount) {
-		workBuilder.maxResultsCount( maxResultsCount );
-	}
-
-	@Override
 	public String getQueryString() {
 		return getClass().getName() + "@" + Integer.toHexString( hashCode() );
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch() {
+	public IndexSearchResult<T> fetch(Long limit, Long offset) {
+		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
 				indexNames, workBuilder.build(), convertContext, projectionHitMapper, rootProjection
 		);

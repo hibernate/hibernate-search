@@ -32,8 +32,8 @@ public class LuceneSearcher<T> implements AutoCloseable {
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 
-	private final long firstResultIndex;
-	private final Long maxResultsCount;
+	private final long offset;
+	private final Long limit;
 
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<T> searchResultExtractor;
@@ -42,16 +42,16 @@ public class LuceneSearcher<T> implements AutoCloseable {
 			Set<ReaderProvider> readerProviders,
 			Query luceneQuery,
 			Sort luceneSort,
-			Long firstResultIndex,
-			Long maxResultsCount,
+			Long offset,
+			Long limit,
 			LuceneCollectorProvider luceneCollectorProvider,
 			LuceneSearchResultExtractor<T> searchResultExtractor) {
 		this.indexNames = indexNames;
 		this.indexSearcher = new IndexSearcher( MultiReaderFactory.openReader( indexNames, readerProviders ) );
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
-		this.firstResultIndex = firstResultIndex == null ? 0L : firstResultIndex;
-		this.maxResultsCount = maxResultsCount;
+		this.offset = offset == null ? 0L : offset;
+		this.limit = limit;
 		this.luceneCollectorProvider = luceneCollectorProvider;
 		this.searchResultExtractor = searchResultExtractor;
 	}
@@ -70,7 +70,7 @@ public class LuceneSearcher<T> implements AutoCloseable {
 
 		return searchResultExtractor.extract(
 				indexSearcher, luceneCollectors.getTotalHits(),
-				luceneCollectors.getTopDocs( firstResultIndex, maxResultsCount ),
+				luceneCollectors.getTopDocs( offset, limit ),
 				projectionExecutionContext
 		);
 	}
@@ -92,14 +92,14 @@ public class LuceneSearcher<T> implements AutoCloseable {
 		// FIXME this is very naive for now, we will probably need to implement some scrolling in the collector
 		// as it is done in Search 5.
 		// Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
-		if ( maxResultsCount == null ) {
+		if ( limit == null ) {
 			return indexSearcher.getIndexReader().maxDoc();
 		}
-		else if ( maxResultsCount == 0L ) {
+		else if ( limit == 0L ) {
 			return 0;
 		}
 		else {
-			return Math.min( (int) ( firstResultIndex + maxResultsCount ), indexSearcher.getIndexReader().maxDoc() );
+			return Math.min( (int) ( offset + limit ), indexSearcher.getIndexReader().maxDoc() );
 		}
 	}
 }

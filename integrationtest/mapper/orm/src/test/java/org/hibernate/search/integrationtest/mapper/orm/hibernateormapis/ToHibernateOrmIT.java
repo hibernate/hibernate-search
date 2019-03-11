@@ -181,8 +181,8 @@ public class ToHibernateOrmIT {
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
 					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+							.offset( 3L )
+							.limit( 2L ),
 					StubSearchWorkBehavior.empty()
 			);
 			query.list();

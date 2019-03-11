@@ -11,13 +11,13 @@ package org.hibernate.search.engine.search.query.spi;
  */
 public interface IndexSearchQuery<T> {
 
-	IndexSearchResult<T> fetch();
+	default IndexSearchResult<T> fetch() {
+		return fetch( null, null );
+	}
+
+	IndexSearchResult<T> fetch(Long limit, Long offset);
 
 	long fetchTotalHitCount();
-
-	void setFirstResult(Long firstResultIndex);
-
-	void setMaxResults(Long maxResultsCount);
 
 	String getQueryString();
 

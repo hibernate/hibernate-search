@@ -36,9 +36,6 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final LuceneCollectorProvider luceneCollectorProvider;
 	private final LuceneSearchResultExtractor<T> searchResultExtractor;
 
-	private Long firstResultIndex = 0L;
-	private Long maxResultsCount;
-
 	public LuceneIndexSearchQuery(LuceneQueryWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, Set<String> indexNames, Set<ReaderProvider> readerProviders,
 			SessionContextImplementor sessionContext,
@@ -56,16 +53,6 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public void setFirstResult(Long firstResultIndex) {
-		this.firstResultIndex = firstResultIndex;
-	}
-
-	@Override
-	public void setMaxResults(Long maxResultsCount) {
-		this.maxResultsCount = maxResultsCount;
-	}
-
-	@Override
 	public String getQueryString() {
 		return luceneQuery.toString();
 	}
@@ -76,13 +63,13 @@ public class LuceneIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch() {
+	public IndexSearchResult<T> fetch(Long limit, Long offset) {
 		LuceneQueryWork<LuceneLoadableSearchResult<T>> work = workFactory.search(
 				new LuceneSearcher<>(
 						indexNames,
 						readerProviders,
 						luceneQuery, luceneSort,
-						firstResultIndex, maxResultsCount,
+						offset, limit,
 						luceneCollectorProvider, searchResultExtractor
 				)
 		);
