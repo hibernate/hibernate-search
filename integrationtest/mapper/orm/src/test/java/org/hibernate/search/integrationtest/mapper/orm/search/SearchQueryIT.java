@@ -120,8 +120,8 @@ public class SearchQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
-					b -> b.firstResultIndex( 2L )
-							.maxResultsCount( 3L ),
+					b -> b.offset( 2L )
+							.limit( 3L ),
 					StubSearchWorkBehavior.of(
 							0L
 					)
@@ -146,8 +146,8 @@ public class SearchQueryIT {
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( Book.INDEX ),
-					b -> b.firstResultIndex( 2L )
-							.maxResultsCount( 3L ),
+					b -> b.offset( 2L )
+							.limit( 3L ),
 					StubSearchWorkBehavior.of(
 							0L
 					)

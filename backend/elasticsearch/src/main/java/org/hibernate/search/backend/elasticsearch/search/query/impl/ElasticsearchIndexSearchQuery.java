@@ -35,9 +35,6 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	private final JsonObject payload;
 	private final ElasticsearchSearchResultExtractor<T> searchResultExtractor;
 
-	private Long firstResultIndex;
-	private Long maxResultsCount;
-
 	public ElasticsearchIndexSearchQuery(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			Set<URLEncodedString> indexNames,
@@ -54,16 +51,6 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public void setFirstResult(Long firstResultIndex) {
-		this.firstResultIndex = firstResultIndex;
-	}
-
-	@Override
-	public void setMaxResults(Long maxResultsCount) {
-		this.maxResultsCount = maxResultsCount;
-	}
-
-	@Override
 	public String getQueryString() {
 		return payload.toString();
 	}
@@ -74,11 +61,11 @@ public class ElasticsearchIndexSearchQuery<T> implements IndexSearchQuery<T> {
 	}
 
 	@Override
-	public IndexSearchResult<T> fetch() {
+	public IndexSearchResult<T> fetch(Long limit, Long offset) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<T>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( indexNames )
-				.paging( firstResultIndex, maxResultsCount )
+				.paging( limit, offset )
 				.routingKeys( routingKeys ).build();
 
 		return queryOrchestrator.submit( work ).join()

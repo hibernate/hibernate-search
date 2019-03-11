@@ -70,9 +70,8 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setFirstResult( 1L );
 
-		assertThat( query )
+		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
@@ -81,10 +80,8 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setFirstResult( 1L );
-		query.setMaxResults( 1L );
 
-		assertThat( query )
+		assertThat( query.fetch( 1L, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
@@ -93,9 +90,8 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setMaxResults( 2L );
 
-		assertThat( query )
+		assertThat( query.fetch( 2L, null ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
@@ -104,10 +100,8 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setFirstResult( null );
-		query.setMaxResults( null );
 
-		assertThat( query )
+		assertThat( query.fetch( null, null ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
@@ -121,35 +115,24 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setFirstResult( 1L );
 
-		assertThat( query )
+		assertThat( query.fetch( null, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
-		query.setFirstResult( 1L );
-		query.setMaxResults( 1L );
-
-		assertThat( query )
+		assertThat( query.fetch( 1L, 1L ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2 );
 
-		query.setFirstResult( null );
-		query.setMaxResults( 2L );
-
-		assertThat( query )
+		assertThat( query.fetch( 2L, null ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-		query = scope.query()
-				.asReference()
-				.predicate( f -> f.matchAll() )
-				.sort( c -> c.byField( "string" ).asc() )
-				.toQuery();
-		query.setFirstResult( null );
-		query.setMaxResults( null );
+		assertThat( query.fetch( null, null ) ).fromQuery( query )
+				.hasTotalHitCount( 3 )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		assertThat( query )
+		assertThat( query.fetch() ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
@@ -164,9 +147,8 @@ public class IndexSearchQueryIT {
 				.predicate( f -> f.matchAll() )
 				.sort( c -> c.byField( "string" ).asc() )
 				.toQuery();
-		query.setMaxResults( 0L );
 
-		assertThat( query )
+		assertThat( query.fetch( 0L, 0L ) ).fromQuery( query )
 				.hasTotalHitCount( 3 )
 				.hasNoHits();
 	}

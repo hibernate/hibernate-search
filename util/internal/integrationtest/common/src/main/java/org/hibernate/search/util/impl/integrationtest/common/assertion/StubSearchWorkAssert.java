@@ -41,11 +41,11 @@ public class StubSearchWorkAssert {
 		hasAnyMismatch = mismatch;
 		mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
-		mismatch = checkForMismatch( builder, "firstResultIndex",
-				expected.getFirstResultIndex(), actual.getFirstResultIndex()
+		mismatch = checkForMismatch( builder, "offset",
+				expected.getOffset(), actual.getOffset()
 		);
 		hasAnyMismatch = hasAnyMismatch || mismatch;
-		mismatch = checkForMismatch( builder, "maxResultsCount", expected.getMaxResultsCount(), actual.getMaxResultsCount() );
+		mismatch = checkForMismatch( builder, "limit", expected.getLimit(), actual.getLimit() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		if ( hasAnyMismatch ) {

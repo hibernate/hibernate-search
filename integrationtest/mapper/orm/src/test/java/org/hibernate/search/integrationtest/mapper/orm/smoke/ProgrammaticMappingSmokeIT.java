@@ -308,8 +308,8 @@ public class ProgrammaticMappingSmokeIT {
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+							.offset( 3L )
+							.limit( 2L ),
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.INDEX, "0" ),

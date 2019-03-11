@@ -24,14 +24,14 @@ public class StubSearchWork {
 
 	private final ResultType resultType;
 	private final List<String> routingKeys;
-	private final Long firstResultIndex;
-	private final Long maxResultsCount;
+	private final Long offset;
+	private final Long limit;
 
 	private StubSearchWork(Builder builder) {
 		this.resultType = builder.resultType;
 		this.routingKeys = Collections.unmodifiableList( new ArrayList<>( builder.routingKeys ) );
-		this.firstResultIndex = builder.firstResultIndex;
-		this.maxResultsCount = builder.maxResultsCount;
+		this.offset = builder.offset;
+		this.limit = builder.limit;
 	}
 
 	public ResultType getResultType() {
@@ -42,20 +42,20 @@ public class StubSearchWork {
 		return routingKeys;
 	}
 
-	public Long getFirstResultIndex() {
-		return firstResultIndex;
+	public Long getOffset() {
+		return offset;
 	}
 
-	public Long getMaxResultsCount() {
-		return maxResultsCount;
+	public Long getLimit() {
+		return limit;
 	}
 
 	@Override
 	public String toString() {
 		return "StubSearchWork[" +
 				", routingKeys=" + routingKeys +
-				", firstResultIndex=" + firstResultIndex +
-				", maxResultsCount=" + maxResultsCount +
+				", offset=" + offset +
+				", limit=" + limit +
 				']';
 	}
 
@@ -63,8 +63,8 @@ public class StubSearchWork {
 
 		private final ResultType resultType;
 		private final List<String> routingKeys = new ArrayList<>();
-		private Long firstResultIndex;
-		private Long maxResultsCount;
+		private Long offset;
+		private Long limit;
 
 		private Builder(ResultType resultType) {
 			this.resultType = resultType;
@@ -75,13 +75,13 @@ public class StubSearchWork {
 			return this;
 		}
 
-		public Builder firstResultIndex(Long firstResultIndex) {
-			this.firstResultIndex = firstResultIndex;
+		public Builder offset(Long offset) {
+			this.offset = offset;
 			return this;
 		}
 
-		public Builder maxResultsCount(Long maxResultsCount) {
-			this.maxResultsCount = maxResultsCount;
+		public Builder limit(Long limit) {
+			this.limit = limit;
 			return this;
 		}
 

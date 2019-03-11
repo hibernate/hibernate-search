@@ -338,17 +338,18 @@ public class IndexSearchResultLoadingOrTransformingIT {
 
 		assertEquals( 1L, query.fetchTotalHitCount() );
 
-		// Using setFirstResult/setMaxResult should not affect the count
 		query = scope.query()
 				.asReference()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		query.setFirstResult( 1L );
+		// Using an offset/limit should not affect later counts
+		query.fetch( 1L, 1L );
+
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
-		query.setFirstResult( 0L );
-		query.setMaxResults( 1L );
+		query.fetch( 1L, 0L );
+
 		assertEquals( 2L, query.fetchTotalHitCount() );
 	}
 

@@ -373,8 +373,8 @@ public class AnnotationMappingSmokeIT {
 			backendMock.expectSearchReferences(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+							.offset( 3L )
+							.limit( 2L ),
 					StubSearchWorkBehavior.of(
 							6L,
 							reference( IndexedEntity.INDEX, "0" ),
@@ -410,8 +410,8 @@ public class AnnotationMappingSmokeIT {
 			backendMock.expectSearchProjection(
 					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
 					b -> b
-							.firstResultIndex( 3L )
-							.maxResultsCount( 2L ),
+							.offset( 3L )
+							.limit( 2L ),
 					StubSearchWorkBehavior.of(
 							2L,
 							"text1",

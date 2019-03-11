@@ -105,7 +105,7 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 
 	private SearchResult<R> doFetch() {
 		// TODO handle timeouts
-		final IndexSearchResult<R> results = delegate.fetch();
+		final IndexSearchResult<R> results = delegate.fetch( maxResults, firstResult );
 		// TODO apply the result transformer?
 		return new HibernateOrmSearchResult<>( results );
 	}
@@ -143,7 +143,6 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 					"Negative (" + maxResults + ") parameter passed in to setMaxResults"
 			);
 		}
-		delegate.setMaxResults( maxResults );
 		this.maxResults = maxResults;
 		return this;
 	}
@@ -155,7 +154,6 @@ public class HibernateOrmSearchQuery<R> extends AbstractProducedQuery<R> impleme
 					"Negative (" + firstResult + ") parameter passed in to setFirstResult"
 			);
 		}
-		delegate.setFirstResult( firstResult );
 		this.firstResult = firstResult;
 		return this;
 	}
