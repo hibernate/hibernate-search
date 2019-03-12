@@ -19,6 +19,10 @@
     <name>Hibernate Search Mapper - JavaBean</name>
     <description>Hibernate Search Mapper for POJOs following the JavaBean conventions</description>
 
+    <properties>
+        <java.module.name>org.hibernate.search.mapper.javabean</java.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -61,7 +65,7 @@
                         <configuration>
                             <archive>
                                 <manifestEntries>
-                                    <Automatic-Module-Name>org.hibernate.search.mapper.javabean</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -70,4 +74,39 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>module-descriptors</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.moditect</groupId>
+                        <artifactId>moditect-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-module-infos</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>add-module-info</goal>
+                                </goals>
+                                <configuration>
+                                    <module>
+                                        <moduleInfo>
+                                            <name>${java.module.name}</name>
+                                            <exports>
+                                                !org.hibernate.search.*.impl;
+                                                !org.hibernate.search.*.impl.*;
+                                                *;
+                                            </exports>
+                                        </moduleInfo>
+                                    </module>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
