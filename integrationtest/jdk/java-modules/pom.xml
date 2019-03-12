@@ -59,8 +59,7 @@
                 </executions>
             </plugin>
 
-            <!-- TODO use Java 9 -->
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -69,7 +68,7 @@
                     <showWarnings>true</showWarnings>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 
