@@ -12,6 +12,10 @@
     <name>Hibernate Search Utils - Common</name>
     <description>Hibernate Search common utilities</description>
 
+    <properties>
+        <java.module.name>org.hibernate.search.util.internal.common</java.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jboss.logging</groupId>
@@ -56,7 +60,7 @@
                         <configuration>
                             <archive>
                                 <manifestEntries>
-                                    <Automatic-Module-Name>org.hibernate.search.util.internal.common</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -65,5 +69,40 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>module-descriptors</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.moditect</groupId>
+                        <artifactId>moditect-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-module-infos</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>add-module-info</goal>
+                                </goals>
+                                <configuration>
+                                    <module>
+                                        <moduleInfo>
+                                            <name>${java.module.name}</name>
+                                            <exports>
+                                                !org.hibernate.search.*.impl;
+                                                !org.hibernate.search.*.impl.*;
+                                                *;
+                                            </exports>
+                                        </moduleInfo>
+                                    </module>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
 

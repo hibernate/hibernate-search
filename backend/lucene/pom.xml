@@ -14,6 +14,10 @@
     <name>Hibernate Search Backend - Lucene</name>
     <description>Hibernate Search Backend relying on embedded instances of Lucene</description>
 
+    <properties>
+        <java.module.name>org.hibernate.search.backend.lucene</java.module.name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -74,7 +78,7 @@
                         <configuration>
                             <archive>
                                 <manifestEntries>
-                                    <Automatic-Module-Name>org.hibernate.search.backend.lucene</Automatic-Module-Name>
+                                    <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -83,4 +87,45 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>module-descriptors</id>
+            <!--
+                TODO HSEARCH-3274
+                Trying to generate module info, we got some issues on package names
+                Invocation of jdeps failed: jdeps -generate-module-info ...
+                Error: Module lucene.sandbox contains package org.apache.lucene.search, module lucene.core exports package org.apache.lucene.search to lucene.sandbox
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.moditect</groupId>
+                        <artifactId>moditect-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-module-infos</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>add-module-info</goal>
+                                </goals>
+                                <configuration>
+                                    <module>
+                                        <moduleInfo>
+                                            <name>${java.module.name}</name>
+                                            <exports>
+                                                !org.hibernate.search.*.impl;
+                                                !org.hibernate.search.*.impl.*;
+                                                *;
+                                            </exports>
+                                        </moduleInfo>
+                                    </module>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            -->
+        </profile>
+    </profiles>
 </project>

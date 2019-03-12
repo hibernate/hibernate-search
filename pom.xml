@@ -262,6 +262,7 @@
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
         <version.com.buschmais.jqassistant.plugin>1.5.0</version.com.buschmais.jqassistant.plugin>
         <version.com.github.alexcojocaru.elasticsearch.plugin>6.10</version.com.github.alexcojocaru.elasticsearch.plugin>
+        <version.moditech.plugin>1.0.0.Beta2</version.moditech.plugin>
 
         <!--
             Please don't change the name of this property, it may be used and
