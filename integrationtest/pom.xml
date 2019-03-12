@@ -25,6 +25,7 @@
         <module>mapper/pojo</module>
         <module>mapper/orm</module>
         <module>showcase/library</module>
+        <module>jdk/java-modules</module>
     </modules>
 
     <dependencyManagement>
