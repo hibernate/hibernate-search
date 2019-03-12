@@ -2257,6 +2257,29 @@
             </build>
         </profile>
 
+        <!-- Elasticsearch 7.0+ test environment -->
+        <profile>
+            <id>elasticsearch-7.0</id>
+            <properties>
+                <test.elasticsearch.host.version>7.0.0-beta1</test.elasticsearch.host.version>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
+                            <configuration>
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/7.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/7.0/init/init.script</pathInitScript>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
         <!-- =============================== -->
         <!-- Database profiles               -->
         <!-- =============================== -->
