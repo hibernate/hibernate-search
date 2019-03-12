@@ -110,8 +110,24 @@
             <!--
                 TODO HSEARCH-3274
                 Trying to generate module info, we got some issues on multi-release dependent modules.
+
                 Invocation of jdeps failed: jdeps -generate-module-info ...
                 Error: byte-buddy-1.9.5.jar is a multi-release jar file but -multi-release option is not set.
+
+                Sometimes the error is about jaxb-api-2.3.1.jar.
+
+                Adding this to the moditect configuration removes the message:
+
+                <jdepsExtraArgs>- -multi-release=11</jdepsExtraArgs>
+
+                ... but then we get another error:
+
+                Invocation of jdeps failed: jdeps -generate-module-info ...
+                Error: hibernate-search-mapper-orm-6.0.0-SNAPSHOT.jar is not a multi-release jar file but - -multi-release option is set
+
+                So adding - -multi-release=11 probably isn't a good idea.
+                Maybe a better solution would be to exclude these dependencies from the scanning,
+                since we do not need to expose them anyway?
             <build>
                 <plugins>
                     <plugin>
@@ -133,6 +149,14 @@
                                                 !org.hibernate.search.*.impl.*;
                                                 *;
                                             </exports>
+                                            <requires>
+                                                !net.bytebuddy;
+                                                !net.bytebuddy.*;
+                                                !javax.xml;
+                                                !javax.xml.*;
+                                                !javax.*;
+                                                *;
+                                            </requires>
                                         </moduleInfo>
                                     </module>
                                 </configuration>
