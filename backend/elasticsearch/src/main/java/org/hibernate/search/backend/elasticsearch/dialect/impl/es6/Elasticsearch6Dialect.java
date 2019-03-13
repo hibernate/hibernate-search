@@ -11,8 +11,12 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.es7.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch6SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch6IndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+
+import com.google.gson.Gson;
 
 /**
  * The dialect for Elasticsearch 6.
@@ -29,5 +33,12 @@ public class Elasticsearch6Dialect extends Elasticsearch7Dialect implements Elas
 	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
 		// Necessary because the total hit count is formatted differently in ES7
 		return new Elasticsearch6SearchResultExtractorFactory();
+	}
+
+	@Override
+	public ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(
+			Gson userFacingGson) {
+		// Necessary because the date formats are handled differently in ES7
+		return new Elasticsearch6IndexFieldTypeFactoryContextProvider( userFacingGson );
 	}
 }
