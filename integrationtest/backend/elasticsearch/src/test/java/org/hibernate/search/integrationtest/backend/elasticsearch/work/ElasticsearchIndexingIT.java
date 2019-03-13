@@ -11,13 +11,13 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 
@@ -35,7 +35,8 @@ public class ElasticsearchIndexingIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
-	private static final URLEncodedString TYPE_NAME = Elasticsearch6WorkBuilderFactory.TYPE_NAME;
+
+	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -74,7 +75,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( TYPE_NAME )
+						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )
@@ -90,7 +91,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( TYPE_NAME )
+						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )
@@ -104,7 +105,7 @@ public class ElasticsearchIndexingIT {
 		clientSpy.expectNext(
 				ElasticsearchRequest.delete()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.pathComponent( TYPE_NAME )
+						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.param( "routing", routingKey )
 						.build(),

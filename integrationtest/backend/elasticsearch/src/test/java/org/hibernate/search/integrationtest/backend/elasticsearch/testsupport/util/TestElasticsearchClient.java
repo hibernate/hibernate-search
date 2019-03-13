@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
@@ -26,8 +27,8 @@ import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNor
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -53,6 +54,8 @@ public class TestElasticsearchClient implements TestRule {
 	 */
 	private final ElasticsearchClientFactoryImpl clientFactory = new ElasticsearchClientFactoryImpl();
 
+	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
+
 	private TestHelper testHelper;
 
 	private ElasticsearchClientImplementor client;
@@ -60,6 +63,10 @@ public class TestElasticsearchClient implements TestRule {
 	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
 
 	private final List<String> createdTemplatesNames = new ArrayList<>();
+
+	public ElasticsearchTestDialect getDialect() {
+		return dialect;
+	}
 
 	public IndexClient index(String indexName) {
 		return new IndexClient( URLEncodedString.fromString( ElasticsearchIndexNameNormalizer.normalize( indexName ) ) );
@@ -99,11 +106,7 @@ public class TestElasticsearchClient implements TestRule {
 		}
 
 		public TypeClient type() {
-			return new TypeClient( this, Elasticsearch6WorkBuilderFactory.TYPE_NAME );
-		}
-
-		public TypeClient type(String mappingName) {
-			return new TypeClient( this, URLEncodedString.fromString( mappingName ) );
+			return new TypeClient( this );
 		}
 
 		public SettingsClient settings() {
@@ -119,25 +122,22 @@ public class TestElasticsearchClient implements TestRule {
 
 		private final IndexClient indexClient;
 
-		private final URLEncodedString typeName;
-
-		public TypeClient(IndexClient indexClient, URLEncodedString typeName) {
+		public TypeClient(IndexClient indexClient) {
 			this.indexClient = indexClient;
-			this.typeName = typeName;
 		}
 
 		public TypeClient putMapping(String mappingJson) {
-			TestElasticsearchClient.this.putMapping( indexClient.indexName, typeName, mappingJson );
+			TestElasticsearchClient.this.putMapping( indexClient.indexName, mappingJson );
 			return this;
 		}
 
 		public String getMapping() {
-			return TestElasticsearchClient.this.getMapping( indexClient.indexName, typeName );
+			return TestElasticsearchClient.this.getMapping( indexClient.indexName );
 		}
 
 		public TypeClient index(URLEncodedString id, String jsonDocument) {
 			URLEncodedString indexName = indexClient.indexName;
-			TestElasticsearchClient.this.index( indexName, typeName, id, jsonDocument );
+			TestElasticsearchClient.this.index( indexName, id, jsonDocument );
 			return this;
 		}
 
@@ -199,11 +199,11 @@ public class TestElasticsearchClient implements TestRule {
 		}
 
 		public JsonObject getSource() {
-			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.indexName, typeClient.typeName, id );
+			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.indexName, id );
 		}
 
 		public JsonElement getStoredField(String fieldName) {
-			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, typeClient.typeName, id, fieldName );
+			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, id, fieldName );
 		}
 	}
 
@@ -296,24 +296,29 @@ public class TestElasticsearchClient implements TestRule {
 				.build() );
 	}
 
-	private void putMapping(URLEncodedString indexName, URLEncodedString mappingName, String mappingJson) {
+	private void putMapping(URLEncodedString indexName, String mappingJson) {
 		JsonObject mappingJsonObject = toJsonElement( mappingJson ).getAsJsonObject();
 
-		performRequest( ElasticsearchRequest.put()
-				.pathComponent( indexName ).pathComponent( Paths._MAPPING ).pathComponent( mappingName )
-				.body( mappingJsonObject )
-				.build() );
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
+		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
+		builder.body( mappingJsonObject );
+
+		performRequest( builder.build() );
 	}
 
-	private String getMapping(URLEncodedString indexName, URLEncodedString mappingName) {
+	private String getMapping(URLEncodedString indexName) {
+
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
+		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
+
 		/*
 		 * Elasticsearch 5.5+ triggers a 404 error when mappings are missing,
 		 * while 5.4 and below just return an empty mapping.
 		 * In our case, an empty mapping is fine, so we'll just ignore 404.
 		 */
-		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get()
-				.pathComponent( indexName ).pathComponent( Paths._MAPPING ).pathComponent( mappingName )
-				.build() );
+		ElasticsearchResponse response = performRequestIgnore404( builder.build() );
 		JsonObject result = response.getBody();
 		JsonElement index = result.get( indexName.original );
 		if ( index == null ) {
@@ -323,11 +328,17 @@ public class TestElasticsearchClient implements TestRule {
 		if ( mappings == null ) {
 			return new JsonObject().toString();
 		}
-		JsonElement mapping = mappings.getAsJsonObject().get( mappingName.original );
-		if ( mapping == null ) {
-			return new JsonObject().toString();
+		Optional<URLEncodedString> typeName = dialect.getTypeNameForMappingApi();
+		if ( typeName.isPresent() ) {
+			JsonElement mapping = mappings.getAsJsonObject().get( typeName.get().original );
+			if ( mapping == null ) {
+				return new JsonObject().toString();
+			}
+			return mapping.toString();
 		}
-		return mapping.toString();
+		else {
+			return mappings.toString();
+		}
 	}
 
 	private void putDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
@@ -390,26 +401,26 @@ public class TestElasticsearchClient implements TestRule {
 		return settings.toString();
 	}
 
-	private void index(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String jsonDocument) {
+	private void index(URLEncodedString indexName, URLEncodedString id, String jsonDocument) {
 		JsonObject documentJsonObject = toJsonElement( jsonDocument ).getAsJsonObject();
 		performRequest( ElasticsearchRequest.put()
-				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
 				.body( documentJsonObject )
 				.param( "refresh", true )
 				.build() );
 	}
 
-	private JsonObject getDocumentSource(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id) {
+	private JsonObject getDocumentSource(URLEncodedString indexName, URLEncodedString id) {
 		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
-				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
 				.build() );
 		JsonObject result = response.getBody();
 		return result.get( "_source" ).getAsJsonObject();
 	}
 
-	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String fieldName) {
+	protected JsonElement getDocumentField(URLEncodedString indexName, URLEncodedString id, String fieldName) {
 		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
-				.pathComponent( indexName ).pathComponent( typeName ).pathComponent( id )
+				.pathComponent( indexName ).pathComponent( dialect.getTypeKeywordForNonMappingApi() ).pathComponent( id )
 				.param( "stored_fields", fieldName )
 				.build() );
 		JsonObject result = response.getBody();

@@ -164,6 +164,10 @@ public class ElasticsearchSchemaValidationIT {
 
 	@Test
 	public void mapping_missing() throws Exception {
+		Assume.assumeTrue(
+				"Skipping this test as there is always a mapping (be it empty) in " + elasticSearchClient.getDialect(),
+				elasticSearchClient.getDialect().isEmptyMappingPossible()
+		);
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 
 		setupExpectingFailure(
