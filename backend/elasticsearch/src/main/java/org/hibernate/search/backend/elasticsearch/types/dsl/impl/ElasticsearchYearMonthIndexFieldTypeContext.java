@@ -6,16 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearMonthFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -26,26 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchYearMonthIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchYearMonthIndexFieldTypeContext, YearMonth> {
-
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchYearIndexFieldTypeContext.FORMATTER )
-			.appendLiteral( '-' )
-			.appendValue( MONTH_OF_YEAR, 2 )
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchYearMonthFieldCodec DEFAULT_CODEC = new ElasticsearchYearMonthFieldCodec( FORMATTER );
-
-	private final ElasticsearchYearMonthFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchYearMonthIndexFieldTypeContext, YearMonth> {
 
 	ElasticsearchYearMonthIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, YearMonth.class, DataType.DATE );
+		super( buildContext, YearMonth.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<YearMonth> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_year_month", "yyyyyyyyy-MM" ) );
+	protected ElasticsearchIndexFieldType<YearMonth> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchYearMonthFieldCodec codec = new ElasticsearchYearMonthFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends YearMonth> dslToIndexConverter =
 				createDslToIndexConverter();

@@ -6,17 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchMonthDayFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -27,31 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchMonthDayIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchMonthDayIndexFieldTypeContext, MonthDay> {
-
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.appendLiteral( "--" )
-			.appendValue( MONTH_OF_YEAR, 2 )
-			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchMonthDayFieldCodec DEFAULT_CODEC = new ElasticsearchMonthDayFieldCodec( FORMATTER );
-
-	private final ElasticsearchMonthDayFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchMonthDayIndexFieldTypeContext, MonthDay> {
 
 	ElasticsearchMonthDayIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, MonthDay.class, DataType.DATE );
+		super( buildContext, MonthDay.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<MonthDay> toIndexFieldType(PropertyMapping mapping) {
-		/*
-		 * This seems to be the ISO-8601 format for dates without year.
-		 * It's also the default format for Java's MonthDay, see MonthDay.PARSER.
-		 */
-		mapping.setFormat( Arrays.asList( "--MM-dd" ) );
+	protected ElasticsearchIndexFieldType<MonthDay> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchMonthDayFieldCodec codec = new ElasticsearchMonthDayFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends MonthDay> dslToIndexConverter =
 				createDslToIndexConverter();

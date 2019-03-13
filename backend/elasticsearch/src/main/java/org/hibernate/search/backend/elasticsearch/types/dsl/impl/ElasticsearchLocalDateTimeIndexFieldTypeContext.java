@@ -8,12 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateTimeFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -24,26 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchLocalDateTimeIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLocalDateTimeIndexFieldTypeContext, LocalDateTime> {
-
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchLocalDateIndexFieldTypeContext.FORMATTER )
-			.appendLiteral( 'T' )
-			.append( ElasticsearchLocalTimeIndexFieldTypeContext.FORMATTER )
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchLocalDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateTimeFieldCodec( FORMATTER );
-
-	private final ElasticsearchLocalDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchLocalDateTimeIndexFieldTypeContext, LocalDateTime> {
 
 	ElasticsearchLocalDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, LocalDateTime.class, DataType.DATE );
+		super( buildContext, LocalDateTime.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<LocalDateTime> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_date_hour_minute_second_fraction", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS" ) );
+	protected ElasticsearchIndexFieldType<LocalDateTime> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchLocalDateTimeFieldCodec codec = new ElasticsearchLocalDateTimeFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends LocalDateTime> dslToIndexConverter =
 				createDslToIndexConverter();

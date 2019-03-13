@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -54,7 +57,7 @@ public class ElasticsearchSchemaValidationIT {
 							+ "'myField': {"
 									+ "'type': 'date',"
 									+ "'index': true,"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'ignore_malformed': true" // Ignored during validation
 							+ "},"
 							+ "'NOTmyField': {" // Ignored during validation
@@ -108,7 +111,7 @@ public class ElasticsearchSchemaValidationIT {
 					+ "'properties': {"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'ignore_malformed': true," // Ignored during validation
 									+ "'fields': {"
 											+ "'myField" + FACET_FIELD_SUFFIX + "': {"
@@ -311,7 +314,7 @@ public class ElasticsearchSchemaValidationIT {
 					+ "'properties': {"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'index': false"
 							+ "}"
 					+ "}"
@@ -420,7 +423,7 @@ public class ElasticsearchSchemaValidationIT {
 					+ "'properties': {"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'epoch_millis||yyyy'"
+									+ "'format': 'epoch_millis||strict_date_time'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -443,13 +446,25 @@ public class ElasticsearchSchemaValidationIT {
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "The output format (the first format in the 'format' attribute) is invalid. Expected 'strict_date', actual is 'epoch_millis'" )
+						.failure(
+								"The output format (the first format in the 'format' attribute) is invalid. Expected '"
+										+ elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat()
+										+ "', actual is 'epoch_millis'"
+						)
 						.build()
 		);
 	}
 
 	@Test
 	public void property_format_missingInputFormat() throws Exception {
+		String firstFormat = elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat();
+		List<String> nextFormats = elasticSearchClient.getDialect().getAllLocalDateDefaultMappingFormats()
+				.stream().skip( 1 ).collect( Collectors.toList() );
+		Assume.assumeFalse(
+				"Skipping this test as we don't have a type with multiple default formats in " + elasticSearchClient.getDialect(),
+				nextFormats.isEmpty()
+		);
+
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
 				"{"
@@ -462,7 +477,7 @@ public class ElasticsearchSchemaValidationIT {
 							+ "},"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date'"
+									+ "'format': '" + firstFormat + "'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -487,7 +502,7 @@ public class ElasticsearchSchemaValidationIT {
 						.indexFieldContext( "myField" )
 						.failure(
 								"Invalid formats for attribute 'format'",
-								"missing elements are '[yyyyyyyyy-MM-dd]'"
+								"missing elements are '" + nextFormats + "'"
 						)
 						.build()
 		);
@@ -502,7 +517,7 @@ public class ElasticsearchSchemaValidationIT {
 					+ "'properties': {"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd||yyyy'"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "||yyyy'"
 							+ "}"
 					+ "}"
 				+ "}"
@@ -578,7 +593,7 @@ public class ElasticsearchSchemaValidationIT {
 							+ "'properties': {"
 								+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'index': false"
 								+ "}"
 							+ "}"

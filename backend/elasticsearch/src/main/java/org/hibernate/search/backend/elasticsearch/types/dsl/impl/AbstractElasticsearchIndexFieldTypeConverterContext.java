@@ -43,6 +43,10 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterContext<S extends Abs
 
 	protected abstract S thisAsS();
 
+	final Class<F> getFieldType() {
+		return fieldType;
+	}
+
 	final ElasticsearchIndexFieldTypeBuildContext getBuildContext() {
 		return buildContext;
 	}

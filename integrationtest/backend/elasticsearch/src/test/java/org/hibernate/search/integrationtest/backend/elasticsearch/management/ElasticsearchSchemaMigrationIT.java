@@ -57,7 +57,7 @@ public class ElasticsearchSchemaMigrationIT {
 									+ "'type': 'date',"
 									+ "'index': true,"
 									+ "'doc_values': false,"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'ignore_malformed': true" // Ignored during migration
 							+ "},"
 							+ "'NOTmyField': {" // Ignored during migration
@@ -158,7 +158,7 @@ public class ElasticsearchSchemaMigrationIT {
 							+ "'myField': {"
 									+ "'type': 'date',"
 									+ "'doc_values': false,"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'ignore_malformed': true" // Assert it was not removed
 							+ "},"
 							+ "'NOTmyField': {" // Assert it was not removed
@@ -319,7 +319,7 @@ public class ElasticsearchSchemaMigrationIT {
 							+ "'myField': {"
 									+ "'type': 'date',"
 									+ "'doc_values': false,"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
 							+ "},"
 							+ "'NOTmyField': {" // Assert it was not removed
 									+ "'type': 'date'"
@@ -341,7 +341,7 @@ public class ElasticsearchSchemaMigrationIT {
 							+ "'myField': {"
 									+ "'type': 'date',"
 									+ "'index': false," // Invalid
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd'"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
 							+ "}"
 					+ "}"
 				+ "}"

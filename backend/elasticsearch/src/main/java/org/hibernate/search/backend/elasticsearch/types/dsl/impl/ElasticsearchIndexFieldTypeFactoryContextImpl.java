@@ -21,6 +21,7 @@ import java.time.ZonedDateTime;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchJsonStringIndexFieldTypeContext;
+import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -40,10 +41,13 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 
 	private final EventContext eventContext;
 	private final Gson userFacingGson;
+	private final ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider;
 
-	public ElasticsearchIndexFieldTypeFactoryContextImpl(EventContext eventContext, Gson userFacingGson) {
+	public ElasticsearchIndexFieldTypeFactoryContextImpl(EventContext eventContext, Gson userFacingGson,
+			ElasticsearchDefaultFieldFormatProvider defaultFieldFormatProvider) {
 		this.eventContext = eventContext;
 		this.userFacingGson = userFacingGson;
+		this.defaultFieldFormatProvider = defaultFieldFormatProvider;
 	}
 
 	@Override
@@ -220,5 +224,10 @@ public class ElasticsearchIndexFieldTypeFactoryContextImpl
 	@Override
 	public Gson getUserFacingGson() {
 		return userFacingGson;
+	}
+
+	@Override
+	public ElasticsearchDefaultFieldFormatProvider getDefaultFieldFormatProvider() {
+		return defaultFieldFormatProvider;
 	}
 }

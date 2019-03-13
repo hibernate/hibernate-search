@@ -28,7 +28,7 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return new JsonPrimitive( formatter.format( value ) );
+		return new JsonPrimitive( nullUnsafeFormat( value ) );
 	}
 
 	@Override
@@ -52,5 +52,9 @@ public abstract class AbstractElasticsearchJavaTimeFieldCodec<T extends Temporal
 		return formatter.equals( other.formatter );
 	}
 
-	protected abstract T nullUnsafeParse( String stringValue );
+	protected String nullUnsafeFormat(T value) {
+		return formatter.format( value );
+	}
+
+	protected abstract T nullUnsafeParse(String stringValue);
 }
