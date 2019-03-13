@@ -126,9 +126,13 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 		JsonObject scriptContent = new JsonObject();
 		scriptContent.addProperty( "lang", "painless" );
 		scriptContent.add( "params", jsonCenter );
-		scriptContent.addProperty( "source", "doc['" + absoluteFieldPath + "'].value !== null ?"
-				+ " doc['" + absoluteFieldPath + "'].arcDistance(params.lat, params.lon)"
-				+ " : null" );
+		scriptContent.addProperty(
+				"source",
+				// Use ".size() != 0" to check whether this field has a value. ".value != null" won't work on ES7+
+				"doc['" + absoluteFieldPath + "'].size() != 0"
+						+ " ? doc['" + absoluteFieldPath + "'].arcDistance(params.lat, params.lon)"
+						+ " : null"
+		);
 
 		return scriptContent;
 	}
