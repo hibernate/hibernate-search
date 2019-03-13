@@ -8,11 +8,11 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.d
 
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
+@SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
-	private final URLEncodedString DOC = URLEncodedString.fromString( "doc" );
-
 	@Override
 	public boolean isEmptyMappingPossible() {
 		return true;
@@ -20,11 +20,11 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public URLEncodedString getTypeKeywordForNonMappingApi() {
-		return DOC;
+		return Paths.DOC;
 	}
 
 	@Override
 	public Optional<URLEncodedString> getTypeNameForMappingApi() {
-		return Optional.of( DOC );
+		return Optional.of( Paths.DOC );
 	}
 }

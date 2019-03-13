@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.es7.Elasticsearch7Dialect;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
@@ -114,12 +115,24 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2748")
+	@TestForIssue(jiraKey = "HSEARCH-3490")
+	public void es700beta1() throws Exception {
+		testSuccess( "7.0.0-beta1", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3490")
 	public void es70() throws Exception {
-		doMock( "7.0.0" );
-		logged.expectMessage( "HSEARCH400085", "'7.0.0'" );
+		testSuccess( "7.0.0", Elasticsearch7Dialect.class );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2748")
+	public void es80() throws Exception {
+		doMock( "8.0.0" );
+		logged.expectMessage( "HSEARCH400085", "'8.0.0'" );
 		ElasticsearchDialect dialect = dialectFactory.createFromClusterVersion( clientMock );
-		assertThat( dialect ).isInstanceOf( Elasticsearch6Dialect.class );
+		assertThat( dialect ).isInstanceOf( Elasticsearch7Dialect.class );
 	}
 
 	private void testSuccess(String versionString, Class<?> expectedDialectClass) throws Exception {

@@ -31,7 +31,13 @@ public final class Paths {
 	public static final URLEncodedString _TEMPLATE = URLEncodedString.fromString( "_template" );
 	public static final URLEncodedString _CLUSTER = URLEncodedString.fromString( "_cluster" );
 	public static final URLEncodedString _BULK = URLEncodedString.fromString( "_bulk" );
+	public static final URLEncodedString _DOC = URLEncodedString.fromString( "_doc" );
 
+	/**
+	 * @deprecated Only useful in Elasticsearch 6 and below.
+	 */
+	@Deprecated
+	public static final URLEncodedString DOC = URLEncodedString.fromString( "doc" );
 	public static final URLEncodedString SCROLL = URLEncodedString.fromString( "scroll" );
 	public static final URLEncodedString HEALTH = URLEncodedString.fromString( "health" );
 

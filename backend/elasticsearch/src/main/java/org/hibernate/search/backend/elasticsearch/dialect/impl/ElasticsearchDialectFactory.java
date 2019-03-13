@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.es7.Elasticsearch7Dialect;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -51,12 +52,15 @@ public class ElasticsearchDialectFactory {
 				return new Elasticsearch56Dialect();
 			}
 		}
+		else if ( version.startsWith( "6." ) ) {
+			return new Elasticsearch6Dialect();
+		}
 		else {
 			// Either the latest supported version, or a newer/unknown one
-			if ( !version.startsWith( "6." ) ) {
+			if ( !version.startsWith( "7." ) ) {
 				log.unexpectedElasticsearchVersion( version );
 			}
-			return new Elasticsearch6Dialect();
+			return new Elasticsearch7Dialect();
 		}
 	}
 

@@ -38,7 +38,17 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 		private final URLEncodedString typeName;
 		private final JsonObject payload;
 
-		public Builder(
+		public static Builder forElasticsearch6AndBelow(GsonProvider gsonProvider,
+				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
+			return new Builder( gsonProvider, indexName, typeName, typeMapping );
+		}
+
+		public static Builder forElasticsearch7AndAbove(GsonProvider gsonProvider,
+				URLEncodedString indexName, RootTypeMapping typeMapping) {
+			return new Builder( gsonProvider, indexName, null, typeMapping );
+		}
+
+		private Builder(
 				GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName, RootTypeMapping typeMapping) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -56,9 +66,12 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.put()
-					.pathComponent( indexName )
-					.pathComponent( typeName )
-					.pathComponent( Paths._MAPPING )
+					.pathComponent( indexName );
+			// ES6 and below only
+			if ( typeName != null ) {
+				builder.pathComponent( typeName );
+			}
+			builder.pathComponent( Paths._MAPPING )
 					.body( payload );
 			return builder.build();
 		}
