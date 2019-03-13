@@ -59,7 +59,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ScrollWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWork;
 
 import com.google.gson.JsonObject;
@@ -109,7 +109,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public <T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return new SearchWork.Builder<>( payload, searchResultExtractor );
+		return ElasticsearchSearchWork.Builder.forElasticsearch7AndAbove( payload, searchResultExtractor );
 	}
 
 	@Override

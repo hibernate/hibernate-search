@@ -13,9 +13,14 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
+
+import com.google.gson.JsonObject;
 
 /**
  * A work builder factory for ES6.
@@ -31,6 +36,12 @@ public class Elasticsearch6WorkBuilderFactory extends Elasticsearch7WorkBuilderF
 
 	public Elasticsearch6WorkBuilderFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
+	}
+
+	@Override
+	public <T> SearchWorkBuilder<T> search(JsonObject payload,
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+		return ElasticsearchSearchWork.Builder.forElasticsearch6AndBelow( payload, searchResultExtractor );
 	}
 
 	@Override
