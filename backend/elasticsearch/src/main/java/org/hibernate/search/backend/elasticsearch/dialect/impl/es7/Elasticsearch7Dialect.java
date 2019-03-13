@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.dialect.impl.es7;
 
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch7SearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch7WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
@@ -26,5 +28,10 @@ public class Elasticsearch7Dialect implements ElasticsearchDialect {
 	@Override
 	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
 		return new Elasticsearch7WorkBuilderFactory( gsonProvider );
+	}
+
+	@Override
+	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
+		return new Elasticsearch7SearchResultExtractorFactory();
 	}
 }

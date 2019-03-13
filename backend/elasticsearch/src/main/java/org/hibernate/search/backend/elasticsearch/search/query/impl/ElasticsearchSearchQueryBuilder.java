@@ -30,6 +30,7 @@ class ElasticsearchSearchQueryBuilder<T>
 		implements SearchQueryBuilder<T, ElasticsearchSearchQueryElementCollector> {
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -43,6 +44,7 @@ class ElasticsearchSearchQueryBuilder<T>
 
 	ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
 			MultiTenancyStrategy multiTenancyStrategy,
 			Set<URLEncodedString> indexNames,
@@ -50,6 +52,7 @@ class ElasticsearchSearchQueryBuilder<T>
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		this.workFactory = workFactory;
+		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 
@@ -91,7 +94,7 @@ class ElasticsearchSearchQueryBuilder<T>
 		rootProjection.contributeRequest( payload, searchProjectionExecutionContext );
 
 		ElasticsearchSearchResultExtractor<T> searchResultExtractor =
-				new ElasticsearchSearchResultExtractorImpl<>( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
+				searchResultExtractorFactory.createResultExtractor( projectionHitMapper, rootProjection, searchProjectionExecutionContext );
 
 		return new ElasticsearchIndexSearchQuery<>(
 				workFactory, queryOrchestrator,
