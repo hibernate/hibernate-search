@@ -10,9 +10,12 @@ import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDial
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch7SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch7IndexFieldTypeFactoryContextProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch7WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
@@ -33,5 +36,11 @@ public class Elasticsearch7Dialect implements ElasticsearchDialect {
 	@Override
 	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
 		return new Elasticsearch7SearchResultExtractorFactory();
+	}
+
+	@Override
+	public ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(
+			Gson userFacingGson) {
+		return new Elasticsearch7IndexFieldTypeFactoryContextProvider( userFacingGson );
 	}
 }

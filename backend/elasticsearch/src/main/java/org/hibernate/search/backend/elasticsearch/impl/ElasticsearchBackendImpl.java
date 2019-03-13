@@ -22,9 +22,9 @@ import org.hibernate.search.backend.elasticsearch.index.management.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
-import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -86,7 +86,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final String name;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 
-	private final Gson userFacingGson;
+	private final ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider;
 
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
@@ -102,6 +102,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	ElasticsearchBackendImpl(ElasticsearchClientImplementor client, GsonProvider gsonProvider, String name,
 			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
@@ -115,10 +116,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
 				new LogErrorHandler()
 		);
-		this.userFacingGson = userFacingGson;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
+
+		this.typeFactoryContextProvider = typeFactoryContextProvider;
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexingContext = new IndexingBackendContext( eventContext, workFactory, multiTenancyStrategy,
@@ -177,7 +179,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
 		ElasticsearchIndexFieldTypeFactoryContext typeFactoryContext =
-				new ElasticsearchIndexFieldTypeFactoryContextImpl( indexEventContext, userFacingGson );
+				typeFactoryContextProvider.create( indexEventContext );
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(

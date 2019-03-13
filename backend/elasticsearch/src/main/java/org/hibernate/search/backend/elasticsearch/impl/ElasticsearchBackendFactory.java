@@ -26,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.Discriminato
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -102,6 +103,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchWorkBuilderFactory workFactory = dialect.createWorkBuilderFactory( dialectSpecificGsonProvider );
 
+			ElasticsearchIndexFieldTypeFactoryContextProvider typeFactoryContextProvider =
+					dialect.createIndexTypeFieldFactoryContextProvider( userFacingGson );
+
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory =
 					dialect.createSearchResultExtractorFactory();
 
@@ -113,6 +117,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					dialectSpecificGsonProvider,
 					name,
 					workFactory,
+					typeFactoryContextProvider,
 					searchResultExtractorFactory,
 					userFacingGson,
 					analysisDefinitionRegistry,

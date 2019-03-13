@@ -8,8 +8,10 @@ package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryContextProvider;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 /**
@@ -34,5 +36,7 @@ public interface ElasticsearchDialect {
 	ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider);
 
 	ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory();
+
+	ElasticsearchIndexFieldTypeFactoryContextProvider createIndexTypeFieldFactoryContextProvider(Gson userFacingGson);
 
 }
