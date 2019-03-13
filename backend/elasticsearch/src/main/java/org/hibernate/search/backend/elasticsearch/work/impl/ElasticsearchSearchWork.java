@@ -26,13 +26,13 @@ import com.google.gson.JsonObject;
 /**
  * @author Yoann Rodiere
  */
-public class SearchWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
+public class ElasticsearchSearchWork<T> extends AbstractSimpleElasticsearchWork<ElasticsearchLoadableSearchResult<T>> {
 
 	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<T> resultExtractor;
 
-	protected SearchWork(Builder<T> builder) {
+	protected ElasticsearchSearchWork(Builder<T> builder) {
 		super( builder );
 		this.resultExtractor = builder.resultExtractor;
 	}
@@ -56,8 +56,20 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 	public static class Builder<T>
 			extends AbstractBuilder<Builder<T>>
 			implements SearchWorkBuilder<T> {
+
+		public static <T> Builder<T> forElasticsearch6AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
+			return new Builder<>( payload, resultExtractor, null );
+		}
+
+		public static <T> Builder<T> forElasticsearch7AndAbove(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+			// TODO HSEARCH-3517 disable track_total_hits when possible
+			return new Builder<>( payload, resultExtractor, true );
+		}
+
 		private final JsonObject payload;
 		private final ElasticsearchSearchResultExtractor<T> resultExtractor;
+		private final Boolean trackTotalHits;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
 		private Long from;
@@ -66,10 +78,11 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 		private String scrollTimeout;
 		private Set<String> routingKeys;
 
-		public Builder(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor, Boolean trackTotalHits) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
+			this.trackTotalHits = trackTotalHits;
 		}
 
 		@Override
@@ -123,12 +136,16 @@ public class SearchWork<T> extends AbstractSimpleElasticsearchWork<Elasticsearch
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 
+			if ( trackTotalHits != null ) {
+				builder.param( "track_total_hits", trackTotalHits );
+			}
+
 			return builder.build();
 		}
 
 		@Override
-		public SearchWork<T> build() {
-			return new SearchWork<>( this );
+		public ElasticsearchSearchWork<T> build() {
+			return new ElasticsearchSearchWork<>( this );
 		}
 	}
 }
