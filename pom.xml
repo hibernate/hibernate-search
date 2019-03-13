@@ -414,6 +414,8 @@
         <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
+        <!-- Control how integration tests format the requests sent to Elasticsearch -->
+        <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 
         <!-- Eclipse plugin options -->
 
@@ -1499,6 +1501,7 @@
                             <com.sun.management.jmxremote>true</com.sun.management.jmxremote>
                             <org.hibernate.search.enable_performance_tests>${org.hibernate.search.enable_performance_tests}</org.hibernate.search.enable_performance_tests>
                             <org.hibernate.search.fail_on_unreleased_service>true</org.hibernate.search.fail_on_unreleased_service>
+                            <org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>${test.elasticsearch.testdialect}</org.hibernate.search.integrationtest.backend.elasticsearch.testdialect>
                         </systemPropertyVariables>
                         <argLine>${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}-${surefire.executing-module}</reportNameSuffix>
@@ -2210,6 +2213,7 @@
             <id>elasticsearch-5.6</id>
             <properties>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2239,6 +2243,7 @@
             </activation>
             <properties>
                 <test.elasticsearch.host.version>${version.org.elasticsearch.main}</test.elasticsearch.host.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch6TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2262,6 +2267,7 @@
             <id>elasticsearch-7.0</id>
             <properties>
                 <test.elasticsearch.host.version>7.0.0-beta1</test.elasticsearch.host.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>

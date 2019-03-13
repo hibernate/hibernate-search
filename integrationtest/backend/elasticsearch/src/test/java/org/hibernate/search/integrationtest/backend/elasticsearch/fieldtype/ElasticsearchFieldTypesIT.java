@@ -10,6 +10,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -27,6 +28,8 @@ public class ElasticsearchFieldTypesIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
+
+	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -76,11 +79,18 @@ public class ElasticsearchFieldTypesIT {
 		JsonObject mappings = new JsonObject();
 		payload.add( "mappings", mappings );
 
-		JsonObject doc = new JsonObject();
-		mappings.add( "doc", doc );
+		JsonObject mapping = dialect.getTypeNameForMappingApi()
+				// ES6 and below: the mapping has its own object node, child of "mappings"
+				.map( name -> {
+					JsonObject doc = new JsonObject();
+					mappings.add( name.original, doc );
+					return doc;
+				} )
+				// ES7 and below: the mapping is the "mappings" node
+				.orElse( mappings );
 
 		JsonObject properties = new JsonObject();
-		doc.add( "properties", properties );
+		mapping.add( "properties", properties );
 
 		properties.add( "keyword", type( "keyword" ) );
 		properties.add( "text", type( "text" ) );

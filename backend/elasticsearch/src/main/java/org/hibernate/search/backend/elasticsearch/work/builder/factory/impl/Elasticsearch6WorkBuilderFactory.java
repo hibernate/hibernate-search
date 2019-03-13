@@ -65,8 +65,7 @@ import com.google.gson.JsonObject;
 
 public class Elasticsearch6WorkBuilderFactory implements ElasticsearchWorkBuilderFactory {
 
-	// Exposed publicly for testing purposes
-	public static final URLEncodedString TYPE_NAME = URLEncodedString.fromString( "doc" );
+	private static final URLEncodedString TYPE_NAME = URLEncodedString.fromString( "doc" );
 
 	private final GsonProvider gsonProvider;
 
