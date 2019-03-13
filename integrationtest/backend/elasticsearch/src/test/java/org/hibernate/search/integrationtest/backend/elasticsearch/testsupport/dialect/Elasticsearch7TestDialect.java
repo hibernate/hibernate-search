@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -26,5 +28,10 @@ public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public Optional<URLEncodedString> getTypeNameForMappingApi() {
 		return Optional.empty();
+	}
+
+	@Override
+	public List<String> getAllLocalDateDefaultMappingFormats() {
+		return Collections.singletonList( "uuuu-MM-dd" );
 	}
 }

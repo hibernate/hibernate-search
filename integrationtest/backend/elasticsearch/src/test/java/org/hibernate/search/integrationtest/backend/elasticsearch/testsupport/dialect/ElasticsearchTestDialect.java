@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.dialect;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -18,6 +19,16 @@ public interface ElasticsearchTestDialect {
 
 	Optional<URLEncodedString> getTypeNameForMappingApi();
 
+	List<String> getAllLocalDateDefaultMappingFormats();
+
+	default String getFirstLocalDateDefaultMappingFormat() {
+		return getAllLocalDateDefaultMappingFormats().get( 0 );
+	}
+
+	default String getConcatenatedLocalDateDefaultMappingFormats() {
+		return String.join( "||", getAllLocalDateDefaultMappingFormats() );
+	}
+
 	static ElasticsearchTestDialect get() {
 		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
 		try {
@@ -28,7 +39,8 @@ public interface ElasticsearchTestDialect {
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(
-					"Unexpected error while initializing the ElasticsearchTestDialect with name " + dialectClassName,
+					"Unexpected error while initializing the ElasticsearchTestDialect with name '" + dialectClassName + "'."
+							+ " Did you properly set the appropriate elasticsearch-x.x profile?",
 					e
 			);
 		}

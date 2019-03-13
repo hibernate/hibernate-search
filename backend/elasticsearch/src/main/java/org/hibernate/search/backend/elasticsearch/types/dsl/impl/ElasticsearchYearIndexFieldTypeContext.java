@@ -6,17 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.YEAR;
-
 import java.time.Year;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.time.format.SignStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchYearFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -27,24 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchYearIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchYearIndexFieldTypeContext, Year> {
-
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.appendValue( YEAR, 4, 9, SignStyle.EXCEEDS_PAD )
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchYearFieldCodec DEFAULT_CODEC = new ElasticsearchYearFieldCodec( FORMATTER );
-
-	private final ElasticsearchYearFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchYearIndexFieldTypeContext, Year> {
 
 	ElasticsearchYearIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Year.class, DataType.DATE );
+		super( buildContext, Year.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<Year> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_year", "yyyyyyyyy" ) );
+	protected ElasticsearchIndexFieldType<Year> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchYearFieldCodec codec = new ElasticsearchYearFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends Year> dslToIndexConverter =
 				createDslToIndexConverter();

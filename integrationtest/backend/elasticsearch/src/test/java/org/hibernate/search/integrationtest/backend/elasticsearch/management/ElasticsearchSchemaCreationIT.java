@@ -78,7 +78,7 @@ public class ElasticsearchSchemaCreationIT {
 					+ "'properties': {"
 							+ "'myField': {"
 									+ "'type': 'date',"
-									+ "'format': 'strict_date||yyyyyyyyy-MM-dd',"
+									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
 									+ "'doc_values': false"
 							+ "}"
 					+ "}"

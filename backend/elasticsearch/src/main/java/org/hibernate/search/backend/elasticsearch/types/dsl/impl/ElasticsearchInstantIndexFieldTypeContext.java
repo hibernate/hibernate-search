@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchInstantFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -20,21 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchInstantIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchInstantIndexFieldTypeContext, Instant> {
-
-	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_INSTANT;
-
-	private static final ElasticsearchInstantFieldCodec DEFAULT_CODEC = new ElasticsearchInstantFieldCodec( FORMATTER );
-
-	private final ElasticsearchInstantFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchInstantIndexFieldTypeContext, Instant> {
 
 	ElasticsearchInstantIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, Instant.class, DataType.DATE );
+		super( buildContext, Instant.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<Instant> toIndexFieldType(PropertyMapping mapping) {
-		// Use default formats ("strict_date_optional_time||epoch_millis")
+	protected ElasticsearchIndexFieldType<Instant> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchInstantFieldCodec codec = new ElasticsearchInstantFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends Instant> dslToIndexConverter =
 				createDslToIndexConverter();

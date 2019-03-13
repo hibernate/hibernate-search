@@ -7,12 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
+import java.time.format.DateTimeFormatter;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchZonedDateTimeFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -23,31 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchZonedDateTimeIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchZonedDateTimeIndexFieldTypeContext, ZonedDateTime> {
-
-	private static final ElasticsearchZonedDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchZonedDateTimeFieldCodec(
-		new DateTimeFormatterBuilder()
-				.append( ElasticsearchOffsetDateTimeIndexFieldTypeContext.FORMATTER )
-				// ZoneRegionId is optional
-				.optionalStart()
-					.appendLiteral( '[' )
-					.parseCaseSensitive()
-					.appendZoneRegionId()
-					.appendLiteral( ']' )
-				.optionalEnd()
-				.toFormatter( Locale.ROOT )
-				.withResolverStyle( ResolverStyle.STRICT )
-	);
-
-	private final ElasticsearchZonedDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchZonedDateTimeIndexFieldTypeContext, ZonedDateTime> {
 
 	ElasticsearchZonedDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, ZonedDateTime.class, DataType.DATE );
+		super( buildContext, ZonedDateTime.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<ZonedDateTime> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'" ) );
+	protected ElasticsearchIndexFieldType<ZonedDateTime> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchZonedDateTimeFieldCodec codec = new ElasticsearchZonedDateTimeFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends ZonedDateTime> dslToIndexConverter =
 				createDslToIndexConverter();

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl;
 
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactoryContext;
 import org.hibernate.search.backend.elasticsearch.types.dsl.impl.ElasticsearchIndexFieldTypeFactoryContextImpl;
+import org.hibernate.search.backend.elasticsearch.types.format.impl.Elasticsearch6DefaultFieldFormatProvider;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
@@ -16,6 +17,8 @@ public class Elasticsearch6IndexFieldTypeFactoryContextProvider
 		implements ElasticsearchIndexFieldTypeFactoryContextProvider {
 
 	private final Gson userFacingGson;
+	private final Elasticsearch6DefaultFieldFormatProvider defaultFieldFormatProvider =
+			new Elasticsearch6DefaultFieldFormatProvider();
 
 	public Elasticsearch6IndexFieldTypeFactoryContextProvider(Gson userFacingGson) {
 		this.userFacingGson = userFacingGson;
@@ -23,7 +26,6 @@ public class Elasticsearch6IndexFieldTypeFactoryContextProvider
 
 	@Override
 	public ElasticsearchIndexFieldTypeFactoryContext create(EventContext eventContext) {
-		// FIXME use a different implementation for ES6 and ES7
-		return new ElasticsearchIndexFieldTypeFactoryContextImpl( eventContext, userFacingGson );
+		return new ElasticsearchIndexFieldTypeFactoryContextImpl( eventContext, userFacingGson, defaultFieldFormatProvider );
 	}
 }

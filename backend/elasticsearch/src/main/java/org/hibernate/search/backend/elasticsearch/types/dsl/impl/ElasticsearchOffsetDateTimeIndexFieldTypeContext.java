@@ -8,12 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchOffsetDateTimeFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -24,26 +19,15 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
 class ElasticsearchOffsetDateTimeIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchOffsetDateTimeIndexFieldTypeContext, OffsetDateTime> {
-
-	public static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchLocalDateTimeIndexFieldTypeContext.FORMATTER )
-			// OffsetId is mandatory
-			.appendOffsetId()
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchOffsetDateTimeFieldCodec DEFAULT_CODEC = new ElasticsearchOffsetDateTimeFieldCodec( FORMATTER );
-
-	private final ElasticsearchOffsetDateTimeFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchOffsetDateTimeIndexFieldTypeContext, OffsetDateTime> {
 
 	ElasticsearchOffsetDateTimeIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, OffsetDateTime.class, DataType.DATE );
+		super( buildContext, OffsetDateTime.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<OffsetDateTime> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_date_time", "yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZ" ) );
+	protected ElasticsearchIndexFieldType<OffsetDateTime> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchOffsetDateTimeFieldCodec codec = new ElasticsearchOffsetDateTimeFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends OffsetDateTime> dslToIndexConverter =
 				createDslToIndexConverter();

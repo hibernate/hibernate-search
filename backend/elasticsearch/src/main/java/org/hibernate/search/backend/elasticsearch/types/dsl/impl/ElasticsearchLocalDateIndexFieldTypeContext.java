@@ -6,16 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.ResolverStyle;
-import java.util.Arrays;
-import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.DataType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.esnative.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchLocalDateFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -30,26 +23,15 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
  * @author Guillaume Smet
  */
 class ElasticsearchLocalDateIndexFieldTypeContext
-		extends AbstractElasticsearchScalarFieldTypeContext<ElasticsearchLocalDateIndexFieldTypeContext, LocalDate> {
-
-	static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-			.append( ElasticsearchYearMonthIndexFieldTypeContext.FORMATTER )
-			.appendLiteral( '-' )
-			.appendValue( DAY_OF_MONTH, 2 )
-			.toFormatter( Locale.ROOT )
-			.withResolverStyle( ResolverStyle.STRICT );
-
-	private static final ElasticsearchLocalDateFieldCodec DEFAULT_CODEC = new ElasticsearchLocalDateFieldCodec( FORMATTER );
-
-	private final ElasticsearchLocalDateFieldCodec codec = DEFAULT_CODEC; // TODO HSEARCH-2354 add method to allow customization
+		extends AbstractElasticsearchTemporalIndexFieldTypeContext<ElasticsearchLocalDateIndexFieldTypeContext, LocalDate> {
 
 	ElasticsearchLocalDateIndexFieldTypeContext(ElasticsearchIndexFieldTypeBuildContext buildContext) {
-		super( buildContext, LocalDate.class, DataType.DATE );
+		super( buildContext, LocalDate.class );
 	}
 
 	@Override
-	protected ElasticsearchIndexFieldType<LocalDate> toIndexFieldType(PropertyMapping mapping) {
-		mapping.setFormat( Arrays.asList( "strict_date", "yyyyyyyyy-MM-dd" ) );
+	protected ElasticsearchIndexFieldType<LocalDate> toIndexFieldType(PropertyMapping mapping, DateTimeFormatter formatter) {
+		ElasticsearchLocalDateFieldCodec codec = new ElasticsearchLocalDateFieldCodec( formatter );
 
 		ToDocumentFieldValueConverter<?, ? extends LocalDate> dslToIndexConverter =
 				createDslToIndexConverter();
