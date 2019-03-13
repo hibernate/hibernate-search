@@ -24,6 +24,8 @@ import com.google.gson.JsonObject;
  */
 public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndexResult> {
 
+	private static final String MAPPINGS_PROPERTY = "mappings";
+
 	protected CreateIndexWork(Builder builder) {
 		super( builder );
 	}
@@ -48,7 +50,17 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		private final URLEncodedString typeName;
 		private final JsonObject payload = new JsonObject();
 
-		public Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName) {
+		public static Builder forElasticsearch6AndBelow(GsonProvider gsonProvider,
+				URLEncodedString indexName, URLEncodedString typeName) {
+			return new Builder( gsonProvider, indexName, typeName );
+		}
+
+		public static Builder forElasticsearch7AndAbove(GsonProvider gsonProvider,
+				URLEncodedString indexName) {
+			return new Builder( gsonProvider, indexName, null );
+		}
+
+		private Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
@@ -70,13 +82,19 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 		public Builder mapping(RootTypeMapping mapping) {
 			Gson gson = gsonProvider.getGsonNoSerializeNulls();
 
-			JsonObject mappings = payload.getAsJsonObject( "mappings" );
-			if ( mappings == null ) {
-				mappings = new JsonObject();
-				payload.add( "mappings", mappings );
+			if ( typeName != null ) {
+				// ES6 and below
+				JsonObject mappings = payload.getAsJsonObject( MAPPINGS_PROPERTY );
+				if ( mappings == null ) {
+					mappings = new JsonObject();
+					payload.add( MAPPINGS_PROPERTY, mappings );
+				}
+				mappings.add( typeName.original, gson.toJsonTree( mapping ) );
 			}
-
-			mappings.add( typeName.original, gson.toJsonTree( mapping ) );
+			else {
+				// ES7 and above
+				payload.add( MAPPINGS_PROPERTY, gson.toJsonTree( mapping ) );
+			}
 
 			return this;
 		}

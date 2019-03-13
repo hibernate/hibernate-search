@@ -8,10 +8,10 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.d
 
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
-	private final URLEncodedString _DOC = URLEncodedString.fromString( "_doc" );
 
 	@Override
 	public boolean isEmptyMappingPossible() {
@@ -20,7 +20,7 @@ public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 
 	@Override
 	public URLEncodedString getTypeKeywordForNonMappingApi() {
-		return _DOC;
+		return Paths._DOC;
 	}
 
 	@Override

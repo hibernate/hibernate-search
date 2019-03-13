@@ -49,9 +49,16 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 
 		if ( mappings != null ) {
 			GsonProvider gsonProvider = context.getGsonProvider();
-			Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
-			Map<String, RootTypeMapping> mappingsMap = gsonProvider.getGson().fromJson( mappings, mapType );
-			return mappingsMap.get( typeName.original );
+			if ( typeName != null ) {
+				// ES6 and below
+				Type mapType = STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN.getType();
+				Map<String, RootTypeMapping> mappingsMap = gsonProvider.getGson().fromJson( mappings, mapType );
+				return mappingsMap.get( typeName.original );
+			}
+			else {
+				// ES7 and above
+				return gsonProvider.getGson().fromJson( mappings, RootTypeMapping.class );
+			}
 		}
 		else {
 			return null;
@@ -63,6 +70,14 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 			implements GetIndexTypeMappingWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
+
+		public static Builder forElasticsearch6AndBelow(URLEncodedString indexName, URLEncodedString typeName) {
+			return new Builder( indexName, typeName );
+		}
+
+		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName) {
+			return new Builder( indexName, null );
+		}
 
 		public Builder(URLEncodedString indexName, URLEncodedString typeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
