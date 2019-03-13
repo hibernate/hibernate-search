@@ -7,6 +7,7 @@
 package org.hibernate.search.util.common.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +66,18 @@ public final class CollectionHelper {
 		list.add( firstItem );
 		Collections.addAll( list, otherItems );
 		return list;
+	}
+
+	@SafeVarargs
+	public static <T> List<T> asImmutableList(T ... items) {
+		switch ( items.length ) {
+			case 0:
+				return Collections.emptyList();
+			case 1:
+				return Collections.singletonList( items[0] );
+			default:
+				return Collections.unmodifiableList( Arrays.asList( items ) );
+		}
 	}
 
 	public static <T> List<T> toImmutableList(List<? extends T> list) {
