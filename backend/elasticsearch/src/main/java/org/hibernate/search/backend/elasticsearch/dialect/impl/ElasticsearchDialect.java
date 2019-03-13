@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 import com.google.gson.GsonBuilder;
@@ -31,5 +32,7 @@ public interface ElasticsearchDialect {
 	GsonBuilder createGsonBuilderBase();
 
 	ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider);
+
+	ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory();
 
 }

@@ -21,23 +21,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchSearchResultExtractor<T> {
+class Elasticsearch7SearchResultExtractor<T> implements ElasticsearchSearchResultExtractor<T> {
 
-	private static final JsonObjectAccessor HITS_ACCESSOR =
+	protected static final JsonObjectAccessor HITS_ACCESSOR =
 			JsonAccessor.root().property( "hits" ).asObject();
 
 	private static final JsonAccessor<JsonArray> HITS_HITS_ACCESSOR =
 			HITS_ACCESSOR.property( "hits" ).asArray();
 
 	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
-			HITS_ACCESSOR.property( "total" ).asLong();
+			HITS_ACCESSOR.property( "total" ).property( "value" ).asLong();
 
 	private final ProjectionHitMapper<?, ?> projectionHitMapper;
 	private final ElasticsearchSearchProjection<?, T> rootProjection;
 
 	private final SearchProjectionExtractContext searchProjectionExecutionContext;
 
-	public ElasticsearchSearchResultExtractorImpl(
+	Elasticsearch7SearchResultExtractor(
 			ProjectionHitMapper<?, ?> projectionHitMapper,
 			ElasticsearchSearchProjection<?, T> rootProjection,
 			SearchProjectionExtractContext searchProjectionExecutionContext) {
@@ -48,11 +48,15 @@ public class ElasticsearchSearchResultExtractorImpl<T> implements ElasticsearchS
 
 	@Override
 	public ElasticsearchLoadableSearchResult<T> extract(JsonObject responseBody) {
-		Long hitCount = HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
+		long hitCount = extractHitCount( responseBody );
 
 		final List<Object> extractedData = hitCount > 0 ? extractHits( responseBody ) : Collections.emptyList();
 
 		return new ElasticsearchLoadableSearchResult<>( projectionHitMapper, rootProjection, hitCount, extractedData );
+	}
+
+	protected long extractHitCount(JsonObject responseBody) {
+		return HITS_TOTAL_ACCESSOR.get( responseBody ).orElse( 0L );
 	}
 
 	private List<Object> extractHits(JsonObject responseBody) {

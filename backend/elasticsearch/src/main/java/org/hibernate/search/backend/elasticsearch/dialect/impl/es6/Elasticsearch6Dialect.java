@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.dialect.impl.es6;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.es7.Elasticsearch7Dialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch6SearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch6WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
@@ -21,5 +23,11 @@ public class Elasticsearch6Dialect extends Elasticsearch7Dialect implements Elas
 	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
 		// Necessary because of the breaking changes related to type names in ES7
 		return new Elasticsearch6WorkBuilderFactory( gsonProvider );
+	}
+
+	@Override
+	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
+		// Necessary because the total hit count is formatted differently in ES7
+		return new Elasticsearch6SearchResultExtractorFactory();
 	}
 }

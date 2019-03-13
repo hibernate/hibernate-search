@@ -28,6 +28,7 @@ public class SearchBackendContext {
 	private final EventContext eventContext;
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
+	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
@@ -39,12 +40,14 @@ public class SearchBackendContext {
 
 	public SearchBackendContext(EventContext eventContext,
 			ElasticsearchWorkBuilderFactory workFactory,
+			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			Gson userFacingGson,
 			Function<String, String> indexNameConverter,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator) {
 		this.eventContext = eventContext;
 		this.workFactory = workFactory;
+		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
@@ -86,7 +89,7 @@ public class SearchBackendContext {
 			ElasticsearchSearchProjection<?, T> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
-				workFactory, orchestrator, multiTenancyStrategy,
+				workFactory, searchResultExtractorFactory, orchestrator, multiTenancyStrategy,
 				indexNames, sessionContext, projectionHitMapper, rootProjection
 		);
 	}
