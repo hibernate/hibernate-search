@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -28,14 +27,12 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
-	private final ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy;
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
-			ElasticsearchIndexSettingsBuilder settingsBuilder,
-			ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy) {
+			ElasticsearchIndexSettingsBuilder settingsBuilder) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
@@ -43,7 +40,6 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
-		this.indexLifecycleStrategy = indexLifecycleStrategy;
 	}
 
 	@Override
@@ -66,8 +62,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		return new ElasticsearchIndexManagerImpl(
 				indexingBackendContext, searchBackendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				model,
-				indexLifecycleStrategy
+				model
 		);
 	}
 
