@@ -57,12 +57,6 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<Boolean> REFRESH_AFTER_WRITE =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.REFRESH_AFTER_WRITE )
-					.asBoolean()
-					.withDefault( ElasticsearchIndexSettings.Defaults.REFRESH_AFTER_WRITE )
-					.build();
-
 	private static final ConfigurationProperty<ElasticsearchIndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
 			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_STRATEGY )
 					.as( ElasticsearchIndexLifecycleStrategyName.class, ElasticsearchIndexLifecycleStrategyName::of )
@@ -218,16 +212,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchIndexSettingsBuilder settingsBuilder =
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
-		boolean refreshAfterWrite = REFRESH_AFTER_WRITE.get( propertySource );
-
 		ElasticsearchIndexLifecycleStrategy lifecycleStrategy = createIndexLifecycleStrategy( propertySource );
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexingContext, searchContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
 				indexSchemaRootNodeBuilder, settingsBuilder,
-				lifecycleStrategy,
-				refreshAfterWrite
+				lifecycleStrategy
 		);
 	}
 

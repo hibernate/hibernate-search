@@ -11,12 +11,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 /**
  * @author Yoann Rodiere
@@ -31,16 +29,13 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
 	private final ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy;
-	private final boolean refreshAfterWrite;
-
 
 	public ElasticsearchIndexManagerBuilder(IndexingBackendContext indexingBackendContext,
 			SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
-			ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy,
-			boolean refreshAfterWrite) {
+			ElasticsearchIndexLifecycleStrategy indexLifecycleStrategy) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 
@@ -49,7 +44,6 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
 		this.indexLifecycleStrategy = indexLifecycleStrategy;
-		this.refreshAfterWrite = refreshAfterWrite;
 	}
 
 	@Override
@@ -69,32 +63,12 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
 				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
 
-		ElasticsearchSharedWorkOrchestrator parallelOrchestrator = null;
-		ElasticsearchSharedWorkOrchestrator serialOrchestrator = null;
-		ElasticsearchIndexManagerImpl indexManager = null;
-
-		try {
-			parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName );
-			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName, refreshAfterWrite );
-
-			indexManager = new ElasticsearchIndexManagerImpl(
-					indexingBackendContext, searchBackendContext,
-					hibernateSearchIndexName, encodedElasticsearchIndexName,
-					model,
-					indexLifecycleStrategy,
-					serialOrchestrator, parallelOrchestrator,
-					refreshAfterWrite
-			);
-
-			return indexManager;
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( parallelOrchestrator )
-					.push( serialOrchestrator )
-					.push( indexManager );
-			throw e;
-		}
+		return new ElasticsearchIndexManagerImpl(
+				indexingBackendContext, searchBackendContext,
+				hibernateSearchIndexName, encodedElasticsearchIndexName,
+				model,
+				indexLifecycleStrategy
+		);
 	}
 
 }
