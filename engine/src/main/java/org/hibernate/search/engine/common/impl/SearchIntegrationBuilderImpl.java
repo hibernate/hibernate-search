@@ -199,7 +199,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			return new SearchIntegrationPartialBuildStateImpl(
 					beanResolver,
 					partiallyBuiltMappings,
-					indexManagerBuildingStateHolder.getBackendsByName(),
+					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName()
 			);
 		}

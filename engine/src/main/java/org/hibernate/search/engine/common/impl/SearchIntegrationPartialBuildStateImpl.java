@@ -12,15 +12,13 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -32,27 +30,31 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltMappings = new LinkedHashMap<>();
-	private final Map<String, BackendImplementor<?>> backends;
-	private final Map<String, IndexManagerImplementor<?>> indexManagers;
+	private final Map<String, BackendPartialBuildState> partiallyBuiltBackends;
+	private final Map<String, BackendImplementor<?>> fullyBuiltBackends = new LinkedHashMap<>();
+	private final Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers;
+	private final Map<String, IndexManagerImplementor<?>> fullyBuiltIndexManagers = new LinkedHashMap<>();
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanResolver beanResolver,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
-			Map<String, BackendImplementor<?>> backends,
-			Map<String, IndexManagerImplementor<?>> indexManagers) {
+			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
+			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers) {
 		this.beanResolver = beanResolver;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
-		this.backends = backends;
-		this.indexManagers = indexManagers;
+		this.partiallyBuiltBackends = partiallyBuiltBackends;
+		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
 	}
 
 	@Override
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
+			closer.pushAll( IndexManagerPartialBuildState::closeOnFailure, partiallyBuiltIndexManagers.values() );
+			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
 			closer.pushAll( MappingImplementor::close, fullyBuiltMappings.values() );
-			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
-			closer.pushAll( BackendImplementor::close, backends.values() );
+			closer.pushAll( IndexManagerImplementor::close, fullyBuiltIndexManagers.values() );
+			closer.pushAll( BackendImplementor::close, fullyBuiltBackends.values() );
 			closer.pushAll( BeanResolver::close, beanResolver );
 		}
 	}
@@ -89,44 +91,30 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
 
 		// Start backends
-		for ( Map.Entry<String, BackendImplementor<?>> entry : backends.entrySet() ) {
-			String backendName = entry.getKey();
-			BackendImplementor<?> backend = entry.getValue();
-			ContextualFailureCollector backendFailureCollector =
-					failureCollector.withContext( EventContexts.fromBackendName( backendName ) );
-			BackendStartContextImpl startContext = new BackendStartContextImpl( backendFailureCollector );
+		for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {
 			// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
-			try {
-				backend.start( startContext );
-			}
-			catch (RuntimeException e) {
-				backendFailureCollector.add( e );
-			}
+			fullyBuiltBackends.put(
+					entry.getKey(),
+					entry.getValue().finalizeBuild( failureCollector )
+			);
 		}
 		failureCollector.checkNoFailure();
 
 		// Start indexes
-		for ( Map.Entry<String, IndexManagerImplementor<?>> entry : indexManagers.entrySet() ) {
-			String indexName = entry.getKey();
-			IndexManagerImplementor<?> indexManager = entry.getValue();
-			ContextualFailureCollector indexFailureCollector =
-					failureCollector.withContext( EventContexts.fromIndexName( indexName ) );
-			IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl( indexFailureCollector );
+		for ( Map.Entry<String, IndexManagerPartialBuildState> entry : partiallyBuiltIndexManagers.entrySet() ) {
 			// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
-			try {
-				indexManager.start( startContext );
-			}
-			catch (RuntimeException e) {
-				indexFailureCollector.add( e );
-			}
+			fullyBuiltIndexManagers.put(
+					entry.getKey(),
+					entry.getValue().finalizeBuild( failureCollector )
+			);
 		}
 		failureCollector.checkNoFailure();
 
 		return new SearchIntegrationImpl(
 				beanResolver,
 				fullyBuiltMappings,
-				backends,
-				indexManagers
+				fullyBuiltBackends,
+				fullyBuiltIndexManagers
 		);
 	}
 }

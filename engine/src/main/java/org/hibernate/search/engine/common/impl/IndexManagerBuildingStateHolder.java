@@ -59,9 +59,9 @@ class IndexManagerBuildingStateHolder {
 	private final RootBuildContext rootBuildContext;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, BackendBuildingState<?>> backendBuildingStateByName = new LinkedHashMap<>();
+	private final Map<String, BackendInitialBuildState<?>> backendBuildStateByName = new LinkedHashMap<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, IndexManagerBuildingStateImpl<?>> indexManagerBuildingStateByName = new LinkedHashMap<>();
+	private final Map<String, IndexManagerInitialBuildState<?>> indexManagerBuildStateByName = new LinkedHashMap<>();
 
 	IndexManagerBuildingStateHolder(BeanProvider beanProvider, ConfigurationPropertySource propertySource,
 			RootBuildContext rootBuildContext) {
@@ -75,15 +75,15 @@ class IndexManagerBuildingStateHolder {
 				propertySource.withMask( EngineSettings.INDEXES ).withMask( indexName );
 		String backendName = getBackendName( indexName, indexPropertySource );
 
-		BackendBuildingState<?> backendBuildingstate =
-				backendBuildingStateByName.computeIfAbsent( backendName, this::createBackend );
+		BackendInitialBuildState<?> backendBuildingstate =
+				backendBuildStateByName.computeIfAbsent( backendName, this::createBackend );
 
-		IndexManagerBuildingStateImpl<?> state = indexManagerBuildingStateByName.get( indexName );
+		IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
 		if ( state == null ) {
 			state = backendBuildingstate.createIndexManagerBuildingState(
 					indexName, multiTenancyEnabled, indexPropertySource
 			);
-			indexManagerBuildingStateByName.put( indexName, state );
+			indexManagerBuildStateByName.put( indexName, state );
 		}
 		return state;
 	}
@@ -109,30 +109,30 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	Map<String, BackendImplementor<?>> getBackendsByName() {
+	Map<String, BackendPartialBuildState> getBackendPartialBuildStates() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, BackendImplementor<?>> backendsByName = new LinkedHashMap<>();
-		for ( Map.Entry<String, BackendBuildingState<?>> entry : backendBuildingStateByName.entrySet() ) {
-			backendsByName.put( entry.getKey(), entry.getValue().getBuilt() );
+		Map<String, BackendPartialBuildState> backendsByName = new LinkedHashMap<>();
+		for ( Map.Entry<String, BackendInitialBuildState<?>> entry : backendBuildStateByName.entrySet() ) {
+			backendsByName.put( entry.getKey(), entry.getValue().getPartiallyBuilt() );
 		}
 		return backendsByName;
 	}
 
-	Map<String, IndexManagerImplementor<?>> getIndexManagersByName() {
+	Map<String, IndexManagerPartialBuildState> getIndexManagersByName() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, IndexManagerImplementor<?>> indexManagersByName = new LinkedHashMap<>();
-		for ( Map.Entry<String, IndexManagerBuildingStateImpl<?>> entry : indexManagerBuildingStateByName.entrySet() ) {
-			indexManagersByName.put( entry.getKey(), entry.getValue().getBuilt() );
+		Map<String, IndexManagerPartialBuildState> indexManagersByName = new LinkedHashMap<>();
+		for ( Map.Entry<String, IndexManagerInitialBuildState<?>> entry : indexManagerBuildStateByName.entrySet() ) {
+			indexManagersByName.put( entry.getKey(), entry.getValue().getPartialBuildState() );
 		}
 		return indexManagersByName;
 	}
 
 	void closeOnFailure(SuppressingCloser closer) {
-		closer.pushAll( state -> state.closeOnFailure( closer ), indexManagerBuildingStateByName.values() );
-		closer.pushAll( BackendBuildingState::closeOnFailure, backendBuildingStateByName.values() );
+		closer.pushAll( state -> state.closeOnFailure( closer ), indexManagerBuildStateByName.values() );
+		closer.pushAll( BackendInitialBuildState::closeOnFailure, backendBuildStateByName.values() );
 	}
 
-	private BackendBuildingState<?> createBackend(String backendName) {
+	private BackendInitialBuildState<?> createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource =
 				propertySource.withMask( EngineSettings.BACKENDS ).withMask( backendName );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
@@ -145,25 +145,29 @@ class IndexManagerBuildingStateHolder {
 
 			BackendImplementor<?> backend = backendFactoryHolder.get()
 					.create( backendName, backendBuildContext, backendPropertySource );
-			return new BackendBuildingState<>( backendBuildContext, backendPropertySource, backend );
+			return new BackendInitialBuildState<>( backendName, backendBuildContext, backendPropertySource, backend );
 		}
 	}
 
-	private class BackendBuildingState<D extends DocumentElement> {
+	private class BackendInitialBuildState<D extends DocumentElement> {
+		private final String backendName;
 		private final BackendBuildContext backendBuildContext;
 		private final ConfigurationPropertySource defaultIndexPropertySource;
 		private final BackendImplementor<D> backend;
 
-		private BackendBuildingState(BackendBuildContext backendBuildContext,
+		private BackendInitialBuildState(
+				String backendName,
+				BackendBuildContext backendBuildContext,
 				ConfigurationPropertySource backendPropertySource,
 				BackendImplementor<D> backend) {
+			this.backendName = backendName;
 			this.backendBuildContext = backendBuildContext;
 			this.defaultIndexPropertySource =
 					backendPropertySource.withMask( BackendSettings.INDEX_DEFAULTS );
 			this.backend = backend;
 		}
 
-		IndexManagerBuildingStateImpl<D> createIndexManagerBuildingState(
+		IndexManagerInitialBuildState<D> createIndexManagerBuildingState(
 				String indexName, boolean multiTenancyEnabled,
 				ConfigurationPropertySource indexPropertySource) {
 			ConfigurationPropertySource defaultedIndexPropertySource =
@@ -173,27 +177,27 @@ class IndexManagerBuildingStateHolder {
 			);
 			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 			IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
-			return new IndexManagerBuildingStateImpl<>( indexName, builder, bindingContext );
+			return new IndexManagerInitialBuildState<>( indexName, builder, bindingContext );
 		}
 
 		void closeOnFailure() {
 			backend.close();
 		}
 
-		BackendImplementor<D> getBuilt() {
-			return backend;
+		BackendPartialBuildState getPartiallyBuilt() {
+			return new BackendPartialBuildState( backendName, backend );
 		}
 	}
 
-	private class IndexManagerBuildingStateImpl<D extends DocumentElement> implements IndexManagerBuildingState<D> {
+	private class IndexManagerInitialBuildState<D extends DocumentElement> implements IndexManagerBuildingState<D> {
 
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
 		private final IndexModelBindingContext bindingContext;
 
-		private IndexManagerImplementor<D> built;
+		private IndexManagerImplementor<D> indexManager;
 
-		IndexManagerBuildingStateImpl(String indexName,
+		IndexManagerInitialBuildState(String indexName,
 				IndexManagerBuilder<D> builder,
 				IndexModelBindingContext bindingContext) {
 			this.indexName = indexName;
@@ -202,8 +206,8 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		void closeOnFailure(SuppressingCloser closer) {
-			if ( built != null ) {
-				closer.push( IndexManagerImplementor::close, built );
+			if ( indexManager != null ) {
+				closer.push( IndexManagerImplementor::close, indexManager );
 			}
 			else {
 				closer.push( IndexManagerBuilder::closeOnFailure, builder );
@@ -222,24 +226,24 @@ class IndexManagerBuildingStateHolder {
 
 		@Override
 		public MappedIndexManager<D> build() {
-			if ( built != null ) {
+			if ( indexManager != null ) {
 				throw new AssertionFailure(
 						"Trying to build index manager " + indexName + " twice."
 						+ " There is probably a bug in the mapper implementation."
 				);
 			}
-			built = builder.build();
-			return new MappedIndexManagerImpl<>( built );
+			indexManager = builder.build();
+			return new MappedIndexManagerImpl<>( indexManager );
 		}
 
-		public IndexManagerImplementor<D> getBuilt() {
-			if ( built == null ) {
+		IndexManagerPartialBuildState getPartialBuildState() {
+			if ( indexManager == null ) {
 				throw new AssertionFailure(
 						"Index manager " + indexName + " was not built by the mapper as expected."
 						+ " There is probably a bug in the mapper implementation."
 				);
 			}
-			return built;
+			return new IndexManagerPartialBuildState( indexName, indexManager );
 		}
 	}
 
