@@ -13,6 +13,8 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
+import com.google.gson.JsonObject;
+
 @SuppressWarnings("deprecation") // We use Paths.DOC on purpose
 public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	@Override
@@ -33,5 +35,10 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public List<String> getAllLocalDateDefaultMappingFormats() {
 		return Arrays.asList( "yyyy-MM-dd", "yyyyyyyyy-MM-dd" );
+	}
+
+	@Override
+	public void setTemplatePattern(JsonObject object, String pattern) {
+		object.addProperty( "template", pattern );
 	}
 }

@@ -13,6 +13,9 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 
 	@Override
@@ -33,5 +36,12 @@ public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 	@Override
 	public List<String> getAllLocalDateDefaultMappingFormats() {
 		return Collections.singletonList( "uuuu-MM-dd" );
+	}
+
+	@Override
+	public void setTemplatePattern(JsonObject object, String pattern) {
+		JsonArray array = new JsonArray();
+		array.add( pattern );
+		object.add( "index_patterns", array );
 	}
 }

@@ -262,7 +262,7 @@ public class TestElasticsearchClient implements TestRule {
 
 	private void createTemplate(String templateName, String templateString, JsonObject settings) {
 		JsonObject source = new JsonObject();
-		source.addProperty( "template", templateString );
+		dialect.setTemplatePattern( source, templateString );
 		source.add( "settings", settings );
 
 		registerTemplateForCleanup( templateName );

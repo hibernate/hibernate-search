@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
+import com.google.gson.JsonObject;
+
 public interface ElasticsearchTestDialect {
 
 	boolean isEmptyMappingPossible();
@@ -28,6 +30,8 @@ public interface ElasticsearchTestDialect {
 	default String getConcatenatedLocalDateDefaultMappingFormats() {
 		return String.join( "||", getAllLocalDateDefaultMappingFormats() );
 	}
+
+	void setTemplatePattern(JsonObject object, String pattern);
 
 	static ElasticsearchTestDialect get() {
 		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
