@@ -46,12 +46,12 @@ public class DocumentService {
 	}
 
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
-		return documentRepo.searchByMedium( terms, medium, offset, limit );
+		return documentRepo.searchByMedium( terms, medium, limit, offset );
 	}
 
 	public List<Document<?>> searchAroundMe(String terms, String tags, GeoPoint myLocation, Double maxDistanceInKilometers, List<LibraryServiceOption> options,
 			int offset, int limit) {
-		return documentRepo.searchAroundMe( terms, tags, myLocation, maxDistanceInKilometers, options, offset, limit );
+		return documentRepo.searchAroundMe( terms, tags, myLocation, maxDistanceInKilometers, options, limit, offset );
 	}
 
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
