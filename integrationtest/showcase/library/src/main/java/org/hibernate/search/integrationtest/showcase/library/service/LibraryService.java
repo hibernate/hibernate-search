@@ -58,6 +58,6 @@ public class LibraryService {
 	}
 
 	public List<Library> search(String terms, int offset, int limit) {
-		return libraryRepo.search( terms, offset, limit );
+		return libraryRepo.search( terms, limit, offset );
 	}
 }
