@@ -242,9 +242,11 @@ public class TestElasticsearchClient implements TestRule {
 	}
 
 	private void deleteAndCreateIndex(URLEncodedString indexName, JsonObject settingsAsJsonObject) {
+		JsonObject payload = new JsonObject();
+		payload.add( "settings", settingsAsJsonObject );
 		doDeleteAndCreateIndex(
 				indexName,
-				ElasticsearchRequest.put().pathComponent( indexName ).body( settingsAsJsonObject ).build()
+				ElasticsearchRequest.put().pathComponent( indexName ).body( payload ).build()
 				);
 	}
 
