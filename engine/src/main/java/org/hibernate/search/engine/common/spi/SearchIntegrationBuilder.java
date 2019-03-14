@@ -24,8 +24,6 @@ public interface SearchIntegrationBuilder {
 
 	SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver);
 
-	SearchIntegrationBuilder setProperty(String name, Object value);
-
 	<PBM extends MappingPartialBuildState> SearchIntegrationBuilder addMappingInitiator(
 			MappingKey<PBM, ?> mappingKey, MappingInitiator<?, PBM> initiator);
 

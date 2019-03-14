@@ -97,8 +97,8 @@ public class SearchSetupHelper implements TestRule {
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
 
-		SetupContext(ConfigurationPropertySource propertySource) {
-			this.propertySource = propertySource;
+		SetupContext(ConfigurationPropertySource basePropertySource) {
+			this.propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
 		}
 
 		public SetupContext withProperty(String key, Object value) {
@@ -136,10 +136,6 @@ public class SearchSetupHelper implements TestRule {
 
 		public SearchIntegration setup() {
 			SearchIntegrationBuilder integrationBuilder = SearchIntegration.builder( propertySource );
-
-			for ( Map.Entry<String, Object> entry : overriddenProperties.entrySet() ) {
-				integrationBuilder = integrationBuilder.setProperty( entry.getKey(), entry.getValue() );
-			}
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
 			StubMappingKey mappingKey = new StubMappingKey();

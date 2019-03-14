@@ -60,7 +60,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	private static final int FAILURE_LIMIT = 100;
 
 	private final ConfigurationPropertySource mainPropertySource;
-	private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
 
 	private ClassResolver classResolver;
@@ -87,12 +86,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	@Override
 	public SearchIntegrationBuilder setBeanResolver(BeanResolver beanResolver) {
 		this.beanResolver = beanResolver;
-		return this;
-	}
-
-	@Override
-	public SearchIntegrationBuilder setProperty(String name, Object value) {
-		this.overriddenProperties.put( name, value );
 		return this;
 	}
 
@@ -149,15 +142,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				beanResolver = new ReflectionBeanResolver( classResolver );
 			}
 
-			ConfigurationPropertySource propertySource;
-			if ( !overriddenProperties.isEmpty() ) {
-				propertySource = mainPropertySource.withOverride(
-						ConfigurationPropertySource.fromMap( overriddenProperties )
-				);
-			}
-			else {
-				propertySource = mainPropertySource;
-			}
+			ConfigurationPropertySource propertySource = mainPropertySource;
 
 			BeanProvider beanProvider = new ConfiguredBeanProvider( classResolver, beanResolver, propertySource );
 			ServiceManager serviceManager = new ServiceManagerImpl( classResolver, resourceResolver, beanProvider );
