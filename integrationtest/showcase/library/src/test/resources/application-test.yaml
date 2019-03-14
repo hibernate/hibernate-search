@@ -18,7 +18,7 @@ spring.jpa:
 logging.level:
   org.hibernate.SQL: DEBUG
   org.hibernate.search.massindexing: INFO
-  org.hibernate.search.fulltext_query: DEBUG
+  org.hibernate.search.query: DEBUG
   org.hibernate.search.elasticsearch.request: DEBUG
   org.hibernate.search.backend.lucene: DEBUG
 

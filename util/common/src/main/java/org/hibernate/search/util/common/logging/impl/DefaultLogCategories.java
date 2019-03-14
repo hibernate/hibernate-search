@@ -19,6 +19,6 @@ public final class DefaultLogCategories {
 	/**
 	 * Category for logging executed search queries.
 	 */
-	public static final LogCategory QUERY = new LogCategory( "org.hibernate.search.fulltext_query" );
+	public static final LogCategory QUERY = new LogCategory( "org.hibernate.search.query" );
 
 }
