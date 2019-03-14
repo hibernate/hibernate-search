@@ -107,7 +107,7 @@ public class ElasticsearchExtensionIT {
 								)
 						)
 						// Also test using the standard DSL on a field defined with the extension
-						.should( f.match().onField( "yearDays" ).matching( "'2018:12'" ) )
+						.should( f.match().onField( "dateWithColons" ).matching( "'2018:01:12'" ) )
 				)
 				.toQuery();
 		assertThat( query )
@@ -137,8 +137,8 @@ public class ElasticsearchExtensionIT {
 				)
 				.toPredicate();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchPredicate predicate4 = scope.predicate().match().onField( "yearDays" )
-				.matching( "'2018:12'" ).toPredicate();
+		SearchPredicate predicate4 = scope.predicate().match().onField( "dateWithColons" )
+				.matching( "'2018:01:12'" ).toPredicate();
 		SearchPredicate booleanPredicate = scope.predicate().bool()
 				.should( predicate1 )
 				.should( predicate2 )
@@ -267,7 +267,7 @@ public class ElasticsearchExtensionIT {
 						+ "'string': 'text 2',"
 						+ "'integer': 1,"
 						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'yearDays': '2018:025',"
+						+ "'dateWithColons': '2018:01:25',"
 						+ "'sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
@@ -302,7 +302,7 @@ public class ElasticsearchExtensionIT {
 						+ "'string': 'text 2',"
 						+ "'integer': 1,"
 						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'yearDays': '2018:025',"
+						+ "'dateWithColons': '2018:01:25',"
 						+ "'sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
@@ -417,7 +417,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.sort5, "a" );
 		} );
 		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( indexMapping.yearDays, "'2018:012'" );
+			document.addValue( indexMapping.dateWithColons, "'2018:01:12'" );
 
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "z" );
@@ -430,7 +430,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.string, "'text 2'" );
 			document.addValue( indexMapping.integer, "1" );
 			document.addValue( indexMapping.geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
-			document.addValue( indexMapping.yearDays, "'2018:025'" );
+			document.addValue( indexMapping.dateWithColons, "'2018:01:25'" );
 
 			document.addValue( indexMapping.sort5, "z" );
 		} );
@@ -454,7 +454,7 @@ public class ElasticsearchExtensionIT {
 		final IndexFieldReference<String> integer;
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<String> geoPoint;
-		final IndexFieldReference<String> yearDays;
+		final IndexFieldReference<String> dateWithColons;
 
 		final IndexFieldReference<String> sort1;
 		final IndexFieldReference<String> sort2;
@@ -481,10 +481,10 @@ public class ElasticsearchExtensionIT {
 							.asJsonString( "{'type': 'geo_point'}" )
 			)
 					.toReference();
-			yearDays = root.field(
-					"yearDays",
+			dateWithColons = root.field(
+					"dateWithColons",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asJsonString( "{'type': 'date', 'format': 'yyyy:DDD'}" )
+							.asJsonString( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
 			)
 					.toReference();
 
