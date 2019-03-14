@@ -9,11 +9,14 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSharedWorkOrchestrator;
@@ -27,6 +30,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexSearchScopeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.mapper.mapping.context.spi.MappingContextImplementor;
@@ -51,6 +55,24 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 					.withDefault( ElasticsearchIndexSettings.Defaults.REFRESH_AFTER_WRITE )
 					.build();
 
+	private static final ConfigurationProperty<ElasticsearchIndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_STRATEGY )
+					.as( ElasticsearchIndexLifecycleStrategyName.class, ElasticsearchIndexLifecycleStrategyName::of )
+					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_STRATEGY )
+					.build();
+
+	private static final ConfigurationProperty<ElasticsearchIndexStatus> MANAGEMENT_REQUIRED_STATUS =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
+					.as( ElasticsearchIndexStatus.class, ElasticsearchIndexStatus::of )
+					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
+					.build();
+
+	private static final ConfigurationProperty<Integer> MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.build();
+
 	private final IndexingBackendContext indexingBackendContext;
 	private final SearchBackendContext searchBackendContext;
 
@@ -58,8 +80,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final URLEncodedString elasticsearchIndexName;
 	private final ElasticsearchIndexModel model;
 
-	private final ElasticsearchIndexLifecycleStrategy managementStrategy;
 	private final ElasticsearchIndexAdministrationClient administrationClient;
+
+	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
 	private ElasticsearchSharedWorkOrchestrator serialOrchestrator;
 	private ElasticsearchSharedWorkOrchestrator parallelOrchestrator;
@@ -67,14 +90,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	ElasticsearchIndexManagerImpl(IndexingBackendContext indexingBackendContext, SearchBackendContext searchBackendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
-			ElasticsearchIndexModel model,
-			ElasticsearchIndexLifecycleStrategy managementStrategy) {
+			ElasticsearchIndexModel model) {
 		this.indexingBackendContext = indexingBackendContext;
 		this.searchBackendContext = searchBackendContext;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.model = model;
-		this.managementStrategy = managementStrategy;
 		this.administrationClient = indexingBackendContext.createAdministrationClient(
 				elasticsearchIndexName, model
 		);
@@ -84,16 +105,22 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	public void start(IndexManagerStartContext context) {
 		try {
 			/*
+			 * Create the lifecycle strategy late to allow the related settings to be changed
+			 * after the first phase of bootstrap (useful for compile-time boot).
+			 */
+			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
+
+			/*
 			 * Create orchestrators late to allow the refresh_after_write setting to be changed
 			 * after the first phase of bootstrap (useful for compile-time boot).
- 			 */
+			 */
 			refreshAfterWrite = REFRESH_AFTER_WRITE.get( context.getConfigurationPropertySource() );
 			parallelOrchestrator = indexingBackendContext.createParallelOrchestrator( elasticsearchIndexName.original );
 			serialOrchestrator = indexingBackendContext.createSerialOrchestrator( elasticsearchIndexName.original, refreshAfterWrite );
 
+			lifecycleStrategy.onStart( administrationClient, context );
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
-			managementStrategy.onStart( administrationClient, context );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -110,7 +137,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			serialOrchestrator = null;
 			closer.push( ElasticsearchWorkOrchestrator::close, parallelOrchestrator );
 			parallelOrchestrator = null;
-			closer.push( strategy -> strategy.onStop( administrationClient ), managementStrategy );
+			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
 		}
 		catch (IOException e) {
 			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, indexingBackendContext.getEventContext() );
@@ -187,6 +214,16 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private EventContext getBackendAndIndexEventContext() {
 		return indexingBackendContext.getEventContext().append(
 				EventContexts.fromIndexName( hibernateSearchIndexName )
+		);
+	}
+
+	private ElasticsearchIndexLifecycleStrategy createLifecycleStrategy(ConfigurationPropertySource propertySource) {
+		return new ElasticsearchIndexLifecycleStrategy(
+				LIFECYCLE_STRATEGY.get( propertySource ),
+				new ElasticsearchIndexLifecycleExecutionOptions(
+						MANAGEMENT_REQUIRED_STATUS.get( propertySource ),
+						MANAGEMENT_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
+				)
 		);
 	}
 
