@@ -479,9 +479,9 @@ public class MatchSearchPredicateIT {
 				text -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
-								.fuzzy()
 								.onField( absoluteFieldPath )
-								.matching( text ) )
+								.matching( text )
+								.fuzzy() )
 						.toQuery();
 
 		// max edit distance = default (2), ignored prefix length = default (0)
@@ -504,9 +504,9 @@ public class MatchSearchPredicateIT {
 				(text, maxEditDistance) -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
-								.fuzzy( maxEditDistance )
 								.onField( absoluteFieldPath )
-								.matching( text ) )
+								.matching( text )
+								.fuzzy( maxEditDistance ) )
 						.toQuery();
 
 		// max edit distance = 2
@@ -549,9 +549,9 @@ public class MatchSearchPredicateIT {
 				(text, exactPrefixLength) -> scope.query()
 						.asReference()
 						.predicate( f -> f.match()
-								.fuzzy( 1, exactPrefixLength )
 								.onField( absoluteFieldPath )
-								.matching( text ) )
+								.matching( text )
+								.fuzzy( 1, exactPrefixLength ) )
 						.toQuery();
 
 		// exact prefix length = 0
@@ -593,7 +593,7 @@ public class MatchSearchPredicateIT {
 
 		createQuery = param -> scope.query()
 				.asReference()
-				.predicate( f -> f.match().fuzzy().onField( absoluteFieldPath ).matching( param ) )
+				.predicate( f -> f.match().onField( absoluteFieldPath ).matching( param ).fuzzy() )
 				.toQuery();
 		assertThat( createQuery.apply( "Irving" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -606,8 +606,8 @@ public class MatchSearchPredicateIT {
 
 		createQuery = param -> scope.query()
 				.asReference()
-				.predicate( f -> f.match().fuzzy( 2, 1 ).onField( absoluteFieldPath )
-						.matching( param ) )
+				.predicate( f -> f.match().onField( absoluteFieldPath )
+						.matching( param ).fuzzy( 2, 1 ) )
 				.toQuery();
 		assertThat( createQuery.apply( "Irving" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -629,7 +629,7 @@ public class MatchSearchPredicateIT {
 
 		createQuery = param -> scope.query()
 				.asReference()
-				.predicate( f -> f.match().fuzzy().onFields( absoluteFieldPath1, absoluteFieldPath2 ).matching( param ) )
+				.predicate( f -> f.match().onFields( absoluteFieldPath1, absoluteFieldPath2 ).matching( param ).fuzzy() )
 				.toQuery();
 		assertThat( createQuery.apply( "word" ) ) // distance 1 from doc1:field2, 0 from doc2:field1
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
@@ -651,8 +651,8 @@ public class MatchSearchPredicateIT {
 
 			SubTest.expectException(
 					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().match().fuzzy()
-							.onField( absoluteFieldPath ).matching( valueToMatch )
+					() -> scope.predicate().match()
+							.onField( absoluteFieldPath ).matching( valueToMatch ).fuzzy()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -664,8 +664,8 @@ public class MatchSearchPredicateIT {
 
 			SubTest.expectException(
 					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().match().fuzzy( 1 )
-							.onField( absoluteFieldPath ).matching( valueToMatch )
+					() -> scope.predicate().match()
+							.onField( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -677,8 +677,8 @@ public class MatchSearchPredicateIT {
 
 			SubTest.expectException(
 					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().match().fuzzy( 1, 1 )
-							.onField( absoluteFieldPath ).matching( valueToMatch )
+					() -> scope.predicate().match()
+							.onField( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1, 1 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -693,9 +693,11 @@ public class MatchSearchPredicateIT {
 	@Test
 	public void error_fuzzy_invalidMaxEditDistance() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
 		SubTest.expectException(
-				() -> scope.predicate().match().fuzzy( 3 )
+				() -> scope.predicate().match().onField( absoluteFieldPath )
+						.matching( "foo" ).fuzzy( 3 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -703,7 +705,8 @@ public class MatchSearchPredicateIT {
 				.hasMessageContaining( "0, 1 or 2" );
 
 		SubTest.expectException(
-				() -> scope.predicate().match().fuzzy( -1 )
+				() -> scope.predicate().match().onField( absoluteFieldPath )
+						.matching( "foo" ).fuzzy( -1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -714,9 +717,11 @@ public class MatchSearchPredicateIT {
 	@Test
 	public void error_fuzzy_invalidPrefixLength() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
 		SubTest.expectException(
-				() -> scope.predicate().match().fuzzy( 1, -1 )
+				() -> scope.predicate().match().onField( absoluteFieldPath )
+						.matching( "foo" ).fuzzy( 1, -1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
