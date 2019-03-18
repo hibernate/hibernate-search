@@ -178,7 +178,7 @@ public interface SearchPredicateFactoryContext {
 	 * Note that by default, unless the query string contains explicit operators,
 	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
 	 * This makes sense when sorting results by relevance, but is not ideal otherwise.
-	 * See {@link SimpleQueryStringPredicateFieldSetContext#withAndAsDefaultOperator()} to change this behavior.
+	 * See {@link SimpleQueryStringPredicateTerminalContext#withAndAsDefaultOperator()} to change this behavior.
 	 *
 	 * @return A context allowing to define the predicate more precisely
 	 * and ultimately {@link SearchPredicateTerminalContext#toPredicate() get the resulting predicate}.

@@ -12,18 +12,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 public interface SimpleQueryStringPredicateFieldSetContext extends MultiFieldPredicateFieldSetContext<SimpleQueryStringPredicateFieldSetContext> {
 
 	/**
-	 * Define the default operator as AND.
-	 * <p>
-	 * By default, unless the query string contains explicit operators,
-	 * documents will match if <em>any</em> term mentioned in the query string is present in the document (OR operator).
-	 * This will change the default behavior,
-	 * making document match if <em>all</em> terms mentioned in the query string are present in the document.
-	 *
-	 * @return {@code this}, for method chaining.
-	 */
-	SimpleQueryStringPredicateFieldSetContext withAndAsDefaultOperator();
-
-	/**
 	 * Target the given field in the simple query string predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
@@ -61,6 +49,6 @@ public interface SimpleQueryStringPredicateFieldSetContext extends MultiFieldPre
 	 * @param simpleQueryString The query string to match.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext matching(String simpleQueryString);
+	SimpleQueryStringPredicateTerminalContext matching(String simpleQueryString);
 
 }

@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.SimpleQueryStringPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.spi.AbstractSearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -41,12 +41,6 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldSetContext withAndAsDefaultOperator() {
-		commonState.withAndAsDefaultOperator();
-		return this;
-	}
-
-	@Override
 	public SimpleQueryStringPredicateFieldSetContext orFields(String... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
@@ -58,12 +52,12 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext matching(String simpleQueryString) {
+	public SimpleQueryStringPredicateTerminalContext matching(String simpleQueryString) {
 		return commonState.matching( simpleQueryString );
 	}
 
 	static class CommonState<B> extends AbstractSearchPredicateTerminalContext<B>
-			implements SearchPredicateTerminalContext {
+			implements SimpleQueryStringPredicateTerminalContext {
 
 		private final SimpleQueryStringPredicateBuilder<B> builder;
 
@@ -95,15 +89,17 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 			return builder.field( absoluteFieldPath );
 		}
 
-		void withAndAsDefaultOperator() {
-			builder.withAndAsDefaultOperator();
-		}
-
-		private SearchPredicateTerminalContext matching(String simpleQueryString) {
+		private SimpleQueryStringPredicateTerminalContext matching(String simpleQueryString) {
 			if ( simpleQueryString == null ) {
 				throw log.simpleQueryStringCannotBeNull( collectAbsoluteFieldPaths() );
 			}
 			builder.simpleQueryString( simpleQueryString );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryStringPredicateTerminalContext withAndAsDefaultOperator() {
+			builder.withAndAsDefaultOperator();
 			return this;
 		}
 
