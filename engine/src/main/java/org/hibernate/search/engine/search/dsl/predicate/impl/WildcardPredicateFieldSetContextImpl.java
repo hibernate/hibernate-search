@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.WildcardPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -54,7 +54,7 @@ class WildcardPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext matching(String wildcard) {
+	public WildcardPredicateTerminalContext matching(String wildcard) {
 		return commonState.matching( wildcard );
 	}
 
@@ -71,13 +71,13 @@ class WildcardPredicateFieldSetContextImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, WildcardPredicateFieldSetContextImpl<B>>
-			implements SearchPredicateTerminalContext {
+			implements WildcardPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 
-		private SearchPredicateTerminalContext matching(String wildcardPattern) {
+		private WildcardPredicateTerminalContext matching(String wildcardPattern) {
 			if ( wildcardPattern == null ) {
 				throw log.wildcardPredicateCannotMatchNullPattern( getEventContext() );
 			}
