@@ -34,12 +34,6 @@ class PhrasePredicateContextImpl<B> implements PhrasePredicateContext {
 	}
 
 	@Override
-	public PhrasePredicateContext withSlop(int slop) {
-		commonState.withSlop( slop );
-		return this;
-	}
-
-	@Override
 	public PhrasePredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new PhrasePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
