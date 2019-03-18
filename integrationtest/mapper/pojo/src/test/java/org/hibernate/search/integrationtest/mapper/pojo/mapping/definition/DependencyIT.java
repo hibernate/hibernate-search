@@ -257,10 +257,11 @@ public class DependencyIT {
 						.typeContext( CannotInvertAssociation.A.class.getName() )
 						.pathContext( ".embedded<no value extractors>.b<no value extractors>.text<no value extractors>" )
 						.failure(
-								"Cannot find the inverse side of the association at path "
-										+ "'.embedded<no value extractors>.b<no value extractors>'",
-								"from type '" + CannotInvertAssociation.A.class.getName() + "'",
-								"on type '" + CannotInvertAssociation.B.class.getName() + "'"
+								"Cannot find the inverse side of the association on type '" + CannotInvertAssociation.A.class.getName() + "'"
+										+ " at path '.embedded<no value extractors>.b<no value extractors>'",
+								" Hibernate Search needs this information in order to reindex '"
+										+ CannotInvertAssociation.A.class.getName() + "' when '"
+										+ CannotInvertAssociation.B.class.getName() + "' is modified."
 						)
 						.build()
 				);
@@ -303,12 +304,17 @@ public class DependencyIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Cannot apply the path of the inverse association '.invalidPath<default value extractors>'"
-						+ " from type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
+						"Cannot apply the path '.invalidPath<default value extractors>'"
+						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(
-						"Association on the original side (which was being inverted) was '.b<no value extractors>'"
+						"This path was resolved as the inverse side of the association '.b<no value extractors>'"
 						+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
+				)
+				.hasMessageContaining(
+						"Hibernate Search needs to apply this path in order to reindex '"
+								+ CannotApplyInvertAssociationPath.A.class.getName() + "' when '"
+								+ CannotApplyInvertAssociationPath.B.class.getName() + "' is modified."
 				)
 				.hasMessageContaining(
 						"Unable to find property 'invalidPath' on type '"
@@ -353,12 +359,17 @@ public class DependencyIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"Cannot apply the path of the inverse association '.a<default value extractors>'"
-								+ " from type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
+						"Cannot apply the path '.a<default value extractors>'"
+						+ " to type '" + CannotApplyInvertAssociationPath.B.class.getName() + "'"
 				)
 				.hasMessageContaining(
-						"Association on the original side (which was being inverted) was '.b<no value extractors>'"
-								+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
+						"This path was resolved as the inverse side of the association '.b<no value extractors>'"
+						+ " on type '" + CannotApplyInvertAssociationPath.A.class.getName() + "'"
+				)
+				.hasMessageContaining(
+						"Hibernate Search needs to apply this path in order to reindex '"
+								+ CannotApplyInvertAssociationPath.A.class.getName() + "' when '"
+								+ CannotApplyInvertAssociationPath.B.class.getName() + "' is modified."
 				)
 				.hasMessageContaining(
 						"The inverse association targets type '" + String.class.getName()

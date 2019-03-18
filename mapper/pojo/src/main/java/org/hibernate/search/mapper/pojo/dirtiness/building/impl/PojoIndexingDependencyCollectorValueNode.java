@@ -238,7 +238,7 @@ public class PojoIndexingDependencyCollectorValueNode<P, V> extends AbstractPojo
 							.invertPath( inverseSideEntityType, modelPathFromConcreteEntitySubType )
 							.orElse( null );
 					if ( inverseAssociationPath == null ) {
-						throw log.cannotInvertAssociation(
+						throw log.cannotInvertAssociationForReindexing(
 								inverseSideRawEntityType, concreteEntityType,
 								modelPathFromLastEntityNode.toUnboundPath()
 						);
