@@ -8,11 +8,11 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * Context for predicates that could generate a score different from constant.
+ * A superinterface for contexts allowing to set the score of a predicate to a constant value.
  *
  * @param <S> The "self" type (the actual type of this context)
  */
-public interface SearchPredicateScoreContext<S> extends SearchPredicateNoFieldContext<S> {
+public interface SearchPredicateScoreContext<S> extends SearchPredicateBoostContext<S> {
 
 	S withConstantScore();
 

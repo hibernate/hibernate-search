@@ -30,10 +30,4 @@ class RangePredicateContextImpl<B> implements RangePredicateContext {
 	public RangePredicateFieldSetContext onRawFields(String ... absoluteFieldPaths) {
 		return new RangePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
 	}
-
-	@Override
-	public RangePredicateContextImpl boostedTo(float boost) {
-		this.commonState.setPredicateLevelBoost( boost );
-		return this;
-	}
 }

@@ -17,9 +17,8 @@ class SpatialWithinPredicateContextImpl<B> implements SpatialWithinPredicateCont
 
 	private final SpatialWithinPredicateFieldSetContextImpl.CommonState<B> commonState;
 
-	SpatialWithinPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory, Float boost) {
+	SpatialWithinPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.commonState = new SpatialWithinPredicateFieldSetContextImpl.CommonState<>( factory );
-		this.commonState.setPredicateLevelBoost( boost );
 	}
 
 	@Override

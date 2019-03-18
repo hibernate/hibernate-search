@@ -8,11 +8,11 @@ package org.hibernate.search.engine.search.dsl.predicate;
 
 
 /**
- * A superinterface for contexts allowing to define predicates, before any field was mentioned.
+ * A superinterface for contexts allowing to set the "boost" of a predicate.
  *
- * @param <S> The "self" type (the actual type of this context)
+ * @param <S> The "self" type (the actual type of the terminal context)
  */
-public interface SearchPredicateNoFieldContext<S> {
+public interface SearchPredicateBoostContext<S> {
 
 	/**
 	 * Boost the weight of the predicate in score computation.

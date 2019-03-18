@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 class SpatialPredicateContextImpl<B> implements SpatialPredicateContext {
 
 	private final SearchPredicateBuilderFactory<?, B> factory;
-	private Float boost;
 
 	SpatialPredicateContextImpl(SearchPredicateBuilderFactory<?, B> factory) {
 		this.factory = factory;
@@ -21,12 +20,6 @@ class SpatialPredicateContextImpl<B> implements SpatialPredicateContext {
 
 	@Override
 	public SpatialWithinPredicateContext within() {
-		return new SpatialWithinPredicateContextImpl<>( factory, boost );
-	}
-
-	@Override
-	public SpatialPredicateContext boostedTo(float boost) {
-		this.boost = boost;
-		return this;
+		return new SpatialWithinPredicateContextImpl<>( factory );
 	}
 }

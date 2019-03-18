@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The context used when starting to define a range predicate.
  */
-public interface RangePredicateContext extends SearchPredicateNoFieldContext<RangePredicateContext> {
+public interface RangePredicateContext {
 
 	/**
 	 * Target the given field in the range predicate.

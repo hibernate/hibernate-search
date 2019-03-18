@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The context used when starting to define a wildcard predicate.
  */
-public interface WildcardPredicateContext extends SearchPredicateNoFieldContext<WildcardPredicateContext> {
+public interface WildcardPredicateContext {
 
 	/**
 	 * Target the given field in the wildcard predicate.

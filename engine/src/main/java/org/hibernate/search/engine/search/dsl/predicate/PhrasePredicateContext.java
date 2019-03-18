@@ -9,7 +9,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The context used when starting to define a phrase predicate.
  */
-public interface PhrasePredicateContext extends SearchPredicateScoreContext<PhrasePredicateContext> {
+public interface PhrasePredicateContext {
 
 	/**
 	 * Target the given field in the phrase predicate.

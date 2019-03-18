@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
-public interface RangePredicateTerminalContext extends SearchPredicateTerminalContext {
+public interface RangePredicateTerminalContext
+		extends SearchPredicateTerminalContext, SearchPredicateBoostContext<RangePredicateTerminalContext> {
 
 	/**
 	 * Exclude the limit bound from the range.

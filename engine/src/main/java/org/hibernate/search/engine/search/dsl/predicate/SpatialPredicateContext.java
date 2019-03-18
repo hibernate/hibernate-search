@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
 /**
  * The terminal context of the predicate DSL.
  */
-public interface SpatialPredicateContext extends SearchPredicateNoFieldContext<SpatialPredicateContext> {
+public interface SpatialPredicateContext {
 
 	/**
 	 * Match documents where targeted fields point to a location within given bounds:

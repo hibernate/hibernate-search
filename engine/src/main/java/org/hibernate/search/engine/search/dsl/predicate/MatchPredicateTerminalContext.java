@@ -11,7 +11,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
  * <p>
  * Allows to set options or to {@link #toPredicate() retrieve the predicate}.
  */
-public interface MatchPredicateTerminalContext extends SearchPredicateTerminalContext {
+public interface MatchPredicateTerminalContext
+		extends SearchPredicateTerminalContext, SearchPredicateScoreContext<MatchPredicateTerminalContext> {
 
 	/**
 	 * Enable fuzziness for this match predicate; only works for text fields.

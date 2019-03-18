@@ -11,7 +11,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
  * <p>
  * Allows to set options or to {@link #toPredicate() retrieve the predicate}.
  */
-public interface WildcardPredicateTerminalContext extends SearchPredicateTerminalContext {
+public interface WildcardPredicateTerminalContext
+		extends SearchPredicateTerminalContext, SearchPredicateBoostContext<WildcardPredicateTerminalContext> {
 
 	// FIXME no specific options for wildcard predicates; move boost option here
 

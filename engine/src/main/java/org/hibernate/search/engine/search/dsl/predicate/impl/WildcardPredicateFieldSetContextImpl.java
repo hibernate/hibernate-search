@@ -66,11 +66,14 @@ class WildcardPredicateFieldSetContextImpl<B>
 	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( WildcardPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+			// Perform last-minute changes, since it's the last call that will be made on this field set context
+			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
+
 			collector.accept( predicateBuilder.toImplementation() );
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, WildcardPredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, WildcardPredicateFieldSetContextImpl<B>>
 			implements WildcardPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
@@ -84,14 +87,15 @@ class WildcardPredicateFieldSetContextImpl<B>
 			for ( WildcardPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( WildcardPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
 					predicateBuilder.pattern( wildcardPattern );
-
-					// Fieldset contexts won't be accessed anymore, it's time to apply their options
-					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
 				}
 			}
 			return this;
 		}
 
+		@Override
+		protected CommonState<B> thisAsS() {
+			return this;
+		}
 	}
 
 }

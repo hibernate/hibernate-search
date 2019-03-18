@@ -22,18 +22,6 @@ class PhrasePredicateContextImpl<B> implements PhrasePredicateContext {
 	}
 
 	@Override
-	public PhrasePredicateContext withConstantScore() {
-		commonState.withConstantScore();
-		return this;
-	}
-
-	@Override
-	public PhrasePredicateContext boostedTo(float boost) {
-		commonState.setPredicateLevelBoost( boost );
-		return this;
-	}
-
-	@Override
 	public PhrasePredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new PhrasePredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}

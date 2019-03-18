@@ -11,7 +11,8 @@ package org.hibernate.search.engine.search.dsl.predicate;
  * <p>
  * Allows to set options or to {@link #toPredicate() retrieve the predicate}.
  */
-public interface PhrasePredicateTerminalContext extends SearchPredicateTerminalContext {
+public interface PhrasePredicateTerminalContext
+		extends SearchPredicateTerminalContext, SearchPredicateScoreContext<PhrasePredicateTerminalContext> {
 
 	// TODO HSEARCH-3312 allow analyzer/normalizer override
 
