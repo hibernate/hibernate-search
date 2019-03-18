@@ -13,52 +13,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
 public interface MatchPredicateContext extends SearchPredicateScoreContext<MatchPredicateContext> {
 
 	/**
-	 * Enable fuzziness for this match predicate; only works for text fields.
-	 * <p>
-	 * Fuzziness allows to match documents that do not contain the value to match,
-	 * but a close value, for example with one letter that differs.
-	 *
-	 * @return {@code this}, for method chaining.
-	 * @see #fuzzy(int, int)
-	 */
-	default MatchPredicateContext fuzzy() {
-		return fuzzy( 2, 0 );
-	}
-
-	/**
-	 * Enable fuzziness for this match predicate; only works for text fields.
-	 * <p>
-	 * Fuzziness allows to match documents that do not contain the value to match,
-	 * but a close value, for example with one letter that differs.
-	 *
-	 * @param maxEditDistance The maximum value of the edit distance, which defines how permissive the fuzzy predicate will be.
-	 * @return {@code this}, for method chaining.
-	 * @see #fuzzy(int, int)
-	 */
-	default MatchPredicateContext fuzzy(int maxEditDistance) {
-		return fuzzy( maxEditDistance, 0 );
-	}
-
-	/**
-	 * Enable fuzziness for this match predicate; only works for text fields.
-	 * <p>
-	 * Fuzziness allows to match documents that do not contain the value to match,
-	 * but a close value, for example with one letter that differs.
-	 *
-	 * @param maxEditDistance The maximum value of the edit distance, which defines how permissive the fuzzy predicate will be.
-	 * <p>
-	 * Roughly speaking, the edit distance is the number of changes between two terms: switching characters, removing them, ...
-	 * <p>
-	 * If zero, then fuzziness is completely disabled.
-	 * The other accepted values, {@code 1} and {@code 2}, are increasingly fuzzy.
-	 * @param exactPrefixLength Length of the prefix that has to match exactly, i.e. for which fuzziness will not be allowed.
-	 * <p>
-	 * A non-zero value is recommended if the index contains a large amount of distinct terms.
-	 * @return {@code this}, for method chaining.
-	 */
-	MatchPredicateContext fuzzy(int maxEditDistance, int exactPrefixLength);
-
-	/**
 	 * Target the given field in the match predicate.
 	 * <p>
 	 * Multiple fields may be targeted by the same predicate:

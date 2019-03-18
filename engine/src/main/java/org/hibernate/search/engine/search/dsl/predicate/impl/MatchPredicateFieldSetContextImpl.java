@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.MatchPredicateFieldSetContext;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -60,7 +60,7 @@ class MatchPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext matching(Object value) {
+	public MatchPredicateTerminalContext matching(Object value) {
 		return commonState.matching( value );
 	}
 
@@ -77,27 +77,13 @@ class MatchPredicateFieldSetContextImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, MatchPredicateFieldSetContextImpl<B>>
-			implements SearchPredicateTerminalContext {
-
-		private Integer maxEditDistance;
-		private Integer exactPrefixLength;
+			implements MatchPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 
-		void fuzzy(int maxEditDistance, int exactPrefixLength) {
-			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
-				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
-			}
-			if ( exactPrefixLength < 0 ) {
-				throw log.invalidExactPrefixLength( exactPrefixLength );
-			}
-			this.maxEditDistance = maxEditDistance;
-			this.exactPrefixLength = exactPrefixLength;
-		}
-
-		SearchPredicateTerminalContext matching(Object value) {
+		MatchPredicateTerminalContext matching(Object value) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
@@ -108,9 +94,23 @@ class MatchPredicateFieldSetContextImpl<B>
 
 					// Fieldset contexts won't be accessed anymore, it's time to apply their options
 					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
-					if ( maxEditDistance != null ) {
-						predicateBuilder.fuzzy( maxEditDistance, exactPrefixLength );
-					}
+				}
+			}
+			return this;
+		}
+
+		@Override
+		public MatchPredicateTerminalContext fuzzy(int maxEditDistance, int exactPrefixLength) {
+			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
+				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
+			}
+			if ( exactPrefixLength < 0 ) {
+				throw log.invalidExactPrefixLength( exactPrefixLength );
+			}
+
+			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
+					predicateBuilder.fuzzy( maxEditDistance, exactPrefixLength );
 				}
 			}
 			return this;
