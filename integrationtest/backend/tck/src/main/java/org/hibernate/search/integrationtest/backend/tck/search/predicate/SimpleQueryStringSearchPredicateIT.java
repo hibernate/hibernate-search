@@ -157,8 +157,9 @@ public class SimpleQueryStringSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query().asReference()
-				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath ).withAndAsDefaultOperator()
-						.matching( TERM_1 + " " + TERM_2 ) )
+				.predicate( f -> f.simpleQueryString().onField( absoluteFieldPath )
+						.matching( TERM_1 + " " + TERM_2 )
+						.withAndAsDefaultOperator() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );

@@ -11,8 +11,6 @@ package org.hibernate.search.engine.search.dsl.predicate;
  */
 public interface SimpleQueryStringPredicateContext extends SearchPredicateScoreContext<SimpleQueryStringPredicateContext> {
 
-	// TODO HSEARCH-3312 allow analyzer/normalizer override
-
 	/**
 	 * Target the given field in the simple query string predicate.
 	 * <p>
