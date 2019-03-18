@@ -2202,10 +2202,7 @@
              Different profiles are needed to handle the environment setup (which is handled in Maven,
              on contrary to the various database profiles).
 
-             To run tests against a different version of Elasticsearch, use the appropriate profile
-             and provide the Elasticsearch version:
-
-                 mvn clean test -Pelasticsearch-5.6 -Dtest.elasticsearch.version=5.6.0
+             To run tests against a different version of Elasticsearch, see README.md.
           -->
 
         <!-- Elasticsearch 5.6+ test environment -->
