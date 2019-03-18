@@ -195,15 +195,17 @@ public interface Log extends BasicLogger {
 			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoContainedTypeManager<?> typeManager);
 
 	@Message(id = ID_OFFSET_2 + 20,
-			value = "Cannot find the inverse side of the association at path '%3$s' from type '%2$s' on type '%1$s'")
-	SearchException cannotInvertAssociation(
+			value = "Cannot find the inverse side of the association on type '%2$s' at path '%3$s'."
+					+ " Hibernate Search needs this information in order to reindex '%2$s' when '%1$s' is modified.")
+	SearchException cannotInvertAssociationForReindexing(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode associationPath);
 
 	@Message(id = ID_OFFSET_2 + 21,
-			value = "Cannot apply the path of the inverse association '%2$s' from type '%1$s'."
-					+ " Association on the original side (which was being inverted) was '%4$s' on type '%3$s'."
+			value = "Cannot apply the path '%2$s' to type '%1$s'."
+					+ " This path was resolved as the inverse side of the association '%4$s' on type '%3$s'."
+					+ " Hibernate Search needs to apply this path in order to reindex '%3$s' when '%1$s' is modified."
 					+ " Error was: '%5$s'")
 	SearchException cannotApplyInvertAssociationPath(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
