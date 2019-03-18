@@ -30,10 +30,15 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * Some predicate support targeting multiple fields at the backend SPI level,
  * like the simple query string predicate.
  *
+ * @param <S> The "self" type returned by DSL methods.
  * @param <B> The implementation type of builders.
  * @param <F> The type of field set contexts.
  */
-abstract class AbstractBooleanMultiFieldPredicateCommonState<B, F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetContext<B>>
+abstract class AbstractBooleanMultiFieldPredicateCommonState<
+		S extends AbstractBooleanMultiFieldPredicateCommonState<?, ?, ?>,
+		B,
+		F extends AbstractBooleanMultiFieldPredicateCommonState.FieldSetContext<B>
+		>
 		extends AbstractSearchPredicateTerminalContext<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -58,33 +63,14 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<B, F extends Abstra
 		return fieldSetContexts;
 	}
 
-	void setPredicateLevelBoost(Float boost) {
+	public S boostedTo(float boost) {
 		this.predicateLevelBoost = boost;
+		return thisAsS();
 	}
 
-	void withConstantScore() {
+	public S withConstantScore() {
 		withConstantScore = true;
-	}
-
-	void applyBoostAndConstantScore(Float fieldBoost, SearchPredicateBuilder<?> predicateBuilder) {
-		if ( fieldBoost != null && withConstantScore ) {
-			// another good option would be the one to simply ignore the fieldBoost
-			// when the option withConstantScore is defined
-			throw log.perFieldBoostWithConstantScore();
-		}
-		if ( predicateLevelBoost != null && fieldBoost != null ) {
-			predicateBuilder.boost( predicateLevelBoost * fieldBoost );
-		}
-		else if ( predicateLevelBoost != null ) {
-			predicateBuilder.boost( predicateLevelBoost );
-		}
-		else if ( fieldBoost != null ) {
-			predicateBuilder.boost( fieldBoost );
-		}
-
-		if ( withConstantScore ) {
-			predicateBuilder.withConstantScore();
-		}
+		return thisAsS();
 	}
 
 	@Override
@@ -102,6 +88,29 @@ abstract class AbstractBooleanMultiFieldPredicateCommonState<B, F extends Abstra
 		}
 		else {
 			return predicateBuilders.get( 0 );
+		}
+	}
+
+	protected abstract S thisAsS();
+
+	final void applyBoostAndConstantScore(Float fieldSetBoost, SearchPredicateBuilder<?> predicateBuilder) {
+		if ( fieldSetBoost != null && withConstantScore ) {
+			// another good option would be the one to simply ignore the fieldSetBoost
+			// when the option withConstantScore is defined
+			throw log.perFieldBoostWithConstantScore();
+		}
+		if ( predicateLevelBoost != null && fieldSetBoost != null ) {
+			predicateBuilder.boost( predicateLevelBoost * fieldSetBoost );
+		}
+		else if ( predicateLevelBoost != null ) {
+			predicateBuilder.boost( predicateLevelBoost );
+		}
+		else if ( fieldSetBoost != null ) {
+			predicateBuilder.boost( fieldSetBoost );
+		}
+
+		if ( withConstantScore ) {
+			predicateBuilder.withConstantScore();
 		}
 	}
 

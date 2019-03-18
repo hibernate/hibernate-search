@@ -11,6 +11,7 @@ package org.hibernate.search.engine.search.dsl.predicate;
  * <p>
  * Allows to set options or to {@link #toPredicate() retrieve the predicate}.
  */
-public interface SpatialWithinPredicateTerminalContext extends SearchPredicateTerminalContext {
+public interface SpatialWithinPredicateTerminalContext
+		extends SearchPredicateTerminalContext, SearchPredicateBoostContext<SpatialWithinPredicateTerminalContext> {
 
 }

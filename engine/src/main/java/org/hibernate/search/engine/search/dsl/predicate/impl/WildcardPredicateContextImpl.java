@@ -22,12 +22,6 @@ class WildcardPredicateContextImpl<B> implements WildcardPredicateContext {
 	}
 
 	@Override
-	public WildcardPredicateContext boostedTo(float boost) {
-		commonState.setPredicateLevelBoost( boost );
-		return this;
-	}
-
-	@Override
 	public WildcardPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new WildcardPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}

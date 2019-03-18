@@ -66,11 +66,14 @@ class PhrasePredicateFieldSetContextImpl<B>
 	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( PhrasePredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+			// Fieldset contexts won't be accessed anymore, it's time to apply their options
+			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
+
 			collector.accept( predicateBuilder.toImplementation() );
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, PhrasePredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, PhrasePredicateFieldSetContextImpl<B>>
 			implements PhrasePredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
@@ -85,9 +88,6 @@ class PhrasePredicateFieldSetContextImpl<B>
 			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
 					predicateBuilder.phrase( phrase );
-
-					// Fieldset contexts won't be accessed anymore, it's time to apply their options
-					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
 				}
 			}
 			return this;
@@ -107,6 +107,10 @@ class PhrasePredicateFieldSetContextImpl<B>
 			return this;
 		}
 
+		@Override
+		protected CommonState<B> thisAsS() {
+			return this;
+		}
 	}
 
 }

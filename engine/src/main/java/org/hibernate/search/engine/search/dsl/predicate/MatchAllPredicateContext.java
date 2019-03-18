@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.SearchPredicate;
 /**
  * The context used when starting to define a match all predicate.
  */
-public interface MatchAllPredicateContext extends SearchPredicateNoFieldContext<MatchAllPredicateContext>,
+public interface MatchAllPredicateContext extends SearchPredicateBoostContext<MatchAllPredicateContext>,
 		SearchPredicateTerminalContext {
 
 	/**

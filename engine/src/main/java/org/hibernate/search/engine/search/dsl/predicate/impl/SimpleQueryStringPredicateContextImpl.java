@@ -22,18 +22,6 @@ class SimpleQueryStringPredicateContextImpl<B> implements SimpleQueryStringPredi
 	}
 
 	@Override
-	public SimpleQueryStringPredicateContext withConstantScore() {
-		commonState.withConstantScore();
-		return this;
-	}
-
-	@Override
-	public SimpleQueryStringPredicateContext boostedTo(float boost) {
-		commonState.boost( boost );
-		return this;
-	}
-
-	@Override
 	public SimpleQueryStringPredicateFieldSetContext onFields(String ... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}

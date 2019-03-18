@@ -73,14 +73,6 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 			return builder.toImplementation();
 		}
 
-		void withConstantScore() {
-			builder.withConstantScore();
-		}
-
-		void boost(float boost) {
-			builder.boost( boost );
-		}
-
 		void add(SimpleQueryStringPredicateFieldSetContextImpl<B> fieldSetContext) {
 			fieldSetContexts.add( fieldSetContext );
 		}
@@ -94,6 +86,18 @@ class SimpleQueryStringPredicateFieldSetContextImpl<B>
 				throw log.simpleQueryStringCannotBeNull( collectAbsoluteFieldPaths() );
 			}
 			builder.simpleQueryString( simpleQueryString );
+			return this;
+		}
+
+		@Override
+		public CommonState<B> withConstantScore() {
+			builder.withConstantScore();
+			return this;
+		}
+
+		@Override
+		public CommonState<B> boostedTo(float boost) {
+			builder.boost( boost );
 			return this;
 		}
 

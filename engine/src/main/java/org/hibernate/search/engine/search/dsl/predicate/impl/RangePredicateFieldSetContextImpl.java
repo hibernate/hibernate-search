@@ -92,7 +92,7 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, RangePredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldSetContextImpl<B>>
 			implements RangePredicateTerminalContext {
 
 		private boolean hasNonNullBound = false;
@@ -119,26 +119,17 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		RangePredicateFromContext from(Object value) {
-			// Fieldset contexts won't be accessed anymore, it's time to apply their options
-			applyPerFieldSetOptions();
-
 			doAbove( value );
 			return new RangePredicateFromContextImpl<>( this );
 		}
 
 		RangePredicateTerminalContext above(Object value) {
-			// Fieldset contexts won't be accessed anymore, it's time to apply their options
-			applyPerFieldSetOptions();
-
 			doAbove( value );
 			checkHasNonNullBound();
 			return this;
 		}
 
 		RangePredicateTerminalContext below(Object value) {
-			// Fieldset contexts won't be accessed anymore, it's time to apply their options
-			applyPerFieldSetOptions();
-
 			doBelow( value );
 			checkHasNonNullBound();
 			return this;
@@ -160,14 +151,6 @@ class RangePredicateFieldSetContextImpl<B>
 			}
 		}
 
-		private void applyPerFieldSetOptions() {
-			for ( RangePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
-				for ( RangePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
-					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
-				}
-			}
-		}
-
 		private void checkHasNonNullBound() {
 			if ( !hasNonNullBound ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
@@ -178,6 +161,10 @@ class RangePredicateFieldSetContextImpl<B>
 			return getFieldSetContexts().stream().flatMap( f -> f.predicateBuilders.stream() );
 		}
 
+		@Override
+		protected CommonState<B> thisAsS() {
+			return this;
+		}
 	}
 
 	static class RangePredicateFromContextImpl<B> implements RangePredicateFromContext {

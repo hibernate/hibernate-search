@@ -31,16 +31,4 @@ class MatchPredicateContextImpl<B> implements MatchPredicateContext {
 	public MatchPredicateFieldSetContext onRawFields(String ... absoluteFieldPaths) {
 		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
 	}
-
-	@Override
-	public MatchPredicateContextImpl boostedTo(float boost) {
-		this.commonState.setPredicateLevelBoost( boost );
-		return this;
-	}
-
-	@Override
-	public MatchPredicateContext withConstantScore() {
-		this.commonState.withConstantScore();
-		return this;
-	}
 }

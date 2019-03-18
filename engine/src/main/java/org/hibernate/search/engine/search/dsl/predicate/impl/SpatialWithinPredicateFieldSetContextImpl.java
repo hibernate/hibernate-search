@@ -86,6 +86,9 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 	@Override
 	public void contributePredicateBuilders(Consumer<B> collector) {
 		for ( SearchPredicateBuilder<B> predicateBuilder : predicateBuilders ) {
+			// Perform last-minute changes, since it's the last call that will be made on this field set context
+			commonState.applyBoostAndConstantScore( fieldSetBoost, predicateBuilder );
+
 			collector.accept( predicateBuilder.toImplementation() );
 		}
 	}
@@ -114,7 +117,7 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, SpatialWithinPredicateFieldSetContextImpl<B>>
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, SpatialWithinPredicateFieldSetContextImpl<B>>
 			implements SpatialWithinPredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
@@ -124,9 +127,6 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		SpatialWithinPredicateTerminalContext circle(GeoPoint center, double radius, DistanceUnit unit) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinCircleQueryBuilders( center, radius, unit );
-
-				// Fieldset contexts won't be accessed anymore, it's time to apply their options
-				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
@@ -135,9 +135,6 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		SpatialWithinPredicateTerminalContext polygon(GeoPolygon polygon) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinPolygonQueryBuilders( polygon );
-
-				// Fieldset contexts won't be accessed anymore, it's time to apply their options
-				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
@@ -146,18 +143,14 @@ class SpatialWithinPredicateFieldSetContextImpl<B>
 		SpatialWithinPredicateTerminalContext boundingBox(GeoBoundingBox boundingBox) {
 			for ( SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				fieldSetContext.generateWithinBoundingBoxQueryBuilders( boundingBox );
-
-				// Fieldset contexts won't be accessed anymore, it's time to apply their options
-				applyPerFieldSetOptions( fieldSetContext );
 			}
 
 			return this;
 		}
 
-		private void applyPerFieldSetOptions(SpatialWithinPredicateFieldSetContextImpl<B> fieldSetContext) {
-			for ( SearchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
-				applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
-			}
+		@Override
+		protected CommonState<B> thisAsS() {
+			return this;
 		}
 	}
 }
