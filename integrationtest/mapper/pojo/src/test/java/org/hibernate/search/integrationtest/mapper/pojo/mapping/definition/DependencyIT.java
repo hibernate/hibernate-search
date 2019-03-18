@@ -261,7 +261,14 @@ public class DependencyIT {
 										+ " at path '.embedded<no value extractors>.b<no value extractors>'",
 								" Hibernate Search needs this information in order to reindex '"
 										+ CannotInvertAssociation.A.class.getName() + "' when '"
-										+ CannotInvertAssociation.B.class.getName() + "' is modified."
+										+ CannotInvertAssociation.B.class.getName() + "' is modified.",
+								// Tips
+								"@OneToMany(mappedBy",
+								"@AssociationInverseSide",
+								"if you do not need to reindex '"
+										+ CannotInvertAssociation.A.class.getName() + "' when '"
+										+ CannotInvertAssociation.B.class.getName() + "' is modified",
+								"@IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)"
 						)
 						.build()
 				);
