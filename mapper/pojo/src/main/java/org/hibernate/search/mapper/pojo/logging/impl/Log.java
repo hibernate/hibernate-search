@@ -196,7 +196,13 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 20,
 			value = "Cannot find the inverse side of the association on type '%2$s' at path '%3$s'."
-					+ " Hibernate Search needs this information in order to reindex '%2$s' when '%1$s' is modified.")
+					+ " Hibernate Search needs this information in order to reindex '%2$s' when '%1$s' is modified."
+					+ " You can solve this error by defining the inverse side of this association, "
+					+ " either with annotations specific to your integration (@OneToMany(mappedBy = ...) in Hibernate ORM) "
+					+ " or with the Hibernate Search @AssociationInverseSide annotation."
+					+ " Alternatively, if you do not need to reindex '%2$s' when '%1$s' is modified,"
+					+ " you can disable reindexing with @IndexingDependency(reindexOnUpdate = ReindexOnUpdate.NO)."
+	)
 	SearchException cannotInvertAssociationForReindexing(
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> inverseSideTypeModel,
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
