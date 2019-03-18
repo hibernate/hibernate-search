@@ -12,7 +12,7 @@ a new major version which is very different from Hibernate Search 5,
 and is still in its early stages.
 
 If you are looking for the code of the version of Hibernate Search you are currently using,
-you should try branch [5.10](https://github.com/hibernate/hibernate-search/tree/5.10) instead,
+you should try branch [5.11](https://github.com/hibernate/hibernate-search/tree/5.11) instead,
 or any of the [older branches](https://github.com/hibernate/hibernate-search/branches/all).
 
 If you are looking for version 6, then keep in mind that most of the old codebase
