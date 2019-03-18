@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateFieldSetContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
+import org.hibernate.search.engine.search.dsl.predicate.PhrasePredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -54,7 +54,7 @@ class PhrasePredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext matching(String phrase) {
+	public PhrasePredicateTerminalContext matching(String phrase) {
 		return commonState.matching( phrase );
 	}
 
@@ -71,22 +71,13 @@ class PhrasePredicateFieldSetContextImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<B, PhrasePredicateFieldSetContextImpl<B>>
-			implements SearchPredicateTerminalContext {
-
-		private int slop = 0;
+			implements PhrasePredicateTerminalContext {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> factory) {
 			super( factory );
 		}
 
-		void withSlop(int slop) {
-			if ( slop < 0 ) {
-				throw log.invalidPhrasePredicateSlop( slop );
-			}
-			this.slop = slop;
-		}
-
-		private SearchPredicateTerminalContext matching(String phrase) {
+		private PhrasePredicateTerminalContext matching(String phrase) {
 			if ( phrase == null ) {
 				throw log.phrasePredicateCannotMatchNullPhrase( getEventContext() );
 			}
@@ -97,6 +88,19 @@ class PhrasePredicateFieldSetContextImpl<B>
 
 					// Fieldset contexts won't be accessed anymore, it's time to apply their options
 					applyBoostAndConstantScore( fieldSetContext.fieldSetBoost, predicateBuilder );
+				}
+			}
+			return this;
+		}
+
+		@Override
+		public PhrasePredicateTerminalContext withSlop(int slop) {
+			if ( slop < 0 ) {
+				throw log.invalidPhrasePredicateSlop( slop );
+			}
+
+			for ( PhrasePredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
+				for ( PhrasePredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
 					predicateBuilder.slop( slop );
 				}
 			}

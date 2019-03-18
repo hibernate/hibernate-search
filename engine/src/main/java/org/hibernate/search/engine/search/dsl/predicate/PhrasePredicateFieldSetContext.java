@@ -47,8 +47,8 @@ public interface PhrasePredicateFieldSetContext extends MultiFieldPredicateField
 	 * Require at least one of the targeted fields to match the given phrase.
 	 *
 	 * @param phrase The phrase to match.
-	 * @return A context allowing to get the resulting predicate.
+	 * @return A context allowing to set options or get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext matching(String phrase);
+	PhrasePredicateTerminalContext matching(String phrase);
 
 }

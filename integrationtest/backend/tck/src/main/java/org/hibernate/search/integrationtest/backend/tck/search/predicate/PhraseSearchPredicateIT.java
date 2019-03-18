@@ -238,7 +238,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<Integer, IndexSearchQuery<DocumentReference>> createQuery = slop -> scope.query().asReference()
-				.predicate( f -> f.phrase().withSlop( slop ).onField( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.predicate( f -> f.phrase().onField( absoluteFieldPath ).matching( PHRASE_1 ).withSlop( slop ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( 0 ) )
@@ -509,10 +509,12 @@ public class PhraseSearchPredicateIT {
 	@Test
 	public void error_invalidSlop() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
-				() -> scope.predicate().phrase().withSlop( -1 )
+				() -> scope.predicate().phrase().onField( absoluteFieldPath )
+						.matching( "foo" ).withSlop( -1 )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -521,7 +523,8 @@ public class PhraseSearchPredicateIT {
 
 		SubTest.expectException(
 				"phrase() predicate with negative slop",
-				() -> scope.predicate().phrase().withSlop( Integer.MIN_VALUE )
+				() -> scope.predicate().phrase().onField( absoluteFieldPath )
+						.matching( "foo" ).withSlop( Integer.MIN_VALUE )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
