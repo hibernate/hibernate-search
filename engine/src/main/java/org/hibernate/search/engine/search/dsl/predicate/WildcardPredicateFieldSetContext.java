@@ -51,6 +51,6 @@ public interface WildcardPredicateFieldSetContext extends MultiFieldPredicateFie
 	 * which matches any single character. {@code \} is the escape character.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext matching(String wildcardPattern);
+	WildcardPredicateTerminalContext matching(String wildcardPattern);
 
 }
