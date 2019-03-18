@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.SearchPredicate;
+import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateFactoryContext;
 import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.NestedPredicateContext;
@@ -23,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class NestedPredicateContextImpl<B>
 		extends AbstractSearchPredicateTerminalContext<B>
-		implements NestedPredicateContext, NestedPredicateFieldContext, SearchPredicateTerminalContext {
+		implements NestedPredicateContext, NestedPredicateFieldContext, NestedPredicateTerminalContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,7 +44,7 @@ class NestedPredicateContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext nest(SearchPredicate searchPredicate) {
+	public NestedPredicateTerminalContext nest(SearchPredicate searchPredicate) {
 		if ( this.childPredicateBuilder != null ) {
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}
@@ -52,7 +53,7 @@ class NestedPredicateContextImpl<B>
 	}
 
 	@Override
-	public SearchPredicateTerminalContext nest(
+	public NestedPredicateTerminalContext nest(
 			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor) {
 		return nest( predicateContributor.apply( factoryContext ) );
 	}

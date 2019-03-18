@@ -15,8 +15,6 @@ import org.hibernate.search.engine.search.SearchPredicate;
  */
 public interface NestedPredicateFieldContext {
 
-	// TODO add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
-
 	/**
 	 * Set the inner predicate to a previously-built {@link SearchPredicate}.
 	 * <p>
@@ -26,7 +24,7 @@ public interface NestedPredicateFieldContext {
 	 * @param searchPredicate The predicate that must be matched by at least one element of the nested object field.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext nest(SearchPredicate searchPredicate);
+	NestedPredicateTerminalContext nest(SearchPredicate searchPredicate);
 
 	/*
 	 * Syntactic sugar allowing to skip the toPredicate() call by passing a SearchPredicateTerminalContext
@@ -42,7 +40,7 @@ public interface NestedPredicateFieldContext {
 	 * @param terminalContext The terminal context allowing to retrieve a {@link SearchPredicate}.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	default SearchPredicateTerminalContext nest(SearchPredicateTerminalContext terminalContext) {
+	default NestedPredicateTerminalContext nest(SearchPredicateTerminalContext terminalContext) {
 		return nest( terminalContext.toPredicate() );
 	}
 
@@ -66,7 +64,7 @@ public interface NestedPredicateFieldContext {
 	 * Should generally be a lambda expression.
 	 * @return A context allowing to get the resulting predicate.
 	 */
-	SearchPredicateTerminalContext nest(
+	NestedPredicateTerminalContext nest(
 			Function<? super SearchPredicateFactoryContext, ? extends SearchPredicateTerminalContext> predicateContributor);
 
 }
