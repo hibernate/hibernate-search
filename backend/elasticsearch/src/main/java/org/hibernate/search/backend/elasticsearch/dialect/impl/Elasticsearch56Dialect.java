@@ -4,10 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.dialect.impl.es56;
-
-import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
+package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 /**
  * The dialect for Elasticsearch 5.6.
