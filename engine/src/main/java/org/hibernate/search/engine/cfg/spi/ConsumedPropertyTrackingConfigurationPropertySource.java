@@ -13,24 +13,22 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 
-public final class UnusedPropertyTrackingConfigurationPropertySource implements ConfigurationPropertySource {
+public final class ConsumedPropertyTrackingConfigurationPropertySource implements ConfigurationPropertySource {
 
 	private final ConfigurationPropertySource delegate;
 
-	private final Set<String> unusedPropertyKeys;
+	private final Set<String> consumedPropertyKeys;
 
-	public UnusedPropertyTrackingConfigurationPropertySource(
-			ConfigurationPropertySource delegate, Set<String> availablePropertyKeys) {
+	public ConsumedPropertyTrackingConfigurationPropertySource(ConfigurationPropertySource delegate) {
 		this.delegate = delegate;
-		this.unusedPropertyKeys = ConcurrentHashMap.newKeySet();
-		unusedPropertyKeys.addAll( availablePropertyKeys );
+		this.consumedPropertyKeys = ConcurrentHashMap.newKeySet();
 	}
 
 	@Override
 	public Optional<?> get(String key) {
 		Optional<String> resolved = resolve( key );
 		if ( resolved.isPresent() ) {
-			unusedPropertyKeys.remove( resolved.get() );
+			consumedPropertyKeys.add( resolved.get() );
 		}
 		return delegate.get( key );
 	}
@@ -40,7 +38,7 @@ public final class UnusedPropertyTrackingConfigurationPropertySource implements 
 		return delegate.resolve( key );
 	}
 
-	public Set<String> getUnusedPropertyKeys() {
-		return Collections.unmodifiableSet( unusedPropertyKeys );
+	public Set<String> getConsumedPropertyKeys() {
+		return Collections.unmodifiableSet( consumedPropertyKeys );
 	}
 }

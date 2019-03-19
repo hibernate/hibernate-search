@@ -7,6 +7,8 @@
 package org.hibernate.search.mapper.orm.cfg.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -14,9 +16,10 @@ import java.util.Set;
 import org.hibernate.engine.config.spi.ConfigurationService;
 import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.UnusedPropertyTrackingConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConsumedPropertyTrackingConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmConfigurationPropertySource implements ConfigurationPropertySource {
@@ -24,32 +27,28 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<Boolean> ENABLE_CONFIGURATION_PROPERTY_TRACKING =
-			// We don't use the radical here, but the full property key: the property is retrieved before we apply the mask
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
 					.asBoolean()
 					.withDefault( HibernateOrmMapperSettings.Defaults.ENABLE_CONFIGURATION_PROPERTY_TRACKING )
 					.build();
 
-	private final ConfigurationService configurationService;
-	private final UnusedPropertyTrackingConfigurationPropertySource unusedPropertyTrackingPropertySource;
+	private final HibernateOrmConfigurationServicePropertySource configurationServiceSource;
+	private final ConsumedPropertyTrackingConfigurationPropertySource consumedPropertyTrackingPropertySource;
 	private final ConfigurationPropertySource delegate;
 
 	public HibernateOrmConfigurationPropertySource(ConfigurationService configurationService) {
-		this.configurationService = configurationService;
-		HibernateOrmConfigurationServicePropertySource serviceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
-		ConfigurationPropertySource maskedSource = serviceSource.withMask( "hibernate.search" );
+		this.configurationServiceSource = new HibernateOrmConfigurationServicePropertySource( configurationService );
+		ConfigurationPropertySource maskedSource = configurationServiceSource.withMask( "hibernate.search" );
 
 		if ( ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( maskedSource ) ) {
-			Set<String> availablePropertyKeys = serviceSource.resolveAll( HibernateOrmMapperSettings.PREFIX );
-			unusedPropertyTrackingPropertySource =
-					new UnusedPropertyTrackingConfigurationPropertySource( maskedSource, availablePropertyKeys );
+			consumedPropertyTrackingPropertySource =
+					new ConsumedPropertyTrackingConfigurationPropertySource( maskedSource );
 			// Make sure to mark the "enable configuration property tracking" property as used
-			ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( unusedPropertyTrackingPropertySource );
-			delegate = unusedPropertyTrackingPropertySource;
+			ENABLE_CONFIGURATION_PROPERTY_TRACKING.get( consumedPropertyTrackingPropertySource );
+			delegate = consumedPropertyTrackingPropertySource;
 		}
 		else {
-			log.configurationPropertyTrackingDisabled();
-			unusedPropertyTrackingPropertySource = null;
+			consumedPropertyTrackingPropertySource = null;
 			delegate = maskedSource;
 		}
 	}
@@ -65,18 +64,52 @@ public class HibernateOrmConfigurationPropertySource implements ConfigurationPro
 	}
 
 	public Map<?, ?> getAllRawProperties() {
-		return configurationService.getSettings();
+		return configurationServiceSource.getAllRawProperties();
 	}
 
-	public void afterBootstrap() {
-		if ( unusedPropertyTrackingPropertySource != null ) {
-			Set<String> unusedPropertyKeys = unusedPropertyTrackingPropertySource.getUnusedPropertyKeys();
-			if ( !unusedPropertyKeys.isEmpty() ) {
-				log.configurationPropertyTrackingUnusedProperties(
-						unusedPropertyKeys,
-						ENABLE_CONFIGURATION_PROPERTY_TRACKING.resolveOrRaw( this )
-				);
-			}
+	public Optional<ConsumedPropertyKeysReport> getConsumedPropertiesReport() {
+		if ( consumedPropertyTrackingPropertySource == null ) {
+			return Optional.empty();
+		}
+		else {
+			return Optional.of( new ConsumedPropertyKeysReport(
+					configurationServiceSource.resolveAll( HibernateOrmMapperSettings.PREFIX ),
+					consumedPropertyTrackingPropertySource.getConsumedPropertyKeys()
+			) );
 		}
 	}
+
+	public void beforeBoot() {
+		if ( consumedPropertyTrackingPropertySource == null ) {
+			log.configurationPropertyTrackingDisabled();
+		}
+	}
+
+	public void afterBoot(Optional<ConsumedPropertyKeysReport> previousReport) {
+		List<Optional<ConsumedPropertyKeysReport>> reports =
+				CollectionHelper.asImmutableList( previousReport, getConsumedPropertiesReport() );
+		Set<String> unconsumedPropertyKeys = new LinkedHashSet<>();
+
+		// Add all available property keys
+		for ( Optional<ConsumedPropertyKeysReport> report : reports ) {
+			if ( report.isPresent() ) {
+				unconsumedPropertyKeys.addAll( report.get().getAvailablePropertyKeys() );
+			}
+		}
+
+		// Remove all consumed property keys
+		for ( Optional<ConsumedPropertyKeysReport> report : reports ) {
+			if ( report.isPresent() ) {
+				unconsumedPropertyKeys.removeAll( report.get().getConsumedPropertyKeys() );
+			}
+		}
+
+		if ( !unconsumedPropertyKeys.isEmpty() ) {
+			log.configurationPropertyTrackingUnusedProperties(
+					unconsumedPropertyKeys,
+					ENABLE_CONFIGURATION_PROPERTY_TRACKING.resolveOrRaw( this )
+			);
+		}
+	}
+
 }

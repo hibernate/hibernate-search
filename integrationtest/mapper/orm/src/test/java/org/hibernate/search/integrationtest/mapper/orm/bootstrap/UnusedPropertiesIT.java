@@ -43,7 +43,8 @@ public class UnusedPropertiesIT {
 				"Some properties in the Hibernate Search configuration were not used"
 		)
 				.never();
-		log.expectMessage( "Configuration property tracking is disabled" );
+		log.expectMessage( "Configuration property tracking is disabled" )
+				.once();
 		setup( builder -> {
 			builder.setProperty( HibernateOrmMapperSettings.ENABLE_CONFIGURATION_PROPERTY_TRACKING, false );
 			builder.setProperty( unusedPropertyKey, "bar" );
@@ -56,7 +57,8 @@ public class UnusedPropertiesIT {
 		log.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used",
 				"[" + unusedPropertyKey + "]"
-		);
+		)
+				.once();
 		log.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		// Also check that used properties are not reported as unused

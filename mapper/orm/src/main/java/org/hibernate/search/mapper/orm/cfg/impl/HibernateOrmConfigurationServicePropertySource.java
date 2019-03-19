@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.cfg.impl;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,6 +32,10 @@ class HibernateOrmConfigurationServicePropertySource implements ConfigurationPro
 	@Override
 	public Optional<String> resolve(String key) {
 		return Optional.of( key );
+	}
+
+	public Map<?, ?> getAllRawProperties() {
+		return configurationService.getSettings();
 	}
 
 	public Set<String> resolveAll(String prefix) {

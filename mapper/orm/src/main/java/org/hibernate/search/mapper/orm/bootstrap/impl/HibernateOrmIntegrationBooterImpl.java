@@ -23,6 +23,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.spi.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.ReflectionBeanResolver;
 import org.hibernate.search.mapper.orm.bootstrap.spi.HibernateOrmIntegrationBooter;
+import org.hibernate.search.mapper.orm.cfg.impl.ConsumedPropertyKeysReport;
 import org.hibernate.search.mapper.orm.cfg.impl.HibernateOrmConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.impl.HibernateSearchContextService;
@@ -99,6 +100,8 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		BeanResolver beanResolver = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
+			propertySource.beforeBoot();
+
 			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
@@ -132,7 +135,11 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 			searchIntegrationPartialBuildState = builder.prepareBuild();
 
-			return new HibernateOrmIntegrationPartialBuildState( searchIntegrationPartialBuildState, mappingKey );
+			return new HibernateOrmIntegrationPartialBuildState(
+					searchIntegrationPartialBuildState,
+					mappingKey,
+					propertySource.getConsumedPropertiesReport()
+			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -164,8 +171,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 //		this.jmx = new JMXHook( propertySource );
 //		this.jmx.registerIfEnabled( extendedIntegrator, factory );
 
-		// TODO Find a way to remember the properties used at bootstrap, and restore them into our new property source
-		propertySource.afterBootstrap();
+		propertySource.afterBoot( partialBuildState.bootFirstPhaseConsumedPropertyKeysReport );
 
 		return contextService;
 	}
@@ -210,12 +216,15 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 		private final SearchIntegrationPartialBuildState integrationBuildState;
 		private final HibernateOrmMappingKey mappingKey;
+		private final Optional<ConsumedPropertyKeysReport> bootFirstPhaseConsumedPropertyKeysReport;
 
 		HibernateOrmIntegrationPartialBuildState(
 				SearchIntegrationPartialBuildState integrationBuildState,
-				HibernateOrmMappingKey mappingKey) {
+				HibernateOrmMappingKey mappingKey,
+				Optional<ConsumedPropertyKeysReport> bootFirstPhaseConsumedPropertyKeysReport) {
 			this.integrationBuildState = integrationBuildState;
 			this.mappingKey = mappingKey;
+			this.bootFirstPhaseConsumedPropertyKeysReport = bootFirstPhaseConsumedPropertyKeysReport;
 		}
 
 		void closeOnFailure() {

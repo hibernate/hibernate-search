@@ -299,6 +299,10 @@ public class ExpectedLog4jLog implements TestRule {
 			times( 0 );
 		}
 
+		public void once() {
+			times( 1 );
+		}
+
 		public void times(int expectedCount) {
 			if ( this.expectedCount != null ) {
 				throw new IllegalStateException( "Can only set log expectations once" );
