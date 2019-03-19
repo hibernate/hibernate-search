@@ -28,7 +28,7 @@ import org.hibernate.jenkins.pipeline.helpers.version.Version
  * See https://blog.grdryn.me/blog/jenkins-pipeline-trust.html for a full explanation,
  * and a potential solution if we really need local libraries.
  * Alternatively we might be able to host libraries in a separate GitHub repo and configure
- * them in the GUI: see http://ci.hibernate.org/job/hibernate-search-6-poc/configure, "Pipeline Libraries".
+ * them in the GUI: see http://ci.hibernate.org/job/hibernate-search/configure, "Pipeline Libraries".
  */
 
 /*
