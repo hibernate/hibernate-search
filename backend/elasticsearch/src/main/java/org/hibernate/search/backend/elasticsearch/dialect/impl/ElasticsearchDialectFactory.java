@@ -12,9 +12,6 @@ import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClien
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.es56.Elasticsearch56Dialect;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.es6.Elasticsearch6Dialect;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.es7.Elasticsearch7Dialect;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
