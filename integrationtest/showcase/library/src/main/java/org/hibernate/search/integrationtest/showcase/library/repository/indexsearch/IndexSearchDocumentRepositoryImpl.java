@@ -11,6 +11,7 @@ import java.util.Optional;
 import javax.persistence.EntityManager;
 
 import org.hibernate.search.engine.search.dsl.sort.SortOrder;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.showcase.library.model.Book;
@@ -52,7 +53,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		SearchQuery<Book> query = Search.getSearchSession( entityManager ).search( Book.class )
 						.asEntity()
 						// onRawField option allows to bypass the bridge in the DSL
-						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString ) )
+						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString, DslConverter.DISABLED ) )
 						.toQuery();
 
 		return query.fetchSingleHit();

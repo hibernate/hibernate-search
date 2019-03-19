@@ -25,9 +25,9 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	ElasticsearchTextMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter,
+			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
 			ElasticsearchFieldCodec<String> codec) {
-		super( searchContext, absoluteFieldPath, dslToIndexConverter, codec );
+		super( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 	}
 
 	@Override
