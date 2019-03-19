@@ -14,10 +14,10 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.dsl.predicate.RangePredicateLimitTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateTerminalContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFromContext;
-import org.hibernate.search.engine.search.dsl.predicate.SearchPredicateTerminalContext;
 import org.hibernate.search.engine.search.predicate.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
@@ -68,12 +68,12 @@ class RangePredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public RangePredicateTerminalContext above(Object value) {
+	public RangePredicateLimitTerminalContext above(Object value) {
 		return commonState.above( value );
 	}
 
 	@Override
-	public RangePredicateTerminalContext below(Object value) {
+	public RangePredicateLimitTerminalContext below(Object value) {
 		return commonState.below( value );
 	}
 
@@ -93,7 +93,7 @@ class RangePredicateFieldSetContextImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldSetContextImpl<B>>
-			implements RangePredicateTerminalContext {
+			implements RangePredicateLimitTerminalContext {
 
 		private boolean hasNonNullBound = false;
 
@@ -106,7 +106,7 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public SearchPredicateTerminalContext excludeLimit() {
+		public RangePredicateTerminalContext excludeLimit() {
 			getQueryBuilders().forEach( ( excludeUpperLimit ) ? RangePredicateBuilder::excludeUpperLimit : RangePredicateBuilder::excludeLowerLimit );
 			return this;
 		}
@@ -123,13 +123,13 @@ class RangePredicateFieldSetContextImpl<B>
 			return new RangePredicateFromContextImpl<>( this );
 		}
 
-		RangePredicateTerminalContext above(Object value) {
+		RangePredicateLimitTerminalContext above(Object value) {
 			doAbove( value );
 			checkHasNonNullBound();
 			return this;
 		}
 
-		RangePredicateTerminalContext below(Object value) {
+		RangePredicateLimitTerminalContext below(Object value) {
 			doBelow( value );
 			checkHasNonNullBound();
 			return this;
@@ -176,7 +176,7 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public RangePredicateTerminalContext to(Object value) {
+		public RangePredicateLimitTerminalContext to(Object value) {
 			delegate.doBelow( value );
 			delegate.checkHasNonNullBound();
 			return delegate;

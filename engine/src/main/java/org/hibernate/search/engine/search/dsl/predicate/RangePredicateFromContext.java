@@ -26,9 +26,9 @@ public interface RangePredicateFromContext {
 	 *
 	 * Upper bound is included by default in the range.
 	 *
-	 * @return A context allowing to exclude the upper bound from the range or to get the resulting predicate.
+	 * @return A context allowing to exclude the upper bound from the range, to set options or to get the resulting predicate.
 	 */
-	RangePredicateTerminalContext to(Object value);
+	RangePredicateLimitTerminalContext to(Object value);
 
 	/**
 	 * Exclude the lower bound from the range.

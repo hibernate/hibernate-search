@@ -6,17 +6,12 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+/**
+ * The context used when a range predicate is fully defined.
+ * <p>
+ * Allows to set options or to {@link #toPredicate() retrieve the predicate}.
+ */
 public interface RangePredicateTerminalContext
 		extends SearchPredicateTerminalContext, SearchPredicateBoostContext<RangePredicateTerminalContext> {
-
-	/**
-	 * Exclude the limit bound from the range.
-	 *
-	 * After a {@link RangePredicateFieldSetContext#below(Object)} or {@link RangePredicateFromContext#to(Object)} will exclude the upper bound from the range.
-	 * After a {@link RangePredicateFieldSetContext#above(Object)} will exclude the lower bound.
-	 *
-	 * @return A context to get the resulting predicate.
-	 */
-	SearchPredicateTerminalContext excludeLimit();
 
 }
