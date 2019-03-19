@@ -53,8 +53,12 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 			case PATH_AND_METHOD:
 				break;
 			case EXTENSIBLE:
-				Assertions.assertThat( actualCall.request.getParameters() )
-						.containsAllEntriesOf( request.getParameters() );
+				// containsAllEntriesOf( emptyMap ) has a special, inconsistent meaning: "the actual map is empty"
+				// Avoid that...
+				if ( !request.getParameters().isEmpty() ) {
+					Assertions.assertThat( actualCall.request.getParameters() )
+							.containsAllEntriesOf( request.getParameters() );
+				}
 				try {
 					JSONAssert.assertEquals(
 							toComparableJson( request.getBodyParts() ),
