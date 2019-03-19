@@ -40,18 +40,21 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
-	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
+
+	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement value;
 
 	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.dslToIndexConverter = dslToIndexConverter;
+		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 
@@ -62,7 +65,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	@Override
 	public void value(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter option here
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
@@ -85,5 +88,4 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 		MATCH_ACCESSOR.set( outerObject, middleObject );
 		return outerObject;
 	}
-
 }

@@ -63,7 +63,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other);
 
 	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath);
 
 	RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);

@@ -53,8 +53,8 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
+		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
 	}
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
+	private ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
 		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }
