@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.BooleanJunctionPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
@@ -79,6 +80,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 
 	@Override
 	public void value(Object value) {
+		// No-op
+	}
+
+	@Override
+	public void value(Object value, DslConverter dslConverter) {
 		// No-op
 	}
 

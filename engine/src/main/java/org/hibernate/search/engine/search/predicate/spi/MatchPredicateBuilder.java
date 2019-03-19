@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
+
 public interface MatchPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
 	void fuzzy(int maxEditDistance, int exactPrefixLength);
 
-	void value(Object value);
+	void value(Object value, DslConverter dslConverter);
 
 }

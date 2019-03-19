@@ -60,8 +60,8 @@ class MatchPredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public MatchPredicateTerminalContext matching(Object value) {
-		return commonState.matching( value );
+	public MatchPredicateTerminalContext matching(Object value, DslConverter dslConverter) {
+		return commonState.matching( value, dslConverter );
 	}
 
 	@Override
@@ -86,14 +86,14 @@ class MatchPredicateFieldSetContextImpl<B>
 			super( factory );
 		}
 
-		MatchPredicateTerminalContext matching(Object value) {
+		MatchPredicateTerminalContext matching(Object value, DslConverter dslConverter) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
 
 			for ( MatchPredicateFieldSetContextImpl<B> fieldSetContext : getFieldSetContexts() ) {
 				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetContext.predicateBuilders ) {
-					predicateBuilder.value( value );
+					predicateBuilder.value( value, dslConverter );
 				}
 			}
 			return this;
