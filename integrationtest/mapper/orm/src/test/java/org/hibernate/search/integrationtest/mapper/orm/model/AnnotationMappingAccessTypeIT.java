@@ -32,7 +32,12 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * @author Yoann Rodiere
+ * Integration tests checking that we get the expected access type for properties when using annotation mapping.
+ * <p>
+ * Similar to {@link ProgrammaticMappingAccessTypeIT}, which tests programmatic mapping.
+ * <p>
+ * Note that more thorough testing is performed in {@code HibernateOrmBootstrapIntrospectorAccessTypeTest},
+ * including tests of access type on an embeddable that is only ever mentioned in an element collection.
  */
 public class AnnotationMappingAccessTypeIT {
 
