@@ -10,7 +10,6 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -27,8 +26,8 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 	}
 
 	@Override

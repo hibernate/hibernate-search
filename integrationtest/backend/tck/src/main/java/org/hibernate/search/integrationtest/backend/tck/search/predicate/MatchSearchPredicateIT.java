@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -145,7 +146,7 @@ public class MatchSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue ) )
+					.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -853,7 +854,7 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.match()
 						.onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue )
+						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue, DslConverter.DISABLED )
 				)
 				.toQuery();
 
@@ -980,7 +981,7 @@ public class MatchSearchPredicateIT {
 
 				IndexSearchQuery<DocumentReference> query = scope.query()
 						.asReference()
-						.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( valueToMatch ) )
+						.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( valueToMatch, DslConverter.DISABLED ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
