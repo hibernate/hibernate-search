@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
+
 /**
  * The context used when defining a match predicate, after at least one field was mentioned.
  */
@@ -69,13 +71,35 @@ public interface MatchPredicateFieldSetContext extends MultiFieldPredicateFieldS
 
 	/**
 	 * Require at least one of the targeted fields to match the given value.
+	 * <p>
+	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The value to match.
 	 * The signature of this method defines this parameter as an {@link Object},
 	 * but a specific type is expected depending on the targeted field.
 	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
-	 * @return A context allowing to set options or get the resulting predicate.
+	 * @return A context allowing to set further options or get the resulting predicate.
+	 *
+	 * @see #matching(Object, DslConverter)
 	 */
-	MatchPredicateTerminalContext matching(Object value);
+	default MatchPredicateTerminalContext matching(Object value) {
+		return matching( value, DslConverter.ENABLED );
+	}
 
+	/**
+	 * Require at least one of the targeted fields to match the given value.
+	 *
+	 * @param value The value to match.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter}.
+	 * @return A context allowing to set further options or get the resulting predicate.
+	 *
+	 * @see DslConverter
+	 */
+	// TODO test DslConverter.DISABLED
+	MatchPredicateTerminalContext matching(Object value, DslConverter dslConverter);
 }

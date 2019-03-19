@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  * allowing fine-grained control over the type of predicate created for each field.
  * <p>
  * For example, a match predicate on an {@link Integer} field
- * will not have its {@link MatchPredicateBuilder#value(Object)} method
+ * will not have its {@link MatchPredicateBuilder#value(Object, DslConverter)} method
  * accept the same arguments as a match predicate on a {@link java.time.LocalDate} field;
  * having a separate {@link ElasticsearchFieldPredicateBuilderFactory} for those two fields
  * allows to implement the different behavior.

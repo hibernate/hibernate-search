@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -52,7 +53,8 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void value(Object value) {
+	public void value(Object value, DslConverter dslConverter) {
+		// TODO handle dslConverter option here
 		try {
 			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
