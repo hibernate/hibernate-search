@@ -10,7 +10,7 @@ import java.util.Arrays;
 
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateContext;
 import org.hibernate.search.engine.search.dsl.predicate.RangePredicateFieldSetContext;
-import org.hibernate.search.engine.search.predicate.spi.DslConverter;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 class RangePredicateContextImpl<B> implements RangePredicateContext {
