@@ -179,4 +179,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 14, value = "Multiple hits when a single hit was expected: got %1$s hits.")
 	SearchException nonSingleHit(long totalHitCount);
+
+	@Message(id = ID_OFFSET_2 + 15,
+			value = "Invalid property handle factory name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidPropertyHandleFactoryName(String invalidRepresentation, List<String> validRepresentations);
 }

@@ -18,11 +18,11 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.MemberPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
@@ -38,7 +38,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final MethodHandles.Lookup lookup;
+	private final PropertyHandleFactory propertyHandleFactory;
 	private final AnnotationHelper annotationHelper;
 	private final JavaBeanGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
@@ -46,7 +46,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	public JavaBeanBootstrapIntrospector(MethodHandles.Lookup lookup) {
-		this.lookup = lookup;
+		this.propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
 		this.annotationHelper = new AnnotationHelper( lookup );
 		this.genericContextHelper = new JavaBeanGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
@@ -88,7 +88,7 @@ public class JavaBeanBootstrapIntrospector implements PojoBootstrapIntrospector 
 	}
 
 	PropertyHandle createPropertyHandle(String name, Method method) throws IllegalAccessException {
-		return new MemberPropertyHandle( name, method, lookup.unreflect( method ) );
+		return propertyHandleFactory.createForMethod( name, method );
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {

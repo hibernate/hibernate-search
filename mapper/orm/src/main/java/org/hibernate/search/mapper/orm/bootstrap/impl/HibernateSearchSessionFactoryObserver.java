@@ -130,7 +130,7 @@ public class HibernateSearchSessionFactoryObserver implements SessionFactoryObse
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, sessionFactoryImplementor
+					metadata, propertySource, sessionFactoryImplementor
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 

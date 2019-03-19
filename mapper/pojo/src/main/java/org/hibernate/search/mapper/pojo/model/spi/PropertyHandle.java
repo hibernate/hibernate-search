@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 /**
- * @author Yoann Rodiere
+ * A handle to a property of a POJO, allowing to get the value of that property from a POJO instance.
  */
 public interface PropertyHandle {
 

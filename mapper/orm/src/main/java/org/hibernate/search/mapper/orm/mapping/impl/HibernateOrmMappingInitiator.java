@@ -53,9 +53,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					.build();
 
 	public static HibernateOrmMappingInitiator create(Metadata metadata,
+			ConfigurationPropertySource propertySource,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		HibernateOrmBootstrapIntrospector introspector =
-				new HibernateOrmBootstrapIntrospector( metadata, sessionFactoryImplementor );
+				HibernateOrmBootstrapIntrospector.create( metadata, propertySource, sessionFactoryImplementor );
 
 		return new HibernateOrmMappingInitiator(
 				metadata,

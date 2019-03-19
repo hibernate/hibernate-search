@@ -12,10 +12,7 @@ import java.lang.reflect.Field;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-/**
- * @author Yoann Rodiere
- */
-public final class FieldPropertyHandle implements PropertyHandle {
+final class FieldPropertyHandle implements PropertyHandle {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

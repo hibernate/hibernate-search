@@ -33,27 +33,72 @@ import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
+import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmPropertyHandleFactoryName;
 import org.hibernate.search.mapper.orm.util.impl.HibernateOrmXClassOrdering;
-import org.hibernate.search.mapper.pojo.model.spi.FieldPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.MethodPropertyHandle;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PropertyHandle;
+import org.hibernate.search.mapper.pojo.model.spi.PropertyHandleFactory;
 import org.hibernate.search.mapper.pojo.util.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.impl.StreamHelper;
 
-/**
- * @author Yoann Rodiere
- */
 public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospector {
 
+	private static final ConfigurationProperty<HibernateOrmPropertyHandleFactoryName> PROPERTY_HANDLE_FACTORY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.PROPERTY_HANDLE_FACTORY )
+					.as( HibernateOrmPropertyHandleFactoryName.class, HibernateOrmPropertyHandleFactoryName::of )
+					.withDefault( HibernateOrmMapperSpiSettings.Defaults.PROPERTY_HANDLE_FACTORY )
+					.build();
+
+	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
+	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
+			ConfigurationPropertySource propertySource,
+			SessionFactoryImplementor sessionFactoryImplementor) {
+		// TODO get the user lookup from Hibernate ORM?
+		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+
+		ReflectionManager reflectionManager = null;
+		if ( metadata instanceof MetadataImplementor ) {
+			reflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext()
+					.getBootstrapContext().getReflectionManager();
+		}
+		if ( reflectionManager == null ) {
+			// Fall back to our own instance of JavaReflectionManager
+			// when metadata is not a MetadataImplementor or
+			// the reflection manager were not created by Hibernate yet.
+			reflectionManager = new JavaReflectionManager();
+		}
+
+		AnnotationHelper annotationHelper = new AnnotationHelper( lookup );
+
+		HibernateOrmPropertyHandleFactoryName propertyHandleFactoryName = PROPERTY_HANDLE_FACTORY.get( propertySource );
+		PropertyHandleFactory propertyHandleFactory;
+		switch ( propertyHandleFactoryName ) {
+			case JAVA_LANG_REFLECT:
+				propertyHandleFactory = PropertyHandleFactory.usingJavaLangReflect();
+				break;
+			case METHOD_HANDLE:
+				propertyHandleFactory = PropertyHandleFactory.usingMethodHandle( lookup );
+				break;
+			default:
+				throw new AssertionFailure( "Unexpected property handle factory name: " + propertyHandleFactoryName );
+		}
+
+		return new HibernateOrmBootstrapIntrospector(
+				reflectionManager, annotationHelper, propertyHandleFactory, sessionFactoryImplementor
+		);
+	}
+
 	private final ReflectionManager reflectionManager;
-	private final MethodHandles.Lookup lookup;
+	private final PropertyHandleFactory propertyHandleFactory;
 	private final AnnotationHelper annotationHelper;
 	private final SessionFactoryImplementor sessionFactoryImplementor;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
@@ -72,24 +117,13 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 	 */
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
-	@SuppressWarnings("deprecation") // There is no alternative to getReflectionManager() at the moment.
-	public HibernateOrmBootstrapIntrospector(Metadata metadata, SessionFactoryImplementor sessionFactoryImplementor) {
-		ReflectionManager metadataReflectionManager = null;
-		if ( metadata instanceof MetadataImplementor ) {
-			metadataReflectionManager = ((MetadataImplementor) metadata).getTypeConfiguration().getMetadataBuildingContext().getBootstrapContext().getReflectionManager();
-		}
-		if ( metadataReflectionManager != null ) {
-			this.reflectionManager = metadataReflectionManager;
-		}
-		else {
-			// Fall back to our own instance of JavaReflectionManager
-			// when metadata is not a MetadataImplementor or
-			// the reflection manager were not created by Hibernate yet.
-			this.reflectionManager = new JavaReflectionManager();
-		}
-		// TODO get the user lookup from Hibernate ORM?
-		this.lookup = MethodHandles.publicLookup();
-		this.annotationHelper = new AnnotationHelper( lookup );
+	private HibernateOrmBootstrapIntrospector(ReflectionManager reflectionManager,
+			AnnotationHelper annotationHelper,
+			PropertyHandleFactory propertyHandleFactory,
+			SessionFactoryImplementor sessionFactoryImplementor) {
+		this.reflectionManager = reflectionManager;
+		this.propertyHandleFactory = propertyHandleFactory;
+		this.annotationHelper = annotationHelper;
 		this.sessionFactoryImplementor = sessionFactoryImplementor;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
@@ -165,12 +199,12 @@ public class HibernateOrmBootstrapIntrospector implements PojoBootstrapIntrospec
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
-			return new MethodPropertyHandle( name, method );
+			return propertyHandleFactory.createForMethod( name, method );
 		}
 		else if ( member instanceof Field ) {
 			Field field = (Field) member;
 			setAccessible( field );
-			return new FieldPropertyHandle( name, field );
+			return propertyHandleFactory.createForField( name, field );
 		}
 		else {
 			throw new AssertionFailure( "Unexpected type for a " + Member.class.getName() + ": " + member );
