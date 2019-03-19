@@ -96,9 +96,9 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * Lower bound is included by default in the range.
 	 *
-	 * @return A context allowing to exclude the lower bound from the range or to get the resulting predicate.
+	 * @return A context allowing to exclude the lower bound from the range, to set options or to get the resulting predicate.
 	 */
-	RangePredicateTerminalContext above(Object value);
+	RangePredicateLimitTerminalContext above(Object value);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
@@ -111,8 +111,8 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * Upper bound is included by default in the range.
 	 *
-	 * @return A context allowing to exclude the upper bound from the range or to get the resulting predicate.
+	 * @return A context allowing to exclude the upper bound from the range, to set options or to get the resulting predicate.
 	 */
-	RangePredicateTerminalContext below(Object value);
+	RangePredicateLimitTerminalContext below(Object value);
 
 }
