@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
-import org.hibernate.search.engine.search.projection.spi.ProjectionConverter;
+import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
