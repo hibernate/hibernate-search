@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuild
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
@@ -30,6 +32,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -68,7 +71,8 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
 				mappingHelper, bindingContext,
-				Optional.of( identityMappingCollector )
+				Optional.of( identityMappingCollector ),
+				Collections.emptyList()
 		);
 	}
 
@@ -114,7 +118,6 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			if ( entityIdPathOptional.isPresent() ) {
 				BoundPojoModelPathPropertyNode<E, ?> entityIdPath = entityIdPathOptional.get();
 				identityMappingCollector.defaultIdentifierBridge(
-						mappingHelper,
 						entityIdPath
 				);
 				identifierMapping = identityMappingCollector.identifierMapping;
@@ -183,7 +186,9 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 
 		@Override
 		public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
-				BeanHolder<? extends IdentifierBridge<T>> bridgeHolder) {
+				BridgeBuilder<? extends IdentifierBridge<?>> builder) {
+			BeanHolder<? extends IdentifierBridge<T>> bridgeHolder = mappingHelper.getIndexModelBinder()
+					.addIdentifierBridge( indexManagerBuildingState.getRootBindingContext(), modelPath, builder );
 			PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 			this.identifierMapping = new PropertyIdentifierMapping<>(
 					propertyModel.getTypeModel().getRawType().getCaster(),
@@ -192,17 +197,18 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			);
 		}
 
-		<T> void defaultIdentifierBridge(PojoMappingHelper mappingHelper,
-				BoundPojoModelPathPropertyNode<?, T> entityIdPath) {
-			identifierBridge(
-					entityIdPath,
-					mappingHelper.getIndexModelBinder().addIdentifierBridge( indexManagerBuildingState.getRootBindingContext(), entityIdPath, null )
-			);
+		@Override
+		public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
+				BridgeBuilder<? extends RoutingKeyBridge> builder) {
+			BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
+					.addRoutingKeyBridge( indexManagerBuildingState.getRootBindingContext(), modelPath, builder );
+			this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );
+			return boundRoutingKeyBridge;
 		}
 
-		@Override
-		public void routingKeyBridge(BeanHolder<? extends RoutingKeyBridge> bridgeHolder) {
-			this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( bridgeHolder );
+		<T> void defaultIdentifierBridge(BoundPojoModelPathPropertyNode<?, T> entityIdPath) {
+			identifierBridge( entityIdPath, null );
 		}
+
 	}
 }

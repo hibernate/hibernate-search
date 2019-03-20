@@ -46,6 +46,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 
 	private final Optional<PojoIdentityMappingCollector> identityMappingCollector;
+	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
 	private BoundRoutingKeyBridge<T> boundRoutingKeyBridge;
 	private final Collection<BoundTypeBridge<T>> boundBridges = new ArrayList<>();
@@ -56,12 +57,14 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	public PojoIndexingProcessorTypeNodeBuilder(
 			BoundPojoModelPathTypeNode<T> modelPath,
 			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
-			Optional<PojoIdentityMappingCollector> identityMappingCollector) {
+			Optional<PojoIdentityMappingCollector> identityMappingCollector,
+			Collection<IndexObjectFieldReference> parentIndexObjectReferences) {
 		super( mappingHelper, bindingContext );
 
 		this.modelPath = modelPath;
 
 		this.identityMappingCollector = identityMappingCollector;
+		this.parentIndexObjectReferences = parentIndexObjectReferences;
 	}
 
 	@Override
@@ -73,9 +76,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	@Override
 	public void routingKeyBridge(BridgeBuilder<? extends RoutingKeyBridge> builder) {
 		if ( identityMappingCollector.isPresent() ) {
-			boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
-					.addRoutingKeyBridge( bindingContext, modelPath, builder );
-			identityMappingCollector.get().routingKeyBridge( boundRoutingKeyBridge.getBridgeHolder() );
+			boundRoutingKeyBridge = identityMappingCollector.get().routingKeyBridge( modelPath, builder );
 		}
 	}
 
@@ -119,8 +120,6 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	private Optional<PojoIndexingProcessor<T>> doBuild(PojoIndexingDependencyCollectorTypeNode<T> dependencyCollector) {
-		Collection<IndexObjectFieldReference> parentIndexObjectReferences = bindingContext.getParentIndexObjectReferences();
-
 		if ( boundRoutingKeyBridge != null ) {
 			boundRoutingKeyBridge.getPojoModelRootElement().contributeDependencies( dependencyCollector );
 		}

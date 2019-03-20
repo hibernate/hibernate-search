@@ -15,6 +15,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
@@ -77,7 +78,7 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 
 		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.getParent().getParent();
 
-		Optional<IndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
+		Optional<NonRootIndexModelBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
 				holderTypePath.getTypeModel().getRawType(),
 				defaultedRelativePrefix, storage, maxDepth, includePaths
 		);
@@ -86,7 +87,8 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 			PojoIndexingProcessorTypeNodeBuilder<V> nestedProcessorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 					embeddedTypeModelPath, mappingHelper, nestedBindingContext,
 					// Do NOT propagate the identity mapping collector to IndexedEmbeddeds
-					Optional.empty()
+					Optional.empty(),
+					nestedBindingContext.getParentIndexObjectReferences()
 			);
 			typeNodeBuilders.add( nestedProcessorBuilder );
 			mappingHelper.getContributorProvider().forEach(

@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
+import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -283,7 +284,7 @@ public class DocumentElementIT {
 			nestedObject = new FirstLevelObjectMapping( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
-			IndexModelBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
+			NonRootIndexModelBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectFieldStorage.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )

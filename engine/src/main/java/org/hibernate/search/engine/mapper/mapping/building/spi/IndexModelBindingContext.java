@@ -6,36 +6,48 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
+/**
+ * The binding context associated to a specific node in the entity tree.
+ * <p>
+ * The context includes in particular {@link #getSchemaElement() the corresponding node in the index schema tree}.
+ * <p>
+ * Provides entry points to add fields to the index schema and to generate new contexts for indexed-embeddeds.
+ */
 public interface IndexModelBindingContext {
 
+	/**
+	 * @return The type factory of the bound index, allowing to create field types.
+	 */
 	IndexFieldTypeFactoryContext getTypeFactory();
 
-	Collection<IndexObjectFieldReference> getParentIndexObjectReferences();
-
+	/**
+	 * @return The element in the index schema that this context points to.
+	 */
 	IndexSchemaElement getSchemaElement();
 
+	/**
+	 * @param listener A listener to notify when operations are executed on the returned schema element.
+	 * @return The element in the index schema that this context points to,
+	 * with a wrapper that ensures the given listener will be called when operations are executed on the schema element.
+	 */
 	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
 
 	/**
-	 * Inform the model collector that documents will always be provided along
-	 * with an explicit routing key,
-	 * to be used to route the document to a specific shard.
+	 * @param parentTypeModel The model representing the type holding the property with an indexed-embedded.
+	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
+	 * @param storage The storage type to use for all object fields created as part of the {@code relativePrefix}.
+	 * @param maxDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
+	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
+	 * @return The element in the index schema that this context points to.
 	 */
-	void explicitRouting();
-
-	void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter);
-
-	Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
+	Optional<NonRootIndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 }

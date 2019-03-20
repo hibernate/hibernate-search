@@ -13,13 +13,15 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
 import org.hibernate.search.util.common.AssertionFailure;
 
-class NonRootIndexModelBindingContext
-		extends AbstractIndexModelBindingContext<IndexSchemaObjectNodeBuilder> {
+class NonRootIndexModelBindingContextImpl
+		extends AbstractIndexModelBindingContext<IndexSchemaObjectNodeBuilder>
+		implements NonRootIndexModelBindingContext {
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
-	NonRootIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+	NonRootIndexModelBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences,
 			ConfiguredIndexSchemaNestingContext nestingContext) {
@@ -30,20 +32,6 @@ class NonRootIndexModelBindingContext
 	@Override
 	public Collection<IndexObjectFieldReference> getParentIndexObjectReferences() {
 		return parentIndexObjectReferences;
-	}
-
-	@Override
-	public void idDslConverter(ToDocumentIdentifierValueConverter<?> idConverter) {
-		throw new AssertionFailure(
-				"idDslConverter(ToDocumentIdentifierValueConverter) was called on a non-root binding context; this should never happen."
-		);
-	}
-
-	@Override
-	public void explicitRouting() {
-		throw new AssertionFailure(
-				"explicitRouting() was called on a non-root binding context; this should never happen."
-		);
 	}
 
 }

@@ -6,22 +6,15 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
+import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
 
-public class RootIndexModelBindingContext extends AbstractIndexModelBindingContext<IndexSchemaRootNodeBuilder> {
+public class RootIndexModelBindingContextImpl extends AbstractIndexModelBindingContext<IndexSchemaRootNodeBuilder>
+		implements RootIndexModelBindingContext {
 
-	public RootIndexModelBindingContext(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
+	public RootIndexModelBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
 		super( indexSchemaObjectNodeBuilder, indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext.root() );
-	}
-
-	@Override
-	public Collection<IndexObjectFieldReference> getParentIndexObjectReferences() {
-		return Collections.emptyList();
 	}
 
 	@Override

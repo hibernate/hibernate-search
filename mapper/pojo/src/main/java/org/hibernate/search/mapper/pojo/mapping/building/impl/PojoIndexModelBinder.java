@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
@@ -51,10 +52,10 @@ public interface PojoIndexModelBinder {
 	<C, V> ContainerExtractorHolder<C, V> createExtractors(
 			BoundContainerExtractorPath<C, V> boundExtractorPath);
 
-	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(IndexModelBindingContext bindingContext,
+	<I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(RootIndexModelBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath, BridgeBuilder<? extends IdentifierBridge<?>> bridgeBuilder);
 
-	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexModelBindingContext bindingContext,
+	<T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(RootIndexModelBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> bridgeBuilder);
 
 	<T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexModelBindingContext bindingContext,

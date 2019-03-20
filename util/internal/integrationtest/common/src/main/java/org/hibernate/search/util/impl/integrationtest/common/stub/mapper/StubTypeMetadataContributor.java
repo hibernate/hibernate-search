@@ -11,14 +11,15 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
 
 class StubTypeMetadataContributor {
 
 	private final StubTypeModel typeIdentifier;
 	private final String indexName;
-	private final Consumer<IndexModelBindingContext> delegate;
+	private final Consumer<? super RootIndexModelBindingContext> delegate;
 
-	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<IndexModelBindingContext> delegate) {
+	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<? super RootIndexModelBindingContext> delegate) {
 		this.typeIdentifier = typeIdentifier;
 		this.indexName = indexName;
 		this.delegate = delegate;

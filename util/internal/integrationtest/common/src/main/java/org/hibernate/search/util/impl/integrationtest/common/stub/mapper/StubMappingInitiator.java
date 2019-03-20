@@ -14,6 +14,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBinding
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
+import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 
@@ -26,7 +27,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
-	public void add(String typeIdentifier, String indexName, Consumer<IndexModelBindingContext> mappingContributor) {
+	public void add(String typeIdentifier, String indexName, Consumer<? super RootIndexModelBindingContext> mappingContributor) {
 		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
 	}
 

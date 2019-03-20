@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
+import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexModelBindingContext {
@@ -70,7 +71,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 	}
 
 	@Override
-	public Optional<IndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
+	public Optional<NonRootIndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths) {
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				parentTypeModel, relativePrefix, maxDepth, includePaths,
@@ -79,7 +80,7 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 	}
 
 	private static class NestedContextBuilderImpl
-			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexModelBindingContext> {
+			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<NonRootIndexModelBindingContext> {
 
 		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
@@ -102,8 +103,8 @@ abstract class AbstractIndexModelBindingContext<B extends IndexSchemaObjectNodeB
 		}
 
 		@Override
-		public IndexModelBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
-			return new NonRootIndexModelBindingContext(
+		public NonRootIndexModelBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
+			return new NonRootIndexModelBindingContextImpl(
 					indexSchemaRootNodeBuilder,
 					currentNodeBuilder, parentIndexObjectReferences, nestingContext
 			);
