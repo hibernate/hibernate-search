@@ -19,8 +19,8 @@ import org.hibernate.search.util.common.impl.Contracts;
 abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends LuceneStandardFieldCodec<F, ?>>
 		extends AbstractLuceneFieldPredicateBuilderFactory {
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 
 	final C codec;
 

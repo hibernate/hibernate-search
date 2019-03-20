@@ -28,8 +28,8 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
 
 	@Override
 	public LuceneNumericMatchPredicateBuilder<F, E> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 	}
 
 	@Override
