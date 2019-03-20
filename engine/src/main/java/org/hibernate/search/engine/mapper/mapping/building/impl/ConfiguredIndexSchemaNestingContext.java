@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -91,6 +93,12 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			while ( nextDotIndex >= 0 ) {
 				String objectName = prefixToParse.substring( afterPreviousDotIndex, nextDotIndex );
 				contextBuilder.appendObject( objectName );
+
+				// Make sure to mark the paths as encountered in the filter
+				String objectNameRelativeToFilter = prefixToParse.substring( 0, nextDotIndex );
+				// We only use isPathIncluded for its side effect: it marks the path as encountered
+				filter.isPathIncluded( objectNameRelativeToFilter );
+
 				afterPreviousDotIndex = nextDotIndex + 1;
 				nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			}
@@ -103,6 +111,24 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 		else {
 			return Optional.empty();
 		}
+	}
+
+	public Set<String> getUselessIncludePaths() {
+		Set<String> includePaths = filter.getProperExplicitlyIncludedPaths();
+		Map<String, Boolean> encounteredFieldPaths = filter.getEncounteredFieldPaths();
+		Set<String> uselessIncludePaths = new LinkedHashSet<>();
+		for ( String path : includePaths ) {
+			Boolean included = encounteredFieldPaths.get( path );
+			if ( included == null /* not encountered */ || !included ) {
+				// An "includePaths" filter that does not result in inclusion is useless
+				uselessIncludePaths.add( path );
+			}
+		}
+		return uselessIncludePaths;
+	}
+
+	public Set<String> getEncounteredFieldPaths() {
+		return filter.getEncounteredFieldPaths().keySet();
 	}
 
 	public interface NestedContextBuilder<T> {

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.newCapture;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -267,6 +268,206 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3136")
+	public void indexedEmbedded_includePaths_tracking() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> includePaths = new HashSet<>();
+
+		includePaths.add( "included" );
+		includePaths.add( "notEncountered" );
+		includePaths.add( "level2NonIndexedEmbedded" );
+		includePaths.add( "level2NonIndexedEmbedded.included" );
+		includePaths.add( "level2NonIndexedEmbedded.notEncountered" );
+		includePaths.add( "level2IndexedEmbedded.included" );
+		includePaths.add( "level2IndexedEmbedded.notEncountered" );
+		includePaths.add( "level2IndexedEmbedded.excludedBecauseOfLevel2" );
+
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext, typeModel1Mock, "level1.",
+				null, includePaths
+		);
+		// Initially no path was encountered so all includePaths are useless
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.isEmpty();
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"included",
+						"notEncountered",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Encounter "included" and "excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level1Context, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level1Context, "excludedBecauseOfLevel1" );
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included", // Added
+						"excludedBecauseOfLevel1" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						// "included" removed
+						"notEncountered",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Check non-IndexedEmbedded nesting
+		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
+				checkCompositeIncluded( "level2NonIndexedEmbedded", level1Context, "level2NonIndexedEmbedded" );
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"level2NonIndexedEmbedded" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"notEncountered",
+						// "level2NonIndexedEmbedded" removed
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Encounter "level2NonIndexedEmbedded.included" and "level2NonIndexedEmbedded.excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level2NonIndexedEmbeddedContext, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level2NonIndexedEmbeddedContext, "excludedBecauseOfLevel1" );
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included", // Added
+						"level2NonIndexedEmbedded.excludedBecauseOfLevel1" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"notEncountered",
+						// "level2NonIndexedEmbedded.included" removed
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Check IndexedEmbedded nesting
+		includePaths.clear();
+		includePaths.add( "included" );
+		includePaths.add( "notEncountered" );
+		includePaths.add( "excludedBecauseOfLevel1" );
+		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
+				"level2IndexedEmbedded", level1Context, typeModel2Mock, "level2IndexedEmbedded.",
+				null, includePaths
+		);
+		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+				.isEmpty();
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
+						"level2IndexedEmbedded" // Added
+				);
+		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+				.containsOnly(
+						"included",
+						"notEncountered"
+						// "excludedBecauseOfLevel1" should not be here: it was excluded by the parent filter.
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						// No change expected
+						"notEncountered",
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Encounter "level2IndexedEmbedded.included" and "level2IndexedEmbedded.excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level2IndexedEmbeddedContext, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level2IndexedEmbeddedContext, "excludedBecauseOfLevel1" );
+		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included", // Added
+						"excludedBecauseOfLevel1" // Added
+				);
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
+						"level2IndexedEmbedded",
+						"level2IndexedEmbedded.included", // Added
+						"level2IndexedEmbedded.excludedBecauseOfLevel1" // Added
+				);
+		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+				.containsOnly(
+						// "included" removed
+						"notEncountered"
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"notEncountered",
+						"level2NonIndexedEmbedded.notEncountered",
+						// "level2IndexedEmbedded.included" removed
+						"level2IndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+
+		// Encounter "level2IndexedEmbedded.excludedBecauseOfLevel2"
+		checkLeafExcluded( "excludedBecauseOfLevel2", level2IndexedEmbeddedContext, "excludedBecauseOfLevel2" );
+		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"excludedBecauseOfLevel2" // Added
+				);
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"excludedBecauseOfLevel1",
+						"level2NonIndexedEmbedded",
+						"level2NonIndexedEmbedded.included",
+						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
+						"level2IndexedEmbedded",
+						"level2IndexedEmbedded.included",
+						"level2IndexedEmbedded.excludedBecauseOfLevel1",
+						"level2IndexedEmbedded.excludedBecauseOfLevel2" // Added
+				);
+		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+				.containsOnly(
+						// No change expected
+						"notEncountered"
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"notEncountered",
+						"level2NonIndexedEmbedded.notEncountered",
+						"level2IndexedEmbedded.notEncountered",
+						// No change expected: "excludedBecauseOfLevel2" was excluded in the end, so it really is useless
+						"level2IndexedEmbedded.excludedBecauseOfLevel2"
+				);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2194")
 	public void indexedEmbedded_noFilterThenIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
@@ -466,6 +667,98 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		checkLeafExcluded( "level3", level2Context, "level3" );
 		checkCompositeExcluded( "level3", level2Context, "level3" );
 	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3136")
+	public void indexedEmbedded_includePaths_depth1_tracking() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> includePaths = new HashSet<>();
+
+		includePaths.add( "included" );
+		includePaths.add( "notEncountered" );
+		includePaths.add( "level2.level3.included" );
+		includePaths.add( "level2.level3.notEncountered" );
+
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext, typeModel1Mock, "level1.",
+				1, includePaths
+		);
+		// Initially no path was encountered so all includePaths are useless
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.isEmpty();
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"included",
+						"notEncountered",
+						"level2.level3.included",
+						"level2.level3.notEncountered"
+				);
+
+		// Encounter "included" and "excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level1Context, "included" );
+		checkLeafIncluded( "includedBecauseOfDepth", level1Context, "includedBecauseOfDepth" );
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included", // Added
+						"includedBecauseOfDepth" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						// "included" removed
+						"notEncountered",
+						"level2.level3.included",
+						"level2.level3.notEncountered"
+				);
+
+		// Encounter a nested indexedEmbedded
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+				"level2", level1Context, typeModel2Mock, "level2.",
+				null, null
+		);
+		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
+				"level3", level2Context, typeModel2Mock, "level3.",
+				null, null
+		);
+		assertThat( level3Context.getUselessIncludePaths() )
+				.isEmpty();
+		assertThat( level2Context.getUselessIncludePaths() )
+				.isEmpty();
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"includedBecauseOfDepth",
+						"level2", // Added
+						"level2.level3" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						// No change expected
+						"notEncountered",
+						"level2.level3.included",
+						"level2.level3.notEncountered"
+				);
+
+		// Encounter "level2.level3.included" and "level2.level3.excludedBecauseOfLevel1"
+		checkLeafIncluded( "included", level3Context, "included" );
+		checkLeafExcluded( "excludedBecauseOfLevel1", level3Context, "excludedBecauseOfLevel1" );
+		assertThat( level1Context.getEncounteredFieldPaths() )
+				.containsOnly(
+						"included",
+						"includedBecauseOfDepth",
+						"level2",
+						"level2.level3",
+						"level2.level3.included", // Added
+						"level2.level3.excludedBecauseOfLevel1" // Added
+				);
+		assertThat( level1Context.getUselessIncludePaths() )
+				.containsOnly(
+						"notEncountered",
+						// "level2.level3.included" removed
+						"level2.level3.notEncountered"
+				);
+	}
+
 
 	@Test
 	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
