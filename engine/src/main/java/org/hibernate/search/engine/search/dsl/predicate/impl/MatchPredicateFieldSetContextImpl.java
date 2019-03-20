@@ -33,24 +33,19 @@ class MatchPredicateFieldSetContextImpl<B>
 
 	private Float fieldSetBoost;
 
-	MatchPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths, DslConverter dslConverter) {
+	MatchPredicateFieldSetContextImpl(CommonState<B> commonState, List<String> absoluteFieldPaths) {
 		this.commonState = commonState;
 		this.commonState.add( this );
 		this.absoluteFieldPaths = absoluteFieldPaths;
 		SearchPredicateBuilderFactory<?, B> predicateFactory = commonState.getFactory();
 		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			predicateBuilders.add( predicateFactory.match( absoluteFieldPath, dslConverter ) );
+			predicateBuilders.add( predicateFactory.match( absoluteFieldPath ) );
 		}
 	}
 
 	@Override
 	public MatchPredicateFieldSetContext orFields(String... absoluteFieldPaths) {
-		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.ENABLED );
-	}
-
-	@Override
-	public MatchPredicateFieldSetContext orRawFields(String... absoluteFieldPaths) {
-		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ), DslConverter.DISABLED );
+		return new MatchPredicateFieldSetContextImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override

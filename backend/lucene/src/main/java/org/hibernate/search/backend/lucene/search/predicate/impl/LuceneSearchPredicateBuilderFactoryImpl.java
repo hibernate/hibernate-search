@@ -87,9 +87,9 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath, DslConverter dslConverter) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
 				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
 	}
 
