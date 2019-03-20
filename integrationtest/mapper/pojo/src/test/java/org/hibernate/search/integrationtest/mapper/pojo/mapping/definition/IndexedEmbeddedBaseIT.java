@@ -24,8 +24,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -231,6 +235,67 @@ public class IndexedEmbeddedBaseIT {
 						.field( "includedProperty", "valueForIncluded" )
 				)
 		);
+	}
+
+	/**
+	 * Check that an "includePaths" parameter that doesn't match anything is reported to the user.
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3136")
+	public void error_includePaths_nonMatched() {
+		class IndexedEmbeddedLevel1 {
+			String ignoredProperty;
+			String includedProperty;
+			@GenericField
+			public String getIgnoredProperty() {
+				return ignoredProperty;
+			}
+			@GenericField
+			public String getIncludedProperty() {
+				return includedProperty;
+			}
+		}
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			IndexedEmbeddedLevel1 level1;
+			public IndexedEntity(int id, String ignoredProperty, String includedProperty) {
+				this.id = id;
+				this.level1 = new IndexedEmbeddedLevel1();
+				this.level1.ignoredProperty = ignoredProperty;
+				this.level1.includedProperty = includedProperty;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(includePaths = {"includedProperty", "nonMatchingPath"})
+			public IndexedEmbeddedLevel1 getLevel1() {
+				return level1;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.withBackendMock( backendMock )
+						.withAnnotatedEntityTypes( IndexedEntity.class )
+						.withAnnotatedTypes( IndexedEmbeddedLevel1.class )
+						.setup()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".level1" )
+						.failure(
+								"IndexedEmbedded defines includePaths filters that do not match anything",
+								"Non-matching includePaths filters:",
+								CollectionHelper.asLinkedHashSet( "nonMatchingPath" ).toString(),
+								"Encountered field paths:",
+								CollectionHelper.asLinkedHashSet( "ignoredProperty", "includedProperty" ).toString(),
+								"Check the filters for typos, or remove them if they are not useful"
+						)
+						.build()
+				);
 	}
 
 	/**

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.processing.building.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorValueNode;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.BoundValueBridge;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMappingHelper;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
@@ -29,6 +31,7 @@ import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A delegate to be used by {@link PojoIndexingProcessorPropertyNodeBuilder}
@@ -39,6 +42,8 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
  */
 class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoProcessorNodeBuilder
 		implements PojoMappingCollectorValueNode {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BoundPojoModelPathValueNode<?, P, V> modelPath;
 
@@ -95,6 +100,11 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 					embeddedTypeModelPath.getTypeModel().getRawType(),
 					c -> c.contributeMapping( nestedProcessorBuilder )
 			);
+			Set<String> uselessIncludePaths = nestedBindingContext.getUselessIncludePaths();
+			if ( !uselessIncludePaths.isEmpty() ) {
+				Set<String> encounteredFieldPaths = nestedBindingContext.getEncounteredFieldPaths();
+				throw log.uselessIncludePathFilters( uselessIncludePaths, encounteredFieldPaths );
+			}
 		} );
 	}
 
