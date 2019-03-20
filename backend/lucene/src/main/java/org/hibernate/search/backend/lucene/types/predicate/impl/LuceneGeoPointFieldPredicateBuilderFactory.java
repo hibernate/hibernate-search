@@ -42,7 +42,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
 		throw log.matchPredicatesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

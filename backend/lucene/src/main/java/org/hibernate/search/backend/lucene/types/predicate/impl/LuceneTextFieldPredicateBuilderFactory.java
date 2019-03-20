@@ -46,8 +46,8 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 
 	@Override
 	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec, queryBuilder );
+			LuceneSearchContext searchContext, String absoluteFieldPath) {
+		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec, queryBuilder );
 	}
 
 	@Override
