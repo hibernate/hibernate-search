@@ -58,7 +58,7 @@ public class StubSearchPredicateBuilderFactory
 	}
 
 	@Override
-	public MatchPredicateBuilder<StubPredicateBuilder> match(String absoluteFieldPath, DslConverter dslConverter) {
+	public MatchPredicateBuilder<StubPredicateBuilder> match(String absoluteFieldPath) {
 		return new StubPredicateBuilder();
 	}
 

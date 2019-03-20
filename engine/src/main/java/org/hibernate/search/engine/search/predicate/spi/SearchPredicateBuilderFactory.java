@@ -61,7 +61,7 @@ public interface SearchPredicateBuilderFactory<C, B> {
 
 	BooleanJunctionPredicateBuilder<B> bool();
 
-	MatchPredicateBuilder<B> match(String absoluteFieldPath, DslConverter dslConverter);
+	MatchPredicateBuilder<B> match(String absoluteFieldPath);
 
 	RangePredicateBuilder<B> range(String absoluteFieldPath, DslConverter dslConverter);
 
