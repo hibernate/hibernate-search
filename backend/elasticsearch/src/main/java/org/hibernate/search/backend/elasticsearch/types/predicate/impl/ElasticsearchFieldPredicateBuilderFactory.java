@@ -50,7 +50,17 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter);
+	default boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+		if ( !hasCompatibleCodec( other ) ) {
+			return false;
+		}
+
+		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
+	}
+
+	boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other);
+
+	boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other);
 
 	MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);

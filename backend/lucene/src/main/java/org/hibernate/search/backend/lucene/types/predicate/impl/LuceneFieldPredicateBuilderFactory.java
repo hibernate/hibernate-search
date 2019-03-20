@@ -49,7 +49,17 @@ public interface LuceneFieldPredicateBuilderFactory {
 	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
 	 * {@code false} otherwise, or when in doubt.
 	 */
-	boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter);
+	default boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+		if ( !hasCompatibleCodec( other ) ) {
+			return false;
+		}
+
+		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
+	}
+
+	boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other);
+
+	boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other);
 
 	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);
