@@ -86,9 +86,9 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
-	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath, DslConverter dslConverter) {
+	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
+				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
 				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
 	}
 

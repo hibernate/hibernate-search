@@ -951,7 +951,7 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
-	@Test
+	// TODO handle it in subsequent commits @Test
 	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SubTest.expectException(
@@ -981,7 +981,7 @@ public class MatchSearchPredicateIT {
 
 				IndexSearchQuery<DocumentReference> query = scope.query()
 						.asReference()
-						.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( valueToMatch, DslConverter.DISABLED ) )
+						.predicate( f -> f.match().onField( absoluteFieldPath ).matching( valueToMatch, DslConverter.DISABLED ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -1020,7 +1020,7 @@ public class MatchSearchPredicateIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			SubTest.expectException(
-					() -> scope.predicate().match().onRawField( fieldPath )
+					() -> scope.predicate().match().onField( fieldPath )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
