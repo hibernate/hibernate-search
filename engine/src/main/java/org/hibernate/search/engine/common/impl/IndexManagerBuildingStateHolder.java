@@ -21,6 +21,7 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -30,7 +31,7 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -177,7 +178,7 @@ class IndexManagerBuildingStateHolder {
 					indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
 			);
 			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
-			IndexModelBindingContext bindingContext = new RootIndexModelBindingContext( schemaRootNodeBuilder );
+			RootIndexModelBindingContext bindingContext = new RootIndexModelBindingContextImpl( schemaRootNodeBuilder );
 			return new IndexManagerInitialBuildState<>( backendName, indexName, builder, bindingContext );
 		}
 
@@ -195,13 +196,13 @@ class IndexManagerBuildingStateHolder {
 		private final String backendName;
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
-		private final IndexModelBindingContext bindingContext;
+		private final RootIndexModelBindingContext bindingContext;
 
 		private IndexManagerImplementor<D> indexManager;
 
 		IndexManagerInitialBuildState(String backendName, String indexName,
 				IndexManagerBuilder<D> builder,
-				IndexModelBindingContext bindingContext) {
+				RootIndexModelBindingContext bindingContext) {
 			this.backendName = backendName;
 			this.indexName = indexName;
 			this.builder = builder;
@@ -223,7 +224,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public IndexModelBindingContext getRootBindingContext() {
+		public RootIndexModelBindingContext getRootBindingContext() {
 			return bindingContext;
 		}
 
