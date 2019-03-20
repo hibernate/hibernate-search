@@ -21,9 +21,9 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
-import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -275,7 +275,7 @@ public class DocumentElementIT {
 		final FirstLevelObjectMapping nestedObject;
 		final FirstLevelObjectMapping excludingObject;
 
-		IndexMapping(IndexModelBindingContext ctx) {
+		IndexMapping(IndexBindingContext ctx) {
 			super( ctx.getSchemaElement() );
 			IndexSchemaElement root = ctx.getSchemaElement();
 			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
@@ -284,7 +284,7 @@ public class DocumentElementIT {
 			nestedObject = new FirstLevelObjectMapping( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
-			NonRootIndexModelBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
+			IndexedEmbeddedBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
 					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectFieldStorage.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )

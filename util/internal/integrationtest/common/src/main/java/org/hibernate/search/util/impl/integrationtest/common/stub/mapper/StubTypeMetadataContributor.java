@@ -9,17 +9,16 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 
 class StubTypeMetadataContributor {
 
 	private final StubTypeModel typeIdentifier;
 	private final String indexName;
-	private final Consumer<? super RootIndexModelBindingContext> delegate;
+	private final Consumer<? super IndexedEntityBindingContext> delegate;
 
-	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<? super RootIndexModelBindingContext> delegate) {
+	StubTypeMetadataContributor(StubTypeModel typeIdentifier, String indexName, Consumer<? super IndexedEntityBindingContext> delegate) {
 		this.typeIdentifier = typeIdentifier;
 		this.indexName = indexName;
 		this.delegate = delegate;
@@ -33,7 +32,7 @@ class StubTypeMetadataContributor {
 	}
 
 	public void contribute(IndexManagerBuildingState<?> indexManagerBuildingState) {
-		delegate.accept( indexManagerBuildingState.getRootBindingContext() );
+		delegate.accept( indexManagerBuildingState.getIndexedEntityBindingContext() );
 	}
 
 }

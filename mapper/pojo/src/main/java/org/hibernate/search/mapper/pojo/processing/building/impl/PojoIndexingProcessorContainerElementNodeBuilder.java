@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.processing.building.impl;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoIndexingDependencyCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorValueNode;
@@ -35,7 +35,7 @@ class PojoIndexingProcessorContainerElementNodeBuilder<P extends C, C, V> extend
 
 	PojoIndexingProcessorContainerElementNodeBuilder(BoundPojoModelPathValueNode<?, P, V> modelPath,
 			ContainerExtractorHolder<C, V> extractorHolder,
-			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext) {
+			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext) {
 		super( mappingHelper, bindingContext );
 		this.modelPath = modelPath;
 		this.extractorHolder = extractorHolder;

@@ -11,17 +11,15 @@ import java.util.Collections;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
-import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.NonRootIndexModelBindingContext;
-import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 
-class NonRootIndexModelBindingContextImpl
-		extends AbstractIndexModelBindingContext<IndexSchemaObjectNodeBuilder>
-		implements NonRootIndexModelBindingContext {
+class IndexedEmbeddedBindingContextImpl
+		extends AbstractIndexBindingContext<IndexSchemaObjectNodeBuilder>
+		implements IndexedEmbeddedBindingContext {
 	private final Collection<IndexObjectFieldReference> parentIndexObjectReferences;
 
-	NonRootIndexModelBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+	IndexedEmbeddedBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			IndexSchemaObjectNodeBuilder indexSchemaObjectNodeBuilder,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences,
 			ConfiguredIndexSchemaNestingContext nestingContext) {

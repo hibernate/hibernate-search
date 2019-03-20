@@ -14,7 +14,7 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -67,7 +67,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		this.mappingHelper = mappingHelper;
 		this.indexManagerBuildingState = indexManagerBuildingState;
 		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl( defaultIdentifierMapping );
-		IndexModelBindingContext bindingContext = indexManagerBuildingState.getRootBindingContext();
+		IndexBindingContext bindingContext = indexManagerBuildingState.getIndexedEntityBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
 				mappingHelper, bindingContext,
@@ -188,7 +188,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		public <T> void identifierBridge(BoundPojoModelPathPropertyNode<?, T> modelPath,
 				BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 			BeanHolder<? extends IdentifierBridge<T>> bridgeHolder = mappingHelper.getIndexModelBinder()
-					.addIdentifierBridge( indexManagerBuildingState.getRootBindingContext(), modelPath, builder );
+					.addIdentifierBridge( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, builder );
 			PojoPropertyModel<T> propertyModel = modelPath.getPropertyModel();
 			this.identifierMapping = new PropertyIdentifierMapping<>(
 					propertyModel.getTypeModel().getRawType().getCaster(),
@@ -201,7 +201,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
 				BridgeBuilder<? extends RoutingKeyBridge> builder) {
 			BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
-					.addRoutingKeyBridge( indexManagerBuildingState.getRootBindingContext(), modelPath, builder );
+					.addRoutingKeyBridge( indexManagerBuildingState.getIndexedEntityBindingContext(), modelPath, builder );
 			this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );
 			return boundRoutingKeyBridge;
 		}

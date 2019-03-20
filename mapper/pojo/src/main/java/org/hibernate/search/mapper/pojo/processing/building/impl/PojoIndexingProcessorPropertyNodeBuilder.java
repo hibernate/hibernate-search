@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -58,7 +58,7 @@ class PojoIndexingProcessorPropertyNodeBuilder<T, P> extends AbstractPojoProcess
 
 	PojoIndexingProcessorPropertyNodeBuilder(
 			BoundPojoModelPathPropertyNode<T, P> modelPath,
-			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
+			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext,
 			Optional<PojoIdentityMappingCollector> identityMappingCollector) {
 		super( mappingHelper, bindingContext );
 

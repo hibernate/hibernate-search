@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchAnalysisDefinitionContainerContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -345,7 +345,7 @@ public class ElasticsearchAnalysisConfigurerIT {
 		setup( analysisConfigurer, c -> { } );
 	}
 
-	private void setup(String analysisConfigurer, Consumer<IndexModelBindingContext> mappingContributor) {
+	private void setup(String analysisConfigurer, Consumer<IndexBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withProperty(
 						"backends." + BACKEND_NAME + "." + ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,

@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeTerminalContext;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -493,7 +493,7 @@ public class DocumentModelDslIT {
 		return factoryContext.asString();
 	}
 
-	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {
+	private void setup(Consumer<IndexBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration()
 				.withIndex(
 						INDEX_NAME,

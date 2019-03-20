@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 
@@ -27,7 +26,7 @@ public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataCo
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
-	public void add(String typeIdentifier, String indexName, Consumer<? super RootIndexModelBindingContext> mappingContributor) {
+	public void add(String typeIdentifier, String indexName, Consumer<? super IndexedEntityBindingContext> mappingContributor) {
 		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), indexName, mappingContributor ) );
 	}
 

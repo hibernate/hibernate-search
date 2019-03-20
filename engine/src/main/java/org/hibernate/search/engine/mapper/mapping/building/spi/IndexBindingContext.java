@@ -21,7 +21,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
  * <p>
  * Provides entry points to add fields to the index schema and to generate new contexts for indexed-embeddeds.
  */
-public interface IndexModelBindingContext {
+public interface IndexBindingContext {
 
 	/**
 	 * @return The type factory of the bound index, allowing to create field types.
@@ -48,6 +48,6 @@ public interface IndexModelBindingContext {
 	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
 	 * @return The element in the index schema that this context points to.
 	 */
-	Optional<NonRootIndexModelBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
+	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(MappableTypeModel parentTypeModel,
 			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
 }
