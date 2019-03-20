@@ -9,6 +9,9 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -67,7 +70,8 @@ class IndexSchemaFilter {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final IndexSchemaFilter ROOT = new IndexSchemaFilter(
-			null, null, null, null, Collections.emptySet()
+			null, null, null,
+			null, Collections.emptySet(), Collections.emptySet()
 	);
 
 	public static IndexSchemaFilter root() {
@@ -92,13 +96,27 @@ class IndexSchemaFilter {
 	 */
 	private final Set<String> explicitlyIncludedPaths;
 
+	/**
+	 * The {@code explicitlyIncludedPaths} that were included by this filter explicitly (not a parent filter).
+	 */
+	private final Set<String> properExplicitlyIncludedPaths;
+
+	/**
+	 * The {@code paths} that were encountered, i.e. passed to {@link #isPathIncluded(String)}
+	 * or to the same method of a child filter.
+	 */
+	// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
+	private final Map<String, Boolean> encounteredFieldPaths = new LinkedHashMap<>();
+
 	private IndexSchemaFilter(IndexSchemaFilter parent, MappableTypeModel parentTypeModel, String relativePrefix,
-			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths) {
+			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths,
+			Set<String> properExplicitlyIncludedPaths) {
 		this.parent = parent;
 		this.parentTypeModel = parentTypeModel;
 		this.relativePrefix = relativePrefix;
 		this.remainingCompositionDepth = remainingCompositionDepth;
 		this.explicitlyIncludedPaths = explicitlyIncludedPaths;
+		this.properExplicitlyIncludedPaths = properExplicitlyIncludedPaths;
 	}
 
 	@Override
@@ -114,11 +132,28 @@ class IndexSchemaFilter {
 	}
 
 	public boolean isPathIncluded(String relativePath) {
-		return isPathIncluded( remainingCompositionDepth, explicitlyIncludedPaths, relativePath );
+		boolean included = isPathIncluded( remainingCompositionDepth, explicitlyIncludedPaths, relativePath );
+		markAsEncountered( relativePath, included );
+		return included;
+	}
+
+	private void markAsEncountered(String relativePath, boolean included) {
+		encounteredFieldPaths.put( relativePath, included );
+		if ( parent != null ) {
+			parent.markAsEncountered( relativePrefix + relativePath, included );
+		}
 	}
 
 	public boolean isEveryPathExcluded() {
 		return !isEveryPathIncludedByDefault( remainingCompositionDepth ) && !isAnyPathExplicitlyIncluded();
+	}
+
+	public Set<String> getProperExplicitlyIncludedPaths() {
+		return properExplicitlyIncludedPaths;
+	}
+
+	public Map<String, Boolean> getEncounteredFieldPaths() {
+		return encounteredFieldPaths;
 	}
 
 	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(MappableTypeModel parentTypeModel, String relativePrefix) {
@@ -184,19 +219,12 @@ class IndexSchemaFilter {
 			composedRemainingDepth = nestedRemainingDepth;
 		}
 
-		Set<String> composedFilterExplicitlyIncludedPaths = composeExplicitlyIncludedPaths(
-				relativePrefix, nullSafeIncludePaths, currentRemainingDepth, nestedRemainingDepth
-		);
-
-		return new IndexSchemaFilter(
-				this, parentTypeModel, relativePrefix,
-				composedRemainingDepth, composedFilterExplicitlyIncludedPaths
-		);
-	}
-
-	private Set<String> composeExplicitlyIncludedPaths(String relativePrefix, Set<String> nullSafeIncludePaths,
-			Integer currentRemainingDepth, Integer nestedRemainingDepth) {
+		// The included paths that will be used to determine inclusion
 		Set<String> composedFilterExplicitlyIncludedPaths = new HashSet<>();
+		// The subset of these included paths that were added by the nested filter (and not a parent filter)
+		// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
+		Set<String> composedFilterProperExplicitlyIncludedPaths = new LinkedHashSet<>();
+
 		/*
 		 * Add the nested filter's explicitly included paths to the composed filter's "explicitlyIncludedPaths",
 		 * provided they are not filtered out by the current filter.
@@ -204,6 +232,7 @@ class IndexSchemaFilter {
 		for ( String path : nullSafeIncludePaths ) {
 			if ( isPathIncluded( currentRemainingDepth, explicitlyIncludedPaths, relativePrefix + path ) ) {
 				composedFilterExplicitlyIncludedPaths.add( path );
+				composedFilterProperExplicitlyIncludedPaths.add( path );
 				// Also add paths leading to this path (so that object nodes are not excluded)
 				int afterPreviousDotIndex = 0;
 				int nextDotIndex = path.indexOf( '.', afterPreviousDotIndex );
@@ -228,7 +257,12 @@ class IndexSchemaFilter {
 				}
 			}
 		}
-		return composedFilterExplicitlyIncludedPaths;
+
+		return new IndexSchemaFilter(
+				this, parentTypeModel, relativePrefix,
+				composedRemainingDepth, composedFilterExplicitlyIncludedPaths,
+				composedFilterProperExplicitlyIncludedPaths
+		);
 	}
 
 	private static boolean isPathIncluded(Integer remainingDepth, Set<String> explicitlyIncludedPaths, String relativePath) {
