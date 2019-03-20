@@ -32,16 +32,23 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		ElasticsearchStandardFieldPredicateBuilderFactory<?> castedOther =
 				(ElasticsearchStandardFieldPredicateBuilderFactory<?>) other;
-		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
+		return codec.isCompatibleWith( castedOther.codec );
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		return !dslConverter.isEnabled() || converter.isCompatibleWith( castedOther.converter );
+		ElasticsearchStandardFieldPredicateBuilderFactory<?> castedOther =
+				(ElasticsearchStandardFieldPredicateBuilderFactory<?>) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	@Override

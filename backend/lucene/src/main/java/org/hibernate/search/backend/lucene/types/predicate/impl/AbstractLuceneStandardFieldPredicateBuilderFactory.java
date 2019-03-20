@@ -35,16 +35,23 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
 		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
 		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
 				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
-		if ( !codec.isCompatibleWith( castedOther.codec ) ) {
+		return codec.isCompatibleWith( castedOther.codec );
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
+		if ( !getClass().equals( other.getClass() ) ) {
 			return false;
 		}
-		return !dslConverter.isEnabled() || converter.isCompatibleWith( castedOther.converter );
+		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
+				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
+		return converter.isCompatibleWith( castedOther.converter );
 	}
 
 	protected ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {

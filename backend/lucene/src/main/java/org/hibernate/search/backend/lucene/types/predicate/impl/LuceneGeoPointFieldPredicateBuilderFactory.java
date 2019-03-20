@@ -31,7 +31,12 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(LuceneFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+	public boolean hasCompatibleCodec(LuceneFieldPredicateBuilderFactory other) {
+		return INSTANCE == other;
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other) {
 		return INSTANCE == other;
 	}
 

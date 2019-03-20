@@ -34,7 +34,12 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
+	public boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other) {
+		return getClass().equals( other.getClass() );
+	}
+
+	@Override
+	public boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory other) {
 		return getClass().equals( other.getClass() );
 	}
 
