@@ -16,7 +16,7 @@ public interface IndexManagerBuildingState<D extends DocumentElement> {
 
 	String getIndexName();
 
-	RootIndexModelBindingContext getRootBindingContext();
+	IndexedEntityBindingContext getIndexedEntityBindingContext();
 
 	MappedIndexManager<D> build();
 

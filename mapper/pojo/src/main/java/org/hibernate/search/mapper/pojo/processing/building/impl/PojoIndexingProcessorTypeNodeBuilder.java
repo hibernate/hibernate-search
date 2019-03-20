@@ -15,7 +15,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.BridgeBuilder;
@@ -56,7 +56,7 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 
 	public PojoIndexingProcessorTypeNodeBuilder(
 			BoundPojoModelPathTypeNode<T> modelPath,
-			PojoMappingHelper mappingHelper, IndexModelBindingContext bindingContext,
+			PojoMappingHelper mappingHelper, IndexBindingContext bindingContext,
 			Optional<PojoIdentityMappingCollector> identityMappingCollector,
 			Collection<IndexObjectFieldReference> parentIndexObjectReferences) {
 		super( mappingHelper, bindingContext );

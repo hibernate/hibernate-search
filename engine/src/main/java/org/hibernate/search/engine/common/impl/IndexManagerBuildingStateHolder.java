@@ -21,7 +21,7 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -31,9 +31,8 @@ import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanProvider;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.mapper.mapping.building.impl.RootIndexModelBindingContextImpl;
+import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -178,7 +177,7 @@ class IndexManagerBuildingStateHolder {
 					indexName, multiTenancyEnabled, backendBuildContext, defaultedIndexPropertySource
 			);
 			IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
-			RootIndexModelBindingContext bindingContext = new RootIndexModelBindingContextImpl( schemaRootNodeBuilder );
+			IndexedEntityBindingContext bindingContext = new IndexedEntityBindingContextImpl( schemaRootNodeBuilder );
 			return new IndexManagerInitialBuildState<>( backendName, indexName, builder, bindingContext );
 		}
 
@@ -196,13 +195,13 @@ class IndexManagerBuildingStateHolder {
 		private final String backendName;
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
-		private final RootIndexModelBindingContext bindingContext;
+		private final IndexedEntityBindingContext bindingContext;
 
 		private IndexManagerImplementor<D> indexManager;
 
 		IndexManagerInitialBuildState(String backendName, String indexName,
 				IndexManagerBuilder<D> builder,
-				RootIndexModelBindingContext bindingContext) {
+				IndexedEntityBindingContext bindingContext) {
 			this.backendName = backendName;
 			this.indexName = indexName;
 			this.builder = builder;
@@ -224,7 +223,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public RootIndexModelBindingContext getRootBindingContext() {
+		public IndexedEntityBindingContext getIndexedEntityBindingContext() {
 			return bindingContext;
 		}
 

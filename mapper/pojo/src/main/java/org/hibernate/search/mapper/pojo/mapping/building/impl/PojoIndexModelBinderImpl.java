@@ -15,9 +15,9 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactoryContex
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.FieldModelContributor;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
@@ -85,7 +85,8 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(RootIndexModelBindingContext bindingContext,
+	public <I> BeanHolder<? extends IdentifierBridge<I>> addIdentifierBridge(
+			IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, I> modelPath,
 			BridgeBuilder<? extends IdentifierBridge<?>> builder) {
 		PojoGenericTypeModel<I> typeModel = modelPath.valueWithoutExtractors().getTypeModel();
@@ -117,7 +118,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(RootIndexModelBindingContext bindingContext,
+	public <T> BoundRoutingKeyBridge<T> addRoutingKeyBridge(IndexedEntityBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends RoutingKeyBridge> builder) {
 		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = builder.build( bridgeBuildContext );
 		try {
@@ -140,7 +141,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexModelBindingContext bindingContext,
+	public <T> Optional<BoundTypeBridge<T>> addTypeBridge(IndexBindingContext bindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, BridgeBuilder<? extends TypeBridge> builder) {
 		BeanHolder<? extends TypeBridge> bridgeHolder = builder.build( bridgeBuildContext );
 		try {
@@ -175,7 +176,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexModelBindingContext bindingContext,
+	public <P> Optional<BoundPropertyBridge<P>> addPropertyBridge(IndexBindingContext bindingContext,
 			BoundPojoModelPathPropertyNode<?, P> modelPath, BridgeBuilder<? extends PropertyBridge> builder) {
 		BeanHolder<? extends PropertyBridge> bridgeHolder = builder.build( bridgeBuildContext );
 		try {
@@ -210,7 +211,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	}
 
 	@Override
-	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexModelBindingContext bindingContext,
+	public <V> Optional<BoundValueBridge<V, ?>> addValueBridge(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, BridgeBuilder<? extends ValueBridge<?, ?>> builder,
 			String relativeFieldName, FieldModelContributor contributor) {
 		PojoGenericTypeModel<V> valueTypeModel = modelPath.getTypeModel();

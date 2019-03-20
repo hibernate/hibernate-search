@@ -8,12 +8,12 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 
-public class RootIndexModelBindingContextImpl extends AbstractIndexModelBindingContext<IndexSchemaRootNodeBuilder>
-		implements RootIndexModelBindingContext {
+public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext<IndexSchemaRootNodeBuilder>
+		implements IndexedEntityBindingContext {
 
-	public RootIndexModelBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
+	public IndexedEntityBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
 		super( indexSchemaObjectNodeBuilder, indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext.root() );
 	}
 

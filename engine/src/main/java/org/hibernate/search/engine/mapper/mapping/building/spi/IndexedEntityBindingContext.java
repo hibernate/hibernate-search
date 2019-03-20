@@ -11,12 +11,12 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 /**
  * The binding context associated to the root node in the entity tree.
  *
- * @see IndexModelBindingContext
+ * @see IndexBindingContext
  */
-public interface RootIndexModelBindingContext extends IndexModelBindingContext {
+public interface IndexedEntityBindingContext extends IndexBindingContext {
 
 	/**
-	 * Inform the backend that documents for this index will always be provided along
+	 * Inform the backend that documents for the mapped index will always be provided along
 	 * with an explicit routing key,
 	 * to be used to route the document to a specific shard.
 	 */

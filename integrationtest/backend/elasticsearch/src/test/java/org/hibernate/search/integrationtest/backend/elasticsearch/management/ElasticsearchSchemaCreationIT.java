@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -199,7 +199,7 @@ public class ElasticsearchSchemaCreationIT {
 				);
 	}
 
-	private void setup(Consumer<IndexModelBindingContext> mappingContributor) {
+	private void setup(Consumer<IndexBindingContext> mappingContributor) {
 		setupHelper.withDefaultConfiguration( BACKEND_NAME )
 				.withIndex(
 						INDEX_NAME,

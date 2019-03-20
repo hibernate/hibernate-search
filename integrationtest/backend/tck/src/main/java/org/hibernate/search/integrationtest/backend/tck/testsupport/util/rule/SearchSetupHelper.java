@@ -16,7 +16,7 @@ import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.RootIndexModelBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -119,12 +119,12 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext withIndex(String rawIndexName,
-				Consumer<? super RootIndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
+				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
 			return withIndex( rawIndexName + "_Type", rawIndexName, mappingContributor, listener );
 		}
 
 		public SetupContext withIndex(String typeName, String rawIndexName,
-				Consumer<? super RootIndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
+				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
 			indexDefinitions.add( new IndexDefinition( typeName, rawIndexName, mappingContributor, listener ) );
 			return this;
 		}
@@ -181,11 +181,11 @@ public class SearchSetupHelper implements TestRule {
 	private static class IndexDefinition {
 		private final String typeName;
 		private final String rawIndexName;
-		private final Consumer<? super RootIndexModelBindingContext> mappingContributor;
+		private final Consumer<? super IndexedEntityBindingContext> mappingContributor;
 		private final IndexSetupListener listener;
 
 		private IndexDefinition(String typeName, String rawIndexName,
-				Consumer<? super RootIndexModelBindingContext> mappingContributor, IndexSetupListener listener) {
+				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
 			this.typeName = typeName;
 			this.rawIndexName = rawIndexName;
 			this.mappingContributor = mappingContributor;

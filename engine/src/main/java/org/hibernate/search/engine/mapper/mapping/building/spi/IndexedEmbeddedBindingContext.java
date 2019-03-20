@@ -13,9 +13,9 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 /**
  * The binding context associated to a specific non-root node in the entity tree.
  *
- * @see IndexModelBindingContext
+ * @see IndexBindingContext
  */
-public interface NonRootIndexModelBindingContext extends IndexModelBindingContext {
+public interface IndexedEmbeddedBindingContext extends IndexBindingContext {
 
 	/**
 	 * @return The list of index object fields between the parent binding context and this context.
