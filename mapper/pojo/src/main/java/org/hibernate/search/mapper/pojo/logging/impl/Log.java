@@ -48,6 +48,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 @ValidIdRanges({
 		@ValidIdRange(min = MessageConstants.MAPPER_POJO_ID_RANGE_MIN, max = MessageConstants.MAPPER_POJO_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
+		@ValidIdRange(min = 216, max = 216),
 		@ValidIdRange(min = 295, max = 295),
 		@ValidIdRange(min = 297, max = 297)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5. See the Lucene logger for examples.
@@ -61,6 +62,14 @@ public interface Log extends BasicLogger {
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
+
+	@Message(id = ID_OFFSET_1 + 216,
+			value = "An IndexedEmbedded defines includePaths filters that do not match anything."
+					+ " Non-matching includePaths filters: %1$s."
+					+ " Encountered field paths: %2$s."
+					+ " Check the filters for typos, or remove them if they are not useful."
+	)
+	SearchException uselessIncludePathFilters(Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths);
 
 	@Message(id = ID_OFFSET_1 + 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);

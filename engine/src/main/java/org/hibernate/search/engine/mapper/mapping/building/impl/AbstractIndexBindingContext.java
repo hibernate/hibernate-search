@@ -28,7 +28,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 
 	private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 	final B indexSchemaObjectNodeBuilder;
-	private final ConfiguredIndexSchemaNestingContext nestingContext;
+	final ConfiguredIndexSchemaNestingContext nestingContext;
 
 	AbstractIndexBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {

@@ -8,10 +8,11 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 
 class IndexedEmbeddedBindingContextImpl
@@ -32,4 +33,13 @@ class IndexedEmbeddedBindingContextImpl
 		return parentIndexObjectReferences;
 	}
 
+	@Override
+	public Set<String> getUselessIncludePaths() {
+		return nestingContext.getUselessIncludePaths();
+	}
+
+	@Override
+	public Set<String> getEncounteredFieldPaths() {
+		return nestingContext.getEncounteredFieldPaths();
+	}
 }
