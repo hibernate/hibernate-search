@@ -146,7 +146,7 @@ public class MatchSearchPredicateIT {
 
 			IndexSearchQuery<DocumentReference> query = scope.query()
 					.asReference()
-					.predicate( f -> f.match().onRawField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, DslConverter.DISABLED ) )
+					.predicate( f -> f.match().onField( absoluteFieldPath ).matching( fieldModel.predicateParameterValue, DslConverter.DISABLED ) )
 					.toQuery();
 
 			assertThat( query )
@@ -852,8 +852,8 @@ public class MatchSearchPredicateIT {
 		IndexSearchQuery<DocumentReference> query = indexManager.createSearchScope().query()
 				.asReference()
 				.predicate( f -> f.match()
-						.onRawField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
-						.orRawField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
+						.onField( indexMapping.string1FieldWithDslConverter.relativeFieldName )
+						.orField( indexMapping.string2FieldWithDslConverter.relativeFieldName )
 						.matching( indexMapping.string1FieldWithDslConverter.document3Value.indexedValue, DslConverter.DISABLED )
 				)
 				.toQuery();

@@ -31,7 +31,9 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 
 	private final LuceneSearchContext searchContext;
 	protected final String absoluteFieldPath;
+
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
+	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
 	protected final C codec;
 
 	protected E value;
@@ -39,11 +41,12 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 	protected AbstractLuceneStandardMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			C codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
+		this.rawConverter = rawConverter;
 		this.codec = codec;
 	}
 
@@ -54,9 +57,9 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 
 	@Override
 	public void value(Object value, DslConverter dslConverter) {
-		// TODO handle dslConverter option here
+		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
-			F converted = converter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
+			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
 		}
 		catch (RuntimeException e) {

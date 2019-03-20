@@ -31,10 +31,10 @@ class LuceneTextMatchPredicateBuilder<F>
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec,
 			QueryBuilder queryBuilder) {
-		super( searchContext, absoluteFieldPath, converter, codec );
+		super( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 		this.queryBuilder = queryBuilder;
 	}
 

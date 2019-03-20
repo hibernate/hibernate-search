@@ -53,7 +53,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 		SearchQuery<Book> query = Search.getSearchSession( entityManager ).search( Book.class )
 						.asEntity()
 						// onRawField option allows to bypass the bridge in the DSL
-						.predicate( f -> f.match().onRawField( "isbn" ).matching( isbnAsString, DslConverter.DISABLED ) )
+						.predicate( f -> f.match().onField( "isbn" ).matching( isbnAsString, DslConverter.DISABLED ) )
 						.toQuery();
 
 		return query.fetchSingleHit();

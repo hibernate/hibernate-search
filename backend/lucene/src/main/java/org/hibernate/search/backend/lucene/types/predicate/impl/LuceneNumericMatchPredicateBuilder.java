@@ -20,9 +20,9 @@ class LuceneNumericMatchPredicateBuilder<F, E>
 	LuceneNumericMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter,
+			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
 			LuceneNumericFieldCodec<F, E> codec) {
-		super( searchContext, absoluteFieldPath, converter, codec );
+		super( searchContext, absoluteFieldPath, converter, rawConverter, codec );
 	}
 
 	@Override
