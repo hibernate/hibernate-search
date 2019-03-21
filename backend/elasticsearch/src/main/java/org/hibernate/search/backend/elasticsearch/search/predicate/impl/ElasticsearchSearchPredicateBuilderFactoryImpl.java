@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
@@ -87,30 +88,30 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
+		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
+		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
-				.createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
+				.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createPhrasePredicateBuilder( absoluteFieldPath );
+				.getComponent().createPhrasePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createWildcardPredicateBuilder( absoluteFieldPath );
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -123,7 +124,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -131,7 +132,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -139,7 +140,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -167,6 +168,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		public boolean areCompatible(ElasticsearchFieldPredicateBuilderFactory component1,
 				ElasticsearchFieldPredicateBuilderFactory component2, DslConverter dslConverter) {
 			return component1.isDslCompatibleWith( component2, dslConverter );
+		}
+
+		@Override
+		public boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2) {
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override

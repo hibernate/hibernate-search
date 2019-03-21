@@ -75,17 +75,18 @@ public class ElasticsearchSearchScopeModel {
 		return selectedIdConverter;
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		// by default dsl converter check is enabled
 		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
+		ElasticsearchConverterCompatibilityChecker converterChecker = null;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
@@ -109,12 +110,24 @@ public class ElasticsearchSearchScopeModel {
 							)
 					);
 				}
+				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
+					converterChecker = new ElasticsearchFailingConverterCompatibilityChecker<>(
+							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
+							indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+							indexModel.getHibernateSearchIndexName()
+					), componentRetrievalStrategy );
+				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		return selectedComponent;
+		if ( converterChecker == null ) {
+			// no converter incompatibility detected
+			converterChecker = new ElasticsearchSucceedingConverterCompatibilityChecker();
+		}
+
+		return new ElasticsearchScopedIndexFieldComponent( selectedComponent, converterChecker );
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {
