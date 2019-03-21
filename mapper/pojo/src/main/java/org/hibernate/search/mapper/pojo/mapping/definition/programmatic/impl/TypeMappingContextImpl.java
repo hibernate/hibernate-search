@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
@@ -40,7 +39,7 @@ public class TypeMappingContextImpl
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		if ( indexName != null ) {
 			try {

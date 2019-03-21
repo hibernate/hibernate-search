@@ -171,7 +171,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				// We know the key and initiator have compatible types, see how they are put into the map
 				@SuppressWarnings({"rawtypes", "unchecked"})
 				MappingBuildingState<?, ?> mappingBuildingState = new MappingBuildingState<>(
-						rootBuildContext, propertySource,
+						rootBuildContext,
 						(MappingKey) entry.getKey(), entry.getValue()
 				);
 				mappingBuildingStates.add( mappingBuildingState );
@@ -266,7 +266,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private static class MappingBuildingState<C, M> {
 		private final MappingBuildContext buildContext;
-		private final ConfigurationPropertySource propertySource;
 
 		private final MappingKey<M> mappingKey;
 		private final MappingInitiator<C, M> mappingInitiator;
@@ -280,22 +279,21 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		private Mapper<M> mapper; // Initially null, set in createMapper()
 
-		MappingBuildingState(RootBuildContext rootBuildContext, ConfigurationPropertySource propertySource,
+		MappingBuildingState(RootBuildContext rootBuildContext,
 				MappingKey<M> mappingKey, MappingInitiator<C, M> mappingInitiator) {
 			this.mappingKey = mappingKey;
 			this.buildContext = new MappingBuildContextImpl( rootBuildContext, mappingKey );
-			this.propertySource = propertySource;
 			this.mappingInitiator = mappingInitiator;
 		}
 
 		void collect() {
-			mappingInitiator.configure( buildContext, propertySource, new MappingConfigurationCollectorImpl() );
+			mappingInitiator.configure( buildContext, new MappingConfigurationCollectorImpl() );
 		}
 
 		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
 
 			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
-			mapper = mappingInitiator.createMapper( buildContext, propertySource, contributorProvider );
+			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
 
 			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>(
 					contributionByType.keySet() );

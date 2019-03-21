@@ -59,15 +59,17 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				HibernateOrmBootstrapIntrospector.create( metadata, propertySource, sessionFactoryImplementor );
 
 		return new HibernateOrmMappingInitiator(
-				metadata,
+				metadata, propertySource,
 				introspector, sessionFactoryImplementor
 		);
 	}
 
 	private final Metadata metadata;
+	private final ConfigurationPropertySource propertySource;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
 	private HibernateOrmMappingInitiator(Metadata metadata,
+			ConfigurationPropertySource propertySource,
 			HibernateOrmBootstrapIntrospector introspector,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		super(
@@ -76,6 +78,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 		);
 
 		this.metadata = metadata;
+		this.propertySource = propertySource;
 		this.introspector = introspector;
 
 		setMultiTenancyEnabled(
@@ -84,7 +87,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
 				// getMappedClass() can return null, which should be ignored
@@ -123,6 +126,6 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 					}
 				} );
 
-		super.configure( buildContext, propertySource, configurationCollector );
+		super.configure( buildContext, configurationCollector );
 	}
 }

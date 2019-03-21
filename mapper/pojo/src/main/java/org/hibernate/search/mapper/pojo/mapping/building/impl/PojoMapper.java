@@ -14,23 +14,22 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
-import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.impl.BridgeResolver;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoAssociationPathInverter;
 import org.hibernate.search.mapper.pojo.dirtiness.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.dirtiness.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -44,21 +43,20 @@ import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoMapper<M> implements Mapper<M> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ContextualFailureCollector failureCollector;
-	private final ConfigurationPropertySource propertySource;
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
-	private final BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
+	private final Function<PojoMappingDelegate, MappingImplementor<M>> wrapperFactory;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
 	private final PojoMappingHelper mappingHelper;
@@ -69,13 +67,12 @@ public class PojoMapper<M> implements Mapper<M> {
 
 	private boolean closed = false;
 
-	public PojoMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public PojoMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider,
 			PojoBootstrapIntrospector introspector,
 			boolean implicitProvidedId,
-			BiFunction<ConfigurationPropertySource, PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
+			Function<PojoMappingDelegate, MappingImplementor<M>> wrapperFactory) {
 		this.failureCollector = buildContext.getFailureCollector();
-		this.propertySource = propertySource;
 		this.contributorProvider = contributorProvider;
 		this.implicitProvidedId = implicitProvidedId;
 		this.wrapperFactory = wrapperFactory;
@@ -220,7 +217,7 @@ public class PojoMapper<M> implements Mapper<M> {
 		closed = true;
 
 		try {
-			return wrapperFactory.apply( propertySource, mappingImplementor );
+			return wrapperFactory.apply( mappingImplementor );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e ).push( mappingImplementor );

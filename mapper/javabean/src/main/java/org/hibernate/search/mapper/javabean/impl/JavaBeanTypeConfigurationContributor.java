@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.javabean.impl;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
@@ -28,7 +27,7 @@ class JavaBeanTypeConfigurationContributor implements PojoMappingConfigurationCo
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		for ( Class<?> type : entityTypes ) {
 			configurationCollector.collectContributor(

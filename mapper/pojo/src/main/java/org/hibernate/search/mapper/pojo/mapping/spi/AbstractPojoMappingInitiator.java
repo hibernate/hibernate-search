@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
@@ -75,21 +74,21 @@ public abstract class AbstractPojoMappingInitiator<M>
 	}
 
 	@Override
-	public void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		if ( multiTenancyEnabled ) {
 			configurationCollector.enableMultiTenancy();
 		}
 		for ( PojoMappingConfigurationContributor delegate : delegates ) {
-			delegate.configure( buildContext, propertySource, configurationCollector );
+			delegate.configure( buildContext, configurationCollector );
 		}
 	}
 
 	@Override
-	public Mapper<M> createMapper(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	public Mapper<M> createMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider) {
 		return new PojoMapper<>(
-				buildContext, propertySource, contributorProvider,
+				buildContext, contributorProvider,
 				introspector, implicitProvidedId, mappingFactory::createMapping
 		);
 	}

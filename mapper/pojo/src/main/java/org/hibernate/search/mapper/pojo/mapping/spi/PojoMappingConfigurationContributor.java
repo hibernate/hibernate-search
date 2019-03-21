@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import org.hibernate.search.engine.cfg.ConfigurationPropertySource;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 
 public interface PojoMappingConfigurationContributor {
 
-	void configure(MappingBuildContext buildContext, ConfigurationPropertySource propertySource,
+	void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector);
 
 }
