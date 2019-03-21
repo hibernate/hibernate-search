@@ -71,7 +71,7 @@ public class BatchIndexingWorkspace extends ErrorHandledRunnable {
 		this.tenantId = tenantId;
 
 		this.mapping = mapping;
-		this.idNameOfIndexedType = sessionFactory.getMetamodel().entity( indexedType ).getId( Object.class ).getName();
+		this.idNameOfIndexedType = sessionFactory.getMetamodel().entity( indexedType ).locateIdAttribute().getName();
 
 		this.sessionFactory = sessionFactory;
 
