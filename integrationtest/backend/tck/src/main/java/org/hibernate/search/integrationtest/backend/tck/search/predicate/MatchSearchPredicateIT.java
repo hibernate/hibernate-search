@@ -930,7 +930,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_usingField() {
+	public void multiIndex_withCompatibleIndexManager_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( compatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -951,13 +951,15 @@ public class MatchSearchPredicateIT {
 		}
 	}
 
-	// TODO handle it in subsequent commits @Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_usingField() {
+	@Test
+	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterEnabled() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			Object valueToMatch = fieldModel.predicateParameterValue;
+
 			SubTest.expectException(
 					() -> {
 						indexManager.createSearchScope( rawFieldCompatibleIndexManager )
-								.predicate().match().onField( fieldModel.relativeFieldName );
+								.predicate().match().onField( fieldModel.relativeFieldName ).matching( valueToMatch );
 					}
 			)
 					.assertThrown()
@@ -971,7 +973,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_usingRawField() {
+	public void multiIndex_withRawFieldCompatibleIndexManager_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( rawFieldCompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -993,7 +995,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_usingField() {
+	public void multiIndex_withIncompatibleIndexManager_dslConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -1013,7 +1015,7 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_usingRawField() {
+	public void multiIndex_withIncompatibleIndexManager_dslConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope( incompatibleIndexManager );
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {

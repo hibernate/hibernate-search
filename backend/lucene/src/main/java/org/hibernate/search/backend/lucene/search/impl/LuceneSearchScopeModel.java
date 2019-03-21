@@ -31,6 +31,8 @@ public class LuceneSearchScopeModel {
 	private final Set<String> indexNames;
 	private final Set<ReaderProvider> readerProviders;
 
+	private volatile LuceneDslConverterHandler dslConverterHandler;
+
 	public LuceneSearchScopeModel(Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
 		this.indexModels = indexModels;
 		this.indexNames = indexModels.stream()
@@ -107,12 +109,31 @@ public class LuceneSearchScopeModel {
 							)
 					);
 				}
+				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
+					dslConverterHandler = new LuceneIncompatibleDslConverterHandler(
+							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
+							indexModelForSelectedSchemaNode.getIndexName(),
+							indexModel.getIndexName()
+					), componentRetrievalStrategy );
+				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
+		if ( dslConverterHandler == null ) {
+			// no converter incompatibility detected
+			dslConverterHandler = new LuceneDslConverterHandler();
+		}
+
 		return selectedComponent;
+	}
+
+	public LuceneDslConverterHandler getDslConverterHandler() {
+		if ( dslConverterHandler == null ) {
+			throw new IllegalStateException( "This method is supposed to be called after #getSchemaNodeComponent()" );
+		}
+		return dslConverterHandler;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

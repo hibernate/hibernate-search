@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneDslConverterHandler;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -34,6 +35,7 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final LuceneDslConverterHandler dslConverterHandler;
 	protected final C codec;
 
 	protected E value;
@@ -42,11 +44,12 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			C codec) {
+			LuceneDslConverterHandler dslConverterHandler, C codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
+		this.dslConverterHandler = dslConverterHandler;
 		this.codec = codec;
 	}
 
@@ -57,6 +60,7 @@ public abstract class AbstractLuceneStandardMatchPredicateBuilder<F, E, C extend
 
 	@Override
 	public void value(Object value, DslConverter dslConverter) {
+		dslConverterHandler.handle( dslConverter );
 		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );

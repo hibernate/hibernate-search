@@ -156,6 +156,11 @@ public class LuceneSearchProjectionBuilderFactory implements SearchProjectionBui
 		}
 
 		@Override
+		public boolean hasCompatibleConverter(LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2) {
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldProjectionBuilderFactory component1, LuceneFieldProjectionBuilderFactory component2,
 				EventContext context) {

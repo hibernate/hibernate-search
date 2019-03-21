@@ -157,6 +157,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		}
 
 		@Override
+		public boolean hasCompatibleConverter(ElasticsearchFieldProjectionBuilderFactory component1, ElasticsearchFieldProjectionBuilderFactory component2) {
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldProjectionBuilderFactory component1,
 				ElasticsearchFieldProjectionBuilderFactory component2,

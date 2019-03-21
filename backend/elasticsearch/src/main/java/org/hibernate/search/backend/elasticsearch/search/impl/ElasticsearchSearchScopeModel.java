@@ -31,6 +31,8 @@ public class ElasticsearchSearchScopeModel {
 	private final Set<String> hibernateSearchIndexNames;
 	private final Set<URLEncodedString> elasticsearchIndexNames;
 
+	private volatile ElasticsearchDslConverterHandler dslConverterHandler;
+
 	public ElasticsearchSearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 		this.hibernateSearchIndexNames = indexModels.stream()
@@ -109,12 +111,31 @@ public class ElasticsearchSearchScopeModel {
 							)
 					);
 				}
+				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
+					dslConverterHandler = new ElasticsearchIncompatibleDslConverterHandler<>(
+							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
+							indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+							indexModel.getHibernateSearchIndexName()
+					), componentRetrievalStrategy );
+				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
+		if ( dslConverterHandler == null ) {
+			// no converter incompatibility detected
+			dslConverterHandler = new ElasticsearchDslConverterHandler();
+		}
+
 		return selectedComponent;
+	}
+
+	public ElasticsearchDslConverterHandler getDslConverterHandler() {
+		if ( dslConverterHandler == null ) {
+			throw new IllegalStateException( "This method is supposed to be called after #getSchemaNodeComponent()" );
+		}
+		return dslConverterHandler;
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

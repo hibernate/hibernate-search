@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDslConverterHandler;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -26,8 +27,8 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
-			ElasticsearchFieldCodec<String> codec) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, codec );
+			ElasticsearchDslConverterHandler dslConverterHandler, ElasticsearchFieldCodec<String> codec) {
+		super( searchContext, absoluteFieldPath, converter, rawConverter, dslConverterHandler, codec );
 	}
 
 	@Override

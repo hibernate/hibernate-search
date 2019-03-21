@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneDslConverterHandler;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
@@ -28,8 +29,8 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
 
 	@Override
 	public LuceneNumericMatchPredicateBuilder<F, E> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec );
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneDslConverterHandler dslConverterHandler) {
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, dslConverterHandler, codec );
 	}
 
 	@Override

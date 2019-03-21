@@ -111,6 +111,11 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 		}
 
 		@Override
+		public boolean hasCompatibleConverter(ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2) {
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				ElasticsearchFieldSortBuilderFactory component1, ElasticsearchFieldSortBuilderFactory component2,
 				EventContext context) {

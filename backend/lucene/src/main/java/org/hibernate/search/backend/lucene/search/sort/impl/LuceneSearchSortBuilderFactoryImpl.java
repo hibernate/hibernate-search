@@ -116,6 +116,11 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 		}
 
 		@Override
+		public boolean hasCompatibleConverter(LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2) {
+			return true;
+		}
+
+		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
 				LuceneFieldSortBuilderFactory component1, LuceneFieldSortBuilderFactory component2,
 				EventContext context) {

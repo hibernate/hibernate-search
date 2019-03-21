@@ -89,7 +89,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> match(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
+				.createMatchPredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getDslConverterHandler() );
 	}
 
 	@Override
@@ -167,6 +167,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		public boolean areCompatible(ElasticsearchFieldPredicateBuilderFactory component1,
 				ElasticsearchFieldPredicateBuilderFactory component2, DslConverter dslConverter) {
 			return component1.isDslCompatibleWith( component2, dslConverter );
+		}
+
+		@Override
+		public boolean hasCompatibleConverter(ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2) {
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override
