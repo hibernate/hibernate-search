@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+public class ElasticsearchSucceedingConverterCompatibilityChecker implements ElasticsearchConverterCompatibilityChecker {
 
-public class ElasticsearchDslConverterHandler {
-
-	public void handle(DslConverter dslConverter) {
-		// do nothing
+	@Override
+	public void failIfNotCompatible() {
+		// this sub class never fails
 	}
 }

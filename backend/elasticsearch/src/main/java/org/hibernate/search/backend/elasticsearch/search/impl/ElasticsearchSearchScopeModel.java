@@ -31,8 +31,6 @@ public class ElasticsearchSearchScopeModel {
 	private final Set<String> hibernateSearchIndexNames;
 	private final Set<URLEncodedString> elasticsearchIndexNames;
 
-	private volatile ElasticsearchDslConverterHandler dslConverterHandler;
-
 	public ElasticsearchSearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
 		this.hibernateSearchIndexNames = indexModels.stream()
@@ -77,17 +75,18 @@ public class ElasticsearchSearchScopeModel {
 		return selectedIdConverter;
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		// by default dsl converter check is enabled
 		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
+		ElasticsearchConverterCompatibilityChecker converterChecker = null;
 
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
@@ -112,7 +111,7 @@ public class ElasticsearchSearchScopeModel {
 					);
 				}
 				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
-					dslConverterHandler = new ElasticsearchIncompatibleDslConverterHandler<>(
+					converterChecker = new ElasticsearchFailingConverterCompatibilityChecker<>(
 							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
 							indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
 							indexModel.getHibernateSearchIndexName()
@@ -123,19 +122,12 @@ public class ElasticsearchSearchScopeModel {
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		if ( dslConverterHandler == null ) {
+		if ( converterChecker == null ) {
 			// no converter incompatibility detected
-			dslConverterHandler = new ElasticsearchDslConverterHandler();
+			converterChecker = new ElasticsearchSucceedingConverterCompatibilityChecker();
 		}
 
-		return selectedComponent;
-	}
-
-	public ElasticsearchDslConverterHandler getDslConverterHandler() {
-		if ( dslConverterHandler == null ) {
-			throw new IllegalStateException( "This method is supposed to be called after #getSchemaNodeComponent()" );
-		}
-		return dslConverterHandler;
+		return new ElasticsearchScopedIndexFieldComponent( selectedComponent, converterChecker );
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

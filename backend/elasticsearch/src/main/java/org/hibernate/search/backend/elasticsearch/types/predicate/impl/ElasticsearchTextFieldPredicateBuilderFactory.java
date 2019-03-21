@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDslConverterHandler;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -27,8 +27,8 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchDslConverterHandler dslConverterHandler) {
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, dslConverterHandler, codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

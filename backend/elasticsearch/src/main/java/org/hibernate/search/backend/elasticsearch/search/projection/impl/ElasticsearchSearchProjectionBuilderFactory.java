@@ -61,7 +61,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <T> FieldProjectionBuilder<T> field(String absoluteFieldPath, Class<T> expectedType, ProjectionConverter projectionConverter) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
+				.getComponent().createFieldValueProjectionBuilder( absoluteFieldPath, expectedType, projectionConverter );
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public DistanceToFieldProjectionBuilder distance(String absoluteFieldPath, GeoPoint center) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createDistanceProjectionBuilder( absoluteFieldPath, center );
+				.getComponent().createDistanceProjectionBuilder( absoluteFieldPath, center );
 	}
 
 	@Override
