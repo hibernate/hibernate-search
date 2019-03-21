@@ -73,17 +73,18 @@ public class LuceneSearchScopeModel {
 		return selectedIdConverter;
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		// by default dsl converter check is enabled
 		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
+		LuceneConverterCompatibilityChecker converterChecker = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
@@ -107,12 +108,24 @@ public class LuceneSearchScopeModel {
 							)
 					);
 				}
+				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
+					converterChecker = new LuceneFailingConverterCompatibilityChecker(
+							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
+							indexModelForSelectedSchemaNode.getIndexName(),
+							indexModel.getIndexName()
+					), componentRetrievalStrategy );
+				}
 			}
 		}
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		return selectedComponent;
+		if ( converterChecker == null ) {
+			// no converter incompatibility detected
+			converterChecker = new LuceneSucceedingConverterCompatibilityChecker();
+		}
+
+		return new LuceneScopedIndexFieldComponent<>( selectedComponent, converterChecker );
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {

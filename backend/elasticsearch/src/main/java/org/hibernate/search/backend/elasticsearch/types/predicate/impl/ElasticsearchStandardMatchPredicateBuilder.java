@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
@@ -43,6 +44,8 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
 	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final ElasticsearchConverterCompatibilityChecker converterChecker;
+
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement value;
@@ -50,11 +53,12 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
 			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
-			ElasticsearchFieldCodec<F> codec) {
+			ElasticsearchConverterCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
+		this.converterChecker = converterChecker;
 		this.codec = codec;
 	}
 
@@ -65,6 +69,10 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	@Override
 	public void value(Object value, DslConverter dslConverter) {
+		if ( dslConverter.isEnabled() ) {
+			converterChecker.failIfNotCompatible();
+		}
+
 		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = ( dslConverter.isEnabled() ) ? converter : rawConverter;
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );

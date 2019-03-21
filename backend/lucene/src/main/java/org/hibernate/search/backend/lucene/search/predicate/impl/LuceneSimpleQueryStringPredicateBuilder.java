@@ -47,7 +47,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 					LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
 					DslConverter.DISABLED
 			)
-					.createSimpleQueryStringFieldContext( absoluteFieldPath );
+					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;

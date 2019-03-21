@@ -12,6 +12,7 @@ import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.lucene.search.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -88,30 +89,30 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
-		return scopeModel
-				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createMatchPredicateBuilder( searchContext, absoluteFieldPath );
+		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
+				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
+		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, dslConverter )
-				.createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
+				.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, dslConverter );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createPhrasePredicateBuilder( absoluteFieldPath );
+				.getComponent().createPhrasePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED )
-				.createWildcardPredicateBuilder( absoluteFieldPath );
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -123,14 +124,14 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinCircle(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinPolygon(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -138,7 +139,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
 	}
 
 	@Override
@@ -164,6 +165,11 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 		public boolean areCompatible(LuceneFieldPredicateBuilderFactory component1,
 				LuceneFieldPredicateBuilderFactory component2, DslConverter dslConverter) {
 			return component1.isDslCompatibleWith( component2, dslConverter );
+		}
+
+		@Override
+		public boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2) {
+			return component1.hasCompatibleConverter( component2 );
 		}
 
 		@Override

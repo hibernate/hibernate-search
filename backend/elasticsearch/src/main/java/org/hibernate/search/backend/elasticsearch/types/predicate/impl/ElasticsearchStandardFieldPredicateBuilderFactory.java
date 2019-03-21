@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
@@ -53,8 +54,8 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath) {
-		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec );
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
+		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

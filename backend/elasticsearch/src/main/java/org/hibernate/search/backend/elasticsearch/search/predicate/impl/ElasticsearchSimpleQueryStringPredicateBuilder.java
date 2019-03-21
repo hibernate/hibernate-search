@@ -58,7 +58,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 					ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
 					DslConverter.DISABLED
 			)
-					.createSimpleQueryStringFieldContext( absoluteFieldPath );
+					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;

@@ -10,6 +10,7 @@ import java.util.Objects;
 
 import org.apache.lucene.util.QueryBuilder;
 
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
@@ -46,8 +47,8 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 
 	@Override
 	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath) {
-		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, codec, queryBuilder );
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker) {
+		return new LuceneTextMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, queryBuilder );
 	}
 
 	@Override
