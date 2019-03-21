@@ -6,10 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneIncompatibleDslConverterHandler<T> extends LuceneDslConverterHandler {
+public class LuceneFailingConverterCompatibilityChecker<T> implements LuceneConverterCompatibilityChecker {
 
 	private final String absoluteFieldPath;
 	private final IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy;
@@ -17,7 +16,7 @@ public class LuceneIncompatibleDslConverterHandler<T> extends LuceneDslConverter
 	private final T component2;
 	private final EventContext eventContext;
 
-	public LuceneIncompatibleDslConverterHandler(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
+	public LuceneFailingConverterCompatibilityChecker(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.component1 = component1;
@@ -26,9 +25,8 @@ public class LuceneIncompatibleDslConverterHandler<T> extends LuceneDslConverter
 		this.componentRetrievalStrategy = componentRetrievalStrategy;
 	}
 
-	public void handle(DslConverter dslConverter) {
-		if ( dslConverter.isEnabled() ) {
-			throw componentRetrievalStrategy.createCompatibilityException( absoluteFieldPath, component1, component2, eventContext );
-		}
+	@Override
+	public void failIfNotCompatible() {
+		throw componentRetrievalStrategy.createCompatibilityException( absoluteFieldPath, component1, component2, eventContext );
 	}
 }

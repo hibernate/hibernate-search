@@ -6,11 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.impl;
 
-import org.hibernate.search.engine.search.predicate.DslConverter;
+public interface LuceneConverterCompatibilityChecker {
 
-public class LuceneDslConverterHandler {
+	void failIfNotCompatible();
 
-	public void handle(DslConverter dslConverter) {
-		// do nothing
-	}
 }

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneDslConverterHandler;
+import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -63,7 +63,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 	boolean hasCompatibleConverter(LuceneFieldPredicateBuilderFactory other);
 
 	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneDslConverterHandler dslConverterHandler);
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker);
 
 	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter);

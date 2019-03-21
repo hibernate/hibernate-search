@@ -31,8 +31,6 @@ public class LuceneSearchScopeModel {
 	private final Set<String> indexNames;
 	private final Set<ReaderProvider> readerProviders;
 
-	private volatile LuceneDslConverterHandler dslConverterHandler;
-
 	public LuceneSearchScopeModel(Set<LuceneIndexModel> indexModels, Set<ReaderProvider> readerProviders) {
 		this.indexModels = indexModels;
 		this.indexNames = indexModels.stream()
@@ -75,17 +73,18 @@ public class LuceneSearchScopeModel {
 		return selectedIdConverter;
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		// by default dsl converter check is enabled
 		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
 	}
 
-	public <T> T getSchemaNodeComponent(String absoluteFieldPath,
+	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
+		LuceneConverterCompatibilityChecker converterChecker = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
@@ -110,7 +109,7 @@ public class LuceneSearchScopeModel {
 					);
 				}
 				else if ( !componentRetrievalStrategy.hasCompatibleConverter( selectedComponent, component ) ) {
-					dslConverterHandler = new LuceneIncompatibleDslConverterHandler(
+					converterChecker = new LuceneFailingConverterCompatibilityChecker(
 							absoluteFieldPath, selectedComponent, component, EventContexts.fromIndexNames(
 							indexModelForSelectedSchemaNode.getIndexName(),
 							indexModel.getIndexName()
@@ -121,19 +120,12 @@ public class LuceneSearchScopeModel {
 		if ( selectedSchemaNode == null ) {
 			throw log.unknownFieldForSearch( absoluteFieldPath, getIndexesEventContext() );
 		}
-		if ( dslConverterHandler == null ) {
+		if ( converterChecker == null ) {
 			// no converter incompatibility detected
-			dslConverterHandler = new LuceneDslConverterHandler();
+			converterChecker = new LuceneSucceedingConverterCompatibilityChecker();
 		}
 
-		return selectedComponent;
-	}
-
-	public LuceneDslConverterHandler getDslConverterHandler() {
-		if ( dslConverterHandler == null ) {
-			throw new IllegalStateException( "This method is supposed to be called after #getSchemaNodeComponent()" );
-		}
-		return dslConverterHandler;
+		return new LuceneScopedIndexFieldComponent<>( selectedComponent, converterChecker );
 	}
 
 	public void checkNestedField(String absoluteFieldPath) {
