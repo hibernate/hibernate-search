@@ -1,6 +1,66 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Alpha3 (21-03-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3529 MassIndexer fails for entities with primitive ID type
+    * HSEARCH-3477 Wrong incompatible types error when query a full text field across different indexes on Lucene backend
+    * HSEARCH-2908 Incorrect mapping for 'java.lang.Short and java.lang.Byte' fields with Elasticsearch.
+    * HSEARCH-1640 boolean field should never be analyzed
+
+** Improvement
+    * HSEARCH-3511 Make the entry points to the Search API more intuitive
+    * HSEARCH-3509 Document the limitations of the date/time conversion in the Pojo mapper for java.util.Calendar and java.util.Date
+    * HSEARCH-3503 Add dedicated default value bridges for java.sql.Timestamp, java.sql.Date and java.sql.Time
+    * HSEARCH-3498 Move optional predicate DSL parameters to the terminal contexts
+    * HSEARCH-3444 Reduce the verbosity of the predicate/projection/sort DSLs and index schema DSL
+    * HSEARCH-3251 Avoid "fuzzy" query in Elasticsearch and prefer "match" query with "fuzziness" parameter
+    * HSEARCH-2658 Support @Inject in most (if not all?) non-service customizable classes
+    * HSEARCH-2088 Take advantage of ORM's capability of MultiLoading by list of IDs
+
+** New Feature
+    * HSEARCH-3526 Allow to specify the Elasticsearch dialect to use explicitly
+    * HSEARCH-3523 Allow integrators to pre-build Hibernate Search from Metadata + service registry, without a SessionFactory
+    * HSEARCH-3257 Allow to bypass bridges in projections
+
+** Remove Feature
+    * HSEARCH-3403 Remove the inheritance from FullTextQuery/FullTextSession to the corresponding Hibernate ORM types
+    * HSEARCH-2248 Remove deprecated threshold method for fuzzy queries from the DSL
+
+** Task
+    * HSEARCH-3525 Allow Quarkus to switch our ProperyHandles to using java.lang.reflect instead of MethodHandles
+    * HSEARCH-3524 Avoid the use of Hibernate ORM's Metamodel object during boot (use Metadata instead)
+    * HSEARCH-3520 Upgrade to Elasticseearch 6.6.2
+    * HSEARCH-3515 Upgrade to checkstyle 8.18 and maven-checkstyle-plugin 3.0.0
+    * HSEARCH-3514 Search 6 groundwork - add automatic Java module names and test them
+    * HSEARCH-3494 Allow to build the javadoc with JDK12
+    * HSEARCH-3493 Test compatibility with JDK13
+    * HSEARCH-3490 Add experimental support for Elasticsearch 7.0.0.beta1
+    * HSEARCH-3489 Improve the error message when the inverse side of an association cannot be found by Hibernate Search
+    * HSEARCH-3485 Test compatibility with JDK12
+    * HSEARCH-3484 Use Maven 3.6.0 in the Jenkinsfile
+    * HSEARCH-3483 Upgrade to Lucene 7.7.0
+    * HSEARCH-3482 Adjust some configuration property names in the Elasticsearch backend
+    * HSEARCH-3481 Change max_connections_per_route default value to 10
+    * HSEARCH-3480 Rename fromExternalRepresentation() to of() for enums used in the configuration
+    * HSEARCH-3478 Fix bugs, vulnerabilities and code smells detected by Sonar - 20190206
+    * HSEARCH-3474 Do not deploy the distribution module to Maven
+    * HSEARCH-3473 Search 6 groundwork - Document the configuration options in Search 6
+    * HSEARCH-3468 Restore the ability for the Elasticsearch schema validation to report errors across multiple indexes
+    * HSEARCH-3445 Search 6 groundwork - Restore support for query result caching
+    * HSEARCH-3425 Clean up Java compiler warnings inherited from the Search 6 prototype
+    * HSEARCH-3424 Clean up the showcases to turn it into a full-stack ORM integration test suite
+    * HSEARCH-3315 Search 6 groundwork - Move publicly exposed util types to a dedicated module
+    * HSEARCH-3295 Search 6 groundwork - Invert the syntax of accessors
+    * HSEARCH-3256 Search 6 groundwork - Restore support for bypassing bridges in the predicate/sort DSL
+    * HSEARCH-3091 Search 6 groundwork - Add to the predicate DSL the missing per-predicate options compared to Search 5
+    * HSEARCH-3089 Search 6 groundwork - Add to the DSL the missing query predicates (excluding spatial, faceting, moreLikeThis) compared to Search 5
+    * HSEARCH-3080 Search 6 groundwork - Find out how to use type names in the Elasticsearch mapping
+    * HSEARCH-3054 Search 6 groundwork - Restore the Elasticsearch dialect support
+    * HSEARCH-3047 Search 6 groundwork - Implement the missing field types and default bridges compared to Search 5
+
 6.0.0.Alpha2 (31-01-2019)
 -------------------------
 
