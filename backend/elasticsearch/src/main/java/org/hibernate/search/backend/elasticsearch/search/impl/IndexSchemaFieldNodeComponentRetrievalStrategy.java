@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 
@@ -15,7 +14,7 @@ public interface IndexSchemaFieldNodeComponentRetrievalStrategy<T> {
 
 	T extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode);
 
-	boolean areCompatible(T component1, T component2, DslConverter dslConverter);
+	boolean hasCompatibleCodec(T component1, T component2);
 
 	boolean hasCompatibleConverter(T component1, T component2);
 

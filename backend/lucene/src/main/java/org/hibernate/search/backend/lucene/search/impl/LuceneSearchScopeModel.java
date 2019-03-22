@@ -19,7 +19,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -75,14 +74,6 @@ public class LuceneSearchScopeModel {
 
 	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
-		// by default dsl converter check is enabled
-		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
-	}
-
-	// TODO remove dslConverter parameter in subsequent commit within the same current issue
-	// the option will be handled later on the stream using the power of the converterChecker
-	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		T selectedComponent = null;
@@ -99,7 +90,7 @@ public class LuceneSearchScopeModel {
 					indexModelForSelectedSchemaNode = indexModel;
 					selectedComponent = component;
 				}
-				else if ( !componentRetrievalStrategy.areCompatible( selectedComponent, component, dslConverter ) ) {
+				else if ( !componentRetrievalStrategy.hasCompatibleCodec( selectedComponent, component ) ) {
 					throw componentRetrievalStrategy.createCompatibilityException(
 							absoluteFieldPath,
 							selectedComponent,

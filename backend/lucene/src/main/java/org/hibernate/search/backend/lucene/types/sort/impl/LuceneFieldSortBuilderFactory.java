@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
-import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -39,26 +37,6 @@ public interface LuceneFieldSortBuilderFactory {
 			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker);
 
 	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, GeoPoint center);
-
-	/**
-	 * Determine whether another sort builder factory is DSL-compatible with this one,
-	 * i.e. whether it creates builders that behave the same way.
-	 *
-	 * @see ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
-	 * @see LuceneFieldCodec#isCompatibleWith(LuceneFieldCodec)
-	 *
-	 * @param other Another {@link LuceneFieldSortBuilderFactory}, never {@code null}.
-	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
-	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
-	 * {@code false} otherwise, or when in doubt.
-	 */
-	default boolean isDslCompatibleWith(LuceneFieldSortBuilderFactory other, DslConverter dslConverter) {
-		if ( !hasCompatibleCodec( other ) ) {
-			return false;
-		}
-
-		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
-	}
 
 	boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other);
 

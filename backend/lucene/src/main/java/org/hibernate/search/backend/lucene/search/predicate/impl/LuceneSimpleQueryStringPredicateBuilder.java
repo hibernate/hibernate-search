@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldContext;
 import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -42,11 +41,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	public FieldContext field(String absoluteFieldPath) {
 		LuceneSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = scopeModel.getSchemaNodeComponent(
-					absoluteFieldPath,
-					LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
-					DslConverter.DISABLED
-			)
+			field = scopeModel.getSchemaNodeComponent( absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}

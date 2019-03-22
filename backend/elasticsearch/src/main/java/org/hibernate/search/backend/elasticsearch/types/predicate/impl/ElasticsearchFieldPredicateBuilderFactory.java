@@ -9,8 +9,6 @@ package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchConverterCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -38,26 +36,6 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
  * (either because it has the wrong type, or it's not configured in a way that allows it).
  */
 public interface ElasticsearchFieldPredicateBuilderFactory {
-
-	/**
-	 * Determine whether another predicate builder factory is DSL-compatible with this one,
-	 * i.e. whether it creates builders that behave the same way.
-	 *
-	 * @see ToDocumentFieldValueConverter#isCompatibleWith(ToDocumentFieldValueConverter)
-	 * @see org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec#isCompatibleWith(ElasticsearchFieldCodec)
-	 *
-	 * @param other Another {@link ElasticsearchFieldPredicateBuilderFactory}, never {@code null}.
-	 * @param dslConverter whether {@code ENABLED}, converters will also be taken in account for the matching
-	 * @return {@code true} if the given predicate builder factory is DSL-compatible.
-	 * {@code false} otherwise, or when in doubt.
-	 */
-	default boolean isDslCompatibleWith(ElasticsearchFieldPredicateBuilderFactory other, DslConverter dslConverter) {
-		if ( !hasCompatibleCodec( other ) ) {
-			return false;
-		}
-
-		return ( !dslConverter.isEnabled() || hasCompatibleConverter( other ) );
-	}
 
 	boolean hasCompatibleCodec(ElasticsearchFieldPredicateBuilderFactory other);
 

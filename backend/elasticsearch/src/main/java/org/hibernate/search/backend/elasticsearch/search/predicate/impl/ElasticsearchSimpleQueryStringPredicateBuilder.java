@@ -13,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchSimpleQueryStringPredicateBuilderFieldContext;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -53,11 +52,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	public FieldContext field(String absoluteFieldPath) {
 		ElasticsearchSimpleQueryStringPredicateBuilderFieldContext field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
-			field = scopeModel.getSchemaNodeComponent(
-					absoluteFieldPath,
-					ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY,
-					DslConverter.DISABLED
-			)
+			field = scopeModel.getSchemaNodeComponent( absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 					.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
