@@ -56,8 +56,8 @@ class FieldSortContextImpl<B>
 	}
 
 	@Override
-	public FieldSortContext use(Object value) {
-		builder.missingAs( value );
+	public FieldSortContext use(Object value, DslConverter dslConverter) {
+		builder.missingAs( value, dslConverter );
 		return this;
 	}
 
