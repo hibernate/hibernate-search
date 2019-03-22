@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeContext;
 import org.hibernate.search.engine.backend.index.spi.IndexWorkPlan;
 import org.hibernate.search.engine.search.DocumentReference;
+import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.search.query.spi.IndexSearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
@@ -175,11 +176,11 @@ public class FieldSearchProjectionIT {
 
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
-		scope.projection().field( indexMapping.string1Field.relativeFieldName, null ).toProjection();
+		scope.projection().field( indexMapping.string1Field.relativeFieldName, (Class<? extends Object>) null ).toProjection();
 	}
 
 	@Test
-	public void error_invalidProjectionType() {
+	public void error_invalidProjectionType_projectionConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -200,7 +201,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void error_invalidProjectionType_rawField() {
+	public void error_invalidProjectionType_projectionConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -210,7 +211,7 @@ public class FieldSearchProjectionIT {
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
 			SubTest.expectException(
-					() -> scope.projection().rawField( fieldPath, wrongType ).toProjection()
+					() -> scope.projection().field( fieldPath, wrongType, ProjectionConverter.ENABLED ).toProjection()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -274,7 +275,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void withProjectionConverters() {
+	public void withProjectionConverters_projectionConverterEnabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
@@ -296,7 +297,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void withProjectionConverters_rawValues() {
+	public void withProjectionConverters_projectionConverterDisabled() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
@@ -305,7 +306,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.rawField( fieldPath, model.type ) )
+								.asProjection( f -> f.field( fieldPath, model.type, ProjectionConverter.DISABLED ) )
 								.predicate( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -319,7 +320,7 @@ public class FieldSearchProjectionIT {
 	}
 
 	@Test
-	public void withProjectionConverters_rawValues_withoutType() {
+	public void withProjectionConverters_projectionConverterDisabled_withoutType() {
 		StubMappingSearchScope scope = indexManager.createSearchScope();
 
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
@@ -328,7 +329,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.rawField( fieldPath ) )
+								.asProjection( f -> f.field( fieldPath, ProjectionConverter.DISABLED ) )
 								.predicate( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(

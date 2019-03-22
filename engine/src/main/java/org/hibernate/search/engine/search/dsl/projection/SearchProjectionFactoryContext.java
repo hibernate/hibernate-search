@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.engine.search.DocumentReference;
 import org.hibernate.search.engine.search.SearchProjection;
+import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
@@ -56,45 +57,55 @@ public interface SearchProjectionFactoryContext<R, O> {
 
 	/**
 	 * Project to the value of a field in the indexed document.
+	 * <p>
+	 * This method will apply projection converters on data fetched from the backend.
+	 * See {@link ProjectionConverter#ENABLED}.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @param type The resulting type of the projection.
 	 * @param <T> The resulting type of the projection.
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type);
+	default <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type) {
+		return field( absoluteFieldPath, type, ProjectionConverter.ENABLED );
+	}
+
+	/**
+	 * Project to the value of a field in the indexed document.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @param type The resulting type of the projection.
+	 * @param <T> The resulting type of the projection.
+	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
+	 * See {@link ProjectionConverter}.
+	 *
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	<T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter);
+
+	/**
+	 * Project to the value of a field in the indexed document, without specifying a type.
+	 * <p>
+	 * This method will apply projection converters on data fetched from the backend.
+	 * See {@link ProjectionConverter#ENABLED}.
+	 *
+	 * @param absoluteFieldPath The absolute path of the field.
+	 * @return A context allowing to define the projection more precisely.
+	 */
+	default FieldProjectionContext<Object> field(String absoluteFieldPath) {
+		return field( absoluteFieldPath, ProjectionConverter.ENABLED );
+	}
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
 	 *
 	 * @param absoluteFieldPath The absolute path of the field.
-	 * @return A context allowing to define the projection more precisely.
-	 */
-	FieldProjectionContext<Object> field(String absoluteFieldPath);
-
-	/**
-	 * Project to the raw value of a field in the indexed document.
-	 * <p>
-	 * Using this method instead of {@link #field(String, Class)} will disable some of the conversion applied to the field value,
-	 * allowing to retrieve values directly from the backend.
+	 * @param projectionConverter Controls how the data fetched from the backend should be converted.
+	 * See {@link ProjectionConverter}.
 	 *
-	 * @param absoluteFieldPath The absolute path of the field.
-	 * @param type The resulting type of the projection.
-	 * @param <T> The resulting type of the projection.
 	 * @return A context allowing to define the projection more precisely.
 	 */
-	<T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> type);
-
-	/**
-	 * Project to the raw value of a field in the indexed document, without specifying a type.
-	 * <p>
-	 * Using this method instead of {@link #field(String, Class)} will disable some of the conversion applied to the field value,
-	 * allowing to retrieve values directly from the backend.
-	 *
-	 * @param absoluteFieldPath The absolute path of the field.
-	 * @return A context allowing to define the projection more precisely.
-	 */
-	FieldProjectionContext<Object> rawField(String absoluteFieldPath);
+	FieldProjectionContext<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter);
 
 	/**
 	 * Project on the score of the hit.
