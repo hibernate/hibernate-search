@@ -89,7 +89,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void lowerLimit(Object value) {
+	public void lowerLimit(Object value, DslConverter dslConverter) {
 		// No-op
 	}
 
@@ -99,7 +99,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void upperLimit(Object value) {
+	public void upperLimit(Object value, DslConverter dslConverter) {
 		// No-op
 	}
 
