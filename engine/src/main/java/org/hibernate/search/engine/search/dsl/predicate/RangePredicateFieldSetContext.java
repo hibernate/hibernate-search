@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.dsl.predicate;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
+
 /**
  * The context used when defining a range predicate, after at least one field was mentioned.
  */
@@ -72,6 +74,9 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 * and "lower than" another value (to be provided in following calls).
 	 * <p>
 	 * This syntax is essentially used like this: {@code .from( lowerBound ).to( upperBound )}.
+	 * <p>
+	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The lower bound of the range. May be null, in which case the range has no lower bound
 	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
@@ -83,11 +88,36 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @return A context allowing to exclude the lower bound from the range or to set the upper bound of the range.
 	 */
-	RangePredicateFromContext from(Object value);
+	default RangePredicateFromContext from(Object value) {
+		return from( value, DslConverter.ENABLED );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "higher than" the given value,
+	 * and "lower than" another value (to be provided in following calls).
+	 * <p>
+	 * This syntax is essentially used like this: {@code .from( lowerBound ).to( upperBound )}.
+	 *
+	 * @param value The lower bound of the range. May be null, in which case the range has no lower bound
+	 * and the upper bound (passed to {@link RangePredicateFromContext#to(Object)}) must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter}.
+	 *
+	 * Lower bound is included by default in the range.
+	 *
+	 * @return A context allowing to exclude the lower bound from the range or to set the upper bound of the range.
+	 */
+	RangePredicateFromContext from(Object value, DslConverter dslConverter);
 
 	/**
 	 * Require at least one of the targeted fields to be "higher than" the given value,
 	 * with no limit as to how high it can be.
+	 * <p>
+	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The lower bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
@@ -98,11 +128,33 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @return A context allowing to exclude the lower bound from the range, to set options or to get the resulting predicate.
 	 */
-	RangePredicateLimitTerminalContext above(Object value);
+	default RangePredicateLimitTerminalContext above(Object value) {
+		return above( value, DslConverter.ENABLED );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "higher than" the given value,
+	 * with no limit as to how high it can be.
+	 *
+	 * @param value The lower bound of the range. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter}.
+	 *
+	 * Lower bound is included by default in the range.
+	 *
+	 * @return A context allowing to exclude the lower bound from the range, to set options or to get the resulting predicate.
+	 */
+	RangePredicateLimitTerminalContext above(Object value, DslConverter dslConverter);
 
 	/**
 	 * Require at least one of the targeted fields to be "lower than" the given value,
 	 * with no limit as to how low it can be.
+	 * <p>
+	 * This method will apply DSL converters to {@code value} before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter#ENABLED}.
 	 *
 	 * @param value The upper bound of the range. Must not be null.
 	 * The signature of this method defines this parameter as an {@link Object},
@@ -113,6 +165,25 @@ public interface RangePredicateFieldSetContext extends MultiFieldPredicateFieldS
 	 *
 	 * @return A context allowing to exclude the upper bound from the range, to set options or to get the resulting predicate.
 	 */
-	RangePredicateLimitTerminalContext below(Object value);
+	default RangePredicateLimitTerminalContext below(Object value) {
+		return below( value, DslConverter.ENABLED );
+	}
+
+	/**
+	 * Require at least one of the targeted fields to be "lower than" the given value,
+	 * with no limit as to how low it can be.
+	 *
+	 * @param value The upper bound of the range. Must not be null.
+	 * The signature of this method defines this parameter as an {@link Object},
+	 * but a specific type is expected depending on the targeted field.
+	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-parametertype">there</a> for more information.
+	 * @param dslConverter Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
+	 * See {@link DslConverter}.
+	 *
+	 * Upper bound is included by default in the range.
+	 *
+	 * @return A context allowing to exclude the upper bound from the range, to set options or to get the resulting predicate.
+	 */
+	RangePredicateLimitTerminalContext below(Object value, DslConverter dslConverter);
 
 }

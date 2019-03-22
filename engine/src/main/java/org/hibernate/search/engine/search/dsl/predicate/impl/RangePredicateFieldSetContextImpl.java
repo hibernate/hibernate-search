@@ -63,18 +63,18 @@ class RangePredicateFieldSetContextImpl<B>
 	}
 
 	@Override
-	public RangePredicateFromContext from(Object value) {
-		return commonState.from( value );
+	public RangePredicateFromContext from(Object value, DslConverter dslConverter) {
+		return commonState.from( value, dslConverter );
 	}
 
 	@Override
-	public RangePredicateLimitTerminalContext above(Object value) {
-		return commonState.above( value );
+	public RangePredicateLimitTerminalContext above(Object value, DslConverter dslConverter) {
+		return commonState.above( value, dslConverter );
 	}
 
 	@Override
-	public RangePredicateLimitTerminalContext below(Object value) {
-		return commonState.below( value );
+	public RangePredicateLimitTerminalContext below(Object value, DslConverter dslConverter) {
+		return commonState.below( value, dslConverter );
 	}
 
 	@Override
@@ -118,36 +118,36 @@ class RangePredicateFieldSetContextImpl<B>
 			return super.toImplementation();
 		}
 
-		RangePredicateFromContext from(Object value) {
-			doAbove( value );
+		RangePredicateFromContext from(Object value, DslConverter dslConverter) {
+			doAbove( value, dslConverter );
 			return new RangePredicateFromContextImpl<>( this );
 		}
 
-		RangePredicateLimitTerminalContext above(Object value) {
-			doAbove( value );
+		RangePredicateLimitTerminalContext above(Object value, DslConverter dslConverter) {
+			doAbove( value, dslConverter );
 			checkHasNonNullBound();
 			return this;
 		}
 
-		RangePredicateLimitTerminalContext below(Object value) {
-			doBelow( value );
+		RangePredicateLimitTerminalContext below(Object value, DslConverter dslConverter) {
+			doBelow( value, dslConverter );
 			checkHasNonNullBound();
 			return this;
 		}
 
-		private void doAbove(Object value) {
+		private void doAbove(Object value, DslConverter dslConverter) {
 			excludeUpperLimit = false;
 			if ( value != null ) {
 				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.lowerLimit( value ) );
+				getQueryBuilders().forEach( q -> q.lowerLimit( value, dslConverter ) );
 			}
 		}
 
-		private void doBelow(Object value) {
+		private void doBelow(Object value, DslConverter dslConverter) {
 			excludeUpperLimit = true;
 			if ( value != null ) {
 				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.upperLimit( value ) );
+				getQueryBuilders().forEach( q -> q.upperLimit( value, dslConverter ) );
 			}
 		}
 
@@ -176,8 +176,8 @@ class RangePredicateFieldSetContextImpl<B>
 		}
 
 		@Override
-		public RangePredicateLimitTerminalContext to(Object value) {
-			delegate.doBelow( value );
+		public RangePredicateLimitTerminalContext to(Object value, DslConverter dslConverter) {
+			delegate.doBelow( value, dslConverter );
 			delegate.checkHasNonNullBound();
 			return delegate;
 		}

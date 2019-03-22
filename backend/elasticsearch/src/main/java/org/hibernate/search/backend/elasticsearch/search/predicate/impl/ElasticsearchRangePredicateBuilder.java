@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -58,7 +59,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	public void lowerLimit(Object value) {
+	public void lowerLimit(Object value, DslConverter dslConverter) {
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.lowerLimit = codec.encode( converted );
@@ -76,7 +77,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	public void upperLimit(Object value) {
+	public void upperLimit(Object value, DslConverter dslConverter) {
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.upperLimit = codec.encode( converted );

@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.DslConverter;
+
 public interface RangePredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
-	void lowerLimit(Object value);
+	void lowerLimit(Object value, DslConverter dslConverter);
 
 	void excludeLowerLimit();
 
-	void upperLimit(Object value);
+	void upperLimit(Object value, DslConverter dslConverter);
 
 	void excludeUpperLimit();
 
