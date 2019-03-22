@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.dsl.projection.ScoreProjectionContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContext;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryContextExtension;
 import org.hibernate.search.engine.search.dsl.projection.SearchProjectionFactoryExtensionContext;
+import org.hibernate.search.engine.search.projection.ProjectionConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.function.TriFunction;
 
@@ -48,23 +49,13 @@ public class DelegatingSearchProjectionFactoryContext<R, O> implements SearchPro
 	}
 
 	@Override
-	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type) {
-		return delegate.field( absoluteFieldPath, type );
+	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> type, ProjectionConverter projectionConverter) {
+		return delegate.field( absoluteFieldPath, type, projectionConverter );
 	}
 
 	@Override
-	public FieldProjectionContext<Object> field(String absoluteFieldPath) {
-		return delegate.field( absoluteFieldPath );
-	}
-
-	@Override
-	public <T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> type) {
-		return delegate.rawField( absoluteFieldPath, type );
-	}
-
-	@Override
-	public FieldProjectionContext<Object> rawField(String absoluteFieldPath) {
-		return delegate.rawField( absoluteFieldPath );
+	public FieldProjectionContext<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
+		return delegate.field( absoluteFieldPath, projectionConverter );
 	}
 
 	@Override

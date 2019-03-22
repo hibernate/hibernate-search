@@ -43,27 +43,15 @@ public class DefaultSearchProjectionFactoryContext<R, O> implements SearchProjec
 	}
 
 	@Override
-	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> clazz) {
+	public <T> FieldProjectionContext<T> field(String absoluteFieldPath, Class<T> clazz, ProjectionConverter projectionConverter) {
 		Contracts.assertNotNull( clazz, "clazz" );
 
-		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, ProjectionConverter.ENABLED );
+		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, projectionConverter );
 	}
 
 	@Override
-	public FieldProjectionContext<Object> field(String absoluteFieldPath) {
-		return field( absoluteFieldPath, Object.class );
-	}
-
-	@Override
-	public <T> FieldProjectionContext<T> rawField(String absoluteFieldPath, Class<T> clazz) {
-		Contracts.assertNotNull( clazz, "clazz" );
-
-		return new FieldProjectionContextImpl<>( factory, absoluteFieldPath, clazz, ProjectionConverter.DISABLED );
-	}
-
-	@Override
-	public FieldProjectionContext<Object> rawField(String absoluteFieldPath) {
-		return rawField( absoluteFieldPath, Object.class );
+	public FieldProjectionContext<Object> field(String absoluteFieldPath, ProjectionConverter projectionConverter) {
+		return field( absoluteFieldPath, Object.class, projectionConverter );
 	}
 
 	@Override
