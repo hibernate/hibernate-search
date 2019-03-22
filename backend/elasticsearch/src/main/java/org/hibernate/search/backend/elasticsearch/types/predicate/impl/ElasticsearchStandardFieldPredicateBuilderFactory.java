@@ -12,7 +12,6 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 
@@ -60,11 +59,7 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
-	}
-
-	private ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
-		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchConverterCompatibilityChecker converterChecker) {
+		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 }

@@ -81,6 +81,8 @@ public class ElasticsearchSearchScopeModel {
 		return getSchemaNodeComponent( absoluteFieldPath, componentRetrievalStrategy, DslConverter.ENABLED );
 	}
 
+	// TODO remove dslConverter parameter in subsequent commit within the same current issue
+	// the option will be handled later on the stream using the power of the converterChecker
 	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy, DslConverter dslConverter) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
