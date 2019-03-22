@@ -10,7 +10,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneConverterCompatibil
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 
 /**
  * A predicate factory for fields encoded as a number.
@@ -35,7 +34,7 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E>
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, DslConverter dslConverter) {
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, getConverter( dslConverter ), codec );
+			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneConverterCompatibilityChecker converterChecker) {
+		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
 	}
 }

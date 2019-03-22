@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.search.predicate.DslConverter;
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
@@ -52,9 +51,5 @@ abstract class AbstractLuceneStandardFieldPredicateBuilderFactory<F, C extends L
 		AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?> castedOther =
 				(AbstractLuceneStandardFieldPredicateBuilderFactory<?, ?>) other;
 		return converter.isCompatibleWith( castedOther.converter );
-	}
-
-	protected ToDocumentFieldValueConverter<?, ? extends F> getConverter(DslConverter dslConverter) {
-		return ( dslConverter.isEnabled() ) ? converter : rawConverter;
 	}
 }

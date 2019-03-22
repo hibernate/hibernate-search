@@ -94,8 +94,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
-	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath, DslConverter dslConverter) {
-		// TODO remove dslConverter parameter in subsequent commit within the same current issue
+	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY, DslConverter.DISABLED );
 		return fieldComponent.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );

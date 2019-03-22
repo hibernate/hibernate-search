@@ -46,38 +46,4 @@ public interface RangePredicateContext {
 	 * @see #onField(String)
 	 */
 	RangePredicateFieldSetContext onFields(String ... absoluteFieldPaths);
-
-	/**
-	 * Target the given <strong>raw</strong> field in the range predicate.
-	 * <p>
-	 * Using this method instead of {@link #onField(String)} will disable some of the conversion applied to
-	 * arguments to {@link RangePredicateFieldSetContext#from(Object)},
-	 * {@link RangePredicateFieldSetContext#below(Object)}, etc.,
-	 * allowing to pass values directly to the backend.
-	 * <p>
-	 * See <a href="SearchPredicateFactoryContext.html#commonconcepts-rawfield">there</a> for more information
-	 * about raw fields.
-	 *
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return A {@link RangePredicateFieldSetContext} (see {@link #onField(String)} for details).
-	 */
-	default RangePredicateFieldSetContext onRawField(String absoluteFieldPath) {
-		return onRawFields( absoluteFieldPath );
-	}
-
-	/**
-	 * Target the given <strong>raw</strong> fields in the range predicate.
-	 * <p>
-	 * Equivalent to {@link #onRawField(String)} followed by multiple calls to
-	 * {@link RangePredicateFieldSetContext#orRawField(String)},
-	 * the only difference being that calls to {@link RangePredicateFieldSetContext#boostedTo(float)}
-	 * and other field-specific settings on the returned context will only need to be done once
-	 * and will apply to all the fields passed to this method.
-	 *
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
-	 * @return A {@link RangePredicateFieldSetContext} (see {@link #onField(String)} for details).
-	 *
-	 * @see #onRawField(String)
-	 */
-	RangePredicateFieldSetContext onRawFields(String... absoluteFieldPaths);
 }
